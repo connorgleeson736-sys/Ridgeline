@@ -1,0 +1,30 @@
+{
+  "version": "0.5.0",
+  "versionCode": 5,
+  "apk": "Ridgeline-3D-0.5.0-Full.apk",
+  "bytes": 391210888,
+  "sha256": "70dc00fe7dc3cac23ea7d4ce46fb47e9448d0ed07c63a0dfd86f3c2056d883a8",
+  "previewBuild": true,
+  "lintPassed": true,
+  "packagingTests": 7,
+  "embeddedPacksVerified": 6,
+  "uiMatchesSyncedSource": true,
+  "sameSignerAsPrevious": true,
+  "browser": {
+    "directTerrain": true,
+    "routeCreationInLogoMenu": true,
+    "savedRouteReopening": true,
+    "mapPanelRatio": 0.625,
+    "offlineBottomPanel": true,
+    "coordinateFieldsInAdvanced": true,
+    "rectangleFirstCornerMarker": true,
+    "rectangleCancellationPreservesBounds": true,
+    "profile": true,
+    "topoNativeResolution": true,
+    "pageErrors": [],
+    "consoleErrors": [],
+    "actualPrecomputedReads": 15
+  },
+  "emulatorUsed": false,
+  "physicalPhoneTested": false
+}
