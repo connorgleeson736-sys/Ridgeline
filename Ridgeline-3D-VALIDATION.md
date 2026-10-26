@@ -1,29 +1,29 @@
-# Capacitor preview 0.2.0 validation
+# Capacitor preview 0.3.0 validation
 
-Validated 26 October 2026. This is a development-signed preview, not a Play Store release.
+Validated 27 October 2026 (Melbourne). Development-signed preview; no Play Store release.
 
-## Passed
+## Imagery evidence
 
-- Android debug and preview builds, targeting SDK 36 with minimum SDK 26.
-- Android lint: no errors. Nonfatal dependency-update and intentional compatibility warnings remain.
-- 10 JVM tests: bounded offline plans, ancestor zooms, DEM neighbours, imagery gap coverage, optional overlays, provider path/origin validation, coordinate validation and key encoding. No failures or skips.
-- 5 web packaging tests: only Direct is selectable, no Cook reference assets or alternate renderer, requested Layers/Advanced layout, shared native tile routes, and preserved imagery routing.
-- Chromium integration check with the actual WebGL renderer and controlled provider fixtures: terrain enabled; Direct supported/enabled and drawing terrain patches using source textures; route add/edit, elevation profile sampling, drawn offline rectangle, and Layers/Advanced interaction. No page or console errors in the successful run.
-- Preview APK: ZIP CRC and APK Signature Scheme v2 verified. Asset inspection confirms Cook reference and alternate renderer bundles are absent.
-- Removing old imagery versions and repackaging reduced the APK to approximately 25.1 MiB (26.3 MB).
+- All 15 user-provided imagery ZIPs were read. Uploaded documentation was treated as export metadata, not execution instructions.
+- Reconstructed the original authoritative 2,115,490-byte overview index from the export and repository catalogue. SHA256 exactly matches the pinned `0131124bab52e92164eb46f4e61ca1e41743cb1df68ce6a49a2cb35427c22da1`.
+- Verified SHA256, WebP format and 256×256 dimensions of all **5,344** original overview images, covering **5,313 coordinates / 10,626 raw/natural mappings**.
+- All **67** zoom 0–8 image files in the existing **0.2.0 APK** exactly match the uploaded export. They total **3,681,702 bytes** and are the downsampled overviews, not substituted 10 m imagery. Ordinary provider imagery may still appear outside their coverage or as a fallback.
+- Repacked the missing **5,277** zoom 9–12 images into **six** data ZIPs without changing their bytes, resolution or colour. Additional payload: **364,762,502 bytes**. Every optimized file range was independently checked against the original image hash.
+- The exact streaming SHA256/size verifier used by the Android importer accepted all six real data ZIPs in a desktop JVM. This verifies the ZIP stream/crypto path, not Android's document picker.
+- Separate Cook-reference assets, duplicate coarse assets and intermediate overlays are excluded from the new data packs. The original general imagery shader and raw/natural variants remain.
 
-## Device checks still pending
+## Software checks
 
-The software-emulated Android device did not answer its basic property queries reliably. Gradle could not establish a compatible API level, so the seven Android archive/worker tests **did not execute**. This is an environment failure, not a passing Android test result. Emulator troubleshooting was stopped at the user's request.
+- Android debug/preview builds and lint; JVM tests include archive streaming, tamper detection, truncation/excess-size rejection, download plans and resource addressing.
+- Web packaging checks include local overview addressing and bounded file ranges, with no dependency on the original site's private archive endpoint inside the app.
+- Website checks cover baseline rendering, phone performance/LOD, Topo protocol and overlays, and the new Topo native-resolution policy. Existing aerial LOD/resolution behaviour is retained.
+- Chromium checks exercise the actual 3D Direct renderer, route/profile and rectangle workflows, precise SVG GPS centring, Topo DPR/zoom/sampling, and restoring aerial zoom limits. Provider fixtures are controlled; archive-backed runs read the actual verified overview files.
+- Preview signatures, ZIP CRC and signer continuity with 0.2.0 are checked before delivery. No emulator validation is requested or performed for this update.
 
-The test sources and instrumented APK are provided. They check persistent archive reads, restart/resume generations, deletion during an in-flight write, RGB elevation interpolation, bounded reads/settings and an actual worker fetch through WebView interception. Run them on a compatible disposable test device before treating those behaviours as device-verified.
+## Phone checks still needed
 
-Also test on a phone:
+Test Android's multi-file document picker and import UI, full offline use after restart, GPS/gesture behaviour and memory/storage limits on the phone. GPS positioning was confirmed working by the user in the previous app; its location logic is preserved in this update. Desktop/JVM/browser checks do not replace these phone checks.
 
-1. Update Android System WebView/Chrome; confirm 3D appearance, terrain rotation and gesture responsiveness.
-2. Confirm live LINZ imagery/elevation authorization. The cloud environment's provider access has been blocked, so fixture tests do not verify current upstream availability or the owner's key.
-3. Download a small region until complete, enable downloaded-only mode (which reloads and clears transient caches), and check the selected imagery, 3D terrain, profiles and optional Topo at multiple zooms. Repeat in airplane mode after restarting the app.
-4. Check pause/resume, region removal and coverage gaps on real storage/network conditions.
-5. Verify GPS permission/accuracy, native GPX import and Save dialogs, and route persistence after closing/reopening.
+The printed Topo service is a raster map with finite detail. The changes remove photo-oriented degradation and excessive enlargement; they do not manufacture additional survey detail.
 
-Browser fixtures use an authentic website image tile repeatedly with a controlled constant-height DEM. They demonstrate rendering and integration, not geographic correctness, visual parity with the live site, hardware GPS or a performance benchmark.
+Website source changes are committed and provided in a four-file deployment ZIP. The original live Site was **not deployed** by this cloud session: its host is blocked by the environment's outbound policy and no Site deployment connector is available. Apply the patch through the original Site editing/deployment session.

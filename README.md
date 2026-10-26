@@ -1,15 +1,23 @@
 # Ridgeline Android downloads
 
-## Latest: Ridgeline 3D 0.2.0 — Capacitor
+## Latest: Ridgeline 3D 0.3.0
 
-Choose **Ridgeline-3D-0.2.0.apk**, open its file page, and click **Download raw file** (the download arrow). Sign in to your GitHub account if required.
+Download **[Ridgeline-3D-0.3.0.apk](Ridgeline-3D-0.3.0.apk)**. Open the file page and choose **Download raw file** (↓). Sign in to GitHub if necessary. This universal APK supports Android phones/emulators with Android 8.0+ and an up-to-date Android System WebView/Chrome. It has the same signer as 0.2.0 and installs as an update to **Ridgeline 3D**.
 
-This universal APK works on supported Android phones and Android Studio emulators. Android 8.0+ and an up-to-date Android System WebView/Chrome are required. It installs as **Ridgeline 3D**, separately from the earlier native app.
+The app uses the original website's Original + Direct 3D renderer. Version 0.3.0 centres the GPS SVG, improves printed Topo sharpness, and adds import of the complete precomputed South Island overview imagery. Cook-reference colour changes and alternate renderers remain excluded.
 
-It packages the original website's Original + Direct 3D renderer, with offline region downloads, route editing, GPS, GPX and elevation profiles. Terrain and imagery detail are in Layers; tuning is under Advanced. Cook reference imagery changes and alternate renderers are omitted.
+### Add the overview imagery
 
-This is a development-signed preview. Read [validation results](Ridgeline-3D-VALIDATION.md) for passed checks and pending phone tests. The accompanying SHA256 file identifies the exact APK. Source is on the main branch under [capacitor/](https://github.com/connorgleeson736-sys/Ridgeline/tree/main/capacitor), commit f41bce7.
+1. Download all six ZIPs from **[overview-packs/](overview-packs/)** — 364.8 MB of additional imagery.
+2. Open **Layers → Download offline region → Import overview ZIPs**. Select the six ZIPs together, or import them one at a time.
+3. Keep Ridgeline open until **Ready for offline use · 6/6 packs**. Download selected regions for elevation/3D terrain and profiles; the overview pack contains imagery only.
 
-## Earlier native preview 0.1.0
+The existing 67 downsampled zoom 0–8 images in the APK were byte-matched against the new export. The six ZIPs add zoom 9–12 without changing original image pixels. Terrain/imagery tile zooms can differ from camera zooms. Normal providers may be used outside the saved coverage or as a fallback.
 
-The `Ridgeline-Android-0.1.0-*.apk` files are the earlier Kotlin / MapLibre Native imagery-and-hillshade app. They do not contain the website's 3D terrain renderer. They remain available for comparison.
+### Website fix
+
+**[Ridgeline-Website-Topo-Fix-0.3.0.zip](Ridgeline-Website-Topo-Fix-0.3.0.zip)** contains the four website files needed for the Topo fix. Apply it through the original Site editing/deployment session. This cloud session updated GitHub source and produced the patch; it did not deploy the original live Site.
+
+See **[validation results](Ridgeline-3D-VALIDATION.md)** and the versioned JSON/checksum files. No emulator validation was requested or performed. Source: [main/capacitor](https://github.com/connorgleeson736-sys/Ridgeline/tree/main/capacitor), commit 97cc48c.
+
+Earlier APKs remain available for comparison. `Ridgeline-Android-0.1.0-*.apk` are the earlier Kotlin/MapLibre Native hillshade app and do not contain the website's 3D terrain. `Ridgeline-3D-0.2.0.apk` is the earlier Capacitor preview.

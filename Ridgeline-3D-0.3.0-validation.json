@@ -1,0 +1,80 @@
+{
+  "source_commit": "97cc48cce6714e915bdf73ac1582ce0c508bd204",
+  "version": "0.3.0",
+  "apk": {
+    "file": "Ridgeline-3D-0.3.0.apk",
+    "bytes": 26443542,
+    "sha256": "e4347a1bb44e4de86a347ee5ea258afc31d392108ff759257b720404683c5869",
+    "signature_v2": "verified",
+    "same_signer_as_0_2_0": true,
+    "zip_crc": "passed"
+  },
+  "jvm_tests": {
+    "tests": 14,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "packaging_tests_passed": 6,
+  "browser_integration": {
+    "real_direct_3d": true,
+    "actual_precomputed_file_reads": 13,
+    "gps_icon_centred": true,
+    "topo_native_dpr": true,
+    "topo_zoom_limit": 16,
+    "page_errors": 0,
+    "unexpected_console_errors": 0
+  },
+  "imagery": {
+    "cookReferenceAssetsIncluded": false,
+    "coordinateCount": 5313,
+    "extraImages": 5277,
+    "method": "Lossless repacking of hash-verified original WebP bytes; no resampling or colour changes",
+    "packBytes": 364762502,
+    "packs": [
+      {
+        "bytes": 62857754,
+        "file": "Ridgeline-Overviews-0.3.0-1-of-6.zip",
+        "sha256": "af5ec2aabca4a46a251033a686591c4fb325b7d244f2225d6246ab7d0bd5b5a7"
+      },
+      {
+        "bytes": 62851278,
+        "file": "Ridgeline-Overviews-0.3.0-2-of-6.zip",
+        "sha256": "26f4d0b61468339a490f7830e6f4755148e6eab641d661154286b2a8a766f241"
+      },
+      {
+        "bytes": 62909066,
+        "file": "Ridgeline-Overviews-0.3.0-3-of-6.zip",
+        "sha256": "7dd82e1675a9ead380b3a1fab9ca1b98c02341d72aecd9182293a4139c53f467"
+      },
+      {
+        "bytes": 62868120,
+        "file": "Ridgeline-Overviews-0.3.0-4-of-6.zip",
+        "sha256": "8e21484c083d3334066aa338c10d7411390d58a5c4b1a0e8897ca67b0138026a"
+      },
+      {
+        "bytes": 62886802,
+        "file": "Ridgeline-Overviews-0.3.0-5-of-6.zip",
+        "sha256": "7c465a15634f2b22ca55e43fe62976d5ba45befe6ab9bdbcea681deaadb95ee3"
+      },
+      {
+        "bytes": 50390886,
+        "file": "Ridgeline-Overviews-0.3.0-6-of-6.zip",
+        "sha256": "a94e465377edca22fd515cbd8aa564130162a04a3605f02b874d2ec7001852d2"
+      }
+    ],
+    "sourceIndexSHA256": "0131124bab52e92164eb46f4e61ca1e41743cb1df68ce6a49a2cb35427c22da1",
+    "variantMappings": 10626,
+    "verifiedImages": 5344
+  },
+  "native_stream_checks": "all six actual ZIPs verified by the exact native SHA256/size helper in a desktop JVM",
+  "emulator": "not requested or run",
+  "website_live_deployed": false,
+  "website_patch": "Ridgeline-Website-Topo-Fix-0.3.0.zip",
+  "phone_checks_pending": [
+    "Android multi-select/import UI",
+    "offline restart on phone",
+    "GPS and gestures",
+    "storage and GPU behaviour"
+  ]
+}
