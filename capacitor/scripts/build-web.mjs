@@ -45,6 +45,10 @@ app=replace(app,"selectable:()=>map===active&&ready&&!switching", "selectable:()
 app=replace(app,"enabled:()=>map===active&&drawing&&ready", "enabled:()=>map===active&&drawing&&ready&&!globalThis.RidgeMobile?.selecting()");
 app=replace(app,'updateRendererUI();initMap();',`updateRendererUI();initMap(globalThis.RidgeMobile?.lastView());
 globalThis.RidgeMobile?.attach({getMap:()=>map,isReady:()=>ready,getKey:()=>activeLinzKey,getPoints:()=>points.map(p=>p.slice()),stopDrawing:()=>setDrawing(false),importText:(name,text)=>importRoute(new File([text],name,{type:'application/gpx+xml'})),refresh:()=>{profileClient.cancel();profileStamp='';queueProfile();},toast,goPeak,renderStatus:()=>({ready,terrain:!!map?.getTerrain(),direct:directRaster?.stats(),points:points.length,profile:profile.map(p=>({h:p.h,provider:p.provider}))})});`);
+// App panels occupy their own row so map hit testing and camera fitting use the visible viewport.
+app=replace(app,"routePopup=RidgeRouteInteractions.attachPopup({element:$('profile-card'),handle:$('profile-drag-handle'),bounds:$('map-area'),resizeHandle:$('profile-resize-handle')})","routePopup={constrain(){}}");
+app=replace(app,"if($('profile-card').hidden)chartInteraction?.clear();","globalThis.RidgeMobile?.syncPanels();if($('profile-card').hidden)chartInteraction?.clear();");
+app=replace(app,"padding:{top:110,left:70,right:70,bottom:260}","padding:{top:80,left:35,right:35,bottom:40}");
 await writeFile(path.join(out,'app.js'),app);
 let viewer=await readFile(path.join(out,'viewer.mjs'),'utf8');
 viewer=replace(viewer,"import './cook-reference-overviews.js?v=1';",'');

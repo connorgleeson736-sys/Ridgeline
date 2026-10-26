@@ -1,4 +1,4 @@
-# Capacitor preview 0.4.0 validation
+# Capacitor preview 0.5.0 validation
 
 Validated 27 October 2026 (Melbourne). Development-signed preview; no Play Store release.
 
@@ -33,3 +33,7 @@ Test direct APK asset reading and offline use after restart, GPS/gesture behavio
 The printed Topo service is a raster map with finite detail. The changes remove photo-oriented degradation and excessive enlargement; they do not manufacture additional survey detail.
 
 Website source changes are committed and provided in a four-file deployment ZIP. The original live Site was **not deployed** by this cloud session: its host is blocked by the environment's outbound policy and no Site deployment connector is available. Apply the patch through the original Site editing/deployment session.
+
+## 0.5.0 panel changes
+
+Route creation lives under Import GPX in the logo menu. Route and offline panels reserve the bottom 3/8 of the viewport; camera fitting and hit testing use the resized map. App popup dragging/resizing is disabled for these fixed panels. Coordinates and bundled imagery information are collapsed. Rectangle selection has a first-corner marker, pointer preview, small-area validation and cancellation that retains the previous region. Browser checks cover saved-route reopening, panel/map geometry and selection cancellation. No emulator validation is used.
