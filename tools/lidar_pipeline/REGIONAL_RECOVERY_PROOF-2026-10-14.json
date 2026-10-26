@@ -1,0 +1,84 @@
+{
+  "external_proof": {
+    "path": "runs/f899852804c645c7c8834d25a9642ce1e55000f19ad15138be5b5bbb777b142e/events/verified-regional-recovery-33592ca741e2273b/c2457885df2eca92f8f46a68ed8111bb9127dfae946e42c09c474e8f5f764b42",
+    "sha256": "c2457885df2eca92f8f46a68ed8111bb9127dfae946e42c09c474e8f5f764b42"
+  },
+  "limitation": "Persistence/recovery verification only; not a browser, GPU or geographic accuracy benchmark.",
+  "recovered_tasks": 4,
+  "run": "f899852804c645c7c8834d25a9642ce1e55000f19ad15138be5b5bbb777b142e",
+  "schema": 1,
+  "tasks": [
+    {
+      "artifacts": [
+        {
+          "bytes": 6580464,
+          "path": "data/gltf/glb-regional-7e8d397b8039-d1p35-2-native/terrain.glb",
+          "sha256": "483d11d60e92d308bf887a34e933faf8de0c3f83c555e2be75be84689f347920"
+        },
+        {
+          "bytes": 10151,
+          "path": "data/gltf/glb-regional-7e8d397b8039-d1p35-2-native/validation.json",
+          "sha256": "0ae54121f3eadad912d167c8ae66590053570c0fad506a9b07a8bf79db6d1db1"
+        }
+      ],
+      "signature": "dc8dd91401ebdd4d8fac0a47896cf43dababd66bad67565721a8a41a6ce3963c",
+      "task": "glb-regional-7e8d397b8039-d1p35-2-native"
+    },
+    {
+      "artifacts": [
+        {
+          "bytes": 7083506,
+          "path": "data/local/1p35-r2/0231/finest.npz",
+          "sha256": "f2fdd550ca8294704afb088124364f05e1495bcc77ee923e231a6c693cb53f6e"
+        },
+        {
+          "bytes": 1148,
+          "path": "data/local/1p35-r2/0231/validation.json",
+          "sha256": "14e2a0dfd28efb346eeed2bdb9976ca03c2b3b2dbec1bfdae4b57f8887079596"
+        },
+        {
+          "bytes": 132,
+          "path": "data/local/1p35-r2/0231/native.log",
+          "sha256": "40291f682f6948c2db0e48f5f926299d0ad45f2ffde1420248ce8280b8df6974"
+        },
+        {
+          "bytes": 100089,
+          "path": "data/local/1p35-r2/0231/seam-triangles.npz",
+          "sha256": "eb89f69cb280b7030358120e22fd762867be8b0e99021214528f0ab1067b1d3c"
+        }
+      ],
+      "signature": "6ee2b000c54f2e7cb57e7eaa6d58f6d31814fdcedeaa6caf2cc8b4167177c7fd",
+      "task": "local-surface-0231-d1p35-r2"
+    },
+    {
+      "artifacts": [
+        {
+          "bytes": 3679,
+          "path": "data/regional/parent-comparison-2m.json",
+          "sha256": "a74b8eb20756cd9bf4279d797bbf7f6463024e15a6c212e1aa79d79afd100601"
+        }
+      ],
+      "signature": "47222f92997733c5a0ab3ac2e0bd55fe94056c364b91042bd656547770d2e096",
+      "task": "regional-parent-comparison-2m"
+    },
+    {
+      "artifacts": [
+        {
+          "bytes": 3021,
+          "path": "data/regional/preflight-r2/totals.npz",
+          "sha256": "ba30e8c80289a6b24f0a9d175042d26109c8268bcf6e13861b5897d787c72e14"
+        },
+        {
+          "bytes": 487,
+          "path": "data/regional/preflight-r2/validation.json",
+          "sha256": "915cc1e9b05e891525f5c98f9d8338f824336407125033f154c92941d273750f"
+        }
+      ],
+      "signature": "2340fadfd8dfb59f0a6926a3bbb0a293dfc1f7c25aecfd87dc9ac8178d7478de",
+      "task": "regional-preflight-r2"
+    }
+  ],
+  "verification": "Remote.restore_run journal/archive/artifact SHA checks plus independent original/restored byte-hash equality.",
+  "verified": true,
+  "verified_artifact_bytes": 13782677
+}

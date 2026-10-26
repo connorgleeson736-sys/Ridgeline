@@ -1,0 +1,15 @@
+{
+  "authenticSource": "LINZ Terrain-RGB",
+  "sourceZooms": [
+    16,
+    18
+  ],
+  "sourceTiles": 32,
+  "validSourceSamples": 2097152,
+  "exactSharedEdgeComparisons": 1028,
+  "maximumSharedEdgeDifferenceMetres": 0,
+  "actualCesiumHeightmapMeshes": 2,
+  "maximumSampledDecodedMeshHeightErrorMetres": 0.10680126263423517,
+  "geoidGridCentimetreQuantizationMaximumMetres": 0.005,
+  "caveat": "Source and CPU tessellation validation; no browser GPU/FPS benchmark."
+}

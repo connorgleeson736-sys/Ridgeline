@@ -1,0 +1,166 @@
+{
+  "allPassed": true,
+  "results": [
+    {
+      "check": "bottleneck-diagnostics",
+      "passed": true,
+      "wallMs": 102
+    },
+    {
+      "check": "audit-recovery",
+      "passed": true,
+      "wallMs": 72
+    },
+    {
+      "check": "audit-worker-cancel",
+      "passed": true,
+      "wallMs": 71
+    },
+    {
+      "check": "audit-resources",
+      "passed": true,
+      "wallMs": 65
+    },
+    {
+      "check": "audit-dem-revisions",
+      "passed": true,
+      "wallMs": 70
+    },
+    {
+      "check": "audit-coordinates",
+      "passed": true,
+      "wallMs": 127
+    },
+    {
+      "check": "zoom-continuity",
+      "passed": true,
+      "wallMs": 168
+    },
+    {
+      "check": "expanded-view",
+      "passed": true,
+      "wallMs": 845
+    },
+    {
+      "check": "loading-controls",
+      "passed": true,
+      "wallMs": 159
+    },
+    {
+      "check": "imagery-preload",
+      "passed": true,
+      "wallMs": 73
+    },
+    {
+      "check": "cache-return",
+      "passed": true,
+      "wallMs": 156
+    },
+    {
+      "check": "native-residency",
+      "passed": true,
+      "wallMs": 137
+    },
+    {
+      "check": "raster-residency",
+      "passed": true,
+      "wallMs": 168
+    },
+    {
+      "check": "cache-slider",
+      "passed": true,
+      "wallMs": 246
+    },
+    {
+      "check": "terrain-composition",
+      "passed": true,
+      "wallMs": 160
+    },
+    {
+      "check": "prepare-ahead",
+      "passed": true,
+      "wallMs": 416
+    },
+    {
+      "check": "composition-scheduler",
+      "passed": true,
+      "wallMs": 118
+    },
+    {
+      "check": "terrain-visibility",
+      "passed": true,
+      "wallMs": 242
+    },
+    {
+      "check": "loading-continuity",
+      "passed": true,
+      "wallMs": 191
+    },
+    {
+      "check": "hierarchical-streaming",
+      "passed": true,
+      "wallMs": 146
+    },
+    {
+      "check": "regional-imagery",
+      "passed": true,
+      "wallMs": 87
+    },
+    {
+      "check": "regional-worker",
+      "passed": true,
+      "wallMs": 134
+    },
+    {
+      "check": "regional-blend",
+      "passed": true,
+      "wallMs": 75
+    },
+    {
+      "check": "south-routing",
+      "passed": true,
+      "wallMs": 72
+    },
+    {
+      "check": "cook-reference",
+      "passed": true,
+      "wallMs": 104
+    },
+    {
+      "check": "imagery-retention",
+      "passed": true,
+      "wallMs": 464
+    },
+    {
+      "check": "imagery-diagnostics",
+      "passed": true,
+      "wallMs": 89
+    },
+    {
+      "check": "base-viewer",
+      "passed": true,
+      "wallMs": 187
+    },
+    {
+      "check": "topographic-overlays",
+      "passed": true,
+      "wallMs": 124
+    },
+    {
+      "check": "label-priority",
+      "passed": true,
+      "wallMs": 86
+    },
+    {
+      "check": "gap-imagery",
+      "passed": true,
+      "wallMs": 120
+    },
+    {
+      "check": "sky-colours",
+      "passed": true,
+      "wallMs": 86
+    }
+  ],
+  "caveat": "Current-source deterministic regressions, not browser/GPU/Chromebook benchmarks."
+}

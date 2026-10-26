@@ -1,0 +1,3047 @@
+{
+  "bounds": [
+    169.96,
+    -43.665,
+    170.245,
+    -43.44
+  ],
+  "z": 13,
+  "x": 7963,
+  "y": 5195,
+  "width": 2048,
+  "height": 2048,
+  "active": [
+    "canterbury-rural-2015-2016-0.3m",
+    "west-coast-rural-2016-2017-0.3m",
+    "west-coast-2024-2026-0.2m"
+  ],
+  "screen": [
+    {
+      "name": "canterbury-rural-2013-2014-0.4m",
+      "z": 11,
+      "x": 1990,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2013-2014-0.4m",
+      "z": 11,
+      "x": 1991,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2013-2014-0.4m",
+      "z": 11,
+      "x": 1992,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2013-2014-0.4m",
+      "z": 11,
+      "x": 1990,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2013-2014-0.4m",
+      "z": 11,
+      "x": 1991,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2013-2014-0.4m",
+      "z": 11,
+      "x": 1992,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2013-2014-0.4m",
+      "z": 11,
+      "x": 1990,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2013-2014-0.4m",
+      "z": 11,
+      "x": 1991,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2013-2014-0.4m",
+      "z": 11,
+      "x": 1992,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2014-2015-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2014-2015-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2014-2015-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2014-2015-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2014-2015-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2014-2015-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2014-2015-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2014-2015-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2014-2015-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1299,
+      "covered": 746,
+      "bytes": 3151,
+      "sha256": "da957a324c6b793bc5ae4ffb8af027c78958781eeac720b275d721813334641f"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1299,
+      "covered": 32911,
+      "bytes": 67110,
+      "sha256": "df0bdb2b04b484e5a418ec6b8e5144a498277b797b0ca22f5693d10a7a80ec0f"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1300,
+      "covered": 31314,
+      "bytes": 68866,
+      "sha256": "70e888c6b31225181b26af7eec380aee36c60e92791eaea5a5aa629dc23ee54b"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1300,
+      "covered": 65536,
+      "bytes": 129503,
+      "sha256": "a1ba2b7c1c15f62e46c52f024ec260de7ef35fb2de679839a2f883c5af33b281"
+    },
+    {
+      "name": "west-coast-rural-2015-2016-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2015-2016-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2015-2016-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2015-2016-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2015-2016-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2015-2016-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2015-2016-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2015-2016-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2015-2016-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2016-2018-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2016-2018-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2016-2018-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2016-2018-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2016-2018-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2016-2018-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2016-2018-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2016-2018-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2016-2018-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1298,
+      "covered": 33196,
+      "bytes": 50702,
+      "sha256": "8dcbca82ee694d173e35c2c54fc43baaa7f5caaedd588a2b8c45928af66abe85"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1298,
+      "covered": 63995,
+      "bytes": 122803,
+      "sha256": "79e83bf2e10cb0f217ddfed09a206c8d9aad1a15cae10843ae9273560fa001be"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1298,
+      "covered": 62331,
+      "bytes": 146099,
+      "sha256": "03011e4ff03251d4c43510b9ee11a14e5c89917ed0793328649671fb84c9a755"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1299,
+      "covered": 65536,
+      "bytes": 139520,
+      "sha256": "bfca173425fe682ad238ff903c1dcf72a338d128c2edf9ae3b95af5703dadc6f"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1299,
+      "covered": 51733,
+      "bytes": 130676,
+      "sha256": "39c245f17eccd970e32454a844fa6659b932973c61c0b6fbb0f332a5f0b01e47"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1299,
+      "covered": 8229,
+      "bytes": 20947,
+      "sha256": "97c854904802e7ac9aafcb3641bf8732d4848259dcdb48b08c0c5428ee868718"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1300,
+      "covered": 35854,
+      "bytes": 78371,
+      "sha256": "36e805f3f327b6a94f0b63065ca958d33c3c294adff859b3b2d2b1ab5d7aaf00"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1300,
+      "covered": 1382,
+      "bytes": 5378,
+      "sha256": "d493a267875d310ddd29b5290e80935ccfe9c0a08946c2d844e3dae5e2c3ba38"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2019-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2019-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2019-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2019-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2019-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2019-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2019-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2019-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2019-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2020-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2020-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2020-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2020-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2020-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2020-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2020-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2020-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2020-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2020-2021-0.2m",
+      "z": 11,
+      "x": 1990,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2020-2021-0.2m",
+      "z": 11,
+      "x": 1991,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2020-2021-0.2m",
+      "z": 11,
+      "x": 1992,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2020-2021-0.2m",
+      "z": 11,
+      "x": 1990,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2020-2021-0.2m",
+      "z": 11,
+      "x": 1991,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2020-2021-0.2m",
+      "z": 11,
+      "x": 1992,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2020-2021-0.2m",
+      "z": 11,
+      "x": 1990,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2020-2021-0.2m",
+      "z": 11,
+      "x": 1991,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2020-2021-0.2m",
+      "z": 11,
+      "x": 1992,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-waitaki-rural-2021-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-waitaki-rural-2021-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-waitaki-rural-2021-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-waitaki-rural-2021-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-waitaki-rural-2021-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-waitaki-rural-2021-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-waitaki-rural-2021-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-waitaki-rural-2021-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-waitaki-rural-2021-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-mackenzie-rural-2021-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-mackenzie-rural-2021-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-mackenzie-rural-2021-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-mackenzie-rural-2021-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-mackenzie-rural-2021-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-mackenzie-rural-2021-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-mackenzie-rural-2021-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-mackenzie-rural-2021-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-mackenzie-rural-2021-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2022-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2022-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2022-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2022-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2022-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2022-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2022-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2022-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2022-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2024-0.2m",
+      "z": 11,
+      "x": 1990,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2024-0.2m",
+      "z": 11,
+      "x": 1991,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2024-0.2m",
+      "z": 11,
+      "x": 1992,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2024-0.2m",
+      "z": 11,
+      "x": 1990,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2024-0.2m",
+      "z": 11,
+      "x": 1991,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2024-0.2m",
+      "z": 11,
+      "x": 1992,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2024-0.2m",
+      "z": 11,
+      "x": 1990,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2024-0.2m",
+      "z": 11,
+      "x": 1991,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2024-0.2m",
+      "z": 11,
+      "x": 1992,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2025-0.25m",
+      "z": 11,
+      "x": 1990,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2025-0.25m",
+      "z": 11,
+      "x": 1991,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2025-0.25m",
+      "z": 11,
+      "x": 1992,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2025-0.25m",
+      "z": 11,
+      "x": 1990,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2025-0.25m",
+      "z": 11,
+      "x": 1991,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2025-0.25m",
+      "z": 11,
+      "x": 1992,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2025-0.25m",
+      "z": 11,
+      "x": 1990,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2025-0.25m",
+      "z": 11,
+      "x": 1991,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2025-0.25m",
+      "z": 11,
+      "x": 1992,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 11,
+      "x": 1990,
+      "y": 1298,
+      "covered": 33200,
+      "bytes": 49958,
+      "sha256": "77e06a7112a5885e7443570646850bd4749fb74d86f1c8b053c3879a336d63b6"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 11,
+      "x": 1991,
+      "y": 1298,
+      "covered": 62730,
+      "bytes": 117312,
+      "sha256": "0ee24719fd67b895ec91a7a3b4540ae6bb5d938c47f92413efbc97a094e120fc"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 11,
+      "x": 1992,
+      "y": 1298,
+      "covered": 38016,
+      "bytes": 83855,
+      "sha256": "2c3ccff0aef560b71a9ac4fca450e8734e348cf17395c53c2e9890d3ca47e651"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 11,
+      "x": 1990,
+      "y": 1299,
+      "covered": 52487,
+      "bytes": 104317,
+      "sha256": "ab421e1e0d8bda3e93c49ac294230f8a53b84982483b2b9ee2642bb728c90f99"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 11,
+      "x": 1991,
+      "y": 1299,
+      "covered": 16774,
+      "bytes": 39971,
+      "sha256": "629bde1ead446afd0a0bc308f93acc0f80f05b3522ea08f8ca6521cb52cf8100"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 11,
+      "x": 1992,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 11,
+      "x": 1990,
+      "y": 1300,
+      "covered": 3004,
+      "bytes": 8029,
+      "sha256": "395dc6ee8613738a7a4e5af60d9e90e38ac6fea3e7249f437f01a3bd50f6862c"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 11,
+      "x": 1991,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 11,
+      "x": 1992,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2023-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2023-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2023-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1298,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2023-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2023-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2023-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1299,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2023-0.3m",
+      "z": 11,
+      "x": 1990,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2023-0.3m",
+      "z": 11,
+      "x": 1991,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-2023-0.3m",
+      "z": 11,
+      "x": 1992,
+      "y": 1300,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    }
+  ],
+  "tiles": [
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7963,
+      "y": 5195,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7964,
+      "y": 5195,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7965,
+      "y": 5195,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7966,
+      "y": 5195,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7967,
+      "y": 5195,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7968,
+      "y": 5195,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7969,
+      "y": 5195,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7970,
+      "y": 5195,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7963,
+      "y": 5196,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7964,
+      "y": 5196,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7965,
+      "y": 5196,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7966,
+      "y": 5196,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7967,
+      "y": 5196,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7968,
+      "y": 5196,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7969,
+      "y": 5196,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7970,
+      "y": 5196,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7963,
+      "y": 5197,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7964,
+      "y": 5197,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7965,
+      "y": 5197,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7966,
+      "y": 5197,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7967,
+      "y": 5197,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7968,
+      "y": 5197,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7969,
+      "y": 5197,
+      "covered": 5048,
+      "bytes": 10575,
+      "sha256": "b2c2a0ed126992fc4760156be80508a16be3145280248792bf8470f0c0c3c3d3"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7970,
+      "y": 5197,
+      "covered": 23326,
+      "bytes": 38728,
+      "sha256": "a3948e13151b4798404e550d2bd40411b1d2087bfde6c9884e1ee4b038b87df5"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7963,
+      "y": 5198,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7964,
+      "y": 5198,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7965,
+      "y": 5198,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7966,
+      "y": 5198,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7967,
+      "y": 5198,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7968,
+      "y": 5198,
+      "covered": 1815,
+      "bytes": 5251,
+      "sha256": "0d4fb1cc00956a60be2bfce173c02367f4f4bcf8a9abf9d3dc388e799b701703"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7969,
+      "y": 5198,
+      "covered": 54931,
+      "bytes": 103064,
+      "sha256": "d4800c0015af9bfac63267213ab079b95d800419d7542ab07babeffbdf71e688"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7970,
+      "y": 5198,
+      "covered": 65536,
+      "bytes": 114012,
+      "sha256": "a87b06a6ceb53aca9f0b7c2c92944aed10873e2915d021e0d6eea51bb862d3de"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7963,
+      "y": 5199,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7964,
+      "y": 5199,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7965,
+      "y": 5199,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7966,
+      "y": 5199,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7967,
+      "y": 5199,
+      "covered": 10594,
+      "bytes": 22184,
+      "sha256": "bff73fff7c176f200557966aed2da99262aada69b46534ee2a8274b852fded1e"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7968,
+      "y": 5199,
+      "covered": 54014,
+      "bytes": 79121,
+      "sha256": "5528484226142e609e792c1b29d9da20f8bac0074da417b69aeddac965da0e77"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7969,
+      "y": 5199,
+      "covered": 65536,
+      "bytes": 106576,
+      "sha256": "fb6174b541554f22a91c314e68c48ed76c27a34192bfe1ea98df9dfeb2fca84d"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7970,
+      "y": 5199,
+      "covered": 65536,
+      "bytes": 126518,
+      "sha256": "db10f2627b92af01c7394f2e8f5c2fa47270d33ebcc3e14f09878bcc1f930409"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7963,
+      "y": 5200,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7964,
+      "y": 5200,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7965,
+      "y": 5200,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7966,
+      "y": 5200,
+      "covered": 26266,
+      "bytes": 41743,
+      "sha256": "58343bf2720d9a0d3cb2d2a0d5dba550de82b617f28c54b73767a53e964e59f7"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7967,
+      "y": 5200,
+      "covered": 62195,
+      "bytes": 114812,
+      "sha256": "7c7513342998812e320b3a1e7b5bf50dcefc31e4e69c0709f72805807b683d15"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7968,
+      "y": 5200,
+      "covered": 65536,
+      "bytes": 99285,
+      "sha256": "37f2acc40a6c5d14f37b08014b09dcc6fab8e74a9f76ec64f9b4d7e619652979"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7969,
+      "y": 5200,
+      "covered": 65536,
+      "bytes": 91723,
+      "sha256": "0993a8ec25f6c12e38b38215f2c8d1877970a39213255e01d2a905fde06f17c8"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7970,
+      "y": 5200,
+      "covered": 65536,
+      "bytes": 134721,
+      "sha256": "27b6c9245d48cd6ff37511d3a3e4b03bd4c4e93562a53feb7109f6267adc947d"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7963,
+      "y": 5201,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7964,
+      "y": 5201,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7965,
+      "y": 5201,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7966,
+      "y": 5201,
+      "covered": 32548,
+      "bytes": 64105,
+      "sha256": "4b098d804445715221842d3e98d8864af0199c62cd2e8864d82423a6e8b7ab3b"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7967,
+      "y": 5201,
+      "covered": 65536,
+      "bytes": 118710,
+      "sha256": "a16eb13d956dbad32115f8bbf12d2955ae572d941398b9bdfa67c15042026aea"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7968,
+      "y": 5201,
+      "covered": 65536,
+      "bytes": 108545,
+      "sha256": "e20e9a63f6c9e33fd503b402258b5cb27a7a27de12db2552d9cc9a6c070b7d92"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7969,
+      "y": 5201,
+      "covered": 65536,
+      "bytes": 105335,
+      "sha256": "2d26ef1dd9afd8038711da5ab1e3ff524667c27c15eb2fd8a5aa83143246b021"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7970,
+      "y": 5201,
+      "covered": 65536,
+      "bytes": 106305,
+      "sha256": "27cc21f781876f282b9b550165210f03bb4dcb7f5ba7cb12271e20ee5768efc4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7963,
+      "y": 5202,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7964,
+      "y": 5202,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7965,
+      "y": 5202,
+      "covered": 2676,
+      "bytes": 5571,
+      "sha256": "c7ba53450c65b738318c05f8983cde3496857b22b8098b9172c50742836d825c"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7966,
+      "y": 5202,
+      "covered": 48434,
+      "bytes": 88540,
+      "sha256": "9bc5b1ca5cf922629fbbc26e7f9d12596f36cb15b47d24c188e5719398695655"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7967,
+      "y": 5202,
+      "covered": 65536,
+      "bytes": 115781,
+      "sha256": "d1416c161357ddc35da94b493920a337da55031e22e178b0720e0e0090320ee8"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7968,
+      "y": 5202,
+      "covered": 65536,
+      "bytes": 87373,
+      "sha256": "1ca0c425dbe90d92f8aa4fd7f052cc1b5397fc0aaf2a5791f3e543a554924f06"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7969,
+      "y": 5202,
+      "covered": 65536,
+      "bytes": 102659,
+      "sha256": "98c5376359f211c23ecd07e67295a2b142f86694476fc882451d57f493afd844"
+    },
+    {
+      "name": "canterbury-rural-2015-2016-0.3m",
+      "z": 13,
+      "x": 7970,
+      "y": 5202,
+      "covered": 65536,
+      "bytes": 113081,
+      "sha256": "6f000323aef914d068f1069718de851f3cb2bb7b1e1f28687aca9e47b28cf333"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7963,
+      "y": 5195,
+      "covered": 65536,
+      "bytes": 93618,
+      "sha256": "52f33d0064a0b70ff34ac33758c6302fd5d788d7aa31ee5c92e348ec06a8823f"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7964,
+      "y": 5195,
+      "covered": 65536,
+      "bytes": 102318,
+      "sha256": "2350e4c3ad8113307b97adcdec24b914a0b074b94c6d628cc7e5f26ef8541ab5"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7965,
+      "y": 5195,
+      "covered": 65536,
+      "bytes": 99154,
+      "sha256": "b3d2daea6d5d67c2aca63d3069c2a44bc6e33036061d956dd9271452d27ea79a"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7966,
+      "y": 5195,
+      "covered": 65536,
+      "bytes": 130392,
+      "sha256": "86ad94d089113f8d706ffb33fcf4797e47ef685fa7e015aa32b0cf4a5e43e8ac"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7967,
+      "y": 5195,
+      "covered": 65536,
+      "bytes": 135659,
+      "sha256": "39bdb20b2b50abae461d5608eecd58aee09aac3f62a6bc31dbd395c975ec88d7"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7968,
+      "y": 5195,
+      "covered": 65536,
+      "bytes": 143028,
+      "sha256": "35213a5691ae2716f547485f2e1db136c99547b1816e0fbaea8bbacba5412eaf"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7969,
+      "y": 5195,
+      "covered": 65536,
+      "bytes": 141986,
+      "sha256": "3e326b61384df2acdcfe247d0ee49c3717b70f71c1faeec2e4fb23ed2f48bdbf"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7970,
+      "y": 5195,
+      "covered": 61224,
+      "bytes": 139423,
+      "sha256": "31dfd5e9be6a594b78f7ccba4feb59c471c602ca0e3ac22a0af724125d92f7d8"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7963,
+      "y": 5196,
+      "covered": 65536,
+      "bytes": 110983,
+      "sha256": "a12a421f5d329d47e9c6d9e3f06c3632a0f3bdf4ea117d0de3d84f6f12d253fe"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7964,
+      "y": 5196,
+      "covered": 65536,
+      "bytes": 121688,
+      "sha256": "470d19cb55fa8fa6bb3833a828fb471a230fb40ad9d7cba6d9f73f779fe9be82"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7965,
+      "y": 5196,
+      "covered": 65536,
+      "bytes": 121632,
+      "sha256": "f0a3067b845758e9298880cde5f7d2cccd522a65ca6b3f034ba2764d4a647a4b"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7966,
+      "y": 5196,
+      "covered": 65536,
+      "bytes": 135278,
+      "sha256": "b6ae25eabb34aa8457d54444de814117d0078ebbe9f67cb17f2b62bcaa660c28"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7967,
+      "y": 5196,
+      "covered": 65536,
+      "bytes": 164027,
+      "sha256": "aa9f849df01d01e672cfa2f352081f6e0e13c741b622108d4577a06adb4943f2"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7968,
+      "y": 5196,
+      "covered": 65536,
+      "bytes": 131653,
+      "sha256": "0040bb0fbcaacd12d38ccc9c510ade2b3547414a8c2b78921abc665226326071"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7969,
+      "y": 5196,
+      "covered": 40171,
+      "bytes": 78241,
+      "sha256": "04253b6efb278f8ec704d891c7a9dcca24cf5ee9991d65041d1c696963e6a08d"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7970,
+      "y": 5196,
+      "covered": 3675,
+      "bytes": 9490,
+      "sha256": "2b593f53623cbfc3a0fa2625dec8bb3069b3504b8f1b2a8370fd41a3cd3b2d5b"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7963,
+      "y": 5197,
+      "covered": 65536,
+      "bytes": 117006,
+      "sha256": "56fd191627c091106cb0e8c42a0811a56b3bdb8c041f00ee60916be1774fcabb"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7964,
+      "y": 5197,
+      "covered": 65536,
+      "bytes": 111033,
+      "sha256": "32b485a3def69391f5c846c6ffe42d0003e335ae29a7df04fac23bf4061d07e1"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7965,
+      "y": 5197,
+      "covered": 65536,
+      "bytes": 146313,
+      "sha256": "38f289f9cea80731bccda4e68a11eb629433a8b4b07493e1614804629d5adb62"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7966,
+      "y": 5197,
+      "covered": 65536,
+      "bytes": 156376,
+      "sha256": "975ef1ff78f4bddffa30e568adb64985bdf87e1277c5b6ee07fd6672ad357827"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7967,
+      "y": 5197,
+      "covered": 61985,
+      "bytes": 132517,
+      "sha256": "8509e9537e74462caa2ecdc78d7453a142b5354d0c0e1aa58773682d2b073c2c"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7968,
+      "y": 5197,
+      "covered": 20797,
+      "bytes": 37170,
+      "sha256": "640d8d9caefe4d06aa9a3e05281a9a4e4e35211651c7fdc15ab4eb030733f285"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7969,
+      "y": 5197,
+      "covered": 22,
+      "bytes": 372,
+      "sha256": "58f20caa3a0a5369003fbfea8700cd812952cba15b1ca0a7622665929116d0b1"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7970,
+      "y": 5197,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7963,
+      "y": 5198,
+      "covered": 65536,
+      "bytes": 121994,
+      "sha256": "9aa96834239bfca7961bebf445404fcdafa9250cc8f8e28f547de318f3a4d09f"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7964,
+      "y": 5198,
+      "covered": 65536,
+      "bytes": 123552,
+      "sha256": "0d4fd2588f4e1fca98f4538c35779b230761c4aaef83e4954a6361badfedf223"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7965,
+      "y": 5198,
+      "covered": 65536,
+      "bytes": 157417,
+      "sha256": "57c6ce883c77c7349b3f3fe647a213c7b68b79e3c588fa79d5542ab11e2fbafe"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7966,
+      "y": 5198,
+      "covered": 53253,
+      "bytes": 136846,
+      "sha256": "d30e2333e0f4869100aead2085f209b302bfca47c20ccee2a808bd997df08781"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7967,
+      "y": 5198,
+      "covered": 8920,
+      "bytes": 18186,
+      "sha256": "73aaf6a84b417f726ca243910808a9e0c702afd025467cb0dd289c22436f0bf5"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7968,
+      "y": 5198,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7969,
+      "y": 5198,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7970,
+      "y": 5198,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7963,
+      "y": 5199,
+      "covered": 65536,
+      "bytes": 156412,
+      "sha256": "f037fef2b127414f01df18a3c32ef3fcd45d9d8ef035ec0f33da2b6406a03e9c"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7964,
+      "y": 5199,
+      "covered": 65536,
+      "bytes": 134958,
+      "sha256": "3f29743754af04bac24f20e93d3ac615d7c600d45e61c1942ee05a7f896e965b"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7965,
+      "y": 5199,
+      "covered": 41838,
+      "bytes": 91656,
+      "sha256": "8f67245a75236fa91f2751cc0346f70e9722227df64143abeff6eeb9dfc39b4b"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7966,
+      "y": 5199,
+      "covered": 4303,
+      "bytes": 10084,
+      "sha256": "921c10c692123813b8fc12f4814d2990a61ad2e1d3fb7022c12a56fb062a9b4f"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7967,
+      "y": 5199,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7968,
+      "y": 5199,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7969,
+      "y": 5199,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7970,
+      "y": 5199,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7963,
+      "y": 5200,
+      "covered": 60012,
+      "bytes": 152154,
+      "sha256": "e00faf202e6e5f46e2062f3d66beac4ba282f78b5a26694e0a9b44fb106dbf0c"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7964,
+      "y": 5200,
+      "covered": 20156,
+      "bytes": 48506,
+      "sha256": "f5230f65a5e7f04edd1de7f8338f28e5e433404860de06b3de4fd24194add917"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7965,
+      "y": 5200,
+      "covered": 53,
+      "bytes": 517,
+      "sha256": "24b802794001245740c48a2b46d26f54dcf92b55d7eaf84c37ae4d5b634809a3"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7966,
+      "y": 5200,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7967,
+      "y": 5200,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7968,
+      "y": 5200,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7969,
+      "y": 5200,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7970,
+      "y": 5200,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7963,
+      "y": 5201,
+      "covered": 10395,
+      "bytes": 23932,
+      "sha256": "975dbcecceb1050bc567b48cc5c666857ae74b0a81aa16072da413a9260736ca"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7964,
+      "y": 5201,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7965,
+      "y": 5201,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7966,
+      "y": 5201,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7967,
+      "y": 5201,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7968,
+      "y": 5201,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7969,
+      "y": 5201,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7970,
+      "y": 5201,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7963,
+      "y": 5202,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7964,
+      "y": 5202,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7965,
+      "y": 5202,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7966,
+      "y": 5202,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7967,
+      "y": 5202,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7968,
+      "y": 5202,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7969,
+      "y": 5202,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-rural-2016-2017-0.3m",
+      "z": 13,
+      "x": 7970,
+      "y": 5202,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7963,
+      "y": 5195,
+      "covered": 65536,
+      "bytes": 104026,
+      "sha256": "a5dd1824daa19b3fbb14b475b339616feb996ec6081c1d016da95c63dd83bd87"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7964,
+      "y": 5195,
+      "covered": 65536,
+      "bytes": 98782,
+      "sha256": "1d345a101e9f8520a960a482a25ec05195a847db6d8620d267c951f49ee4cd02"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7965,
+      "y": 5195,
+      "covered": 65536,
+      "bytes": 107425,
+      "sha256": "2c69ddf431fefb8b4ed2594bbc40ee32d75c28c65913e3eec174a1f4403ab9d1"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7966,
+      "y": 5195,
+      "covered": 65536,
+      "bytes": 131295,
+      "sha256": "cf186a963d0bca82b20db0b0804fe5799f424381aa50f28564b8e1dba9ef657e"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7967,
+      "y": 5195,
+      "covered": 44887,
+      "bytes": 93533,
+      "sha256": "22fded3cfdff9b75791d8842bb052a7bce2c896ced055e513a51bc1f7ff4351f"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7968,
+      "y": 5195,
+      "covered": 40127,
+      "bytes": 90638,
+      "sha256": "94eb6ce64fba0b31cb86b37cfb2fe9ac4462fb37168b05ebb7d7046a35f0a960"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7969,
+      "y": 5195,
+      "covered": 11884,
+      "bytes": 28470,
+      "sha256": "a99867086edfbd4a87c4367aa237485179db665e8bfad54e946aeed5b93bacfd"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7970,
+      "y": 5195,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7963,
+      "y": 5196,
+      "covered": 65536,
+      "bytes": 105479,
+      "sha256": "589ed642f27d90bda567f8f3c45460b76e9eab4fd72afdc994a22ff66e9aef4c"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7964,
+      "y": 5196,
+      "covered": 65536,
+      "bytes": 130083,
+      "sha256": "4e872a88337d4e0fc5a818e5c844e923861bf36baf38d7f43867853a91d45d0f"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7965,
+      "y": 5196,
+      "covered": 61356,
+      "bytes": 121324,
+      "sha256": "a0543ac74b748940a2ef01c71219a61fd63781bc9c63d63f042363b4a9b9def9"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7966,
+      "y": 5196,
+      "covered": 36652,
+      "bytes": 77963,
+      "sha256": "72c9336d18bf03a9df37d1606e1022f6c1e5499f97e644f50a65df7e36db1284"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7967,
+      "y": 5196,
+      "covered": 8693,
+      "bytes": 23335,
+      "sha256": "d777ccd9c0ff0ae2c32f8c5a17c294170ebff6d1059c0aede4d89e6359be5453"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7968,
+      "y": 5196,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7969,
+      "y": 5196,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7970,
+      "y": 5196,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7963,
+      "y": 5197,
+      "covered": 65536,
+      "bytes": 127433,
+      "sha256": "d86944860d6dc7772753d6fbc27cacb525b3cb0c01ce11c5fe2c90c738861311"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7964,
+      "y": 5197,
+      "covered": 48811,
+      "bytes": 92467,
+      "sha256": "c5e27a84fef149d8a03a99e35f50e8c984fd44b39b3aaf921d978afdf37e3a1b"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7965,
+      "y": 5197,
+      "covered": 29730,
+      "bytes": 65250,
+      "sha256": "9879ecb8aaee4b9117a76ab3039f0cdff52071a3dd5048036e9a88498f931648"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7966,
+      "y": 5197,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7967,
+      "y": 5197,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7968,
+      "y": 5197,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7969,
+      "y": 5197,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7970,
+      "y": 5197,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7963,
+      "y": 5198,
+      "covered": 31804,
+      "bytes": 63372,
+      "sha256": "10cfb4ad91619fa46881bd957e27eb36bee248358518df6e9472d51aca89eeba"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7964,
+      "y": 5198,
+      "covered": 15343,
+      "bytes": 32220,
+      "sha256": "7f635f84fff7b97f971ab284de2ce545584611d5bdd8f6c192cf67556e1a52eb"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7965,
+      "y": 5198,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7966,
+      "y": 5198,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7967,
+      "y": 5198,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7968,
+      "y": 5198,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7969,
+      "y": 5198,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7970,
+      "y": 5198,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7963,
+      "y": 5199,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7964,
+      "y": 5199,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7965,
+      "y": 5199,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7966,
+      "y": 5199,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7967,
+      "y": 5199,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7968,
+      "y": 5199,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7969,
+      "y": 5199,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7970,
+      "y": 5199,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7963,
+      "y": 5200,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7964,
+      "y": 5200,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7965,
+      "y": 5200,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7966,
+      "y": 5200,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7967,
+      "y": 5200,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7968,
+      "y": 5200,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7969,
+      "y": 5200,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7970,
+      "y": 5200,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7963,
+      "y": 5201,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7964,
+      "y": 5201,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7965,
+      "y": 5201,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7966,
+      "y": 5201,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7967,
+      "y": 5201,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7968,
+      "y": 5201,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7969,
+      "y": 5201,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7970,
+      "y": 5201,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7963,
+      "y": 5202,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7964,
+      "y": 5202,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7965,
+      "y": 5202,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7966,
+      "y": 5202,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7967,
+      "y": 5202,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7968,
+      "y": 5202,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7969,
+      "y": 5202,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    },
+    {
+      "name": "west-coast-2024-2026-0.2m",
+      "z": 13,
+      "x": 7970,
+      "y": 5202,
+      "covered": 0,
+      "bytes": 355,
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4"
+    }
+  ],
+  "failed": []
+}

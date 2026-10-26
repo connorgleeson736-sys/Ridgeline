@@ -1,0 +1,47 @@
+{
+  "smoothTriangles": 3960,
+  "roughFineTriangles": 81204,
+  "roughCoarseTriangles": 11970,
+  "maxVerticalErrorMetres": 0.500016987323761,
+  "completeBorders": true,
+  "upwardWinding": true,
+  "note": "CPU validation of source-relative vertical approximation, not absolute survey accuracy or browser FPS",
+  "authenticLINZ": [
+    {
+      "z": 16,
+      "x": 63741,
+      "y": 41603,
+      "sourceSamples": 66049,
+      "surfaceTriangles": 38482,
+      "maxMeasuredVerticalErrorMetres": 1.0000989437103271,
+      "workerMeshMilliseconds": 136.08
+    },
+    {
+      "z": 16,
+      "x": 63742,
+      "y": 41603,
+      "sourceSamples": 66049,
+      "surfaceTriangles": 30376,
+      "maxMeasuredVerticalErrorMetres": 1.0000449419021606,
+      "workerMeshMilliseconds": 120.99
+    },
+    {
+      "z": 18,
+      "x": 254964,
+      "y": 166414,
+      "sourceSamples": 66049,
+      "surfaceTriangles": 55374,
+      "maxMeasuredVerticalErrorMetres": 0.15006759762763977,
+      "workerMeshMilliseconds": 182.94
+    },
+    {
+      "z": 18,
+      "x": 254965,
+      "y": 166414,
+      "sourceSamples": 66049,
+      "surfaceTriangles": 39534,
+      "maxMeasuredVerticalErrorMetres": 0.15006417036056519,
+      "workerMeshMilliseconds": 140.29
+    }
+  ]
+}

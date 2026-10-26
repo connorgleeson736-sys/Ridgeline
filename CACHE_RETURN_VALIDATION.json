@@ -1,0 +1,241 @@
+{
+  "baseline": "f294e4da00898c050d096fee6eae939e6a187cb1",
+  "actualNativeTileFingerprintAndStyleLayers": true,
+  "before": {
+    "plainReturn": 0,
+    "coarseArrivalRepaints": 1,
+    "constantRasterZoomRepaints": 1,
+    "stats": {
+      "allocations": 9,
+      "releases": 8,
+      "residentDrapes": 0,
+      "residentBytes": 0,
+      "budgetBytes": 16777216,
+      "reuses": 5,
+      "evictions": 0,
+      "invalidations": 3,
+      "fullInvalidations": 1,
+      "geometryOnlyEvents": 0,
+      "continuityHolds": 0,
+      "demPressureDrops": 0,
+      "waitingCovers": 0,
+      "deferredRefreshes": 0,
+      "readyRefreshes": 3
+    }
+  },
+  "after": {
+    "plainReturn": 0,
+    "coarseArrivalRepaints": 0,
+    "constantRasterZoomRepaints": 0,
+    "stats": {
+      "allocations": 6,
+      "releases": 5,
+      "terrainCoordinatePairsVisited": 14,
+      "terrainCoordinatePairsSkipped": 0,
+      "refreshBacklog": 0,
+      "refreshesThisFrame": 0,
+      "estimatedPatchSubmissionMs": 0.05000000000000001,
+      "residentDrapes": 0,
+      "residentBytes": 0,
+      "budgetBytes": 16777216,
+      "reuses": 5,
+      "evictions": 0,
+      "invalidations": 1,
+      "fullInvalidations": 1,
+      "geometryOnlyEvents": 0,
+      "continuityHolds": 0,
+      "partialCoverHolds": 0,
+      "transitionPatches": 0,
+      "demPressureDrops": 0,
+      "waitingCovers": 0,
+      "deferredRefreshes": 0,
+      "readyRefreshes": 1,
+      "cacheReturns": {
+        "restored": 5,
+        "drawn": 5,
+        "repainted": 0,
+        "zoomReuse": 1,
+        "qualityHolds": 0,
+        "ignoredImageryEvents": 2,
+        "speculativeEvictions": 0,
+        "reasons": {
+          "none": 4,
+          "zoom": 1,
+          "sourceTiles": 0,
+          "visibleLayers": 0,
+          "revision": 0
+        },
+        "pending": 0,
+        "latencyMs": {
+          "samples": 5,
+          "p50": 16,
+          "p95": 16,
+          "max": 16
+        }
+      }
+    }
+  },
+  "roundtripBefore": {
+    "turns": 40,
+    "recompositions": 40,
+    "stats": {
+      "allocations": 42,
+      "releases": 40,
+      "residentDrapes": 1,
+      "residentBytes": 1398101,
+      "budgetBytes": 16777216,
+      "reuses": 40,
+      "evictions": 0,
+      "invalidations": 20,
+      "fullInvalidations": 0,
+      "geometryOnlyEvents": 0,
+      "continuityHolds": 0,
+      "demPressureDrops": 0,
+      "waitingCovers": 0,
+      "deferredRefreshes": 0,
+      "readyRefreshes": 20
+    }
+  },
+  "roundtripAfter": {
+    "turns": 40,
+    "recompositions": 0,
+    "stats": {
+      "allocations": 2,
+      "releases": 0,
+      "terrainCoordinatePairsVisited": 82,
+      "terrainCoordinatePairsSkipped": 0,
+      "refreshBacklog": 0,
+      "refreshesThisFrame": 0,
+      "estimatedPatchSubmissionMs": 0.05000000000000001,
+      "residentDrapes": 1,
+      "residentBytes": 1398101,
+      "budgetBytes": 16777216,
+      "reuses": 40,
+      "evictions": 0,
+      "invalidations": 0,
+      "fullInvalidations": 0,
+      "geometryOnlyEvents": 0,
+      "continuityHolds": 0,
+      "partialCoverHolds": 0,
+      "transitionPatches": 0,
+      "demPressureDrops": 0,
+      "waitingCovers": 0,
+      "deferredRefreshes": 0,
+      "readyRefreshes": 0,
+      "cacheReturns": {
+        "restored": 40,
+        "drawn": 40,
+        "repainted": 0,
+        "zoomReuse": 40,
+        "qualityHolds": 0,
+        "ignoredImageryEvents": 20,
+        "speculativeEvictions": 0,
+        "reasons": {
+          "none": 0,
+          "zoom": 40,
+          "sourceTiles": 0,
+          "visibleLayers": 0,
+          "revision": 0
+        },
+        "pending": 0,
+        "latencyMs": {
+          "samples": 40,
+          "p50": 16,
+          "p95": 16,
+          "max": 16
+        }
+      }
+    }
+  },
+  "pressureBefore": {
+    "recentViewRecompositions": 1,
+    "stats": {
+      "allocations": 5,
+      "releases": 1,
+      "residentDrapes": 3,
+      "residentBytes": 4194304,
+      "budgetBytes": 4194304,
+      "reuses": 0,
+      "evictions": 1,
+      "invalidations": 0,
+      "fullInvalidations": 0,
+      "geometryOnlyEvents": 0,
+      "continuityHolds": 0,
+      "demPressureDrops": 0,
+      "waitingCovers": 0,
+      "deferredRefreshes": 0,
+      "readyRefreshes": 0
+    }
+  },
+  "pressureAfter": {
+    "recentViewRecompositions": 0,
+    "stats": {
+      "allocations": 4,
+      "releases": 1,
+      "terrainCoordinatePairsVisited": 4,
+      "terrainCoordinatePairsSkipped": 0,
+      "refreshBacklog": 0,
+      "refreshesThisFrame": 0,
+      "estimatedPatchSubmissionMs": 0.05000000000000001,
+      "residentDrapes": 2,
+      "residentBytes": 2796203,
+      "budgetBytes": 4194304,
+      "reuses": 1,
+      "evictions": 1,
+      "invalidations": 0,
+      "fullInvalidations": 0,
+      "geometryOnlyEvents": 0,
+      "continuityHolds": 0,
+      "partialCoverHolds": 0,
+      "transitionPatches": 0,
+      "demPressureDrops": 0,
+      "waitingCovers": 0,
+      "deferredRefreshes": 0,
+      "readyRefreshes": 0,
+      "cacheReturns": {
+        "restored": 1,
+        "drawn": 1,
+        "repainted": 0,
+        "zoomReuse": 0,
+        "qualityHolds": 0,
+        "ignoredImageryEvents": 0,
+        "speculativeEvictions": 1,
+        "reasons": {
+          "none": 1,
+          "zoom": 0,
+          "sourceTiles": 0,
+          "visibleLayers": 0,
+          "revision": 0
+        },
+        "pending": 0,
+        "latencyMs": {
+          "samples": 1,
+          "p50": 16,
+          "p95": 16,
+          "max": 16
+        }
+      }
+    }
+  },
+  "coarsenedBefore": {
+    "recompositions": 1,
+    "sameFinishedTexture": false,
+    "noFollowupSpin": true,
+    "partialFineCoverRetained": false,
+    "partialRecompositions": 1
+  },
+  "coarsenedAfter": {
+    "recompositions": 0,
+    "sameFinishedTexture": true,
+    "noFollowupSpin": true,
+    "partialFineCoverRetained": true,
+    "partialRecompositions": 0
+  },
+  "actualContentAndRevisionRefresh": true,
+  "zoomDependentStyleAndVectorSafety": true,
+  "emptyRouteAndTransitionSafety": true,
+  "hiddenProviderSafe": true,
+  "simultaneousContentAndZoomRefreshesAllTiles": true,
+  "cacheBudgetUnchanged": true,
+  "caveat": "Actual native CPU tile/cache/fingerprint/style paths with controlled GPU painting and synthetic frame clock. Recomposition counts are measured in fixtures; latency is simulated, not Chromebook/GPU timing."
+}

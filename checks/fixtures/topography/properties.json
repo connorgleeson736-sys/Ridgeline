@@ -1,0 +1,1074 @@
+{
+  "land": [
+    {
+      "kind": "ice"
+    },
+    {
+      "kind": "moraine"
+    },
+    {
+      "kind": "scree"
+    },
+    {
+      "kind": "scree"
+    },
+    {
+      "kind": "scree"
+    },
+    {
+      "kind": "scree"
+    },
+    {
+      "kind": "scree"
+    },
+    {
+      "kind": "scree"
+    },
+    {
+      "kind": "scree"
+    },
+    {
+      "kind": "scree"
+    },
+    {
+      "kind": "scree"
+    },
+    {
+      "kind": "scree"
+    },
+    {
+      "kind": "scree"
+    },
+    {
+      "kind": "scree"
+    },
+    {
+      "kind": "scree"
+    },
+    {
+      "kind": "moraine_wall"
+    },
+    {
+      "kind": "moraine_wall"
+    },
+    {
+      "kind": "moraine_wall"
+    },
+    {
+      "kind": "scrub"
+    },
+    {
+      "kind": "scrub"
+    },
+    {
+      "kind": "scrub"
+    },
+    {
+      "kind": "scrub"
+    },
+    {
+      "kind": "scrub"
+    },
+    {
+      "kind": "scrub"
+    },
+    {
+      "kind": "scrub"
+    },
+    {
+      "kind": "scree"
+    },
+    {
+      "kind": "scree"
+    },
+    {
+      "kind": "scree"
+    },
+    {
+      "kind": "scree"
+    },
+    {
+      "kind": "scree"
+    },
+    {
+      "kind": "scree"
+    },
+    {
+      "kind": "forest",
+      "landuse": "forest",
+      "tree": "native"
+    },
+    {
+      "kind": "forest",
+      "landuse": "forest",
+      "tree": "native"
+    },
+    {
+      "kind": "moraine"
+    },
+    {
+      "kind": "moraine"
+    },
+    {
+      "kind": "ice"
+    },
+    {
+      "kind": "ice"
+    },
+    {
+      "kind": "ice"
+    }
+  ],
+  "contours": [
+    {
+      "elevation": 1740,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1900,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 1840,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1820,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1800,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 1780,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1760,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1880,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1860,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1740,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1540,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1560,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1600,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 1580,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1620,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1500,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 1460,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1480,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1520,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1420,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1440,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1400,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 1380,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1340,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1360,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1320,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1260,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1280,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1300,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 1720,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1640,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1660,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1700,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 1680,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1220,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1200,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 1180,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1120,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1140,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1160,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1100,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 1080,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1240,
+      "kind": "contours"
+    },
+    {
+      "elevation": 880,
+      "kind": "contours"
+    },
+    {
+      "elevation": 900,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 860,
+      "kind": "contours"
+    },
+    {
+      "elevation": 880,
+      "kind": "contours"
+    },
+    {
+      "elevation": 800,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 780,
+      "kind": "contours"
+    },
+    {
+      "elevation": 800,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 780,
+      "kind": "contours"
+    },
+    {
+      "elevation": 760,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1000,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 840,
+      "kind": "contours"
+    },
+    {
+      "elevation": 800,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 1340,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1320,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1260,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1280,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1300,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 1220,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1200,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 1180,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1120,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1140,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1160,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1100,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 1080,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1060,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1020,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1040,
+      "kind": "contours"
+    },
+    {
+      "elevation": 980,
+      "kind": "contours"
+    },
+    {
+      "elevation": 960,
+      "kind": "contours"
+    },
+    {
+      "elevation": 1240,
+      "kind": "contours"
+    },
+    {
+      "elevation": 940,
+      "kind": "contours"
+    },
+    {
+      "elevation": 920,
+      "kind": "contours"
+    },
+    {
+      "elevation": 820,
+      "kind": "contours"
+    },
+    {
+      "elevation": 900,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 880,
+      "kind": "contours"
+    },
+    {
+      "elevation": 780,
+      "kind": "contours"
+    },
+    {
+      "elevation": 740,
+      "kind": "contours"
+    },
+    {
+      "elevation": 760,
+      "kind": "contours"
+    },
+    {
+      "elevation": 860,
+      "kind": "contours"
+    },
+    {
+      "elevation": 911,
+      "kind": "peak",
+      "rank": 4
+    },
+    {
+      "elevation": 793,
+      "kind": "peak",
+      "rank": 4
+    },
+    {
+      "elevation": 3100,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 2580,
+      "kind": "contours"
+    },
+    {
+      "elevation": 2400,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 2420,
+      "kind": "contours"
+    },
+    {
+      "elevation": 2460,
+      "kind": "contours"
+    },
+    {
+      "elevation": 2440,
+      "kind": "contours"
+    },
+    {
+      "elevation": 2520,
+      "kind": "contours"
+    },
+    {
+      "elevation": 2480,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3300,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 3300,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 3300,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 3380,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3420,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3360,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3400,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 3000,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 2980,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3720,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3700,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 3680,
+      "kind": "contours"
+    },
+    {
+      "elevation": 2860,
+      "kind": "contours"
+    },
+    {
+      "elevation": 2960,
+      "kind": "contours"
+    },
+    {
+      "elevation": 2940,
+      "kind": "contours"
+    },
+    {
+      "elevation": 2920,
+      "kind": "contours"
+    },
+    {
+      "elevation": 2880,
+      "kind": "contours"
+    },
+    {
+      "elevation": 2900,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 2860,
+      "kind": "contours"
+    },
+    {
+      "elevation": 2820,
+      "kind": "contours"
+    },
+    {
+      "elevation": 2840,
+      "kind": "contours"
+    },
+    {
+      "elevation": 2760,
+      "kind": "contours"
+    },
+    {
+      "elevation": 2780,
+      "kind": "contours"
+    },
+    {
+      "elevation": 2800,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 3120,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3020,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3040,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3080,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3060,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3100,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 3240,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3160,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3140,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3180,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3200,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 3220,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3280,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3260,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3300,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 3320,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3340,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3600,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 3620,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3660,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3640,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3580,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3560,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3420,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3440,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3460,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3520,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3540,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3500,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 3480,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3380,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3360,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3400,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 2560,
+      "kind": "contours"
+    },
+    {
+      "elevation": 2540,
+      "kind": "contours"
+    },
+    {
+      "elevation": 2500,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 2600,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 2700,
+      "kind": "contours",
+      "type": "index"
+    },
+    {
+      "elevation": 2740,
+      "kind": "contours"
+    },
+    {
+      "elevation": 2720,
+      "kind": "contours"
+    },
+    {
+      "elevation": 2680,
+      "kind": "contours"
+    },
+    {
+      "elevation": 2660,
+      "kind": "contours"
+    },
+    {
+      "elevation": 2640,
+      "kind": "contours"
+    },
+    {
+      "elevation": 2620,
+      "kind": "contours"
+    },
+    {
+      "elevation": 3309,
+      "kind": "peak",
+      "rank": 1
+    },
+    {
+      "elevation": 3440,
+      "kind": "peak",
+      "rank": 1
+    },
+    {
+      "elevation": 3724,
+      "kind": "peak",
+      "rank": 1
+    },
+    {
+      "elevation": 2960,
+      "kind": "peak",
+      "rank": 1
+    }
+  ],
+  "boundaries": [
+    {
+      "name": "South Island or Te Waipounamu"
+    },
+    {
+      "name": "South Island or Te Waipounamu"
+    },
+    {
+      "name": "South Island or Te Waipounamu"
+    },
+    {
+      "name": "South Island or Te Waipounamu"
+    }
+  ],
+  "buildings": [
+    {
+      "name": "",
+      "use": "Unknown",
+      "kind": "building"
+    },
+    {
+      "name": "",
+      "use": "Unknown",
+      "kind": "building"
+    },
+    {
+      "name": "",
+      "use": "Unknown",
+      "kind": "building"
+    },
+    {
+      "name": "",
+      "use": "Unknown",
+      "kind": "building"
+    },
+    {
+      "name": "",
+      "use": "Unknown",
+      "kind": "building"
+    }
+  ],
+  "water_lines": [
+    {
+      "kind": "river"
+    },
+    {
+      "kind": "river"
+    },
+    {
+      "name": "Stocking Stream",
+      "kind": "river"
+    },
+    {
+      "kind": "river"
+    },
+    {
+      "kind": "river"
+    },
+    {
+      "kind": "river"
+    },
+    {
+      "kind": "river"
+    },
+    {
+      "kind": "river"
+    },
+    {
+      "kind": "river"
+    },
+    {
+      "kind": "river"
+    },
+    {
+      "kind": "river"
+    },
+    {
+      "kind": "river"
+    },
+    {
+      "kind": "river"
+    }
+  ],
+  "pois": [
+    {
+      "name": "Mueller Hut",
+      "building": "hut"
+    },
+    {
+      "historic": "monument"
+    }
+  ],
+  "streets": [
+    {
+      "track_use": "foot",
+      "kind": "track",
+      "subclass": "foot"
+    },
+    {
+      "lane_count": 1,
+      "surface": "metalled",
+      "kind": "secondary"
+    },
+    {
+      "lane_count": 1,
+      "surface": "metalled",
+      "kind": "secondary"
+    },
+    {
+      "name": "HOOKER VALLEY ROAD",
+      "lane_count": 1,
+      "surface": "metalled",
+      "kind": "secondary"
+    },
+    {
+      "name": "HOOKER VALLEY ROAD",
+      "lane_count": 2,
+      "surface": "sealed",
+      "kind": "secondary"
+    },
+    {
+      "use_1": "vehicle",
+      "kind": "secondary",
+      "bridge": 1
+    },
+    {
+      "use_1": "foot traffic",
+      "kind": "secondary",
+      "bridge": 1
+    },
+    {
+      "name": "Hooker Track",
+      "track_use": "foot",
+      "kind": "track",
+      "subclass": "foot"
+    },
+    {
+      "track_use": "foot",
+      "kind": "track",
+      "subclass": "foot"
+    },
+    {
+      "name": "Kea Point Link Track",
+      "track_use": "foot",
+      "kind": "track",
+      "subclass": "foot"
+    },
+    {
+      "name": "Alpine Memorial Track",
+      "track_use": "foot",
+      "kind": "track",
+      "subclass": "foot"
+    },
+    {
+      "name": "Kea Point Track",
+      "track_use": "foot",
+      "kind": "track",
+      "subclass": "foot"
+    }
+  ],
+  "parcel_boundaries": [
+    {
+      "parcel_intent": "DCDB"
+    },
+    {
+      "parcel_intent": "DCDB"
+    },
+    {
+      "parcel_intent": "DCDB"
+    },
+    {
+      "parcel_intent": "DCDB"
+    },
+    {
+      "parcel_intent": "DCDB"
+    },
+    {
+      "parcel_intent": "DCDB"
+    },
+    {
+      "parcel_intent": "DCDB"
+    },
+    {
+      "parcel_intent": "DCDB"
+    },
+    {
+      "parcel_intent": "Hydro"
+    }
+  ],
+  "water_polygons": [
+    {
+      "name": "Hooker River",
+      "kind": "river"
+    },
+    {
+      "kind": "water",
+      "water": "lake"
+    },
+    {
+      "name": "Lake Pukaki",
+      "kind": "water",
+      "water": "lake"
+    }
+  ],
+  "street_labels": [
+    {
+      "kind": "secondary"
+    },
+    {
+      "kind": "secondary"
+    },
+    {
+      "name": "HOOKER VALLEY ROAD",
+      "kind": "secondary"
+    },
+    {
+      "name": "HOOKER VALLEY ROAD",
+      "kind": "secondary"
+    }
+  ],
+  "place_labels": [
+    {
+      "label": "Foliage Hill",
+      "admin_level": 10,
+      "natural": "peak"
+    },
+    {
+      "label": "Mount Vancouver",
+      "admin_level": 10,
+      "natural": "peak"
+    },
+    {
+      "label": "Mount Dampier",
+      "admin_level": 10,
+      "natural": "peak"
+    },
+    {
+      "label": "Aoraki/Mount Cook",
+      "admin_level": 6,
+      "natural": "peak"
+    },
+    {
+      "label": "High Peak",
+      "admin_level": 10,
+      "natural": "peak"
+    }
+  ]
+}

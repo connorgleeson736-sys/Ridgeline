@@ -1,0 +1,10 @@
+laspy[lazrs]==2.7.0
+open3d==0.20.0
+numpy==2.5.4
+scipy==1.18.1
+pyproj==3.8.0
+geopandas==1.2.0
+meshoptimizer==0.2.30a0
+requests==2.34.2
+pillow==12.3.0
+rasterio==1.4.3

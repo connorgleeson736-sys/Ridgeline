@@ -1,0 +1,28 @@
+{
+  "engine": "MapLibre 6.14.0",
+  "nativeStyleAndTileManager": true,
+  "nativeViewportCacheLimit": 32,
+  "baselineEvictions": 13,
+  "panAwayTiles": 60,
+  "revisitFetchDecodeUploads": 0,
+  "sameNativeTileAndGPUTexture": true,
+  "nativeLODSelectionUnmodified": true,
+  "inflightCompletesWhileHidden": true,
+  "failedHiddenLoadRecovers": true,
+  "budgetBounded": true,
+  "sharedAcrossProviders": true,
+  "productionControllerWired": true,
+  "stats": {
+    "sourceResidentTiles": 95,
+    "sourceResidentBytes": 33204970,
+    "sourceBudgetBytes": 33554432,
+    "sourceReuses": 2,
+    "sourceEvictions": 189,
+    "completedOffscreen": 1,
+    "protectedPressure": 0,
+    "fallbackReads": 0,
+    "pendingLimit": 4,
+    "pendingOffscreen": 0
+  },
+  "caveat": "Real native TileManager, TileCache and visible-coordinate lifecycle. Texture upload/allocation and frustum are controlled; browser pixels/FPS are not measured."
+}

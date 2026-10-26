@@ -1,0 +1,14 @@
+{
+  "nativeStyleFilters": true,
+  "exclusivePeakTiers": true,
+  "placesAndWaterTiers": true,
+  "hutAndBivouacTiers": true,
+  "trackDisplayPriorities": true,
+  "contourHierarchy": true,
+  "missingRankFallback": true,
+  "authenticPeakFixtures": true,
+  "collisionRulesPreserved": true,
+  "extraRequests": 0,
+  "perFrameApplicationWork": 0,
+  "browserVisualQA": "unverified; managed preview infrastructure unavailable"
+}

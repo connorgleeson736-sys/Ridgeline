@@ -1,0 +1,6 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+process.env.TEST_FIXTURE='1';const f=require('./base-viewer.cjs');delete process.env.TEST_FIXTURE;
+for(const file of ['loading-controls.js','geo.js','alpine-data.js','alpine-labels.js','surface-focus.js','performance.js','terrain-streaming.js','raster-residency.js','dem-revision.js','terrain-visibility.js','terrain-composition.js','tile-retry.js','native-residency.js','imagery-diagnostics.js','imagery.js','imagery-preload.js','prepare-ahead.js','tile-cache.js','terrain-core.js'])vm.runInContext(fs.readFileSync('public/'+file,'utf8'),f.context);
+vm.runInContext(fs.readFileSync('public/app.js','utf8'),f.context);const map=f.getMap();map.trigger('style.load');
+const expect=value=>{for(const id of ['route-halo','route-line'])assert.equal(map.getLayoutProperty(id,'visibility'),value);};
+expect('none');vm.runInContext('points=[[170,-43]];updateRoute()',f.context);expect('none');vm.runInContext('points.push([170.1,-43.1]);updateRoute()',f.context);expect('visible');f.nodes.clear.onclick();expect('none');vm.runInContext('points=[[170,-43],[170.1,-43.1]];updateRoute()',f.context);map.trigger('style.load');expect('visible');f.listeners.pagehide({persisted:false});console.log('PASS empty route hides draped layers; draw, clear and restored route visibility');

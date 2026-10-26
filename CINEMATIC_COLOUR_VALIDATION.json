@@ -1,0 +1,39 @@
+{
+  "method": "Native raster shader saturation/contrast/brightness equations evaluated numerically on authentic LINZ RGB tiles. No replacement imagery saved or deployed.",
+  "grade": {
+    "saturation": 0.17,
+    "contrast": 0.13,
+    "brightnessMin": 0.035,
+    "brightnessMax": 0.93
+  },
+  "rows": [
+    {
+      "sample": "franz",
+      "z": 15,
+      "sha256": "052b88d169efa469e93d54bd118e699b278f48323888f8995a67b602cc9503db",
+      "oldMeanChroma": 0.02049872075852867,
+      "newMeanChroma": 0.03079046791152143,
+      "oldAllChannelsClippedWhitePercent": 0.0,
+      "newAllChannelsClippedWhitePercent": 0.0
+    },
+    {
+      "sample": "fox",
+      "z": 15,
+      "sha256": "313ff76f43903b7127d25dc081ad71087515936e66592fd0d29811a875957379",
+      "oldMeanChroma": 0.05617337749637252,
+      "newMeanChroma": 0.08435907525907349,
+      "oldAllChannelsClippedWhitePercent": 0.0,
+      "newAllChannelsClippedWhitePercent": 0.0
+    },
+    {
+      "sample": "divide",
+      "z": 15,
+      "sha256": "3cecb5b9303ce08341f75532913b7d089a9993d3696dd3f4834057f963b016f0",
+      "oldMeanChroma": 0.10687720415463338,
+      "newMeanChroma": 0.16053571040520154,
+      "oldAllChannelsClippedWhitePercent": 0.0,
+      "newAllChannelsClippedWhitePercent": 0.0
+    }
+  ],
+  "limits": "Does not include live native hillshade/fog or constitute browser visual QA."
+}

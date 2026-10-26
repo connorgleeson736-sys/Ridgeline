@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-15",
+  "baseline_source": "8df0f2de66a67f6a6dacab3058c7f69df68f66c3",
+  "scope": "Main NZ planner only; experimental terrain viewers retired",
+  "source_public_files_before": 3506,
+  "source_public_bytes_before": 295057880,
+  "source_public_files_after": 16,
+  "source_public_bytes_after": 1759868,
+  "compressed_js_estimate_before": 279554,
+  "compressed_js_estimate_after": 447239,
+  "js_note": "Gzip estimates include the main engine and one copy of its worker, not HTTP/browser measurements. The newer engine has a larger initial payload in exchange for upstream terrain caching and camera fixes. Removing unused experimental assets is not a measured startup speedup.",
+  "performance_fixture": {
+    "gestures": 100,
+    "dpr": 2,
+    "zoom": 17,
+    "buffer_resizes_before": 200,
+    "buffer_resizes_after": 0,
+    "slow_gesture_downshifts": 1,
+    "restored_pixel_ratio": 2,
+    "is_browser_benchmark": false
+  },
+  "checks": {
+    "base_viewer": "passed",
+    "base_viewer_worker": "passed",
+    "base_viewer_worker_failure": "passed",
+    "base_performance": "passed",
+    "base_elevation": "passed",
+    "r2_storage": "passed",
+    "browser_gpu": "unavailable; no supported browser-control skill",
+    "esm_bootstrap": "passed; actual module graph with a mock WebGL map",
+    "production_audit": "passed",
+    "retired_bookmark_handler": "passed"
+  },
+  "terrain": {
+    "provider": "Existing LINZ Terrain-RGB",
+    "max_zoom": 18,
+    "profile_sampling": "Unchanged measured-elevation calculation",
+    "custom_mesh_assets": "Removed from public site"
+  },
+  "source_limitations": [
+    "Orthophoto capture dates and snow cover differ; GPU colour grading and fades cannot eliminate those source differences.",
+    "No newly generated, upscaled or replaced satellite imagery."
+  ],
+  "production_client": {
+    "files": 28,
+    "bytes": 2147489,
+    "engine_assets_sha256": "verified against official package provenance"
+  }
+}

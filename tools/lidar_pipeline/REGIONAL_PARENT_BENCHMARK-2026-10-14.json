@@ -1,0 +1,94 @@
+{
+  "child_triangles": 158826,
+  "children": [
+    {
+      "bound_m": 1.9998397389909492,
+      "divider_facets": 11372,
+      "reference_triangles": 815390,
+      "signature": "bea6968e00a6e7ec913748053506065d6411c174dd82abc15405647ccc7d4f57",
+      "task": "certified-lod-0189-d1p35-2",
+      "triangles": 28098
+    },
+    {
+      "bound_m": 1.9998658879215931,
+      "divider_facets": 10641,
+      "reference_triangles": 788241,
+      "signature": "9a9bc3803905cf9ac1a49c03f5942638b5aefb39095267a7af719c846f7afd6f",
+      "task": "certified-lod-0190-d1p35-2",
+      "triangles": 49139
+    },
+    {
+      "bound_m": 1.9999556428520884,
+      "divider_facets": 13883,
+      "reference_triangles": 903752,
+      "signature": "37421b8413bd6cb1d7b21dbf40b2be6dc305b2ff6b8a5e03e135011ca8a82891",
+      "task": "certified-lod-0209-d1p35-2",
+      "triangles": 54974
+    },
+    {
+      "bound_m": 1.999909270270323,
+      "divider_facets": 11474,
+      "reference_triangles": 778282,
+      "signature": "b8202a48d554ce0d8874022f237278482906ece517b6ceb73765053416fa6e01",
+      "task": "certified-lod-0210-d1p35-2",
+      "triangles": 26615
+    }
+  ],
+  "exact_union_signature": "028a2f0496e0b0c0d9aece77771c293c6f3fe8cf6fc7e0ebb612b7cca7c58b16",
+  "exact_union_task": "regional-union-7e8d397b8039-d1p35",
+  "exclusions": [
+    "No browser FPS, GPU, latency, compressed size or end-to-end processing speed comparison.",
+    "Resumed task total_seconds excludes earlier saved attempts; do not compare those as complete runtimes.",
+    "Certificates describe reconstructed local-coordinate triangle unions, not survey accuracy or completeness.",
+    "Mixed-LOD regional rendering, seams and export/quantization accounting remain separate gates."
+  ],
+  "geometric_budget_m": 2,
+  "geometry_only": true,
+  "interpretation": "A larger parent releases internal100m divider constraints while preserving its exterior facets. Both choices pass symmetric continuous distance checks against the same finest union.",
+  "parent": {
+    "bound_m": 1.9999984292148623,
+    "divider_facets": 23849,
+    "reference_triangles": 3285665,
+    "signature": "6e6db8e7a4e2faf1f71f882b902d7ba7d1883d72b1be9d1ce5d6ba9ca41ca4fa",
+    "task": "certified-lod-regional-7e8d397b8039-d1p35-2",
+    "triangles": 136154
+  },
+  "parent_triangles": 136154,
+  "publishable": false,
+  "reduction_relative_to_child_lods": 0.14274740911437678,
+  "reduction_relative_to_finest": 0.9585612045050241,
+  "region_fraction_of_requested_2km": 0.01,
+  "region_m": [
+    200,
+    200
+  ],
+  "run": "f899852804c645c7c8834d25a9642ce1e55000f19ad15138be5b5bbb777b142e",
+  "schema": 1,
+  "source_patches": [
+    {
+      "mesh_sha256": "9c9f80bf9b5d3d71a2e2c3b49faecc5e9ef7b4014ee003dd380a8a012cb29c1f",
+      "signature": "2a651e786ec93ee3e2eb83b254433a28faae28c46202a3a566295eb64cebe2ba",
+      "task": "local-surface-0189-d1p35",
+      "tile": 189
+    },
+    {
+      "mesh_sha256": "8dad3294bb38b185e5f927d525386a825da24a777cb2fa6bb73954c43eaa2e94",
+      "signature": "cb8cbe915995b4a0dde6989f319d3187bcdebf7bd853ff503a12fd1c2b0310d6",
+      "task": "local-surface-0190-d1p35",
+      "tile": 190
+    },
+    {
+      "mesh_sha256": "c75c431a0e88da77dd555bdb267290d8a0915bfd256fbc36ad58d66dcb071869",
+      "signature": "4604e625733ea13dd0fc7848e7a862bce064a679bb43143ffbeee222aef7dd52",
+      "task": "local-surface-0209-d1p35",
+      "tile": 209
+    },
+    {
+      "mesh_sha256": "98138756711cbe07e1ab02577bbe86234d1ef8fac8d1b558963b5576b36e2a70",
+      "signature": "7abcabe45bb863e40fde69fba222c3b20801674c1490eaf98f20d41db8756982",
+      "task": "local-surface-0210-d1p35",
+      "tile": 210
+    }
+  ],
+  "triangles_saved": 22672
+}

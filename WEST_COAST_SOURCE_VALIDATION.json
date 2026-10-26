@@ -1,0 +1,336 @@
+{
+  "date": "2026-10-15",
+  "region": "Franz Josef / Fox, clarified by user",
+  "points": {
+    "franz": [
+      170.2,
+      -43.47
+    ],
+    "fox": [
+      170.06,
+      -43.5
+    ],
+    "divide": [
+      170.13,
+      -43.48
+    ]
+  },
+  "method": "Direct LINZ aerial and Esri imagery tile downloads at z13,15,17,18, each decoded with Pillow. Hashes cover authentic downloaded bytes. No derived imagery is deployed.",
+  "successfulDecodedTiles": 24,
+  "result": "All 24 sampled requests returned decodable 256x256 images, including z18 at each point. This rules out a blanket absence of high-zoom tiles at the sampled points; it does not establish native ground resolution or diagnose every cutline in the reported view.",
+  "limits": "Different surveys and captures cannot be ranked from edge contrast alone. Browser visual QA was unavailable. An unsampled source-quality boundary can still exist.",
+  "tiles": [
+    {
+      "name": "franz",
+      "provider": "linz",
+      "z": 13,
+      "x": 7968,
+      "y": 5196,
+      "bytes": 14894,
+      "shape": [
+        256,
+        256
+      ],
+      "sha256": "2f81d83ba165196d3a59f0f3655991c1ead7e60e000b9d7c245c602cfce2263d"
+    },
+    {
+      "name": "franz",
+      "provider": "esri",
+      "z": 13,
+      "x": 7968,
+      "y": 5196,
+      "bytes": 16537,
+      "shape": [
+        256,
+        256
+      ],
+      "sha256": "8d15b00a1c241e744c48f60c31ac3ce3e639d9c170f0203f2ffe253581338ca8"
+    },
+    {
+      "name": "franz",
+      "provider": "linz",
+      "z": 15,
+      "x": 31875,
+      "y": 20786,
+      "bytes": 16298,
+      "shape": [
+        256,
+        256
+      ],
+      "sha256": "052b88d169efa469e93d54bd118e699b278f48323888f8995a67b602cc9503db"
+    },
+    {
+      "name": "franz",
+      "provider": "esri",
+      "z": 15,
+      "x": 31875,
+      "y": 20786,
+      "bytes": 15654,
+      "shape": [
+        256,
+        256
+      ],
+      "sha256": "4fbdcb4c723ee0567820ed1cf37d8a7a7837dd185afd431450a9866b9e6ab063"
+    },
+    {
+      "name": "franz",
+      "provider": "linz",
+      "z": 17,
+      "x": 127503,
+      "y": 83144,
+      "bytes": 6456,
+      "shape": [
+        256,
+        256
+      ],
+      "sha256": "0083cc8d3a9333395890e377f5df3f431015210b316daee42cfa084f81865a33"
+    },
+    {
+      "name": "franz",
+      "provider": "esri",
+      "z": 17,
+      "x": 127503,
+      "y": 83144,
+      "bytes": 9996,
+      "shape": [
+        256,
+        256
+      ],
+      "sha256": "f2c1dac2b25d4855baab53847d64564d9e53c4fb99c2db7d5a1c0e273613f796"
+    },
+    {
+      "name": "franz",
+      "provider": "linz",
+      "z": 18,
+      "x": 255007,
+      "y": 166289,
+      "bytes": 5712,
+      "shape": [
+        256,
+        256
+      ],
+      "sha256": "cc8c608a190b6285da7f5475f22560af22cec5dfb7d4270995d8dce15442c655"
+    },
+    {
+      "name": "franz",
+      "provider": "esri",
+      "z": 18,
+      "x": 255007,
+      "y": 166289,
+      "bytes": 10968,
+      "shape": [
+        256,
+        256
+      ],
+      "sha256": "8dc15e6b1c7ecacd36b3ef25fc3c0b1d5a20153ae31a0428a8ec96fe16cd57a5"
+    },
+    {
+      "name": "fox",
+      "provider": "linz",
+      "z": 13,
+      "x": 7965,
+      "y": 5197,
+      "bytes": 13808,
+      "shape": [
+        256,
+        256
+      ],
+      "sha256": "a782c71e72c294b4b9355692cab08ed62ee97aad1352c5ef2f975dd4e0b4f7ad"
+    },
+    {
+      "name": "fox",
+      "provider": "esri",
+      "z": 13,
+      "x": 7965,
+      "y": 5197,
+      "bytes": 16719,
+      "shape": [
+        256,
+        256
+      ],
+      "sha256": "3e2a87901b7150bb9be98d255125a6384494545af9d2c5921b75e82ac7ba93bb"
+    },
+    {
+      "name": "fox",
+      "provider": "linz",
+      "z": 15,
+      "x": 31863,
+      "y": 20789,
+      "bytes": 16302,
+      "shape": [
+        256,
+        256
+      ],
+      "sha256": "313ff76f43903b7127d25dc081ad71087515936e66592fd0d29811a875957379"
+    },
+    {
+      "name": "fox",
+      "provider": "esri",
+      "z": 15,
+      "x": 31863,
+      "y": 20789,
+      "bytes": 15008,
+      "shape": [
+        256,
+        256
+      ],
+      "sha256": "2073992673eb2a8809484e022c257e33463b750bcfe1ff1b52abfbeb50efe82d"
+    },
+    {
+      "name": "fox",
+      "provider": "linz",
+      "z": 17,
+      "x": 127452,
+      "y": 83159,
+      "bytes": 18110,
+      "shape": [
+        256,
+        256
+      ],
+      "sha256": "590070ea9d6474af6cd55fd9938f28d124ba44e2e57745efec28b7eaf943aef8"
+    },
+    {
+      "name": "fox",
+      "provider": "esri",
+      "z": 17,
+      "x": 127452,
+      "y": 83159,
+      "bytes": 24241,
+      "shape": [
+        256,
+        256
+      ],
+      "sha256": "2c4cf9993875878a22de5dafb28dad398f5142d8bcf88c642521bccbb6a6dffe"
+    },
+    {
+      "name": "fox",
+      "provider": "linz",
+      "z": 18,
+      "x": 254905,
+      "y": 166319,
+      "bytes": 19544,
+      "shape": [
+        256,
+        256
+      ],
+      "sha256": "ba6c52e2c63fe2228d419e60791c1a0282e5ed0b182455b3a19499f7bace2789"
+    },
+    {
+      "name": "fox",
+      "provider": "esri",
+      "z": 18,
+      "x": 254905,
+      "y": 166319,
+      "bytes": 27501,
+      "shape": [
+        256,
+        256
+      ],
+      "sha256": "ef875a1af44627c459dc15d883ee47fcabc61d618cd69d87ba50c6da76301cbe"
+    },
+    {
+      "name": "divide",
+      "provider": "linz",
+      "z": 13,
+      "x": 7967,
+      "y": 5196,
+      "bytes": 17854,
+      "shape": [
+        256,
+        256
+      ],
+      "sha256": "c0f60e26fc1d8c8a2b5d55b18e42d0f570eb760e7d651be304bbce5724dfef3c"
+    },
+    {
+      "name": "divide",
+      "provider": "esri",
+      "z": 13,
+      "x": 7967,
+      "y": 5196,
+      "bytes": 19336,
+      "shape": [
+        256,
+        256
+      ],
+      "sha256": "72e5c301be0c75eb926e34c9258f7e59d8fd1b707d920f201f823958d1ac2ca3"
+    },
+    {
+      "name": "divide",
+      "provider": "linz",
+      "z": 15,
+      "x": 31869,
+      "y": 20787,
+      "bytes": 19142,
+      "shape": [
+        256,
+        256
+      ],
+      "sha256": "3cecb5b9303ce08341f75532913b7d089a9993d3696dd3f4834057f963b016f0"
+    },
+    {
+      "name": "divide",
+      "provider": "esri",
+      "z": 15,
+      "x": 31869,
+      "y": 20787,
+      "bytes": 16800,
+      "shape": [
+        256,
+        256
+      ],
+      "sha256": "ce60b2911a5d0c2cfd5eeb928022a25561b3bcd1c738f8a3d107169af5aeba4b"
+    },
+    {
+      "name": "divide",
+      "provider": "linz",
+      "z": 17,
+      "x": 127478,
+      "y": 83149,
+      "bytes": 20328,
+      "shape": [
+        256,
+        256
+      ],
+      "sha256": "dc5e88806fab99a81ff96f7d49e9569b4cee717f141d5c26e799fab815364289"
+    },
+    {
+      "name": "divide",
+      "provider": "esri",
+      "z": 17,
+      "x": 127478,
+      "y": 83149,
+      "bytes": 17192,
+      "shape": [
+        256,
+        256
+      ],
+      "sha256": "1e05a179550c00913eecd1743ba86bc2886cc9fc5b3cf9ebeb6cabe1cb5ae44b"
+    },
+    {
+      "name": "divide",
+      "provider": "linz",
+      "z": 18,
+      "x": 254956,
+      "y": 166299,
+      "bytes": 18062,
+      "shape": [
+        256,
+        256
+      ],
+      "sha256": "61e6e93ec07cdf5cb762b88c9c2dc73351fada7f4970ba2eeb1e02f730e81e89"
+    },
+    {
+      "name": "divide",
+      "provider": "esri",
+      "z": 18,
+      "x": 254956,
+      "y": 166299,
+      "bytes": 20218,
+      "shape": [
+        256,
+        256
+      ],
+      "sha256": "747c5cb624f08043f67bc11f834c48e130001a81dd93168e455412180eef0d14"
+    }
+  ]
+}

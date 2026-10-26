@@ -1,0 +1,9 @@
+{
+  "authenticSourceTiles": 128,
+  "compositeModel": "Original LINZ alpha-composited with authentic Esri only under the georeferenced inward-feathered mask",
+  "unchangedPixelsOutsideMask": true,
+  "unchangedCookModel1_7km": true,
+  "sourcePixelsOutsideMask": 2242718,
+  "sourcePixelsInsideMask": 1951586,
+  "caveat": "Reference geospatial pixel-composite QA; browser canvas pixels/GPU and native renderer not replayed."
+}

@@ -1,0 +1,13 @@
+{
+  "spareAllowanceSharedAcrossBothRecyclers": true,
+  "sourceRecyclerByteCeiling": true,
+  "unusedOnlyDisposal": true,
+  "ownershipDeduplicated": true,
+  "framebuffersAndDecodedDEMReported": true,
+  "pressureDoesNotDeleteVisible": true,
+  "boundedStageRing": 384,
+  "cacheTierIdentity": true,
+  "noURLsOrSecrets": true,
+  "noPolling": true,
+  "caveat": "Deterministic allocation/lifecycle estimates, not actual VRAM/driver memory or GPU completion."
+}

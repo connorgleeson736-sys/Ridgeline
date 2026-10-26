@@ -1,0 +1,10 @@
+{
+  "actualNativeMatrixImplementation": true,
+  "cases": 168,
+  "identicalFloat32Matrices": true,
+  "parentChildOverscaleAndWrapSemantics": true,
+  "indexLifetimeOnePreparation": true,
+  "baselineCandidateAllocations": 8232,
+  "filteredCandidateAllocations": 1008,
+  "caveat": "Exact native CPU coordinate comparison, not a browser/GPU visual test."
+}

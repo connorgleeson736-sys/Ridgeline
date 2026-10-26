@@ -1,0 +1,527 @@
+{
+  "generated_utc": "2026-10-14T05:32:47.591669+00:00",
+  "limitations": [
+    "Mesh error relative to reconstructed reference, not survey accuracy",
+    "QEM reports alone never accept geometry",
+    "Node native/WASM codec timings are not real browser or GPU/FPS benchmarks",
+    "Accepted local reductions use different AFS and local triangle-union baselines; compare within baseline only"
+  ],
+  "results": [
+    {
+      "archive_bytes": 2109440,
+      "archive_sha256": "f07540dac25580ce09c075e72d2502d61c2e627f4f19bde58740f174872d36f2",
+      "artifacts": [
+        {
+          "bytes": 2043906,
+          "path": "data/feedback/feedback-lod-0381-0p2/mesh.npz",
+          "sha256": "c65bcc8466ae229302b08c15a42ca15b07042a911ec58ae08f9757671a6008ad"
+        },
+        {
+          "bytes": 17823,
+          "path": "data/feedback/feedback-lod-0381-0p2/validation.json",
+          "sha256": "c9e1d89298e54a445605d41c42ac71fa94271cbaf045ae99b00f01315967dfba"
+        },
+        {
+          "bytes": 15316,
+          "path": "data/feedback/feedback-lod-0381-0p2/progress.json",
+          "sha256": "c5e06bbe99084c2e5528368bbc52deb1be8fc4af10e1caf7ffda09eec2d466b1"
+        }
+      ],
+      "metrics": {
+        "accepted": true,
+        "budget_m": 0.2,
+        "candidate_accepted": true,
+        "continuous_bound": {
+          "certified": true,
+          "forward": {
+            "certified": true,
+            "numeric_margin_m": 1e-05,
+            "subdivisions": 47414,
+            "tested": 658166,
+            "upper_bound_m": 0.19999823733381358
+          },
+          "method": "Adaptive convex-triangle distance bounds, both directions; reconstructed mesh only, not survey accuracy",
+          "reverse": {
+            "certified": true,
+            "numeric_margin_m": 1e-05,
+            "subdivisions": 216464,
+            "tested": 1072720,
+            "upper_bound_m": 0.1999996394676622
+          },
+          "upper_bound_m": 0.1999996394676622
+        },
+        "exact_open_borders": true,
+        "publishable": false,
+        "recovery": {
+          "geometry_modified": false,
+          "metadata_repaired": true,
+          "original_task_signature": "2179fcf2a024979ca4e442aee7860b36bcf06c45d7f58eeee46173a4273bacf4",
+          "prior_error": "Circular reference detected",
+          "prior_finished": 1791951413.3479807,
+          "revalidation_seconds": 6.25365527200006,
+          "source_sha256": "5781cc97db26742ea02f7159dacd1b731601d3c448965e057e84faa93a8fe86b"
+        },
+        "reduction_fraction": 0.5584640669356044,
+        "reference_triangles": 468510,
+        "reference_vertex_max_m": 0.12999096512794495,
+        "topology": {
+          "edge_manifold": true,
+          "orientable": true,
+          "vertex_manifold": true
+        },
+        "triangles": 206864,
+        "vertices": 115927
+      },
+      "signature": "2179fcf2a024979ca4e442aee7860b36bcf06c45d7f58eeee46173a4273bacf4",
+      "state": "durable",
+      "task": "feedback-lod-0381-0p2"
+    },
+    {
+      "archive_bytes": 4259840,
+      "archive_sha256": "a3b28fc6f84f4421e1e615e5518484984da404b701bbb89e53ad5ea85799ad3d",
+      "artifacts": [
+        {
+          "bytes": 4226987,
+          "path": "data/certified/certified-lod-0381-d1p35-0p2/mesh.npz",
+          "sha256": "fc7173da033ec5f9a0d919169276e3e6f2a0c52e31a7f023d8743fcf8beeff7f"
+        },
+        {
+          "bytes": 4891,
+          "path": "data/certified/certified-lod-0381-d1p35-0p2/validation.json",
+          "sha256": "c47d6c62706d4a958dff3054440842572376f177c28ea39e63a7eccd37de0f1c"
+        },
+        {
+          "bytes": 3312,
+          "path": "data/certified/certified-lod-0381-d1p35-0p2/progress.json",
+          "sha256": "dfa289b1c7a43d91964a411ca50e70b2433c5eb79c9df998eac5b33a817c00aa"
+        }
+      ],
+      "metrics": {
+        "accuracy_note": "Error relative to finest reconstructed triangle union; not survey accuracy or point-cloud completeness",
+        "budget_m": 0.2,
+        "candidate_accepted": true,
+        "continuous_bound": {
+          "certified": true,
+          "forward": {
+            "certified": true,
+            "method": "Continuous convex-triangle bounds; unproved faces rejected, no sample-based acceptance",
+            "numeric_margin_m": 1e-05,
+            "subdivisions": 3388,
+            "tested": 658780,
+            "unresolved": 0,
+            "upper_bound_m": 0.19998713450161282,
+            "work_cap_reached": false
+          },
+          "reverse": {
+            "certified": true,
+            "method": "Continuous convex-triangle bounds; unproved faces rejected, no sample-based acceptance",
+            "numeric_margin_m": 1e-05,
+            "subdivisions": 28111,
+            "tested": 637917,
+            "unresolved": 0,
+            "upper_bound_m": 0.19999895430237874,
+            "work_cap_reached": false
+          },
+          "upper_bound_m": 0.19999895430237874
+        },
+        "divider_facets": 10090,
+        "exact_divider_facets": true,
+        "pending": [
+          "geometry-preserving sheet orientation and owned coplanar facets",
+          "compressed hierarchy",
+          "renderer and device benchmarks"
+        ],
+        "publishable": false,
+        "reduction_fraction": 0.1856010588505148,
+        "reference_triangles": 645228,
+        "total_seconds": 87.9677843469999,
+        "triangles": 525473,
+        "vertices": 205939
+      },
+      "signature": "73dfa5fbd998686b05239a383583bf8ec14a93ac452321ccbb7860b0df6cb49b",
+      "state": "durable",
+      "task": "certified-lod-0381-d1p35-0p2"
+    },
+    {
+      "archive_bytes": 1095680,
+      "archive_sha256": "575c8e7f2af59b75888ee2d16b964af50ed81ac5bf977ed4146bf56767d87cee",
+      "artifacts": [
+        {
+          "bytes": 1059173,
+          "path": "data/certified/certified-lod-0381-d1p35-0p6/mesh.npz",
+          "sha256": "48bba92503ced96da8e798545e1f8a1ae2c41fd528464a283d494e2c6d01405a"
+        },
+        {
+          "bytes": 5315,
+          "path": "data/certified/certified-lod-0381-d1p35-0p6/validation.json",
+          "sha256": "e1a4800949c0f9e7cdd48d8753a02993f82eef92935900a7cb8e808bb2780089"
+        },
+        {
+          "bytes": 3706,
+          "path": "data/certified/certified-lod-0381-d1p35-0p6/progress.json",
+          "sha256": "70d74bea04b85a705851a4150b7c354372faa2513060b818a8d054c7754b8f2c"
+        }
+      ],
+      "metrics": {
+        "accuracy_note": "Error relative to finest reconstructed triangle union; not survey accuracy or point-cloud completeness",
+        "budget_m": 0.6,
+        "candidate_accepted": true,
+        "continuous_bound": {
+          "certified": true,
+          "forward": {
+            "certified": true,
+            "method": "Continuous convex-triangle bounds; unproved faces rejected, no sample-based acceptance",
+            "numeric_margin_m": 1e-05,
+            "subdivisions": 5126,
+            "tested": 665732,
+            "unresolved": 0,
+            "upper_bound_m": 0.5999909809530299,
+            "work_cap_reached": false
+          },
+          "reverse": {
+            "certified": true,
+            "method": "Continuous convex-triangle bounds; unproved faces rejected, no sample-based acceptance",
+            "numeric_margin_m": 1e-05,
+            "subdivisions": 20312,
+            "tested": 210754,
+            "unresolved": 0,
+            "upper_bound_m": 0.59999844827581,
+            "work_cap_reached": false
+          },
+          "upper_bound_m": 0.59999844827581
+        },
+        "divider_facets": 10090,
+        "exact_divider_facets": true,
+        "pending": [
+          "geometry-preserving sheet orientation and owned coplanar facets",
+          "compressed hierarchy",
+          "renderer and device benchmarks"
+        ],
+        "publishable": false,
+        "reduction_fraction": 0.7992864537806791,
+        "reference_triangles": 645228,
+        "total_seconds": 112.81263196300006,
+        "triangles": 129506,
+        "vertices": 56363
+      },
+      "signature": "be276bd30aeb453b8dab95a0087fa8b1798c755462a24dca158829263d564237",
+      "state": "durable",
+      "task": "certified-lod-0381-d1p35-0p6"
+    },
+    {
+      "archive_bytes": 296960,
+      "archive_sha256": "bfd53c508b6908ef0e5003f061b01cfc8495f40f3a8d30a348d2fb829dbbf03b",
+      "artifacts": [
+        {
+          "bytes": 262867,
+          "path": "data/certified/certified-lod-0381-d1p35-2/mesh.npz",
+          "sha256": "b7dc817d5529603e2248106cb6ef13f9c3e36b99cf7f12f0a3ea299b7e9e05ef"
+        },
+        {
+          "bytes": 5315,
+          "path": "data/certified/certified-lod-0381-d1p35-2/validation.json",
+          "sha256": "1d4625b82193d33081f8f824d6dbdcee16df47ca6dce0bf16a917b926f2c47ae"
+        },
+        {
+          "bytes": 3706,
+          "path": "data/certified/certified-lod-0381-d1p35-2/progress.json",
+          "sha256": "000e7b06259649ee9765d59695e48926afb5524ea43ec81ad091d8217b5fde8d"
+        }
+      ],
+      "metrics": {
+        "accuracy_note": "Error relative to finest reconstructed triangle union; not survey accuracy or point-cloud completeness",
+        "budget_m": 2.0,
+        "candidate_accepted": true,
+        "continuous_bound": {
+          "certified": true,
+          "forward": {
+            "certified": true,
+            "method": "Continuous convex-triangle bounds; unproved faces rejected, no sample-based acceptance",
+            "numeric_margin_m": 1e-05,
+            "subdivisions": 295,
+            "tested": 646408,
+            "unresolved": 0,
+            "upper_bound_m": 1.9999902750652845,
+            "work_cap_reached": false
+          },
+          "reverse": {
+            "certified": true,
+            "method": "Continuous convex-triangle bounds; unproved faces rejected, no sample-based acceptance",
+            "numeric_margin_m": 1e-05,
+            "subdivisions": 2838,
+            "tested": 40913,
+            "unresolved": 0,
+            "upper_bound_m": 1.9999978873128825,
+            "work_cap_reached": false
+          },
+          "upper_bound_m": 1.9999978873128825
+        },
+        "divider_facets": 10090,
+        "exact_divider_facets": true,
+        "pending": [
+          "geometry-preserving sheet orientation and owned coplanar facets",
+          "compressed hierarchy",
+          "renderer and device benchmarks"
+        ],
+        "publishable": false,
+        "reduction_fraction": 0.9541851872516381,
+        "reference_triangles": 645228,
+        "total_seconds": 114.91382029099987,
+        "triangles": 29561,
+        "vertices": 16850
+      },
+      "signature": "ac9df9b3cee18cf5d768abea26011c011df0c85516afc963f78250713b56459f",
+      "state": "durable",
+      "task": "certified-lod-0381-d1p35-2"
+    },
+    {
+      "archive_bytes": 6461440,
+      "archive_sha256": "3dba6423c8c6e4ccc838f3f4a3e636e97ec7ae9b6459b7e3dfbf3e65353a28db",
+      "artifacts": [
+        {
+          "bytes": 6439066,
+          "path": "data/oriented/0381-d1p35-0p2/mesh.npz",
+          "sha256": "c06fc517d99547e4492290858b214c3602d1868e1f26c84b7adb3d43af8117cc"
+        },
+        {
+          "bytes": 584,
+          "path": "data/oriented/0381-d1p35-0p2/validation.json",
+          "sha256": "a1a5fc357c31d90047f1debe1d37c0ce01a5e9a4b27d50b77f90f15110b8c6a6"
+        },
+        {
+          "bytes": 67,
+          "path": "data/oriented/0381-d1p35-0p2/native.log",
+          "sha256": "cb36c4055adafa9bccbf5e52fa01a6f1fc77a5d69a0b8ffa908b88d8b25fcb3d"
+        }
+      ],
+      "metrics": {
+        "duplicated_vertices": 509991,
+        "geometry_identical": true,
+        "limitations": "Combinatorial manifold sheets can still intersect geometrically. No inference of solid geology or measured outward orientation. GPU vertex packing is a separate stage.",
+        "original_vertices": 205939,
+        "publishable": false,
+        "seconds": 11.962614652999946,
+        "separated_vertices": 715930,
+        "source_sha256": "fc7173da033ec5f9a0d919169276e3e6f2a0c52e31a7f023d8743fcf8beeff7f",
+        "topology": {
+          "edge_manifold": true,
+          "orientable": true,
+          "vertex_manifold": true
+        },
+        "triangles": 525473
+      },
+      "signature": "c7b7bc173a1a127d07ab7fd6e35576aa9e81026f9dcecc4474e07cbdbb868240",
+      "state": "durable",
+      "task": "oriented-0381-d1p35-0p2"
+    },
+    {
+      "archive_bytes": 1208320,
+      "archive_sha256": "288cff3683bb0b50ad0ed32d1ce35d2741b300e35b1ab2ab3f629ec8b4f7f3a7",
+      "artifacts": [
+        {
+          "bytes": 1190236,
+          "path": "data/codec/0381-d1p35-0p6/geometry.meshopt.bin",
+          "sha256": "34be21f35d940490e104ba898a1f8acac57b78caef8b036a24622227faa6ec45"
+        },
+        {
+          "bytes": 648,
+          "path": "data/codec/0381-d1p35-0p6/geometry.meshopt.json",
+          "sha256": "cc6e0c6be298d642b8f098d1e24744892ad2412d5c28b57ca6fecbdc577de06e"
+        },
+        {
+          "bytes": 852,
+          "path": "data/codec/0381-d1p35-0p6/validation.json",
+          "sha256": "b77f088cce891623b5388c322550ad9cb127438f016d9ba4f948080ca5f262bd"
+        }
+      ],
+      "metrics": {
+        "additional_geometric_error_m": 0.0,
+        "browser_codec_node": {
+          "decoded_bytes": 2230428,
+          "milliseconds": 7.894834999999993,
+          "position_bytes_identical": true,
+          "triangle_corners_and_winding_identical": true,
+          "verified": true
+        },
+        "encode_ms": 8.401619999858667,
+        "encoded_bytes": 1190236,
+        "limitation": "Node/WASM codec timings are not browser/device GPU/FPS measurements. Unchanged source coordinate frame; no imagery, normals, hierarchy or ECEF transform yet.",
+        "native_decode_ms": 2.369439999711176,
+        "position_bits_identical": true,
+        "publishable": false,
+        "raw_bytes": 2230428,
+        "source_sha256": "48bba92503ced96da8e798545e1f8a1ae2c41fd528464a283d494e2c6d01405a",
+        "transfer_reduction_fraction": 0.46636430317409927,
+        "triangle_geometry_and_winding_identical": true,
+        "triangles": 129506,
+        "vertices": 56363
+      },
+      "signature": "155a810779d970af7fb230b1b0b9563dad57dcf9e7268873e9238ccf51aa29ca",
+      "state": "durable",
+      "task": "codec-0381-d1p35-0p6"
+    }
+  ],
+  "run": "f899852804c645c7c8834d25a9642ce1e55000f19ad15138be5b5bbb777b142e",
+  "schema": 1,
+  "seams": [
+    {
+      "accepted": true,
+      "name": "seams-local-1p35-7e8d397b8039",
+      "pairs": [
+        {
+          "accepted": true,
+          "axis": 0,
+          "crossing_original_facets_a": 1686,
+          "crossing_original_facets_b": 1686,
+          "edges_a": 1485,
+          "edges_b": 1485,
+          "endpoint_hausdorff_m": 0.0,
+          "exact_at_micrometre_keys": true,
+          "note": "Original crossing facet equality proves the same measured triangles are present. Nonmanifold sheet separation and coplanar ownership remain separate release gates.",
+          "original_facet_sets_identical": true,
+          "same_topology_at_0488mm_grid": true,
+          "tiles": [
+            189,
+            190
+          ],
+          "value": 1000
+        },
+        {
+          "accepted": true,
+          "axis": 1,
+          "crossing_original_facets_a": 2249,
+          "crossing_original_facets_b": 2249,
+          "edges_a": 2103,
+          "edges_b": 2102,
+          "endpoint_hausdorff_m": 0.0,
+          "exact_at_micrometre_keys": false,
+          "note": "Original crossing facet equality proves the same measured triangles are present. Nonmanifold sheet separation and coplanar ownership remain separate release gates.",
+          "original_facet_sets_identical": true,
+          "same_topology_at_0488mm_grid": false,
+          "tiles": [
+            189,
+            209
+          ],
+          "value": 1000
+        },
+        {
+          "accepted": true,
+          "axis": 1,
+          "crossing_original_facets_a": 2148,
+          "crossing_original_facets_b": 2148,
+          "edges_a": 2009,
+          "edges_b": 2009,
+          "endpoint_hausdorff_m": 0.0,
+          "exact_at_micrometre_keys": true,
+          "note": "Original crossing facet equality proves the same measured triangles are present. Nonmanifold sheet separation and coplanar ownership remain separate release gates.",
+          "original_facet_sets_identical": true,
+          "same_topology_at_0488mm_grid": true,
+          "tiles": [
+            190,
+            210
+          ],
+          "value": 1000
+        },
+        {
+          "accepted": true,
+          "axis": 0,
+          "crossing_original_facets_a": 2305,
+          "crossing_original_facets_b": 2305,
+          "edges_a": 2153,
+          "edges_b": 2153,
+          "endpoint_hausdorff_m": 0.0,
+          "exact_at_micrometre_keys": true,
+          "note": "Original crossing facet equality proves the same measured triangles are present. Nonmanifold sheet separation and coplanar ownership remain separate release gates.",
+          "original_facet_sets_identical": true,
+          "same_topology_at_0488mm_grid": true,
+          "tiles": [
+            209,
+            210
+          ],
+          "value": 1000
+        }
+      ],
+      "publishable": false
+    },
+    {
+      "accepted": true,
+      "name": "seams-local-1p35",
+      "pairs": [
+        {
+          "accepted": true,
+          "axis": 0,
+          "crossing_original_facets_a": 1577,
+          "crossing_original_facets_b": 1577,
+          "edges_a": 1499,
+          "edges_b": 1499,
+          "endpoint_hausdorff_m": 0.0,
+          "exact_at_micrometre_keys": true,
+          "note": "Original crossing facet equality proves the same measured triangles are present. Nonmanifold sheet separation and coplanar ownership remain separate release gates.",
+          "original_facet_sets_identical": true,
+          "same_topology_at_0488mm_grid": true,
+          "tiles": [
+            361,
+            362
+          ],
+          "value": 200
+        },
+        {
+          "accepted": true,
+          "axis": 0,
+          "crossing_original_facets_a": 2142,
+          "crossing_original_facets_b": 2142,
+          "edges_a": 2003,
+          "edges_b": 2001,
+          "endpoint_hausdorff_m": 1.0123856327579717,
+          "exact_at_micrometre_keys": false,
+          "note": "Original crossing facet equality proves the same measured triangles are present. Nonmanifold sheet separation and coplanar ownership remain separate release gates.",
+          "original_facet_sets_identical": true,
+          "same_topology_at_0488mm_grid": false,
+          "tiles": [
+            381,
+            382
+          ],
+          "value": 200
+        },
+        {
+          "accepted": true,
+          "axis": 1,
+          "crossing_original_facets_a": 2721,
+          "crossing_original_facets_b": 2721,
+          "edges_a": 2536,
+          "edges_b": 2537,
+          "endpoint_hausdorff_m": 0.34953018042725176,
+          "exact_at_micrometre_keys": false,
+          "note": "Original crossing facet equality proves the same measured triangles are present. Nonmanifold sheet separation and coplanar ownership remain separate release gates.",
+          "original_facet_sets_identical": true,
+          "same_topology_at_0488mm_grid": false,
+          "tiles": [
+            361,
+            381
+          ],
+          "value": 1900
+        },
+        {
+          "accepted": true,
+          "axis": 1,
+          "crossing_original_facets_a": 1588,
+          "crossing_original_facets_b": 1588,
+          "edges_a": 1475,
+          "edges_b": 1475,
+          "endpoint_hausdorff_m": 0.0,
+          "exact_at_micrometre_keys": true,
+          "note": "Original crossing facet equality proves the same measured triangles are present. Nonmanifold sheet separation and coplanar ownership remain separate release gates.",
+          "original_facet_sets_identical": true,
+          "same_topology_at_0488mm_grid": true,
+          "tiles": [
+            362,
+            382
+          ],
+          "value": 1900
+        }
+      ],
+      "publishable": false
+    }
+  ],
+  "status": "Experiments only; not a released regional tileset"
+}

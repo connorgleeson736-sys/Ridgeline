@@ -1,0 +1,119 @@
+{
+  "baselineCommit": "906759f6d16e4b1edc364666f331beddaf77fdc7",
+  "profiles": [
+    {
+      "memory": 2,
+      "saveData": false,
+      "imageryMiB": 64,
+      "demMiB": 24,
+      "viewsMiB": 48,
+      "spareMiB": 16,
+      "imageryBytesMiB": 24,
+      "demBytesMiB": 12,
+      "unfinishedImagery": 4,
+      "unfinishedDEM": 2,
+      "totalMiB": 188
+    },
+    {
+      "memory": 4,
+      "saveData": false,
+      "imageryMiB": 128,
+      "demMiB": 48,
+      "viewsMiB": 96,
+      "spareMiB": 16,
+      "imageryBytesMiB": 48,
+      "demBytesMiB": 16,
+      "unfinishedImagery": 4,
+      "unfinishedDEM": 2,
+      "totalMiB": 352
+    },
+    {
+      "memory": 8,
+      "saveData": false,
+      "imageryMiB": 128,
+      "demMiB": 48,
+      "viewsMiB": 96,
+      "spareMiB": 16,
+      "imageryBytesMiB": 48,
+      "demBytesMiB": 16,
+      "unfinishedImagery": 4,
+      "unfinishedDEM": 2,
+      "totalMiB": 352
+    },
+    {
+      "memory": 4,
+      "saveData": true,
+      "imageryMiB": 32,
+      "demMiB": 12,
+      "viewsMiB": 96,
+      "spareMiB": 8,
+      "imageryBytesMiB": 12,
+      "demBytesMiB": 8,
+      "unfinishedImagery": 2,
+      "unfinishedDEM": 1,
+      "totalMiB": 168
+    }
+  ],
+  "completeCachedFrames": {
+    "before": {
+      "terrainTiles": 64,
+      "completeFrames": 700,
+      "coverageBuilds": 700,
+      "medianPreparationMs": 6.865327650000001,
+      "samplesMs": [
+        4.3018747500000005,
+        4.193000960000001,
+        5.5253482499999995,
+        6.865327650000001,
+        7.793531749999997,
+        6.936865309999998,
+        7.789425799999995
+      ],
+      "stableUpdateDEMReads": 44800,
+      "medianUpdateMs": 0.135618429999995,
+      "updateSamplesMs": [
+        0.2865558299999975,
+        0.15911216999999853,
+        0.12677302000000054,
+        0.135618429999995,
+        0.12024393000000601,
+        0.12585160000000542,
+        0.21268479999999726
+      ]
+    },
+    "after": {
+      "terrainTiles": 64,
+      "completeFrames": 700,
+      "coverageBuilds": 0,
+      "medianPreparationMs": 0.8460282800000004,
+      "samplesMs": [
+        0.8086112300000059,
+        0.7544934599999942,
+        0.9149298100000033,
+        1.0312784199999987,
+        0.8404582399999981,
+        0.855786160000007,
+        0.8460282800000004
+      ],
+      "stableUpdateDEMReads": 0,
+      "medianUpdateMs": 0.13216247999999722,
+      "updateSamplesMs": [
+        0.19570409999999355,
+        0.17171986999999717,
+        0.13216247999999722,
+        0.12174885000000359,
+        0.13709698000000572,
+        0.12471157999999377,
+        0.1183386900000005
+      ]
+    }
+  },
+  "underBudgetDependencyScans": {
+    "before": 32,
+    "after": 0
+  },
+  "legacyDefaultUpgrade": "passed",
+  "userCacheChoicePreserved": "passed",
+  "prefetchCopyAvoidedAndVisibleBufferIsolation": "passed",
+  "caveat": "CPU microbenchmark with actual native RTT preparation and controlled GPU/source fixtures; not device FPS, network latency, or total GPU memory."
+}

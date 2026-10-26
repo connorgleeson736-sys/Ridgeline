@@ -1,0 +1,44 @@
+{
+  "accuracy_limits": [
+    "Bounds are relative to reconstructed geometry, not absolute LiDAR accuracy",
+    "Encoding precision does not imply geological or survey accuracy"
+  ],
+  "browser_fps": null,
+  "browser_gpu_time_ms": null,
+  "device_benchmark_url": "/lidar-summit.html",
+  "device_benchmarks": [],
+  "fine": {
+    "baseline_attribute_bytes_per_vertex": 32,
+    "clusters": 64,
+    "compact_attribute_bytes_per_vertex": 20,
+    "full_precision_reconstruction_display_bound_m": 0.0004840190892970862,
+    "glb_bytes": 30982328,
+    "gpu_geometry_bytes": 58680280,
+    "same_input_float32_glb_bytes": 50758780,
+    "triangles": 815390
+  },
+  "levels": [
+    {
+      "continuous_bound_against_float32_reference_m": 2.0047028340612463,
+      "full_precision_reference_bound_m": 2.0047640227460763,
+      "glb_bytes": 1310724,
+      "name": "coarse",
+      "persistent_sha256": "870f2b01fb1a43b8c8839788f8c30694d443a68dfc25e1cdbf006cc4d37b4928",
+      "triangles": 28098
+    },
+    {
+      "continuous_bound_against_float32_reference_m": 0.6021977450191973,
+      "full_precision_reference_bound_m": 0.6022589337040276,
+      "glb_bytes": 3184872,
+      "name": "intermediate",
+      "persistent_sha256": "b37b6329a50c7a43f12b17d5aa2baaa2838f7715f1a0f28d4ff9a275692b9a74",
+      "triangles": 72961
+    }
+  ],
+  "reference_float32_rounding_max_m": 6.118868483024512e-05,
+  "run": "f899852804c645c7c8834d25a9642ce1e55000f19ad15138be5b5bbb777b142e",
+  "schema": 1,
+  "scope": "Single100m summit0189 pilot; NOT regional/device performance results",
+  "tileset_sha256": "fb0318fe588e6a7099b5cb1298acafaa3e48f38b399d71d33031c3772f6e46b7",
+  "verification": "Actual site meshopt WASM decoder under Node, decoded-core Khronos validation, continuous geometry bounds and persistent readback; no browser/device test"
+}

@@ -1,0 +1,89 @@
+{
+  "method": "Matched geographic footprint from original LINZ zoom-12/13 tiles and actual MapLibre raster grading equations; no generated/edited imagery assets.",
+  "rows": [
+    {
+      "sample": "west",
+      "cameraZoom": 11.5,
+      "rgbMismatchBefore": 0.09668120269607844,
+      "rgbMismatchAfter": 0.09176021088494196,
+      "meanChromaGapBefore": 0.013163657536764711,
+      "meanChromaGapAfter": 0.010314315832519537
+    },
+    {
+      "sample": "west",
+      "cameraZoom": 12,
+      "rgbMismatchBefore": 0.09775058818057965,
+      "rgbMismatchAfter": 0.09250032124230878,
+      "meanChromaGapBefore": 0.01496387469618056,
+      "meanChromaGapAfter": 0.010879708347375415
+    },
+    {
+      "sample": "west",
+      "cameraZoom": 13,
+      "rgbMismatchBefore": 0.0999268261878319,
+      "rgbMismatchAfter": 0.09408797905284076,
+      "meanChromaGapBefore": 0.01820480430453432,
+      "meanChromaGapAfter": 0.012741067325367651
+    },
+    {
+      "sample": "summit",
+      "cameraZoom": 11.5,
+      "rgbMismatchBefore": 0.24120076760110296,
+      "rgbMismatchAfter": 0.22950473077460398,
+      "meanChromaGapBefore": 0.0025468970818014747,
+      "meanChromaGapAfter": 0.001995608045959482
+    },
+    {
+      "sample": "summit",
+      "cameraZoom": 12,
+      "rgbMismatchBefore": 0.2433396379511903,
+      "rgbMismatchAfter": 0.23123808828678172,
+      "meanChromaGapBefore": 0.0028952020887586735,
+      "meanChromaGapAfter": 0.00210499987282348
+    },
+    {
+      "sample": "summit",
+      "cameraZoom": 13,
+      "rgbMismatchBefore": 0.24764331075963367,
+      "rgbMismatchAfter": 0.23475197014569718,
+      "meanChromaGapBefore": 0.003522255332797177,
+      "meanChromaGapAfter": 0.0024651345645680094
+    },
+    {
+      "sample": "coast",
+      "cameraZoom": 11.5,
+      "rgbMismatchBefore": 0.1758549749080882,
+      "rgbMismatchAfter": 0.16732209528910322,
+      "meanChromaGapBefore": 0.004790615004595586,
+      "meanChromaGapAfter": 0.0037536616287231483
+    },
+    {
+      "sample": "coast",
+      "cameraZoom": 12,
+      "rgbMismatchBefore": 0.17742067311538326,
+      "rgbMismatchAfter": 0.1685863070796526,
+      "meanChromaGapBefore": 0.005445763264973966,
+      "meanChromaGapAfter": 0.003959423428404565
+    },
+    {
+      "sample": "coast",
+      "cameraZoom": 13,
+      "rgbMismatchBefore": 0.18058275228928378,
+      "rgbMismatchAfter": 0.17115298521752453,
+      "meanChromaGapBefore": 0.006625226189108463,
+      "meanChromaGapAfter": 0.0046368228687959576
+    }
+  ],
+  "sourceHashes": {
+    "summit-13.webp": "096e4740c3b5bc27f602176c86f47ce1bff47f2e05172b437320849eab235892",
+    "coast-13.webp": "d8280fc9c3b2254481665fb1ada3bf6d3787f3d814b6be172b5fa13a3cf13636",
+    "west-13.webp": "f3cb6ca951979d1cd9c69c4e4af8cdb4f1a0e7b424304ca06a9ea6f9d32c85e4",
+    "summit-12.webp": "b27a39d4d8a95e67984343f8164a45ad84b636f2cb7df6fdc4f7f4936572f6d5",
+    "west-12.webp": "9bc504b43220dd3a02db703fecf6c477e99e6f63cfceff1cd0aa6b2a6dc0b625",
+    "west-14.webp": "9befad90f3831dc1b22db616dd6701e9bd576aaf59f2ffbaa6e31d4b39575f5c",
+    "summit-14.webp": "3428a413d3635adbd0e1a672835b0684d89c21226263491736534e8c14c3de21",
+    "coast-14.webp": "a463d9a2d992bcfd16d2748f63e9ca4f0fd7fa8ee59ec42c6ae48c670a2ca2c1",
+    "coast-12.webp": "a8d3726d4760ce7788be5710652f198f8764c35defed5b4dff7c53386f9542c3"
+  },
+  "limitations": "This softens source-colour differences; seasonal/survey boundaries and different capture geometry remain. Not a browser pixel or FPS benchmark."
+}

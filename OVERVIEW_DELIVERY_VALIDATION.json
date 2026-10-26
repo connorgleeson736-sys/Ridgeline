@@ -1,0 +1,34 @@
+{
+  "deployedSource": "e6098a440471f49b79cd758138e371478811f3a8",
+  "origin": "https://ridgeline-nz.connorgleeson736.chatgpt.site",
+  "asset": "/assets/alpine-overviews-v1/a22d893fbfdb2906a5177a67.webp",
+  "HTTPStatus": 200,
+  "contentType": "application/octet-stream",
+  "bytes": 81926,
+  "sha256": "a22d893fbfdb2906a5177a67428cf0a9b9c04ce7ed74f2b0b28dd0fb6654c6d2",
+  "oldLoaderRejectsActualHeader": true,
+  "patchedProtocol": {
+    "registeredProtocolReturnsDownloadedProductionImage": true,
+    "savedTileRequests": 1,
+    "LINZFallbackRequests": 0,
+    "cacheReused": true,
+    "sha256": "a22d893fbfdb2906a5177a67428cf0a9b9c04ce7ed74f2b0b28dd0fb6654c6d2",
+    "regional": {
+      "untouchedLINZ": 0,
+      "regionalEsri": 0,
+      "boundaryComposites": 0,
+      "overzoomCrops": 0,
+      "esriColourCompensations": 0,
+      "precomputedOverviews": 1,
+      "overviewGenericContentType": 1,
+      "overviewFallbacks": 0,
+      "workerJobs": 0,
+      "mainThreadJobs": 0,
+      "compositionFailures": 0,
+      "compositesActive": 0,
+      "compositesQueued": 0
+    },
+    "caveat": "Actual protocol/cache code with a controlled engine registry and recorded HTTP response; not a browser/GPU replay."
+  },
+  "caveat": "Authenticated production photo download passed through the actual registered ridge callback and cache with a controlled engine registry; no browser/GPU replay."
+}

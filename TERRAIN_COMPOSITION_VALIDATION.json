@@ -1,0 +1,25 @@
+{
+  "engine": "6.14.0",
+  "actualNativeCoordinatesFingerprintsRasterDraw": true,
+  "finishedTextureAdoptedWithoutRecomposition": true,
+  "coarseCoverRetainedUntilRefinement": true,
+  "sourceRevisionInvalidates": true,
+  "incompleteCoverageRejected": true,
+  "shaderFailureAtomic": true,
+  "frameUniformsFramebufferViewportRestored": true,
+  "noVisibleSelectionMutation": true,
+  "noCanvasTerrainDraw": true,
+  "cacheBudgetEnforced": true,
+  "multipleNativeDrapeStacks": true,
+  "preparedCompositionZoomMetadata": true,
+  "nonblockingFlush": true,
+  "draws": 3,
+  "mips": 3,
+  "releases": 4,
+  "drawNames": [
+    "raster",
+    "raster",
+    "raster"
+  ],
+  "caveat": "Real native CPU coordinate/fingerprint/raster shader-dispatch paths with controlled GPU handles/program draw; no real browser GPU or device FPS benchmark."
+}

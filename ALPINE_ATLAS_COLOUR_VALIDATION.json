@@ -1,0 +1,59 @@
+{
+  "grade": "snow-v2",
+  "LINZContrast": 0.28,
+  "LINZBlackPoint": 0.075,
+  "samples": {
+    "snow": {
+      "input": [
+        182,
+        186,
+        184
+      ],
+      "before": [
+        205.5466216216216,
+        209.31689189189186,
+        207.43175675675676
+      ],
+      "after": [
+        207.7222222222222,
+        211.57638888888886,
+        209.64930555555551
+      ]
+    },
+    "rock": {
+      "input": [
+        68,
+        70,
+        66
+      ],
+      "before": [
+        61.64797297297297,
+        63.533108108108095,
+        59.76283783783784
+      ],
+      "after": [
+        60.62152777777778,
+        62.54861111111111,
+        58.69444444444445
+      ]
+    },
+    "brightSnow": {
+      "input": [
+        215,
+        220,
+        225
+      ],
+      "before": [
+        247.96216216216214,
+        252.675,
+        255
+      ],
+      "after": [
+        251.08159722222223,
+        255,
+        255
+      ]
+    }
+  },
+  "method": "Pinned native raster shader equations, display bytes. Esri reference maintained by inverse grade compensation. No GPU screenshot claim."
+}

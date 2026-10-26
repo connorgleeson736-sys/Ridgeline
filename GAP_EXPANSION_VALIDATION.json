@@ -1,0 +1,133 @@
+{
+  "regions": [
+    {
+      "id": "LINZ10-001",
+      "coarsePixels": 5025605,
+      "overlapWidthMetres": 0,
+      "colourCorrectionReachMetres": 0,
+      "maximumRGBOffset": 0,
+      "protectedCookPixelsChanged": 0
+    },
+    {
+      "id": "LINZ10-002",
+      "coarsePixels": 1220567,
+      "overlapWidthMetres": 0,
+      "colourCorrectionReachMetres": 0,
+      "maximumRGBOffset": 0,
+      "protectedCookPixelsChanged": 0
+    },
+    {
+      "id": "LINZ10-003",
+      "coarsePixels": 1090944,
+      "overlapWidthMetres": 0,
+      "colourCorrectionReachMetres": 0,
+      "maximumRGBOffset": 0,
+      "protectedCookPixelsChanged": 0
+    },
+    {
+      "id": "LINZ10-004",
+      "coarsePixels": 1178704,
+      "overlapWidthMetres": 0,
+      "colourCorrectionReachMetres": 0,
+      "maximumRGBOffset": 0,
+      "protectedCookPixelsChanged": 0
+    },
+    {
+      "id": "LINZ10-005",
+      "coarsePixels": 759200,
+      "overlapWidthMetres": 0,
+      "colourCorrectionReachMetres": 0,
+      "maximumRGBOffset": 0,
+      "protectedCookPixelsChanged": 0
+    },
+    {
+      "id": "LINZ10-006",
+      "coarsePixels": 403487,
+      "overlapWidthMetres": 0,
+      "colourCorrectionReachMetres": 0,
+      "maximumRGBOffset": 0,
+      "protectedCookPixelsChanged": 0
+    },
+    {
+      "id": "LINZ10-007",
+      "coarsePixels": 361445,
+      "overlapWidthMetres": 0,
+      "colourCorrectionReachMetres": 0,
+      "maximumRGBOffset": 0,
+      "protectedCookPixelsChanged": 0
+    },
+    {
+      "id": "LINZ10-009",
+      "coarsePixels": 259099,
+      "overlapWidthMetres": 0,
+      "colourCorrectionReachMetres": 0,
+      "maximumRGBOffset": 0,
+      "protectedCookPixelsChanged": 0
+    },
+    {
+      "id": "LINZ10-015",
+      "coarsePixels": 157557,
+      "overlapWidthMetres": 0,
+      "colourCorrectionReachMetres": 0,
+      "maximumRGBOffset": 0,
+      "protectedCookPixelsChanged": 0
+    },
+    {
+      "id": "LINZ10-035",
+      "coarsePixels": 54744,
+      "overlapWidthMetres": 0,
+      "colourCorrectionReachMetres": 0,
+      "maximumRGBOffset": 0,
+      "protectedCookPixelsChanged": 0
+    },
+    {
+      "id": "LINZ10-036",
+      "coarsePixels": 50903,
+      "overlapWidthMetres": 0,
+      "colourCorrectionReachMetres": 0,
+      "maximumRGBOffset": 0,
+      "protectedCookPixelsChanged": 0
+    },
+    {
+      "id": "LINZ10-037",
+      "coarsePixels": 58033,
+      "overlapWidthMetres": 0,
+      "colourCorrectionReachMetres": 0,
+      "maximumRGBOffset": 0,
+      "protectedCookPixelsChanged": 0
+    },
+    {
+      "id": "LINZ10-038",
+      "coarsePixels": 58388,
+      "overlapWidthMetres": 0,
+      "colourCorrectionReachMetres": 0,
+      "maximumRGBOffset": 0,
+      "protectedCookPixelsChanged": 0
+    },
+    {
+      "id": "LINZ10-039",
+      "coarsePixels": 58441,
+      "overlapWidthMetres": 0,
+      "colourCorrectionReachMetres": 0,
+      "maximumRGBOffset": 0,
+      "protectedCookPixelsChanged": 0
+    },
+    {
+      "id": "COOK-LEGACY",
+      "coarsePixels": 929639,
+      "overlapWidthMetres": 0,
+      "colourCorrectionReachMetres": 0,
+      "maximumRGBOffset": 0,
+      "protectedCookPixelsChanged": 0
+    }
+  ],
+  "maskTiles": 292,
+  "coarseOverlayTiles": 207,
+  "sourceSnapshots": 684,
+  "sourceZoom": 13,
+  "pixelMethod": "Audited gap geometry expanded 200m, subtract actual live fine-survey PNG alpha on intersecting boundary tiles; live source IDs checked unchanged. Native binary mask grid z13, no feathering.",
+  "protectedCookRadiusMetres": 1100,
+  "seamMode": "Hard source boundaries: binary masks, no feathering or colour correction",
+  "DEMChanged": false,
+  "generatedGeographicDetail": false
+}

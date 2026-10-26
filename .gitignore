@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+source-cache/
+
+/node_modules/
+/tools/lidar_pipeline/node_modules/
+/dist/
+/.next/
+/.wrangler/
+/.env*
+**/__pycache__/
+
+/.vinext/

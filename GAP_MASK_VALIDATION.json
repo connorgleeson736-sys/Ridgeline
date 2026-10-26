@@ -1,0 +1,29 @@
+{
+  "hardBinaryMaskTiles": 292,
+  "maskedPixelsAtZ13": 11292690,
+  "sampleAlpha": {
+    "LINZ10-001": 255,
+    "LINZ10-002": 255,
+    "LINZ10-003": 255,
+    "LINZ10-004": 255,
+    "LINZ10-005": 255,
+    "LINZ10-006": 255,
+    "LINZ10-007": 255,
+    "LINZ10-009": 255,
+    "LINZ10-015": 255,
+    "LINZ10-035": 255,
+    "LINZ10-036": 255,
+    "LINZ10-037": 255,
+    "LINZ10-038": 255,
+    "LINZ10-039": 255
+  },
+  "fineAndWaterControlsUnchanged": true,
+  "measuredFinePixelsChanged": 0,
+  "oldFeatherPixelsLeftUncovered": 0,
+  "coarseOverlayTiles": 207,
+  "sourceAssets": 426,
+  "sourceAssetBytes": 8781721,
+  "noFeatheringOrColourOffsets": true,
+  "protectedCookRadiusMetres": 1100,
+  "caveat": "Footprints and native z13 mask grid are approximate, not subpixel survey cutlines. Coarse imagery uses standard area downsampling, not a geographic feather band."
+}

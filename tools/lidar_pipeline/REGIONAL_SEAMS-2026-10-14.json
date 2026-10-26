@@ -1,0 +1,389 @@
+{
+  "accepted": true,
+  "failed_pairs": [],
+  "note": "Selected reconstructed scope only. This does not validate unprocessed regional neighbours or rendered LOD seams.",
+  "pairs": [
+    {
+      "accepted": true,
+      "axis": 0,
+      "limits": "Exact original triangle agreement only. Coplanar ownership, manifold sheets, source completeness and mixed-LOD transitions remain independent gates.",
+      "measured_crossings_present": true,
+      "no_coordinate_tolerance": true,
+      "no_missing_crossing_facets": true,
+      "original_facets_a": 1544,
+      "original_facets_b": 1544,
+      "publishable": false,
+      "tiles": [
+        168,
+        169
+      ]
+    },
+    {
+      "accepted": true,
+      "axis": 1,
+      "limits": "Exact original triangle agreement only. Coplanar ownership, manifold sheets, source completeness and mixed-LOD transitions remain independent gates.",
+      "measured_crossings_present": true,
+      "no_coordinate_tolerance": true,
+      "no_missing_crossing_facets": true,
+      "original_facets_a": 2059,
+      "original_facets_b": 2059,
+      "publishable": false,
+      "tiles": [
+        168,
+        188
+      ]
+    },
+    {
+      "accepted": true,
+      "axis": 0,
+      "limits": "Exact original triangle agreement only. Coplanar ownership, manifold sheets, source completeness and mixed-LOD transitions remain independent gates.",
+      "measured_crossings_present": true,
+      "no_coordinate_tolerance": true,
+      "no_missing_crossing_facets": true,
+      "original_facets_a": 1370,
+      "original_facets_b": 1370,
+      "publishable": false,
+      "tiles": [
+        169,
+        170
+      ]
+    },
+    {
+      "accepted": true,
+      "axis": 1,
+      "limits": "Exact original triangle agreement only. Coplanar ownership, manifold sheets, source completeness and mixed-LOD transitions remain independent gates.",
+      "measured_crossings_present": true,
+      "no_coordinate_tolerance": true,
+      "no_missing_crossing_facets": true,
+      "original_facets_a": 2162,
+      "original_facets_b": 2162,
+      "publishable": false,
+      "tiles": [
+        169,
+        189
+      ]
+    },
+    {
+      "accepted": true,
+      "axis": 0,
+      "limits": "Exact original triangle agreement only. Coplanar ownership, manifold sheets, source completeness and mixed-LOD transitions remain independent gates.",
+      "measured_crossings_present": true,
+      "no_coordinate_tolerance": true,
+      "no_missing_crossing_facets": true,
+      "original_facets_a": 1721,
+      "original_facets_b": 1721,
+      "publishable": false,
+      "tiles": [
+        170,
+        171
+      ]
+    },
+    {
+      "accepted": true,
+      "axis": 1,
+      "limits": "Exact original triangle agreement only. Coplanar ownership, manifold sheets, source completeness and mixed-LOD transitions remain independent gates.",
+      "measured_crossings_present": true,
+      "no_coordinate_tolerance": true,
+      "no_missing_crossing_facets": true,
+      "original_facets_a": 1960,
+      "original_facets_b": 1960,
+      "publishable": false,
+      "tiles": [
+        170,
+        190
+      ]
+    },
+    {
+      "accepted": true,
+      "axis": 1,
+      "limits": "Exact original triangle agreement only. Coplanar ownership, manifold sheets, source completeness and mixed-LOD transitions remain independent gates.",
+      "measured_crossings_present": true,
+      "no_coordinate_tolerance": true,
+      "no_missing_crossing_facets": true,
+      "original_facets_a": 1942,
+      "original_facets_b": 1942,
+      "publishable": false,
+      "tiles": [
+        171,
+        191
+      ]
+    },
+    {
+      "accepted": true,
+      "axis": 0,
+      "limits": "Exact original triangle agreement only. Coplanar ownership, manifold sheets, source completeness and mixed-LOD transitions remain independent gates.",
+      "measured_crossings_present": true,
+      "no_coordinate_tolerance": true,
+      "no_missing_crossing_facets": true,
+      "original_facets_a": 2066,
+      "original_facets_b": 2066,
+      "publishable": false,
+      "tiles": [
+        188,
+        189
+      ]
+    },
+    {
+      "accepted": true,
+      "axis": 1,
+      "limits": "Exact original triangle agreement only. Coplanar ownership, manifold sheets, source completeness and mixed-LOD transitions remain independent gates.",
+      "measured_crossings_present": true,
+      "no_coordinate_tolerance": true,
+      "no_missing_crossing_facets": true,
+      "original_facets_a": 2513,
+      "original_facets_b": 2513,
+      "publishable": false,
+      "tiles": [
+        188,
+        208
+      ]
+    },
+    {
+      "accepted": true,
+      "axis": 0,
+      "limits": "Exact original triangle agreement only. Coplanar ownership, manifold sheets, source completeness and mixed-LOD transitions remain independent gates.",
+      "measured_crossings_present": true,
+      "no_coordinate_tolerance": true,
+      "no_missing_crossing_facets": true,
+      "original_facets_a": 1686,
+      "original_facets_b": 1686,
+      "publishable": false,
+      "tiles": [
+        189,
+        190
+      ]
+    },
+    {
+      "accepted": true,
+      "axis": 1,
+      "limits": "Exact original triangle agreement only. Coplanar ownership, manifold sheets, source completeness and mixed-LOD transitions remain independent gates.",
+      "measured_crossings_present": true,
+      "no_coordinate_tolerance": true,
+      "no_missing_crossing_facets": true,
+      "original_facets_a": 2249,
+      "original_facets_b": 2249,
+      "publishable": false,
+      "tiles": [
+        189,
+        209
+      ]
+    },
+    {
+      "accepted": true,
+      "axis": 0,
+      "limits": "Exact original triangle agreement only. Coplanar ownership, manifold sheets, source completeness and mixed-LOD transitions remain independent gates.",
+      "measured_crossings_present": true,
+      "no_coordinate_tolerance": true,
+      "no_missing_crossing_facets": true,
+      "original_facets_a": 1802,
+      "original_facets_b": 1802,
+      "publishable": false,
+      "tiles": [
+        190,
+        191
+      ]
+    },
+    {
+      "accepted": true,
+      "axis": 1,
+      "limits": "Exact original triangle agreement only. Coplanar ownership, manifold sheets, source completeness and mixed-LOD transitions remain independent gates.",
+      "measured_crossings_present": true,
+      "no_coordinate_tolerance": true,
+      "no_missing_crossing_facets": true,
+      "original_facets_a": 2148,
+      "original_facets_b": 2148,
+      "publishable": false,
+      "tiles": [
+        190,
+        210
+      ]
+    },
+    {
+      "accepted": true,
+      "axis": 1,
+      "limits": "Exact original triangle agreement only. Coplanar ownership, manifold sheets, source completeness and mixed-LOD transitions remain independent gates.",
+      "measured_crossings_present": true,
+      "no_coordinate_tolerance": true,
+      "no_missing_crossing_facets": true,
+      "original_facets_a": 1909,
+      "original_facets_b": 1909,
+      "publishable": false,
+      "tiles": [
+        191,
+        211
+      ]
+    },
+    {
+      "accepted": true,
+      "axis": 0,
+      "limits": "Exact original triangle agreement only. Coplanar ownership, manifold sheets, source completeness and mixed-LOD transitions remain independent gates.",
+      "measured_crossings_present": true,
+      "no_coordinate_tolerance": true,
+      "no_missing_crossing_facets": true,
+      "original_facets_a": 2485,
+      "original_facets_b": 2485,
+      "publishable": false,
+      "tiles": [
+        208,
+        209
+      ]
+    },
+    {
+      "accepted": true,
+      "axis": 1,
+      "limits": "Exact original triangle agreement only. Coplanar ownership, manifold sheets, source completeness and mixed-LOD transitions remain independent gates.",
+      "measured_crossings_present": true,
+      "no_coordinate_tolerance": true,
+      "no_missing_crossing_facets": true,
+      "original_facets_a": 1948,
+      "original_facets_b": 1948,
+      "publishable": false,
+      "tiles": [
+        208,
+        228
+      ]
+    },
+    {
+      "accepted": true,
+      "axis": 0,
+      "limits": "Exact original triangle agreement only. Coplanar ownership, manifold sheets, source completeness and mixed-LOD transitions remain independent gates.",
+      "measured_crossings_present": true,
+      "no_coordinate_tolerance": true,
+      "no_missing_crossing_facets": true,
+      "original_facets_a": 2305,
+      "original_facets_b": 2305,
+      "publishable": false,
+      "tiles": [
+        209,
+        210
+      ]
+    },
+    {
+      "accepted": true,
+      "axis": 1,
+      "limits": "Exact original triangle agreement only. Coplanar ownership, manifold sheets, source completeness and mixed-LOD transitions remain independent gates.",
+      "measured_crossings_present": true,
+      "no_coordinate_tolerance": true,
+      "no_missing_crossing_facets": true,
+      "original_facets_a": 2822,
+      "original_facets_b": 2822,
+      "publishable": false,
+      "tiles": [
+        209,
+        229
+      ]
+    },
+    {
+      "accepted": true,
+      "axis": 0,
+      "limits": "Exact original triangle agreement only. Coplanar ownership, manifold sheets, source completeness and mixed-LOD transitions remain independent gates.",
+      "measured_crossings_present": true,
+      "no_coordinate_tolerance": true,
+      "no_missing_crossing_facets": true,
+      "original_facets_a": 1989,
+      "original_facets_b": 1989,
+      "publishable": false,
+      "tiles": [
+        210,
+        211
+      ]
+    },
+    {
+      "accepted": true,
+      "axis": 1,
+      "limits": "Exact original triangle agreement only. Coplanar ownership, manifold sheets, source completeness and mixed-LOD transitions remain independent gates.",
+      "measured_crossings_present": true,
+      "no_coordinate_tolerance": true,
+      "no_missing_crossing_facets": true,
+      "original_facets_a": 1753,
+      "original_facets_b": 1753,
+      "publishable": false,
+      "tiles": [
+        210,
+        230
+      ]
+    },
+    {
+      "accepted": true,
+      "axis": 1,
+      "limits": "Exact original triangle agreement only. Coplanar ownership, manifold sheets, source completeness and mixed-LOD transitions remain independent gates.",
+      "measured_crossings_present": true,
+      "no_coordinate_tolerance": true,
+      "no_missing_crossing_facets": true,
+      "original_facets_a": 1838,
+      "original_facets_b": 1838,
+      "publishable": false,
+      "tiles": [
+        211,
+        231
+      ]
+    },
+    {
+      "accepted": true,
+      "axis": 0,
+      "limits": "Exact original triangle agreement only. Coplanar ownership, manifold sheets, source completeness and mixed-LOD transitions remain independent gates.",
+      "measured_crossings_present": true,
+      "no_coordinate_tolerance": true,
+      "no_missing_crossing_facets": true,
+      "original_facets_a": 2259,
+      "original_facets_b": 2259,
+      "publishable": false,
+      "tiles": [
+        228,
+        229
+      ]
+    },
+    {
+      "accepted": true,
+      "axis": 0,
+      "limits": "Exact original triangle agreement only. Coplanar ownership, manifold sheets, source completeness and mixed-LOD transitions remain independent gates.",
+      "measured_crossings_present": true,
+      "no_coordinate_tolerance": true,
+      "no_missing_crossing_facets": true,
+      "original_facets_a": 3083,
+      "original_facets_b": 3083,
+      "publishable": false,
+      "tiles": [
+        229,
+        230
+      ]
+    },
+    {
+      "accepted": true,
+      "axis": 0,
+      "limits": "Exact original triangle agreement only. Coplanar ownership, manifold sheets, source completeness and mixed-LOD transitions remain independent gates.",
+      "measured_crossings_present": true,
+      "no_coordinate_tolerance": true,
+      "no_missing_crossing_facets": true,
+      "original_facets_a": 3021,
+      "original_facets_b": 3021,
+      "publishable": false,
+      "tiles": [
+        230,
+        231
+      ]
+    }
+  ],
+  "publishable": false,
+  "requested_scope_patches": 16,
+  "required_region_patches": 400,
+  "tested_pairs": 24,
+  "tiles": [
+    168,
+    169,
+    170,
+    171,
+    188,
+    189,
+    190,
+    191,
+    208,
+    209,
+    210,
+    211,
+    228,
+    229,
+    230,
+    231
+  ]
+}

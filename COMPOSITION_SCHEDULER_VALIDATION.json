@@ -1,0 +1,14 @@
+{
+  "perViewAndMinuteBudgets": true,
+  "oneIdleCompositionAtATime": true,
+  "visibleAndNetworkFirst": true,
+  "requiresRenderedIdle": true,
+  "visibleRefinementMustFinish": true,
+  "newVisibleLoadPreemptsPreparation": true,
+  "navigationCancelsScheduledComposition": true,
+  "cachePressureGating": true,
+  "slowSubmissionBackoff": true,
+  "slowSubmissionResumesSameView": true,
+  "checkboxDisableCleanup": true,
+  "compositions": 81
+}

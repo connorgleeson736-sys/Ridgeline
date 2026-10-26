@@ -1,0 +1,10 @@
+{
+  "lumaVersion": "9.4.2",
+  "mathVersion": "4.1.0",
+  "source": "Pinned npm packages in package-lock.json; rebuild with node scripts/build-luma.mjs",
+  "files": {
+    "luma.mjs": "6a1ccdc226e84f299792a564d9ac123568e7e6c251982b7069538bb3e74d3342",
+    "luma-license.txt": "798eb174985988b167e86a01ba86142c902a4d1dd85cb310289b04877be60db3",
+    "math-license.txt": "0a713c4944b0e1d3104ba648cc9757f592f521144e537689a65574fc28d1b94a"
+  }
+}

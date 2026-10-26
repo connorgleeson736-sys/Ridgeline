@@ -1,0 +1,11 @@
+{
+  "version": "alpine-overviews-v1",
+  "sourceZoom": 13,
+  "minimumZoom": 0,
+  "maximumZoom": 12,
+  "sourceTileBounds": [7960, 5192, 7975, 5207],
+  "inwardFeatherTiles": 2,
+  "resampling": "BOX",
+  "format": "lossless WebP",
+  "description": "Cook alpine surroundings: approximately 57 km square with a roughly 7 km inward edge blend; no change to zoom 13 or finer imagery."
+}

@@ -1,0 +1,9 @@
+{
+  "unchangedUpdates": 1000,
+  "extraEnumerations": 0,
+  "inPlaceExtremaInvalidate": true,
+  "evictionInvalidates": true,
+  "cachedInsertionInvalidates": true,
+  "resetAndCleanup": true,
+  "caveat": "Controlled mutation/lifecycle test; actual summit frustum coverage is checked separately."
+}

@@ -1,0 +1,16 @@
+{
+  "engine": "MapLibre 6.14.0",
+  "actualMercatorCamera": true,
+  "camera": {
+    "longitude": 170.06,
+    "latitude": -43.5,
+    "zoom": 13,
+    "pitch": 58,
+    "elevation": 1500
+  },
+  "nativeRefreshReproducesMissingTextureWindow": true,
+  "safeRetryUsesFreshLoadingTile": true,
+  "noPrematureRenderableTile": true,
+  "updatesScheduled": 1,
+  "caveat": "Actual bundled transform, source manager and tile states. Network and GPU upload are controlled; not a visual reproduction of the user's West Coast patch."
+}

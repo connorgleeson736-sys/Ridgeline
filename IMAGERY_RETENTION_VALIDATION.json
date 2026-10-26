@@ -1,0 +1,16 @@
+{
+  "scope": "Original",
+  "providers": [
+    "LINZ aerial",
+    "Esri imagery",
+    "Esri topo"
+  ],
+  "imageryTilesRetained": 300,
+  "terrainLoadsWhileLookingAway": 600,
+  "imageryRevisitDownloads": 0,
+  "terrainEvictionsDoNotEvictImagery": true,
+  "transientRetry": "passed",
+  "authFailureNotRetried": "passed",
+  "nativeRasterProtocolHandoff": "passed",
+  "caveat": "Controlled source-fetch fixture; does not assert permanent GPU residency or browser FPS"
+}

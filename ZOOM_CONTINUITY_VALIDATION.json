@@ -1,0 +1,83 @@
+{
+  "engine": "MapLibre 6.14.0",
+  "scenes": [
+    {
+      "finishedChildren": 1,
+      "partialImages": false,
+      "cacheBudgetBytes": 0,
+      "preservedFinishedTextures": 1,
+      "transientDrawTiles": 4,
+      "stableUpdates": 50,
+      "extraGPUAllocations": 0,
+      "partialCoverHolds": 52
+    },
+    {
+      "finishedChildren": 1,
+      "partialImages": false,
+      "cacheBudgetBytes": 100663296,
+      "preservedFinishedTextures": 1,
+      "transientDrawTiles": 4,
+      "stableUpdates": 50,
+      "extraGPUAllocations": 0,
+      "partialCoverHolds": 52
+    },
+    {
+      "finishedChildren": 2,
+      "partialImages": false,
+      "cacheBudgetBytes": 0,
+      "preservedFinishedTextures": 2,
+      "transientDrawTiles": 4,
+      "stableUpdates": 50,
+      "extraGPUAllocations": 0,
+      "partialCoverHolds": 52
+    },
+    {
+      "finishedChildren": 2,
+      "partialImages": false,
+      "cacheBudgetBytes": 100663296,
+      "preservedFinishedTextures": 2,
+      "transientDrawTiles": 4,
+      "stableUpdates": 50,
+      "extraGPUAllocations": 0,
+      "partialCoverHolds": 52
+    },
+    {
+      "finishedChildren": 3,
+      "partialImages": false,
+      "cacheBudgetBytes": 0,
+      "preservedFinishedTextures": 3,
+      "transientDrawTiles": 4,
+      "stableUpdates": 50,
+      "extraGPUAllocations": 0,
+      "partialCoverHolds": 52
+    },
+    {
+      "finishedChildren": 3,
+      "partialImages": false,
+      "cacheBudgetBytes": 100663296,
+      "preservedFinishedTextures": 3,
+      "transientDrawTiles": 4,
+      "stableUpdates": 50,
+      "extraGPUAllocations": 0,
+      "partialCoverHolds": 52
+    },
+    {
+      "finishedChildren": 3,
+      "partialImages": true,
+      "cacheBudgetBytes": 100663296,
+      "preservedFinishedTextures": 3,
+      "transientDrawTiles": 4,
+      "stableUpdates": 50,
+      "extraGPUAllocations": 0,
+      "partialCoverHolds": 52
+    }
+  ],
+  "mixedResolutionPartition": true,
+  "wrapPreserved": true,
+  "boundedTransitionWork": true,
+  "zoomOutPrefetchAncestors": [
+    16,
+    15
+  ],
+  "caveat": "Native CPU lifecycle and exact texture identities with controlled readiness/GPU. Not browser pixels, latency or FPS."
+}

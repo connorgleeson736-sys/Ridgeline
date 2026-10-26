@@ -1,0 +1,10 @@
+const assert=require('node:assert/strict'),I=require('../public/imagery.js');
+// Equations taken from the pinned native raster program/fragment shader.
+function display(p,paint){const mean=(p[0]+p[1]+p[2])/3,contrast=paint['raster-contrast'],factor=contrast>0?1/(1-contrast):1+contrast,low=paint['raster-brightness-min'],high=paint['raster-brightness-max'],sat=-paint['raster-saturation'];return p.slice(0,3).map(v=>Math.max(0,Math.min(255,(low+(((v+(mean-v)*sat)/255-.5)*factor+.5)*(high-low))*255)));}
+const grade=I.paint('linz'),reference=I.paint('satellite'),old={...grade,'raster-saturation':-.18,'raster-contrast':.015,'raster-brightness-min':0,'raster-brightness-max':.99};
+assert.ok(display([182,186,184],grade)[0]>display([182,186,184],old)[0]+20,'Snow must visibly brighten');assert.ok(display([68,70,66],grade)[0]<display([68,70,66],old)[0],'Rock shadows slightly deepen');
+let worst=0,neutralWorst=0;for(let r=0;r<=255;r+=17)for(let g=0;g<=255;g+=17)for(let b=0;b<=255;b+=17){const raw=[r,g,b,173],pixels=Uint8ClampedArray.from(raw);I.compensateEsri(pixels);assert.equal(pixels[3],173);const wanted=display(raw,reference),shown=display(Array.from(pixels),grade);const error=Math.max(...wanted.map((v,k)=>Math.abs(v-shown[k])));worst=Math.max(worst,error);if(Math.max(r,g,b)-Math.min(r,g,b)<=85)neutralWorst=Math.max(neutralWorst,error);}
+assert.ok(neutralWorst<1.1,'Neutral snow/rock/ice colours retain the Esri reference through the LINZ shader');assert.ok(worst<7,'Even saturated synthetic RGB extremes have bounded gamut error');
+const off=I.paint('linz',{natural:false});assert.deepEqual(display([24,180,240],off),[24,180,240]);
+const bytes=new Uint8ClampedArray(256*256*4).fill(187),start=performance.now();for(let i=0;i<50;i++)I.compensateEsri(bytes);const ms=(performance.now()-start)/50;
+console.log(JSON.stringify({snowBrighter:true,rocksDarker:true,EsriReferenceMaximumChannelError:worst,neutralEsriMaximumChannelError:neutralWorst,alphaUnchanged:true,ungradedToggleIdentity:true,workerCPU256pxMs:ms,caveat:'CPU compensation throughput on this host, not browser decode/encode latency or device FPS.'}));

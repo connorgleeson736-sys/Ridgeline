@@ -1,0 +1,63 @@
+{
+  "reviewedSurveyFootprints": true,
+  "sourceSurveyRequests": 336,
+  "failedRequests": 0,
+  "cookAndTasmanUseOriginalLINZ": true,
+  "goodWestCoastSurveysStayLINZ": true,
+  "onlyReviewedGapsUseEsri": true,
+  "elevationUntouched": true,
+  "outsideRegionUntouched": true,
+  "ungradedBoundaryOnlyComposites": true,
+  "onlyBoundaryTilesFetchBothProviders": true,
+  "LINZGradeUsesNativeShaderOnly": true,
+  "EsriCompensationConfinedToReviewedGaps": true,
+  "verifiedEsriZoomCeilingWithGeographicCrop": true,
+  "cacheTTLRespectsUpstreamAge": true,
+  "destructionRejectsPendingJobs": true,
+  "cachePreventsRepeatDownloadsAndComposition": true,
+  "routes": [
+    {
+      "name": "Cook",
+      "z": 18,
+      "x": 254964,
+      "y": 166414,
+      "selected": "linz"
+    },
+    {
+      "name": "Tasman",
+      "z": 18,
+      "x": 254976,
+      "y": 166389,
+      "selected": "linz"
+    },
+    {
+      "name": "Balfour gap",
+      "z": 18,
+      "x": 254937,
+      "y": 166379,
+      "selected": "esri"
+    },
+    {
+      "name": "west gap",
+      "z": 18,
+      "x": 254935,
+      "y": 166399,
+      "selected": "esri"
+    },
+    {
+      "name": "Fox",
+      "z": 18,
+      "x": 254905,
+      "y": 166319,
+      "selected": "linz"
+    },
+    {
+      "name": "Franz Josef",
+      "z": 18,
+      "x": 255007,
+      "y": 166289,
+      "selected": "linz"
+    }
+  ],
+  "caveat": "Routing, cache and boundary-job lifecycle are tested here. Pixel preservation/feathering are separately checked against authentic image samples; no browser screenshot/FPS claim."
+}

@@ -1,0 +1,39 @@
+{
+  "engine": "MapLibre 6.14.0",
+  "scope": "Original only",
+  "repeatPanLoads": 200,
+  "uniquePanNetworkRequests": 20,
+  "cancellationIsolation": "passed",
+  "quickReversalReuse": "passed",
+  "transferSafety": "passed",
+  "boundedCache": "passed",
+  "expiryAndErrors": "passed",
+  "nativeDEMProtocolHandoff": "passed",
+  "nativeLOD": [
+    {
+      "zoom": 5,
+      "oldDistantZoom": 3.7727894273843745,
+      "newDistantZoom": 1.0429165325727583,
+      "focusZoom": 5
+    },
+    {
+      "zoom": 12,
+      "oldDistantZoom": 10.772789427384376,
+      "newDistantZoom": 8.04291653257276,
+      "focusZoom": 12
+    },
+    {
+      "zoom": 17,
+      "oldDistantZoom": 15.772789427384376,
+      "newDistantZoom": 13.04291653257276,
+      "focusZoom": 17
+    },
+    {
+      "zoom": 19,
+      "oldDistantZoom": 17.772789427384375,
+      "newDistantZoom": 15.04291653257276,
+      "focusZoom": 19
+    }
+  ],
+  "caveat": "Native CPU/source path with mock bitmap decode; no browser pixels or device FPS measured"
+}

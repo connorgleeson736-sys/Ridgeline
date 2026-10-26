@@ -1,0 +1,30 @@
+{
+  "run": "ac824fc35e7efc4945ea59cf3e38ff5a0dd99bd8eba3521f58f51558e1679a57",
+  "allSourceHashesVerified": 16226,
+  "allSourceSnapshotsOpaque": true,
+  "outputCoordinates": 5313,
+  "outputVariantEntries": 10626,
+  "uniqueTileFiles": 5344,
+  "tileBytes": 368444204,
+  "allOutputAndOverlayHashesVerified": true,
+  "allPublicRangesMatchDurableManifest": true,
+  "independentRecursiveSamples": 65,
+  "worstSampleMeanByteError": 0.004123687744140625,
+  "sourceSnapshotBytes": 154170241,
+  "allLevels": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+  ],
+  "caveat": "CPU filtering, checksums and range mapping; not GPU screenshots or device FPS."
+}

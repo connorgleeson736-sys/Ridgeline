@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "pipeline_version": "0.1.0",
+  "region": "aoraki-summit-2km",
+  "crs": "EPSG:2193+7839",
+  "bounds": [1368289, 5168127, 1370289, 5170127],
+  "origin": [1368289, 5168127, 2500],
+  "tile_size_m": 100,
+  "halo_m": 8,
+  "max_points_per_job": 1200000,
+  "normal_radius_m": 1.2,
+  "normal_max_nn": 32,
+  "ball_radii_m": [0.12, 0.24, 0.5, 1.0, 2.0],
+  "lod_errors_m": [0, 0.025, 0.075, 0.2, 0.6, 2.0],
+  "exclude_classes_from_surface": [7, 18],
+  "exclude_withheld_from_surface": true,
+  "preserve_original_laz": true,
+  "allow_visual_gap_filling": false,
+  "persistent_folder_id": "1eY2tUhH2WGGSrQxWxRcv2IVc6zDgso4W",
+  "source_collection": "NZ20_Cant2",
+  "source_index_url": "https://opentopography.s3.sdsc.edu/pc-bulk/NZ20_Cant2/NZ20_Cant2_TileIndex.zip",
+  "source_selection_note": "Canterbury index covers the full ROI. West Coast overlap is a separate adjusted delivery and is retained as source-audit metadata, not blindly superimposed."
+}

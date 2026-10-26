@@ -1,0 +1,989 @@
+{
+  "version": "alpine-overviews-v1",
+  "sourceZoom": 13,
+  "levels": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+  ],
+  "sourceCounts": {
+    "linz": 354,
+    "esri": 27
+  },
+  "failedSources": 0,
+  "tileCoordinates": 98,
+  "uniqueFiles": 130,
+  "assetBytes": 10180424,
+  "losslessRoundTripsVerified": true,
+  "colourModes": [
+    "raw",
+    "natural"
+  ],
+  "filter": "recursive aligned 2x2 area averaging",
+  "inwardFeatherTiles": 2,
+  "pillow": "12.3.0",
+  "quality": {
+    "raw/12/3980/2596": {
+      "corePixels": 36,
+      "beforeMAE": 3.8981481481481484,
+      "afterMAE": 0.0
+    },
+    "raw/12/3980/2597": {
+      "corePixels": 1536,
+      "beforeMAE": 46.64453125,
+      "afterMAE": 0.0
+    },
+    "raw/12/3980/2598": {
+      "corePixels": 1536,
+      "beforeMAE": 49.638888888888886,
+      "afterMAE": 0.0
+    },
+    "raw/12/3980/2599": {
+      "corePixels": 1536,
+      "beforeMAE": 34.33897569444444,
+      "afterMAE": 0.0
+    },
+    "raw/12/3980/2600": {
+      "corePixels": 1536,
+      "beforeMAE": 27.473307291666668,
+      "afterMAE": 0.0
+    },
+    "raw/12/3980/2601": {
+      "corePixels": 1536,
+      "beforeMAE": 7.427083333333333,
+      "afterMAE": 0.0
+    },
+    "raw/12/3980/2602": {
+      "corePixels": 1536,
+      "beforeMAE": 23.19878472222222,
+      "afterMAE": 0.0
+    },
+    "raw/12/3980/2603": {
+      "corePixels": 36,
+      "beforeMAE": 47.620370370370374,
+      "afterMAE": 0.0
+    },
+    "raw/12/3981/2596": {
+      "corePixels": 1536,
+      "beforeMAE": 36.753255208333336,
+      "afterMAE": 0.0
+    },
+    "raw/12/3981/2597": {
+      "corePixels": 65536,
+      "beforeMAE": 48.9400889078776,
+      "afterMAE": 0.0
+    },
+    "raw/12/3981/2598": {
+      "corePixels": 65536,
+      "beforeMAE": 43.17437744140625,
+      "afterMAE": 0.0
+    },
+    "raw/12/3981/2599": {
+      "corePixels": 65536,
+      "beforeMAE": 28.58568827311198,
+      "afterMAE": 0.0
+    },
+    "raw/12/3981/2600": {
+      "corePixels": 65536,
+      "beforeMAE": 23.202234903971355,
+      "afterMAE": 0.0
+    },
+    "raw/12/3981/2601": {
+      "corePixels": 65536,
+      "beforeMAE": 10.919209798177084,
+      "afterMAE": 0.0
+    },
+    "raw/12/3981/2602": {
+      "corePixels": 65536,
+      "beforeMAE": 33.28864542643229,
+      "afterMAE": 0.0
+    },
+    "raw/12/3981/2603": {
+      "corePixels": 1536,
+      "beforeMAE": 44.33051215277778,
+      "afterMAE": 0.0
+    },
+    "raw/12/3982/2596": {
+      "corePixels": 1536,
+      "beforeMAE": 48.779296875,
+      "afterMAE": 0.0
+    },
+    "raw/12/3982/2597": {
+      "corePixels": 65536,
+      "beforeMAE": 47.07704162597656,
+      "afterMAE": 0.0
+    },
+    "raw/12/3982/2598": {
+      "corePixels": 65536,
+      "beforeMAE": 34.24876403808594,
+      "afterMAE": 0.0
+    },
+    "raw/12/3982/2599": {
+      "corePixels": 65536,
+      "beforeMAE": 29.04632059733073,
+      "afterMAE": 0.0
+    },
+    "raw/12/3982/2600": {
+      "corePixels": 65536,
+      "beforeMAE": 51.931396484375,
+      "afterMAE": 0.0
+    },
+    "raw/12/3982/2601": {
+      "corePixels": 65536,
+      "beforeMAE": 29.678237915039062,
+      "afterMAE": 0.0
+    },
+    "raw/12/3982/2602": {
+      "corePixels": 65536,
+      "beforeMAE": 42.05560811360677,
+      "afterMAE": 0.0
+    },
+    "raw/12/3982/2603": {
+      "corePixels": 1536,
+      "beforeMAE": 51.162109375,
+      "afterMAE": 0.0
+    },
+    "raw/12/3983/2596": {
+      "corePixels": 1536,
+      "beforeMAE": 37.37586805555556,
+      "afterMAE": 0.0
+    },
+    "raw/12/3983/2597": {
+      "corePixels": 65536,
+      "beforeMAE": 33.77422078450521,
+      "afterMAE": 0.0
+    },
+    "raw/12/3983/2598": {
+      "corePixels": 65536,
+      "beforeMAE": 35.94811503092448,
+      "afterMAE": 0.0
+    },
+    "raw/12/3983/2599": {
+      "corePixels": 65536,
+      "beforeMAE": 49.532877604166664,
+      "afterMAE": 0.0
+    },
+    "raw/12/3983/2600": {
+      "corePixels": 65536,
+      "beforeMAE": 63.01935831705729,
+      "afterMAE": 0.0
+    },
+    "raw/12/3983/2601": {
+      "corePixels": 65536,
+      "beforeMAE": 64.82433573404948,
+      "afterMAE": 0.0
+    },
+    "raw/12/3983/2602": {
+      "corePixels": 65536,
+      "beforeMAE": 36.061747233072914,
+      "afterMAE": 0.0
+    },
+    "raw/12/3983/2603": {
+      "corePixels": 1536,
+      "beforeMAE": 29.14822048611111,
+      "afterMAE": 0.0
+    },
+    "raw/12/3984/2596": {
+      "corePixels": 1536,
+      "beforeMAE": 40.373263888888886,
+      "afterMAE": 0.0
+    },
+    "raw/12/3984/2597": {
+      "corePixels": 65536,
+      "beforeMAE": 29.455368041992188,
+      "afterMAE": 0.0
+    },
+    "raw/12/3984/2598": {
+      "corePixels": 65536,
+      "beforeMAE": 25.371566772460938,
+      "afterMAE": 0.0
+    },
+    "raw/12/3984/2599": {
+      "corePixels": 65536,
+      "beforeMAE": 43.539581298828125,
+      "afterMAE": 0.0
+    },
+    "raw/12/3984/2600": {
+      "corePixels": 65536,
+      "beforeMAE": 67.5222880045573,
+      "afterMAE": 0.0
+    },
+    "raw/12/3984/2601": {
+      "corePixels": 65536,
+      "beforeMAE": 61.01347859700521,
+      "afterMAE": 0.0
+    },
+    "raw/12/3984/2602": {
+      "corePixels": 65536,
+      "beforeMAE": 48.18299865722656,
+      "afterMAE": 0.0
+    },
+    "raw/12/3984/2603": {
+      "corePixels": 1536,
+      "beforeMAE": 27.109375,
+      "afterMAE": 0.0
+    },
+    "raw/12/3985/2596": {
+      "corePixels": 1536,
+      "beforeMAE": 33.97157118055556,
+      "afterMAE": 0.0
+    },
+    "raw/12/3985/2597": {
+      "corePixels": 65536,
+      "beforeMAE": 22.935343424479168,
+      "afterMAE": 0.0
+    },
+    "raw/12/3985/2598": {
+      "corePixels": 65536,
+      "beforeMAE": 19.694371541341145,
+      "afterMAE": 0.0
+    },
+    "raw/12/3985/2599": {
+      "corePixels": 65536,
+      "beforeMAE": 68.51861063639323,
+      "afterMAE": 0.0
+    },
+    "raw/12/3985/2600": {
+      "corePixels": 65536,
+      "beforeMAE": 67.9220682779948,
+      "afterMAE": 0.0
+    },
+    "raw/12/3985/2601": {
+      "corePixels": 65536,
+      "beforeMAE": 68.36746215820312,
+      "afterMAE": 0.0
+    },
+    "raw/12/3985/2602": {
+      "corePixels": 65536,
+      "beforeMAE": 54.23932902018229,
+      "afterMAE": 0.0
+    },
+    "raw/12/3985/2603": {
+      "corePixels": 1536,
+      "beforeMAE": 46.023220486111114,
+      "afterMAE": 0.0
+    },
+    "raw/12/3986/2596": {
+      "corePixels": 1536,
+      "beforeMAE": 27.353515625,
+      "afterMAE": 0.0
+    },
+    "raw/12/3986/2597": {
+      "corePixels": 65536,
+      "beforeMAE": 13.891983032226562,
+      "afterMAE": 0.0
+    },
+    "raw/12/3986/2598": {
+      "corePixels": 65536,
+      "beforeMAE": 20.58477274576823,
+      "afterMAE": 0.0
+    },
+    "raw/12/3986/2599": {
+      "corePixels": 65536,
+      "beforeMAE": 65.72938028971355,
+      "afterMAE": 0.0
+    },
+    "raw/12/3986/2600": {
+      "corePixels": 65536,
+      "beforeMAE": 72.31056722005208,
+      "afterMAE": 0.0
+    },
+    "raw/12/3986/2601": {
+      "corePixels": 65536,
+      "beforeMAE": 59.60926818847656,
+      "afterMAE": 0.0
+    },
+    "raw/12/3986/2602": {
+      "corePixels": 65536,
+      "beforeMAE": 44.37254842122396,
+      "afterMAE": 0.0
+    },
+    "raw/12/3986/2603": {
+      "corePixels": 1536,
+      "beforeMAE": 53.806640625,
+      "afterMAE": 0.0
+    },
+    "raw/12/3987/2596": {
+      "corePixels": 36,
+      "beforeMAE": 37.675925925925924,
+      "afterMAE": 0.0
+    },
+    "raw/12/3987/2597": {
+      "corePixels": 1536,
+      "beforeMAE": 13.210503472222221,
+      "afterMAE": 0.0
+    },
+    "raw/12/3987/2598": {
+      "corePixels": 1536,
+      "beforeMAE": 33.256076388888886,
+      "afterMAE": 0.0
+    },
+    "raw/12/3987/2599": {
+      "corePixels": 1536,
+      "beforeMAE": 51.815104166666664,
+      "afterMAE": 0.0
+    },
+    "raw/12/3987/2600": {
+      "corePixels": 1536,
+      "beforeMAE": 75.36002604166667,
+      "afterMAE": 0.0
+    },
+    "raw/12/3987/2601": {
+      "corePixels": 1536,
+      "beforeMAE": 44.251736111111114,
+      "afterMAE": 0.0
+    },
+    "raw/12/3987/2602": {
+      "corePixels": 1536,
+      "beforeMAE": 41.86241319444444,
+      "afterMAE": 0.0
+    },
+    "raw/12/3987/2603": {
+      "corePixels": 36,
+      "beforeMAE": 90.21296296296296,
+      "afterMAE": 0.0
+    },
+    "raw/11/1990/1298": {
+      "corePixels": 17161,
+      "beforeMAE": 48.60101392692734,
+      "afterMAE": 0.0
+    },
+    "raw/11/1990/1299": {
+      "corePixels": 33536,
+      "beforeMAE": 35.49978132951654,
+      "afterMAE": 0.0
+    },
+    "raw/11/1990/1300": {
+      "corePixels": 33536,
+      "beforeMAE": 17.44102854643766,
+      "afterMAE": 0.0
+    },
+    "raw/11/1990/1301": {
+      "corePixels": 17161,
+      "beforeMAE": 31.98135306800303,
+      "afterMAE": 0.0
+    },
+    "raw/11/1991/1298": {
+      "corePixels": 33536,
+      "beforeMAE": 40.53765108142493,
+      "afterMAE": 0.0
+    },
+    "raw/11/1991/1299": {
+      "corePixels": 65536,
+      "beforeMAE": 35.561604817708336,
+      "afterMAE": 0.0
+    },
+    "raw/11/1991/1300": {
+      "corePixels": 65536,
+      "beforeMAE": 50.37895202636719,
+      "afterMAE": 0.0
+    },
+    "raw/11/1991/1301": {
+      "corePixels": 33536,
+      "beforeMAE": 36.96334287531807,
+      "afterMAE": 0.0
+    },
+    "raw/11/1992/1298": {
+      "corePixels": 33536,
+      "beforeMAE": 25.45726979961832,
+      "afterMAE": 0.0
+    },
+    "raw/11/1992/1299": {
+      "corePixels": 65536,
+      "beforeMAE": 37.7949473063151,
+      "afterMAE": 0.0
+    },
+    "raw/11/1992/1300": {
+      "corePixels": 65536,
+      "beforeMAE": 63.39525349934896,
+      "afterMAE": 0.0
+    },
+    "raw/11/1992/1301": {
+      "corePixels": 33536,
+      "beforeMAE": 47.72431615776082,
+      "afterMAE": 0.0
+    },
+    "raw/11/1993/1298": {
+      "corePixels": 17161,
+      "beforeMAE": 14.951207194607928,
+      "afterMAE": 0.0
+    },
+    "raw/11/1993/1299": {
+      "corePixels": 33536,
+      "beforeMAE": 41.43602894402036,
+      "afterMAE": 0.0
+    },
+    "raw/11/1993/1300": {
+      "corePixels": 33536,
+      "beforeMAE": 62.968988549618324,
+      "afterMAE": 0.0
+    },
+    "raw/11/1993/1301": {
+      "corePixels": 17161,
+      "beforeMAE": 41.915408969951244,
+      "afterMAE": 0.0
+    },
+    "raw/10/995/649": {
+      "corePixels": 37249,
+      "beforeMAE": 37.26581474223022,
+      "afterMAE": 0.0
+    },
+    "raw/10/995/650": {
+      "corePixels": 37249,
+      "beforeMAE": 36.219093130016915,
+      "afterMAE": 0.0
+    },
+    "raw/10/996/649": {
+      "corePixels": 37249,
+      "beforeMAE": 31.771251129784243,
+      "afterMAE": 0.0
+    },
+    "raw/10/996/650": {
+      "corePixels": 37249,
+      "beforeMAE": 53.89741111618209,
+      "afterMAE": 0.0
+    },
+    "raw/9/497/324": {
+      "corePixels": 9216,
+      "beforeMAE": 36.1000072337963,
+      "afterMAE": 0.0
+    },
+    "raw/9/497/325": {
+      "corePixels": 9216,
+      "beforeMAE": 34.4125072337963,
+      "afterMAE": 0.0
+    },
+    "raw/9/498/324": {
+      "corePixels": 9216,
+      "beforeMAE": 30.32989728009259,
+      "afterMAE": 0.0
+    },
+    "raw/9/498/325": {
+      "corePixels": 9216,
+      "beforeMAE": 50.746274594907405,
+      "afterMAE": 0.0
+    },
+    "raw/8/248/162": {
+      "corePixels": 4608,
+      "beforeMAE": 33.583695023148145,
+      "afterMAE": 0.0
+    },
+    "raw/8/249/162": {
+      "corePixels": 4608,
+      "beforeMAE": 38.349754050925924,
+      "afterMAE": 0.0
+    },
+    "raw/7/124/81": {
+      "corePixels": 2304,
+      "beforeMAE": 34.27054398148148,
+      "afterMAE": 0.0
+    },
+    "raw/6/62/40": {
+      "corePixels": 576,
+      "beforeMAE": 32.692129629629626,
+      "afterMAE": 0.0
+    },
+    "raw/5/31/20": {
+      "corePixels": 144,
+      "beforeMAE": 30.84259259259259,
+      "afterMAE": 0.0
+    },
+    "raw/4/15/10": {
+      "corePixels": 36,
+      "beforeMAE": 29.14814814814815,
+      "afterMAE": 0.0
+    },
+    "raw/3/7/5": {
+      "corePixels": 4,
+      "beforeMAE": 24.666666666666668,
+      "afterMAE": 0.0
+    },
+    "natural/12/3980/2596": {
+      "corePixels": 36,
+      "beforeMAE": 3.8981481481481484,
+      "afterMAE": 0.0
+    },
+    "natural/12/3980/2597": {
+      "corePixels": 1536,
+      "beforeMAE": 46.64453125,
+      "afterMAE": 0.0
+    },
+    "natural/12/3980/2598": {
+      "corePixels": 1536,
+      "beforeMAE": 49.638888888888886,
+      "afterMAE": 0.0
+    },
+    "natural/12/3980/2599": {
+      "corePixels": 1536,
+      "beforeMAE": 34.33897569444444,
+      "afterMAE": 0.0
+    },
+    "natural/12/3980/2600": {
+      "corePixels": 1536,
+      "beforeMAE": 27.473307291666668,
+      "afterMAE": 0.0
+    },
+    "natural/12/3980/2601": {
+      "corePixels": 1536,
+      "beforeMAE": 7.427083333333333,
+      "afterMAE": 0.0
+    },
+    "natural/12/3980/2602": {
+      "corePixels": 1536,
+      "beforeMAE": 23.19878472222222,
+      "afterMAE": 0.0
+    },
+    "natural/12/3980/2603": {
+      "corePixels": 36,
+      "beforeMAE": 47.620370370370374,
+      "afterMAE": 0.0
+    },
+    "natural/12/3981/2596": {
+      "corePixels": 1536,
+      "beforeMAE": 36.753255208333336,
+      "afterMAE": 0.0
+    },
+    "natural/12/3981/2597": {
+      "corePixels": 65536,
+      "beforeMAE": 48.9400889078776,
+      "afterMAE": 0.0
+    },
+    "natural/12/3981/2598": {
+      "corePixels": 65536,
+      "beforeMAE": 43.17437744140625,
+      "afterMAE": 0.0
+    },
+    "natural/12/3981/2599": {
+      "corePixels": 65536,
+      "beforeMAE": 28.58568827311198,
+      "afterMAE": 0.0
+    },
+    "natural/12/3981/2600": {
+      "corePixels": 65536,
+      "beforeMAE": 23.45850118001302,
+      "afterMAE": 0.0
+    },
+    "natural/12/3981/2601": {
+      "corePixels": 65536,
+      "beforeMAE": 9.976048787434896,
+      "afterMAE": 0.0
+    },
+    "natural/12/3981/2602": {
+      "corePixels": 65536,
+      "beforeMAE": 33.28864542643229,
+      "afterMAE": 0.0
+    },
+    "natural/12/3981/2603": {
+      "corePixels": 1536,
+      "beforeMAE": 44.33051215277778,
+      "afterMAE": 0.0
+    },
+    "natural/12/3982/2596": {
+      "corePixels": 1536,
+      "beforeMAE": 48.779296875,
+      "afterMAE": 0.0
+    },
+    "natural/12/3982/2597": {
+      "corePixels": 65536,
+      "beforeMAE": 47.07704162597656,
+      "afterMAE": 0.0
+    },
+    "natural/12/3982/2598": {
+      "corePixels": 65536,
+      "beforeMAE": 34.24876403808594,
+      "afterMAE": 0.0
+    },
+    "natural/12/3982/2599": {
+      "corePixels": 65536,
+      "beforeMAE": 28.676305135091145,
+      "afterMAE": 0.0
+    },
+    "natural/12/3982/2600": {
+      "corePixels": 65536,
+      "beforeMAE": 49.297200520833336,
+      "afterMAE": 0.0
+    },
+    "natural/12/3982/2601": {
+      "corePixels": 65536,
+      "beforeMAE": 29.09649658203125,
+      "afterMAE": 0.0
+    },
+    "natural/12/3982/2602": {
+      "corePixels": 65536,
+      "beforeMAE": 42.05560811360677,
+      "afterMAE": 0.0
+    },
+    "natural/12/3982/2603": {
+      "corePixels": 1536,
+      "beforeMAE": 51.162109375,
+      "afterMAE": 0.0
+    },
+    "natural/12/3983/2596": {
+      "corePixels": 1536,
+      "beforeMAE": 37.37586805555556,
+      "afterMAE": 0.0
+    },
+    "natural/12/3983/2597": {
+      "corePixels": 65536,
+      "beforeMAE": 33.77422078450521,
+      "afterMAE": 0.0
+    },
+    "natural/12/3983/2598": {
+      "corePixels": 65536,
+      "beforeMAE": 36.258076985677086,
+      "afterMAE": 0.0
+    },
+    "natural/12/3983/2599": {
+      "corePixels": 65536,
+      "beforeMAE": 54.25645446777344,
+      "afterMAE": 0.0
+    },
+    "natural/12/3983/2600": {
+      "corePixels": 65536,
+      "beforeMAE": 62.96892801920573,
+      "afterMAE": 0.0
+    },
+    "natural/12/3983/2601": {
+      "corePixels": 65536,
+      "beforeMAE": 64.9303487141927,
+      "afterMAE": 0.0
+    },
+    "natural/12/3983/2602": {
+      "corePixels": 65536,
+      "beforeMAE": 36.061747233072914,
+      "afterMAE": 0.0
+    },
+    "natural/12/3983/2603": {
+      "corePixels": 1536,
+      "beforeMAE": 29.14822048611111,
+      "afterMAE": 0.0
+    },
+    "natural/12/3984/2596": {
+      "corePixels": 1536,
+      "beforeMAE": 40.373263888888886,
+      "afterMAE": 0.0
+    },
+    "natural/12/3984/2597": {
+      "corePixels": 65536,
+      "beforeMAE": 29.455368041992188,
+      "afterMAE": 0.0
+    },
+    "natural/12/3984/2598": {
+      "corePixels": 65536,
+      "beforeMAE": 35.4147694905599,
+      "afterMAE": 0.0
+    },
+    "natural/12/3984/2599": {
+      "corePixels": 65536,
+      "beforeMAE": 51.46720886230469,
+      "afterMAE": 0.0
+    },
+    "natural/12/3984/2600": {
+      "corePixels": 65536,
+      "beforeMAE": 67.5222880045573,
+      "afterMAE": 0.0
+    },
+    "natural/12/3984/2601": {
+      "corePixels": 65536,
+      "beforeMAE": 61.01347859700521,
+      "afterMAE": 0.0
+    },
+    "natural/12/3984/2602": {
+      "corePixels": 65536,
+      "beforeMAE": 48.18299865722656,
+      "afterMAE": 0.0
+    },
+    "natural/12/3984/2603": {
+      "corePixels": 1536,
+      "beforeMAE": 27.109375,
+      "afterMAE": 0.0
+    },
+    "natural/12/3985/2596": {
+      "corePixels": 1536,
+      "beforeMAE": 33.97157118055556,
+      "afterMAE": 0.0
+    },
+    "natural/12/3985/2597": {
+      "corePixels": 65536,
+      "beforeMAE": 22.935343424479168,
+      "afterMAE": 0.0
+    },
+    "natural/12/3985/2598": {
+      "corePixels": 65536,
+      "beforeMAE": 19.754353841145832,
+      "afterMAE": 0.0
+    },
+    "natural/12/3985/2599": {
+      "corePixels": 65536,
+      "beforeMAE": 68.51861063639323,
+      "afterMAE": 0.0
+    },
+    "natural/12/3985/2600": {
+      "corePixels": 65536,
+      "beforeMAE": 67.9220682779948,
+      "afterMAE": 0.0
+    },
+    "natural/12/3985/2601": {
+      "corePixels": 65536,
+      "beforeMAE": 68.36746215820312,
+      "afterMAE": 0.0
+    },
+    "natural/12/3985/2602": {
+      "corePixels": 65536,
+      "beforeMAE": 54.23932902018229,
+      "afterMAE": 0.0
+    },
+    "natural/12/3985/2603": {
+      "corePixels": 1536,
+      "beforeMAE": 46.023220486111114,
+      "afterMAE": 0.0
+    },
+    "natural/12/3986/2596": {
+      "corePixels": 1536,
+      "beforeMAE": 27.353515625,
+      "afterMAE": 0.0
+    },
+    "natural/12/3986/2597": {
+      "corePixels": 65536,
+      "beforeMAE": 13.891983032226562,
+      "afterMAE": 0.0
+    },
+    "natural/12/3986/2598": {
+      "corePixels": 65536,
+      "beforeMAE": 20.58477274576823,
+      "afterMAE": 0.0
+    },
+    "natural/12/3986/2599": {
+      "corePixels": 65536,
+      "beforeMAE": 65.72938028971355,
+      "afterMAE": 0.0
+    },
+    "natural/12/3986/2600": {
+      "corePixels": 65536,
+      "beforeMAE": 72.31056722005208,
+      "afterMAE": 0.0
+    },
+    "natural/12/3986/2601": {
+      "corePixels": 65536,
+      "beforeMAE": 59.60926818847656,
+      "afterMAE": 0.0
+    },
+    "natural/12/3986/2602": {
+      "corePixels": 65536,
+      "beforeMAE": 44.37254842122396,
+      "afterMAE": 0.0
+    },
+    "natural/12/3986/2603": {
+      "corePixels": 1536,
+      "beforeMAE": 53.806640625,
+      "afterMAE": 0.0
+    },
+    "natural/12/3987/2596": {
+      "corePixels": 36,
+      "beforeMAE": 37.675925925925924,
+      "afterMAE": 0.0
+    },
+    "natural/12/3987/2597": {
+      "corePixels": 1536,
+      "beforeMAE": 13.210503472222221,
+      "afterMAE": 0.0
+    },
+    "natural/12/3987/2598": {
+      "corePixels": 1536,
+      "beforeMAE": 33.256076388888886,
+      "afterMAE": 0.0
+    },
+    "natural/12/3987/2599": {
+      "corePixels": 1536,
+      "beforeMAE": 51.815104166666664,
+      "afterMAE": 0.0
+    },
+    "natural/12/3987/2600": {
+      "corePixels": 1536,
+      "beforeMAE": 75.36002604166667,
+      "afterMAE": 0.0
+    },
+    "natural/12/3987/2601": {
+      "corePixels": 1536,
+      "beforeMAE": 44.251736111111114,
+      "afterMAE": 0.0
+    },
+    "natural/12/3987/2602": {
+      "corePixels": 1536,
+      "beforeMAE": 41.86241319444444,
+      "afterMAE": 0.0
+    },
+    "natural/12/3987/2603": {
+      "corePixels": 36,
+      "beforeMAE": 90.21296296296296,
+      "afterMAE": 0.0
+    },
+    "natural/11/1990/1298": {
+      "corePixels": 17161,
+      "beforeMAE": 48.60101392692734,
+      "afterMAE": 0.0
+    },
+    "natural/11/1990/1299": {
+      "corePixels": 33536,
+      "beforeMAE": 35.49978132951654,
+      "afterMAE": 0.0
+    },
+    "natural/11/1990/1300": {
+      "corePixels": 33536,
+      "beforeMAE": 17.104941952926207,
+      "afterMAE": 0.0
+    },
+    "natural/11/1990/1301": {
+      "corePixels": 17161,
+      "beforeMAE": 31.98135306800303,
+      "afterMAE": 0.0
+    },
+    "natural/11/1991/1298": {
+      "corePixels": 33536,
+      "beforeMAE": 40.53765108142493,
+      "afterMAE": 0.0
+    },
+    "natural/11/1991/1299": {
+      "corePixels": 65536,
+      "beforeMAE": 36.64533487955729,
+      "afterMAE": 0.0
+    },
+    "natural/11/1991/1300": {
+      "corePixels": 65536,
+      "beforeMAE": 49.519510904947914,
+      "afterMAE": 0.0
+    },
+    "natural/11/1991/1301": {
+      "corePixels": 33536,
+      "beforeMAE": 36.96334287531807,
+      "afterMAE": 0.0
+    },
+    "natural/11/1992/1298": {
+      "corePixels": 33536,
+      "beforeMAE": 25.45726979961832,
+      "afterMAE": 0.0
+    },
+    "natural/11/1992/1299": {
+      "corePixels": 65536,
+      "beforeMAE": 42.04162089029948,
+      "afterMAE": 0.0
+    },
+    "natural/11/1992/1300": {
+      "corePixels": 65536,
+      "beforeMAE": 63.39525349934896,
+      "afterMAE": 0.0
+    },
+    "natural/11/1992/1301": {
+      "corePixels": 33536,
+      "beforeMAE": 47.72431615776082,
+      "afterMAE": 0.0
+    },
+    "natural/11/1993/1298": {
+      "corePixels": 17161,
+      "beforeMAE": 14.951207194607928,
+      "afterMAE": 0.0
+    },
+    "natural/11/1993/1299": {
+      "corePixels": 33536,
+      "beforeMAE": 41.43602894402036,
+      "afterMAE": 0.0
+    },
+    "natural/11/1993/1300": {
+      "corePixels": 33536,
+      "beforeMAE": 62.968988549618324,
+      "afterMAE": 0.0
+    },
+    "natural/11/1993/1301": {
+      "corePixels": 17161,
+      "beforeMAE": 41.915408969951244,
+      "afterMAE": 0.0
+    },
+    "natural/10/995/649": {
+      "corePixels": 37249,
+      "beforeMAE": 37.67968715043804,
+      "afterMAE": 0.0
+    },
+    "natural/10/995/650": {
+      "corePixels": 37249,
+      "beforeMAE": 35.71116897992787,
+      "afterMAE": 0.0
+    },
+    "natural/10/996/649": {
+      "corePixels": 37249,
+      "beforeMAE": 33.387160281707786,
+      "afterMAE": 0.0
+    },
+    "natural/10/996/650": {
+      "corePixels": 37249,
+      "beforeMAE": 53.89741111618209,
+      "afterMAE": 0.0
+    },
+    "natural/9/497/324": {
+      "corePixels": 9216,
+      "beforeMAE": 36.46730324074074,
+      "afterMAE": 0.0
+    },
+    "natural/9/497/325": {
+      "corePixels": 9216,
+      "beforeMAE": 33.91297743055556,
+      "afterMAE": 0.0
+    },
+    "natural/9/498/324": {
+      "corePixels": 9216,
+      "beforeMAE": 31.57790798611111,
+      "afterMAE": 0.0
+    },
+    "natural/9/498/325": {
+      "corePixels": 9216,
+      "beforeMAE": 50.746274594907405,
+      "afterMAE": 0.0
+    },
+    "natural/8/248/162": {
+      "corePixels": 4608,
+      "beforeMAE": 33.625651041666664,
+      "afterMAE": 0.0
+    },
+    "natural/8/249/162": {
+      "corePixels": 4608,
+      "beforeMAE": 38.810836226851855,
+      "afterMAE": 0.0
+    },
+    "natural/7/124/81": {
+      "corePixels": 2304,
+      "beforeMAE": 34.538773148148145,
+      "afterMAE": 0.0
+    },
+    "natural/6/62/40": {
+      "corePixels": 576,
+      "beforeMAE": 33.16956018518518,
+      "afterMAE": 0.0
+    },
+    "natural/5/31/20": {
+      "corePixels": 144,
+      "beforeMAE": 31.38888888888889,
+      "afterMAE": 0.0
+    },
+    "natural/4/15/10": {
+      "corePixels": 36,
+      "beforeMAE": 29.62962962962963,
+      "afterMAE": 0.0
+    },
+    "natural/3/7/5": {
+      "corePixels": 4,
+      "beforeMAE": 26.333333333333332,
+      "afterMAE": 0.0
+    }
+  },
+  "fineImageryUnchanged": "Runtime replacement is restricted to z0\u201312; original z13+ requests are untouched.",
+  "caveat": "Source-pixel, area-filter, asset and routing validation. No live browser or FPS measurement; survey edges/coverage differences inside the original z13 imagery remain."
+}

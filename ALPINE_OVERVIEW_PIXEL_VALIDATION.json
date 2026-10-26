@@ -1,0 +1,20 @@
+{
+  "raw": {
+    "Cook1_7kmBeforeMAE255": 76.0108759553204,
+    "Cook1_7kmAfterMAE255": 0.24137062232300327,
+    "CookMaximumAreaAverageError255": 0.5,
+    "interiorZ12ToZ11MAE255": 0.23525492350260416,
+    "outerEdgePreservesOriginalBasemapPixels": true
+  },
+  "natural": {
+    "Cook1_7kmBeforeMAE255": 76.0108759553204,
+    "Cook1_7kmAfterMAE255": 0.24137062232300327,
+    "CookMaximumAreaAverageError255": 0.5,
+    "interiorZ12ToZ11MAE255": 0.23533248901367188,
+    "outerEdgePreservesOriginalBasemapPixels": true
+  },
+  "sourceSnapshotsVerified": 381,
+  "outputCoordinates": 98,
+  "assetFiles": 130,
+  "caveat": "Independent source/area-filter/asset checks, not a browser pixel or FPS benchmark."
+}

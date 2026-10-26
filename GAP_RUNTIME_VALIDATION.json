@@ -1,0 +1,13 @@
+{
+  "all14AuditSamplesUseSatellite": true,
+  "waterExcluded": true,
+  "cookAndOtherFineControlsPreserved": true,
+  "hardMaskOnly": true,
+  "coarsePyramidUsed": true,
+  "DEMUnchanged": true,
+  "overzoomUsesCorrectParent": true,
+  "destroyRejectsWork": true,
+  "cachedReturnsAvoidDownloadsAndComposition": true,
+  "maskTiles": 630,
+  "coarseTiles": 546
+}

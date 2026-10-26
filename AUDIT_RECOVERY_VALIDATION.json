@@ -1,0 +1,13 @@
+{
+  "queuedAbortImmediate": true,
+  "queueBytesReleased": true,
+  "activeSlotsAwaitAcknowledgement": true,
+  "visiblePromotion": true,
+  "boundedAdmissionAndSpeculativeEviction": true,
+  "retry65Recovers": true,
+  "cooldownAndSourceGenerationRecovery": true,
+  "ignoredStatusesAndCleanup": true,
+  "cancelledBitmapsClosed": true,
+  "sharedSubscriberSurvives": true,
+  "caveat": "Controlled async/worker lifecycle and byte-cache fixtures, not a device latency/FPS measurement."
+}

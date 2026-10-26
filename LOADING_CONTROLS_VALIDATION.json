@@ -1,0 +1,12 @@
+{
+  "actualPinnedEngineConfig": true,
+  "savedPreferencesSurviveMapStartup": true,
+  "UIUpdatesAndReset": true,
+  "boundedAndClamped": true,
+  "zeroPredictionSupported": true,
+  "rendererScope": true,
+  "storageFailureSafe": true,
+  "noMapRecreation": true,
+  "teardown": true,
+  "caveat": "Actual configuration export and app/DOM fixtures; not browser pixels or measured loading/FPS improvement."
+}

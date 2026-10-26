@@ -1,0 +1,98 @@
+{
+  "engine": "MapLibre 6.14.0",
+  "actualNativeMercatorFrustumAndTerrain": true,
+  "measuredCoarseMaximum": 3056,
+  "measuredFineMaximum": 3717.3,
+  "baselineCentreTiles": 1,
+  "fixedCentreTiles": 1,
+  "baselineMissingCameras": 10,
+  "correctedCameras": 10,
+  "totalNativeTiles": 1904,
+  "totalGuardedTiles": 2186,
+  "maxNativeTiles": 51,
+  "maxGuardedTiles": 56,
+  "cases": [
+    {
+      "zoom": 17,
+      "pitch": 45,
+      "bearing": -120,
+      "before": 0,
+      "after": 1
+    },
+    {
+      "zoom": 17,
+      "pitch": 58,
+      "bearing": -120,
+      "before": 0,
+      "after": 1
+    },
+    {
+      "zoom": 17,
+      "pitch": 58,
+      "bearing": 150,
+      "before": 0,
+      "after": 1
+    },
+    {
+      "zoom": 17,
+      "pitch": 60,
+      "bearing": -120,
+      "before": 0,
+      "after": 1
+    },
+    {
+      "zoom": 17,
+      "pitch": 60,
+      "bearing": 150,
+      "before": 0,
+      "after": 1
+    },
+    {
+      "zoom": 18,
+      "pitch": 45,
+      "bearing": -120,
+      "before": 0,
+      "after": 1
+    },
+    {
+      "zoom": 18,
+      "pitch": 58,
+      "bearing": -120,
+      "before": 0,
+      "after": 1
+    },
+    {
+      "zoom": 18,
+      "pitch": 58,
+      "bearing": 150,
+      "before": 0,
+      "after": 1
+    },
+    {
+      "zoom": 18,
+      "pitch": 60,
+      "bearing": -120,
+      "before": 0,
+      "after": 1
+    },
+    {
+      "zoom": 18,
+      "pitch": 60,
+      "bearing": 150,
+      "before": 0,
+      "after": 1
+    }
+  ],
+  "hierarchyReuse": true,
+  "evictionAndUnknownBounds": true,
+  "cleanup": true,
+  "stats": {
+    "visibilityBoundsSupported": true,
+    "visibilityBoundScans": 3,
+    "visibilityBoundRebuilds": 3,
+    "visibilityBoundsExpanded": 4,
+    "visibilityIndexedDEMs": 0,
+    "visibilityIndexNodes": 0
+  },
+  "caveat": "Actual native CPU frustum/coverage. Measured LINZ extrema, controlled residency and actual installed bounds adapter; not a browser screenshot or GPU/FPS benchmark."
+}

@@ -1,0 +1,67 @@
+{
+  "date": "2026-10-18 Melbourne",
+  "method": "Screened regional survey layers at z11, then unioned the actual PNG alpha coverage of intersecting high-resolution surveys at z13. Esri is eligible only where those fine surveys have no coverage, inside the reviewed alpine ROI.",
+  "coveragePixelGroundMetres": 13.85,
+  "guardPixels": 2,
+  "inwardFeatherPixels": 4,
+  "reviewBounds": [
+    169.96,
+    -43.665,
+    170.245,
+    -43.44
+  ],
+  "activeSurveys": [
+    "canterbury-rural-2015-2016-0.3m",
+    "west-coast-rural-2016-2017-0.3m",
+    "west-coast-2024-2026-0.2m"
+  ],
+  "maskPixels": 4194304,
+  "esriNonzeroPixels": 897253,
+  "LINZFinePixelsChanged": 0,
+  "cookModel1_7kmUnchanged": true,
+  "points": {
+    "Cook": {
+      "longitude": 170.141,
+      "latitude": -43.595,
+      "alpha": 0,
+      "fineLINZ": true
+    },
+    "Tasman": {
+      "longitude": 170.157,
+      "latitude": -43.57,
+      "alpha": 0,
+      "fineLINZ": true
+    },
+    "Balfour gap": {
+      "longitude": 170.103,
+      "latitude": -43.56,
+      "alpha": 255,
+      "fineLINZ": false
+    },
+    "west gap": {
+      "longitude": 170.1,
+      "latitude": -43.58,
+      "alpha": 255,
+      "fineLINZ": false
+    },
+    "Fox": {
+      "longitude": 170.06,
+      "latitude": -43.5,
+      "alpha": 0,
+      "fineLINZ": true
+    },
+    "Franz Josef": {
+      "longitude": 170.2,
+      "latitude": -43.47,
+      "alpha": 0,
+      "fineLINZ": true
+    }
+  },
+  "maskSHA256": "6eee4e6d318c13d2d479e8c113a71481f86cd5701a636b06d8f0512bbbb64914",
+  "outerVertices": 1880,
+  "innerVertices": 1828,
+  "screenedTiles": 144,
+  "footprintTiles": 192,
+  "failedTiles": 0,
+  "caveat": "Footprints sampled at about 14 m ground spacing with conservative guard and inward feather; not a claim of centimetre-exact survey boundaries. No imagery is generated or upscaled. Only an opacity mask is precomputed."
+}

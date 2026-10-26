@@ -1,0 +1,42 @@
+{
+  "package": "maplibre-gl",
+  "version": "6.14.0",
+  "npm_integrity": "sha512-L7U9y9TyPJ3P/JJbW+eH+A3FzdPq+3fnZFqqeCwf/S6cRGganHwVI5b/C8/zOYzreUzsloDPZVVaMQA94wOt4A==",
+  "files": {
+    "maplibre-gl.mjs": "44d33ed80312d9180a454346f829fc7a12e851a2e0f7e103fc3f861eefb8ff82",
+    "maplibre-gl-worker.mjs": "5f1e2f0e1624082b7e88a06e4c86085992b0f8c02929801e552f3f7a119856a9",
+    "maplibre-gl.css": "bacba6a85a867fcf602f2ff88331b8acf7edf3fbd063a519888cfbff39970193"
+  },
+  "upstream_files": {
+    "maplibre-gl.mjs": "244d36122c1398da3a8259817cc6d71e04321afe6404f32606b4b6c6cc4f26fb",
+    "maplibre-gl-worker.mjs": "5f1e2f0e1624082b7e88a06e4c86085992b0f8c02929801e552f3f7a119856a9",
+    "maplibre-gl.css": "bacba6a85a867fcf602f2ff88331b8acf7edf3fbd063a519888cfbff39970193"
+  },
+  "patches": [
+    {
+      "id": "RIDGE_SCHEDULER_V2",
+      "script": "scripts/patch-image-scheduler.py",
+      "scope": "Indexed image admission, adaptive ready reserve, optional tracing and bounded moving RTT refresh; no shaders or terrain data changes."
+    },
+    {
+      "id": "RIDGE_DIRECT_SAMPLING_V1",
+      "script": "scripts/patch-direct-sampling.py",
+      "scope": "Opt-in direct raster sampling on native terrain; native camera, DEM, overlays and normal rendering fallback."
+    },
+    {
+      "id": "RIDGE_TEXTURE_FILTERING_V1",
+      "script": "scripts/patch-texture-filtering.py",
+      "scope": "Runtime colour-texture filtering controls; deferred mip generation and anisotropy policy."
+    },
+    {
+      "id": "RIDGE_TEXTURE_STATE_V1",
+      "script": "scripts/patch-texture-filtering.py",
+      "scope": "Shared texture anisotropy cache, including native parent imagery and recycled terrain targets."
+    },
+    {
+      "id": "RIDGE_ADAPTIVE_TERRAIN_V1",
+      "script": "scripts/patch-adaptive-terrain.py",
+      "scope": "Native terrain index variants share native vertices and skirts; DEM border revisions invalidate runtime error metadata."
+    }
+  ]
+}

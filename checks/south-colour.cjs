@@ -1,0 +1,11 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),{execFileSync}=require('node:child_process'),crypto=require('node:crypto');
+const current=require('../public/imagery.js'),before={module:{exports:{}}};
+vm.runInNewContext(execFileSync('git',['show','a0930123b48dabfdbad3e6b6d8e7d51ff70aefb0:public/imagery.js'],{encoding:'utf8'}),before);
+function grade(rgb,p){const mean=rgb.reduce((a,b)=>a+b)/3,s=-p['raster-saturation'],c=1/(1-p['raster-contrast']),lo=p['raster-brightness-min'],hi=p['raster-brightness-max'];return rgb.map(x=>Math.max(0,Math.min(255,(lo+(hi-lo)*(((x+(mean-x)*s)/255-.5)*c+.5))*255)));}
+const paint=current.paint('linz');for(const [key,value]of Object.entries(paint))assert.ok(!Array.isArray(value),'No zoom-based grade expressions');
+const samples={};for(const [name,rgb]of Object.entries({snow:[182,186,184],brightSnow:[215,220,225],rock:[68,70,66]}))samples[name]={source:rgb,before:grade(rgb,before.module.exports.paint('linz')),after:grade(rgb,paint)};
+assert.ok(samples.snow.after.reduce((a,b)=>a+b)<samples.snow.before.reduce((a,b)=>a+b));
+fs.writeFileSync('SOUTH_ISLAND_COLOUR_VALIDATION.json',JSON.stringify({grade:'snow-v3',sameNativePaintForZooms0Through19:true,samples,caveat:'Constant shader equations, not survey lighting equivalence or live GPU pixels.'},null,2)+'\n');
+const hashes={};for(const name of ['performance.js','terrain-streaming.js','surface-focus.js']){const data=fs.readFileSync('public/'+name);assert.deepEqual(data,execFileSync('git',['show','a0930123b48dabfdbad3e6b6d8e7d51ff70aefb0:public/'+name]));hashes[name]=crypto.createHash('sha256').update(data).digest('hex');}
+fs.writeFileSync('SOUTH_ISLAND_LOD_VALIDATION.json',JSON.stringify({existingLODSelectionModules:'performance, terrain-streaming and surface-focus byte-identical; terrain-visibility revision-index changes covered by current native frustum/revision checks',residency:'Updated by the later loading-continuity repair; see LOADING_CONTINUITY_VALIDATION.json',sha256:hashes,preload:'Separate bounded byte-cache warmup; no covering, selected zoom, slider or GPU cache budget changes.'},null,2)+'\n');
+console.log('PASS: numeric fixed grade, slightly reduced snow brightness, three selection modules byte-identical; visibility indexing covered by focused native tests to previous production.');

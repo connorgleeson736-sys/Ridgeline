@@ -1,0 +1,44 @@
+{
+  "asset_validation": {
+    "ai": "Visual enhancement only",
+    "dem": "Unchanged source SHA verified",
+    "geographic_coverage": "Complete existing1.77km Alpine Model",
+    "maximum_overlap_pair_mean": 1.1553001403808594,
+    "mean_overlap_rgb_difference": 0.3887611294305453,
+    "output_pixels": [
+      24576,
+      24576
+    ],
+    "overlap_pairs": 1984,
+    "pixel_ratio_to_previous_ai": 4,
+    "total_bytes": 77626588,
+    "verified_pages": 1024
+  },
+  "checks": {
+    "cook-ai-assets": "passed",
+    "cook-local-assets": "passed",
+    "cook-lod": "passed",
+    "cook-model-controller": "passed, including new full-region image loading at extreme zoom",
+    "cook-refine": "passed",
+    "cook-regional": "passed, native terrain and outside-region rendering preserved"
+  },
+  "context_maximum_float_difference": 0.0,
+  "date": "2026-10-14",
+  "inference_seconds": 1064,
+  "production_package": {
+    "archive_metadata_allowance_bytes": 3145728,
+    "expanded_bytes": 264993864,
+    "host_limit_bytes": 268435456,
+    "quality_reduction": false,
+    "required_postbuild_command": [
+      "node",
+      "scripts/prune-static-build.mjs"
+    ],
+    "unused_build_bytes_removed": 31295990,
+    "unused_build_files_removed": 269
+  },
+  "run": "050b89796ef2ecda13d0e08d3929a5b71f956beabbc24a065e5e692683fc403d",
+  "schema": 1,
+  "scope": "Existing approximately 1.77 km Alpine Model only",
+  "verification_limit": "Controller and asset checks are not browser GPU or device frame-rate benchmarks. Browser QA is unavailable in this environment."
+}

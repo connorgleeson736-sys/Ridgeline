@@ -1,0 +1,318 @@
+{
+  "asset": {
+    "bytes": 6580464,
+    "chunks": 1,
+    "sha256": "483d11d60e92d308bf887a34e933faf8de0c3f83c555e2be75be84689f347920",
+    "url": "https://ridgeline-nz.connorgleeson736.chatgpt.site/api/lidar/files/483d11d60e92d308bf887a34e933faf8de0c3f83c555e2be75be84689f347920",
+    "verified": true
+  },
+  "attributes_sha256": "ab8c69cc0a32bb1a81698a562af581cff59a3602f65d1f783a3d4713ada8061c",
+  "baseline_float32_glb_bytes": 8821404,
+  "continuous_full_precision_world_bound": {
+    "budget_m": 2.005061230969822,
+    "certified": true,
+    "comparison_float32_budget_m": 2.005,
+    "forward": {
+      "certified": true,
+      "method": "Continuous convex-triangle bounds; unproved faces rejected, no sample-based acceptance",
+      "numeric_margin_m": 1e-05,
+      "subdivisions": 1549,
+      "tested": 3291861,
+      "unresolved": 0,
+      "upper_bound_m": 2.004923304904148,
+      "work_cap_reached": false
+    },
+    "packing_error_added_m": 1e-08,
+    "reference": "Full-precision common-ENU transform of finest reconstructed local-coordinate mesh; not survey accuracy",
+    "reference_float32_rounding_added_m": 6.123096982196011e-05,
+    "reverse": {
+      "certified": true,
+      "method": "Continuous convex-triangle bounds; unproved faces rejected, no sample-based acceptance",
+      "numeric_margin_m": 1e-05,
+      "subdivisions": 9389,
+      "tested": 173710,
+      "unresolved": 0,
+      "upper_bound_m": 2.004965678631641,
+      "work_cap_reached": false
+    },
+    "upper_bound_m": 2.005026919601463
+  },
+  "continuous_world_bound": {
+    "budget_m": 2.005,
+    "certified": true,
+    "forward": {
+      "certified": true,
+      "method": "Continuous convex-triangle bounds; unproved faces rejected, no sample-based acceptance",
+      "numeric_margin_m": 1e-05,
+      "subdivisions": 1549,
+      "tested": 3291861,
+      "unresolved": 0,
+      "upper_bound_m": 2.004923304904148,
+      "work_cap_reached": false
+    },
+    "packing_error_added_m": 1e-08,
+    "reverse": {
+      "certified": true,
+      "method": "Continuous convex-triangle bounds; unproved faces rejected, no sample-based acceptance",
+      "numeric_margin_m": 1e-05,
+      "subdivisions": 9389,
+      "tested": 173710,
+      "unresolved": 0,
+      "upper_bound_m": 2.004965678631641,
+      "work_cap_reached": false
+    },
+    "upper_bound_m": 2.004965688631641
+  },
+  "coordinate_frame": {
+    "accuracy_note": "Datum/grid published accuracy is not LOD error or source survey accuracy",
+    "anchor_ecef": [
+      -4560092.147303237,
+      792435.6845927559,
+      -4377353.458483151
+    ],
+    "anchor_nzgd2000_llh": [
+      170.1418011708455,
+      -43.59510134459925,
+      2513.737311096129
+    ],
+    "anchor_nztm_nzvd": [
+      1369289.0,
+      5169127.0,
+      2500.0
+    ],
+    "enu_to_ecef_column_major": [
+      -0.17121035028447903,
+      -0.9852344979523737,
+      0.0,
+      0.0,
+      -0.6793759616697683,
+      0.11805940272501356,
+      0.7242308196517809,
+      0.0,
+      -0.7135371880012585,
+      0.12399581231939677,
+      -0.6895576262115513,
+      0.0,
+      -4560092.147303237,
+      792435.6845927559,
+      -4377353.458483151,
+      1.0
+    ],
+    "geographic_crs": "EPSG:4959",
+    "geoid_corrections_at_corners_center_m": [
+      13.56578191343533,
+      13.633731758383874,
+      13.629024230559025,
+      13.721970178201445,
+      13.737311096128906
+    ],
+    "gltf_axes": "(E,U,-N); runtime glTF Y-up to tile Z-up yields (E,N,U)",
+    "grid": {
+      "name": "nz_linz_nzgeoid2016.tif",
+      "sha256": "b986261d778e30b52b7d9ae24280c704c280c13bb02e51f3dca65fa862d1f027",
+      "url": "https://cdn.proj.org/nz_linz_nzgeoid2016.tif"
+    },
+    "horizontal_operation": {
+      "accuracy_m": 1.0,
+      "description": "NZGD2000 to WGS 84 (1) + Conversion from WGS 84 (geog3D) to WGS 84 (geocentric) (with axis order normalized for visualization)",
+      "epoch": null,
+      "note": "Published static NZGD2000-to-WGS84 operation; no centimetre-level dynamic epoch claim",
+      "pipeline": "proj=pipeline step proj=unitconvert xy_in=deg z_in=m xy_out=rad z_out=m step proj=cart ellps=WGS84"
+    },
+    "independent_geoid_max_error_m": 2.504663143554353e-13,
+    "proj_version": "9.8.1",
+    "pyproj_version": "3.8.0",
+    "source_crs": "EPSG:2193+7839",
+    "target_crs": "EPSG:4978",
+    "vertical_operation": {
+      "accuracy_m": 0.1,
+      "description": "Inverse of New Zealand Transverse Mercator 2000 + Inverse of NZGD2000 to NZVD2016 height (2) (with axis order normalized for visualization)",
+      "pipeline": "proj=pipeline step inv proj=tmerc lat_0=0 lon_0=173 k=0.9996 x_0=1600000 y_0=10000000 ellps=GRS80 step proj=vgridshift grids=nz_linz_nzgeoid2016.tif multiplier=1 step proj=unitconvert xy_in=rad xy_out=deg"
+    },
+    "vertical_roundtrip_max_error_m": 1.6789657099707143e-09
+  },
+  "coordinate_rounding_max_m": 6.11505737907703e-05,
+  "cyclic_index_sha256": "642bb700a13f46ff64298847d4e625f7f089e42610ea9796059f363a2c3e65c5",
+  "degenerate_shading_faces": 0,
+  "display_quantization": {
+    "authoritative_mesh_modified": false,
+    "corresponding_triangle_bound_both_directions_m": 1e-08,
+    "normal_max_angle_degrees": 0.0014791016722757696,
+    "position_rounding_max_m": 0.0,
+    "position_step_m": null,
+    "shared_positions": "Original localized Float32 positions",
+    "uv_max_error_normalized": [
+      7.629018904220519e-06,
+      7.62946456345226e-06
+    ]
+  },
+  "encoded_size_reduction_fraction": 0.25403439180429777,
+  "enu_max": [
+    103.41399383544922,
+    103.4130859375,
+    1218.09716796875
+  ],
+  "enu_min": [
+    -103.4130630493164,
+    -103.4138412475586,
+    1045.041015625
+  ],
+  "finest_reference": false,
+  "geometry_unchanged_by_packing": true,
+  "glb_bytes": 6580464,
+  "gpu_attribute_bytes": 9604056,
+  "gpu_index_bytes": 1633848,
+  "gpu_vertices": 400169,
+  "image_sha256": "f7c138fecec8ae87a81e04100a2806dc598cf8f3c8ee0165496cf74bf2a73193",
+  "imagery": {
+    "ai": false,
+    "appearance_only": false,
+    "attribution": {
+      "license": "CC-BY-4.0",
+      "providers": [
+        {
+          "name": "Toit\u016b Te Whenua Land Information New Zealand",
+          "roles": [
+            "host",
+            "processor"
+          ]
+        },
+        {
+          "name": "AAM NZ",
+          "roles": [
+            "producer"
+          ]
+        },
+        {
+          "name": "Canterbury Aerial Imagery Consortium (CAI)",
+          "roles": [
+            "licensor"
+          ]
+        }
+      ]
+    },
+    "catalog_sha256": "5480384b0f55d4fb3afc3d0eb9eec7552b1c825bf2aa5c9196b90f64928001da",
+    "covered": true,
+    "crop_bounds": [
+      1369188.4,
+      5169026.4,
+      1369389.7,
+      5169227.7
+    ],
+    "crop_pixel_window": [
+      6628,
+      9241,
+      7299,
+      9912
+    ],
+    "geographic_uv": "Exact source NZTM pixel grid; original native pixel values, no extrapolation",
+    "image_pixels": [
+      671,
+      671
+    ],
+    "input_windows": [
+      {
+        "pixel_window": [
+          5296,
+          9576,
+          6964,
+          11244
+        ],
+        "sha256": "8a4cbe5d27707c9a6a7bfe38d06002f79f243be3be1f9c8f4a5a6e4b8a621e7e",
+        "signature": "6b2afe89addf0896967062b8f68ce1bd82e61edc5bbd31682705cf15eea8b55d",
+        "task": "source-photo-0005"
+      },
+      {
+        "pixel_window": [
+          6963,
+          9576,
+          8630,
+          11244
+        ],
+        "sha256": "e1b3921e78bef221ebd89fccf964b129c4e8b6a595c8153bcf58649f65ae6df5",
+        "signature": "7a86a7a17ece279ab1df90f46927051619e598ba465bdc051ce9b8bb5ab03234",
+        "task": "source-photo-0006"
+      },
+      {
+        "pixel_window": [
+          5296,
+          7910,
+          6964,
+          9577
+        ],
+        "sha256": "1d78993135b6bed62901f7961e173e6cf5530e7c88c0bd2b5e673d36492f4642",
+        "signature": "028d737c653e828ad43c4d5b948f05cd6c3d412c7b5ae862391d158bddf2686a",
+        "task": "source-photo-0009"
+      },
+      {
+        "pixel_window": [
+          6963,
+          7910,
+          8630,
+          9577
+        ],
+        "sha256": "4564827285f4f07a3ccade101bf4cb9d51fd37705c4923bd424bf64812006476",
+        "signature": "b0db7e62b05357fff197dd13c2c454690a026d957d2c5081e5daebea5b6d372e",
+        "task": "source-photo-0010"
+      }
+    ],
+    "kind": "native",
+    "limitations": "Aerial ground sampling is0.3m in plan view, not uniform on steep surface area. Hidden cliff faces remain unobserved.",
+    "native_pixel_spacing_m": 0.3,
+    "png_bytes": 810039,
+    "resampled": false,
+    "source_crs": "EPSG:2193"
+  },
+  "meshopt_bytes": 5763363,
+  "publishable": false,
+  "reference_conversion_rounding_max_m": 6.123096982196011e-05,
+  "seconds": 10.389581782999812,
+  "triangle_topology_preserved": true,
+  "triangles": 136154,
+  "unwelded_vertices": 408462,
+  "validation": {
+    "browser_decoder_node_ms": 21.800506000000013,
+    "complete_attributes_bits_identical": true,
+    "image_bytes_identical": true,
+    "khronos_compressed_issues": {
+      "messages": [
+        {
+          "code": "UNSUPPORTED_EXTENSION",
+          "message": "Cannot validate an extension as it is not supported by the validator: 'EXT_meshopt_compression'.",
+          "pointer": "/extensionsUsed/0",
+          "severity": 2
+        },
+        {
+          "code": "IMAGE_NPOT_DIMENSIONS",
+          "message": "Image has non-power-of-two dimensions: 671x671.",
+          "pointer": "/images/0",
+          "severity": 2
+        }
+      ],
+      "numErrors": 0,
+      "numHints": 0,
+      "numInfos": 2,
+      "numWarnings": 0,
+      "truncated": false
+    },
+    "khronos_decoded_issues": {
+      "messages": [
+        {
+          "code": "IMAGE_NPOT_DIMENSIONS",
+          "message": "Image has non-power-of-two dimensions: 671x671.",
+          "pointer": "/images/0",
+          "severity": 2
+        }
+      ],
+      "numErrors": 0,
+      "numHints": 0,
+      "numInfos": 1,
+      "numWarnings": 0,
+      "truncated": false
+    },
+    "limitation": "Node/WASM decode and glTF validation are not rendered/browser/GPU benchmarks",
+    "triangle_geometry_winding_identical": true,
+    "validator_version": "2.0.0-dev.3.10",
+    "verified": true
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "existingLODSelectionModules": "performance, terrain-streaming and surface-focus byte-identical; terrain-visibility revision-index changes covered by current native frustum/revision checks",
+  "residency": "Updated by the later loading-continuity repair; see LOADING_CONTINUITY_VALIDATION.json",
+  "sha256": {
+    "performance.js": "ca1462c8b48364dea3059986a9cb9ac9a82914a26558030b3c96a288e5bedf23",
+    "terrain-streaming.js": "3a35f359f7e9ababe754a9b9f00445081c96e59eef96b1f4971d62e310d5aa9c",
+    "surface-focus.js": "7988b3ce80fa9053c459f336d9b17b237b1f28c57ddaeea66decc880ae8c3ecd"
+  },
+  "preload": "Separate bounded byte-cache warmup; no covering, selected zoom, slider or GPU cache budget changes."
+}

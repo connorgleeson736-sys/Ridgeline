@@ -1,0 +1,235 @@
+{
+  "ai": false,
+  "aligned_crop_bounds": [
+    1368289.0,
+    5168127.0,
+    1370289.1,
+    5170127.1
+  ],
+  "all_common_pixels_identical": true,
+  "common_pixel_comparisons": 24,
+  "common_pixels_checked": 26684,
+  "complete": true,
+  "integrated_in_pilot_glbs": false,
+  "limits": "Native 2km source imagery preparation only; pilot GLBs retain the prior same-place source photographic crops",
+  "native_pixel_spacing_m": 0.3,
+  "requested_bounds": [
+    1368289,
+    5168127,
+    1370289,
+    5170127
+  ],
+  "resampled": false,
+  "total_png_bytes": 74244285,
+  "unique_opaque_pixels": 44448889,
+  "windows": [
+    {
+      "bytes": 4597038,
+      "path": "data/source-photos/0000/photo.png",
+      "sha256": "2537ba00f2b7d83c670b7fbe8f2852c69e196d68955ccc5c51cdfc7649e98982",
+      "signature": "efd1a8f526153ad96f989a216c3c2ffb43b59f157a4c35b2f952e6cea804efdf",
+      "task": "source-photo-0000",
+      "window": [
+        3630,
+        11243,
+        5297,
+        12910
+      ]
+    },
+    {
+      "bytes": 4781840,
+      "path": "data/source-photos/0001/photo.png",
+      "sha256": "59c77424797fe620f718e846254ec7ec9dafb29a499c5c975f6d12e95c4d93c2",
+      "signature": "3406fd835fd1254474923cce75236cba715c1082f17e2bfee0ddbfd7f996c5ad",
+      "task": "source-photo-0001",
+      "window": [
+        5296,
+        11243,
+        6964,
+        12910
+      ]
+    },
+    {
+      "bytes": 5617633,
+      "path": "data/source-photos/0002/photo.png",
+      "sha256": "192cf3cd772648f3c45b8665ddadd1cf50fe050535d4134a285776885a3c6fa2",
+      "signature": "0322a40898a9ff2d0b0720b227812cea1c687e0894a8948c12622f00b5d173c8",
+      "task": "source-photo-0002",
+      "window": [
+        6963,
+        11243,
+        8630,
+        12910
+      ]
+    },
+    {
+      "bytes": 4343156,
+      "path": "data/source-photos/0003/photo.png",
+      "sha256": "5ffd96cca22fab551e423d2bf43a3ad94fb71dd698a79bdb4e7ce935788f3081",
+      "signature": "e9f181c113db0529b0e0e854e161d548db0993177befb41d975f966ad63298cb",
+      "task": "source-photo-0003",
+      "window": [
+        8630,
+        11243,
+        10297,
+        12910
+      ]
+    },
+    {
+      "bytes": 4563405,
+      "path": "data/source-photos/0004/photo.png",
+      "sha256": "21018d9920e4ce8515143674edfceaf15c87bcca083992a495d640582fdcb360",
+      "signature": "ed735d23c3b74a90bf9a8c2bc263005710cd65e7d200279ca8fe68b6f468679b",
+      "task": "source-photo-0004",
+      "window": [
+        3630,
+        9576,
+        5297,
+        11244
+      ]
+    },
+    {
+      "bytes": 4587997,
+      "path": "data/source-photos/0005/photo.png",
+      "sha256": "8a4cbe5d27707c9a6a7bfe38d06002f79f243be3be1f9c8f4a5a6e4b8a621e7e",
+      "signature": "6b2afe89addf0896967062b8f68ce1bd82e61edc5bbd31682705cf15eea8b55d",
+      "task": "source-photo-0005",
+      "window": [
+        5296,
+        9576,
+        6964,
+        11244
+      ]
+    },
+    {
+      "bytes": 5276874,
+      "path": "data/source-photos/0006/photo.png",
+      "sha256": "e1b3921e78bef221ebd89fccf964b129c4e8b6a595c8153bcf58649f65ae6df5",
+      "signature": "7a86a7a17ece279ab1df90f46927051619e598ba465bdc051ce9b8bb5ab03234",
+      "task": "source-photo-0006",
+      "window": [
+        6963,
+        9576,
+        8630,
+        11244
+      ]
+    },
+    {
+      "bytes": 3637541,
+      "path": "data/source-photos/0007/photo.png",
+      "sha256": "8be56dc779e8be72a8f560e4d0dd045a9b265f4e5399ecae1a9c3fe9c0918e55",
+      "signature": "8efb4b013fe20fd96a6e39f8177cf1102491b2bcb3b1a69ed3ca647e837cf8c4",
+      "task": "source-photo-0007",
+      "window": [
+        8630,
+        9576,
+        10297,
+        11244
+      ]
+    },
+    {
+      "bytes": 3823489,
+      "path": "data/source-photos/0008/photo.png",
+      "sha256": "d0079064cc9d74ac6ed9cef50b1556276329a77c3d750764e664f8c17ea182ef",
+      "signature": "d44c7cef6a0886713eb62b14a8d3f4ad8de08cb604d1e5c7434fab4a2fa18f18",
+      "task": "source-photo-0008",
+      "window": [
+        3630,
+        7910,
+        5297,
+        9577
+      ]
+    },
+    {
+      "bytes": 5254724,
+      "path": "data/source-photos/0009/photo.png",
+      "sha256": "1d78993135b6bed62901f7961e173e6cf5530e7c88c0bd2b5e673d36492f4642",
+      "signature": "028d737c653e828ad43c4d5b948f05cd6c3d412c7b5ae862391d158bddf2686a",
+      "task": "source-photo-0009",
+      "window": [
+        5296,
+        7910,
+        6964,
+        9577
+      ]
+    },
+    {
+      "bytes": 5107144,
+      "path": "data/source-photos/0010/photo.png",
+      "sha256": "4564827285f4f07a3ccade101bf4cb9d51fd37705c4923bd424bf64812006476",
+      "signature": "b0db7e62b05357fff197dd13c2c454690a026d957d2c5081e5daebea5b6d372e",
+      "task": "source-photo-0010",
+      "window": [
+        6963,
+        7910,
+        8630,
+        9577
+      ]
+    },
+    {
+      "bytes": 3572262,
+      "path": "data/source-photos/0011/photo.png",
+      "sha256": "a957cd401f04f5ec72f4f7f69e4ddcde105ebddd4927e21d5256726a11b9eabb",
+      "signature": "bf5957529327edba5a08882b4020d67f1669335abdab94d4daf807489835128f",
+      "task": "source-photo-0011",
+      "window": [
+        8630,
+        7910,
+        10297,
+        9577
+      ]
+    },
+    {
+      "bytes": 5189348,
+      "path": "data/source-photos/0012/photo.png",
+      "sha256": "6304071c40a430ec671b38b26e094929496c6d4e9c79372cff65fce4a74ef401",
+      "signature": "9091a6a3b9c0ca4a9d3025472666e9913e003761c8335fd5e47e39ffb7da94b9",
+      "task": "source-photo-0012",
+      "window": [
+        3630,
+        6243,
+        5297,
+        7910
+      ]
+    },
+    {
+      "bytes": 4732043,
+      "path": "data/source-photos/0013/photo.png",
+      "sha256": "06d778806f17f983e316aed98b1de0023098f58dc287f38c74ca668039902a0d",
+      "signature": "9d2cec53a3628353c85a5b3a33011446272f29205f5ba4d8372094eaa690e942",
+      "task": "source-photo-0013",
+      "window": [
+        5296,
+        6243,
+        6964,
+        7910
+      ]
+    },
+    {
+      "bytes": 3686649,
+      "path": "data/source-photos/0014/photo.png",
+      "sha256": "81dc8ca62f1c0d4b7f2ba458881980012b809714dcfa44c6940bdf92f2aca751",
+      "signature": "d00b005544a5a2c31e83d22e640cc921edb57f02ec4d2c53c25ce8e797957f21",
+      "task": "source-photo-0014",
+      "window": [
+        6963,
+        6243,
+        8630,
+        7910
+      ]
+    },
+    {
+      "bytes": 5473142,
+      "path": "data/source-photos/0015/photo.png",
+      "sha256": "4bb4e12ef644723c6e0500bbf5bc17ede732a3b0e47e6b8a51ebc023ff0476de",
+      "signature": "bcad5d4222e3672879e6ace7e274c7600f3426fef21237297d0871456874fdb2",
+      "task": "source-photo-0015",
+      "window": [
+        8630,
+        6243,
+        10297,
+        7910
+      ]
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "nativeEngine": "6.14.0",
+  "recording": "Screen recording 2026-10-18 21.32.53.webm",
+  "oldCachedDEMHeightAfterPressure": 0,
+  "protectedDEMHeightAfterPressure": 3200,
+  "actualNativeDEMSampling": true,
+  "actualNativeRTTPreparation": true,
+  "renderHookRecordsCoverage": true,
+  "partialAtlasCanRefresh": true,
+  "offscreenExpiryDoesNotUnload": true,
+  "readFallbackRefreshesRecency": true,
+  "reloadRetainsValidTexture": true,
+  "unusedRTTPoolBounded": true,
+  "maxPitch": 85,
+  "highPitchCases": [
+    {
+      "pitch": 60,
+      "zoom": 11,
+      "renderTiles": 17
+    },
+    {
+      "pitch": 60,
+      "zoom": 13,
+      "renderTiles": 23
+    },
+    {
+      "pitch": 60,
+      "zoom": 15,
+      "renderTiles": 35
+    },
+    {
+      "pitch": 60,
+      "zoom": 17,
+      "renderTiles": 48
+    },
+    {
+      "pitch": 75,
+      "zoom": 11,
+      "renderTiles": 26
+    },
+    {
+      "pitch": 75,
+      "zoom": 13,
+      "renderTiles": 36
+    },
+    {
+      "pitch": 75,
+      "zoom": 15,
+      "renderTiles": 52
+    },
+    {
+      "pitch": 75,
+      "zoom": 17,
+      "renderTiles": 63
+    },
+    {
+      "pitch": 85,
+      "zoom": 11,
+      "renderTiles": 27
+    },
+    {
+      "pitch": 85,
+      "zoom": 13,
+      "renderTiles": 39
+    },
+    {
+      "pitch": 85,
+      "zoom": 15,
+      "renderTiles": 47
+    },
+    {
+      "pitch": 85,
+      "zoom": 17,
+      "renderTiles": 60
+    }
+  ],
+  "sourceCacheBytesBounded": true,
+  "caveat": "Native CPU source/cache/terrain sampling with controlled 3200m DEM and GPU handles, not a live replay or GPU screenshot."
+}

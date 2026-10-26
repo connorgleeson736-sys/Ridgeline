@@ -1,0 +1,10 @@
+{
+  "opaqueCoastGuardTilesChecked": 3084,
+  "coastMaskTileSeam": "byte-identical to one continuous resampling",
+  "authenticLINZFourTileMean": "pixel-exact independent integer sum / nearest-even rounding",
+  "ungradedLINZRawNaturalPixels": "identical",
+  "losslessOutput": "pixel-exact",
+  "sourceZoom": 13,
+  "outputZoom": 12,
+  "caveat": "CPU source/filter/encoding checks, not live browser or GPU pixels"
+}

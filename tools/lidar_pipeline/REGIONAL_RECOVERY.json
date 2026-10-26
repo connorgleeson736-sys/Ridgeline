@@ -1,0 +1,65 @@
+{
+  "completed_r2_tiles": [
+    168,
+    169,
+    170,
+    171,
+    188,
+    189,
+    190,
+    191,
+    208,
+    209,
+    210,
+    211,
+    228,
+    229,
+    230,
+    231
+  ],
+  "completed_surface_triangles": 11092985,
+  "inventory_module": "tools.lidar_pipeline.recovery_inventory",
+  "native_task": "native-toolchain-9a26235b2e48fbd8",
+  "next_bounded_run": {
+    "limit": 16,
+    "max_seconds": 1800,
+    "module": "tools.lidar_pipeline.regional_batch"
+  },
+  "prefixes": [
+    "source-audit",
+    "partition-",
+    "preflight-r2-",
+    "regional-preflight-r2",
+    "regional-plan-r2",
+    "regional-union-",
+    "regional-parent-comparison-",
+    "local-surface-",
+    "certified-lod-",
+    "seam-r2-",
+    "seams-r2-",
+    "native-toolchain-",
+    "source-photo-",
+    "coordinate-frame",
+    "glb-regional-"
+  ],
+  "publishable": false,
+  "python_example": "/workspace/ridgeline-env/bin/python",
+  "resume_notes": [
+    "Read current Git status and external recovery Doc before processing.",
+    "Get a fresh token for the same Site; pass only through hidden stdin. Never save credentials.",
+    "Inventory prefixes discover durable tasks; restore_run independently verifies all matching archives/artifacts.",
+    "Some prefixes include older experiments; counts are a selected local view, never whole-region completion.",
+    "After restore, verify the saved native binary SHA and chmod it executable; rerun native planar tests.",
+    "Use limit0 to verify all source generations and completed geometry before continuing.",
+    "Repeated bounded dispatch skips verified completed r2 surfaces and saves each new surface before advancing.",
+    "Seam validation is independent; matching finest facets does not certify manifold geology or mixed-LOD transitions."
+  ],
+  "root_example": "/workspace/ridgeline-run",
+  "run": "f899852804c645c7c8834d25a9642ce1e55000f19ad15138be5b5bbb777b142e",
+  "schema": 1,
+  "total_region_patches": 400,
+  "verification_only": {
+    "limit": 0,
+    "module": "tools.lidar_pipeline.regional_batch"
+  }
+}

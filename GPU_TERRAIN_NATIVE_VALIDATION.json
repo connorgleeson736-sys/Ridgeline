@@ -1,0 +1,19 @@
+{
+  "backend": "vulkan",
+  "GPUDisplacementSharedMaterialAndNativeRendering": "passed",
+  "perObjectElevationBindings": "passed",
+  "additionalTilesWithoutShaderCompilation": 24,
+  "pixelCheck": {
+    "redTerrainPixels": 9209,
+    "blueTerrainPixels": 9545,
+    "displacementAffectedPixels": 14241
+  },
+  "shaderModules": 17,
+  "WGSLAndPipelineValidation": "passed",
+  "frames": 5,
+  "TAAUMotionDepthColour": "passed",
+  "resolutionChangeAndHistoryReset": "passed",
+  "nativeDeviceErrors": [],
+  "geographicRoundtrip": "passed",
+  "note": "Native offscreen validation; browser interaction and hardware FPS unverified"
+}

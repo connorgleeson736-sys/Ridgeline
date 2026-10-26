@@ -1,0 +1,21 @@
+{
+  "engine": "MapLibre 6.14.0",
+  "nativeCoveringTraversal": true,
+  "scene": "Synthetic first-hit ridge in front of navigation pivot at Franz Josef latitude",
+  "oldFaceZoom": 14,
+  "oldValleyZoom": 13,
+  "focusedFaceZoom": 14,
+  "focusedValleyZoom": 14,
+  "desiredFaceZoom": 14.25,
+  "desiredValleyZoom": 13.281296607187347,
+  "nativeCoverTiles": 6,
+  "focusedCoverTiles": 8,
+  "firstSurfaceMetreConversion": "passed",
+  "renderedAndSourceFocusAligned": "passed",
+  "coarserDistantRenderBudgetPreserved": "passed",
+  "raycastThrottle": "240ms plus moveend/terrain",
+  "stableSources": "passed",
+  "skyFallback": "passed",
+  "cleanup": "passed",
+  "caveat": "Actual bundled native CPU covering traversal with controlled visible bounds and first-hit result; browser pixels, network scheduling and device FPS are not measured"
+}

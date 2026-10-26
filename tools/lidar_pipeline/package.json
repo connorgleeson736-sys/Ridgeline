@@ -1,0 +1,7 @@
+{
+  "name": "ridgeline-terrain-validation",
+  "private": true,
+  "dependencies": {
+    "gltf-validator": "2.0.0-dev.3.10"
+  }
+}

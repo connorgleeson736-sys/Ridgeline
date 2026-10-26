@@ -1,0 +1,18 @@
+{
+  "cameraUnchanged": true,
+  "outsideVisibleFrustum": true,
+  "horizontalExtraDegrees": [
+    30,
+    50,
+    70
+  ],
+  "closestAngularFirst": true,
+  "sliderSavedAndLive": true,
+  "sameCameraPositionAndPixelDensity": true,
+  "nativeCovering": true,
+  "sourceFocusRestored": true,
+  "legacyRadiusAndRingControlsRemoved": true,
+  "savedOptIn": true,
+  "testCases": 36,
+  "caveat": "Native CPU frustum/selection and app fixtures; not phone GPU/frame-rate measurements."
+}

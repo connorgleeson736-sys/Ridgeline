@@ -1,0 +1,11 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),V=require('../public/terrain-visibility.js');
+let scans=0;const events={},sourceEvents={},fine={tileID:{key:1,canonical:{z:14,x:1,y:1}},dem:{min:100,max:3000,dim:256}},rows=[fine];
+const cache={data:{},onRemove(){},reset(){this.data={};},add(id,tile){this.data[id.key]=[{value:tile}];}};
+const source={getSource:()=>({type:'raster-dem'}),_inViewTiles:{getAllTiles(){scans++;return rows;}},_outOfViewCache:cache,on(n,f){(sourceEvents[n]??=[]).push(f);},off(n,f){sourceEvents[n]=(sourceEvents[n]||[]).filter(x=>x!==f);}};
+const terrain={exaggeration:1,getMinMaxElevation:()=>({minElevation:0,maxElevation:100}),tileManager:{tileManager:source,getSourceTile:()=>rows[0],update(){terrain.getMinMaxElevation(fine.tileID);}}};
+const map={terrain,on(n,f){(events[n]??=[]).push(f);},off(n,f){events[n]=(events[n]||[]).filter(x=>x!==f);}};
+const control=V.attach(map,{engineVersion:'6.14.0'});terrain.tileManager.update();const first=scans;for(let i=0;i<1000;i++)terrain.tileManager.update();assert.equal(scans,first);
+ fine.dem.max=3717;assert.ok(terrain.getMinMaxElevation(fine.tileID).maxElevation>=3717);assert.equal(scans,first+1,'In-place extrema invalidate');
+ rows.length=0;cache.onRemove(fine);terrain.getMinMaxElevation(fine.tileID);assert.equal(control.stats().visibilityIndexedDEMs,0);
+ cache.add(fine.tileID,fine);terrain.getMinMaxElevation(fine.tileID);assert.equal(control.stats().visibilityIndexedDEMs,1,'Loaded cached insertion without an arrival event invalidates');cache.reset();terrain.getMinMaxElevation(fine.tileID);assert.equal(control.stats().visibilityIndexedDEMs,0);control.destroy();assert.ok(Object.values(sourceEvents).every(x=>!x.length));assert.equal(Object.getOwnPropertyDescriptor(fine.dem,'max').value,3717);
+ const report={unchangedUpdates:1000,extraEnumerations:0,inPlaceExtremaInvalidate:true,evictionInvalidates:true,cachedInsertionInvalidates:true,resetAndCleanup:true,caveat:'Controlled mutation/lifecycle test; actual summit frustum coverage is checked separately.'};fs.writeFileSync('AUDIT_DEM_REVISION_VALIDATION.json',JSON.stringify(report,null,2)+'\n');console.log(report);

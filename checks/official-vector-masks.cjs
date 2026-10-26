@@ -1,0 +1,5 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),crypto=require('node:crypto'),{performance}=require('node:perf_hooks');
+const {vectorAlpha}=require('../public/regional-blend.js'),atlas=require('../public/gap-imagery-atlas.js');
+const fixtures=JSON.parse(fs.readFileSync('qa/official-surveys/vector-mask-fixtures.json'));const start=performance.now();let close=0;
+for(const f of fixtures){const entry=atlas.entries[f.key],data=vectorAlpha({...entry,rings:entry.outer},f.z,f.x,f.y,f.size,f.size),alpha=new Uint8Array(f.size*f.size);for(let i=0;i<alpha.length;i++)alpha[i]=data[i*4+3];assert.equal(crypto.createHash('sha256').update(alpha).digest('hex'),f.sha256,`Official geometry mismatch ${f.key} at z${f.z}/${f.x}/${f.y}`);if(f.protectedSha256){for(const [lo,hi]of f.vetoRuns)alpha.fill(0,lo,hi);assert.equal(crypto.createHash('sha256').update(alpha).digest('hex'),f.protectedSha256,'Fine alpha protection must match shipped coarse mask '+f.key);} if(f.z>13)close++;}
+console.log(JSON.stringify({PASS:true,nativeAndCloseZoomMasks:fixtures.length,closeZoomMasks:close,elapsedMs:Math.round(performance.now()-start)}));

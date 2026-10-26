@@ -1,0 +1,66 @@
+{
+  "method": "Matched geographic footprint in existing LINZ tiles; RGB max-minus-min chroma, using actual raster saturation/contrast/brightness equations. This is image-statistics analysis, not a rendered browser benchmark. No derived images are served.",
+  "rows": [
+    {
+      "peak": "Aoraki",
+      "source_zooms": [
+        12,
+        13
+      ],
+      "fixed_camera_zoom": 11.5,
+      "mean_chroma_gap_before": 0.004469927619485298,
+      "mean_chroma_gap_after": 0.0025630922564338255,
+      "reduction_percent": 42.659200000000006,
+      "luma_gap_before": 0.24573990566278614
+    },
+    {
+      "peak": "Aspiring",
+      "source_zooms": [
+        12,
+        13
+      ],
+      "fixed_camera_zoom": 11.5,
+      "mean_chroma_gap_before": 0.01605846928615196,
+      "mean_chroma_gap_after": 0.00920805475643382,
+      "reduction_percent": 42.659200000000006,
+      "luma_gap_before": 0.1644705180249184
+    },
+    {
+      "peak": "Ruapehu",
+      "source_zooms": [
+        12,
+        13
+      ],
+      "fixed_camera_zoom": 11.5,
+      "mean_chroma_gap_before": 0.10496108111213234,
+      "mean_chroma_gap_after": 0.06018552359834557,
+      "reduction_percent": 42.659200000000006,
+      "luma_gap_before": 0.03981255425347219
+    },
+    {
+      "peak": "Taranaki",
+      "source_zooms": [
+        12,
+        13
+      ],
+      "fixed_camera_zoom": 11.5,
+      "mean_chroma_gap_before": 0.09186054304534313,
+      "mean_chroma_gap_after": 0.05267357026654411,
+      "reduction_percent": 42.659200000000006,
+      "luma_gap_before": 0.04631395526960791
+    },
+    {
+      "peak": "Ngauruhoe",
+      "source_zooms": [
+        12,
+        13
+      ],
+      "fixed_camera_zoom": 11.5,
+      "mean_chroma_gap_before": 0.09858901079963235,
+      "mean_chroma_gap_after": 0.05653172750459558,
+      "reduction_percent": 42.659200000000006,
+      "luma_gap_before": 0.057349271088643794
+    }
+  ],
+  "limitation": "Different capture dates and snow cover remain; colour grading cannot recover consistent seasonal photography."
+}

@@ -1,0 +1,113 @@
+{
+  "engine": "MapLibre 6.14.0",
+  "actualNativeCovering": true,
+  "oldDEMTiles": 162,
+  "newDEMTiles": 139,
+  "scenes": [
+    {
+      "zoom": 11,
+      "oldTiles": 24,
+      "newTiles": 23,
+      "viewedBefore": 12,
+      "viewedAfter": 12,
+      "pivotBefore": 11,
+      "pivotAfter": 11,
+      "distantBefore": 11,
+      "distantAfter": 11
+    },
+    {
+      "zoom": 13,
+      "oldTiles": 28,
+      "newTiles": 28,
+      "viewedBefore": 14,
+      "viewedAfter": 14,
+      "pivotBefore": 13,
+      "pivotAfter": 13,
+      "distantBefore": 13,
+      "distantAfter": 13
+    },
+    {
+      "zoom": 15,
+      "oldTiles": 44,
+      "newTiles": 36,
+      "viewedBefore": 16,
+      "viewedAfter": 16,
+      "pivotBefore": 15,
+      "pivotAfter": 15,
+      "distantBefore": 15,
+      "distantAfter": 14
+    },
+    {
+      "zoom": 17,
+      "oldTiles": 66,
+      "newTiles": 52,
+      "viewedBefore": 18,
+      "viewedAfter": 18,
+      "pivotBefore": 17,
+      "pivotAfter": 17,
+      "distantBefore": 17,
+      "distantAfter": 16
+    }
+  ],
+  "viewedSurfaceAndPivotDetailPreserved": true,
+  "completeChildCoverageRequired": true,
+  "nearRequestsPrioritised": true,
+  "parentTextureSurvivesChildLoading": true,
+  "noParentChildOverlap": true,
+  "noExtraGPUTextureAllocationsDuringHold": true,
+  "replacementNeedsDEMAndImagery": true,
+  "timeoutCannotCreateHole": true,
+  "nativeFingerprintKeepsLastCompleteImage": true,
+  "pendingSourceArrivalKeepsDrape": true,
+  "noPendingRenderSpin": true,
+  "coarseningKeepsCompleteChildren": true,
+  "largeZoomJumpRetainsParent": true,
+  "imageryAloneCannotReplaceMissingDEM": true,
+  "partialDrapeCannotFreeze": true,
+  "stats": {
+    "terrainCoordinatePairsVisited": 68,
+    "terrainCoordinatePairsSkipped": 63,
+    "refreshBacklog": 1,
+    "refreshesThisFrame": 1,
+    "estimatedPatchSubmissionMs": null,
+    "residentDrapes": 1,
+    "residentBytes": 1398101,
+    "budgetBytes": 100663296,
+    "reuses": 2,
+    "evictions": 0,
+    "invalidations": 1,
+    "fullInvalidations": 0,
+    "geometryOnlyEvents": 0,
+    "continuityHolds": 14,
+    "partialCoverHolds": 0,
+    "transitionPatches": 0,
+    "demPressureDrops": 0,
+    "waitingCovers": 0,
+    "deferredRefreshes": 2,
+    "readyRefreshes": 0,
+    "cacheReturns": {
+      "restored": 6,
+      "drawn": 0,
+      "repainted": 0,
+      "zoomReuse": 0,
+      "qualityHolds": 0,
+      "ignoredImageryEvents": 0,
+      "speculativeEvictions": 0,
+      "reasons": {
+        "none": 0,
+        "zoom": 0,
+        "sourceTiles": 2,
+        "visibleLayers": 0,
+        "revision": 0
+      },
+      "pending": 1,
+      "latencyMs": {
+        "samples": 0,
+        "p50": null,
+        "p95": null,
+        "max": null
+      }
+    }
+  },
+  "caveat": "Native CPU tile traversal/lifecycle with controlled first hit, readiness and GPU allocation; no browser pixels or FPS measured."
+}

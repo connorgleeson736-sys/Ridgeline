@@ -1,0 +1,9 @@
+{
+  "shippedWorkerAndScheduler": true,
+  "abortSettlesBeforeDecode": true,
+  "slotRetainedUntilActualAcknowledgement": true,
+  "bitmapClosed": true,
+  "encodeSkipped": true,
+  "abortNotFailure": true,
+  "caveat": "Actual shipped worker/compositor in an async VM worker bridge with controlled decode; not browser worker scheduling latency."
+}

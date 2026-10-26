@@ -1,0 +1,54 @@
+{
+  "benchmark": "Warm CPU preprocessing medians, seven samples per algorithm after three warmups; same V8 process",
+  "tiles": [
+    {
+      "z": 16,
+      "x": 63741,
+      "y": 41603,
+      "previousCPUMedianMilliseconds": 22.141,
+      "gpuPatchPreparationMedianMilliseconds": 6.252,
+      "preparationSpeedRatio": 3.54,
+      "previousTransferBytes": 1415580,
+      "newTransferBytes": 528392,
+      "transferReductionPercent": 62.7,
+      "finestPatchMeasuredNodeErrorMetres": 0
+    },
+    {
+      "z": 16,
+      "x": 63742,
+      "y": 41603,
+      "previousCPUMedianMilliseconds": 13.955,
+      "gpuPatchPreparationMedianMilliseconds": 5.811,
+      "preparationSpeedRatio": 2.4,
+      "previousTransferBytes": 1188612,
+      "newTransferBytes": 528392,
+      "transferReductionPercent": 55.5,
+      "finestPatchMeasuredNodeErrorMetres": 0
+    },
+    {
+      "z": 18,
+      "x": 254964,
+      "y": 166414,
+      "previousCPUMedianMilliseconds": 22.237,
+      "gpuPatchPreparationMedianMilliseconds": 5.974,
+      "preparationSpeedRatio": 3.72,
+      "previousTransferBytes": 1888556,
+      "newTransferBytes": 528392,
+      "transferReductionPercent": 72,
+      "finestPatchMeasuredNodeErrorMetres": 0
+    },
+    {
+      "z": 18,
+      "x": 254965,
+      "y": 166414,
+      "previousCPUMedianMilliseconds": 16.448,
+      "gpuPatchPreparationMedianMilliseconds": 5.58,
+      "preparationSpeedRatio": 2.95,
+      "previousTransferBytes": 1445036,
+      "newTransferBytes": 528392,
+      "transferReductionPercent": 63.4,
+      "finestPatchMeasuredNodeErrorMetres": 0
+    }
+  ],
+  "caveat": "Excludes network, image decode, GPU work and browser overhead. Does not establish FPS or user-device speedup."
+}

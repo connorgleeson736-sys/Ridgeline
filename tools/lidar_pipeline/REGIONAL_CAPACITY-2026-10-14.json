@@ -1,0 +1,14 @@
+{
+  "all_native_jobs_within_record_cap": true,
+  "counts_before_duplicate_xyz_removal": true,
+  "dense_patch_ids": [],
+  "halo_m": 8,
+  "max_records_per_native_job": 1200000,
+  "maximum_core_inclusive_records": 377932,
+  "maximum_halo_records": 517618,
+  "note": "Capacity/preparation audit only. Geometry, seams and regional publication remain independent gates.",
+  "processing_patches": 400,
+  "publishable": false,
+  "selected_records": 65476037,
+  "source_records_sampled": false
+}

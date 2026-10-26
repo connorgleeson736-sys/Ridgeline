@@ -1,0 +1,52 @@
+{
+  "samples": [
+    {
+      "z": 18,
+      "x": 254937,
+      "y": 166379,
+      "status": 200,
+      "shape": [
+        256,
+        256
+      ],
+      "bytes": 8412
+    },
+    {
+      "z": 19,
+      "x": 509874,
+      "y": 332759,
+      "status": 200,
+      "shape": [
+        256,
+        256
+      ],
+      "bytes": 2521
+    },
+    {
+      "z": 18,
+      "x": 254935,
+      "y": 166399,
+      "status": 200,
+      "shape": [
+        256,
+        256
+      ],
+      "bytes": 22896
+    },
+    {
+      "z": 19,
+      "x": 509870,
+      "y": 332799,
+      "status": 200,
+      "shape": [
+        256,
+        256
+      ],
+      "bytes": 2521
+    }
+  ],
+  "inspection": "Downloaded z19 response visually inspected: grey Map data not yet available placeholder despite HTTP 200. Both z19 responses have identical 2521-byte size. z18 samples contain authentic geographic imagery.",
+  "inspectedPlaceholderSHA256": "9eafd300d61393184a4abc1d458564cfd1cd9b6f9c4e9c74687045c0a0e5b858",
+  "implemented": "Esri requests in reviewed gaps stop at z18; z19 uses the correctly georeferenced quadrant of its z18 parent. Original LINZ outside the gap retains z19.",
+  "scope": "Two reviewed gap locations; not a universal availability claim for Esri across New Zealand."
+}

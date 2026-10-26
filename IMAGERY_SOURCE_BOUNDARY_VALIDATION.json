@@ -1,0 +1,1039 @@
+{
+  "z": 14,
+  "xmin": 15930,
+  "xmax": 15937,
+  "ymin": 10396,
+  "ymax": 10403,
+  "tiles": [
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15930,
+      "y": 10396,
+      "bytes": 15232,
+      "sha256": "ed4bf27e2e7c361ba276efbd6c2fcb67f7d8bdc7e6d2d4e06fea220b6e1055ea"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15931,
+      "y": 10396,
+      "bytes": 17778,
+      "sha256": "4b5d148165a6f45efc871f0d57e30f5774b770fe76cf3162dce32e8b3d20199f"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15932,
+      "y": 10396,
+      "bytes": 15536,
+      "sha256": "b69f5b80ec057275c4c028c374b19f32929ca3c746b19d19d7eb7a5dae4356c0"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15933,
+      "y": 10396,
+      "bytes": 15724,
+      "sha256": "839ec4df7eaafbf929f0df23c51c1fe07c2feb0ea7c412be2def7920b453c36f"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15934,
+      "y": 10396,
+      "bytes": 9822,
+      "sha256": "3da0d9063dd96b42a5d902d1ee3d61dc02c51089e3d50473492746bae6f12d04"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15935,
+      "y": 10396,
+      "bytes": 1294,
+      "sha256": "b550fe9bac5801ba5f17ae5eb88f84686f49187663ebc6085e1e010e3aeed817"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15936,
+      "y": 10396,
+      "bytes": 2408,
+      "sha256": "fb84eaa38854b98c59e50aab5c1afe1941bfbb8f49c3f71316e34d842520734c"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15937,
+      "y": 10396,
+      "bytes": 1338,
+      "sha256": "2db0e3c5594d17ee565814e580510f0dccb9d8145383dd15894c47fb48c20e67"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15930,
+      "y": 10397,
+      "bytes": 12452,
+      "sha256": "d7196dac415842454549cb6f60b386fe44dc8ddb495a1b135e6e1290b1a105f4"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15931,
+      "y": 10397,
+      "bytes": 12876,
+      "sha256": "d7567d709f2a56c20032179236ffbe393a07d22db7ba3c549413f08fb1a16da8"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15932,
+      "y": 10397,
+      "bytes": 17168,
+      "sha256": "74f4d0255cb0a0d8a993bba80d149657f6ee0814f6dd44091b66c91abb2abe81"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15933,
+      "y": 10397,
+      "bytes": 12440,
+      "sha256": "d06699bc6cc133892778f3bad5c7074fa31e43ae9499ea5a6287a30b21be209e"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15934,
+      "y": 10397,
+      "bytes": 3728,
+      "sha256": "7c5640dbe06f8e1e6b8d6d8a218fc2db331b2153cf4455ed28b9030a486a3861"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15935,
+      "y": 10397,
+      "bytes": 1434,
+      "sha256": "c8c55db4d4f9d2146d696e0ba021e1bd7d38dc4d6edac1bee6cf31d7b36a6789"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15936,
+      "y": 10397,
+      "bytes": 1186,
+      "sha256": "9cab322aff2d5d97360411ef6b2f65c9798409fb2370287306f6fb455ba56d76"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15937,
+      "y": 10397,
+      "bytes": 3436,
+      "sha256": "717ee90509ff7fda8b7c8705fc8032fe176a921e43cabe22a31f886416b2afd6"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15930,
+      "y": 10398,
+      "bytes": 14782,
+      "sha256": "15f617032eccfb10b0f9527451f03badee9e797e6bca444da1c84e08ecd93d35"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15931,
+      "y": 10398,
+      "bytes": 14478,
+      "sha256": "e0bf09f506a9dd977ac05d158bdd0e53b36b01ea786f3e32f1926a70396bbbe3"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15932,
+      "y": 10398,
+      "bytes": 13106,
+      "sha256": "589664a71eabcd9463cfc6c431cc117d2c2c963335f4372eca34dcc59de782d1"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15933,
+      "y": 10398,
+      "bytes": 11420,
+      "sha256": "f3d7391bf21bb360a5ceba6801d4239ad70d71e9e9973eec6210523a1c7bbb5f"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15934,
+      "y": 10398,
+      "bytes": 10358,
+      "sha256": "1f8199534bfdae1478dfd565974de25cf26120947a858b2f3bd5557f496f46ce"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15935,
+      "y": 10398,
+      "bytes": 6038,
+      "sha256": "2fbdd2b66b2d3b4953c33694b8024c5d064c565c8900ce742e39309982f5d630"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15936,
+      "y": 10398,
+      "bytes": 8446,
+      "sha256": "b675115aa5f28e53447f4686b202cdcb4871733b82c37b09825996f88ce86a7c"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15937,
+      "y": 10398,
+      "bytes": 8886,
+      "sha256": "1e914bedb340be51eea301e6e01bb68fdd1fbba77ca23294cfb6a600f7c79f45"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15930,
+      "y": 10399,
+      "bytes": 15292,
+      "sha256": "3626e43d0e9dbaa581b700f3d79cac4a627ecb3d494ff380886f02e19b6fe0b6"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15931,
+      "y": 10399,
+      "bytes": 12410,
+      "sha256": "667d0a5d2a50c4d3d23fc786e6c1daabe059b48471313dc62d8fb35cc7804297"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15932,
+      "y": 10399,
+      "bytes": 11762,
+      "sha256": "c365fbb3799caf010d88e4c651715c70839b379132a14d44e89654c6adb7755c"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15933,
+      "y": 10399,
+      "bytes": 9490,
+      "sha256": "fc9f2bbc3e61d684bebd2e9ce971617e5a39521dd4b4c1aaa007cfc81b3e9b3f"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15934,
+      "y": 10399,
+      "bytes": 7934,
+      "sha256": "0fafacddffee7b01b1807444354a094213543d57021e544cff9ae7ead47c7567"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15935,
+      "y": 10399,
+      "bytes": 10212,
+      "sha256": "5393266c67439ffcd1eac57f05e02f7a6c134807ad7e344c0f0e1fba27f5e744"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15936,
+      "y": 10399,
+      "bytes": 6652,
+      "sha256": "9473edf80f527ab23f81ab7e0b76c007fca6bad857a82c2632db8666f719cd7c"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15937,
+      "y": 10399,
+      "bytes": 8666,
+      "sha256": "d9bc8612890263638b87f31490e9ec0f6073c65574d82dcbe1c6d42e0752670e"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15930,
+      "y": 10400,
+      "bytes": 8784,
+      "sha256": "ec9a618a2c5208759d5ebc682338e1e021a2ff8efa9ae0244c566b08611b1a05"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15931,
+      "y": 10400,
+      "bytes": 12000,
+      "sha256": "3f408d0f4b407406f479fc5ca609921a9c761b935f6ea4e14984fedc17d49b83"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15932,
+      "y": 10400,
+      "bytes": 10576,
+      "sha256": "99ac2345c95fee4fb067190ddd4528bc3a08738263fe64a8b1b6584861be33ba"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15933,
+      "y": 10400,
+      "bytes": 12258,
+      "sha256": "e22fe1f813de6fec570284de1b06f45aa2584f5ad03fe8ba0ec188bffa2e7be9"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15934,
+      "y": 10400,
+      "bytes": 11476,
+      "sha256": "4adbfc9ad79ab852ad7fe6e88c420b1ca540f4e60d910d02319bc88b97a4556c"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15935,
+      "y": 10400,
+      "bytes": 11984,
+      "sha256": "3428a413d3635adbd0e1a672835b0684d89c21226263491736534e8c14c3de21"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15936,
+      "y": 10400,
+      "bytes": 6142,
+      "sha256": "868f664c062e28a645565b1fc351c895e74ab8594bec342ca5162dafcc9938b2"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15937,
+      "y": 10400,
+      "bytes": 14706,
+      "sha256": "a5edccba66972d91c039390685c704f43b950a97e106944b10eb91d25c574003"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15930,
+      "y": 10401,
+      "bytes": 10260,
+      "sha256": "15be2029330e6670d47599298e9baae5f4137a92f7f17f0aeddcc3b41e597952"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15931,
+      "y": 10401,
+      "bytes": 11128,
+      "sha256": "7573cae57a8fb311bf53212777a440082730db0f96d00885472838585ead628b"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15932,
+      "y": 10401,
+      "bytes": 8494,
+      "sha256": "a5bfbb74d63d5f11ca7e5731a36cc4d11d9b60919481308e1b48b01e33bcb6e5"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15933,
+      "y": 10401,
+      "bytes": 8332,
+      "sha256": "aa5a0d58c348efeea7e2af326fe9a8006ae08c9ff3a2b0a0f4140c6fc25cde36"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15934,
+      "y": 10401,
+      "bytes": 12754,
+      "sha256": "c6bc5104863fd6ebacf628de92df4bae7b1cdfdece2313806182d73994cd2d64"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15935,
+      "y": 10401,
+      "bytes": 12652,
+      "sha256": "90f562127d641e2ebe601e2d2f2de759bf08fa734aac3169340a4659535ccb51"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15936,
+      "y": 10401,
+      "bytes": 9144,
+      "sha256": "3fa38d972dfae9938c54715307ebc72d711adbf26655c5c5cbfc3164594a292c"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15937,
+      "y": 10401,
+      "bytes": 10584,
+      "sha256": "d4f33937802974bb6a167437a900dabc9a82c1c7228d2eff6b8955db25d1ac6c"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15930,
+      "y": 10402,
+      "bytes": 11002,
+      "sha256": "b40d3bab76446a719a348646085f548367cabeeaba84de9fdc27437ce0570e17"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15931,
+      "y": 10402,
+      "bytes": 11342,
+      "sha256": "91fa9683de8b25c4bd8860ececf4c4e1e34b2d52d77cf832357fd34408c15683"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15932,
+      "y": 10402,
+      "bytes": 13574,
+      "sha256": "0ac106a58d0721a246349b09009fa319274939094950f23b0f03a6ed78a373d5"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15933,
+      "y": 10402,
+      "bytes": 14094,
+      "sha256": "2488aa4824e3f6fdf7db0b9980ae1489f8eddaebe470c0ecd0768fc1ce29ea90"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15934,
+      "y": 10402,
+      "bytes": 15450,
+      "sha256": "4706524f3018585270aaf68cd79752355646ecb8e1e7c2de81f95e5d90c695f7"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15935,
+      "y": 10402,
+      "bytes": 12132,
+      "sha256": "892e2b6ccf6f12dfc074de1f72da9caa5aad8fae71d808c9dd816676a489bebb"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15936,
+      "y": 10402,
+      "bytes": 13854,
+      "sha256": "6c5e7262d12ad0da06508f5c11d0037a957e5551075696c5234a1958faa3dbc4"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15937,
+      "y": 10402,
+      "bytes": 6070,
+      "sha256": "46f259d10a6713806b81ef1550ec1e3e4734ca315b9acc93660abe93333088ff"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15930,
+      "y": 10403,
+      "bytes": 9982,
+      "sha256": "30ab5e0684e170558a29edb35951879dc8008ad8f03d07002eb56bd60e32abe3"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15931,
+      "y": 10403,
+      "bytes": 10336,
+      "sha256": "b678079d107b46ef51c401b8bc0621e32a8519cdceb274cbcd36244ef177676c"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15932,
+      "y": 10403,
+      "bytes": 11196,
+      "sha256": "3c1d527887440d2c91b1f6e7f6dffdf0d1faecc0ca682238c1fa427f4ccdc4a1"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15933,
+      "y": 10403,
+      "bytes": 14490,
+      "sha256": "0c534bd227835a5db7867fba4e258f24f93b883e5570c82185365b94dd1ae39e"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15934,
+      "y": 10403,
+      "bytes": 9782,
+      "sha256": "5c4c42b63bc344e4db249dd40750ed4d3e2ff8ca80bda1e177f38fa25405ba27"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15935,
+      "y": 10403,
+      "bytes": 14504,
+      "sha256": "be1767196c09a189e1ed1d848f0d998562e2f99a17ffa8e049320de03d4e6af4"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15936,
+      "y": 10403,
+      "bytes": 15592,
+      "sha256": "19fe6e40b0b7e6d97c49721907fb446de5a705590293f2decead6fe405130013"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15937,
+      "y": 10403,
+      "bytes": 7052,
+      "sha256": "4d22143ac5e6fd05216f445c9b14a169ce5e3a1cd9d6ef94d741f4002db5e287"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15930,
+      "y": 10396,
+      "bytes": 13690,
+      "sha256": "e5bb1168a398c38b1a797f47b343e15276d7dadc01afb5307219bd906ba07924"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15931,
+      "y": 10396,
+      "bytes": 13672,
+      "sha256": "1bb7f0d7afe3678e3f4f729c99bacf9e8fef99e7897a43f8c9c01857ae3595f0"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15932,
+      "y": 10396,
+      "bytes": 13982,
+      "sha256": "bb1a075009d7ce3dc91e928fb7a23bb637279643d536f49c2d36f9b9cfd1dcaa"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15933,
+      "y": 10396,
+      "bytes": 15748,
+      "sha256": "471eb757880e28593a185d41debd5df8a1ebb1003452af625469c300edee47f2"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15934,
+      "y": 10396,
+      "bytes": 13333,
+      "sha256": "c40fd53d010e7404ba9286d1a6113f660f89edbd9f7ad7f1de28218465162371"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15935,
+      "y": 10396,
+      "bytes": 12371,
+      "sha256": "9c6f4f23926bd4c2cdc37524c1b69a656ae643d538ced58294a39120ea9b8e99"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15936,
+      "y": 10396,
+      "bytes": 11040,
+      "sha256": "7f88154dc1b62271cf8131fe100030ee364f615e08ce96fea05ea5e17e4edd5c"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15937,
+      "y": 10396,
+      "bytes": 5632,
+      "sha256": "437ee6825c833bd922ba51b329a296725b9631a1d0612f6c3f6fa2c532582ba4"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15930,
+      "y": 10397,
+      "bytes": 12103,
+      "sha256": "b732a5eef626f91dd163baa14b7866b755a14ed54134a5376718f79a915f68f4"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15931,
+      "y": 10397,
+      "bytes": 11472,
+      "sha256": "ceec23756daa3ef15f1457c8242ea43f209938d9410946be5a4bed601c0c1f6e"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15932,
+      "y": 10397,
+      "bytes": 14406,
+      "sha256": "cfedcf5503e343d5222c11cad0e7163b73391bc8e6ef1c02edc0b406fbac07d6"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15933,
+      "y": 10397,
+      "bytes": 12338,
+      "sha256": "b35dd6b566864acea7be8b2835512b2853305148f3eddf9127cac5c73f7e632c"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15934,
+      "y": 10397,
+      "bytes": 9774,
+      "sha256": "20bbfc5900265a50da336a25c39eeacb42ebdc27ebc53b0850373f7a2fdfbf2a"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15935,
+      "y": 10397,
+      "bytes": 10412,
+      "sha256": "9fed93fd08ed9955adb2a72094508e40f20628de46a9270328178b86119dd2af"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15936,
+      "y": 10397,
+      "bytes": 6613,
+      "sha256": "e3c37ded46d1b04260d1df17cf590991b88101763d00bfff353dab293af6f816"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15937,
+      "y": 10397,
+      "bytes": 8094,
+      "sha256": "8fd4ea85eae810483645dd9f2e4fc19789adf249cd70ffd2603daabcb0e4077b"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15930,
+      "y": 10398,
+      "bytes": 11666,
+      "sha256": "4c43cff5ee18437f52bf073124d543f187141abb370da540971b27bbf477bc55"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15931,
+      "y": 10398,
+      "bytes": 13897,
+      "sha256": "1799b7dd75618e830ad42bab8b96d917f7454b4a8bba72ba7e92c18627cae5f8"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15932,
+      "y": 10398,
+      "bytes": 15879,
+      "sha256": "734260dd5d30934734f680dbaa7491877c83a0238f46953626a4210abd35ecdf"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15933,
+      "y": 10398,
+      "bytes": 14823,
+      "sha256": "10f0ea13b4c49560d9fe647bfd770a8d5de50d347fcaab03305046aa36152b5a"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15934,
+      "y": 10398,
+      "bytes": 13944,
+      "sha256": "e08acf231e59c025a82d969c45ae5c5ab144ea2be1cdd8e84a4deaa33de52f1c"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15935,
+      "y": 10398,
+      "bytes": 14094,
+      "sha256": "8857b78e9726bc7762e632896d3f46baec044fa2641c73d1cc2f7a43b14249f2"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15936,
+      "y": 10398,
+      "bytes": 12999,
+      "sha256": "844d61d24914d7546f2814f3caedaf77f20ccefd71f4a51a647158ed7da11d7f"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15937,
+      "y": 10398,
+      "bytes": 12470,
+      "sha256": "b0da03f17cdd5249cc53d917f690e8b7ae6c075b8e0de841cca8af1438b3d54c"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15930,
+      "y": 10399,
+      "bytes": 14050,
+      "sha256": "fa88c2772b804a02c7376b01b8b7fed59164fe5c556f271efdbecbebc0fe38a1"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15931,
+      "y": 10399,
+      "bytes": 12867,
+      "sha256": "45d62516ef669cbe9506a8946022ee75b6de85d432212489d99a2ad981accc3a"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15932,
+      "y": 10399,
+      "bytes": 15321,
+      "sha256": "b8cc59641c882ce91a1340c9c488f675b0d95eea2c9c8299aa1d2fda0f0e2ad3"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15933,
+      "y": 10399,
+      "bytes": 18771,
+      "sha256": "41cd682b768c76ad2fab1ee9c7b1b042d2bbfa452021679e907ceb327f9b1a3a"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15934,
+      "y": 10399,
+      "bytes": 16603,
+      "sha256": "6c257f275f7559d508d3f614937530480d256409d4ce81abdd7890921797c4d4"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15935,
+      "y": 10399,
+      "bytes": 15190,
+      "sha256": "d1e24958e9c6203fce17f86c90171039f1c00a23a0dceed306e23a013d7190ff"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15936,
+      "y": 10399,
+      "bytes": 11328,
+      "sha256": "5a925967d31c6eb56cc78cf46f7dd64683429f4056ae6b96ade08b12be607ec3"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15937,
+      "y": 10399,
+      "bytes": 13217,
+      "sha256": "deaf6aec480fb602278de36cdfd9eab1f344b4b534eac7c7067765d36f3670cf"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15930,
+      "y": 10400,
+      "bytes": 15509,
+      "sha256": "8104b002580f13d648702331d0ef864a35b094a35f053f8ad886a9d30935e736"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15931,
+      "y": 10400,
+      "bytes": 17894,
+      "sha256": "d774e1e7f84b4d47cba91e74bf21974b8a804bda4f0187204bb04b1d30b6ce14"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15932,
+      "y": 10400,
+      "bytes": 18216,
+      "sha256": "9fc537aea6022d2a841605845fc489dbebac2b1d9180b720f7f7881b3585219d"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15933,
+      "y": 10400,
+      "bytes": 18841,
+      "sha256": "c6a78fefc53bdd1c9c8169ab02923ad50ed103e493f90b1a14da85463b1428ab"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15934,
+      "y": 10400,
+      "bytes": 15453,
+      "sha256": "293906f0f716608e11ead801004a7fc0be4a654931f724e5a8393e3c58e7c93e"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15935,
+      "y": 10400,
+      "bytes": 14892,
+      "sha256": "e3323fc8a5198d56331242fb3ce3ded6b49494aa1544d2845701f1aa574ad63d"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15936,
+      "y": 10400,
+      "bytes": 9677,
+      "sha256": "39ee8132773079419b5a4428982a6724f62880131e7b045bd8cfd5b6439afc32"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15937,
+      "y": 10400,
+      "bytes": 18125,
+      "sha256": "ca266d836c1e3649162c8a7336694152c2af15bfed5e183f17fce3bdeaeade6e"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15930,
+      "y": 10401,
+      "bytes": 13110,
+      "sha256": "7a8f072274f81a0c0e41d3c8f6e60ebc00f7b0c9c8b1a3770e24c152ab9f5674"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15931,
+      "y": 10401,
+      "bytes": 14783,
+      "sha256": "b5b050c28964969495b37754b714e9ce7c83f8d072ef749bf6b42e9fabe4492f"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15932,
+      "y": 10401,
+      "bytes": 10683,
+      "sha256": "131f9026140bb4937489c0ac8c8e0bcc8882ea70717b37600911d7ec83437001"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15933,
+      "y": 10401,
+      "bytes": 16877,
+      "sha256": "da440bb4fbea76a38c8c081cabfa0000b439269bcbeaa16e13bcdb81d61bdc15"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15934,
+      "y": 10401,
+      "bytes": 16764,
+      "sha256": "d6696abce8106cd89c763606384206612f4e70a6d8c0bc0a1306133a756b33b4"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15935,
+      "y": 10401,
+      "bytes": 15451,
+      "sha256": "8075f062978ac268c0696d40b6dec4a9932d49bfaf41b4ca227157f44ded2593"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15936,
+      "y": 10401,
+      "bytes": 14636,
+      "sha256": "ca96c835ab25be280c159dffe67a90d80cf54afbe4aee636b5c64da1caa86e6a"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15937,
+      "y": 10401,
+      "bytes": 18302,
+      "sha256": "59c37f3ef046abbcb87311ebf2b0d9ea38ef02a79f5ecbb27ab575d5734ed05f"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15930,
+      "y": 10402,
+      "bytes": 16067,
+      "sha256": "ab7a9f4b28f6b05796eaf157560562ac209ca756af12c8afe154b2c9c419bdcc"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15931,
+      "y": 10402,
+      "bytes": 15309,
+      "sha256": "6e56dcd57c84edd55ac1606a5b3242e85c3d8696b3be3eb555ba976b266182d5"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15932,
+      "y": 10402,
+      "bytes": 13930,
+      "sha256": "c91548269e9f771b6b3d42624df65cdd6077fe6f2bd989ba075aeaeacf1a713a"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15933,
+      "y": 10402,
+      "bytes": 14666,
+      "sha256": "1ec180701d7b0cfa21878df55e15860fec25e51185c6d61b90aa3b3604e2118d"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15934,
+      "y": 10402,
+      "bytes": 17142,
+      "sha256": "aaeb4340dcf0506e92d6b6810baa0e64501484e366d8bb8df24d7c34264380e2"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15935,
+      "y": 10402,
+      "bytes": 15560,
+      "sha256": "209beeb6eb05bad905fa096fa53315edd0358e768cdddbd8c497ff6de62fae5f"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15936,
+      "y": 10402,
+      "bytes": 20601,
+      "sha256": "cfc7c5e2522b1b3be7097477b6038197b2e574452793e7a05d408ade780dd00e"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15937,
+      "y": 10402,
+      "bytes": 12623,
+      "sha256": "965558073f0816f9da84b2bc81836dedd5f3ad9cf08a4d8d55e48b3bc10324bb"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15930,
+      "y": 10403,
+      "bytes": 16582,
+      "sha256": "41bf5d43eebaf6b0cd189b4772fa203a62eb0b67f6cd5c99eda879ee22507a76"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15931,
+      "y": 10403,
+      "bytes": 20228,
+      "sha256": "af39a1629ca2e14b68140283c3ac91094a15696364e1a1dbb3371411b0838fb7"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15932,
+      "y": 10403,
+      "bytes": 13876,
+      "sha256": "ea60d274bd33542acd870316fa17411bc9d346ae0f63a8fcd5029ecf5179ba71"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15933,
+      "y": 10403,
+      "bytes": 16273,
+      "sha256": "e94888bb8a8649fdd6601105506d3e0a4951762c7f65d236dfcec9c4f31aa4dc"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15934,
+      "y": 10403,
+      "bytes": 16183,
+      "sha256": "c0219def316a91dd748de3af49b501712a94124f42a86c54bf5eb42dd4103dc3"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15935,
+      "y": 10403,
+      "bytes": 16967,
+      "sha256": "0a9650edf635c325e578a334cc28ee217f414b8aec08b369d6183210e28abaca"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15936,
+      "y": 10403,
+      "bytes": 18425,
+      "sha256": "27699ae7e5f62175e0ec574262dc1d9ed4d44c41ef50f00cf6274789173adb35"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15937,
+      "y": 10403,
+      "bytes": 13009,
+      "sha256": "4832df943ad8bab1bb206d1b667bf4568d61b8ddf8f537b1d42a22462c28f38b"
+    }
+  ],
+  "dateUTC": "2026-10-16",
+  "recording": "Screen recording 2026-10-17 08.49.42.webm",
+  "method": "128 matched authentic z14 tile downloads; mosaics for inspection only, never deployed.",
+  "observation": "LINZ delivery contains the same blue/green low-detail cutline visible west of the summit in the recording. Esri has materially more detail there, with different captures and some cloud.",
+  "implementation": "Startup uses existing Esri World Imagery source. LINZ aerial remains selectable. LINZ elevation unchanged; no generated imagery, runtime mosaics or tile-by-tile provider mixing.",
+  "limit": "Source images inspected; live browser replay after publication not available."
+}

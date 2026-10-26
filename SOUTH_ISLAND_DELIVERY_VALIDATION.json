@@ -1,0 +1,12 @@
+{
+  "proof": "completed-overview",
+  "authenticProductionRange": true,
+  "sha256": "332d411b6e5a631f8606b935e8c63d90d1ed6d99c9a2da5635821c6c79089224",
+  "rangeBytes": 81794,
+  "networkRequestsIncludingRevisits": 1,
+  "noWorkerAssembly": true,
+  "staticAndExactRangeFallback": true,
+  "wrongRangeAndMalformedImageFailSafely": true,
+  "LODAndDEMPassthrough": true,
+  "caveat": "Actual authenticated image bytes through registered protocol/cache; not live browser/GPU or FPS."
+}

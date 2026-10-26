@@ -1,0 +1,28 @@
+const assert=require('node:assert/strict'),P=require('../public/imagery-preload.js'),{createCache,createTileCaches}=require('../public/tile-cache.js');
+const hit={x:.972,y:.635};
+assert.equal(P.plan({hit,previous:hit,zoom:15,baseZoom:16}).length,0,'No warmup while stationary');
+assert.equal(P.plan({hit,previous:{x:hit.x-.001,y:hit.y},zoom:15,baseZoom:19}).length,0,'Do not exceed provider max zoom');
+assert.equal(P.plan({hit,previous:hit,zoom:19,previousZoom:18,baseZoom:18,maxZoom:18}).length,0,'Respect Esri zoom ceiling');
+assert.ok(P.plan({hit,previous:hit,zoom:19,previousZoom:18,baseZoom:17,maxZoom:18}).every(q=>q.z===18));
+assert.equal(P.plan({hit,previous:hit,zoom:9,previousZoom:8,baseZoom:12}).length,0,'Keep small-scale distant views unchanged');
+const pan=P.plan({hit,previous:{x:hit.x-.0001,y:hit.y},zoom:15,baseZoom:16});assert.ok(pan.length>0&&pan.length<=3);assert.ok(pan.every(q=>q.z===17));assert.ok(pan.some(q=>q.x>=Math.floor(hit.x*2**17)),'Warm only ahead along the ridge');
+assert.ok(P.plan({hit,previous:hit,zoom:15.5,previousZoom:15,baseZoom:16}).length>0,'Zoom anchor warms a child tile');
+(async()=>{
+ let requests=[];const cache=createCache({maxBytes:100,maxItems:10,fetcher:async(u,o)=>{requests.push([u,o.priority]);return new Response(new Uint8Array(30));}});
+ await cache.load('view1');await cache.load('view2');await cache.load('view3');await cache.load('speculative',null,'low');assert.equal(cache.stats().tiles,3,'Speculation must not evict retained views');assert.equal(cache.stats().evictions,0);const before=requests.length;await cache.load('view1');assert.equal(requests.length,before);assert.equal(requests.at(-1)[1],'low');
+ let resolve;const shared=createCache({fetcher:()=>new Promise(r=>resolve=r)});const a=shared.load('same',null,'low'),b=shared.load('same');resolve(new Response('same'));await Promise.all([a,b]);assert.equal(shared.stats().network,1,'Native requests share a pending preload');
+ const handlers={},canvas={addEventListener(){},removeEventListener(){},getBoundingClientRect:()=>({left:0,top:0})};let time=1000,x=.972,z=15,network=0;
+ const tile={tileID:{canonical:{z:16,x:Math.floor(x*65536),y:Math.floor(hit.y*65536)}}};
+ const map={getZoom:()=>z,getCanvas:()=>canvas,getSource:()=>({tiles:['ridge://linz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp?api=test']}),style:{tileManagers:{linz:{_inViewTiles:{getAllTiles:()=>[{tileID:{canonical:{z:16,x:Math.floor(x*65536),y:Math.floor(hit.y*65536)}}}]}}}},on:(n,f)=>(handlers[n]??=[]).push(f),off:(n,f)=>handlers[n]=handlers[n].filter(g=>g!==f)};
+ let blocked=false,low=false,predictiveLimit=2;const preload=P.attach(map,{cache:{has:()=>false,stats:()=>({imagery:{pending:blocked?5:0}}),prefetch:async()=>{network++;}},focus:()=>({hit:{x,y:hit.y}}),lowPower:()=>low,concurrency:()=>predictiveLimit,engine:{getVersion:()=>'6.14.0'},clock:()=>time});
+ const emit=n=>(handlers[n]||[]).forEach(f=>f());emit('movestart');x+=.000002;time+=500;emit('move');await new Promise(r=>setImmediate(r));assert.ok(network>0&&network<=2);const old=network;blocked=true;time+=500;x+=.000002;emit('move');await new Promise(r=>setImmediate(r));assert.equal(network,old,'Native request backlog takes priority');blocked=false;low=true;time+=500;x+=.000002;emit('move');assert.equal(network,old,'Low power disables speculative work');
+ low=false;predictiveLimit=0;time+=500;x+=.000002;emit('move');assert.equal(network,old,'Zero predictive limit prevents new downloads');assert.equal(preload.stats().enabled,false);predictiveLimit=1;assert.equal(preload.stats().concurrencyLimit,1);
+ preload.destroy();assert.ok(Object.values(handlers).every(a=>!a.length));
+ let wheel,projections=0;canvas.addEventListener=(name,fn)=>{if(name==='wheel')wheel=fn;};
+ map.unproject=()=>{projections++;return{lng:x*360-180,lat:Math.atan(Math.sinh(Math.PI*(1-2*hit.y)))*180/Math.PI};};
+ const anchored=P.attach(map,{cache:{has:()=>true,prefetch:async()=>{},stats:()=>({imagery:{pending:0}})},focus:()=>({hit:{x,y:hit.y}}),engine:{getVersion:()=>'6.14.0'},clock:()=>time});
+ wheel({clientX:100,clientY:100});emit('movestart');time+=500;z+=.1;emit('move');
+ wheel({clientX:101,clientY:100});time+=500;z+=.1;emit('move');assert.equal(projections,1,'Reuse the geographic wheel anchor instead of repeated terrain readbacks');
+ anchored.destroy();cache.clear();shared.clear();
+ console.log('PASS: one-level / tiny-footprint zoom and directional pan planning, no stationary / distant work, no LOD mutations, two-request cap, native backpressure, low-power opt-out, pending sharing, no speculative eviction and cleanup.');
+})().catch(e=>{console.error(e);process.exitCode=1});

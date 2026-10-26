@@ -1,0 +1,27 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),{execFileSync}=require('node:child_process'),spec=require('@maplibre/maplibre-gl-style-spec');
+const prior=execFileSync('git',['show','900f71e5a4c1a23b7fca6aa638a9e620662c6185:public/topographic-overlays.js'],{encoding:'utf8'});
+function load(source){const ctx=vm.createContext({});vm.runInContext(source,ctx);return ctx.RidgeTopography;}
+const old=load(prior),api=load(fs.readFileSync('public/topographic-overlays.js','utf8'));
+const props=JSON.parse(fs.readFileSync('checks/fixtures/topography/properties.json'));
+const compile=layers=>layers.map(l=>({l,filter:spec.featureFilter(l.filter,'layers[0].filter').filter}));
+const oldLayers=compile(old.layers()),newLayers=compile(api.layers()),expressions=new Map();
+function evaluate(value,properties,zoom){if(!Array.isArray(value))return value;const key=JSON.stringify(value);let e=expressions.get(key);if(!e){const result=spec.createExpression(value,'layers[0].layout.text-size');assert.equal(result.result,'success');expressions.set(key,e=result.value);}return e.evaluate({zoom},{type:1,properties});}
+function labels(rows,source,properties,z){return JSON.stringify(rows.filter(({l,filter})=>l.type==='symbol'&&l['source-layer']===source&&z>=(l.minzoom||0)&&z<(l.maxzoom??24)&&filter({zoom:z},{type:1,properties})).map(({l})=>JSON.stringify([l['source-layer'],evaluate(l.layout['text-field'],properties,z),evaluate(l.layout['text-size'],properties,z),evaluate(l.layout['symbol-sort-key'],properties,z)])).sort());}
+let comparisons=0;for(let z=4;z<=19;z++)for(const [source,rows]of Object.entries(props))for(const p of rows){assert.deepEqual(labels(newLayers,source,p,z),labels(oldLayers,source,p,z),JSON.stringify({source,z,p}));comparisons++;}
+assert.equal(oldLayers.filter(r=>r.l.type==='symbol').length,20);assert.equal(newLayers.filter(r=>r.l.type==='symbol').length,12);
+assert.equal(api.layers().find(l=>l.id==='nz-peaks-secondary').layout['text-variable-anchor'],undefined);assert.equal(api.layers().find(l=>l.id==='nz-peaks-secondary').layout['text-anchor'],'top');
+assert.ok(api.layers().find(l=>l.id==='nz-roads-local-label').layout['symbol-spacing']>old.layers().find(l=>l.id==='nz-roads-local-label').layout['symbol-spacing']);
+// Real visibility toggles and repeated arrivals: no repeated layer scan or
+// fallback-label callback after the first availability transition.
+let reads=0,writes=0,status=0,callbacks=0;const layers=new Map(),events={},order=['background','linz','route-halo','route-line','waypoint-circles'];
+for(const id of order)layers.set(id,{id,type:id.includes('route')?'line':id==='waypoint-circles'?'circle':id==='linz'?'raster':'background',layout:{visibility:'visible'}});
+const settings={...api.defaults,contours:true};const map={getSource:()=>({}),getLayer:id=>layers.get(id),addLayer(l,before){layers.set(l.id,l);const i=order.indexOf(before);i<0?order.push(l.id):order.splice(i,0,l.id);},getLayoutProperty(id,k){reads++;return layers.get(id).layout[k];},setLayoutProperty(id,k,v){writes++;layers.get(id).layout[k]=v;},on:(n,f)=>events[n]=f,off:n=>delete events[n]};
+const controls=api.attach(map,{key:'fixture',settings:()=>settings,onStatus:()=>status++,onNamesReady:()=>callbacks++});reads=writes=status=callbacks=0;
+for(let i=0;i<100;i++)events.sourcedata({sourceId:api.SOURCE,sourceDataType:'content'});
+assert.equal(reads,0);assert.equal(writes,0);assert.equal(callbacks,1);assert.equal(status,1);assert.equal(controls.usesPeakNames(),true);
+const draped=new Set(['background','raster','line','fill','hillshade','color-relief']);for(const z of [12,14,18]){let prev=false,stacks=0;for(const id of order){const l=layers.get(id);if(l.layout.visibility==='none'||z<(l.minzoom||0)||z>=(l.maxzoom??24))continue;const now=draped.has(l.type);if(now&&!prev)stacks++;prev=now;}assert.equal(stacks,1,'Roads/route/contours must share a terrain stack');}
+settings.names=false;controls.refresh();assert.equal(callbacks,2);assert.equal(controls.usesPeakNames(),false);settings.names=true;controls.refresh();assert.equal(callbacks,3);events.error({sourceId:api.SOURCE,error:{status:500}});assert.equal(callbacks,4);events.sourcedata({sourceId:api.SOURCE,sourceDataType:'content'});assert.equal(callbacks,5);controls.destroy();assert.deepEqual(Object.keys(events),[]);
+const N=require('../public/native-residency.js'),budget=N.compositionBudget(),style={_order:['photo','labels','roads'],_layers:{photo:{type:'raster'},labels:{type:'symbol'},roads:{type:'line'}}};
+budget.begin(style,14,true);budget.record(['photo'],4,2);budget.record(['roads'],6,2);assert.equal(budget.estimate(),5);assert.equal(budget.stats().compositionSubmissionMs,10);assert.equal(budget.stats().compositionBudgetMs,2);
+let tracker,inside;const eventMap={style:{tileManagers:{topography:{getSource:()=>({type:'vector'})}}},_handleTerrainDataEvent(){inside=tracker.isVectorContent();}};tracker=N.terrainEventContext(eventMap);eventMap._handleTerrainDataEvent({dataType:'source',sourceDataType:'content',sourceId:'topography',tile:{}},'dem');assert.equal(inside,true);assert.equal(tracker.isVectorContent(),false);tracker.destroy();
+console.log(JSON.stringify({labelComparisons:comparisons,originalSymbolLayers:20,optimizedSymbolLayers:12,terrainStacksWithRoutesAndContours:1,visibilityReadsFor100Arrivals:0,nameCallbacksFor100Arrivals:1,combinedStackBudget:'passed',nestedEventCleanup:'passed'}));

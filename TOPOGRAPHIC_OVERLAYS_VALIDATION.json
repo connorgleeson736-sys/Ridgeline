@@ -1,0 +1,14 @@
+{
+  "styleSchema": true,
+  "oneSharedVectorSource": true,
+  "nativeMaxZoom": 15,
+  "independentToggles": true,
+  "optionalContours": true,
+  "persistedChoices": true,
+  "imageryUnchanged": true,
+  "styleReloadAndCleanup": true,
+  "keyReplacement": true,
+  "errorRecovery": true,
+  "duplicateRasterLabelsSuppressed": true,
+  "browserVisualQA": "blocked by managed preview server lock"
+}

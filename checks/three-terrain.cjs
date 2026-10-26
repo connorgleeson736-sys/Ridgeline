@@ -1,0 +1,21 @@
+const fs=require('fs'),vm=require('vm'),assert=require('node:assert/strict');
+const c=vm.createContext({console,Float32Array,Uint32Array,Uint16Array,Math,Map,Set});
+for(const f of ['checks/fixtures/martini-baseline.js','checks/fixtures/rtin-baseline.js','public/terrain-data.js'])vm.runInContext(fs.readFileSync(f,'utf8'),c);
+const size=257,flat=new Float32Array(size*size);for(let j=0;j<size;j++)for(let i=0;i<size;i++)flat[j*size+i]=1234+i*.1+j*.2;
+const mesh=c.RidgeMesh.build(flat,{x:63743,y:41562,z:16,error:1});
+assert.ok(mesh.surfaceIndices/3<20000,'Smooth terrain should simplify aggressively');
+const borders=[new Set(),new Set(),new Set(),new Set()];let down=0;
+for(let k=0;k<mesh.surfaceIndices;k+=3){const ids=[...mesh.indices.slice(k,k+3)],p=ids.map(i=>[...mesh.positions.slice(i*3,i*3+3)]),a=p[1].map((x,i)=>x-p[0][i]),b=p[2].map((x,i)=>x-p[0][i]);if(a[2]*b[0]-a[0]*b[2]<0)down++;}
+assert.equal(down,0,'All surface triangles must face upward');
+for(let k=0;k<mesh.positions.length/3;k++){const u=mesh.uvs[k*2],v=mesh.uvs[k*2+1];if(v===1)borders[0].add(u);if(u===1)borders[1].add(v);if(v===0)borders[2].add(u);if(u===0)borders[3].add(v);}
+assert.ok(borders.every(b=>b.size===257),'Every boundary measurement must survive');
+assert.ok(mesh.normals.every(Number.isFinite));assert.ok(mesh.indices.every(i=>i<mesh.positions.length/3));
+const rough=new Float32Array(flat);for(let j=0;j<size;j++)for(let i=0;i<size;i++)rough[j*size+i]+=40*Math.sin(i*.2)*Math.sin(j*.2);
+const detailed=c.RidgeMesh.build(rough,{x:63743,y:41562,z:16,error:.5}),coarse=c.RidgeMesh.build(rough,{x:63743,y:41562,z:16,error:10});assert.ok(detailed.surfaceIndices>coarse.surfaceIndices);
+// Reconstruct every measured node from the containing surface triangle; no skirt vertices.
+function validate(m,h){const n=m.size-1,errors=new Float32Array(m.size*m.size).fill(NaN);for(let k=0;k<m.surfaceIndices;k+=3){const ids=m.indices.slice(k,k+3),p=[...ids].map(i=>[m.uvs[i*2]*n,(1-m.uvs[i*2+1])*n,m.positions[i*3+1]/Math.cosh(Math.PI*(1-2*(m.y+(1-m.uvs[i*2+1]))/2**m.z))]);const [a,b,c]=p,den=(b[1]-c[1])*(a[0]-c[0])+(c[0]-b[0])*(a[1]-c[1]);for(let y=Math.min(...p.map(p=>p[1]));y<=Math.max(...p.map(p=>p[1]));y++)for(let x=Math.min(...p.map(p=>p[0]));x<=Math.max(...p.map(p=>p[0]));x++){const u=((b[1]-c[1])*(x-c[0])+(c[0]-b[0])*(y-c[1]))/den,v=((c[1]-a[1])*(x-c[0])+(a[0]-c[0])*(y-c[1]))/den;if(u>=-1e-7&&v>=-1e-7&&u+v<=1+1e-7)errors[y*m.size+x]=Math.abs(a[2]*u+b[2]*v+c[2]*(1-u-v)-h[y*m.size+x]);}}assert.ok(errors.every(Number.isFinite),'No uncovered heightfield nodes');return Math.max(...errors);}
+const error=validate(detailed,rough);assert.ok(error<=.501,'RTIN error respects the configured measured-height tolerance');
+const stats={smoothTriangles:mesh.surfaceIndices/3,roughFineTriangles:detailed.surfaceIndices/3,roughCoarseTriangles:coarse.surfaceIndices/3,maxVerticalErrorMetres:error,completeBorders:true,upwardWinding:true};
+stats.note='CPU validation of source-relative vertical approximation, not absolute survey accuracy or browser FPS';const fixture=(process.env.THREE_QA_TILES||'/workspace/scratch/3dd2ae8bd0a2/cesium-source-qa')+'/tiles.json';stats.authenticLINZ=[];
+if(fs.existsSync(fixture)){const inventory=JSON.parse(fs.readFileSync(fixture)),records=new Map(inventory.map(t=>{const b=fs.readFileSync(fixture.replace('tiles.json',`${t.z}-${t.x}-${t.y}.f32`));return [t.z+'/'+t.x+'/'+t.y,{...t,heights:new Float32Array(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength))}];}));for(const z of [16,18]){const group=inventory.filter(t=>t.z===z),xs=[...new Set(group.map(t=>t.x))].sort(),ys=[...new Set(group.map(t=>t.y))].sort();const local=new Map([...records.values()].filter(t=>t.z===z).map(t=>[t.x+'/'+t.y,t]));let prev;for(const x of [xs[1],xs[2]]){const y=ys[1],h=c.RidgeTerrainData.assemble(local,x,y,z),start=performance.now(),m=c.RidgeMesh.build(h,{x,y,z,error:z===18?.15:1}),elapsed=performance.now()-start,maximum=validate(m,h);assert.ok(maximum<=(z===18?.151:1.001));if(prev)for(let j=0;j<size;j++)assert.equal(prev[j*size+256],h[j*size]);prev=h;stats.authenticLINZ.push({z,x,y,sourceSamples:h.length,surfaceTriangles:m.surfaceIndices/3,maxMeasuredVerticalErrorMetres:maximum,workerMeshMilliseconds:Math.round(elapsed*100)/100});}}}
+console.log(JSON.stringify(stats));

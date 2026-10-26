@@ -1,0 +1,100 @@
+{
+  "region": "1.7 km Cook summit sample",
+  "sourceTiles": [
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15934,
+      "y": 10400,
+      "sha256": "4adbfc9ad79ab852ad7fe6e88c420b1ca540f4e60d910d02319bc88b97a4556c"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15935,
+      "y": 10400,
+      "sha256": "3428a413d3635adbd0e1a672835b0684d89c21226263491736534e8c14c3de21"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15934,
+      "y": 10401,
+      "sha256": "c6bc5104863fd6ebacf628de92df4bae7b1cdfdece2313806182d73994cd2d64"
+    },
+    {
+      "provider": "linz",
+      "z": 14,
+      "x": 15935,
+      "y": 10401,
+      "sha256": "90f562127d641e2ebe601e2d2f2de759bf08fa734aac3169340a4659535ccb51"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15934,
+      "y": 10400,
+      "sha256": "293906f0f716608e11ead801004a7fc0be4a654931f724e5a8393e3c58e7c93e"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15935,
+      "y": 10400,
+      "sha256": "e3323fc8a5198d56331242fb3ce3ded6b49494aa1544d2845701f1aa574ad63d"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15934,
+      "y": 10401,
+      "sha256": "d6696abce8106cd89c763606384206612f4e70a6d8c0bc0a1306133a756b33b4"
+    },
+    {
+      "provider": "esri",
+      "z": 14,
+      "x": 15935,
+      "y": 10401,
+      "sha256": "8075f062978ac268c0696d40b6dec4a9932d49bfaf41b4ca227157f44ded2593"
+    }
+  ],
+  "linzPaint": {
+    "raster-fade-duration": 420,
+    "raster-resampling": "linear",
+    "raster-saturation": -0.25,
+    "raster-contrast": 0.26,
+    "raster-brightness-min": 0.07,
+    "raster-brightness-max": 1
+  },
+  "esriPaint": {
+    "raster-fade-duration": 420,
+    "raster-resampling": "linear",
+    "raster-saturation": -0.12,
+    "raster-contrast": 0.015,
+    "raster-brightness-min": 0,
+    "raster-brightness-max": 0.99
+  },
+  "snowMask": "Source min RGB > 0.65 and max-min < 0.10; heuristic bright neutral pixels, not measured snow classification",
+  "rockMask": "Source mean RGB 0.12\u20130.36 and max-min < 0.12; heuristic dark neutral pixels",
+  "snowMedianBeforeRGB255": [
+    177.52408629441626,
+    182.4690609137056,
+    181.94642131979694
+  ],
+  "snowMedianAfterRGB255": [
+    200.83378378378373,
+    206.4891891891892,
+    205.96554054054056
+  ],
+  "esriReferenceAtSameSnowCoordinatesRGB255": [
+    228.76286802030458,
+    228.8432741116751,
+    222.57159898477155
+  ],
+  "darkRockMedianChangePercent": -6.708359866548808,
+  "LINZAnyChannelHighlightClippingPercent": 0.34040584308282107,
+  "LINZAnyChannelShadowClippingPercent": 0.05122612201731773,
+  "EsriCompensatedMaximumChannelError255": 0.6246309507477216,
+  "EsriCompensatedMeanChannelError255": 0.2865262191215819,
+  "caveat": "CPU reference with actual photo samples and shipped compensation function; no browser/GPU screenshot. Different survey dates/lighting mean this moves LINZ snow closer to Esri, not an exact radiometric or per-location match. Percentages apply only to this sample."
+}

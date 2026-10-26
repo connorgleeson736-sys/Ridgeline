@@ -1,0 +1,24 @@
+const assert=require('node:assert/strict'),fs=require('node:fs');
+const {retryFailedTile}=require('../public/native-residency.js');
+(async()=>{
+ global.window={requestAnimationFrame:fn=>setTimeout(fn,0),cancelAnimationFrame:clearTimeout};
+ const {Style,Evented,LngLat,Map:NativeMap}=await import('../public/assets/maplibre-gl.mjs');
+ let transform,updates=0;
+ Style.prototype._setProjectionInternal.call({map:{migrateProjection:t=>transform=t},tileManagers:{},_globalState:{}},'mercator');
+ transform.resize(800,600);transform.setCenter(new LngLat(170.06,-43.5));transform.setZoom(13);transform.setPitch(58);transform.setElevation(1500);
+ const map={_maxTileCacheSize:192,_maxTileCacheZoomLevels:8,_requestManager:{transformRequest:async url=>({url})},_refreshExpiredTiles:false,_update(){updates++;}};
+ const style=Object.assign(new Evented(),{map,tileManagers:{},dispatcher:{},_layers:{},_checkLoaded(){},_validate:()=>false});map.style=style;style.on('error',()=>{});
+ Style.prototype.addSource.call(style,'linz',{type:'raster',tiles:['https://example.test/{z}/{x}/{y}'],tileSize:256,maxzoom:19});await new Promise(r=>setTimeout(r,10));
+ const manager=style.tileManagers.linz,source=manager.getSource();manager.used=true;
+ source.loadTile=async()=>{throw Object.assign(Error('temporary'),{status:503});};source.unloadTile=()=>{};source.abortTile=()=>{};
+ manager.update(transform,null);await new Promise(r=>setImmediate(r));
+ const tile=manager._inViewTiles.getAllTiles().find(t=>t.state==='errored');assert.ok(tile);const id=tile.tileID,q=id.canonical;
+ const pending=new Map();source.loadTile=async t=>{await new Promise(r=>pending.set(t,r));t.texture={size:[256,256]};t.state='loaded';};
+ NativeMap.prototype.refreshTiles.call(map,'linz',[{z:q.z,x:q.x,y:q.y}]);
+ assert.equal(tile.state,'expired');assert.equal(tile.hasData(),true);assert.equal(tile.isRenderable(),true);assert.equal(tile.texture,undefined,'Reproduce the real missing-texture render window');
+ pending.get(tile)();pending.delete(tile);await new Promise(r=>setImmediate(r));tile.state='errored';delete tile.texture;
+ assert.equal(retryFailedTile(map,'linz',id),true);assert.equal(updates,1);assert.equal(manager.getTile(id),undefined);
+ manager.update(transform,null);const replacement=manager.getTile(id);assert.ok(replacement);assert.notEqual(replacement,tile);assert.equal(replacement.state,'loading');assert.equal(replacement.hasData(),false);assert.equal(replacement.isRenderable(),false,'Fresh retry cannot enter raster rendering before texture upload');
+ pending.get(replacement)();pending.delete(replacement);await new Promise(r=>setImmediate(r));assert.equal(replacement.state,'loaded');assert.ok(replacement.texture);assert.equal(retryFailedTile(map,'linz',id),false);for(const resolve of pending.values())resolve();await new Promise(r=>setImmediate(r));manager.clearTiles();
+ const result={engine:'MapLibre 6.14.0',actualMercatorCamera:true,camera:{longitude:170.06,latitude:-43.5,zoom:13,pitch:58,elevation:1500},nativeRefreshReproducesMissingTextureWindow:true,safeRetryUsesFreshLoadingTile:true,noPrematureRenderableTile:true,updatesScheduled:updates,caveat:'Actual bundled transform, source manager and tile states. Network and GPU upload are controlled; not a visual reproduction of the user\'s West Coast patch.'};fs.writeFileSync('IMAGERY_RECOVERY_VALIDATION.json',JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));
+})().catch(e=>{console.error(e);process.exitCode=1});
