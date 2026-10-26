@@ -1,0 +1,47 @@
+{
+  "source_commit": "f41bce79c352084f28ab67869592d5d2cf49f9f5",
+  "application_id": "nz.ridgeline.mobile",
+  "version": "0.2.0",
+  "apk": {
+    "file": "Ridgeline-3D-0.2.0.apk",
+    "bytes": 26300304,
+    "sha256": "7d9b6cf52c0c976eb27cf4db772f8b611b7981069698a15322eae7006cf93e24",
+    "zip_crc": "passed",
+    "signature_v2": "verified"
+  },
+  "verification": {
+    "jvm_tests": {
+      "passed": 10,
+      "failed": 0
+    },
+    "web_packaging_tests": {
+      "passed": 5,
+      "failed": 0
+    },
+    "browser_integration": {
+      "actual_webgl_terrain": true,
+      "direct_sampling_drawn": true,
+      "route_editing": true,
+      "elevation_profile": true,
+      "drawn_offline_rectangle": true,
+      "layers_advanced_tabs": true,
+      "page_errors": 0,
+      "console_errors": 0
+    },
+    "builds": [
+      "debug",
+      "preview"
+    ],
+    "lint_errors": 0,
+    "android_instrumentation_tests": "NOT RUN: emulator property queries timed out; troubleshooting stopped at user request"
+  },
+  "pending_phone_checks": [
+    "live provider/key authorization",
+    "complete offline region download and airplane-mode restart",
+    "Android dedicated-worker tile interception",
+    "hardware GPS",
+    "native GPX document dialogs",
+    "gesture and GPU performance"
+  ],
+  "distribution": "development-signed preview"
+}
