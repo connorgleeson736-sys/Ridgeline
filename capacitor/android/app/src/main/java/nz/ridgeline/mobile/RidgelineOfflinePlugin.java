@@ -222,6 +222,69 @@ public final class RidgelineOfflinePlugin extends Plugin {
   }
 
   @PluginMethod
+  public void overviewStatus(PluginCall c) {
+    async(c, () -> OverviewStore.get(getContext()).status());
+  }
+
+  @PluginMethod
+  public void removeOverviews(PluginCall c) {
+    async(
+        c,
+        () -> {
+          OverviewStore.get(getContext()).remove();
+          return OverviewStore.get(getContext()).status();
+        });
+  }
+
+  @PluginMethod
+  public void importOverviews(PluginCall c) {
+    Intent intent =
+        new Intent(Intent.ACTION_OPEN_DOCUMENT)
+            .addCategory(Intent.CATEGORY_OPENABLE)
+            .setType("*/*")
+            .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+    startActivityForResult(c, intent, "overviewImportResult");
+  }
+
+  @ActivityCallback
+  private void overviewImportResult(PluginCall c, ActivityResult r) {
+    if (c == null) return;
+    if (r.getResultCode() != Activity.RESULT_OK || r.getData() == null) {
+      JSObject result = new JSObject();
+      result.put("cancelled", true);
+      c.resolve(result);
+      return;
+    }
+    java.util.List<android.net.Uri> uris = new java.util.ArrayList<>();
+    Intent intent = r.getData();
+    if (intent.getClipData() != null) {
+      for (int i = 0; i < intent.getClipData().getItemCount(); i++)
+        uris.add(intent.getClipData().getItemAt(i).getUri());
+    } else if (intent.getData() != null) uris.add(intent.getData());
+    if (uris.size() > 100) {
+      c.reject("Select no more than 100 overview ZIPs at a time.");
+      return;
+    }
+    async(
+        c,
+        () -> {
+          int imported = 0;
+          OverviewStore store = OverviewStore.get(getContext());
+          for (android.net.Uri uri : uris)
+            try (InputStream in = getContext().getContentResolver().openInputStream(uri)) {
+              if (in == null) throw new IOException("An overview ZIP could not be opened.");
+              imported +=
+                  store.importZip(in, status -> notifyListeners("overviewProgress", status));
+            }
+          if (imported == 0)
+            throw new IOException(
+                "No matching overview packs were found. Select the prepared South Island overview"
+                    + " ZIPs.");
+          return store.status();
+        });
+  }
+
+  @PluginMethod
   public void importGpx(PluginCall c) {
     startActivityForResult(
         c,

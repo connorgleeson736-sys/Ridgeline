@@ -12,6 +12,18 @@ await cp(source,out,{recursive:true,filter:p=>!/(?:cook-reference|luma-renderer|
 await mkdir(path.join(out,'licenses'),{recursive:true});
 await cp(path.join(base,'CAPACITOR-LICENSE.txt'),path.join(out,'licenses/capacitor.txt'));
 await cp(path.join(base,'THIRD_PARTY_NOTICES.md'),path.join(out,'licenses/NOTICE.txt'));
+// Only the verified catalogue is bundled; large data ZIPs are imported once.
+const overview=JSON.parse(await readFile(path.join(base,'overview-catalog.json'),'utf8'));
+const expectedIndex=JSON.parse(await readFile(path.join(base,'../SOUTH_ISLAND_IMAGERY_VALIDATION.json'),'utf8')).persistentIndex.sha256;
+if(overview.sourceIndexSHA256!==expectedIndex)throw Error('Overview catalogue does not match the original source index');
+const {default:vm}=await import('node:vm');const holder={};vm.runInNewContext(await readFile(path.join(out,'south-overviews.js'),'utf8'),holder);
+const south=holder.RidgeSouthOverviews,ranges=new Map();
+for(const [coord,variants] of Object.entries(overview.tiles)){
+ const converted={};for(const [mode,r] of Object.entries(variants)){const url=`https://localhost/_ridge/overviews/${r.file}/${r.offset}/${r.bytes}`;converted[mode]={url,range:r};ranges.set(url,[r.file,r.offset,r.bytes]);}
+ south.tiles[coord]=converted;
+}
+await writeFile(path.join(out,'south-overviews.js'),`(function(r){r.RidgeSouthOverviews=${JSON.stringify(south)};})(globalThis);\n`);
+await writeFile(path.join(out,'overview-manifest.json'),JSON.stringify({files:overview.files,ranges:[...ranges.values()]}));
 const replace=(text,old,value)=>{if(!text.includes(old))throw Error('Website integration changed: '+old.slice(0,70));return text.replace(old,value);};
 let app=await readFile(path.join(out,'app.js'),'utf8');
 app=replace(app,'let directSampling=false','let directSampling=true');
@@ -40,7 +52,13 @@ for(const name of await readdir(out))if(/\.(?:m?js)$/.test(name)){
  // Server-side packed overviews are not part of a static Capacitor app.
  // Keep bundled overviews; read the provider for other tiles.
  if(name==='topographic-overlays.js')text=replace(text,'maxzoom:15','maxzoom:14');
- if(name==='regional-imagery.js')text=replace(text,'if(entry){',"if(entry&&(entry.url||entry[compensate?'natural':'raw']?.url)){");
+ if(name==='regional-imagery.js'){
+  text=replace(text,'if(entry){',"if(entry&&(entry.url||entry[compensate?'natural':'raw']?.url)){");
+  text=replace(text,"if(!/^\\/assets\\/south-overviews-v1\\/[a-f0-9]{24}\\.webp$/.test(row.url))", "if(!/^\\/assets\\/south-overviews-v1\\/[a-f0-9]{24}\\.webp$/.test(row.url)&&!/^https:\\/\\/localhost\\/_ridge\\/overviews\\/[a-f0-9]{64}\\/\\d+\\/\\d+$/.test(row.url))");
+  const start=text.indexOf('   const headers=new Headers(options.headers);'),end=text.indexOf('  const asset=baked',start);
+  if(start<0||end<0)throw Error('Overview fallback integration changed');
+  text=text.slice(0,start)+'   return fetcher(url,options);\n  }\n'+text.slice(end);
+ }
  await writeFile(path.join(out,name),text);
 }
 const {document}=parseHTML(await readFile(path.join(out,'index.html'),'utf8'));

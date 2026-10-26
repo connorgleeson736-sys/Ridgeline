@@ -2,15 +2,35 @@
 
 This Capacitor app packages the website's own patched MapLibre GL JS 6.14.0 renderer, UI, route editor, and elevation chart. **Original + Direct is the only renderer.** Terrain is a real elevation mesh rendered with WebGL inside Android WebView. This is a web renderer in a native Android shell, rather than MapLibre Native. The existing native app in `../android` remains a separate application.
 
-The Cook reference imagery replacement is excluded. The website's general imagery shader, genuine LINZ photos, regional imagery boundaries, and available static overviews remain. Server-only packed imagery is replaced by provider tiles. At offline survey seams, missing fine-survey veto masks fall back to the saved base imagery; exact pixel parity at those seams is not promised.
+The Cook reference imagery replacement is excluded. The website's general imagery shader, genuine LINZ photos, regional imagery boundaries, and available static overviews remain. Verified South Island overview packs supply the original precomputed imagery when imported; missing packs fall back to provider tiles. At offline survey seams, missing fine-survey veto masks fall back to the saved base imagery; exact pixel parity at those seams is not promised.
 
 ## Use
 
 - Android 8.0+ with an up-to-date **Android System WebView/Chrome** and WebGL support. Update those through Google Play before testing. WebView performs rendering; no website server or sign-in is required.
-- Open **Layers** for imagery, terrain detail, imagery detail, labels and shading. Less-used loading, cache, colour, sky, performance and API-key controls are under **Advanced**.
+- Open **Layers** for imagery, terrain detail, imagery detail, labels and shading. Less-used loading, cache, colour, sky, performance and API-key controls are under **Advanced**. Printed Topo maps use a dedicated native-resolution 2D policy, omit photo motion/detail reductions, and cap excessive raster enlargement. The GPS icon is an explicitly centred SVG.
 - Use the route button to sketch/edit, the kea button to reopen saved routes or find a peak, and the GPS button for foreground location. GPS stops requesting positions in the background.
 - Import GPX through Android's document picker; Export GPX uses Android's Save dialog. Limit: 2 MB and 2,000 points, one continuous track/route. GPX exports the route coordinates. Profiles are sampled from elevation tiles; imported GPX height values are not used.
 - The website's public LINZ client key is the default, as approved by the owner. It is extractable from the APK and shares the website's provider quota. Override it in Advanced for the current session. Keys never appear in region-list responses or download logs.
+
+## South Island overview pack (0.3.0)
+
+Zooms 0–8 are already bundled: 67 images / 3,681,702 bytes. All 67 have been byte-matched against the uploaded imagery export and the previous 0.2.0 APK. These are the supplied downsampled overviews, not substituted 10 m LINZ images. These numbers describe image-tile zooms: the viewer can request a finer tile than its camera zoom, so a missing zoom 9–12 tile in the old app could still fall back to ordinary LINZ imagery.
+
+For zooms 9–12, download **all six prepared `Ridgeline-Overviews-0.3.0-*-of-6.zip` files** from the GitHub download branch's `overview-packs/` folder. In the app choose **Layers → Download offline region → Import overview ZIPs**. Android's picker supports multiple selection; imports can also be done one part at a time. Wait for **Ready for offline use · 6/6 packs**. Import the six prepared files rather than the 15 original source exports.
+
+The additional data is exactly 364,762,502 bytes (364.8 MB). Allow about 750 MB for both ZIP downloads and imported copies temporarily; the ZIPs can be removed from Downloads after import is complete. Imported packs persist across app restarts/updates. Removal affects only overview imagery, not routes or region downloads.
+
+The preparation script verifies all 5,344 original overview images, reconstructs the original authoritative index and matches its pinned SHA256, then losslessly packs the 5,277 missing images. Every resulting range has been independently compared with the original image hash. Six content-addressed files replace thousands of individual files; reads use native file ranges, and SHA256 verification streams through a 32 KB buffer. The app includes only the catalogue and rejects wrong, truncated, oversized or modified packs. No Cook-reference assets or intermediates are imported.
+
+This pack covers South Island, Rakiura and nearby islands, and contains **imagery only**. Download selected regions for elevation needed by offline 3D terrain and profiles. Outside the saved coverage normal online providers can still be used.
+
+Reproduce the data pack from the 15 user-provided imagery exports with Python/Pillow:
+
+```sh
+python3 scripts/prepare-overviews.py --output /path/to/output --catalog overview-catalog.json /path/to/Ridgeline_Imagery_*.zip
+```
+
+Large data ZIPs remain on the download branch, separately from application source and the APK. The website itself continues using its existing hosted archive; the native import mechanism is for the Capacitor app.
 
 ## Offline regions
 

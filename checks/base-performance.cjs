@@ -19,7 +19,7 @@ for(let i=0;i<100;i++){f.emit('movestart');for(let j=0;j<10;j++)f.emit('render',
 assert.equal(f.calls.length,0,'Ordinary fast pans must not reallocate the drawing buffer');
 assert.equal(f.settled,100);assert.equal(f.classes.has('map-moving'),false);
 const installed=f.map.lod.length;f.control.refresh();f.control.refresh();assert.equal(f.map.lod.length,installed,'Refresh must not reset unchanged source LOD');
-assert.ok(f.map.lod.every(([levels,ratio,id])=>levels===(id.startsWith('terrain')?8:6)&&ratio===3.5));
+assert.ok(f.map.lod.every(([levels,ratio,id])=>id==='topo'?(levels===1&&ratio===1):(levels===(id.startsWith('terrain')?8:6)&&ratio===3.5)));
 assert.equal(f.map.sources.terrain.calculateTileZoom,undefined,'Use the native engine LOD');
 const slow=fixture(source);slow.emit('movestart');for(let i=0;i<120;i++)slow.emit('render',33.34);
 assert.equal(slow.calls.length,1,'Only one adaptive change per long slow gesture');assert.equal(slow.map.ratio,1.5);

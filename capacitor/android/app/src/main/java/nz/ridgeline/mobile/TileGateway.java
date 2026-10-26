@@ -10,8 +10,10 @@ import java.util.Map;
 final class TileGateway {
   private final TileArchive archive;
   private final ConnectivityManager connectivity;
+  private final Context context;
 
   TileGateway(Context context) {
+    this.context = context.getApplicationContext();
     archive = TileArchive.get(context);
     connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
   }
@@ -26,6 +28,17 @@ final class TileGateway {
     if (!"localhost".equals(uri.getHost())
         || uri.getPath() == null
         || !uri.getPath().startsWith("/_ridge/")) return null;
+    if (uri.getPath().startsWith("/_ridge/overviews/")) {
+      if (!"https".equals(uri.getScheme()) || !"GET".equals(request.getMethod()))
+        return response(403, "text/plain", new byte[0]);
+      try {
+        byte[] bytes = OverviewStore.get(context).read(uri.getPath());
+        return response(
+            bytes == null ? 404 : 200, "image/webp", bytes == null ? new byte[0] : bytes);
+      } catch (Exception e) {
+        return response(503, "text/plain", new byte[0]);
+      }
+    }
     TileAddress tile = TileAddress.local(uri.toString());
     if (tile == null || !request.getMethod().equals("GET"))
       return response(

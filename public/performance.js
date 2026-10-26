@@ -33,7 +33,7 @@ function nearbyLod(policy,detail=()=>50,focus=()=>null){return function(zoom,dis
  const distance=Math.hypot(distanceXY,distanceZ);if(!Number.isFinite(distance))return base;const t=Math.max(0,Math.min(1,(distance/reference-.75)/1.25)),weight=1-t*t*(3-2*t);
  return base+(normalizePhoneDetail(detail())-50)/50*.75*weight;
 };}
-function attach(map,{lowPower,adaptiveTerrain=()=>true,phoneMode=()=>false,phoneDetail=()=>50,imageryDetail=()=>.25,motionDetail=()=>0,onSettled=()=>{}}){
+function attach(map,{lowPower,adaptiveTerrain=()=>true,phoneMode=()=>false,phoneDetail=()=>50,imageryDetail=()=>.25,motionDetail=()=>0,basemap=()=>null,onSettled=()=>{}}){
  let moving=false,ratio=map.getPixelRatio(),timer,updating=false,sharp=map.getZoom()>=15,
      memoryPressure=false,lastFrame=0,started=0,intervals=[],reduced=false,downshifts=0,disposed=false,phoneActive=!!phoneMode(),phoneCeiling=Infinity,pressureCeiling=Infinity,healthySince=0;
  const clock=()=>root.performance.now();
@@ -41,13 +41,14 @@ function attach(map,{lowPower,adaptiveTerrain=()=>true,phoneMode=()=>false,phone
  const apply=()=>{
   if(disposed||updating)return;
   const enabled=!!phoneMode();if(enabled!==phoneActive){phoneActive=enabled;phoneCeiling=Infinity;}
+  if(basemap()==='topo'){const el=map.getContainer(),native=Math.max(1,Math.min(root.devicePixelRatio||1,3,Math.sqrt(8000000/Math.max(1,el.clientWidth*el.clientHeight))));setRatio(lowPower()?1:native);return;}
   const zoom=map.getZoom();if(zoom>=15.3)sharp=true;else if(zoom<14.7)sharp=false;
   const el=map.getContainer();setRatio(Math.max(.75,Math.min(pressureCeiling,phoneActive?phoneCeiling:Infinity,(memoryPressure?.75:1)*pixelRatio({dpr:root.devicePixelRatio||1,width:el.clientWidth,height:el.clientHeight,zoom,sharp,lowPower:lowPower(),phoneMode:phoneActive}))));
  };
  const surfaceFocus=root.RidgeSurfaceFocus?.attach(map,{phoneMode,phoneDetail,motionDetail});
  const grids=root.RidgeAdaptiveTerrain?.attach(map,{enabled:adaptiveTerrain});
  const installedLod=new Map();
- const installLod=id=>{const source=map.getSource(id);if(!source)return;const dem=id.startsWith('terrain')||id==='shade-dem',{levels,ratio}=dem?lodParams(lowPower(),phoneMode()):phoneMode()?{levels:10,ratio:2}:{levels:lowPower()?7:6,ratio:lowPower()?3:3.5},bias=dem?0:imageryDetail(),near=phoneMode()?normalizePhoneDetail(phoneDetail()):50,old=installedLod.get(id);if(old?.source===source&&old.levels===levels&&old.ratio===ratio&&old.bias===bias&&old.near===near)return;map.setSourceTileLodParams(levels,ratio,id);if(typeof source.calculateTileZoom==='function'){const policy=focusLod(source.calculateTileZoom,bias,()=>surfaceFocus?.state());const selected=phoneMode()?nearbyLod(policy,phoneDetail,()=>surfaceFocus?.state()):policy;source.calculateTileZoom=function(...args){return selected.apply(this,args)-Math.max(0,Math.min(2,motionDetail()));};}installedLod.set(id,{source,levels,ratio,bias,near});};
+ const installLod=id=>{const source=map.getSource(id);if(!source)return;if(id==='topo'){const old=installedLod.get(id);if(old?.source!==source){map.setSourceTileLodParams(1,1,id);installedLod.set(id,{source,levels:1,ratio:1});}return;}const dem=id.startsWith('terrain')||id==='shade-dem',{levels,ratio}=dem?lodParams(lowPower(),phoneMode()):phoneMode()?{levels:10,ratio:2}:{levels:lowPower()?7:6,ratio:lowPower()?3:3.5},bias=dem?0:imageryDetail(),near=phoneMode()?normalizePhoneDetail(phoneDetail()):50,old=installedLod.get(id);if(old?.source===source&&old.levels===levels&&old.ratio===ratio&&old.bias===bias&&old.near===near)return;map.setSourceTileLodParams(levels,ratio,id);if(typeof source.calculateTileZoom==='function'){const policy=focusLod(source.calculateTileZoom,bias,()=>surfaceFocus?.state());const selected=phoneMode()?nearbyLod(policy,phoneDetail,()=>surfaceFocus?.state()):policy;source.calculateTileZoom=function(...args){return selected.apply(this,args)-Math.max(0,Math.min(2,motionDetail()));};}installedLod.set(id,{source,levels,ratio,bias,near});};
  const refresh=()=>{grids?.refresh();['linz','satellite','topo','terrain','terrain-fallback','shade-dem'].forEach(installLod);apply();};
  const onStart=()=>{
   if(updating||disposed)return;
@@ -56,7 +57,7 @@ function attach(map,{lowPower,adaptiveTerrain=()=>true,phoneMode=()=>false,phone
   // No canvas resize at the beginning of a pan or zoom.
  };
  const onRender=()=>{
-  if(!moving||updating||disposed||root.document.hidden)return;
+  if(!moving||updating||disposed||root.document.hidden||basemap()==='topo')return;
   const now=clock(),dt=now-lastFrame;lastFrame=now;
   if(dt<4||dt>250)return;
   intervals.push(dt);if(intervals.length>24)intervals.shift();if(intervals.length===24&&(!map._ridgeFrameHealth||now-map._ridgeFrameHealth.at>1000))map._ridgeFrameHealth={at:now,p75Ms:intervals.slice().sort((a,b)=>a-b)[17]};

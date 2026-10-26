@@ -11,7 +11,7 @@ import './topographic-overlays.js?v=4';
 import './surface-focus.js?v=5';
 import './loading-controls.js?v=6';
 import './adaptive-terrain.js?v=1';
-import './performance.js?v=21';
+import './performance.js?v=22';
 import './terrain-streaming.js?v=2';
 import './raster-residency.js?v=15';
 import './dem-revision.js?v=2';
@@ -51,7 +51,7 @@ import './terrain-core.js?v=6';
 globalThis.maplibregl=engine;
 RidgeFiltering.install(engine);
 engine.setWorkerUrl(new URL('./assets/maplibre-gl-worker.mjs?v=6.14.0',import.meta.url).href);
-try{await import('./app.js?v=76');}
+try{await import('./app.js?v=77');}
 catch(error){
  const message=document.getElementById('load-state');
  message.hidden=false;message.textContent='The map could not start. Refresh to try again.';
