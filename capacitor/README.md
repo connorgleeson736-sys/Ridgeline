@@ -22,7 +22,7 @@ The imagery and catalogue retain the 0.3.0 verification chain: all 5,344 images 
 
 These numbers are image-tile zooms; the viewer can request finer tiles than its camera zoom. The archive is imagery only. Download selected regions for elevation/3D terrain and profiles, and for detailed imagery beyond zoom 12. The existing offline region download limit remains zoom 17; online imagery sources extend through zoom 19 where data is available.
 
-The old six-ZIP import workflow remains compatible for development/light builds, but is hidden in the full APK. Those data ZIPs can also supply inputs for reproducing a build. Extract their six `.bin` files into the ignored `capacitor/overview-data/` directory, or set `RIDGELINE_OVERVIEW_DATA` to a directory containing those files before `npm run sync`. Full bundling is the default and missing/incorrect data causes the build to fail. `RIDGELINE_BUNDLE_OVERVIEWS=0` is an explicit development-only alternative.
+The old six-ZIP import workflow remains compatible for development/light builds, but is hidden in the full APK. Those data ZIPs can also supply inputs for reproducing a build. Extract their six `.bin` files into the ignored `capacitor/overview-data/` directory, or set `RIDGELINE_OVERVIEW_DATA` to a directory containing those files before `npm run sync`. Full bundling is the default and missing/incorrect data causes the build to fail. `RIDGELINE_BUNDLE_OVERVIEWS=0 npm run sync` builds the smaller base APK instead. In the base app, open Layers → Download offline region → Included imagery → Import overview ZIPs and import all six prepared ZIPs. The base APK keeps the zoom 0–8 images; the ZIPs add zooms 9–12.
 
 Recreate the binary packs from the original 15 exports with Python/Pillow:
 
