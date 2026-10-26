@@ -107,8 +107,10 @@ class PlannerViewModel(application: Application) : AndroidViewModel(application)
         history.clear(); mutable.update { it.copy(route=route,editing=false,pickingRegion=false,corner=null,regionBounds=null,selectedPoint=-1,cameraTarget=route.points.firstOrNull(),cameraRevision=it.cameraRevision+1) }; profile()
     }
     fun deleteRoute(id: String) = act {
+        val active=state.value.route.id==id
         val data=withContext(Dispatchers.IO) { app.store.update { it.copy(routes=it.routes.filterNot { r -> r.id==id },activeId=if(it.activeId==id)null else it.activeId) } }
-        mutable.update { it.copy(routes=data.routes,route=if(it.route.id==id)Route() else it.route) }; history.clear(); profile()
+        mutable.update { if(active)it.copy(routes=data.routes,route=Route(),editing=false,selectedPoint=-1) else it.copy(routes=data.routes) }
+        if(active) { history.clear(); profile() }
     }
     fun importGpx(open: () -> InputStream?) = act {
         mutable.update { it.copy(loading=true) }
