@@ -1,6 +1,8 @@
 package nz.ridgeline.mobile;
 
 import android.content.Context;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
 import android.util.AtomicFile;
 import com.getcapacitor.JSObject;
 import java.io.*;
@@ -20,8 +22,11 @@ final class OverviewStore {
   private final File root;
   private final Map<String, Long> files = new LinkedHashMap<>();
   private final Set<String> allowedRanges = new HashSet<>();
+  private final AssetManager assets;
+  private final Set<String> bundled = new HashSet<>();
 
   private OverviewStore(Context context) throws Exception {
+    assets = context.getAssets();
     root = new File(context.getFilesDir(), "precomputed-overviews");
     JSONObject manifest;
     try (InputStream in = context.getAssets().open("public/overview-manifest.json")) {
@@ -38,6 +43,13 @@ final class OverviewStore {
       if (!sha.matches("[a-f0-9]{64}") || bytes <= 0 || bytes > 64L * 1024 * 1024)
         throw new IOException("Invalid built-in overview manifest.");
       files.put(sha, bytes);
+      if (manifest.optBoolean("bundled", false)) {
+        try (AssetFileDescriptor asset = assets.openFd("public/overview-packs/" + sha + ".bin")) {
+          if (asset.getLength() != bytes)
+            throw new IOException("Bundled overview size does not match its manifest.");
+          bundled.add(sha);
+        }
+      }
     }
     JSONArray ranges = manifest.getJSONArray("ranges");
     for (int i = 0; i < ranges.length(); i++) {
@@ -56,12 +68,15 @@ final class OverviewStore {
   synchronized JSObject status() {
     int done = 0;
     long bytes = 0, total = 0;
+    long importedBytes = 0;
     for (var f : files.entrySet()) {
       total += f.getValue();
       File file = new File(root, f.getKey() + ".bin");
-      if (file.isFile() && file.length() == f.getValue()) {
+      boolean imported = file.isFile() && file.length() == f.getValue();
+      if (imported) importedBytes += file.length();
+      if (bundled.contains(f.getKey()) || imported) {
         done++;
-        bytes += file.length();
+        bytes += f.getValue();
       }
     }
     JSObject result = new JSObject();
@@ -70,6 +85,8 @@ final class OverviewStore {
     result.put("bytes", bytes);
     result.put("totalBytes", total);
     result.put("complete", done == files.size() && !files.isEmpty());
+    result.put("bundled", bundled.size() == files.size() && !files.isEmpty());
+    result.put("importedBytes", importedBytes);
     return result;
   }
 
@@ -150,6 +167,17 @@ final class OverviewStore {
     String key = path.substring(prefix.length());
     if (!allowedRanges.contains(key)) throw new IOException("Invalid overview image address.");
     String[] parts = key.split("/");
+    if (bundled.contains(parts[0])) {
+      try (AssetFileDescriptor asset = assets.openFd("public/overview-packs/" + parts[0] + ".bin");
+          FileInputStream in = asset.createInputStream()) {
+        return OverviewRangeReader.read(
+            in.getChannel(),
+            asset.getStartOffset(),
+            asset.getLength(),
+            Long.parseLong(parts[1]),
+            Integer.parseInt(parts[2]));
+      }
+    }
     File file = new File(root, parts[0] + ".bin");
     if (!file.isFile() || file.length() != files.get(parts[0])) return null;
     byte[] bytes = new byte[Integer.parseInt(parts[2])];

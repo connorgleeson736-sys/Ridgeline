@@ -3,6 +3,8 @@ import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 import {parseHTML} from 'linkedom';
 import {build} from 'esbuild';
+import {createReadStream} from 'node:fs';
+import {createHash} from 'node:crypto';
 
 const base=fileURLToPath(new URL('../',import.meta.url)), source=path.resolve(base,'../public'), out=path.join(base,'www');
 await rm(out,{recursive:true,force:true});await mkdir(out,{recursive:true});
@@ -23,7 +25,12 @@ for(const [coord,variants] of Object.entries(overview.tiles)){
  south.tiles[coord]=converted;
 }
 await writeFile(path.join(out,'south-overviews.js'),`(function(r){r.RidgeSouthOverviews=${JSON.stringify(south)};})(globalThis);\n`);
-await writeFile(path.join(out,'overview-manifest.json'),JSON.stringify({files:overview.files,ranges:[...ranges.values()]}));
+const bundled=process.env.RIDGELINE_BUNDLE_OVERVIEWS!=='0';
+if(bundled){
+ const data=process.env.RIDGELINE_OVERVIEW_DATA||path.join(base,'overview-data');await mkdir(path.join(out,'overview-packs'),{recursive:true});
+ for(const file of overview.files){const sourceFile=path.join(data,file.sha256+'.bin'),digest=createHash('sha256');let bytes=0;for await(const chunk of createReadStream(sourceFile)){bytes+=chunk.length;digest.update(chunk);}if(bytes!==file.bytes||digest.digest('hex')!==file.sha256)throw Error('Bundled overview failed verification: '+file.sha256);await cp(sourceFile,path.join(out,'overview-packs',file.sha256+'.bin'));}
+}
+await writeFile(path.join(out,'overview-manifest.json'),JSON.stringify({bundled,files:overview.files,ranges:[...ranges.values()]}));
 const replace=(text,old,value)=>{if(!text.includes(old))throw Error('Website integration changed: '+old.slice(0,70));return text.replace(old,value);};
 let app=await readFile(path.join(out,'app.js'),'utf8');
 app=replace(app,'let directSampling=false','let directSampling=true');
@@ -62,6 +69,7 @@ for(const name of await readdir(out))if(/\.(?:m?js)$/.test(name)){
  await writeFile(path.join(out,name),text);
 }
 const {document}=parseHTML(await readFile(path.join(out,'index.html'),'utf8'));
+document.documentElement.setAttribute('data-overviews-bundled',String(bundled));
 const $=id=>{const el=document.getElementById(id);if(!el)throw Error('Missing website control '+id);return el;};
 document.querySelector('meta[name=viewport]').setAttribute('content','width=device-width,initial-scale=1,viewport-fit=cover');
 const panel=$('layers-panel'),heading=panel.firstElementChild,advanced=document.createElement('section'),basic=document.createElement('section');

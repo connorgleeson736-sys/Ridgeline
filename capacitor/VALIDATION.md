@@ -1,4 +1,4 @@
-# Capacitor preview 0.3.0 validation
+# Capacitor preview 0.4.0 validation
 
 Validated 27 October 2026 (Melbourne). Development-signed preview; no Play Store release.
 
@@ -12,6 +12,12 @@ Validated 27 October 2026 (Melbourne). Development-signed preview; no Play Store
 - The exact streaming SHA256/size verifier used by the Android importer accepted all six real data ZIPs in a desktop JVM. This verifies the ZIP stream/crypto path, not Android's document picker.
 - Separate Cook-reference assets, duplicate coarse assets and intermediate overlays are excluded from the new data packs. The original general imagery shader and raw/natural variants remain.
 
+## Full APK packaging
+
+The 0.4.0 installer bundles the six verified zoom 9–12 binary packs uncompressed, alongside the already-bundled zoom 0–8 images. The native gateway reads each image directly from its APK asset descriptor using the asset start offset and validated image range. It does not extract or duplicate the 364.8 MB on first launch. Full-build packaging checks verify every embedded pack SHA256/size; final APK checks verify ZIP storage mode and image ranges inside the actual installer.
+
+New JVM tests cover nonzero APK asset offsets, bounds, truncated reads and oversized reads. The full APK UI immediately states that overviews are included and hides download/import controls. Existing 0.3.0 imports can be removed independently to reclaim their duplicate storage.
+
 ## Software checks
 
 - Android debug/preview builds and lint; JVM tests include archive streaming, tamper detection, truncation/excess-size rejection, download plans and resource addressing.
@@ -22,7 +28,7 @@ Validated 27 October 2026 (Melbourne). Development-signed preview; no Play Store
 
 ## Phone checks still needed
 
-Test Android's multi-file document picker and import UI, full offline use after restart, GPS/gesture behaviour and memory/storage limits on the phone. GPS positioning was confirmed working by the user in the previous app; its location logic is preserved in this update. Desktop/JVM/browser checks do not replace these phone checks.
+Test direct APK asset reading and offline use after restart, GPS/gesture behaviour and memory/storage limits on the phone. No new import flow is required in the full build. GPS positioning was confirmed working by the user in the previous app; its location logic is preserved in this update. Desktop/JVM/browser checks do not replace these phone checks.
 
 The printed Topo service is a raster map with finite detail. The changes remove photo-oriented degradation and excessive enlargement; they do not manufacture additional survey detail.
 

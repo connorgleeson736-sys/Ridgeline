@@ -12,25 +12,26 @@ The Cook reference imagery replacement is excluded. The website's general imager
 - Import GPX through Android's document picker; Export GPX uses Android's Save dialog. Limit: 2 MB and 2,000 points, one continuous track/route. GPX exports the route coordinates. Profiles are sampled from elevation tiles; imported GPX height values are not used.
 - The website's public LINZ client key is the default, as approved by the owner. It is extractable from the APK and shares the website's provider quota. Override it in Advanced for the current session. Keys never appear in region-list responses or download logs.
 
-## South Island overview pack (0.3.0)
+## Bundled South Island imagery (0.4.0)
 
-Zooms 0–8 are already bundled: 67 images / 3,681,702 bytes. All 67 have been byte-matched against the uploaded imagery export and the previous 0.2.0 APK. These are the supplied downsampled overviews, not substituted 10 m LINZ images. These numbers describe image-tile zooms: the viewer can request a finer tile than its camera zoom, so a missing zoom 9–12 tile in the old app could still fall back to ordinary LINZ imagery.
+The full APK includes **all supplied precomputed South Island/Rakiura imagery at tile zooms 0–12**. Install the single full APK; no separate ZIP downloads, import steps or first-launch extraction are required. Zooms 0–8 contribute 67 verified files / 3,681,702 bytes. The remaining 5,277 images contribute 364,762,502 bytes, stored in six uncompressed content-addressed APK assets. Total precomputed image payload is 368,444,204 bytes.
 
-For zooms 9–12, download **all six prepared `Ridgeline-Overviews-0.3.0-*-of-6.zip` files** from the GitHub download branch's `overview-packs/` folder. In the app choose **Layers → Download offline region → Import overview ZIPs**. Android's picker supports multiple selection; imports can also be done one part at a time. Wait for **Ready for offline use · 6/6 packs**. Import the six prepared files rather than the 15 original source exports.
+The native renderer gateway reads individual WebP ranges directly from APK asset file descriptors, including each asset's nonzero ZIP offset. It allocates only the requested image bytes. Data is not copied into private storage at startup. Existing imported copies from 0.3.0 are ignored in favour of bundled assets; the offline panel offers to remove those redundant imported copies without touching the APK, routes or downloaded regions.
 
-The additional data is exactly 364,762,502 bytes (364.8 MB). Allow about 750 MB for both ZIP downloads and imported copies temporarily; the ZIPs can be removed from Downloads after import is complete. Imported packs persist across app restarts/updates. Removal affects only overview imagery, not routes or region downloads.
+The imagery and catalogue retain the 0.3.0 verification chain: all 5,344 images are SHA256/format/dimension checked; the reconstructed authoritative index matches the pinned original hash. Original WebP pixels and raw/natural variants are unchanged. Separate Cook-reference corrections remain excluded. The native APK build verifies every binary pack before copying it and marks `.bin` files uncompressed so range reads work immediately.
 
-The preparation script verifies all 5,344 original overview images, reconstructs the original authoritative index and matches its pinned SHA256, then losslessly packs the 5,277 missing images. Every resulting range has been independently compared with the original image hash. Six content-addressed files replace thousands of individual files; reads use native file ranges, and SHA256 verification streams through a 32 KB buffer. The app includes only the catalogue and rejects wrong, truncated, oversized or modified packs. No Cook-reference assets or intermediates are imported.
+These numbers are image-tile zooms; the viewer can request finer tiles than its camera zoom. The archive is imagery only. Download selected regions for elevation/3D terrain and profiles, and for detailed imagery beyond zoom 12. The existing offline region download limit remains zoom 17; online imagery sources extend through zoom 19 where data is available.
 
-This pack covers South Island, Rakiura and nearby islands, and contains **imagery only**. Download selected regions for elevation needed by offline 3D terrain and profiles. Outside the saved coverage normal online providers can still be used.
+The old six-ZIP import workflow remains compatible for development/light builds, but is hidden in the full APK. Those data ZIPs can also supply inputs for reproducing a build. Extract their six `.bin` files into the ignored `capacitor/overview-data/` directory, or set `RIDGELINE_OVERVIEW_DATA` to a directory containing those files before `npm run sync`. Full bundling is the default and missing/incorrect data causes the build to fail. `RIDGELINE_BUNDLE_OVERVIEWS=0` is an explicit development-only alternative.
 
-Reproduce the data pack from the 15 user-provided imagery exports with Python/Pillow:
+Recreate the binary packs from the original 15 exports with Python/Pillow:
 
 ```sh
-python3 scripts/prepare-overviews.py --output /path/to/output --catalog overview-catalog.json /path/to/Ridgeline_Imagery_*.zip
+python3 scripts/prepare-overviews.py --output /path/to/overview-data --catalog overview-catalog.json /path/to/Ridgeline_Imagery_*.zip
+RIDGELINE_OVERVIEW_DATA=/path/to/overview-data npm run sync
 ```
 
-Large data ZIPs remain on the download branch, separately from application source and the APK. The website itself continues using its existing hosted archive; the native import mechanism is for the Capacitor app.
+Large input data remains outside the main source branch. The complete installer is published using Git LFS on the download branch, rather than splitting the installed app or asking users to import imagery.
 
 ## Offline regions
 

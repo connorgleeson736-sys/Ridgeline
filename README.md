@@ -30,3 +30,7 @@ native app. See [validation results](capacitor/VALIDATION.md) before field use.
 Version 0.3.0 adds verified South Island overview data packs (six ZIP imports), a
 centred GPS SVG and a dedicated sharpness policy for printed Topo maps. The website
 source shares the Topo fix; deployment to the original live Site is separate.
+
+Version 0.4.0 bundles the complete verified zoom 0–12 overview imagery in one
+full APK, with native range reads directly from uncompressed APK assets. No
+separate imagery imports or first-launch extraction are needed.
