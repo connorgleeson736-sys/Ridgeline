@@ -1,0 +1,43 @@
+{
+  "source_commit": "27384b94090dc0271be513d796d7a40c5193964a",
+  "application_id": "nz.ridgeline.app",
+  "version": "0.1.0",
+  "minimum_android_api": 26,
+  "unit_tests": {
+    "tests": 23,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "android_data_tests": {
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "device": "Android 8.0 API 26 x86 emulator",
+    "test_class": "nz.ridgeline.app.OfflineDataTest"
+  },
+  "lint_errors": 0,
+  "artifacts": [
+    {
+      "file": "Ridgeline-Android-0.1.0-universal.apk",
+      "bytes": 58916099,
+      "sha256": "527d434115e04daba03aee27bf15dff7a3759b3c36e1bd4c72d37b2a34fe53ea",
+      "zip_crc": "passed",
+      "apk_signature_v2": "verified"
+    },
+    {
+      "file": "Ridgeline-Android-0.1.0-arm64.apk",
+      "bytes": 22233331,
+      "sha256": "53ab3945b475cf344ea3ca84479bf6cce20987c2c1caed7db81d7c29bd2edbf9",
+      "zip_crc": "passed",
+      "apk_signature_v2": "verified"
+    }
+  ],
+  "pending_validation": [
+    "Native screen/interaction tests: emulator System UI ANR prevented reliable UI validation",
+    "GPS requires physical-device validation",
+    "Live LINZ imagery and region downloads: cloud proxy blocked map-provider destinations; required domain additions saved in environment draft"
+  ],
+  "publication": "Signed preview APKs for sideload testing; no Play Store publication"
+}
