@@ -1,0 +1,18 @@
+{
+  "appId": "nz.ridgeline.mobile",
+  "appName": "Ridgeline 3D",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#233d34"
+  },
+  "server": {
+    "androidScheme": "https",
+    "hostname": "localhost"
+  },
+  "plugins": {
+    "SystemBars": {
+      "insetsHandling": "disable"
+    }
+  }
+}

@@ -17,3 +17,12 @@ The Kotlin / Jetpack Compose app is in [`android/`](android/README.md). It uses 
 MapLibre Native imagery/hillshade renderer, with route planning, GPX, foreground
 GPS, elevation profiles, and explicit offline region downloads. See its README
 for building, installing, provider setup, and validation limitations.
+
+## Capacitor Android app with original 3D terrain
+
+The current 3D mobile version is in [`capacitor/`](capacitor/README.md). It packages
+the website's **Original + Direct** renderer and interface, omits Cook reference
+imagery changes, and adds persistent Android offline regions, foreground GPS and
+native GPX file dialogs. Layers keeps terrain and imagery detail accessible, with
+other tuning under Advanced. It installs as **Ridgeline 3D**, alongside the earlier
+native app. See [validation results](capacitor/VALIDATION.md) before field use.
