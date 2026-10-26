@@ -1,5 +1,15 @@
 # Ridgeline Android downloads
 
+## Base APK — optional imagery ZIP imports
+
+[Download Ridgeline 3D 0.5.0 Base](Ridgeline-3D-0.5.0-Base.apk)
+
+This smaller installer includes the latest menu and bottom-panel changes, plus the small zoom 0–8 imagery set. Install it over the current Ridgeline 3D app. Existing routes and imported/downloaded data are retained.
+
+To add the remaining overview imagery, download [all six prepared ZIPs](overview-packs/), then open **Layers → Download offline region → Included imagery → Import overview ZIPs** and select the ZIPs. Use these six prepared packs, rather than the fifteen original export ZIPs. Importing all six adds about 365 MB. Regional high-detail imagery and elevation downloads remain separate.
+
+Open the APK file page and choose **Download raw file**. [Base APK checksum](Ridgeline-3D-0.5.0-Base.apk.sha256).
+
 ## Latest: Ridgeline 3D 0.5.0 — full imagery included
 
 **[Download Ridgeline-3D-0.5.0-Full.apk — 391 MB](Ridgeline-3D-0.5.0-Full.apk)**
