@@ -1,0 +1,37 @@
+{
+  "version": "0.4.0",
+  "apk": {
+    "file": "Ridgeline-3D-0.4.0-Full.apk",
+    "bytes": 391209796,
+    "sha256": "dc8b63ba573178289bd73279fcad82b76311d547367274b8f8a10615fb4d7280",
+    "v2_signature": "verified",
+    "same_signer_as_0_3_0": true,
+    "zip_crc": "passed"
+  },
+  "bundled_data_bytes": 364762502,
+  "bundled_pack_count": 6,
+  "bundled_ranges_verified_inside_apk": 5277,
+  "asset_storage": "uncompressed, direct file-descriptor range reads; no extraction or import",
+  "jvm_tests": {
+    "tests": 17,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "packaging_tests_passed": 7,
+  "emulator": "not requested or run",
+  "coarse_images_verified_inside_apk": 67,
+  "total_original_images_verified": 5344,
+  "total_precomputed_image_bytes": 368444204,
+  "exact_native_range_reader_images_verified_in_actual_apk": 5277,
+  "browser_integration": {
+    "bundled_ready_without_import": true,
+    "actual_precomputed_reads": 12,
+    "direct_terrain_rendering": true,
+    "gps_centred": true,
+    "topo_native_resolution": true,
+    "page_errors": 0,
+    "console_errors": 0
+  },
+  "source_commit": "d0afe8df1cc3c47a0f5d4f079ca3bc996a1461b5"
+}

@@ -1,23 +1,25 @@
 # Ridgeline Android downloads
 
-## Latest: Ridgeline 3D 0.3.0
+## Latest: Ridgeline 3D 0.4.0 — full imagery included
 
-Download **[Ridgeline-3D-0.3.0.apk](Ridgeline-3D-0.3.0.apk)**. Open the file page and choose **Download raw file** (↓). Sign in to GitHub if necessary. This universal APK supports Android phones/emulators with Android 8.0+ and an up-to-date Android System WebView/Chrome. It has the same signer as 0.2.0 and installs as an update to **Ridgeline 3D**.
+**[Download Ridgeline-3D-0.4.0-Full.apk — 391 MB](Ridgeline-3D-0.4.0-Full.apk)**
 
-The app uses the original website's Original + Direct 3D renderer. Version 0.3.0 centres the GPS SVG, improves printed Topo sharpness, and adds import of the complete precomputed South Island overview imagery. Cook-reference colour changes and alternate renderers remain excluded.
+Sign in to GitHub if required, open the APK file page and choose **Download raw file** (↓). The large installer is stored using Git LFS; GitHub's download serves the complete APK.
 
-### Add the overview imagery
+Install this single APK. **All supplied precomputed South Island/Rakiura overview imagery at tile zooms 0–12 is already inside it. No separate ZIP downloads or imports are needed.** The imagery is read directly from uncompressed APK assets; it is not copied out at first launch.
 
-1. Download all six ZIPs from **[overview-packs/](overview-packs/)** — 364.8 MB of additional imagery.
-2. Open **Layers → Download offline region → Import overview ZIPs**. Select the six ZIPs together, or import them one at a time.
-3. Keep Ridgeline open until **Ready for offline use · 6/6 packs**. Download selected regions for elevation/3D terrain and profiles; the overview pack contains imagery only.
+The APK uses the same signer as 0.3.0, so it installs as an update to Ridgeline 3D. Requires Android 8.0+ with up-to-date Android System WebView/Chrome. The original Direct 3D renderer, centred GPS SVG and Topo clarity changes are retained. Separate Cook-reference corrections remain excluded.
 
-The existing 67 downsampled zoom 0–8 images in the APK were byte-matched against the new export. The six ZIPs add zoom 9–12 without changing original image pixels. Terrain/imagery tile zooms can differ from camera zooms. Normal providers may be used outside the saved coverage or as a fallback.
+Detailed imagery beyond zoom 12 and elevation for offline 3D terrain/profiles still use user-selected region downloads. Current offline imagery limit: zoom 17. Online sources extend through zoom 19 where finer data exists. Image-tile zooms can differ from camera zooms.
 
-### Website fix
+[Validation details](Ridgeline-3D-VALIDATION.md) · [APK checksum](Ridgeline-3D-0.4.0-Full.apk.sha256) · [Versioned validation record](Ridgeline-3D-0.4.0-validation.json)
 
-**[Ridgeline-Website-Topo-Fix-0.3.0.zip](Ridgeline-Website-Topo-Fix-0.3.0.zip)** contains the four website files needed for the Topo fix. Apply it through the original Site editing/deployment session. This cloud session updated GitHub source and produced the patch; it did not deploy the original live Site.
+All 5,344 original overview images were verified in the full installer. The exact native range reader checked all 5,277 packed image reads inside the signed APK. Builds, lint, 17 JVM tests, 7 packaging tests and browser integration checks passed. No emulator validation was requested or run. Phone runtime checks remain appropriate for this development preview.
 
-See **[validation results](Ridgeline-3D-VALIDATION.md)** and the versioned JSON/checksum files. No emulator validation was requested or performed. Source: [main/capacitor](https://github.com/connorgleeson736-sys/Ridgeline/tree/main/capacitor), commit 97cc48c.
+## Website patch and earlier builds
 
-Earlier APKs remain available for comparison. `Ridgeline-Android-0.1.0-*.apk` are the earlier Kotlin/MapLibre Native hillshade app and do not contain the website's 3D terrain. `Ridgeline-3D-0.2.0.apk` is the earlier Capacitor preview.
+The [website Topo patch](Ridgeline-Website-Topo-Fix-0.3.0.zip) still needs applying through the original Site deployment session; publishing the Android APK does not deploy that Site.
+
+Earlier APKs and [the old six import ZIPs](overview-packs/) remain available for comparison or reproducing a build. Version 0.4.0 does not require those imports. The offline panel can remove old imported copies to reclaim duplicate storage while retaining bundled imagery.
+
+Source: [main/capacitor](https://github.com/connorgleeson736-sys/Ridgeline/tree/main/capacitor).
