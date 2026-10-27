@@ -1,0 +1,122 @@
+{
+  "version": "0.13.0",
+  "sourceCommit": "ece2f78a340774e7e268deeabe95ffddd24ddba5",
+  "renderer": "Original + Direct",
+  "topoMaximum": 18,
+  "nativeOnlineCacheBytes": 256000000,
+  "workerRetainedDecodeCacheBytes": 2097152,
+  "builds": {
+    "Base": {
+      "file": "Ridgeline-3D-0.13.0-Base.apk",
+      "bytes": 26914150,
+      "sha256": "f9b237739865170c077793b8ce4c6df7f83cbefb78b5a10868965bde89537e8b",
+      "signerSHA256": "c475ac25a331015896bf65a4222833f6a5b2cb14dc30d6eeaa955b5b40169c98"
+    },
+    "Full": {
+      "file": "Ridgeline-3D-0.13.0-Full.apk",
+      "bytes": 391678280,
+      "sha256": "33d2470c1704a0b56df87a45b26abb4d2183766ea13d0dd70cac7abcb1614022",
+      "signerSHA256": "c475ac25a331015896bf65a4222833f6a5b2cb14dc30d6eeaa955b5b40169c98"
+    }
+  },
+  "verification": {
+    "javascriptTestsPerVariant": 36,
+    "androidUnitTests": 81,
+    "lint": "passed",
+    "instrumentationTests": "compiled, not executed",
+    "browserWorkflow": {
+      "renderer": {
+        "supported": true,
+        "enabled": true,
+        "directPatches": 1,
+        "composedPatches": 13,
+        "sourceTextures": 4,
+        "planBuilds": 24,
+        "planCacheHits": 31,
+        "emptyOverlaySkips": 0
+      },
+      "terrain": true,
+      "profile": true,
+      "routeEditing": true,
+      "rectangleSelection": true,
+      "fixedFramePanAndZoom": true,
+      "routeSummariesAndThumbnails": true,
+      "sidebarRenamePersists": true,
+      "mapTapDismissesSidebar": true,
+      "linzPeakLabelsDefaultOn": true,
+      "savedRouteReopening": true,
+      "sheetSnaps": 2,
+      "draggableRegionCorners": true,
+      "touchSheetAndCornerDrags": true,
+      "savedRegionSidebar": true,
+      "routeCreationInLogoMenu": true,
+      "coordinateFieldsInAdvanced": true,
+      "pageSizeSelectionThenSettings": true,
+      "pdfOptions": true,
+      "layerTabs": true,
+      "baseZipImportAvailable": true,
+      "multipleRoutesAndMerge": true,
+      "trueRouteClose": true,
+      "topoOnlyDownloads": true,
+      "pdfExportBridge": true,
+      "screenRectangleOverlay": true,
+      "gpsIconCentred": true,
+      "topoNativeResolution": true,
+      "actualPrecomputedReads": 25,
+      "providerFixtureRequests": 321,
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    "workerTransportAndPixels": {
+      "mainAndWorkerControls": true,
+      "priorityPromotion": true,
+      "abortAfterStart": true,
+      "workerTerminationCancellation": true,
+      "privateRequestHeaders": true,
+      "pixelExactCompositions": 8,
+      "decodeCache": {
+        "decodedBytes": 524288,
+        "decodes": 2,
+        "hits": 16,
+        "shared": 0,
+        "entries": 2
+      },
+      "pageErrors": []
+    },
+    "emulatorRun": false,
+    "physicalPhoneSpeedMeasured": false,
+    "qualitySettingsReduced": false,
+    "overviewHashes": "all six passed, 364762502 extra bytes, stored uncompressed",
+    "baseFullCodeAndSharedAssets": "identical except bundled flags in HTML/overview manifest and APK signatures",
+    "graphicsAndDetailModulesUnchangedFrom0120": [
+      "assets/maplibre-gl.mjs",
+      "assets/maplibre-gl-worker.mjs",
+      "maplibre-direct-sampling.js",
+      "adaptive-terrain.js",
+      "motion-detail.js",
+      "surface-focus.js",
+      "performance.js",
+      "linz-topo.js",
+      "imagery.js",
+      "regional-blend.js",
+      "prepare-ahead.js",
+      "terrain-composition.js"
+    ],
+    "signatures": "passed; same signer as previous previews",
+    "sqliteJdbc": "test-only, excluded from APK"
+  },
+  "changes": [
+    "Per-consumer native cancellation including workers and shared transfers",
+    "Dynamic native priority and foreground capacity",
+    "Earlier online streaming with validated EOF and saved fallback recovery",
+    "Bounded streaming of APK/imported overview image ranges",
+    "Content-hash decoder reuse in imagery worker",
+    "Obsolete predictive work cancellation and shared-input promotion",
+    "Indexed content-addressed offline storage with separate region ownership",
+    "Durable bounded legacy migration and database-space reclamation",
+    "Bounded concurrent region downloads and atomic batches",
+    "Expiry propagation through streaming and JS cache hits"
+  ],
+  "research": "capacitor/LOADING-OPTIMISATIONS.md",
+  "migration": "Existing tile files remain readable until their batch is committed and checkpointed; migrated downloads require 0.13.0 or later."
+}

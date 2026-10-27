@@ -1,27 +1,31 @@
 # Ridgeline Android downloads
 
-## Latest: 0.12.0 — native loading and caching improvements
+## Latest: 0.13.0 — native scheduling, streaming and shared offline storage
 
 | Build | Download | Size |
 | --- | --- | --- |
-| Base | [0.12.0 Base APK](Ridgeline-3D-0.12.0-Base.apk) | 26.9 MB |
-| Full imagery | [0.12.0 Full APK](Ridgeline-3D-0.12.0-Full.apk) | 391.7 MB |
+| Base | [0.13.0 Base APK](Ridgeline-3D-0.13.0-Base.apk) | 26.9 MB |
+| Full imagery | [0.13.0 Full APK](Ridgeline-3D-0.13.0-Full.apk) | 391.7 MB |
 
-Choose **Download raw file** on the APK page, then install over your existing app. Full uses Git LFS and includes the same verified 364.8 MB extra imagery pack. Base retains the six-ZIP import workflow. Both use the previous preview signer.
+Choose **Download raw file** on the APK page, then install over your existing app. Full uses Git LFS and retains the verified 364.8 MB extra imagery pack. Base supports the existing six-ZIP import workflow. Both use the previous preview signer.
 
-**Original + Direct and maximum Topo detail are preserved.** All 65 packaged JavaScript files are byte-for-byte identical to 0.11.0. High-density zoom-18 Topo, zoom-18 offline Topo downloads, lossless PDFs, imagery pixels and rendering preferences remain unchanged.
+**Original + Direct and maximum Topo detail are preserved.** The graphics engine, Direct sampling, detail/terrain policy, blending math and retained high-density zoom-18 Topo policy match 0.12.0. Cook reference substitution remains excluded.
 
-The native layer now shares HTTP connections and supports HTTP/2 where the provider negotiates it. A removable **256 MB native HTTP disk cache** honours server freshness/revalidation rules and can reuse completed estimation samples. Concurrent map/download requests for the same URL share one transfer. Saved-tile locations and misses are memoised, independent offline/overview reads can proceed together, and long exports/imports/estimates no longer queue ahead of status/settings/Pause. Temporary enlarged ancestor tiles are not retained in response/byte caches as full-detail tiles.
+- Existing renderer cancellation and priority now reach Android, including workers and shared-source priority promotion. Cancelling one consumer preserves transfers still needed by others.
+- Online tile headers/bytes and trusted overview ranges stream earlier; validation still gates successful completion. Saved-ancestor recovery remains available to whole-tile readers.
+- The imagery worker reuses exact decoded inputs in a bounded 2 MiB retained pool. Obsolete predictive warmups cancel, with foreground capacity protected.
+- Offline maps use indexed content-addressed SQLite storage with independent region ownership. Identical bytes share storage; different source versions stay separate. Downloads use bounded parallel production, atomic batches and retry/backoff.
+- Cache hits retain the remaining freshness lifetime, including streamed responses and the elevation disk cache. The removable native HTTP cache stays at 256 MB; downloaded-only mode bypasses it.
 
-Downloaded-only mode bypasses the online cache. Saved regions and imagery packs remain persistent. Phone speed gains have not been benchmarked; new-area loading still depends on provider latency and connectivity. Cancellation/priority across native workers and concurrent region downloads are documented next steps.
+Existing region files migrate in small durable batches and remain readable during migration. Routes and imported imagery are retained. **Migrated saved maps require 0.13.0 or later.**
 
-**Passed:** 51 native JVM tests (including real local HTTP/cache/concurrency tests), 18 JavaScript tests for each variant, lint, the isolated real-WebGL browser workflow, APK signatures, six pack hashes, Base/Full code equality and unchanged renderer JavaScript. A browser run concurrent with the Android build reported worker timeouts; the isolated rerun completed with no page or console errors. No emulator run.
+**Passed:** 81 native JVM tests, 36 JavaScript tests per variant, lint, instrumentation-test compilation, real-worker transport checks, eight pixel-exact composition comparisons, full WebGL app workflow, APK signatures, Base/Full code equality and all six full-pack hashes. In the composition fixture, two decodes served 16 reuse hits. No emulator or physical-phone speed benchmark is claimed.
 
-[Research and full findings](https://github.com/connorgleeson736-sys/Ridgeline/blob/main/capacitor/LOADING-OPTIMISATIONS.md) · [Source commit](https://github.com/connorgleeson736-sys/Ridgeline/commit/1a25406ec5f8220c0eba93910067309fc6153288)
+[Research, implementation and safeguards](https://github.com/connorgleeson736-sys/Ridgeline/blob/main/capacitor/LOADING-OPTIMISATIONS.md) · [Source commit](https://github.com/connorgleeson736-sys/Ridgeline/commit/ece2f78a340774e7e268deeabe95ffddd24ddba5)
 
-[Base checksum](Ridgeline-3D-0.12.0-Base.apk.sha256) · [Full checksum](Ridgeline-3D-0.12.0-Full.apk.sha256) · [Validation](Ridgeline-3D-0.12.0-validation.json)
+[Base checksum](Ridgeline-3D-0.13.0-Base.apk.sha256) · [Full checksum](Ridgeline-3D-0.13.0-Full.apk.sha256) · [Validation](Ridgeline-3D-0.13.0-validation.json)
 
-Previous [0.11.0 Base](Ridgeline-3D-0.11.0-Base.apk) and [0.11.0 Full](Ridgeline-3D-0.11.0-Full.apk) remain available.
+Previous [0.12.0 Base](Ridgeline-3D-0.12.0-Base.apk) and [0.12.0 Full](Ridgeline-3D-0.12.0-Full.apk) remain available.
 
 ## Earlier full installer: Ridgeline 3D 0.5.0 — full imagery included
 
