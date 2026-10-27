@@ -1,25 +1,27 @@
 # Ridgeline Android downloads
 
-## Latest: 0.11.0 — Original + Direct retained
+## Latest: 0.12.0 — native loading and caching improvements
 
 | Build | Download | Size |
 | --- | --- | --- |
-| Base | [0.11.0 Base APK](Ridgeline-3D-0.11.0-Base.apk) | 26.5 MB |
-| Full imagery | [0.11.0 Full APK](Ridgeline-3D-0.11.0-Full.apk) | 391.2 MB |
+| Base | [0.12.0 Base APK](Ridgeline-3D-0.12.0-Base.apk) | 26.9 MB |
+| Full imagery | [0.12.0 Full APK](Ridgeline-3D-0.12.0-Full.apk) | 391.7 MB |
 
-Choose **Download raw file** on the APK page, then install over your existing app. Full is stored with Git LFS and includes the verified 364.8 MB extra imagery pack. Base supports the existing six-ZIP import workflow. Both variants use the same code and signer.
+Choose **Download raw file** on the APK page, then install over your existing app. Full uses Git LFS and includes the same verified 364.8 MB extra imagery pack. Base retains the six-ZIP import workflow. Both use the previous preview signer.
 
-**Original + Direct stays enabled. The app has not switched to Original.** Renderer modules and shared resolution policy match the repository website source. The high-density zoom-18 Topo enhancement is intentionally retained, along with zoom-18 offline Topo downloads and lossless PDF export.
+**Original + Direct and maximum Topo detail are preserved.** All 65 packaged JavaScript files are byte-for-byte identical to 0.11.0. High-density zoom-18 Topo, zoom-18 offline Topo downloads, lossless PDFs, imagery pixels and rendering preferences remain unchanged.
 
-This update resets saved rendering/detail/loading/filtering/sky settings to website defaults once, before rendering scripts load. Routes, downloaded regions, imported imagery, saved map view and LINZ label preferences are preserved. Later rendering adjustments remain saved. All page-size selection, PDF grid/north/scale options and route controls from 0.10.0 remain available.
+The native layer now shares HTTP connections and supports HTTP/2 where the provider negotiates it. A removable **256 MB native HTTP disk cache** honours server freshness/revalidation rules and can reuse completed estimation samples. Concurrent map/download requests for the same URL share one transfer. Saved-tile locations and misses are memoised, independent offline/overview reads can proceed together, and long exports/imports/estimates no longer queue ahead of status/settings/Pause. Temporary enlarged ancestor tiles are not retained in response/byte caches as full-detail tiles.
 
-The live Site could not be fetched from this environment. Source-code parity is verified; exact browser/WebView pixels and loading speeds on a physical phone are not claimed. Native offline tile access and the previously excluded Cook reference replacement remain unchanged.
+Downloaded-only mode bypasses the online cache. Saved regions and imagery packs remain persistent. Phone speed gains have not been benchmarked; new-area loading still depends on provider latency and connectivity. Cancellation/priority across native workers and concurrent region downloads are documented next steps.
 
-18 JavaScript tests, 29 Android unit tests, lint, browser workflow checks, APK signatures, all six full-pack hashes and matching Base/Full renderer code passed. No emulator run.
+**Passed:** 51 native JVM tests (including real local HTTP/cache/concurrency tests), 18 JavaScript tests for each variant, lint, the isolated real-WebGL browser workflow, APK signatures, six pack hashes, Base/Full code equality and unchanged renderer JavaScript. A browser run concurrent with the Android build reported worker timeouts; the isolated rerun completed with no page or console errors. No emulator run.
 
-[Base checksum](Ridgeline-3D-0.11.0-Base.apk.sha256) · [Full checksum](Ridgeline-3D-0.11.0-Full.apk.sha256) · [Validation](Ridgeline-3D-0.11.0-validation.json) · [Source](https://github.com/connorgleeson736-sys/Ridgeline/commit/54c0890)
+[Research and full findings](https://github.com/connorgleeson736-sys/Ridgeline/blob/main/capacitor/LOADING-OPTIMISATIONS.md) · [Source commit](https://github.com/connorgleeson736-sys/Ridgeline/commit/1a25406ec5f8220c0eba93910067309fc6153288)
 
-Previous [0.10.0 Base](Ridgeline-3D-0.10.0-Base.apk) and [0.10.0 Full](Ridgeline-3D-0.10.0-Full.apk) remain available.
+[Base checksum](Ridgeline-3D-0.12.0-Base.apk.sha256) · [Full checksum](Ridgeline-3D-0.12.0-Full.apk.sha256) · [Validation](Ridgeline-3D-0.12.0-validation.json)
+
+Previous [0.11.0 Base](Ridgeline-3D-0.11.0-Base.apk) and [0.11.0 Full](Ridgeline-3D-0.11.0-Full.apk) remain available.
 
 ## Earlier full installer: Ridgeline 3D 0.5.0 — full imagery included
 

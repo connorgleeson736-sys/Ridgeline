@@ -1,0 +1,90 @@
+{
+  "version": "0.12.0",
+  "sourceCommit": "1a25406ec5f8220c0eba93910067309fc6153288",
+  "renderer": "Original + Direct",
+  "topoMaximum": 18,
+  "nativeOnlineCacheBytes": 256000000,
+  "builds": {
+    "Base": {
+      "file": "Ridgeline-3D-0.12.0-Base.apk",
+      "bytes": 26890548,
+      "sha256": "6ec48db565ec30a8a2307c1e28e001237a6ce6827b0848677f0973af91201da0",
+      "signerSHA256": "c475ac25a331015896bf65a4222833f6a5b2cb14dc30d6eeaa955b5b40169c98"
+    },
+    "Full": {
+      "file": "Ridgeline-3D-0.12.0-Full.apk",
+      "bytes": 391654674,
+      "sha256": "2545a7dd7602c7e6316e32938acfe07f4251e2efa0c3bf3cf2a7ad9067b9b8ea",
+      "signerSHA256": "c475ac25a331015896bf65a4222833f6a5b2cb14dc30d6eeaa955b5b40169c98"
+    }
+  },
+  "verification": {
+    "javascriptTests": 18,
+    "androidUnitTests": 51,
+    "lint": "passed",
+    "browserWorkflow": {
+      "renderer": {
+        "supported": true,
+        "enabled": true,
+        "directPatches": 1,
+        "composedPatches": 13,
+        "sourceTextures": 4,
+        "planBuilds": 25,
+        "planCacheHits": 31,
+        "emptyOverlaySkips": 0
+      },
+      "terrain": true,
+      "profile": true,
+      "routeEditing": true,
+      "rectangleSelection": true,
+      "fixedFramePanAndZoom": true,
+      "routeSummariesAndThumbnails": true,
+      "sidebarRenamePersists": true,
+      "mapTapDismissesSidebar": true,
+      "linzPeakLabelsDefaultOn": true,
+      "savedRouteReopening": true,
+      "sheetSnaps": 2,
+      "draggableRegionCorners": true,
+      "touchSheetAndCornerDrags": true,
+      "savedRegionSidebar": true,
+      "routeCreationInLogoMenu": true,
+      "coordinateFieldsInAdvanced": true,
+      "pageSizeSelectionThenSettings": true,
+      "pdfOptions": true,
+      "layerTabs": true,
+      "baseZipImportAvailable": true,
+      "multipleRoutesAndMerge": true,
+      "trueRouteClose": true,
+      "topoOnlyDownloads": true,
+      "pdfExportBridge": true,
+      "screenRectangleOverlay": true,
+      "gpsIconCentred": true,
+      "topoNativeResolution": true,
+      "actualPrecomputedReads": 25,
+      "providerFixtureRequests": 323,
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    "browserInitialConcurrentBuildRun": "functional checks completed; console worker timeouts; isolated rerun passed",
+    "packagedJavaScriptIdenticalTo0110": 65,
+    "nativeHttpTests": "real HTTP via local MockWebServer",
+    "emulatorRun": false,
+    "physicalPhoneSpeedMeasured": false,
+    "qualitySettingsReduced": false,
+    "overviewHashes": "all six passed, 364762502 extra bytes, uncompressed assets",
+    "baseFullCodeAndSharedAssets": "identical except bundled flag in HTML/overview manifest and APK signatures",
+    "signatures": "passed, match previous previews",
+    "fullJavaScriptTests": 18
+  },
+  "research": "capacitor/LOADING-OPTIMISATIONS.md",
+  "changes": [
+    "Shared HTTP client/pool and HTTP/2 support",
+    "256 MB removable standard HTTP disk cache",
+    "In-flight map/download coalescing",
+    "4096-entry saved tile hit/miss memo",
+    "Concurrent offline and overview body reads",
+    "Independent native control queue",
+    "Non-cacheable temporary ancestor fallback",
+    "Remaining upstream freshness and Retry-After propagation"
+  ]
+}
