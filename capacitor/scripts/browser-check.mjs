@@ -19,6 +19,7 @@ try{
  // Mock only Android's data bridge; UI, map rendering and gestures run in Chromium.
  await context.addInitScript(()=>{
   window.CapacitorCustomPlatform={name:'android'};
+  localStorage.setItem('ridgeline-phone-mode-v1','1');localStorage.setItem('ridgeline-filtering-v1',JSON.stringify({bilinear:false,mipmaps:false,trilinear:false,anisotropic:false,fade:false,colour:false}));
   localStorage.setItem('ridgeline-routes-v1',JSON.stringify([{id:'second-route',name:'Second route',points:[[170.15,-43.58],[170.16,-43.59]],updated:'2026-10-27T00:00:00Z'}]));
   window.__nativeCalls=[];window.__regions=[{topo:true,zoom:16,id:'test-region',name:'Saved test region',state:'complete',done:12,total:12,bytes:1048576,bounds:[170.05,-43.65,170.2,-43.5]}];
   const methods=['exportRegionPdf','estimateRegion','downloadRegion','getSettings','overviewStatus','listRegions','pauseRegion','resumeRegion','removeRegion','startLocation','stopLocation','addListener','removeListener'];
@@ -40,9 +41,9 @@ try{
  await page.waitForFunction(()=>globalThis.RidgeMobile?.status()?.ready,null,{timeout:60000});
  console.log('Renderer ready',JSON.stringify(await page.evaluate(()=>RidgeMobile.status())));await page.waitForTimeout(1000);
  await page.waitForFunction(()=>globalThis.RidgeMobile?.status()?.direct?.directPatches>0,null,{timeout:60000});
- console.log('Direct imagery ready');
+ console.log('Website Direct imagery ready');
  const gpsGeometry=await page.locator('#mobile-gps').evaluate(b=>{const a=b.getBoundingClientRect(),r=b.querySelector('svg').getBoundingClientRect();return {dx:(r.left+r.width/2)-(a.left+a.width/2),dy:(r.top+r.height/2)-(a.top+a.height/2)};});assert.ok(Math.abs(gpsGeometry.dx)<.2&&Math.abs(gpsGeometry.dy)<.2,'GPS SVG must be centred');
- let status=await page.evaluate(()=>RidgeMobile.status());assert.equal(status.terrain,true);assert.equal(status.direct.enabled,true);assert.equal(status.direct.supported,true);assert.equal(await page.locator('#labels').isChecked(),true);
+ assert.equal(await page.locator('#phone-mode').isChecked(),false);let status=await page.evaluate(()=>RidgeMobile.status());assert.equal(status.terrain,true);assert.equal(status.direct.enabled,true);assert.equal(status.direct.supported,true);assert.equal(await page.locator('#labels').isChecked(),true);
  await page.locator('#layers-toggle').click();await page.locator('#imagery-detail').waitFor({state:'visible'});assert.equal(await page.locator('#loading-controls').isVisible(),false);assert.equal(await page.locator('#topo-names').isVisible(),true);assert.equal(await page.locator('#labels').isVisible(),false);
  await page.locator('#advanced-tab').click();assert.equal(await page.locator('#phone-mode').isVisible(),true);assert.equal(await page.locator('#hillshade').isVisible(),true);assert.equal(await page.locator('#imagery-detail').isVisible(),false);await page.locator('#basic-tab').click();assert.equal(await page.locator('#topographic-note').isVisible(),false);assert.equal(await page.locator('#topo-status').isVisible(),false);await page.getByRole('button',{name:'Close layers by returning to map',exact:true}).click({position:{x:20,y:300}});assert.equal(await page.locator('#layers-panel').isVisible(),false);
  console.log('Layer tabs checked');

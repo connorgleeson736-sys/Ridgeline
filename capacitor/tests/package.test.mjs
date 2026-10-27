@@ -4,7 +4,7 @@ import {readFile,access} from 'node:fs/promises';
 import {parseHTML} from 'linkedom';
 import vm from 'node:vm';
 const read=name=>readFile(new URL('../www/'+name,import.meta.url),'utf8');
-test('single direct renderer starts after mobile integration',async()=>{const app=await read('app.js'),viewer=await read('viewer.mjs'),{document}=parseHTML(await read('index.html'));assert.match(app,/let directSampling=true/);assert.doesNotMatch(app,/async function switchRenderer|import\('\.\/luma/);assert.equal(document.querySelectorAll('[data-renderer]').length,0);assert.equal(document.querySelectorAll('script[src^="/viewer"]').length,0);assert.ok(document.querySelector('script[src="/mobile.js"]'));assert.doesNotMatch(viewer,/cook-reference|luma-renderer/);await assert.rejects(access(new URL('../www/assets/cook-reference-v1',import.meta.url)));});
+test('website Direct renderer starts after mobile integration',async()=>{const app=await read('app.js'),viewer=await read('viewer.mjs'),{document}=parseHTML(await read('index.html'));assert.match(app,/let directSampling=true/);assert.doesNotMatch(app,/async function switchRenderer|import\('\.\/luma/);assert.equal(document.querySelectorAll('[data-renderer]').length,0);assert.equal(document.querySelectorAll('script[src^="/viewer"]').length,0);assert.ok(document.querySelector('script[src="/mobile.js"]'));assert.doesNotMatch(viewer,/cook-reference|luma-renderer/);await assert.rejects(access(new URL('../www/assets/cook-reference-v1',import.meta.url)));});
 test('important detail controls are accessible and tuning is in Advanced',async()=>{const {document}=parseHTML(await read('index.html'));for(const id of ['terrain-detail','imagery-detail','topo-names','topo-tracks'])assert.ok(document.getElementById(id).closest('#layers-basic'),id);for(const id of ['loading-controls','phone-mode','low-power','sky-colour','linz-key','hillshade','labels'])assert.ok(document.getElementById(id).closest('#layers-advanced'),id);assert.ok(document.getElementById('layers-advanced').hasAttribute('hidden'));assert.equal(document.querySelectorAll('[id]').length,new Set([...document.querySelectorAll('[id]')].map(n=>n.id)).size);});
 test('renderer, profile workers and topography use the same native data path',async()=>{for(const name of ['tile-cache.js','terrain-core.js','topographic-overlays.js']){const s=await read(name);assert.doesNotMatch(s,/https:\/\/basemaps\.linz\.govt\.nz/);assert.match(s,/https:\/\/localhost\/_ridge\/linz/);}const app=await read('app.js');assert.match(app,/RidgeMobile\?\.mapClick/);assert.match(app,/importText:/);assert.match(app,/RidgeMobile.exportGpx/);});
 test('tile cache resolves local provider paths while preserving custom protocol',async()=>{const context={globalThis:null,URL,module:{exports:{}}};context.globalThis=context;vm.runInNewContext(await read('tile-cache.js'),context);assert.equal(context.module.exports.networkURL('ridge://linz/v1/tiles/elevation/WebMercatorQuad/3/7/5.png?api=demo'),'https://localhost/_ridge/linz/v1/tiles/elevation/WebMercatorQuad/3/7/5.png?api=demo');});
@@ -13,11 +13,14 @@ test('overview catalogue contains only verified local ranges and no server depen
 
 test('overview packaging matches the selected full or base build',async()=>{const {createReadStream}=await import('node:fs');const {createHash}=await import('node:crypto');const manifest=JSON.parse(await read('overview-manifest.json'));const {document}=parseHTML(await read('index.html'));assert.equal(document.documentElement.dataset.overviewsBundled,String(manifest.bundled));if(!manifest.bundled){await assert.rejects(access(new URL('../www/overview-packs',import.meta.url)));return;}for(const pack of manifest.files){let size=0;const digest=createHash('sha256');for await(const bytes of createReadStream(new URL('../www/overview-packs/'+pack.sha256+'.bin',import.meta.url))){size+=bytes.length;digest.update(bytes);}assert.equal(size,pack.bytes);assert.equal(digest.digest('hex'),pack.sha256);}});
 
-test('flat Topo coverage requests finer tiles on dense displays without enlarging source pixels',async()=>{
- for(const dpr of [1,2,3]){
-  const context={module:{exports:{}},devicePixelRatio:dpr};context.globalThis=context;vm.runInNewContext(await read('linz-topo.js'),context);
-  const source=context.module.exports.source('test-key');assert.equal(source.maxzoom,18);assert.equal(source.tileSize,dpr>1?128:256);
-  // Flat MapLibre coverage uses camera zoom + log2(512/source tile size).
-  assert.equal(Math.min(source.maxzoom,Math.floor(16+Math.log2(512/source.tileSize))),dpr>1?18:17);
+test('rendering engine and quality policies are identical to website source',async()=>{
+ for(const file of ['maplibre-direct-sampling.js','adaptive-terrain.js','motion-detail.js','surface-focus.js','assets/maplibre-gl.mjs','assets/maplibre-gl-worker.mjs']){
+  assert.equal(await read(file),await readFile(new URL('../../public/'+file,import.meta.url),'utf8'),file);
  }
+});
+
+test('Topo retains zoom 18 and high-density source sizing',async()=>{const c={module:{exports:{}},devicePixelRatio:2};c.globalThis=c;vm.runInNewContext(await read('linz-topo.js'),c);const source=c.module.exports.source('test');assert.equal(source.maxzoom,18);assert.equal(source.tileSize,128);});
+test('shared resolution policy matches the website apart from the retained Topo enhancement',async()=>{
+ const web=await readFile(new URL('../../public/performance.js',import.meta.url),'utf8');const app=await read('performance.js');
+ assert.equal(app.replace("const source=map.getSource('topo'),size=(lowPower()?1:native)>1?128:256;if(source&&source.tileSize!==size){source.tileSize=size;map._update?.(true);}",''),web);
 });

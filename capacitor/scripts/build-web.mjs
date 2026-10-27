@@ -5,6 +5,7 @@ import {parseHTML} from 'linkedom';
 import {build} from 'esbuild';
 import {createReadStream} from 'node:fs';
 import {createHash} from 'node:crypto';
+import {resetWebsiteRenderPreferences} from '../mobile/render-preferences.js';
 
 const base=fileURLToPath(new URL('../',import.meta.url)), source=path.resolve(base,'../public'), out=path.join(base,'www');
 await rm(out,{recursive:true,force:true});await mkdir(out,{recursive:true});
@@ -92,6 +93,7 @@ for(const name of await readdir(out))if(/\.(?:m?js)$/.test(name)){
 }
 const {document}=parseHTML(await readFile(path.join(out,'index.html'),'utf8'));
 document.documentElement.setAttribute('data-overviews-bundled',String(bundled));
+const renderDefaults=document.createElement('script');renderDefaults.textContent='try{('+resetWebsiteRenderPreferences.toString()+')(localStorage);}catch{}';document.head.prepend(renderDefaults);
 const $=id=>{const el=document.getElementById(id);if(!el)throw Error('Missing website control '+id);return el;};
 document.querySelector('meta[name=viewport]').setAttribute('content','width=device-width,initial-scale=1,viewport-fit=cover');
 const panel=$('layers-panel'),heading=panel.firstElementChild,advanced=document.createElement('section'),basic=document.createElement('section');
@@ -125,4 +127,4 @@ document.querySelector('script[src^="/viewer.mjs"]')?.remove();
 await writeFile(path.join(out,'index.html'),'<!doctype html>\n'+document.documentElement.outerHTML);
 await cp(path.join(base,'mobile/mobile.css'),path.join(out,'mobile.css'));
 await build({entryPoints:[path.join(base,'mobile/mobile.js')],outfile:path.join(out,'mobile.js'),bundle:true,external:['/viewer.mjs*'],format:'esm',target:'chrome100',minify:false});
-console.log('Packaged original direct 3D renderer and mobile controls.');
+console.log('Packaged website Direct 3D renderer and mobile controls.');
