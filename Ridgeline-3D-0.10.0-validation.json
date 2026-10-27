@@ -1,0 +1,82 @@
+{
+  "version": "0.10.0",
+  "sourceCommit": "1e805cf",
+  "builds": {
+    "Base": {
+      "file": "Ridgeline-3D-0.10.0-Base.apk",
+      "bytes": 26472558,
+      "sha256": "87a2e7473634df9f1ab693eaacf632b29ef9a3cbd12645f4337fc546f6c5420f",
+      "signerSHA256": "c475ac25a331015896bf65a4222833f6a5b2cb14dc30d6eeaa955b5b40169c98"
+    },
+    "Full": {
+      "file": "Ridgeline-3D-0.10.0-Full.apk",
+      "bytes": 391236684,
+      "sha256": "a3e60b2023fb0a67438853c522a19e1b49c920de6b5b624b35659b27c3719e35",
+      "signerSHA256": "c475ac25a331015896bf65a4222833f6a5b2cb14dc30d6eeaa955b5b40169c98"
+    }
+  },
+  "verification": {
+    "androidUnitTests": 29,
+    "javascriptTests": 15,
+    "androidLint": "passed",
+    "browserWorkflowAndTouchChecks": "passed",
+    "browserPageErrors": [],
+    "browserConsoleErrors": [],
+    "topoDensity": {
+      "cameraZoom": 16,
+      "pixelRatio": 2,
+      "tileSize": 128,
+      "requestedZooms": [
+        14,
+        18
+      ]
+    },
+    "liveTopoSamples": {
+      "16": "256px WebP, HTTP 200",
+      "17": "256px WebP, HTTP 200",
+      "18": "256px WebP, HTTP 200"
+    },
+    "pdfFixtures": 12,
+    "pdfSinglePageAndPaperSizes": "passed",
+    "pdfLosslessTileRGB": "verified against input bytes",
+    "nztmIndependentProjSamples": 20,
+    "nztmMaxSampleErrorMetres": 0.017406,
+    "baseAndFullShareWebCodeAndDex": true,
+    "signaturesVerified": true,
+    "emulatorRun": false,
+    "physicalDevicePerformanceMeasured": false
+  },
+  "overviewPacks": [
+    {
+      "sha256": "7241afa52abbc95e0226d1f1964832e1646076857c9b489f52443ecc9c2b8b03",
+      "bytes": 62857520,
+      "uncompressed": true
+    },
+    {
+      "sha256": "0b72203a46ec5c96ad0b9074b6f2335941458d80eb44f936fe6150b9d21914a9",
+      "bytes": 62851044,
+      "uncompressed": true
+    },
+    {
+      "sha256": "bc0dd4764ca150cb54bb463c3bc3e80b9fb5af0591764caa7778d90cfef36b21",
+      "bytes": 62908832,
+      "uncompressed": true
+    },
+    {
+      "sha256": "add2b4659a74691e8e3346df5f41d5592796013199eb7de88dcb9fd640a606b2",
+      "bytes": 62867886,
+      "uncompressed": true
+    },
+    {
+      "sha256": "8431d7e8360b82383121e5e5537f9e2b207d788ec2e808ce1be0daedd7a5519d",
+      "bytes": 62886568,
+      "uncompressed": true
+    },
+    {
+      "sha256": "20c7da20bac6c00a048c1b3af93a3d7681e7bdae850d4246916ce60897b495b3",
+      "bytes": 50390652,
+      "uncompressed": true
+    }
+  ],
+  "overviewExtraBytes": 364762502
+}

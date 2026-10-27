@@ -1,0 +1,50 @@
+[
+  {
+    "file": "paper-auto-landscape.pdf",
+    "pageSize": "2856.2 x 3954.6 pts"
+  },
+  {
+    "file": "paper-auto-portrait.pdf",
+    "pageSize": "2856.2 x 3954.6 pts"
+  },
+  {
+    "file": "paper-Legal-landscape.pdf",
+    "pageSize": "1008 x 612 pts"
+  },
+  {
+    "file": "paper-Legal-portrait.pdf",
+    "pageSize": "612 x 1008 pts"
+  },
+  {
+    "file": "paper-Letter-landscape.pdf",
+    "pageSize": "792 x 612 pts (letter)"
+  },
+  {
+    "file": "paper-Letter-portrait.pdf",
+    "pageSize": "612 x 792 pts (letter)"
+  },
+  {
+    "file": "paper-A3-landscape.pdf",
+    "pageSize": "1190.55 x 841.89 pts (A3)"
+  },
+  {
+    "file": "paper-A3-portrait.pdf",
+    "pageSize": "841.89 x 1190.55 pts (A3)"
+  },
+  {
+    "file": "paper-A4-landscape.pdf",
+    "pageSize": "841.89 x 595.276 pts (A4)"
+  },
+  {
+    "file": "paper-A4-portrait.pdf",
+    "pageSize": "595.276 x 841.89 pts (A4)"
+  },
+  {
+    "file": "paper-A5-landscape.pdf",
+    "pageSize": "595.276 x 419.528 pts"
+  },
+  {
+    "file": "paper-A5-portrait.pdf",
+    "pageSize": "419.528 x 595.276 pts"
+  }
+]
