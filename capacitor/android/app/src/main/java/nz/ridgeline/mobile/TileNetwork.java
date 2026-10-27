@@ -22,7 +22,7 @@ final class TileNetwork {
   static final int MAX = 8 * 1024 * 1024;
   private static TileHttpClient instance;
 
-  private static synchronized TileHttpClient client(Context context) {
+  static synchronized TileHttpClient client(Context context) {
     if (instance == null)
       instance =
           new TileHttpClient(
@@ -33,7 +33,12 @@ final class TileNetwork {
   }
 
   static byte[] fetch(Context context, TileAddress tile, String key) throws IOException {
-    return resource(context, tile, key).data();
+    return client(context).fetch(tile, key, new TileDemand(TileDemand.DOWNLOAD)).data();
+  }
+
+  static byte[] fetch(Context context, TileAddress tile, String key, TileDemand demand)
+      throws IOException {
+    return client(context).fetch(tile, key, demand).data();
   }
 
   static TileHttpClient.Resource resource(Context context, TileAddress tile, String key)

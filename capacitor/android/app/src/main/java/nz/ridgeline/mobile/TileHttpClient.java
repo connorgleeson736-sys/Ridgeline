@@ -3,22 +3,56 @@ package nz.ridgeline.mobile;
 import java.io.*;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import okhttp3.*;
 
-/** One connection pool and HTTP cache for map workers, estimates and region downloads. */
-final class TileHttpClient {
+/** Shared, prioritised native transfers. Headers and body bytes arrive before validated EOF. */
+final class TileHttpClient implements AutoCloseable {
   static final long CACHE_BYTES = 256_000_000L;
 
   interface Validator {
     void validate(TileAddress tile, byte[] data, String type) throws IOException;
   }
 
-  record Resource(byte[] data, String cacheControl) {}
+  static final class Resource {
+    final SharedTileBody body;
+    final Response metadata;
+
+    Resource(SharedTileBody body, Response metadata) {
+      this.body = body;
+      this.metadata = metadata;
+    }
+
+    byte[] data() throws IOException {
+      return body.bytes();
+    }
+
+    byte[] data(TileDispatcher<Resource>.Lease lease) throws IOException {
+      lease.onClose(body::wake);
+      return body.bytes(lease::closed);
+    }
+
+    String cacheControl() {
+      return remainingCacheControl(metadata, System.currentTimeMillis());
+    }
+
+    long expiresAt() {
+      String cc = cacheControl();
+      return cc.startsWith("private, max-age=")
+          ? System.currentTimeMillis() + Long.parseLong(cc.substring(17)) * 1000
+          : 0;
+    }
+
+    InputStream stream(TileDispatcher<Resource>.Lease lease) {
+      lease.onClose(body::wake);
+      return body.stream(lease::closed, lease::close);
+    }
+  }
 
   private final OkHttpClient client, sampling;
   private final Validator validator;
-  private final SingleFlight<Resource> pending = new SingleFlight<>();
+  private final TileDispatcher<Resource> dispatcher = new TileDispatcher<>(8, 2);
 
   static OkHttpClient create(File directory) {
     return new OkHttpClient.Builder()
@@ -37,7 +71,6 @@ final class TileHttpClient {
             .addNetworkInterceptor(
                 chain -> {
                   Response r = chain.proceed(chain.request());
-                  // A transient provider failure must not become a persistent map hole.
                   return r.isSuccessful() || r.code() == 304
                       ? r
                       : r.newBuilder().header("Cache-Control", "no-store").build();
@@ -53,43 +86,115 @@ final class TileHttpClient {
     this.validator = validator;
   }
 
+  TileDispatcher<Resource>.Lease open(
+      TileAddress tile, String key, boolean sample, TileDemand demand) throws IOException {
+    return openURL(tile, tile.network(key), sample, demand);
+  }
+
+  TileDispatcher<Resource>.Lease openURL(
+      TileAddress tile, String url, boolean sample, TileDemand demand) throws IOException {
+    return dispatcher.acquire(
+        url + (sample ? "\nsample" : "\nmap"),
+        demand,
+        publisher -> transfer(tile, url, sample, publisher));
+  }
+
   Resource fetch(TileAddress tile, String key, boolean sample) throws IOException {
     return load(tile, tile.network(key), sample);
   }
 
-  // URL injection is package-private for deterministic local HTTP/cache tests.
   Resource load(TileAddress tile, String url, boolean sample) throws IOException {
-    // Keep short estimation timeouts from shortening a foreground map request.
-    return pending.run(url + (sample ? "\nsample" : "\nmap"), () -> request(tile, url, sample));
+    try (var lease =
+        openURL(
+            tile, url, sample, new TileDemand(sample ? TileDemand.ESTIMATE : TileDemand.VISIBLE))) {
+      Resource r = lease.await();
+      r.data(lease);
+      return r;
+    }
   }
 
-  private Resource request(TileAddress tile, String url, boolean sample) throws IOException {
+  Resource fetch(TileAddress tile, String key, TileDemand demand) throws IOException {
+    try (var lease = open(tile, key, false, demand)) {
+      Resource r = lease.await();
+      r.data(lease);
+      return r;
+    }
+  }
+
+  private void transfer(
+      TileAddress tile, String url, boolean sample, TileDispatcher.Publication<Resource> output)
+      throws IOException {
     Request request =
-        new Request.Builder().url(url).header("User-Agent", "Ridgeline-Android/0.12.0").build();
+        new Request.Builder().url(url).header("User-Agent", "Ridgeline-Android/0.13.0").build();
+    Call call = (sample ? sampling : client).newCall(request);
+    output.onCancel(call::cancel);
+    SharedTileBody body = null;
     boolean evictInvalid = false;
-    try (Response response = (sample ? sampling : client).newCall(request).execute()) {
+    try (Response response = call.execute()) {
       int status = response.code();
       if (status != 200 && !(status == 204 && !tile.raster()))
         throw new TileNetwork.HttpFailure(status, response.header("Retry-After"));
       evictInvalid = true;
-      ResponseBody body = response.body();
-      if (body == null) throw new IOException("Map provider returned an empty response.");
-      if (body.contentLength() > TileNetwork.MAX)
-        throw new IOException("Map tile exceeds the download size limit.");
-      byte[] data = TileNetwork.read(body.byteStream(), TileNetwork.MAX);
-      validator.validate(tile, data, response.header("Content-Type"));
-      return new Resource(data, remainingCacheControl(response, System.currentTimeMillis()));
-    } catch (IOException invalid) {
-      // Close the body before eviction: draining a malformed/oversized response
-      // during close must not commit an invalid success back into the cache.
-      if (evictInvalid && client.cache() != null)
-        try {
-          var urls = client.cache().urls();
-          while (urls.hasNext()) if (url.equals(urls.next())) urls.remove();
-        } catch (IOException ignored) {
+      ResponseBody input = response.body();
+      if (input == null) throw new IOException("Map provider returned an empty response.");
+      if (input.contentLength() > TileNetwork.MAX) throw new SharedTileBody.TooLarge();
+      body = new SharedTileBody(input.contentLength(), TileNetwork.MAX);
+      Resource resource = new Resource(body, response.newBuilder().body(null).build());
+      output.publish(resource);
+      byte[] chunk = new byte[16384];
+      int n;
+      try (InputStream in = input.byteStream()) {
+        while ((n = in.read(chunk)) != -1) {
+          if (output.cancelled()) throw TileDispatcher.abort();
+          body.append(chunk, n);
         }
-      throw invalid;
+      }
+      byte[] exact = body.snapshot();
+      try {
+        validator.validate(tile, exact, response.header("Content-Type"));
+      } catch (IOException invalid) {
+        evict(url);
+        evictInvalid = false;
+        throw invalid;
+      }
+      evictInvalid = false;
+      if (output.cancelled()) throw TileDispatcher.abort();
+      output.complete();
+      body.finish(exact);
+    } catch (IOException error) {
+      if (evictInvalid && (!call.isCanceled() || error instanceof SharedTileBody.TooLarge))
+        evict(url);
+      if (body != null) body.fail(error);
+      throw error;
+    } catch (RuntimeException error) {
+      evict(url);
+      if (body != null) body.fail(new IOException("Map tile validation failed", error));
+      throw error;
     }
+  }
+
+  private void evict(String url) {
+    if (client.cache() != null)
+      try {
+        var urls = client.cache().urls();
+        while (urls.hasNext()) if (url.equals(urls.next())) urls.remove();
+      } catch (IOException ignored) {
+      }
+  }
+
+  Map<String, Long> stats() {
+    Map<String, Long> values = new java.util.HashMap<>(dispatcher.stats());
+    if (client.cache() != null) {
+      values.put("httpCacheHits", (long) client.cache().hitCount());
+      values.put("httpCacheRequests", (long) client.cache().requestCount());
+      values.put("httpNetworkRequests", (long) client.cache().networkCount());
+    }
+    return values;
+  }
+
+  @Override
+  public void close() {
+    dispatcher.close();
   }
 
   static String remainingCacheControl(Response r, long now) {
@@ -98,12 +203,10 @@ final class TileHttpClient {
     if (policy.noCache() || policy.noStore() || seconds < 0) return "no-store";
     long age = 0;
     try {
-      age = Math.max(0, Long.parseLong(r.header("Age", "0")));
-      age = Math.min(age, Integer.MAX_VALUE) * 1000;
+      age = Math.min(Math.max(0, Long.parseLong(r.header("Age", "0"))), Integer.MAX_VALUE) * 1000;
     } catch (NumberFormatException ignored) {
     }
-    long received = r.receivedResponseAtMillis(), sent = r.sentRequestAtMillis();
-    long apparent = 0;
+    long received = r.receivedResponseAtMillis(), sent = r.sentRequestAtMillis(), apparent = 0;
     try {
       apparent =
           Math.max(

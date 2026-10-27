@@ -125,11 +125,8 @@ public final class RidgelineOfflinePlugin extends Plugin {
               TileEstimate.estimate(
                   p,
                   (tile, network) -> {
-                    byte[] bytes =
-                        network && !archive().offlineOnly()
-                            ? TileNetwork.sample(getContext(), tile, c.getString("key", ""))
-                            : archive().read(tile);
-                    return bytes == null ? -1 : bytes.length;
+                    if (!network || archive().offlineOnly()) return archive().sizeAny(tile);
+                    return TileNetwork.sample(getContext(), tile, c.getString("key", "")).length;
                   },
                   !archive().offlineOnly() && !c.getString("key", "").isBlank());
           r.put("estimatedMiB", Math.round(estimate.bytes() / 104857.6) / 10.0);
@@ -227,6 +224,17 @@ public final class RidgelineOfflinePlugin extends Plugin {
           WorkManager.getInstance(getContext()).cancelUniqueWork("region-" + id).getResult().get();
           archive().remove(id);
           return new JSObject();
+        });
+  }
+
+  @PluginMethod
+  public void loadingStats(PluginCall c) {
+    async(
+        c,
+        () -> {
+          JSObject result = new JSObject();
+          result.put("transport", new JSONObject(TileNetwork.client(getContext()).stats()));
+          return result;
         });
   }
 

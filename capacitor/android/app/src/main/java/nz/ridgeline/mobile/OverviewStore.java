@@ -161,33 +161,41 @@ final class OverviewStore {
     return imported;
   }
 
-  byte[] read(String path) throws Exception {
-    // Manifest collections are immutable after construction. Each read owns
-    // its descriptor/channel, so unrelated overview images can load together.
+  record Image(InputStream data, int length) {}
+
+  Image open(String path) throws Exception {
     String prefix = "/_ridge/overviews/";
     if (!path.startsWith(prefix)) return null;
     String key = path.substring(prefix.length());
     if (!allowedRanges.contains(key)) throw new IOException("Invalid overview image address.");
     String[] parts = key.split("/");
+    long offset = Long.parseLong(parts[1]);
+    int length = Integer.parseInt(parts[2]);
     if (bundled.contains(parts[0])) {
-      try (AssetFileDescriptor asset = assets.openFd("public/overview-packs/" + parts[0] + ".bin");
-          FileInputStream in = asset.createInputStream()) {
-        return OverviewRangeReader.read(
-            in.getChannel(),
-            asset.getStartOffset(),
-            asset.getLength(),
-            Long.parseLong(parts[1]),
-            Integer.parseInt(parts[2]));
+      AssetFileDescriptor asset = assets.openFd("public/overview-packs/" + parts[0] + ".bin");
+      FileInputStream in = null;
+      try {
+        in = asset.createInputStream();
+        return new Image(
+            OverviewRangeReader.open(
+                in, asset.getStartOffset(), asset.getLength(), offset, length, asset),
+            length);
+      } catch (Exception e) {
+        if (in != null) in.close();
+        asset.close();
+        throw e;
       }
     }
     File file = new File(root, parts[0] + ".bin");
     if (!file.isFile() || file.length() != files.get(parts[0])) return null;
-    byte[] bytes = new byte[Integer.parseInt(parts[2])];
-    try (RandomAccessFile in = new RandomAccessFile(file, "r")) {
-      in.seek(Long.parseLong(parts[1]));
-      in.readFully(bytes);
+    FileInputStream in = new FileInputStream(file);
+    try {
+      return new Image(
+          OverviewRangeReader.open(in, 0, file.length(), offset, length, () -> {}), length);
+    } catch (Exception e) {
+      in.close();
+      throw e;
     }
-    return bytes;
   }
 
   void remove() throws IOException {

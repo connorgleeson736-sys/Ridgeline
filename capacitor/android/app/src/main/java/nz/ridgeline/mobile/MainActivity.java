@@ -8,11 +8,13 @@ import androidx.core.view.*;
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
+  private final TileRequestRegistry requests = new TileRequestRegistry();
+
   @Override
   public void onCreate(Bundle savedInstanceState) {
     registerPlugin(RidgelineOfflinePlugin.class);
     super.onCreate(savedInstanceState);
-    bridge.getWebView().setWebViewClient(new OfflineWebViewClient(bridge));
+    if (bridge == null || bridge.getWebView() == null) return;
     View parent = (View) bridge.getWebView().getParent();
     ViewCompat.setOnApplyWindowInsetsListener(
         parent,
@@ -41,5 +43,31 @@ public class MainActivity extends BridgeActivity {
                         });
               }
             });
+  }
+
+  @Override
+  protected void load() {
+    android.webkit.WebView view = findViewById(com.getcapacitor.android.R.id.webview);
+    view.getSettings().setJavaScriptEnabled(true);
+    view.addJavascriptInterface(requests, "RidgeTileControl");
+    super.load();
+    bridge.getWebView().setWebViewClient(new OfflineWebViewClient(bridge, requests));
+  }
+
+  @Override
+  public void onTrimMemory(int level) {
+    super.onTrimMemory(level);
+    if (level >= android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW
+        && bridge != null
+        && bridge.getWebView() != null)
+      bridge.getWebView().evaluateJavascript("globalThis.__ridgeTransportInstalled?.trim()", null);
+  }
+
+  @Override
+  public void onDestroy() {
+    requests.close();
+    if (bridge != null && bridge.getWebView() != null)
+      bridge.getWebView().removeJavascriptInterface("RidgeTileControl");
+    super.onDestroy();
   }
 }

@@ -67,6 +67,7 @@ app=replace(app,"const show=basemap!=='topo'&&$('labels').checked&&!topoOverlays
 await writeFile(path.join(out,'app.js'),app);
 let viewer=await readFile(path.join(out,'viewer.mjs'),'utf8');
 viewer=replace(viewer,"import './cook-reference-overviews.js?v=1';",'');
+viewer=replace(viewer,"./assets/maplibre-gl-worker.mjs?v=6.14.0","./native-map-worker.mjs");
 await writeFile(path.join(out,'viewer.mjs'),viewer);
 // Route ALL provider reads (including worker elevation/glyph/vector requests)
 // through the native archive layer. No base64 tile bridge or JS tile copies.
@@ -83,7 +84,32 @@ for(const name of await readdir(out))if(/\.(?:m?js)$/.test(name)){
  }
  if(name==='linz-topo.js'){text=replace(text,'maxzoom:16','maxzoom:18');text=replace(text,'tileSize:256','tileSize:(root.devicePixelRatio||1)>1?128:256');}
  if(name==='performance.js')text=replace(text,"setRatio(lowPower()?1:native);return;", "const source=map.getSource('topo'),size=(lowPower()?1:native)>1?128:256;if(source&&source.tileSize!==size){source.tileSize=size;map._update?.(true);}setRatio(lowPower()?1:native);return;");
+ if(name==='tile-cache.js')text=replace(text,'},grace);return true;','},job.prefetchOnly?0:grace);return true;');
+ if(name==='response-cache.js'){
+  text=replace(text,"const response=v=>new Response([204,205,304].includes(v.status)?null:v.data.slice(0),{status:v.status,headers:v.headers});","const response=v=>new Response([204,205,304].includes(v.status)?null:v.data.slice(0),{status:v.status,headers:ridgeFresh(v.headers,v.until)});");
+  text=replace(text,'if(cached)return cached;',"if(cached){const until=cached.headers.has('X-Ridge-Expires-At')?Number(cached.headers.get('X-Ridge-Expires-At')):Number(cached.headers.get('x-ridgeline-cached-at'))+lifetime(cached.headers);return new Response(cached.body,{status:cached.status,statusText:cached.statusText,headers:ridgeFresh(cached.headers,until)});}");
+  text=replace(text,"'use strict';","'use strict';\nfunction ridgeFresh(original,until){const headers=new Headers(original);if(!/no-store|no-cache/i.test(headers.get('cache-control')||'')){const seconds=Math.max(0,Math.floor((until-Date.now())/1000));headers.set('Cache-Control',seconds?'private, max-age='+seconds:'no-store');headers.set('Age','0');}return headers;}\nfunction ridgeDemand(options){return {priority:options.ridgePriority||(()=>options.priority||'high'),rank:options.ridgeRank||(()=>0)};}\nfunction ridgeBest(job){let best={priority:()=> 'low',rank:()=>1000},score=Infinity;for(const d of job.demands){const rank=Number(d.rank())||0,s=d.priority()==='low'?200+rank:rank>=100?100+rank:rank;if(s<score){score=s;best=d;}}return best;}");
+  text=replace(text,"if(dead||options.signal?.aborted)throw abort();const old=ready.get(url);","if(dead||options.signal?.aborted)throw abort();const demand=ridgeDemand(options);const old=ready.get(url);");
+  text=replace(text,'original:options.ridgeOriginal===true','original:options.ridgeOriginal===true,demands:new Set([demand])');
+  text=replace(text,'{...options,signal:controller.signal}','{...options,signal:controller.signal,ridgePriority:()=>ridgeBest(job).priority(),ridgeRank:()=>ridgeBest(job).rank()}');
+  text=replace(text,'}else shared++;','}else{shared++;job.demands.add(demand);}');
+  text=replace(text,"done=true;options.signal?.removeEventListener('abort',cancel);","done=true;const speculative=[...job.demands].every(d=>d.priority()==='low');job.demands.delete(demand);options.signal?.removeEventListener('abort',cancel);");
+  text=replace(text,'},250);else job.controller.abort();','},speculative?0:250);else job.controller.abort();');
+  text=replace(text,"if(Date.now()-Number(r.headers.get('x-ridgeline-cached-at')||0)<lifetime(r.headers))","if(r.headers.has('X-Ridge-Expires-At')?Number(r.headers.get('X-Ridge-Expires-At'))>Date.now():Date.now()-Number(r.headers.get('x-ridgeline-cached-at')||0)<lifetime(r.headers))");
+ }
+ if(name==='imagery-preload.js'){
+  text=replace(text,'backpressure:0','backpressure:0,obsolete:0');
+  text=replace(text,"if(dead||!supported||!limit()||root.document?.hidden||lowPower()||root.navigator?.connection?.saveData)return;","if(dead||!supported||!limit()||root.document?.hidden||lowPower()||root.navigator?.connection?.saveData){cancelPredictions();return;}");
+  text=replace(text,'  const stats=cache?.stats?.().imagery;',"  if(cache.canPrefetch?.()===false){metrics.backpressure++;cancelPredictions();return;}\n  const stats=cache?.stats?.().imagery;");
+  text=replace(text,' function tick(){'," function cancelPredictions(){for(const c of controllers){if(!c.signal.aborted){metrics.obsolete++;c.abort();}}}\n function tick(){");
+  text=replace(text,'metrics.backpressure++;return;','metrics.backpressure++;cancelPredictions();return;');
+  text=replace(text,'function start(){gestureCount=0;','function start(){cancelPredictions();gestureCount=0;');
+  text=replace(text," const listeners=[['movestart',start]", " const hidden=()=>{if(root.document?.hidden)cancelPredictions();};root.document?.addEventListener?.('visibilitychange',hidden);\n const listeners=[['movestart',start]");
+  text=replace(text,'function destroy(){if(dead)return;dead=true;',"function destroy(){if(dead)return;dead=true;root.document?.removeEventListener?.('visibilitychange',hidden);");
+ }
+ if(name==='terrain-core.js')text=replace(text,'/terrain-worker.js?v=5','/native-terrain-worker.js');
  if(name==='regional-imagery.js'){
+  text=replace(text,'/regional-imagery-worker.js?v=8','/native-regional-worker.js');
   text=replace(text,'if(entry){',"if(entry&&(entry.url||entry[compensate?'natural':'raw']?.url)){");
   text=replace(text,"if(!/^\\/assets\\/south-overviews-v1\\/[a-f0-9]{24}\\.webp$/.test(row.url))", "if(!/^\\/assets\\/south-overviews-v1\\/[a-f0-9]{24}\\.webp$/.test(row.url)&&!/^https:\\/\\/localhost\\/_ridge\\/overviews\\/[a-f0-9]{64}\\/\\d+\\/\\d+$/.test(row.url))");
   const start=text.indexOf('   const headers=new Headers(options.headers);'),end=text.indexOf('  const asset=baked',start);
@@ -92,8 +118,15 @@ for(const name of await readdir(out))if(/\.(?:m?js)$/.test(name)){
  }
  await writeFile(path.join(out,name),text);
 }
+await cp(path.join(base,'mobile/native-transport.js'),path.join(out,'native-transport.js'));
+await cp(path.join(base,'mobile/native-bitmap-cache.js'),path.join(out,'native-bitmap-cache.js'));
+await writeFile(path.join(out,'native-transport-worker.mjs'),"import './native-transport.js';globalThis.RidgeNativeTransport.installWorker();\n");
+await writeFile(path.join(out,'native-map-worker.mjs'),"import './native-transport-worker.mjs';import './assets/maplibre-gl-worker.mjs?v=6.14.0';\n");
+await writeFile(path.join(out,'native-terrain-worker.js'),"importScripts('/native-transport.js');RidgeNativeTransport.installWorker();importScripts('/terrain-worker.js?v=5');\n");
+await writeFile(path.join(out,'native-regional-worker.js'),"importScripts('/native-transport.js','/native-bitmap-cache.js');RidgeNativeTransport.installWorker();RidgeBitmapCache.install();importScripts('/regional-imagery-worker.js?v=8');\n");
 const {document}=parseHTML(await readFile(path.join(out,'index.html'),'utf8'));
 document.documentElement.setAttribute('data-overviews-bundled',String(bundled));
+const nativeBootstrap=document.createElement('script');nativeBootstrap.textContent=await readFile(path.join(base,'mobile/native-transport.js'),'utf8')+'\nRidgeNativeTransport.installPage();';document.head.prepend(nativeBootstrap);
 const renderDefaults=document.createElement('script');renderDefaults.textContent='try{('+resetWebsiteRenderPreferences.toString()+')(localStorage);}catch{}';document.head.prepend(renderDefaults);
 const $=id=>{const el=document.getElementById(id);if(!el)throw Error('Missing website control '+id);return el;};
 document.querySelector('meta[name=viewport]').setAttribute('content','width=device-width,initial-scale=1,viewport-fit=cover');

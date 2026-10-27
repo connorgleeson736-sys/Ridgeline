@@ -11,6 +11,7 @@ import java.io.IOException;
 import org.json.*;
 
 public final class RegionDownloadWorker extends Worker {
+  private volatile TileDemand demand;
   private static final String CHANNEL = "offline-regions";
 
   public RegionDownloadWorker(@NonNull Context c, @NonNull WorkerParameters p) {
@@ -75,6 +76,7 @@ public final class RegionDownloadWorker extends Worker {
     TileArchive archive = TileArchive.get(getApplicationContext());
     int done = 0;
     long bytes = 0;
+    final long[] committed = {0, 0};
     try {
       if (!archive.exists(id)) return Result.success();
       JSONObject r = archive.region(id);
@@ -88,48 +90,35 @@ public final class RegionDownloadWorker extends Worker {
               r.getString("imagery"),
               r.getBoolean("topo"),
               r.optInt("topoZoom", 16));
-      for (TileAddress t : plan.tiles) {
-        long size = archive.size(id, t);
-        if (size >= 0) {
-          done++;
-          bytes += size;
-        }
-      }
       if (isStopped() || !archive.begin(id, generation)) return Result.success();
       archive.total(id, generation, plan.tiles.size());
-      archive.progress(id, generation, done, bytes);
-      setForegroundAsync(foreground(r.getString("name"), done, plan.tiles.size())).get();
-      int failures = 0;
-      String lastError = "";
-      for (TileAddress t : plan.tiles) {
-        if (isStopped() || !archive.active(id, generation)) return Result.success();
-        if (archive.size(id, t) >= 0) continue;
-        if (getApplicationContext().getFilesDir().getUsableSpace() < 32L * 1024 * 1024)
-          throw new IOException("Device storage is nearly full. Free space, then resume.");
-        byte[] data = null;
-        for (int attempt = 0;
-            attempt < 2 && !isStopped() && archive.active(id, generation);
-            attempt++)
-          try {
-            data = archive.read(t);
-            if (data == null)
-              data = TileNetwork.fetch(getApplicationContext(), t, r.getString("key"));
-            break;
-          } catch (IOException e) {
-            lastError = e.getMessage();
-          }
-        if (data == null) {
-          if (++failures >= 6) throw new IOException(lastError);
-          continue;
-        }
-        if (!archive.write(id, t, data, generation)) return Result.success();
-        done++;
-        bytes += data.length;
-        if (done % 16 == 0) {
-          archive.progress(id, generation, done, bytes);
-          setForegroundAsync(foreground(r.getString("name"), done, plan.tiles.size()));
-        }
-      }
+      setForegroundAsync(foreground(r.getString("name"), 0, plan.tiles.size())).get();
+      demand = new TileDemand(TileDemand.DOWNLOAD);
+      String key = r.getString("key");
+      RegionTransfer.Result result =
+          RegionTransfer.run(
+              plan.tiles,
+              archive.sizes(id),
+              t -> {
+                if (getApplicationContext().getFilesDir().getUsableSpace() < 32L * 1024 * 1024)
+                  throw new IOException("Device storage is nearly full. Free space, then resume.");
+                byte[] data = archive.read(t);
+                return data == null
+                    ? TileNetwork.fetch(getApplicationContext(), t, key, demand)
+                    : data;
+              },
+              batch -> archive.writeBatch(id, batch, generation),
+              (count, size) -> {
+                committed[0] = count;
+                committed[1] = size;
+                archive.progress(id, generation, count, size);
+                setForegroundAsync(foreground(r.getString("name"), count, plan.tiles.size()));
+              },
+              () -> !isStopped() && archive.active(id, generation),
+              demand);
+      done = result.done();
+      bytes = result.bytes();
+      String lastError = result.error();
       if (!archive.active(id, generation)) return Result.success();
       archive.progress(id, generation, done, bytes);
       archive.finish(
@@ -139,6 +128,8 @@ public final class RegionDownloadWorker extends Worker {
           done == plan.tiles.size() ? "" : lastError + " Resume to retry missing files.");
       return Result.success();
     } catch (Exception e) {
+      done = (int) committed[0];
+      bytes = committed[1];
       try {
         if (archive.active(id, generation)) {
           archive.progress(id, generation, done, bytes);
@@ -157,6 +148,7 @@ public final class RegionDownloadWorker extends Worker {
   @Override
   public void onStopped() {
     super.onStopped();
+    if (demand != null) demand.cancel();
     String id = getInputData().getString("id"), generation = getInputData().getString("generation");
     if (id != null && generation != null)
       try {

@@ -5,6 +5,10 @@ import android.util.AtomicFile;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -23,6 +27,23 @@ public final class TileArchive {
   private final AtomicFile index;
   private JSONObject regions;
   private final TileLookup lookup = new TileLookup(4096);
+  private final SharedTileStore store;
+  private volatile Set<String> registered = Set.of();
+  private volatile boolean legacy = true;
+  private final java.util.concurrent.ExecutorService migration =
+      java.util.concurrent.Executors.newSingleThreadExecutor(
+          r -> {
+            Thread t = new Thread(r, "ridge-map-migration");
+            t.setDaemon(true);
+            t.setPriority(Thread.MIN_PRIORITY);
+            return t;
+          });
+
+  private void register() {
+    Set<String> ids = new HashSet<>();
+    for (var it = regions.keys(); it.hasNext(); ) ids.add(it.next());
+    registered = Set.copyOf(ids);
+  }
 
   private TileArchive(Context c) {
     context = c;
@@ -37,6 +58,30 @@ public final class TileArchive {
     } catch (Exception e) {
       throw new IllegalStateException(
           "Offline region index could not be read. Existing downloads were retained.", e);
+    }
+    register();
+    store = new SharedTileStore(new AndroidTileDatabase(c));
+    migration.execute(this::migrateLegacy);
+  }
+
+  private void migrateLegacy() {
+    try {
+      LegacyTileMigration.migrate(
+          root,
+          store,
+          () -> registered,
+          this,
+          lookup::invalidate,
+          file -> {
+            if (!file.delete() && file.exists())
+              throw new IOException("Legacy map tile could not be removed");
+          });
+      legacy = false;
+      lookup.clear();
+    } catch (Exception ignored) {
+      // Original files remain readable; the next process retries migration.
+    } finally {
+      migration.shutdown();
     }
   }
 
@@ -71,6 +116,7 @@ public final class TileArchive {
       regions.remove(id);
       throw e;
     }
+    register();
     return id;
   }
 
@@ -158,30 +204,50 @@ public final class TileArchive {
     return new File(new File(root, id), t.id() + ".tile");
   }
 
-  public synchronized long size(String id, TileAddress t) {
+  public long size(String id, TileAddress t) {
+    long size = store.size(id, t.id());
+    if (size >= 0 || !legacy) return size;
     File f = tileFile(id, t);
     return f.isFile() ? f.length() : -1;
   }
 
-  public synchronized boolean write(String id, TileAddress t, byte[] data) throws Exception {
-    // Pause/removal and the final rename share this lock: an in-flight HTTP
-    // response can never recreate a deleted download directory.
-    if (!active(id)) return false;
-    File f = tileFile(id, t);
-    if (!f.getParentFile().isDirectory() && !f.getParentFile().mkdirs())
-      throw new IOException("Offline storage is unavailable.");
-    AtomicFile file = new AtomicFile(f);
-    FileOutputStream out = null;
-    try {
-      out = file.startWrite();
-      out.write(data);
-      file.finishWrite(out);
-      lookup.invalidate(t.id() + ".tile");
-    } catch (Exception e) {
-      if (out != null) file.failWrite(out);
-      throw e;
+  public Map<String, Long> sizes(String id) {
+    Map<String, Long> sizes = store.sizes(id);
+    if (legacy) {
+      File[] files = new File(root, id).listFiles((d, n) -> n.endsWith(".tile"));
+      if (files != null)
+        for (File f : files)
+          sizes.putIfAbsent(f.getName().substring(0, f.getName().length() - 5), f.length());
     }
+    if (legacy) sizes.putAll(store.sizes(id));
+    return sizes;
+  }
+
+  public synchronized boolean write(String id, TileAddress t, byte[] data) throws Exception {
+    if (!active(id)) return false;
+    store.write(id, Map.of(t.id(), data));
+    lookup.invalidate(t.id() + ".tile");
     return true;
+  }
+
+  public synchronized boolean writeBatch(
+      String id, Map<TileAddress, byte[]> data, String generation) {
+    if (!active(id, generation)) return false;
+    Map<String, byte[]> rows = new LinkedHashMap<>();
+    data.forEach((t, b) -> rows.put(t.id(), b));
+    store.write(id, rows);
+    data.keySet().forEach(t -> lookup.invalidate(t.id() + ".tile"));
+    return true;
+  }
+
+  public long sizeAny(TileAddress tile) {
+    long size = store.sizeAny(registered, tile.id());
+    if (size >= 0 || !legacy) return size;
+    for (String id : registered) {
+      File f = tileFile(id, tile);
+      if (f.isFile()) return f.length();
+    }
+    return -1;
   }
 
   public synchronized boolean write(String id, TileAddress t, byte[] data, String generation)
@@ -190,6 +256,11 @@ public final class TileArchive {
   }
 
   public byte[] read(TileAddress t) throws IOException {
+    Set<String> ids = registered;
+    if (ids.isEmpty()) return null;
+    boolean hadLegacy = legacy;
+    byte[] bytes = store.readAny(ids, t.id());
+    if (bytes != null || !hadLegacy) return bytes;
     InputStream opened;
     synchronized (this) {
       opened =
@@ -204,16 +275,20 @@ public final class TileArchive {
     // A descriptor opened under the region lock remains readable if its pathname
     // is removed on Android. Independent tile body reads no longer serialize.
     try (InputStream in = opened) {
-      return in == null ? null : TileNetwork.read(in, TileNetwork.MAX);
+      return in == null ? store.readAny(registered, t.id()) : TileNetwork.read(in, TileNetwork.MAX);
     }
   }
 
   public byte[] read(String id, TileAddress t) throws IOException {
+    if (!registered.contains(id)) throw new IOException("The region no longer exists.");
+    boolean hadLegacy = legacy;
+    byte[] bytes = store.read(id, t.id());
+    if (bytes != null || !hadLegacy) return bytes;
     InputStream opened;
     synchronized (this) {
       if (!regions.has(id)) throw new IOException("The region no longer exists.");
       File f = tileFile(id, t);
-      if (!f.isFile()) return null;
+      if (!f.isFile()) return store.read(id, t.id());
       opened = new FileInputStream(f);
     }
     try (InputStream in = opened) {
@@ -231,6 +306,8 @@ public final class TileArchive {
       regions.put(id, old);
       throw e;
     }
+    register();
+    store.remove(id);
     lookup.clear();
     delete(new File(root, id));
   }

@@ -62,6 +62,7 @@ public class TileHttpClientTest {
 
   @After
   public void cleanup() throws Exception {
+    http.close();
     server.shutdown();
     cache.close();
   }
@@ -96,6 +97,7 @@ public class TileHttpClientTest {
   public void cacheSurvivesClientRestart() throws Exception {
     assertArrayEquals(bytes, load("/tile").data());
     File dir = cache.directory();
+    http.close();
     cache.close();
     cache = new Cache(dir, 1024 * 1024);
     http = client(cache);
@@ -268,5 +270,55 @@ public class TileHttpClientTest {
         "no-store",
         TileHttpClient.remainingCacheControl(
             r.newBuilder().removeHeader("Cache-Control").build(), 21000));
+  }
+
+  @Test
+  public void headersAndPartialBytesArriveBeforeCompleteValidatedBody() throws Exception {
+    handler =
+        e -> reply(200, "max-age=60", new byte[64]).throttleBody(16, 100, TimeUnit.MILLISECONDS);
+    TileDemand demand = new TileDemand(0);
+    try (var lease = http.openURL(tile, url("/stream"), false, demand)) {
+      var resource = lease.await();
+      InputStream stream = resource.stream(lease);
+      assertEquals(0, stream.read());
+      ExecutorService reader = Executors.newSingleThreadExecutor();
+      try {
+        Future<byte[]> complete = reader.submit(() -> resource.data(lease));
+        assertThrows(TimeoutException.class, () -> complete.get(30, TimeUnit.MILLISECONDS));
+        demand.cancel();
+        assertThrows(ExecutionException.class, () -> complete.get(1, TimeUnit.SECONDS));
+      } finally {
+        reader.shutdownNow();
+        stream.close();
+      }
+    }
+  }
+
+  @Test
+  public void abortingTheMapDoesNotCancelARegionSharingThatTransfer() throws Exception {
+    handler = e -> reply(200, "max-age=60", bytes).throttleBody(2, 60, TimeUnit.MILLISECONDS);
+    TileDemand map = new TileDemand(0), region = new TileDemand(300);
+    try (var a = http.openURL(tile, url("/shared"), false, map);
+        var b = http.openURL(tile, url("/shared"), false, region)) {
+      var resource = b.await();
+      map.cancel();
+      assertThrows(InterruptedIOException.class, a::await);
+      assertArrayEquals(bytes, resource.data(b));
+      assertEquals(1, requests.get());
+    }
+  }
+
+  @Test
+  public void invalidImageCannotEndAStreamOrBecomeACachedSuccess() throws Exception {
+    handler = e -> reply(200, "max-age=600", bytes).setHeader("Content-Type", "text/html");
+    try (var lease = http.openURL(tile, url("/invalid"), false, new TileDemand(0))) {
+      var resource = lease.await();
+      try (InputStream in = resource.stream(lease)) {
+        assertThrows(IOException.class, in::readAllBytes);
+      }
+    }
+    handler = e -> reply(200, "max-age=60", bytes);
+    assertArrayEquals(bytes, load("/invalid").data());
+    assertEquals(2, requests.get());
   }
 }

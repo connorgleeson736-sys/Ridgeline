@@ -7,9 +7,9 @@ import com.getcapacitor.BridgeWebViewClient;
 final class OfflineWebViewClient extends BridgeWebViewClient {
   private final TileGateway gateway;
 
-  OfflineWebViewClient(Bridge bridge) {
+  OfflineWebViewClient(Bridge bridge, TileRequestRegistry requests) {
     super(bridge);
-    gateway = new TileGateway(bridge.getContext());
+    gateway = new TileGateway(bridge.getContext(), requests);
   }
 
   @Override
