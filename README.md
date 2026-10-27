@@ -1,16 +1,18 @@
 # Ridgeline Android downloads
 
-## Base APK — optional imagery ZIP imports
+## Latest: 0.6.0 Base APK — optional imagery ZIP imports
 
-[Download Ridgeline 3D 0.5.0 Base](Ridgeline-3D-0.5.0-Base.apk)
+[Download Ridgeline 3D 0.6.0 Base](Ridgeline-3D-0.6.0-Base.apk)
 
-This smaller installer includes the latest menu and bottom-panel changes, plus the small zoom 0–8 imagery set. Install it over the current Ridgeline 3D app. Existing routes and imported/downloaded data are retained.
+This 26.4 MB installer includes draggable bottom sheets with compact metrics and expanded elevation profiles, saved regions and the download action in the logo sidebar, and draggable rectangle corners. It retains the small zoom 0–8 imagery set. Install it over the current Ridgeline 3D app. Existing routes and imported/downloaded data are retained.
 
-To add the remaining overview imagery, download [all six prepared ZIPs](overview-packs/), then open **Layers → Download offline region → Included imagery → Import overview ZIPs** and select the ZIPs. Use these six prepared packs, rather than the fifteen original export ZIPs. Importing all six adds about 365 MB. Regional high-detail imagery and elevation downloads remain separate.
+To add the remaining overview imagery, download [all six prepared ZIPs](overview-packs/), then open **Logo menu → Download offline region → Included imagery → Import overview ZIPs** and select the ZIPs. Use these six prepared packs, rather than the fifteen original export ZIPs. Importing all six adds about 365 MB. Regional high-detail imagery and elevation downloads remain separate.
 
-Open the APK file page and choose **Download raw file**. [Base APK checksum](Ridgeline-3D-0.5.0-Base.apk.sha256).
+Open the APK file page and choose **Download raw file**. [Base APK checksum](Ridgeline-3D-0.6.0-Base.apk.sha256).
 
-## Latest: Ridgeline 3D 0.5.0 — full imagery included
+[Versioned checks](Ridgeline-3D-0.6.0-validation.json) · [Detailed validation](Ridgeline-3D-VALIDATION.md). Build, lint and packaging checks pass. Browser checks exercise the UI with controlled provider/native-data fixtures; no emulator or physical phone validation is claimed.
+
+## Earlier full installer: Ridgeline 3D 0.5.0 — full imagery included
 
 **[Download Ridgeline-3D-0.5.0-Full.apk — 391 MB](Ridgeline-3D-0.5.0-Full.apk)**
 

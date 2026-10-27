@@ -1,0 +1,32 @@
+{
+  "version": "0.6.0",
+  "versionCode": 6,
+  "sourceCommit": "020c1ec",
+  "apk": "Ridgeline-3D-0.6.0-Base.apk",
+  "bytes": 26449886,
+  "sha256": "a15539b291503af35425d28ad7074c48b8ac9244e3bece7c01161fc3ea8d613d",
+  "baseOnly": true,
+  "finalUiMatchesApk": true,
+  "buildPassed": true,
+  "lintPassed": true,
+  "jsTestsPassed": 9,
+  "browser": {
+    "direct3DStartupAndRouteEditing": true,
+    "repeatedResizeAndCornerChecksMode": "2D",
+    "controlledAndroidDataBridge": true,
+    "sheetStops": 3,
+    "compactMetricsAndActions": true,
+    "expandedChartFitsWidth": true,
+    "touchAndMouseSheetDrags": true,
+    "touchAndMouseRegionCornerDrags": true,
+    "keyboardControls": true,
+    "rotation": true,
+    "regionAndRouteReopening": true,
+    "routePointsPreservedDuringRegionEdits": true,
+    "zipImportsAvailable": true,
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  "emulatorUsed": false,
+  "physicalDeviceTested": false
+}
