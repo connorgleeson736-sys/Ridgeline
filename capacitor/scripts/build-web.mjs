@@ -44,7 +44,13 @@ app=replace(app,"active.on('click',e=>{if(map!==active)return;", "active.on('cli
 app=replace(app,"selectable:()=>map===active&&ready&&!switching", "selectable:()=>map===active&&ready&&!switching&&!globalThis.RidgeMobile?.selecting()");
 app=replace(app,"enabled:()=>map===active&&drawing&&ready", "enabled:()=>map===active&&drawing&&ready&&!globalThis.RidgeMobile?.selecting()");
 app=replace(app,'updateRendererUI();initMap();',`updateRendererUI();initMap(globalThis.RidgeMobile?.lastView());
-globalThis.RidgeMobile?.attach({getMap:()=>map,isReady:()=>ready,getKey:()=>activeLinzKey,getPoints:()=>points.map(p=>p.slice()),stopDrawing:()=>setDrawing(false),importText:(name,text)=>importRoute(new File([text],name,{type:'application/gpx+xml'})),refresh:()=>{profileClient.cancel();profileStamp='';queueProfile();},toast,goPeak,renderStatus:()=>({ready,terrain:!!map?.getTerrain(),direct:directRaster?.stats(),points:points.length,profile:profile.map(p=>({h:p.h,provider:p.provider}))})});`);
+globalThis.RidgeMobile?.attach({getMap:()=>map,isReady:()=>ready,getKey:()=>activeLinzKey,getPoints:()=>points.map(p=>p.slice()),stopDrawing:()=>setDrawing(false),
+ routes:()=>saved.map(r=>({...r,points:r.points.map(p=>p.slice())})),activeRoute:()=>activeSaved,
+ openRoute:id=>{const r=saved.find(r=>r.id===id);if(!r||!autoSaveRoute())return false;setDrawing(false);popupDismissed=false;resetRouteHistory();points=r.points.map(p=>p.slice());activeSaved=r.id;$('route-name').value=r.name;setSidebar(false);updateRoute();fitRoute();return true;},
+ unloadRoute:()=>{if(!autoSaveRoute())return false;setDrawing(false);routeEditor?.cancel();points=[];activeSaved=null;selectedRoutePoint=-1;popupDismissed=true;resetRouteHistory();profileClient.cancel();profile=[];updateRoute();return true;},
+ deleteRoute:id=>{if(id===activeSaved&&!autoSaveRoute())return false;const old=saved;saved=saved.filter(r=>r.id!==id);if(!storageWrite()){saved=old;return false;}if(id===activeSaved){setDrawing(false);points=[];activeSaved=null;popupDismissed=true;resetRouteHistory();updateRoute();}renderSaved();return true;},
+ createCombined:value=>{if(!autoSaveRoute())return false;if(saved.length>=50){toast('Delete or export an old route before combining (50 route limit).');return false;}setDrawing(false);points=value;activeSaved=null;selectedRoutePoint=-1;popupDismissed=false;resetRouteHistory();$('route-name').value='Combined route';updateRoute();setSidebar(false);fitRoute();return true;},importText:(name,text)=>importRoute(new File([text],name,{type:'application/gpx+xml'})),refresh:()=>{profileClient.cancel();profileStamp='';queueProfile();},toast,goPeak,renderStatus:()=>({ready,terrain:!!map?.getTerrain(),direct:directRaster?.stats(),points:points.length,profile:profile.map(p=>({h:p.h,provider:p.provider}))})});`);
+app=replace(app,"function renderSaved(){","function renderSaved(){if(globalThis.RidgeMobile?.renderRoutes(saved,activeSaved))return;");
 // App panels occupy their own row so map hit testing and camera fitting use the visible viewport.
 app=replace(app,"routePopup=RidgeRouteInteractions.attachPopup({element:$('profile-card'),handle:$('profile-drag-handle'),bounds:$('map-area'),resizeHandle:$('profile-resize-handle')})","routePopup={constrain(){}}");
 app=replace(app,"if($('profile-card').hidden)chartInteraction?.clear();","globalThis.RidgeMobile?.syncPanels();if($('profile-card').hidden)chartInteraction?.clear();");
@@ -90,7 +96,8 @@ basic.append(advanced.querySelector('.layer-choices'));
 const details=$('detail-controls'),quick=document.createElement('fieldset');quick.className='detail-controls';quick.innerHTML='<legend>Map detail</legend>';
 for(const id of ['imagery-detail','terrain-detail']){const input=$(id),label=details.querySelector(`label[for="${id}"]`);quick.append(label,input);}
 basic.append(quick);
-for(const id of ['labels','hillshade'])basic.append($(id).closest('label'));
+for(const id of ['labels','hillshade'])advanced.append($(id).closest('label'));
+const topoSection=$('topo-names').closest('fieldset,details');if(topoSection)basic.append(topoSection);
 const offline=document.createElement('button');offline.id='open-offline';offline.className='primary';offline.textContent='Download offline region';$('sidebar').append(offline);
 const note=document.createElement('p');note.textContent='3D terrain · Original + Direct';note.className='topo-basemap-note';basic.append(note);
 const tabs=document.createElement('div');tabs.className='layers-tabs';tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label','Layer settings');

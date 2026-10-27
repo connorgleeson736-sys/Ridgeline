@@ -38,6 +38,17 @@ public class TilePlanTest {
   }
 
   @Test
+  public void topoOnlyAlwaysUsesTheNativeMaximumWithoutImageryOrDem() {
+    TilePlan p = new TilePlan(cook, 13, "topo", true);
+    assertTrue(p.tiles.stream().allMatch(t -> t.kind.equals("topo-raster")));
+    assertTrue(p.tiles.stream().anyMatch(t -> t.z == 16));
+    assertFalse(p.tiles.stream().anyMatch(t -> t.z > 16));
+    assertTrue(
+        new TilePlan(cook, 13, "aerial", true)
+            .tiles.stream().anyMatch(t -> t.kind.equals("topo-raster") && t.z == 16));
+  }
+
+  @Test
   public void rejectsUnboundedOrInvalidRegions() {
     for (double[] b :
         new double[][] {

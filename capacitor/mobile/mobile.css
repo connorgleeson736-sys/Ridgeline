@@ -37,3 +37,13 @@
 @media(max-width:360px){#profile-card .sheet-content{padding-left:10px;padding-right:10px}#profile-card .stats strong{font-size:12px}#profile-card .route-popup-actions button{font-size:10px}}
 
 #profile-card[data-snap=compact] .profile-header{position:absolute;top:8px;right:12px;min-height:30px}#profile-card[data-snap=compact] .profile-header .route-name{display:none}
+
+/* Compact headers, clean close controls, and generous rounded sheet corners. */
+#profile-card,#offline-panel{border-radius:24px 24px 0 0;box-shadow:0 -3px 18px #10212c1a}
+.sheet-handle{flex-basis:24px;min-height:24px!important}.sheet-handle span{width:32px;height:4px}
+#profile-card #route-close,#offline-panel #offline-close{border:0!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;width:36px;height:32px;min-width:36px;min-height:32px;font-size:25px;padding:0}
+#profile-card[data-snap=compact] .profile-header{top:0;right:10px}
+#offline-panel .panel-heading{margin-bottom:6px;min-height:32px}#offline-panel h2{font-size:17px}
+#map-area{overflow:hidden}.region-outline{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:6;overflow:visible}.region-outline polygon{stroke:#db784a;stroke-width:1.5;fill:#e8794415;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.offline-region-corner{position:absolute;left:0;top:0;width:32px;height:32px;z-index:7;will-change:transform}.offline-region-corner:after{width:9px;height:9px;border-width:2px;box-shadow:0 1px 3px #0005}
+.route-selection{display:flex;gap:9px;align-items:center}.route-selection input{width:18px;height:18px;accent-color:var(--green)}.route-selection strong{margin:0}.saved-tools{display:flex;gap:14px;margin-top:10px}.saved-tools button{min-height:32px;font-size:12px;color:var(--orange)}.merge-order{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:11px;margin-top:8px}.merge-order button,.merge-controls button{padding:8px;border:1px solid var(--line);border-radius:5px;font-size:11px}.merge-controls p{font-size:11px;line-height:1.5}

@@ -146,6 +146,12 @@ public final class TileArchive {
     save();
   }
 
+  public synchronized void total(String id, String generation, int total) throws Exception {
+    if (!active(id, generation)) return;
+    regions.getJSONObject(id).put("total", total);
+    save();
+  }
+
   private File tileFile(String id, TileAddress t) {
     return new File(new File(root, id), t.id() + ".tile");
   }
@@ -189,6 +195,15 @@ public final class TileArchive {
         }
     }
     return null;
+  }
+
+  public synchronized byte[] read(String id, TileAddress t) throws IOException {
+    if (!regions.has(id)) throw new IOException("The region no longer exists.");
+    File f = tileFile(id, t);
+    if (!f.isFile()) return null;
+    try (InputStream in = new FileInputStream(f)) {
+      return TileNetwork.read(in, TileNetwork.MAX);
+    }
   }
 
   public synchronized void remove(String id) throws Exception {

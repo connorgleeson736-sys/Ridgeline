@@ -18,13 +18,17 @@ public final class TilePlan {
           "Choose a rectangle within New Zealand (165–180° E, 49–33° S)");
     if (zoom < 13 || zoom > 17)
       throw new IllegalArgumentException("Download detail must be between zoom 13 and 17");
+    if (imagery.equals("topo")) {
+      add(b, "topo-raster", 16, 0);
+      return;
+    }
     if (!imagery.equals("aerial") && !imagery.equals("satellite"))
       throw new IllegalArgumentException("Choose LINZ aerial or Satellite");
     add(b, imagery, zoom, 0);
     if (imagery.equals("aerial")) add(b, "satellite", Math.min(zoom, 17), 0);
     add(b, "elevation", Math.min(zoom, 16), 1);
     if (topo) {
-      add(b, "topo-raster", Math.min(zoom, 16), 0);
+      add(b, "topo-raster", 16, 0);
       add(b, "vector", 14, 0);
       for (int start = 0; start < 768; start += 256) tiles.add(TileAddress.font(start));
       tiles.add(TileAddress.font(8192));

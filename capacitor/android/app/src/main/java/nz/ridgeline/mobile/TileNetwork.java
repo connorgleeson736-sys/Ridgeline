@@ -21,9 +21,18 @@ final class TileNetwork {
   static final int MAX = 8 * 1024 * 1024;
 
   static byte[] fetch(TileAddress tile, String key) throws IOException {
+    return fetch(tile, key, 12000, 15000);
+  }
+
+  static byte[] sample(TileAddress tile, String key) throws IOException {
+    return fetch(tile, key, 2500, 3500);
+  }
+
+  private static byte[] fetch(TileAddress tile, String key, int connectTimeout, int readTimeout)
+      throws IOException {
     HttpURLConnection connection = (HttpURLConnection) new URL(tile.network(key)).openConnection();
-    connection.setConnectTimeout(12000);
-    connection.setReadTimeout(15000);
+    connection.setConnectTimeout(connectTimeout);
+    connection.setReadTimeout(readTimeout);
     connection.setInstanceFollowRedirects(false);
     connection.setRequestProperty("User-Agent", "Ridgeline-Android/0.2.0");
     try {

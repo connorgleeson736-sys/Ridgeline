@@ -1,4 +1,4 @@
-# Capacitor preview 0.6.0 validation
+# Capacitor preview 0.7.0 validation
 
 Validated 27 October 2026 (Melbourne). Development-signed preview; no Play Store release.
 
@@ -47,3 +47,10 @@ The offline download action is pinned to the bottom of the logo sidebar. Saved r
 The browser check uses a controlled Android data bridge for saved-region responses and real MapLibre gestures for sheet and corner dragging, including Chromium touch events. It exercises initial route creation in 3D, then repeated sheet resizing, rotation and corner manipulation in 2D to keep software-rendering load bounded. It also checks rotation, compact/expanded controls, chart width, saved-route/region reopening and cancellation. These checks exercise the app UI in Chromium, not physical Android device gestures or the native download service.
 
 Pattern reference: [Material Components bottom sheets](https://github.com/material-components/material-components-android/blob/master/docs/components/BottomSheet.md), including drag handles, collapsed/half-expanded/expanded states and accessibility actions.
+
+## 0.7.0 verification
+
+- New pure Java tests verify Topo-only plans, maximum Topo detail independent of aerial zoom, measured source-specific byte estimates, unavailable sample fallbacks, PDF tile coverage, cross-reference offsets and rejection of missing images.
+- A standalone run of the exact PDF writer generated four-page and 80-page fixture atlases with a 48 MB Java heap limit. Poppler parsed and rasterized the four-page PDF; its landscape page geometry, crop, image orientation, title and attribution were visually inspected. This validates PDF serialization, not Android's document picker.
+- JavaScript checks cover route join order, reversal, identical shared endpoints, preserving originals and the 2,000-point limit. Browser workflows cover real route unloading, multiple visible routes, combined-route creation, revised layer placement, smaller sheets, 2D SVG region editing, touch/keyboard corner movement, maximum-detail Topo form settings, sampled-estimate display and the PDF bridge request. Native data/provider responses are controlled fixtures.
+- Full Topo PDF output from live LINZ downloads, Android document-provider behaviour and phone GPU responsiveness still need physical-device checks. No emulator was requested or used. Estimates are not confidence intervals; their storage allowances reflect sampling and fallback heuristics.

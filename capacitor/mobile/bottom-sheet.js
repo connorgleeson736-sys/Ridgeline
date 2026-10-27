@@ -1,6 +1,6 @@
 // Standard bottom-sheet drag handle with three stable positions.
 export function sheetStops(height) {
-  const compact = Math.min(160, height * .33);
+  const compact = Math.min(136, height * .33);
   const middle = Math.max(compact + 40, height * .4);
   return [compact, middle, Math.min(height - 80, Math.max(middle + 40, height * .64))];
 }
@@ -46,7 +46,7 @@ export function attachSheet(panel, {initial = 0, onChange = () => {}} = {}) {
   handle.addEventListener('pointerdown', event => {
     if (event.button > 0 || event.isPrimary === false || drag) return;
     event.preventDefault(); drag = {id:event.pointerId, y:event.clientY, height, moved:false};
-    handle.setPointerCapture(event.pointerId); panel.classList.add('sheet-dragging');
+    handle.setPointerCapture(event.pointerId); panel.classList.add('sheet-dragging');onChange(height,index);
   });
   handle.addEventListener('pointermove', event => {
     if (!drag || event.pointerId !== drag.id) return;

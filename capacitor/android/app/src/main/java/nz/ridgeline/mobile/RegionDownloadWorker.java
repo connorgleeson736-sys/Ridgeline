@@ -95,6 +95,7 @@ public final class RegionDownloadWorker extends Worker {
         }
       }
       if (isStopped() || !archive.begin(id, generation)) return Result.success();
+      archive.total(id, generation, plan.tiles.size());
       archive.progress(id, generation, done, bytes);
       setForegroundAsync(foreground(r.getString("name"), done, plan.tiles.size())).get();
       int failures = 0;
@@ -109,7 +110,8 @@ public final class RegionDownloadWorker extends Worker {
             attempt < 2 && !isStopped() && archive.active(id, generation);
             attempt++)
           try {
-            data = TileNetwork.fetch(t, r.getString("key"));
+            data = archive.read(t);
+            if (data == null) data = TileNetwork.fetch(t, r.getString("key"));
             break;
           } catch (IOException e) {
             lastError = e.getMessage();
