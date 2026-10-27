@@ -1,0 +1,49 @@
+{
+  "version": "0.7.0",
+  "versionCode": 7,
+  "bytes": 26460194,
+  "sha256": "08d924b53758b4e8681b99cd11d21faa930f72d41d99a902024c519d4479ef56",
+  "baseOnly": true,
+  "finalUiMatchesApk": true,
+  "buildPassed": true,
+  "lintPassed": true,
+  "nativeUnitTests": 22,
+  "jsTests": 11,
+  "browser": {
+    "threeSheetStops": true,
+    "touchSheetAndRectangleEditing": true,
+    "screenOverlayWithoutGeojsonWorkerUpdates": true,
+    "topoOnlyMaximumDetailForm": true,
+    "sampledEstimateDisplay": true,
+    "pdfExportBridgeRequest": true,
+    "routeUnloading": true,
+    "multipleVisibleRoutes": true,
+    "combinesWithoutDeletingOriginals": true,
+    "advancedLabelShadingControls": true,
+    "basicTopographicOverlays": true,
+    "noPeakSearch": true,
+    "actualOverviewReads": 21,
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  "pdf": {
+    "nativeZoom": 16,
+    "a4Landscape": true,
+    "losslessRgbImages": true,
+    "fixturePages": [
+      4,
+      80
+    ],
+    "fixtureJavaHeapLimitMiB": 48,
+    "popplerParseAndRasterize": true
+  },
+  "limitations": [
+    "Provider and Android data bridge used controlled fixtures in browser tests.",
+    "Android document providers and live downloads were not exercised on a phone.",
+    "Download estimates remain sampling-based planning figures.",
+    "Older regions missing zoom-16 Topo need a new download before PDF export."
+  ],
+  "emulatorUsed": false,
+  "physicalPhoneTested": false,
+  "sourceCommit": "2f2469b"
+}

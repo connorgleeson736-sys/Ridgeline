@@ -1,16 +1,20 @@
 # Ridgeline Android downloads
 
-## Latest: 0.6.0 Base APK — optional imagery ZIP imports
+## Latest: 0.7.0 Base APK — 26.5 MB
 
-[Download Ridgeline 3D 0.6.0 Base](Ridgeline-3D-0.6.0-Base.apk)
+[Download Ridgeline 3D 0.7.0 Base](Ridgeline-3D-0.7.0-Base.apk). Open the file page and choose **Download raw file**, then install over your current Ridgeline 3D app.
 
-This 26.4 MB installer includes draggable bottom sheets with compact metrics and expanded elevation profiles, saved regions and the download action in the logo sidebar, and draggable rectangle corners. It retains the small zoom 0–8 imagery set. Install it over the current Ridgeline 3D app. Existing routes and imported/downloaded data are retained.
+This update has smaller, rounder sheets with borderless close buttons; a faster screen-space rectangle editor with small handles in 2D; and no peak-search box. The main Layers tab contains topographic overlays, with peak labels and terrain shading under Advanced.
 
-To add the remaining overview imagery, download [all six prepared ZIPs](overview-packs/), then open **Logo menu → Download offline region → Included imagery → Import overview ZIPs** and select the ZIPs. Use these six prepared packs, rather than the fifteen original export ZIPs. Importing all six adds about 365 MB. Regional high-detail imagery and elevation downloads remain separate.
+Saved routes have Open/Close actions. Multiple routes can remain visible. Select their checkboxes in join order, optionally reverse direction, then choose **Combine selected routes**. The original routes stay saved; gaps become straight connecting segments.
 
-Open the APK file page and choose **Download raw file**. [Base APK checksum](Ridgeline-3D-0.6.0-Base.apk.sha256).
+For printable offline maps choose **Logo menu → Download offline region → Map content → NZ Topo only · maximum detail**. Complete the download, then choose **Export Topo PDF** under Saved regions. The PDF is a north-up, lossless A4 landscape atlas made entirely from downloaded zoom-16 Topo tiles. Older regions lacking those tiles need a new Topo download. Size estimates now use actual saved/sampled tile sizes when available, with a planning estimate and storage allowance.
 
-[Versioned checks](Ridgeline-3D-0.6.0-validation.json) · [Detailed validation](Ridgeline-3D-VALIDATION.md). Build, lint and packaging checks pass. Browser checks exercise the UI with controlled provider/native-data fixtures; no emulator or physical phone validation is claimed.
+The base APK retains zoom 0–8 overview images. Add zooms 9–12 using [all six prepared ZIPs](overview-packs/) through **Logo menu → Download offline region → Included imagery → Import overview ZIPs**. Existing imported imagery is compatible. Use these six prepared packs rather than the fifteen original export ZIPs.
+
+Build, lint, 22 JVM tests, 11 JavaScript checks and browser workflow/touch checks passed. The streaming PDF writer also produced four-page and 80-page test atlases with a 48 MB Java heap limit; Poppler parsed and rendered the PDF. No emulator or physical phone validation is claimed; Android document-provider and live-download checks remain phone tasks.
+
+[APK checksum](Ridgeline-3D-0.7.0-Base.apk.sha256) · [Versioned validation](Ridgeline-3D-0.7.0-validation.json) · [Detailed validation](Ridgeline-3D-VALIDATION.md).
 
 ## Earlier full installer: Ridgeline 3D 0.5.0 — full imagery included
 
