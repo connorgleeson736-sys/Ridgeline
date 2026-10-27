@@ -14,6 +14,7 @@ await rm(out,{recursive:true,force:true});await mkdir(out,{recursive:true});
 await cp(source,out,{recursive:true,filter:p=>!/(?:cook-reference|luma-renderer|luma-terrain|\/assets\/luma(?:\/|$)|\/assets\/gap-imagery-v[123](?:\/|$)|\/assets\/imagery-boundary-v[23](?:\/|$))/.test(p)});
 await mkdir(path.join(out,'licenses'),{recursive:true});
 await cp(path.join(base,'CAPACITOR-LICENSE.txt'),path.join(out,'licenses/capacitor.txt'));
+await cp(path.join(base,'APACHE-2.0-LICENSE.txt'),path.join(out,'licenses/apache-2.0.txt'));
 await cp(path.join(base,'THIRD_PARTY_NOTICES.md'),path.join(out,'licenses/NOTICE.txt'));
 // Only the verified catalogue is bundled; large data ZIPs are imported once.
 const overview=JSON.parse(await readFile(path.join(base,'overview-catalog.json'),'utf8'));
@@ -118,7 +119,7 @@ const tabs=document.createElement('div');tabs.className='layers-tabs';tabs.setAt
 tabs.innerHTML='<button id="basic-tab" role="tab" aria-controls="layers-basic" aria-selected="true">Layers</button><button id="advanced-tab" role="tab" aria-controls="layers-advanced" aria-selected="false" tabindex="-1">Advanced</button>';
 panel.append(tabs,basic,advanced);
 const about=document.createElement('details');about.innerHTML='<summary>Licences &amp; data sources</summary><p>Summits adapted from NZAC / ClimbNZ; Aoraki Tai Poutini (Rob Frost, 2018). CC BY-NC-SA 3.0 NZ. Imagery and terrain attribution appears on the map.</p>';
-for(const [name,file] of [['Capacitor','licenses/capacitor.txt'],['MapLibre','assets/maplibre-LICENSE.txt'],['Third-party notices','licenses/NOTICE.txt']]){const row=document.createElement('details'),title=document.createElement('summary'),text=document.createElement('pre');title.textContent=name;text.textContent=await readFile(path.join(out,file),'utf8');text.style.cssText='white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px;max-height:300px;overflow:auto';row.append(title,text);about.append(row);}advanced.append(about);
+for(const [name,file] of [['Capacitor','licenses/capacitor.txt'],['MapLibre','assets/maplibre-LICENSE.txt'],['Native HTTP libraries','licenses/apache-2.0.txt'],['Third-party notices','licenses/NOTICE.txt']]){const row=document.createElement('details'),title=document.createElement('summary'),text=document.createElement('pre');title.textContent=name;text.textContent=await readFile(path.join(out,file),'utf8');text.style.cssText='white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px;max-height:300px;overflow:auto';row.append(title,text);about.append(row);}advanced.append(about);
 const css=document.createElement('link');css.rel='stylesheet';css.href='/mobile.css';document.head.append(css);
 const bootstrap=document.createElement('script');bootstrap.type='module';bootstrap.src='/mobile.js';document.head.append(bootstrap);
 bootstrap.setAttribute('onerror',"document.getElementById('load-state').textContent='The map could not start. Update Android System WebView and Chrome, then reopen Ridgeline.'");

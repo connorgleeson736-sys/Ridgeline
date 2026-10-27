@@ -1,63 +1,61 @@
 package nz.ridgeline.mobile;
 
+import android.content.Context;
 import android.graphics.BitmapFactory;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 final class TileNetwork {
   static final class HttpFailure extends IOException {
     final int status;
+    final String retryAfter;
 
-    HttpFailure(int status) {
+    HttpFailure(int status, String retryAfter) {
       super(
           "Map provider returned HTTP "
               + status
               + ". Check your connection or LINZ key, then resume.");
       this.status = status;
+      this.retryAfter = retryAfter;
     }
   }
 
   static final int MAX = 8 * 1024 * 1024;
+  private static TileHttpClient instance;
 
-  static byte[] fetch(TileAddress tile, String key) throws IOException {
-    return fetch(tile, key, 12000, 15000);
+  private static synchronized TileHttpClient client(Context context) {
+    if (instance == null)
+      instance =
+          new TileHttpClient(
+              TileHttpClient.create(
+                  new File(context.getApplicationContext().getCacheDir(), "map-http-v1")),
+              TileNetwork::validate);
+    return instance;
   }
 
-  static byte[] sample(TileAddress tile, String key) throws IOException {
-    return fetch(tile, key, 2500, 3500);
+  static byte[] fetch(Context context, TileAddress tile, String key) throws IOException {
+    return resource(context, tile, key).data();
   }
 
-  private static byte[] fetch(TileAddress tile, String key, int connectTimeout, int readTimeout)
+  static TileHttpClient.Resource resource(Context context, TileAddress tile, String key)
       throws IOException {
-    HttpURLConnection connection = (HttpURLConnection) new URL(tile.network(key)).openConnection();
-    connection.setConnectTimeout(connectTimeout);
-    connection.setReadTimeout(readTimeout);
-    connection.setInstanceFollowRedirects(false);
-    connection.setRequestProperty("User-Agent", "Ridgeline-Android/0.2.0");
-    try {
-      int status = connection.getResponseCode();
-      if (status != 200 && !(status == 204 && !tile.raster())) throw new HttpFailure(status);
-      int length = connection.getContentLength();
-      if (length > MAX) throw new IOException("Map tile exceeds the download size limit.");
-      byte[] bytes;
-      try (InputStream in = connection.getInputStream()) {
-        bytes = read(in, MAX);
-      }
-      if (tile.raster()) {
-        BitmapFactory.Options o = new BitmapFactory.Options();
-        o.inJustDecodeBounds = true;
-        BitmapFactory.decodeByteArray(bytes, 0, bytes.length, o);
-        if (o.outWidth != 256 || o.outHeight != 256)
-          throw new IOException("Map provider did not return a valid 256-pixel tile.");
-      } else if (bytes.length > 0) {
-        String type = connection.getContentType();
-        if (type != null && (type.contains("html") || type.contains("json")))
-          throw new IOException("Map provider returned an unexpected response.");
-      }
-      return bytes;
-    } finally {
-      connection.disconnect();
+    return client(context).fetch(tile, key, false);
+  }
+
+  static byte[] sample(Context context, TileAddress tile, String key) throws IOException {
+    return client(context).fetch(tile, key, true).data();
+  }
+
+  private static void validate(TileAddress tile, byte[] bytes, String type) throws IOException {
+    if (tile.raster()) {
+      BitmapFactory.Options o = new BitmapFactory.Options();
+      o.inJustDecodeBounds = true;
+      BitmapFactory.decodeByteArray(bytes, 0, bytes.length, o);
+      if (o.outWidth != 256 || o.outHeight != 256)
+        throw new IOException("Map provider did not return a valid 256-pixel tile.");
+    } else if (bytes.length > 0 && type != null) {
+      type = type.toLowerCase(java.util.Locale.ROOT);
+      if (type.contains("html") || type.contains("json"))
+        throw new IOException("Map provider returned an unexpected response.");
     }
   }
 

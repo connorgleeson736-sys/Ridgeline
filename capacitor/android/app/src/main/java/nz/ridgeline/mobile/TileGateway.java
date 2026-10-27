@@ -5,6 +5,7 @@ import android.net.*;
 import android.webkit.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 
 final class TileGateway {
@@ -47,21 +48,28 @@ final class TileGateway {
       byte[] data = archive.read(tile);
       if (data != null) return response(200, tile.mime(), data);
       int failure = 404;
+      String retryAfter = null;
       if (!archive.offlineOnly() && connected())
         try {
-          data = TileNetwork.fetch(tile, TileAddress.queryKey(uri.toString()));
-          return response(200, tile.mime(), data);
+          TileHttpClient.Resource result =
+              TileNetwork.resource(context, tile, TileAddress.queryKey(uri.toString()));
+          // Preserve upstream freshness instead of granting every response a new hour.
+          return response(200, tile.mime(), result.data(), result.cacheControl(), null);
         } catch (IOException e) {
           failure =
               e instanceof TileNetwork.HttpFailure ? ((TileNetwork.HttpFailure) e).status : 503;
+          if (e instanceof TileNetwork.HttpFailure)
+            retryAfter = ((TileNetwork.HttpFailure) e).retryAfter;
         }
       data = TileResampler.parent(archive, tile);
-      if (data != null) return response(200, "image/png", data);
+      if (data != null) return response(200, "image/png", data, "no-store", null);
       return response(
           failure,
           "text/plain",
           "Outside downloaded coverage or map provider unavailable"
-              .getBytes(StandardCharsets.UTF_8));
+              .getBytes(StandardCharsets.UTF_8),
+          "no-store",
+          retryAfter);
     } catch (Exception e) {
       return response(
           503,
@@ -71,18 +79,22 @@ final class TileGateway {
   }
 
   private WebResourceResponse response(int status, String mime, byte[] data) {
+    return response(status, mime, data, status == 200 ? "private, max-age=3600" : "no-store", null);
+  }
+
+  private WebResourceResponse response(
+      int status, String mime, byte[] data, String cacheControl, String retryAfter) {
+    Map<String, String> headers = new HashMap<>();
+    headers.put("Access-Control-Allow-Origin", "https://localhost");
+    headers.put("Cache-Control", cacheControl);
+    headers.put("X-Content-Type-Options", "nosniff");
+    if (retryAfter != null) headers.put("Retry-After", retryAfter);
     return new WebResourceResponse(
         mime,
         null,
         status,
         status == 200 ? "OK" : status == 404 ? "Not Found" : "Unavailable",
-        Map.of(
-            "Access-Control-Allow-Origin",
-            "https://localhost",
-            "Cache-Control",
-            status == 200 ? "private, max-age=3600" : "no-store",
-            "X-Content-Type-Options",
-            "nosniff"),
+        headers,
         new ByteArrayInputStream(data));
   }
 }

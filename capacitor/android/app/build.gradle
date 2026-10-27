@@ -7,8 +7,8 @@ android {
         applicationId "nz.ridgeline.mobile"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 11
-        versionName "0.11.0"
+        versionCode 12
+        versionName "0.12.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
             noCompress 'bin'
@@ -42,6 +42,7 @@ repositories {
 }
 
 dependencies {
+    implementation "com.squareup.okhttp3:okhttp:4.12.0"
     coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.1.5"
     implementation "androidx.work:work-runtime:2.10.5"
     androidTestImplementation "androidx.test:runner:1.7.0"
@@ -52,6 +53,7 @@ dependencies {
     implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
     implementation project(':capacitor-android')
     testImplementation "junit:junit:$junitVersion"
+    testImplementation "com.squareup.okhttp3:mockwebserver:4.12.0"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     implementation project(':capacitor-cordova-android-plugins')

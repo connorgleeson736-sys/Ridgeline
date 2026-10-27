@@ -112,7 +112,8 @@ public final class RegionDownloadWorker extends Worker {
             attempt++)
           try {
             data = archive.read(t);
-            if (data == null) data = TileNetwork.fetch(t, r.getString("key"));
+            if (data == null)
+              data = TileNetwork.fetch(getApplicationContext(), t, r.getString("key"));
             break;
           } catch (IOException e) {
             lastError = e.getMessage();

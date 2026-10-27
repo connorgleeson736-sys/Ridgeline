@@ -161,7 +161,9 @@ final class OverviewStore {
     return imported;
   }
 
-  synchronized byte[] read(String path) throws Exception {
+  byte[] read(String path) throws Exception {
+    // Manifest collections are immutable after construction. Each read owns
+    // its descriptor/channel, so unrelated overview images can load together.
     String prefix = "/_ridge/overviews/";
     if (!path.startsWith(prefix)) return null;
     String key = path.substring(prefix.length());

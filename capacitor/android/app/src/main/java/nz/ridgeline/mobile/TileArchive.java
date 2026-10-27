@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.AtomicFile;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.UUID;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -21,6 +22,7 @@ public final class TileArchive {
   private final File root;
   private final AtomicFile index;
   private JSONObject regions;
+  private final TileLookup lookup = new TileLookup(4096);
 
   private TileArchive(Context c) {
     context = c;
@@ -174,6 +176,7 @@ public final class TileArchive {
       out = file.startWrite();
       out.write(data);
       file.finishWrite(out);
+      lookup.invalidate(t.id() + ".tile");
     } catch (Exception e) {
       if (out != null) file.failWrite(out);
       throw e;
@@ -186,22 +189,34 @@ public final class TileArchive {
     return active(id, generation) && write(id, t, data);
   }
 
-  public synchronized byte[] read(TileAddress t) throws IOException {
-    for (var it = regions.keys(); it.hasNext(); ) {
-      File f = tileFile(it.next(), t);
-      if (f.isFile())
-        try (InputStream in = new FileInputStream(f)) {
-          return TileNetwork.read(in, TileNetwork.MAX);
-        }
+  public byte[] read(TileAddress t) throws IOException {
+    InputStream opened;
+    synchronized (this) {
+      opened =
+          lookup.open(
+              t.id() + ".tile",
+              () -> {
+                ArrayList<File> dirs = new ArrayList<>(regions.length());
+                for (var it = regions.keys(); it.hasNext(); ) dirs.add(new File(root, it.next()));
+                return dirs;
+              });
     }
-    return null;
+    // A descriptor opened under the region lock remains readable if its pathname
+    // is removed on Android. Independent tile body reads no longer serialize.
+    try (InputStream in = opened) {
+      return in == null ? null : TileNetwork.read(in, TileNetwork.MAX);
+    }
   }
 
-  public synchronized byte[] read(String id, TileAddress t) throws IOException {
-    if (!regions.has(id)) throw new IOException("The region no longer exists.");
-    File f = tileFile(id, t);
-    if (!f.isFile()) return null;
-    try (InputStream in = new FileInputStream(f)) {
+  public byte[] read(String id, TileAddress t) throws IOException {
+    InputStream opened;
+    synchronized (this) {
+      if (!regions.has(id)) throw new IOException("The region no longer exists.");
+      File f = tileFile(id, t);
+      if (!f.isFile()) return null;
+      opened = new FileInputStream(f);
+    }
+    try (InputStream in = opened) {
       return TileNetwork.read(in, TileNetwork.MAX);
     }
   }
@@ -216,6 +231,7 @@ public final class TileArchive {
       regions.put(id, old);
       throw e;
     }
+    lookup.clear();
     delete(new File(root, id));
   }
 

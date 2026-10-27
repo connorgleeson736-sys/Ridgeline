@@ -13,7 +13,6 @@ import com.getcapacitor.*;
 import com.getcapacitor.annotation.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.*;
 import org.json.*;
 
 @CapacitorPlugin(
@@ -27,7 +26,7 @@ import org.json.*;
           })
     })
 public final class RidgelineOfflinePlugin extends Plugin {
-  private final ExecutorService io = Executors.newSingleThreadExecutor();
+  private final NativeTasks jobs = new NativeTasks();
   private LocationManager locations;
   private String estimateSignature = "";
   private JSObject estimateCached;
@@ -64,16 +63,23 @@ public final class RidgelineOfflinePlugin extends Plugin {
   }
 
   private void async(PluginCall call, Operation op) {
-    io.execute(
-        () -> {
-          try {
-            JSObject result = op.run();
-            if (result != null) call.resolve(result);
-          } catch (Exception e) {
-            call.reject(
-                e.getMessage() == null ? "Operation failed. Please try again." : e.getMessage());
-          }
-        });
+    jobs.execute(operation(call, op));
+  }
+
+  private void heavy(PluginCall call, Operation op) {
+    jobs.heavy(operation(call, op));
+  }
+
+  private Runnable operation(PluginCall call, Operation op) {
+    return () -> {
+      try {
+        JSObject result = op.run();
+        if (result != null) call.resolve(result);
+      } catch (Exception e) {
+        call.reject(
+            e.getMessage() == null ? "Operation failed. Please try again." : e.getMessage());
+      }
+    };
   }
 
   private TileArchive archive() {
@@ -104,7 +110,7 @@ public final class RidgelineOfflinePlugin extends Plugin {
 
   @PluginMethod
   public void estimateRegion(PluginCall c) {
-    async(
+    heavy(
         c,
         () -> {
           TilePlan p = plan(c);
@@ -120,8 +126,8 @@ public final class RidgelineOfflinePlugin extends Plugin {
                   p,
                   (tile, network) -> {
                     byte[] bytes =
-                        network
-                            ? TileNetwork.sample(tile, c.getString("key", ""))
+                        network && !archive().offlineOnly()
+                            ? TileNetwork.sample(getContext(), tile, c.getString("key", ""))
                             : archive().read(tile);
                     return bytes == null ? -1 : bytes.length;
                   },
@@ -237,7 +243,7 @@ public final class RidgelineOfflinePlugin extends Plugin {
 
   @PluginMethod
   public void setOfflineOnly(PluginCall c) {
-    io.execute(
+    jobs.execute(
         () -> {
           try {
             archive().offlineOnly(c.getBoolean("enabled", false));
@@ -260,7 +266,7 @@ public final class RidgelineOfflinePlugin extends Plugin {
 
   @PluginMethod
   public void removeOverviews(PluginCall c) {
-    async(
+    heavy(
         c,
         () -> {
           OverviewStore.get(getContext()).remove();
@@ -297,7 +303,7 @@ public final class RidgelineOfflinePlugin extends Plugin {
       c.reject("Select no more than 100 overview ZIPs at a time.");
       return;
     }
-    async(
+    heavy(
         c,
         () -> {
           int imported = 0;
@@ -436,7 +442,7 @@ public final class RidgelineOfflinePlugin extends Plugin {
 
   @PluginMethod
   public void exportRegionPdf(PluginCall c) {
-    async(
+    heavy(
         c,
         () -> {
           String regionId = id(c);
@@ -486,7 +492,7 @@ public final class RidgelineOfflinePlugin extends Plugin {
       return;
     }
     android.net.Uri uri = result.getData().getData();
-    async(
+    heavy(
         c,
         () -> {
           String regionId = id(c);
@@ -632,7 +638,7 @@ public final class RidgelineOfflinePlugin extends Plugin {
   protected void handleOnDestroy() {
     watching = false;
     if (locations != null) locations.removeUpdates(listener);
-    io.shutdownNow();
+    jobs.close();
     super.handleOnDestroy();
   }
 }
