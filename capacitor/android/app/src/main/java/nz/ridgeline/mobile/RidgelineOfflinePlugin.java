@@ -405,17 +405,14 @@ public final class RidgelineOfflinePlugin extends Plugin {
             throw new IOException("Complete a region download including NZ Topo first.");
           JSONArray b = region.getJSONArray("bounds");
           double[] bounds = {b.getDouble(0), b.getDouble(1), b.getDouble(2), b.getDouble(3)};
+          new TilePlan(bounds, 16, "topo", true);
           int[] extent = MapPdf.extent(bounds);
-          if (MapPdf.pageCount(bounds) > 320)
-            throw new IOException("Choose a smaller region for PDF export.");
           for (int y = extent[1]; y <= extent[3]; y++)
             for (int x = extent[0]; x <= extent[2]; x++)
               if (archive().size(regionId, TileAddress.tile("topo-raster", 16, x, y)) < 0)
                 throw new IOException(
                     "This older region lacks maximum-detail Topo. Download it again with NZ Topo at"
                         + " zoom 16.");
-          if (MapPdf.pageCount(bounds) > 320)
-            throw new IOException("Choose a smaller region for PDF export.");
           getActivity()
               .runOnUiThread(
                   () ->

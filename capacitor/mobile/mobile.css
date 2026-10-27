@@ -47,3 +47,14 @@
 #map-area{overflow:hidden}.region-outline{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:6;overflow:visible}.region-outline polygon{stroke:#db784a;stroke-width:1.5;fill:#e8794415;stroke-linejoin:round;vector-effect:non-scaling-stroke}
 .offline-region-corner{position:absolute;left:0;top:0;width:32px;height:32px;z-index:7;will-change:transform}.offline-region-corner:after{width:9px;height:9px;border-width:2px;box-shadow:0 1px 3px #0005}
 .route-selection{display:flex;gap:9px;align-items:center}.route-selection input{width:18px;height:18px;accent-color:var(--green)}.route-selection strong{margin:0}.saved-tools{display:flex;gap:14px;margin-top:10px}.saved-tools button{min-height:32px;font-size:12px;color:var(--orange)}.merge-order{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:11px;margin-top:8px}.merge-order button,.merge-controls button{padding:8px;border:1px solid var(--line);border-radius:5px;font-size:11px}.merge-controls p{font-size:11px;line-height:1.5}
+
+/* Paint the map behind the rounded cut-outs, instead of exposing a square paper backdrop. */
+.bottom-panel-open #map-area{height:calc(100% - var(--active-sheet-height,0px) + 24px)!important}
+#profile-card,#offline-panel{border-radius:24px 24px 0 0;clip-path:inset(0 round 24px 24px 0 0);background-clip:padding-box;isolation:isolate}
+.sheet-handle{flex-basis:30px;min-height:30px!important}
+.bottom-panel-open .maplibregl-ctrl-bottom-right,.bottom-panel-open .maplibregl-ctrl-bottom-left{bottom:24px}
+.sidebar-map-dismiss{display:none;position:absolute;inset:0;z-index:40;background:transparent;padding:0;border:0;border-radius:0}
+.planner-open .sidebar-map-dismiss{display:block}
+.route-card-heading{display:flex;gap:10px;align-items:center}.route-thumbnail{flex:0 0 64px;width:64px;height:56px;display:block;background:#edf2ed;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.route-card-copy{flex:1;min-width:0}.route-card-copy .route-selection strong{overflow-wrap:anywhere}.route-summary{font-size:11px;color:var(--muted);margin:6px 0 0;line-height:1.5}
+.rename-route-form{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.rename-route-form input{flex:1 1 100%;min-height:40px;border:1px solid var(--line);border-radius:5px;padding:8px;font-size:16px;min-width:0}.rename-route-form button{padding:8px 10px;border:1px solid var(--line);border-radius:5px;font-size:12px}

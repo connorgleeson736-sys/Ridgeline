@@ -1,4 +1,4 @@
-# Capacitor preview 0.7.0 validation
+# Capacitor preview 0.8.0 validation
 
 Validated 27 October 2026 (Melbourne). Development-signed preview; no Play Store release.
 
@@ -54,3 +54,9 @@ Pattern reference: [Material Components bottom sheets](https://github.com/materi
 - A standalone run of the exact PDF writer generated four-page and 80-page fixture atlases with a 48 MB Java heap limit. Poppler parsed and rasterized the four-page PDF; its landscape page geometry, crop, image orientation, title and attribution were visually inspected. This validates PDF serialization, not Android's document picker.
 - JavaScript checks cover route join order, reversal, identical shared endpoints, preserving originals and the 2,000-point limit. Browser workflows cover real route unloading, multiple visible routes, combined-route creation, revised layer placement, smaller sheets, 2D SVG region editing, touch/keyboard corner movement, maximum-detail Topo form settings, sampled-estimate display and the PDF bridge request. Native data/provider responses are controlled fixtures.
 - Full Topo PDF output from live LINZ downloads, Android document-provider behaviour and phone GPU responsiveness still need physical-device checks. No emulator was requested or used. Estimates are not confidence intervals; their storage allowances reflect sampling and fallback heuristics.
+
+## 0.8.0 verification
+
+Single-page export keeps every zoom-16 tile as a 256×256 lossless PDF image and clips to exact selected bounds. PDF unit tests check page count, resource coverage, cross-reference offsets, and UserUnit on a long map. Independent normal, large, and long fixture exports each report one page; the writer runs under a 48 MB Java heap. Poppler parses the PDF 1.6 output and renders the complete continuous map. Original v0.7 atlas results above are historical.
+
+JavaScript tests check route-summary distances and thumbnail fitting for point, horizontal and vertical routes. Browser checks exercise summary/thumbnail cards, persisted sidebar rename, backdrop dismissal without point edits, default-off peak labels, actual map underlap and rounded clipping, and a fixed screen frame while the map is panned/zoomed. Touch/keyboard corner resizing and sheet stops remain covered. Android file-picker interaction, live provider downloads and physical GPU performance are not validated by these fixtures.

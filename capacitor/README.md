@@ -35,7 +35,7 @@ Large input data remains outside the main source branch. The complete installer 
 
 ## Offline regions
 
-Choose **Logo menu → Download offline region**. Draw a rectangle using two map taps, drag any of its four corners, type bounds under Advanced, use the current view, or select an area around your route. Rectangles are restricted to New Zealand's main-island map extent. Choose imagery/detail and optional NZ Topo plus mapped overlays, estimate size, then download.
+Choose **Logo menu → Download offline region**. Create a screen-fixed rectangle and pan/zoom the map underneath it, resize its corners, type bounds under Advanced, use the current view, or select an area around your route. Rectangles are restricted to New Zealand's main-island map extent. Choose imagery/detail and optional NZ Topo plus mapped overlays, estimate size, then download.
 
 - Saved regions include all ancestor zooms and neighbouring elevation tiles. LINZ aerial downloads also include satellite imagery for gap coverage. Elevation is included through zoom 16; imagery through the chosen zoom (13–17). Topo raster stops at 16 and vector overlays at 14. Latin and Māori glyph ranges are included.
 - Zooming closer offline enlarges saved imagery/elevation. Elevation interpolation respects the encoded height value, avoiding RGB channel rollover errors. This does not create additional survey detail.
@@ -81,6 +81,14 @@ Sheet headers are 24 px high, with smaller compact mode and rounded corners. Dur
 
 For printable offline maps, choose **Logo menu → Download offline region → Map content → NZ Topo only · maximum detail**. This downloads the current raster Topo source through native zoom 16 without aerial imagery or elevation. Including Topo in a mixed download also requests its zoom 16 tiles independently of the chosen aerial detail. Completed regions containing those tiles offer **Export Topo PDF** under Saved regions. Android's Save dialog chooses the PDF destination.
 
-PDFs are north-up, A4 landscape atlases, eight by five native 256 px tiles per page (roughly 188 dpi), cropped to the selected bounds with LINZ attribution and page numbers. Map pixels are embedded losslessly; large regions span multiple pages rather than shrinking all detail onto one page. PDF generation streams one decoded tile at a time and requires no network. It uses saved raster cartography, without the route overlays. Older saved regions may lack zoom 16 Topo; the exporter explains that a new maximum-detail download is needed. The existing 12,000-file download limit and a 320-page PDF bound apply.
+PDFs are one continuous, north-up map page, cropped to the selected bounds with LINZ attribution. All native 256 px image tiles are embedded losslessly. Page dimensions grow with the selected region at a nominal 192 dpi print density; PDF 1.6 UserUnit supports very long pages without downsampling the imagery. PDF generation streams one decoded tile at a time and requires no network. It uses saved raster cartography, without the route overlays. Older saved regions may lack zoom 16 Topo; the exporter explains that a new maximum-detail download is needed. The existing 12,000-file download limit still applies.
 
 Size estimates stratify resources by source and zoom, use saved tile byte sizes when available, and sample up to 24 new tiles with four workers and a 20-second sampling deadline. The displayed point estimate and storage allowance are planning figures, not guaranteed file sizes. Estimates are cached for one minute; without usable samples they are explicitly labelled planning estimates. Overlapping region downloads reuse saved tiles.
+
+## 0.8.0 saved routes and viewport frame
+
+Saved-route cards include distance/waypoint summaries, north-up route-shape thumbnails with start/end markers, and inline Rename/Save/Cancel controls. Names are persisted to the same route store and active routes keep their identity. Opening additional routes fits the map to all open routes. Tapping the uncovered map area dismisses the sidebar without editing route points.
+
+The grip area is slightly taller (30 px). A 24 px map underlap and clipped sheet contents let the actual map show through rounded top corners instead of revealing a square paper background. Peak labels start off, with explicit changes saved on the device.
+
+Draw rectangle now creates a viewport-anchored frame immediately and keeps the download sheet open. Pan and zoom the map beneath the frame to choose coverage. Drag its corners to resize the frame. The geographic bounds update from the frame on every map movement. Changing the sheet height resizes the frame with the visible map area. Saved-region and Advanced-coordinate selections can still set exact geographic bounds.

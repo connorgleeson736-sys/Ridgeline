@@ -45,6 +45,7 @@ app=replace(app,"selectable:()=>map===active&&ready&&!switching", "selectable:()
 app=replace(app,"enabled:()=>map===active&&drawing&&ready", "enabled:()=>map===active&&drawing&&ready&&!globalThis.RidgeMobile?.selecting()");
 app=replace(app,'updateRendererUI();initMap();',`updateRendererUI();initMap(globalThis.RidgeMobile?.lastView());
 globalThis.RidgeMobile?.attach({getMap:()=>map,isReady:()=>ready,getKey:()=>activeLinzKey,getPoints:()=>points.map(p=>p.slice()),stopDrawing:()=>setDrawing(false),
+ renameRoute:(id,name)=>{name=name.trim();if(!name||name.length>80)throw Error('Use a route name of 1–80 characters.');if(id===activeSaved){$('route-name').value=name;return autoSaveRoute();}const old=saved;saved=saved.map(r=>r.id===id?{...r,name,updated:new Date().toISOString()}:r);if(!storageWrite()){saved=old;return false;}return true;},
  routes:()=>saved.map(r=>({...r,points:r.points.map(p=>p.slice())})),activeRoute:()=>activeSaved,
  openRoute:id=>{const r=saved.find(r=>r.id===id);if(!r||!autoSaveRoute())return false;setDrawing(false);popupDismissed=false;resetRouteHistory();points=r.points.map(p=>p.slice());activeSaved=r.id;$('route-name').value=r.name;setSidebar(false);updateRoute();fitRoute();return true;},
  unloadRoute:()=>{if(!autoSaveRoute())return false;setDrawing(false);routeEditor?.cancel();points=[];activeSaved=null;selectedRoutePoint=-1;popupDismissed=true;resetRouteHistory();profileClient.cancel();profile=[];updateRoute();return true;},
@@ -96,6 +97,7 @@ basic.append(advanced.querySelector('.layer-choices'));
 const details=$('detail-controls'),quick=document.createElement('fieldset');quick.className='detail-controls';quick.innerHTML='<legend>Map detail</legend>';
 for(const id of ['imagery-detail','terrain-detail']){const input=$(id),label=details.querySelector(`label[for="${id}"]`);quick.append(label,input);}
 basic.append(quick);
+$('labels').removeAttribute('checked');
 for(const id of ['labels','hillshade'])advanced.append($(id).closest('label'));
 const topoSection=$('topo-names').closest('fieldset,details');if(topoSection)basic.append(topoSection);
 const offline=document.createElement('button');offline.id='open-offline';offline.className='primary';offline.textContent='Download offline region';$('sidebar').append(offline);

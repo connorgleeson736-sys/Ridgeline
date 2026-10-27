@@ -25,7 +25,9 @@ public class MapPdfTest {
           return rgb;
         });
     String pdf = out.toString(StandardCharsets.ISO_8859_1);
-    assertTrue(pdf.startsWith("%PDF-1.4"));
+    assertTrue(pdf.startsWith("%PDF-1.6"));
+    assertTrue(pdf.contains("/Count 1 /Kids"));
+    assertTrue(pdf.contains("/UserUnit "));
     assertTrue(pdf.endsWith("%%EOF\n"));
     long expected = new TilePlan(b, 16, "topo", true).tiles.stream().filter(t -> t.z == 16).count();
     assertEquals(expected, seen.size());
@@ -39,6 +41,24 @@ public class MapPdfTest {
       int offset = Integer.parseInt(rows[id + 2].substring(0, 10));
       assertTrue(pdf.substring(offset).startsWith(id + " 0 obj\n"));
     }
+  }
+
+  @Test
+  public void longMapsStayOnOnePageWithNativeImagesAndUserUnits() throws Exception {
+    int x = TilePlan.x(170.14, 16), y = TilePlan.y(-43.59, 16);
+    double[] b = {
+      (x + .2) / 65536 * 360 - 180,
+      Math.toDegrees(Math.atan(Math.sinh(Math.PI * (1 - 2 * (y + 1.7) / 65536)))),
+      (x + 199.8) / 65536 * 360 - 180,
+      Math.toDegrees(Math.atan(Math.sinh(Math.PI * (1 - 2 * (y + .3) / 65536))))
+    };
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    MapPdf.write(out, "Wide test", b, (z, tx, ty) -> new byte[256 * 256 * 3]);
+    String pdf = out.toString(StandardCharsets.ISO_8859_1);
+    assertTrue(pdf.contains("/Count 1 /Kids"));
+    assertTrue(pdf.contains("/UserUnit 2.000000"));
+    assertEquals(400, pdf.split("/Subtype /Image", -1).length - 1);
+    assertEquals(400, pdf.split("/Width 256 /Height 256", -1).length - 1);
   }
 
   @Test

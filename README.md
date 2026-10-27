@@ -38,3 +38,5 @@ separate imagery imports or first-launch extraction are needed.
 Version 0.6.0 adds draggable bottom sheets with compact route metrics, larger elevation profiles, saved regions in the logo sidebar and resizable region rectangles. The smaller base APK supports optional import of the six prepared overview ZIPs.
 
 Version 0.7.0 refines sheet and selection performance, supports multiple open routes and combining them, adds maximum-detail offline Topo/PDF atlases, and samples actual tile sizes for download estimates.
+
+Version 0.8.0 exports full-detail Topo maps as one continuous PDF page, restores route summaries with previews and sidebar renaming, and uses a viewport-anchored region frame with map pan/zoom underneath.
