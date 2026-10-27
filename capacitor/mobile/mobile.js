@@ -17,19 +17,30 @@ function syncPanels(){
  const offline=$('offline-panel')&&!$('offline-panel').hidden;
  const route=!$('profile-card').hidden&&!offline&&!selecting;
  const height=offline?offlineSheet?.height:route?routeSheet?.height:0;
- const workspace=document.querySelector('.workspace');
+ const workspace=document.querySelector('.workspace'),dragging=!!document.querySelector('.sheet-dragging');
+ if(dragging){
+  // Only clipping and transforms change during movement. Layout and map resize
+  // happen at the boundaries, never on every pointer frame.
+  if(!document.body.classList.contains('map-sheet-dragging')){
+   const viewport=workspace.clientHeight;
+   document.body.classList.add('map-sheet-dragging');
+   $('map').style.height=viewport+'px';
+   api?.getMap()?.resize();
+  }
+  workspace.style.setProperty('--drag-sheet-inset',Math.max(0,(height||0)-24)+'px');
+  return;
+ }
+ const wasDragging=document.body.classList.contains('map-sheet-dragging');
+ document.body.classList.remove('map-sheet-dragging');
  const value=(height||0)+'px';
- const changed=workspace.style.getPropertyValue('--active-sheet-height')!==value;
- workspace.style.setProperty('--active-sheet-height',value);
+ if(workspace.style.getPropertyValue('--active-sheet-height')!==value)workspace.style.setProperty('--active-sheet-height',value);
  document.body.classList.toggle('bottom-panel-open',!!(offline||route));
  document.body.classList.toggle('offline-panel-open',!!offline);
  document.body.classList.toggle('region-selecting',selecting);
- const dragging=!!document.querySelector('.sheet-dragging');
- document.body.classList.toggle('map-sheet-dragging',dragging);
- const mapElement=$('map');mapElement.style.height=dragging?workspace.clientHeight+'px':'';
- const size=dragging?'drag:'+workspace.clientHeight:value;
- if(lastMapSize!==size){lastMapSize=size;api?.getMap()?.resize();}regionOverlay?.refresh();
+ $('map').style.height='';
+ if(lastMapSize!==value||wasDragging){lastMapSize=value;api?.getMap()?.resize();regionOverlay?.refresh();if(route)requestAnimationFrame(()=>api?.redrawProfile());}
 }
+
 function updateRegionHandles(bounds){drawSelection(bounds);}
 function stopSelection(){selecting=false;corners=[];selectionMarkers.forEach(m=>m.remove());selectionMarkers=[];$('offline-select-hint')?.remove();if(api?.getMap())api.getMap().getCanvas().style.cursor='';}
 function cancelSelection(){stopSelection();drawSelection(selectionBounds);void openOffline().catch(showError);}
@@ -75,6 +86,8 @@ function setupPanels(){
  $('profile-toggle').hidden=true;$('route-save-status').hidden=true;document.querySelector('.route-more').hidden=true;
  routeSheet=attachSheet(card,{initial:0,onChange:syncPanels});
  offlineSheet=attachSheet($('offline-panel'),{initial:1,onChange:syncPanels});
+ const layersDismiss=button('',()=>$('layers-close').click());layersDismiss.className='layers-map-dismiss';layersDismiss.setAttribute('aria-label','Close layers by returning to map');document.querySelector('.workspace').append(layersDismiss);
+ new MutationObserver(()=>document.body.classList.toggle('layers-open',!$('layers-panel').hidden)).observe($('layers-panel'),{attributes:true,attributeFilter:['hidden']});
  const dismiss=button('',()=>$('sidebar-close').click());dismiss.className='sidebar-map-dismiss';dismiss.setAttribute('aria-label','Close sidebar by returning to map');document.querySelector('.workspace').append(dismiss);
  $('labels').checked=false;try{$('labels').checked=localStorage.getItem('ridgeline-peak-labels-v1')==='1';}catch{}$('labels').addEventListener('change',()=>{try{localStorage.setItem('ridgeline-peak-labels-v1',$('labels').checked?'1':'0');}catch{}});
  const create=$('plan-shortcut');create.id='plan-shortcut';create.className='saved-create';create.innerHTML='<span aria-hidden="true">＋</span> Create new';create.setAttribute('aria-label','Create new route');create.title='Create new route';
@@ -92,9 +105,10 @@ function setupGps(){const b=button('',async()=>{native();if(gps){await Native.st
 }
 globalThis.RidgeMobile={attach(value){api=value;setupTabs();createOfflinePanel();setupRegionSidebar();setupPanels();setupGps();routeWorkspace=attachRoutes(api,{button,el,showError});routeWorkspace.render(api.routes(),api.activeRoute());api.getMap()?.on('moveend',()=>{const m=api.getMap();try{localStorage.setItem('ridgeline-mobile-view-v1',JSON.stringify({center:m.getCenter().toArray(),zoom:m.getZoom(),pitch:m.getPitch(),bearing:m.getBearing()}));}catch{}});const importInput=$('import'),importLink=importInput.closest('label');importLink.addEventListener('click',e=>{if(!Capacitor.isNativePlatform())return;e.preventDefault();Native.importGpx().then(file=>{if(file.text!==undefined)return api.importText(file.name,file.text);}).catch(showError);});},
  lastView(){try{const v=JSON.parse(localStorage.getItem('ridgeline-mobile-view-v1'));if(v&&Array.isArray(v.center)&&v.center.length===2&&v.center.every(Number.isFinite)&&v.center[0]>=165&&v.center[0]<=180&&v.center[1]>=-49&&v.center[1]<=-33&&Number.isFinite(v.zoom)&&v.zoom>=4&&v.zoom<=19&&Number.isFinite(v.pitch)&&v.pitch>=0&&v.pitch<=85&&Number.isFinite(v.bearing))return v;}catch{}return undefined;},
- renderRoutes:(saved,active)=>routeWorkspace?.render(saved,active)||false,
+ renderRoutes:(saved,active)=>{routeWorkspace?.render(saved,active);return true;},
  status:()=>({...api?.renderStatus(),openedRoutes:routeWorkspace?.opened()}),
  selecting:()=>selecting||regionDragging||!!($('offline-panel')&&!$('offline-panel').hidden),
+ canDrawProfile:()=>!document.body.classList.contains('map-sheet-dragging')&&$('profile-card').dataset.snap==='expanded'&&!$('profile-card').hidden&&!document.body.classList.contains('offline-panel-open'),
  syncPanels,
  mapClick(e){if(!selecting)return !!($('offline-panel')&&!$('offline-panel').hidden)||regionDragging;const point=[e.lngLat.lng,e.lngLat.lat];if(point[0]<165||point[0]>180||point[1]<-49||point[1]>-33){api.toast('Choose a region within New Zealand.');return true;}if(!corners.length){corners.push(point);const dot=el('span',undefined,'offline-corner');selectionMarkers.push(new maplibregl.Marker({element:dot}).setLngLat(point).addTo(api.getMap()));$('offline-select-hint').querySelector('span').textContent='Tap the opposite corner';return true;}const a=corners[0],b=point;if(Math.abs(a[0]-b[0])<.0001||Math.abs(a[1]-b[1])<.0001){api.toast('Choose a larger rectangle.');return true;}setBounds([Math.min(a[0],b[0]),Math.min(a[1],b[1]),Math.max(a[0],b[0]),Math.max(a[1],b[1])]);stopSelection();void openOffline().catch(showError);return true;},
  async exportGpx(name,text){try{native();const result=await Native.exportGpx({name,text});if(!result.cancelled)api.toast('GPX saved.');}catch(e){showError(e);}},

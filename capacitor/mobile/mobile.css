@@ -58,3 +58,13 @@
 .route-card-heading{display:flex;gap:10px;align-items:center}.route-thumbnail{flex:0 0 64px;width:64px;height:56px;display:block;background:#edf2ed;border:1px solid var(--line);border-radius:7px;overflow:hidden}
 .route-card-copy{flex:1;min-width:0}.route-card-copy .route-selection strong{overflow-wrap:anywhere}.route-summary{font-size:11px;color:var(--muted);margin:6px 0 0;line-height:1.5}
 .rename-route-form{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.rename-route-form input{flex:1 1 100%;min-height:40px;border:1px solid var(--line);border-radius:5px;padding:8px;font-size:16px;min-width:0}.rename-route-form button{padding:8px 10px;border:1px solid var(--line);border-radius:5px;font-size:12px}
+
+/* During a sheet gesture, only the sheet transform and map clipping move. */
+.map-sheet-dragging #map-area{height:100%!important;clip-path:inset(0 0 var(--drag-sheet-inset,0px) 0)}
+.sheet-dragging{will-change:transform}
+.layers-map-dismiss{display:none;position:absolute;inset:0;z-index:31;background:transparent;padding:0;border:0;border-radius:0}
+.layers-open .layers-map-dismiss{display:block}
+#layers-panel{z-index:32;width:320px;padding:14px}
+#layers-panel .layers-tabs{margin-bottom:10px}
+#layers-basic .detail-controls{margin:12px 0}
+@media(max-width:600px){#layers-panel{width:calc(100% - 40px);max-width:330px;right:10px}}

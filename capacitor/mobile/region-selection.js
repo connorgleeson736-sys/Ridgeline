@@ -18,7 +18,7 @@ export function attachRegionSelection(map,{onChange,onCommit,onDrag=()=>{}}){
   return node;
  });
  function draw(){svg.style.display=visible&&bounds?'':'none';nodes.forEach(n=>n.hidden=!visible||!handles||!bounds);if(!visible||!bounds)return;const points=handles?pixels():[[bounds[0],bounds[1]],[bounds[2],bounds[1]],[bounds[2],bounds[3]],[bounds[0],bounds[3]]].map(p=>{const s=map.project(p);return [s.x,s.y];});polygon.setAttribute('points',points.map(p=>p.join(',')).join(' '));points.forEach((p,i)=>nodes[i].style.transform=`translate3d(${p[0]-16}px,${p[1]-16}px,0)`);}
- function refresh(){draw();report();}
+ function refresh(){if(document.body.classList.contains('map-sheet-dragging'))return;draw();report();}
  function schedule(){if(frame!==undefined)return;frame=requestAnimationFrame(()=>{frame=undefined;if(pending&&drag){resize(drag.index,...pending);pending=undefined;}refresh();});}
  map.on('move',schedule);map.on('resize',schedule);map.on('moveend',()=>{refresh();if(visible&&handles)report(true);});
  return {

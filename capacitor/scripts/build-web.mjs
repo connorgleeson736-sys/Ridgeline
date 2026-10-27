@@ -41,17 +41,20 @@ if(start<0||end<0)throw Error('Renderer integration changed');
 app=app.slice(0,start)+app.slice(end);
 app=replace(app,"const url=URL.createObjectURL(new Blob([xml],{type:'application/gpx+xml'}))", "if(globalThis.RidgeMobile){void RidgeMobile.exportGpx(name,xml);return;}const url=URL.createObjectURL(new Blob([xml],{type:'application/gpx+xml'}))");
 app=replace(app,"active.on('click',e=>{if(map!==active)return;", "active.on('click',e=>{if(map!==active)return;if(globalThis.RidgeMobile?.mapClick(e))return;");
-app=replace(app,"selectable:()=>map===active&&ready&&!switching", "selectable:()=>map===active&&ready&&!switching&&!globalThis.RidgeMobile?.selecting()");
+app=replace(app,"selectable:()=>map===active&&ready&&!switching", "selectable:()=>map===active&&drawing&&ready&&!switching&&!globalThis.RidgeMobile?.selecting()");
 app=replace(app,"enabled:()=>map===active&&drawing&&ready", "enabled:()=>map===active&&drawing&&ready&&!globalThis.RidgeMobile?.selecting()");
 app=replace(app,'updateRendererUI();initMap();',`updateRendererUI();initMap(globalThis.RidgeMobile?.lastView());
 globalThis.RidgeMobile?.attach({getMap:()=>map,isReady:()=>ready,getKey:()=>activeLinzKey,getPoints:()=>points.map(p=>p.slice()),stopDrawing:()=>setDrawing(false),
  renameRoute:(id,name)=>{name=name.trim();if(!name||name.length>80)throw Error('Use a route name of 1–80 characters.');if(id===activeSaved){$('route-name').value=name;return autoSaveRoute();}const old=saved;saved=saved.map(r=>r.id===id?{...r,name,updated:new Date().toISOString()}:r);if(!storageWrite()){saved=old;return false;}return true;},
- routes:()=>saved.map(r=>({...r,points:r.points.map(p=>p.slice())})),activeRoute:()=>activeSaved,
+ routes:()=>saved.slice(),redrawProfile:()=>drawProfile(),activeRoute:()=>activeSaved,
  openRoute:id=>{const r=saved.find(r=>r.id===id);if(!r||!autoSaveRoute())return false;setDrawing(false);popupDismissed=false;resetRouteHistory();points=r.points.map(p=>p.slice());activeSaved=r.id;$('route-name').value=r.name;setSidebar(false);updateRoute();fitRoute();return true;},
  unloadRoute:()=>{if(!autoSaveRoute())return false;setDrawing(false);routeEditor?.cancel();points=[];activeSaved=null;selectedRoutePoint=-1;popupDismissed=true;resetRouteHistory();profileClient.cancel();profile=[];updateRoute();return true;},
  deleteRoute:id=>{if(id===activeSaved&&!autoSaveRoute())return false;const old=saved;saved=saved.filter(r=>r.id!==id);if(!storageWrite()){saved=old;return false;}if(id===activeSaved){setDrawing(false);points=[];activeSaved=null;popupDismissed=true;resetRouteHistory();updateRoute();}renderSaved();return true;},
  createCombined:value=>{if(!autoSaveRoute())return false;if(saved.length>=50){toast('Delete or export an old route before combining (50 route limit).');return false;}setDrawing(false);points=value;activeSaved=null;selectedRoutePoint=-1;popupDismissed=false;resetRouteHistory();$('route-name').value='Combined route';updateRoute();setSidebar(false);fitRoute();return true;},importText:(name,text)=>importRoute(new File([text],name,{type:'application/gpx+xml'})),refresh:()=>{profileClient.cancel();profileStamp='';queueProfile();},toast,goPeak,renderStatus:()=>({ready,terrain:!!map?.getTerrain(),direct:directRaster?.stats(),points:points.length,profile:profile.map(p=>({h:p.h,provider:p.provider}))})});`);
 app=replace(app,"function renderSaved(){","function renderSaved(){if(globalThis.RidgeMobile?.renderRoutes(saved,activeSaved))return;");
+// Consolidate successful saves into one card refresh, after activeSaved is set.
+app=replace(app,"updateSavedCount();return true;","return true;");
+app=replace(app,"function drawProfile(){","function drawProfile(){if(globalThis.RidgeMobile?.canDrawProfile&&!globalThis.RidgeMobile.canDrawProfile())return;");
 // App panels occupy their own row so map hit testing and camera fitting use the visible viewport.
 app=replace(app,"routePopup=RidgeRouteInteractions.attachPopup({element:$('profile-card'),handle:$('profile-drag-handle'),bounds:$('map-area'),resizeHandle:$('profile-resize-handle')})","routePopup={constrain(){}}");
 app=replace(app,"if($('profile-card').hidden)chartInteraction?.clear();","globalThis.RidgeMobile?.syncPanels();if($('profile-card').hidden)chartInteraction?.clear();");
@@ -100,6 +103,7 @@ basic.append(quick);
 $('labels').removeAttribute('checked');
 for(const id of ['labels','hillshade'])advanced.append($(id).closest('label'));
 const topoSection=$('topo-names').closest('fieldset,details');if(topoSection)basic.append(topoSection);
+$('topographic-note').hidden=true;$('topo-status').hidden=true;
 const offline=document.createElement('button');offline.id='open-offline';offline.className='primary';offline.textContent='Download offline region';$('sidebar').append(offline);
 const note=document.createElement('p');note.textContent='3D terrain · Original + Direct';note.className='topo-basemap-note';basic.append(note);
 const tabs=document.createElement('div');tabs.className='layers-tabs';tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label','Layer settings');
