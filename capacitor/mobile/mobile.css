@@ -3,11 +3,37 @@
 @media(max-width:600px){#layers-panel{top:68px;right:10px;max-height:calc(100dvh - 92px);width:calc(100% - 20px);max-width:360px}.mobile-panel{top:10px;right:10px;bottom:10px;max-width:calc(100% - 20px);width:400px}.map-launcher{left:10px;top:10px}.profile-card{max-height:60dvh}.route-name{font-size:16px}.mobile-panel .panel-heading button{min-width:44px;min-height:44px}.maplibregl-ctrl-attrib{max-width:85vw}#toast{bottom:36px}}
 
 /* Reserve 3/8 of the viewport for route and download panels, including landscape. */
-.bottom-panel-open #map-area{height:62.5%;bottom:auto}
-#profile-card,.mobile-panel{position:absolute!important;inset:62.5% 0 0!important;width:100%!important;max-width:none!important;height:37.5%!important;min-height:0!important;max-height:none!important;margin:0;border-radius:14px 14px 0 0;padding:14px 18px max(14px,env(safe-area-inset-bottom));overflow:auto;overscroll-behavior:contain;box-sizing:border-box;background:var(--paper);box-shadow:0 -4px 18px #10212c20;z-index:30}
+#map-area{height:calc(100% - var(--active-sheet-height,0px))!important;bottom:auto}
+#profile-card,.mobile-panel{position:absolute!important;inset:auto 0 0!important;width:100%!important;max-width:none!important;height:var(--sheet-height,176px)!important;min-height:0!important;max-height:none!important;margin:0;border-radius:14px 14px 0 0;padding:14px 18px max(14px,env(safe-area-inset-bottom));overflow:auto;overscroll-behavior:contain;box-sizing:border-box;background:var(--paper);box-shadow:0 -4px 18px #10212c20;z-index:30}
 #profile-card[hidden],#offline-panel[hidden],.offline-panel-open #profile-card{display:none!important}
 #profile-card{visibility:visible!important;pointer-events:auto!important;display:flex}
 #profile-card #profile-body{flex:1;min-height:100px;margin-top:6px}#profile-card .chart-wrap,#profile-card .chart-wrap svg{min-height:100px}
 #profile-card .stats{margin:8px 0}#profile-card .route-popup-actions{margin-top:6px;padding-top:6px;flex-wrap:wrap}
 #profile-card.chart-collapsed{height:37.5%!important}.saved-create{display:flex;width:100%;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);border-radius:6px;min-height:44px;margin:-8px 0 18px;font-size:13px;color:var(--green);background:white}.saved-create span{font-size:22px}
 #offline-panel .panel-heading{margin-bottom:10px}#offline-panel details{border-top:1px solid var(--line);padding:10px 0}#offline-panel summary{font-size:12px;cursor:pointer;min-height:32px;align-content:center}#offline-panel .coordinate-grid label{margin:6px 0}.offline-corner{width:16px;height:16px;border:3px solid white;border-radius:50%;background:#e87944;box-shadow:0 1px 6px #0005}.offline-select-hint{top:72px;min-width:200px}.offline-select-hint button{min-height:40px}
+
+/* Material-style handle: a small pill inside a comfortable touch target. */
+#profile-card,#offline-panel{display:flex;flex-direction:column;padding:0!important;overflow:hidden!important}
+.sheet-handle{flex:0 0 48px;min-height:48px!important;width:100%;display:grid;place-items:center;touch-action:none;cursor:ns-resize;padding:0;border:0;background:transparent;user-select:none}
+.sheet-handle span{display:block;width:36px;height:4px;border-radius:99px;background:#8a9691}
+.sheet-content{flex:1;min-height:0;overflow:auto;padding:0 16px max(10px,env(safe-area-inset-bottom));overscroll-behavior:contain}
+#profile-card .sheet-content{display:flex;flex-direction:column;gap:0}
+#profile-card .profile-header{flex-shrink:0;min-height:30px}#profile-card .profile-header .route-name{font-size:13px;padding:3px 0}
+#profile-card #route-close{font-size:25px;width:36px;height:30px;padding:0;line-height:1}
+#profile-card .stats{flex-shrink:0;margin:7px 0;gap:6px}#profile-card .stats span{font-size:9px;margin-bottom:3px}#profile-card .stats strong{font-size:14px}
+#profile-card .route-popup-actions{flex-shrink:0;margin-top:4px;padding-top:6px;gap:6px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+#profile-card .route-popup-actions button{min-height:36px;padding:5px 3px;font-size:11px;white-space:nowrap}
+#profile-card #profile-body{flex:1 0 120px;min-height:120px;width:100%;margin:4px 0 0}
+#profile-card .chart-wrap,#profile-card .chart-wrap svg{width:100%;height:100%;min-height:120px;max-width:100%}
+#profile-card[data-snap=compact] #profile-body,#profile-card #route-edit-hint,#profile-card #route-selected-point{display:none!important}
+#profile-card[data-snap=compact] .sheet-content{overflow-y:auto}
+#profile-card #profile-toggle,#profile-card .route-more,#profile-card .route-save-status{display:none!important}
+.region-selecting #profile-card{display:none!important}
+#sidebar{z-index:45}#saved-panel{flex:1 0 auto}.offline-sidebar-footer{position:sticky;bottom:0;flex-shrink:0;margin-top:auto;padding:14px 18px max(14px,env(safe-area-inset-bottom));background:var(--paper);border-top:1px solid var(--line)}
+.saved-regions{padding:18px 0 0;border-top:1px solid var(--line);margin-top:18px}.saved-regions h2{font-size:16px;font-weight:500;margin:0 0 10px}.saved-regions .saved-item{padding:12px 0}.saved-regions button{min-height:36px;font-size:12px;color:var(--orange)}
+.offline-region-corner{width:44px;height:44px;display:grid;place-items:center;padding:0;touch-action:none;background:none;cursor:move}
+.offline-region-corner:after{content:'';display:block;width:15px;height:15px;background:#e87944;border:3px solid white;border-radius:50%;box-shadow:0 1px 5px #0008}
+.offline-region-corner:focus-visible:after{outline:2px solid var(--green);outline-offset:3px}
+@media(max-width:360px){#profile-card .sheet-content{padding-left:10px;padding-right:10px}#profile-card .stats strong{font-size:12px}#profile-card .route-popup-actions button{font-size:10px}}
+
+#profile-card[data-snap=compact] .profile-header{position:absolute;top:8px;right:12px;min-height:30px}#profile-card[data-snap=compact] .profile-header .route-name{display:none}

@@ -1,4 +1,4 @@
-# Capacitor preview 0.5.0 validation
+# Capacitor preview 0.6.0 validation
 
 Validated 27 October 2026 (Melbourne). Development-signed preview; no Play Store release.
 
@@ -37,3 +37,13 @@ Website source changes are committed and provided in a four-file deployment ZIP.
 ## 0.5.0 panel changes
 
 Route creation lives under Import GPX in the logo menu. Route and offline panels reserve the bottom 3/8 of the viewport; camera fitting and hit testing use the resized map. App popup dragging/resizing is disabled for these fixed panels. Coordinates and bundled imagery information are collapsed. Rectangle selection has a first-corner marker, pointer preview, small-area validation and cancellation that retains the previous region. Browser checks cover saved-route reopening, panel/map geometry and selection cancellation. No emulator validation is used.
+
+## 0.6.0 bottom sheets and region controls
+
+The route and offline panels use a Material-style pill handle with compact, 40% and 64% height stops. Touch/pointer dragging, tap cycling and keyboard controls update the actual map viewport. Resize events preserve the selected stop across rotation. Compact route mode hides the graph and route name, retaining metrics and edit/export/delete-point/undo; the graph returns in the two larger positions. Legacy More, automatic-save text and elevation-toggle controls are not presented. The route close control is an ×. Automatic saving still protects routes.
+
+The offline download action is pinned to the bottom of the logo sidebar. Saved regions use the native download list, with state/size and an Open action; no second region catalogue is maintained. Rectangle corner markers provide 44 px touch targets and pointer/keyboard resizing, update stored bounds and preserve route points. Region editing suppresses route picking and drawing. The smaller base APK and six prepared ZIP import workflow are retained.
+
+The browser check uses a controlled Android data bridge for saved-region responses and real MapLibre gestures for sheet and corner dragging, including Chromium touch events. It exercises initial route creation in 3D, then repeated sheet resizing, rotation and corner manipulation in 2D to keep software-rendering load bounded. It also checks rotation, compact/expanded controls, chart width, saved-route/region reopening and cancellation. These checks exercise the app UI in Chromium, not physical Android device gestures or the native download service.
+
+Pattern reference: [Material Components bottom sheets](https://github.com/material-components/material-components-android/blob/master/docs/components/BottomSheet.md), including drag handles, collapsed/half-expanded/expanded states and accessibility actions.

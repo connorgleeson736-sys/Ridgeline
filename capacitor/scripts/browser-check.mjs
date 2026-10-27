@@ -14,12 +14,25 @@ await new Promise(r=>server.listen(0,'127.0.0.1',r));
 const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
 const errors=[],consoleErrors=[],requests=[];let page,archiveReads=0;
 try{
- const context=await browser.newContext({viewport:{width:412,height:915},deviceScaleFactor:2,isMobile:true,hasTouch:true});
+ const context=await browser.newContext({viewport:{width:412,height:915},deviceScaleFactor:2,isMobile:true,hasTouch:true,reducedMotion:'reduce'});
 
+ // Mock only Android's data bridge; UI, map rendering and gestures run in Chromium.
+ await context.addInitScript(()=>{
+  window.CapacitorCustomPlatform={name:'android'};
+  window.__regions=[{id:'test-region',name:'Saved test region',state:'complete',done:12,total:12,bytes:1048576,bounds:[170.05,-43.65,170.2,-43.5]}];
+  const methods=['getSettings','overviewStatus','listRegions','pauseRegion','resumeRegion','removeRegion','startLocation','stopLocation','addListener','removeListener'];
+  window.Capacitor={PluginHeaders:[{name:'RidgelineOffline',methods:methods.map(name=>({name,rtype:'promise'}))}],nativePromise:async(plugin,method,args)=>{
+   if(method==='getSettings')return {offlineOnly:false};
+   if(method==='overviewStatus')return {bundled:false,complete:false,done:0,total:6,bytes:0};
+   if(method==='listRegions')return {regions:window.__regions};
+   if(method==='removeRegion')window.__regions=window.__regions.filter(r=>r.id!==args.id);
+   return {};
+  }};
+ });
  const dem=png();
  const imagery=await readFile(new URL('../../public/assets/cook-reference-v1/b872335eddfb7fc3c554d59a.webp',import.meta.url));
  await context.route('https://localhost/_ridge/**',async route=>{const url=route.request().url();requests.push(url);if(process.env.RIDGELINE_OVERVIEW_DATA&&url.includes('/_ridge/overviews/')){const match=new URL(url).pathname.match(/^\/_ridge\/overviews\/([a-f0-9]{64})\/(\d+)\/(\d+)$/);assert.ok(match);const file=await open(path.join(process.env.RIDGELINE_OVERVIEW_DATA,match[1]+'.bin'));let data;try{data=Buffer.alloc(Number(match[3]));const result=await file.read(data,0,data.length,Number(match[2]));assert.equal(result.bytesRead,data.length);}finally{await file.close();}archiveReads++;return route.fulfill({status:200,headers:{'access-control-allow-origin':'*'},contentType:'image/webp',body:data});}if(url.includes('.pbf'))return route.fulfill({status:200,headers:{'access-control-allow-origin':'*'},contentType:'application/x-protobuf',body:Buffer.alloc(0)});return route.fulfill({status:200,headers:{'access-control-allow-origin':'*'},contentType:url.includes('/elevation/')||url.includes('/mapzen/')?'image/png':'image/webp',body:url.includes('/elevation/')||url.includes('/mapzen/')?dem:imagery});});
- page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')consoleErrors.push(m.text());});
+ page=await context.newPage();page.setDefaultTimeout(60000);page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')consoleErrors.push(m.text());});
  await page.goto(`http://127.0.0.1:${server.address().port}/`,{waitUntil:'load'});
  console.log('Website loaded');
  await page.waitForFunction(()=>globalThis.RidgeMobile?.status()?.ready,null,{timeout:60000});
@@ -36,19 +49,52 @@ try{
  await page.waitForFunction(()=>globalThis.RidgeMobile.status().profile.some(p=>Number.isFinite(p.h)),null,{timeout:60000});
  console.log('Route/profile ready');
  const panelGeometry=()=>page.evaluate(()=>{const map=document.getElementById('map-area').getBoundingClientRect(),panel=document.getElementById('profile-card').getBoundingClientRect();return {mapBottom:map.bottom,panelTop:panel.top,ratio:map.height/innerHeight};});
- let layout=await panelGeometry();assert.ok(Math.abs(layout.ratio-.625)<.005);assert.ok(Math.abs(layout.mapBottom-layout.panelTop)<1);
- await page.screenshot({path:path.join(diagnostics,'route-bottom-panel.png')});
+ let layout=await panelGeometry();assert.ok(layout.ratio>.8);assert.ok(Math.abs(layout.mapBottom-layout.panelTop)<1);
+ assert.equal(await page.locator('#profile-body').isVisible(),false);
+ for(const selector of ['#profile-toggle','.route-more','#route-save-status'])assert.equal(await page.locator(selector).isVisible(),false);
+ for(const selector of ['#route-popup-edit','#route-popup-export','#route-popup-delete','#undo'])assert.equal(await page.locator(selector).isVisible(),true);
+ assert.equal(await page.locator('#route-close').textContent(),'×');
+ await page.screenshot({path:path.join(diagnostics,'route-sheet-compact.png')});
+ // Route creation above exercises 3D. Use 2D for repeated software-rendered resizes/rotation.
+ await page.locator('#view-2d').click();await page.waitForFunction(()=>!__testMap.getTerrain());
+ const routeHandle=page.locator('#profile-card .sheet-handle');
+ let handleBox=await routeHandle.boundingBox();await page.mouse.move(handleBox.x+handleBox.width/2,handleBox.y+20);await page.mouse.down();await page.mouse.move(handleBox.x+handleBox.width/2,handleBox.y-400,{steps:8});await page.mouse.up();
+ assert.equal(await page.locator('#profile-card').getAttribute('data-snap'),'expanded');assert.equal(await page.locator('#profile-body').isVisible(),true);
+ layout=await panelGeometry();assert.ok(Math.abs(layout.ratio-.36)<.005);
+ const chartFits=await page.locator('#chart').evaluate(n=>n.getBoundingClientRect().right<=innerWidth&&n.getBoundingClientRect().left>=0);assert.equal(chartFits,true);
+ await page.screenshot({path:path.join(diagnostics,'route-sheet-expanded.png')});
+ await routeHandle.focus();await page.keyboard.press('ArrowDown');assert.equal(await page.locator('#profile-card').getAttribute('data-snap'),'middle');
+ await page.setViewportSize({width:915,height:412});await page.waitForTimeout(150);assert.equal(await page.locator('#profile-card').getAttribute('data-snap'),'middle');await page.setViewportSize({width:412,height:915});
  await page.locator('#route-close').click();assert.equal(await page.evaluate(()=>document.getElementById('map-area').clientHeight),915);
- await page.locator('#planner-toggle').click();await page.locator('#saved-list').getByRole('button',{name:'Open',exact:true}).first().click();layout=await panelGeometry();assert.ok(Math.abs(layout.ratio-.625)<.005);await page.locator('#route-close').click();
- await page.locator('#layers-toggle').click();await page.locator('#open-offline').click();assert.equal(await page.locator('html').getAttribute('data-overviews-bundled'),'true');assert.equal(await page.locator('#overview-import').isVisible(),false);assert.match(await page.locator('#overview-status').textContent(),/Included in app/);assert.equal(await page.locator('#offline-west').isVisible(),false);assert.ok(Math.abs(await page.evaluate(()=>document.getElementById('map-area').clientHeight/innerHeight)-.625)<.005);await page.getByRole('button',{name:'Draw rectangle',exact:true}).click();await page.mouse.click(140,350);await page.mouse.move(270,510);assert.equal(await page.locator('.offline-corner').count(),1);await page.mouse.click(270,510);await page.locator('#offline-panel').waitFor({state:'visible'});assert.equal(await page.evaluate(()=>RidgeMobile.status().points),2);assert.ok(Number(await page.locator('#offline-west').inputValue())>165);
- await page.screenshot({path:path.join(diagnostics,'offline-bottom-panel.png')});
+ console.log('Sheet drag/rotation checked');await page.locator('#planner-toggle').click();await page.locator('#saved-list').getByRole('button',{name:'Open',exact:true}).first().click();assert.equal(await page.locator('#profile-card').isVisible(),true);await page.locator('#route-close').click();
+ await page.locator('#planner-toggle').click();assert.equal(await page.locator('#sidebar #open-offline').count(),1);assert.equal(await page.locator('#layers-panel #open-offline').count(),0);
+ await page.locator('#saved-region-list').getByText('Saved test region',{exact:true}).waitFor();
+ await page.screenshot({path:path.join(diagnostics,'sidebar-regions.png')});
+ await page.locator('#open-offline').click();assert.equal(await page.locator('html').getAttribute('data-overviews-bundled'),'false');
+ await page.getByText('Included imagery',{exact:true}).click();assert.equal(await page.locator('#overview-import').isVisible(),true);await page.getByText('Included imagery',{exact:true}).click();
+ assert.equal(await page.locator('#offline-west').isVisible(),false);
+ const offlineHandle=page.locator('#offline-panel .sheet-handle');await offlineHandle.focus();await page.keyboard.press('End');assert.equal(await page.locator('#offline-panel').getAttribute('data-snap'),'expanded');await page.keyboard.press('Home');assert.equal(await page.locator('#offline-panel').getAttribute('data-snap'),'compact');await page.keyboard.press('ArrowUp');
+ await page.getByRole('button',{name:'Draw rectangle',exact:true}).click();await page.mouse.click(140,350);await page.mouse.move(270,510);assert.equal(await page.locator('.offline-corner').count(),1);await page.mouse.click(270,510);
+ await page.locator('#offline-panel').waitFor({state:'visible'});assert.equal(await page.evaluate(()=>RidgeMobile.status().points),2);assert.ok(Number(await page.locator('#offline-west').inputValue())>165);assert.equal(await page.locator('.offline-region-corner').count(),4);
+ // Drag a real MapLibre corner marker; this must update the geographic form and preserve route points.
+ const corner=page.getByRole('button',{name:'Resize region southwest corner',exact:true});let cornerBox=await corner.boundingBox();const previousWest=Number(await page.locator('#offline-west').inputValue());
+ await page.mouse.move(cornerBox.x+22,cornerBox.y+22);await page.mouse.down();await page.mouse.move(cornerBox.x+2,cornerBox.y+32,{steps:8});await page.mouse.up();
+ assert.notEqual(Number(await page.locator('#offline-west').inputValue()),previousWest);assert.equal(await page.evaluate(()=>RidgeMobile.status().points),2);
+ const cdp=await context.newCDPSession(page);
+ async function touchDrag(locator,dx,dy){const b=await locator.boundingBox(),x=b.x+b.width/2,y=b.y+b.height/2;await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});for(let step=1;step<=6;step++){await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x+dx*step/6,y:y+dy*step/6}]});await page.waitForTimeout(30);}await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});}
+ const westBeforeTouch=await page.locator('#offline-west').inputValue();await touchDrag(corner,-12,8);assert.notEqual(await page.locator('#offline-west').inputValue(),westBeforeTouch);assert.equal(await page.evaluate(()=>RidgeMobile.status().points),2);
+ await touchDrag(offlineHandle,0,-250);assert.equal(await page.locator('#offline-panel').getAttribute('data-snap'),'expanded');await offlineHandle.focus();await page.keyboard.press('ArrowDown');await cdp.detach();
+ await corner.focus();const westBeforeKey=await page.locator('#offline-west').inputValue();await page.keyboard.press('ArrowLeft');assert.notEqual(await page.locator('#offline-west').inputValue(),westBeforeKey);
+ await page.screenshot({path:path.join(diagnostics,'offline-sheet-corners.png')});
  await page.locator('#offline-advanced summary').click();assert.equal(await page.locator('#offline-west').isVisible(),true);
- const oldBounds=await page.locator('#offline-west').inputValue();await page.getByRole('button',{name:'Draw rectangle',exact:true}).click();await page.mouse.click(140,350);await page.getByRole('button',{name:'Cancel',exact:true}).click();assert.equal(await page.locator('#offline-west').inputValue(),oldBounds);assert.equal(await page.locator('.offline-corner').count(),0);
- console.log('Offline selection checked');await page.locator('#offline-close').click();await page.locator('#layers-toggle').click();await page.screenshot({path:path.join(diagnostics,'layers-mobile.png')});await page.locator('#layers-close').click();await page.screenshot({path:path.join(diagnostics,'map-mobile.png')});
+ const oldBounds=await page.locator('#offline-west').inputValue();await page.getByRole('button',{name:'Draw rectangle',exact:true}).click();await page.mouse.click(140,350);await page.getByRole('button',{name:'Cancel',exact:true}).click();assert.equal(await page.locator('#offline-west').inputValue(),oldBounds);assert.equal(await page.locator('.offline-corner').count(),0);assert.equal(await page.locator('.offline-region-corner').count(),4);
+ console.log('Sheets, corner dragging and selection checked');
+ await page.locator('#offline-close').click();await page.locator('#planner-toggle').click();await page.locator('#saved-region-list').getByRole('button',{name:'Open',exact:true}).click();assert.equal(await page.locator('#offline-panel').isVisible(),true);assert.equal(Number(await page.locator('#offline-west').inputValue()),170.05);await page.locator('#offline-close').click();
+ await page.locator('#layers-toggle').click();await page.screenshot({path:path.join(diagnostics,'layers-mobile.png')});await page.locator('#layers-close').click();await page.screenshot({path:path.join(diagnostics,'map-mobile.png')});
  await page.locator('#layers-toggle').click();await page.locator('[data-layer=topo]').click();
  await page.waitForFunction(()=>__testMap.getMaxZoom()===16&&!__testMap.getTerrain(),null,{timeout:20000});
  const topo=await page.evaluate(()=>{__testMap.setZoom(19);return {max:__testMap.getMaxZoom(),zoom:__testMap.getZoom(),ratio:__testMap.getPixelRatio(),filter:__testMap.getPaintProperty('topo','raster-resampling')};});assert.equal(topo.max,16);assert.ok(topo.zoom<=16);assert.equal(topo.ratio,2);assert.equal(topo.filter,'nearest');
  await page.locator('#layers-close').click();await page.screenshot({path:path.join(diagnostics,'topo-mobile.png')});await page.locator('#layers-toggle').click();await page.locator('[data-layer=linz]').click();assert.equal(await page.evaluate(()=>__testMap.getMaxZoom()),19);
  if(process.env.RIDGELINE_OVERVIEW_DATA)assert.ok(archiveReads>0,'Read actual verified precomputed images');assert.deepEqual(errors,[]);assert.deepEqual(consoleErrors,[]);assert.equal(requests.some(u=>u.includes('/elevation/')),true);
- console.log(JSON.stringify({renderer:status.direct,terrain:status.terrain,profile:true,routeEditing:true,rectangleSelection:true,rectangleCancellation:true,savedRouteReopening:true,mapPanelRatio:0.625,routeCreationInLogoMenu:true,coordinateFieldsInAdvanced:true,layerTabs:true,bundledReadyWithoutImport:true,gpsIconCentred:true,topoNativeResolution:true,actualPrecomputedReads:archiveReads,providerFixtureRequests:requests.length,pageErrors:errors,consoleErrors},null,2));
+ console.log(JSON.stringify({renderer:status.direct,terrain:status.terrain,profile:true,routeEditing:true,rectangleSelection:true,rectangleCancellation:true,savedRouteReopening:true,sheetSnaps:3,draggableRegionCorners:true,touchSheetAndCornerDrags:true,savedRegionSidebar:true,routeCreationInLogoMenu:true,coordinateFieldsInAdvanced:true,layerTabs:true,baseZipImportAvailable:true,gpsIconCentred:true,topoNativeResolution:true,actualPrecomputedReads:archiveReads,providerFixtureRequests:requests.length,pageErrors:errors,consoleErrors},null,2));
 }catch(error){const status=await Promise.race([page?.evaluate(()=>RidgeMobile.status()),new Promise(r=>setTimeout(()=>r('Unavailable'),2000))]);console.error(JSON.stringify({errors,consoleErrors,requests:requests.length,status,tiles:await Promise.race([page?.evaluate(()=>({linz:__testMap?.isSourceLoaded('linz'),tileCache:RidgeTiles.install(maplibregl).stats(),terrain:__testMap?.isSourceLoaded('terrain')})),new Promise(r=>setTimeout(()=>r('Unavailable'),2000))]),failure:error.message}));throw error;}finally{await browser.close();await new Promise(r=>server.close(r));}

@@ -48,6 +48,8 @@ globalThis.RidgeMobile?.attach({getMap:()=>map,isReady:()=>ready,getKey:()=>acti
 // App panels occupy their own row so map hit testing and camera fitting use the visible viewport.
 app=replace(app,"routePopup=RidgeRouteInteractions.attachPopup({element:$('profile-card'),handle:$('profile-drag-handle'),bounds:$('map-area'),resizeHandle:$('profile-resize-handle')})","routePopup={constrain(){}}");
 app=replace(app,"if($('profile-card').hidden)chartInteraction?.clear();","globalThis.RidgeMobile?.syncPanels();if($('profile-card').hidden)chartInteraction?.clear();");
+app=replace(app,"$('undo').hidden=!drawing;","$('undo').hidden=false;");
+app=replace(app,"$('route-popup-delete').hidden=!selected;","$('route-popup-delete').hidden=false;");
 app=replace(app,"padding:{top:110,left:70,right:70,bottom:260}","padding:{top:80,left:35,right:35,bottom:40}");
 await writeFile(path.join(out,'app.js'),app);
 let viewer=await readFile(path.join(out,'viewer.mjs'),'utf8');
@@ -89,7 +91,7 @@ const details=$('detail-controls'),quick=document.createElement('fieldset');quic
 for(const id of ['imagery-detail','terrain-detail']){const input=$(id),label=details.querySelector(`label[for="${id}"]`);quick.append(label,input);}
 basic.append(quick);
 for(const id of ['labels','hillshade'])basic.append($(id).closest('label'));
-const offline=document.createElement('button');offline.id='open-offline';offline.className='primary';offline.textContent='Download offline region';basic.append(offline);
+const offline=document.createElement('button');offline.id='open-offline';offline.className='primary';offline.textContent='Download offline region';$('sidebar').append(offline);
 const note=document.createElement('p');note.textContent='3D terrain · Original + Direct';note.className='topo-basemap-note';basic.append(note);
 const tabs=document.createElement('div');tabs.className='layers-tabs';tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label','Layer settings');
 tabs.innerHTML='<button id="basic-tab" role="tab" aria-controls="layers-basic" aria-selected="true">Layers</button><button id="advanced-tab" role="tab" aria-controls="layers-advanced" aria-selected="false" tabindex="-1">Advanced</button>';
