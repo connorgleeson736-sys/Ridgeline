@@ -1,0 +1,49 @@
+{
+  "version": "0.8.0",
+  "versionCode": 8,
+  "bytes": 26462054,
+  "sha256": "85709343fe8956307993c75c9cf58a3d188697ab4563cf3f80d2dba043c5a783",
+  "baseOnly": true,
+  "finalUiMatchesApk": true,
+  "buildPassed": true,
+  "lintPassed": true,
+  "nativeTests": 23,
+  "jsTests": 12,
+  "pdf": {
+    "singlePage": true,
+    "nativeZoom": 16,
+    "imagePixels": [
+      256,
+      256
+    ],
+    "lossless": true,
+    "pdfVersion": "1.6",
+    "longPageUserUnitTest": true,
+    "normalLargeAndWideFixturesEachOnePage": true,
+    "fixtureJavaHeapLimitMiB": 48,
+    "popplerParseAndRender": true
+  },
+  "browser": {
+    "routeDistanceAndWaypointSummaries": true,
+    "routeShapeThumbnails": true,
+    "sidebarRenamePersists": true,
+    "mapTapDismissesWithoutRouteEdit": true,
+    "defaultOffPeakLabels": true,
+    "fixedFrameDuringMapPanAndZoom": true,
+    "cornerTouchAndKeyboardResize": true,
+    "frameResizesWithSheet": true,
+    "mapUnderlapBehindRoundedCorners": true,
+    "multipleRoutesAndMerge": true,
+    "actualOverviewReads": 21,
+    "pageErrors": [],
+    "consoleErrors": [],
+    "currentViewAndAroundRouteShortcuts": true
+  },
+  "emulatorUsed": false,
+  "physicalPhoneTested": false,
+  "limitations": [
+    "Browser checks use controlled provider and Android bridge fixtures.",
+    "Android document providers and live downloads still need physical-device checks."
+  ],
+  "sourceCommit": "dc70d24"
+}

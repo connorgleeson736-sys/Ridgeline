@@ -1,20 +1,20 @@
 # Ridgeline Android downloads
 
-## Latest: 0.7.0 Base APK — 26.5 MB
+## Latest: 0.8.0 Base APK — 26.5 MB
 
-[Download Ridgeline 3D 0.7.0 Base](Ridgeline-3D-0.7.0-Base.apk). Open the file page and choose **Download raw file**, then install over your current Ridgeline 3D app.
+[Download Ridgeline 3D 0.8.0 Base](Ridgeline-3D-0.8.0-Base.apk). Open the file page and choose **Download raw file**, then install over your current Ridgeline 3D app.
 
-This update has smaller, rounder sheets with borderless close buttons; a faster screen-space rectangle editor with small handles in 2D; and no peak-search box. The main Layers tab contains topographic overlays, with peak labels and terrain shading under Advanced.
+Topo PDF export now produces **one continuous page at full downloaded detail**. Every native zoom-16 tile stays losslessly embedded; long maps use PDF 1.6 page scaling rather than reducing pixel resolution. Choose **Export Topo PDF** in Saved regions after completing a maximum-detail Topo download. Older regions missing zoom-16 tiles need a new Topo download.
 
-Saved routes have Open/Close actions. Multiple routes can remain visible. Select their checkboxes in join order, optionally reverse direction, then choose **Combine selected routes**. The original routes stay saved; gaps become straight connecting segments.
+Saved routes have distance/waypoint summaries, small route-shape previews, and inline Rename/Save/Cancel. Open/Close, multiple routes and combining selected routes remain available. Tapping the exposed map closes the sidebar without changing route points. Peak labels default off; explicit changes are saved.
 
-For printable offline maps choose **Logo menu → Download offline region → Map content → NZ Topo only · maximum detail**. Complete the download, then choose **Export Topo PDF** under Saved regions. The PDF is a north-up, lossless A4 landscape atlas made entirely from downloaded zoom-16 Topo tiles. Older regions lacking those tiles need a new Topo download. Size estimates now use actual saved/sampled tile sizes when available, with a planning estimate and storage allowance.
+The sheet grip is slightly taller, and the map extends underneath the rounded corners to remove the square backdrop. **Draw rectangle** now creates a screen-fixed frame and leaves the sheet open. Pan/zoom the map underneath it; drag its corners to resize it. Current view expands the frame, and Around route fits the map and frame to your route.
 
-The base APK retains zoom 0–8 overview images. Add zooms 9–12 using [all six prepared ZIPs](overview-packs/) through **Logo menu → Download offline region → Included imagery → Import overview ZIPs**. Existing imported imagery is compatible. Use these six prepared packs rather than the fifteen original export ZIPs.
+The base APK keeps zoom 0–8 overview imagery. Add zooms 9–12 with [all six prepared ZIPs](overview-packs/) via **Logo menu → Download offline region → Included imagery → Import overview ZIPs**. Existing imports remain compatible.
 
-Build, lint, 22 JVM tests, 11 JavaScript checks and browser workflow/touch checks passed. The streaming PDF writer also produced four-page and 80-page test atlases with a 48 MB Java heap limit; Poppler parsed and rendered the PDF. No emulator or physical phone validation is claimed; Android document-provider and live-download checks remain phone tasks.
+Build, lint, 23 JVM tests, 12 JavaScript tests, browser workflow/touch checks and independent PDF parsing/rendering checks passed. Normal, large and long map fixtures all export as one page under a 48 MB Java heap limit. No emulator or physical phone validation is claimed.
 
-[APK checksum](Ridgeline-3D-0.7.0-Base.apk.sha256) · [Versioned validation](Ridgeline-3D-0.7.0-validation.json) · [Detailed validation](Ridgeline-3D-VALIDATION.md).
+[APK checksum](Ridgeline-3D-0.8.0-Base.apk.sha256) · [Versioned validation](Ridgeline-3D-0.8.0-validation.json) · [Detailed validation](Ridgeline-3D-VALIDATION.md).
 
 ## Earlier full installer: Ridgeline 3D 0.5.0 — full imagery included
 
