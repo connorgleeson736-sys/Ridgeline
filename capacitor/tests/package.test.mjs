@@ -12,3 +12,12 @@ test('regional routing still recognises proxied aerial requests',async()=>{for(c
 test('overview catalogue contains only verified local ranges and no server dependency',async()=>{const manifest=JSON.parse(await read('overview-manifest.json'));assert.equal(manifest.files.length,6);assert.equal(manifest.files.reduce((n,f)=>n+f.bytes,0),364762502);const files=new Map(manifest.files.map(f=>[f.sha256,f.bytes]));for(const [hash,start,bytes] of manifest.ranges){assert.ok(files.has(hash));assert.ok(start>=0&&bytes>0&&start+bytes<=files.get(hash));}const regional=await read('regional-imagery.js');assert.doesNotMatch(regional,/\/api\/lidar\/files/);assert.match(regional,/_ridge/);});
 
 test('overview packaging matches the selected full or base build',async()=>{const {createReadStream}=await import('node:fs');const {createHash}=await import('node:crypto');const manifest=JSON.parse(await read('overview-manifest.json'));const {document}=parseHTML(await read('index.html'));assert.equal(document.documentElement.dataset.overviewsBundled,String(manifest.bundled));if(!manifest.bundled){await assert.rejects(access(new URL('../www/overview-packs',import.meta.url)));return;}for(const pack of manifest.files){let size=0;const digest=createHash('sha256');for await(const bytes of createReadStream(new URL('../www/overview-packs/'+pack.sha256+'.bin',import.meta.url))){size+=bytes.length;digest.update(bytes);}assert.equal(size,pack.bytes);assert.equal(digest.digest('hex'),pack.sha256);}});
+
+test('flat Topo coverage requests finer tiles on dense displays without enlarging source pixels',async()=>{
+ for(const dpr of [1,2,3]){
+  const context={module:{exports:{}},devicePixelRatio:dpr};context.globalThis=context;vm.runInNewContext(await read('linz-topo.js'),context);
+  const source=context.module.exports.source('test-key');assert.equal(source.maxzoom,18);assert.equal(source.tileSize,dpr>1?128:256);
+  // Flat MapLibre coverage uses camera zoom + log2(512/source tile size).
+  assert.equal(Math.min(source.maxzoom,Math.floor(16+Math.log2(512/source.tileSize))),dpr>1?18:17);
+ }
+});

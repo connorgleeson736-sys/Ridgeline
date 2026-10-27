@@ -68,3 +68,19 @@
 #layers-panel .layers-tabs{margin-bottom:10px}
 #layers-basic .detail-controls{margin:12px 0}
 @media(max-width:600px){#layers-panel{width:calc(100% - 40px);max-width:330px;right:10px}}
+/* Page selection stays compact; the remaining settings use an accessible modal. */
+.page-selection-controls{display:grid;grid-template-columns:1fr 1.05fr 1.2fr;gap:9px;align-items:end}
+#offline-panel .page-selection-controls label{margin:0;font-size:11px;gap:3px}
+#offline-panel .page-selection-controls select{font-size:13px;min-height:38px;padding:7px}
+.page-selection-controls button{min-height:42px;border-radius:6px;padding:6px;font-size:12px}
+#offline-panel .panel-heading{margin-bottom:2px}
+.region-dialog{position:fixed;inset:0;margin:auto;width:min(520px,calc(100% - 24px));max-height:88dvh;padding:16px;border:1px solid var(--line);border-radius:20px;background:var(--paper);color:var(--ink);box-shadow:0 12px 50px #122d2540;overflow:auto;overscroll-behavior:contain}
+.region-dialog::backdrop{background:#10282366}
+.region-dialog .panel-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.region-dialog h2{font-size:19px;margin:0}
+.region-dialog .panel-heading button{border:0;background:none;font-size:26px;padding:0;width:36px;min-height:36px}
+.region-dialog label:not(.setting){display:grid;gap:6px;margin:14px 0;font-size:12px}
+.region-dialog input:not([type=checkbox]),.region-dialog select{width:100%;min-width:0;background:white;border:1px solid #ccd3c7;border-radius:6px;min-height:44px;padding:9px;font-size:16px;color:var(--ink)}
+.region-dialog .setting{display:flex;align-items:center;justify-content:space-between;gap:16px;font-size:13px;min-height:44px}.region-dialog input[type=checkbox]{width:20px;height:20px}
+.region-dialog p{font-size:12px;line-height:1.6}.region-dialog .primary{background:var(--green);color:white}.region-dialog details{padding:10px 0}.region-dialog summary{font-size:12px;min-height:32px;align-content:center}
+#offline-change-area{color:var(--orange);min-height:36px;font-size:12px}
+.saved-region-actions{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;margin-top:8px}

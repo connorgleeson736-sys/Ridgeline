@@ -26,7 +26,8 @@ public class TilePlanTest {
   public void maximumDetailDoesNotOverpromiseDemResolution() {
     TilePlan p = new TilePlan(cook, 17, "aerial", false);
     assertTrue(p.tiles.stream().anyMatch(t -> t.kind.equals("aerial") && t.z == 17));
-    assertFalse(p.tiles.stream().anyMatch(t -> t.kind.equals("elevation") && t.z > 16));
+    assertFalse(
+        p.tiles.stream().anyMatch(t -> t.kind.equals("elevation") && t.z > TilePlan.TOPO_ZOOM));
     assertFalse(p.tiles.stream().anyMatch(t -> t.kind.equals("vector")));
   }
 
@@ -41,11 +42,12 @@ public class TilePlanTest {
   public void topoOnlyAlwaysUsesTheNativeMaximumWithoutImageryOrDem() {
     TilePlan p = new TilePlan(cook, 13, "topo", true);
     assertTrue(p.tiles.stream().allMatch(t -> t.kind.equals("topo-raster")));
-    assertTrue(p.tiles.stream().anyMatch(t -> t.z == 16));
-    assertFalse(p.tiles.stream().anyMatch(t -> t.z > 16));
+    assertTrue(p.tiles.stream().anyMatch(t -> t.z == TilePlan.TOPO_ZOOM));
+    assertFalse(p.tiles.stream().anyMatch(t -> t.z > TilePlan.TOPO_ZOOM));
     assertTrue(
         new TilePlan(cook, 13, "aerial", true)
-            .tiles.stream().anyMatch(t -> t.kind.equals("topo-raster") && t.z == 16));
+            .tiles.stream()
+                .anyMatch(t -> t.kind.equals("topo-raster") && t.z == TilePlan.TOPO_ZOOM));
   }
 
   @Test
@@ -65,5 +67,12 @@ public class TilePlanTest {
   public void rejectsInvalidSettings() {
     assertThrows(IllegalArgumentException.class, () -> new TilePlan(cook, 20, "aerial", true));
     assertThrows(IllegalArgumentException.class, () -> new TilePlan(cook, 15, "other", true));
+  }
+
+  @Test
+  public void legacyDownloadsRetainTheirOriginalTopoPlan() {
+    TilePlan legacy = new TilePlan(cook, 15, "aerial", true, 16);
+    assertTrue(legacy.tiles.stream().anyMatch(t -> t.kind.equals("topo-raster") && t.z == 16));
+    assertFalse(legacy.tiles.stream().anyMatch(t -> t.kind.equals("topo-raster") && t.z > 16));
   }
 }

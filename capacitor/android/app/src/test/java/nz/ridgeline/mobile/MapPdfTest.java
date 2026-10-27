@@ -72,4 +72,62 @@ public class MapPdfTest {
                 new double[] {170.12, -43.61, 170.16, -43.57},
                 (z, x, y) -> null));
   }
+
+  @Test
+  public void a4AndLandscapeKeepNativeImagesAndVectorFurniture() throws Exception {
+    for (String orientation : new String[] {"portrait", "landscape"}) {
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      MapPdf.Options options =
+          new MapPdf.Options(
+              "A4", orientation, 18, 1000, true, true, true, 24.5, "User supplied | 2026-10-27");
+      MapPdf.write(
+          out,
+          "A4 region",
+          new double[] {170.138, -43.592, 170.142, -43.588},
+          (z, x, y) -> {
+            assertEquals(18, z);
+            return new byte[256 * 256 * 3];
+          },
+          options);
+      String pdf = out.toString(StandardCharsets.ISO_8859_1);
+      assertTrue(
+          pdf.contains(
+              orientation.equals("portrait")
+                  ? "/MediaBox [0 0 595.275591 841.889764]"
+                  : "/MediaBox [0 0 841.889764 595.275591]"));
+      assertTrue(pdf.contains("NZTM2000"));
+      assertTrue(pdf.contains("MN 24.5E"));
+      assertTrue(pdf.contains("Scale ~1:"));
+      assertTrue(pdf.contains("/Interpolate false"));
+      assertTrue(pdf.contains("/Count 1 /Kids"));
+    }
+  }
+
+  @Test
+  public void rejectsUnsupportedPaperAndUnsafeGridOptions() {
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> new MapPdf.Options("bad", "portrait", 18, 1000, true, false, true, 0, ""));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> new MapPdf.Options("A4", "portrait", 18, 1, true, false, true, 0, ""));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> new MapPdf.Options("A4", "portrait", 18, 1000, true, true, true, Double.NaN, ""));
+  }
+
+  @Test
+  public void denseGridIsRejectedBeforeWriting() throws Exception {
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            MapPdf.write(
+                out,
+                "Dense grid",
+                new double[] {170, -43.6, 171, -43.599},
+                (z, x, y) -> new byte[256 * 256 * 3],
+                new MapPdf.Options("A4", "portrait", 18, 100, true, false, true, 0, "")));
+    assertEquals(0, out.size());
+  }
 }

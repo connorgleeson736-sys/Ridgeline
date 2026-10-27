@@ -86,7 +86,8 @@ public final class RegionDownloadWorker extends Worker {
               new double[] {b.getDouble(0), b.getDouble(1), b.getDouble(2), b.getDouble(3)},
               r.getInt("zoom"),
               r.getString("imagery"),
-              r.getBoolean("topo"));
+              r.getBoolean("topo"),
+              r.optInt("topoZoom", 16));
       for (TileAddress t : plan.tiles) {
         long size = archive.size(id, t);
         if (size >= 0) {

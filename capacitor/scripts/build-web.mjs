@@ -61,6 +61,7 @@ app=replace(app,"if($('profile-card').hidden)chartInteraction?.clear();","global
 app=replace(app,"$('undo').hidden=!drawing;","$('undo').hidden=false;");
 app=replace(app,"$('route-popup-delete').hidden=!selected;","$('route-popup-delete').hidden=false;");
 app=replace(app,"padding:{top:110,left:70,right:70,bottom:260}","padding:{top:80,left:35,right:35,bottom:40}");
+app=replace(app,"const show=basemap!=='topo'&&$('labels').checked&&!topoOverlays?.usesPeakNames();","const show=false;");
 await writeFile(path.join(out,'app.js'),app);
 let viewer=await readFile(path.join(out,'viewer.mjs'),'utf8');
 viewer=replace(viewer,"import './cook-reference-overviews.js?v=1';",'');
@@ -75,6 +76,11 @@ for(const name of await readdir(out))if(/\.(?:m?js)$/.test(name)){
  // Server-side packed overviews are not part of a static Capacitor app.
  // Keep bundled overviews; read the provider for other tiles.
  if(name==='topographic-overlays.js')text=replace(text,'maxzoom:15','maxzoom:14');
+ if(name==='topographic-overlays.js'){
+  text=replace(text,"const show=!!s[group(l.id)]&&!rasterTopo&&(!l.id.startsWith('nz-peaks')||peaks)","const show=(l.id.startsWith('nz-peaks')?peaks:!!s[group(l.id)])&&!rasterTopo");
+ }
+ if(name==='linz-topo.js'){text=replace(text,'maxzoom:16','maxzoom:18');text=replace(text,'tileSize:256','tileSize:(root.devicePixelRatio||1)>1?128:256');}
+ if(name==='performance.js')text=replace(text,"setRatio(lowPower()?1:native);return;", "const source=map.getSource('topo'),size=(lowPower()?1:native)>1?128:256;if(source&&source.tileSize!==size){source.tileSize=size;map._update?.(true);}setRatio(lowPower()?1:native);return;");
  if(name==='regional-imagery.js'){
   text=replace(text,'if(entry){',"if(entry&&(entry.url||entry[compensate?'natural':'raw']?.url)){");
   text=replace(text,"if(!/^\\/assets\\/south-overviews-v1\\/[a-f0-9]{24}\\.webp$/.test(row.url))", "if(!/^\\/assets\\/south-overviews-v1\\/[a-f0-9]{24}\\.webp$/.test(row.url)&&!/^https:\\/\\/localhost\\/_ridge\\/overviews\\/[a-f0-9]{64}\\/\\d+\\/\\d+$/.test(row.url))");

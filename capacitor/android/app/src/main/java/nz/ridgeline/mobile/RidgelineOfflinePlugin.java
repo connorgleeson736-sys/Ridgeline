@@ -160,7 +160,11 @@ public final class RidgelineOfflinePlugin extends Plugin {
                       "zoom",
                       "topo".equals(c.getString("imagery", "aerial")) ? 16 : c.getInt("zoom", 15))
                   .put("imagery", c.getString("imagery", "aerial"))
-                  .put("topo", c.getBoolean("topo", true));
+                  .put("topo", c.getBoolean("topo", true))
+                  .put("topoZoom", TilePlan.TOPO_ZOOM)
+                  .put("pageSize", c.getString("pageSize", "A4"))
+                  .put("orientation", c.getString("orientation", "portrait"));
+          pdfOptions(c, cfg);
           String id = archive().create(cfg, p);
           RegionDownloadWorker.enqueue(getContext(), id);
           JSObject r = new JSObject();
@@ -393,6 +397,43 @@ public final class RidgelineOfflinePlugin extends Plugin {
         });
   }
 
+  private MapPdf.Options pdfOptions(PluginCall c, JSONObject region) {
+    JSONArray b = region.optJSONArray("bounds");
+    boolean magnetic = c.getBoolean("magnetic", false);
+    Double entered = c.getDouble("declination");
+    double angle = 0;
+    String note = "";
+    if (magnetic) {
+      if (entered != null) {
+        angle = entered;
+        note = "User supplied";
+      } else if (b != null) {
+        angle =
+            new android.hardware.GeomagneticField(
+                    (float) ((b.optDouble(1) + b.optDouble(3)) / 2),
+                    (float) ((b.optDouble(0) + b.optDouble(2)) / 2),
+                    0,
+                    System.currentTimeMillis())
+                .getDeclination();
+        note = "Android model estimate";
+      }
+      note +=
+          " | "
+              + new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.ROOT)
+                  .format(new java.util.Date());
+    }
+    return new MapPdf.Options(
+        c.getString("pageSize", region.optString("pageSize", "auto")),
+        c.getString("orientation", region.optString("orientation", "portrait")),
+        region.optInt("topoZoom", 16),
+        c.getInt("grid", 0),
+        c.getBoolean("north", true),
+        magnetic,
+        c.getBoolean("scaleBar", true),
+        angle,
+        note);
+  }
+
   @PluginMethod
   public void exportRegionPdf(PluginCall c) {
     async(
@@ -405,14 +446,15 @@ public final class RidgelineOfflinePlugin extends Plugin {
             throw new IOException("Complete a region download including NZ Topo first.");
           JSONArray b = region.getJSONArray("bounds");
           double[] bounds = {b.getDouble(0), b.getDouble(1), b.getDouble(2), b.getDouble(3)};
-          new TilePlan(bounds, 16, "topo", true);
-          int[] extent = MapPdf.extent(bounds);
+          MapPdf.Options options = pdfOptions(c, region);
+          MapPdf.validateOptions(bounds, options);
+          int[] extent = MapPdf.extent(bounds, options.zoom);
           for (int y = extent[1]; y <= extent[3]; y++)
             for (int x = extent[0]; x <= extent[2]; x++)
-              if (archive().size(regionId, TileAddress.tile("topo-raster", 16, x, y)) < 0)
+              if (archive().size(regionId, TileAddress.tile("topo-raster", options.zoom, x, y)) < 0)
                 throw new IOException(
-                    "This older region lacks maximum-detail Topo. Download it again with NZ Topo at"
-                        + " zoom 16.");
+                    "This region lacks its full-detail Topo tiles. Complete or repeat the"
+                        + " download.");
           getActivity()
               .runOnUiThread(
                   () ->
@@ -480,7 +522,8 @@ public final class RidgelineOfflinePlugin extends Plugin {
                   } finally {
                     bitmap.recycle();
                   }
-                });
+                },
+                pdfOptions(c, region));
           } catch (Exception error) {
             try {
               getContext().getContentResolver().delete(uri, null, null);
