@@ -1,27 +1,25 @@
 # Ridgeline Android downloads
 
-## Latest: 0.10.0 preview APKs
+## Latest: 0.11.0 — Original + Direct retained
 
 | Build | Download | Size |
 | --- | --- | --- |
-| Base | [Ridgeline 3D 0.10.0 Base](Ridgeline-3D-0.10.0-Base.apk) | 26.5 MB |
-| Full imagery | [Ridgeline 3D 0.10.0 Full](Ridgeline-3D-0.10.0-Full.apk) | 391.2 MB |
+| Base | [0.11.0 Base APK](Ridgeline-3D-0.11.0-Base.apk) | 26.5 MB |
+| Full imagery | [0.11.0 Full APK](Ridgeline-3D-0.11.0-Full.apk) | 391.2 MB |
 
-Choose either build, open its file page and use **Download raw file**, then install over your existing Ridgeline 3D app. Full is stored with Git LFS; Download raw file serves the complete APK. Both have the same app code and signing certificate.
+Choose **Download raw file** on the APK page, then install over your existing app. Full is stored with Git LFS and includes the verified 364.8 MB extra imagery pack. Base supports the existing six-ZIP import workflow. Both variants use the same code and signer.
 
-Full includes all original precomputed imagery overviews through zoom 12, with a verified 364,762,502-byte extra pack. Base includes zooms 0–8; import [the six overview ZIPs](overview-packs/) to add zooms 9–12. Existing imports remain compatible. Elevation and more detailed offline imagery still use selected-region downloads.
+**Original + Direct stays enabled. The app has not switched to Original.** Renderer modules and shared resolution policy match the repository website source. The high-density zoom-18 Topo enhancement is intentionally retained, along with zoom-18 offline Topo downloads and lossless PDF export.
 
-Offline downloads now start with page size (A5, A4, A3, Letter or Legal), orientation and **Save current view**. Move/zoom the map under the page frame and resize its corners with the page aspect preserved. Saving freezes the geographic area and opens a large dialog for name, map content, detail, estimation and downloading. Change area returns to page selection. Saved-region Open and Export Topo PDF actions have distinct spacing.
+This update resets saved rendering/detail/loading/filtering/sky settings to website defaults once, before rendering scripts load. Routes, downloaded regions, imported imagery, saved map view and LINZ label preferences are preserved. Later rendering adjustments remain saved. All page-size selection, PDF grid/north/scale options and route controls from 0.10.0 remain available.
 
-PDF export offers standard paper or a full-detail custom page, an NZTM2000 (EPSG:2193) grid with edge references, true north, magnetic north and a scale bar. All native raster pixels remain losslessly embedded on one page. Standard paper fits the saved area within the page margins; print scale depends on the area selected. The grid is projected onto the Web Mercator map. Magnetic north is an Android model estimate at the region centre/date, or a user-supplied declination, and is labelled accordingly.
+The live Site could not be fetched from this environment. Source-code parity is verified; exact browser/WebView pixels and loading speeds on a physical phone are not claimed. Native offline tile access and the previously excluded Cook reference replacement remain unchanged.
 
-LINZ API peak labels default on, with the legacy bundled summit labels disabled. Topo on dense screens now requests finer tiles through zoom 18. New Topo downloads include zoom 18; re-download older zoom-16 regions for finer offline detail. Older regions remain exportable, and paused older downloads retain their original detail plan. The 12,000-file region limit remains.
+18 JavaScript tests, 29 Android unit tests, lint, browser workflow checks, APK signatures, all six full-pack hashes and matching Base/Full renderer code passed. No emulator run.
 
-Builds, signatures, lint, **29 Android unit tests**, **15 JavaScript tests**, browser workflow/touch checks, and a separate actual-request Topo density check passed. Twelve PDF fixtures cover all page sizes/orientations and parse as single pages; a lossless image stream was compared with its original RGB bytes. NZTM calculations were checked against independent PROJ control points. All six full-pack hashes and uncompressed APK storage were verified, and Base/Full app code and DEX match. No emulator or physical-phone performance validation is claimed.
+[Base checksum](Ridgeline-3D-0.11.0-Base.apk.sha256) · [Full checksum](Ridgeline-3D-0.11.0-Full.apk.sha256) · [Validation](Ridgeline-3D-0.11.0-validation.json) · [Source](https://github.com/connorgleeson736-sys/Ridgeline/commit/54c0890)
 
-[Base checksum](Ridgeline-3D-0.10.0-Base.apk.sha256) · [Full checksum](Ridgeline-3D-0.10.0-Full.apk.sha256) · [Validation](Ridgeline-3D-0.10.0-validation.json) · [PDF fixtures validation](Ridgeline-3D-0.10.0-PDF-validation.json)
-
-Source: [0.10.0 implementation](https://github.com/connorgleeson736-sys/Ridgeline/commit/1e805cfeb7bf7b885561a4afb6130e3f5978ea4d).
+Previous [0.10.0 Base](Ridgeline-3D-0.10.0-Base.apk) and [0.10.0 Full](Ridgeline-3D-0.10.0-Full.apk) remain available.
 
 ## Earlier full installer: Ridgeline 3D 0.5.0 — full imagery included
 

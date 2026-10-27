@@ -1,0 +1,33 @@
+{
+  "version": "0.11.0",
+  "sourceCommit": "54c0890",
+  "renderer": "Original + Direct",
+  "topoMaximum": 18,
+  "builds": {
+    "Base": {
+      "file": "Ridgeline-3D-0.11.0-Base.apk",
+      "bytes": 26472774,
+      "sha256": "6b0e230fb9cbc75e5f522f908bcdf538d7655d75238e9f90a93378c4ae76de8c",
+      "signerSHA256": "c475ac25a331015896bf65a4222833f6a5b2cb14dc30d6eeaa955b5b40169c98"
+    },
+    "Full": {
+      "file": "Ridgeline-3D-0.11.0-Full.apk",
+      "bytes": 391236900,
+      "sha256": "2b32165c94b9f0378a3fb32b3ef5e8278e54b599c0bfb5a2c7a5b4938df5def8",
+      "signerSHA256": "c475ac25a331015896bf65a4222833f6a5b2cb14dc30d6eeaa955b5b40169c98"
+    }
+  },
+  "verification": {
+    "javascriptTests": 18,
+    "androidUnitTests": 29,
+    "lint": "passed",
+    "browserWorkflow": "passed",
+    "websiteSourceParity": "verified for renderer modules and shared resolution policy; retained Topo enhancement excepted",
+    "liveWebsiteReachable": false,
+    "exactDevicePixelParityVerified": false,
+    "overviewHashes": "all six passed",
+    "signatures": "passed",
+    "emulatorRun": false
+  },
+  "changes": "One-time rendering preference reset before renderer scripts; retains Direct, zoom-18 Topo, routes and offline regions."
+}
