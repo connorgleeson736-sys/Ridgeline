@@ -23,7 +23,7 @@ export function attachRegionSelection(map,{onChange,onCommit,onDrag=()=>{}}){
  map.on('move',schedule);map.on('resize',schedule);map.on('moveend',()=>{refresh();if(visible&&handles)report(true);});
  return {
   set(value,showHandles=false){bounds=value?.slice();visible=!!value;handles=showHandles;if(bounds&&handles){const {w,h}=dimensions(),sw=map.project([bounds[0],bounds[1]]),ne=map.project([bounds[2],bounds[3]]);if(ne.x-sw.x>=32&&sw.y-ne.y>=32&&sw.x>=0&&ne.x<=w&&ne.y>=0&&sw.y<=h)box=[sw.x/w,ne.y/h,ne.x/w,sw.y/h];}refresh();},
-  begin(){box=[.15,.16,.85,.82];visible=true;handles=true;bounds=undefined;report(true);draw();},
+  begin(value=[.15,.16,.85,.82]){box=value.slice();visible=true;handles=true;bounds=undefined;report(true);draw();},
   refresh,hide(){visible=false;draw();}
  };
 }
