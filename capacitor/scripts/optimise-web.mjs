@@ -1,3 +1,4 @@
+import {createCoordinateIndexCache} from './coordinate-index-cache.mjs';
 import {profileMainThread} from './main-thread-profile.mjs';
 // App-only work reductions. No source/detail/mesh selection changes.
 function replace(text, from, to) {
@@ -5,6 +6,48 @@ function replace(text, from, to) {
  return text.replace(from,to);
 }
 export function optimiseWeb(name,text){
+ if(name==='native-residency.js'){
+  text=replace(text,'function relatedCoordinates(manager,regular,id,scope,onCandidates=()=>{}){',createCoordinateIndexCache.toString()+"\nconst coordinateIndexes=createCoordinateIndexCache();\nfunction relatedCoordinates(manager,regular,id,scope,onCandidates=()=>{}){");
+  text=replace(text,'if(!scope.coordinateIndex){const descendants=', 'if(!scope.coordinateIndex)scope.coordinateIndex=coordinateIndexes.get(manager,()=>{const descendants=');
+  text=replace(text,'scope.coordinateIndex={descendants,exact,order:new Map(manager._renderableTilesKeys.map((key,index)=>[key,index]))};}', 'return {descendants,exact,order:new Map(manager._renderableTilesKeys.map((key,index)=>[key,index]))};});');
+  text=replace(text,'...budget.stats(),terrainCoordinatePairsVisited:', '...budget.stats(),...coordinateIndexes.stats(),terrainCoordinatePairsVisited:');
+  text=replace(text,' manager.update=function(...args){',` const releaseHooks=new WeakMap();let releaseContext=null,stableTransitionSkips=0;
+ function releaseHook(tile,key,release){
+  let saved=releaseHooks.get(tile);if(saved&&saved.key===key&&saved.release===release)return saved;
+  saved={tile,key,release,wrapper:function(...args){
+   const frame=releaseContext;
+   if(frame){visibleKeys??=new Set(manager._renderableTilesKeys);
+    if(!visibleKeys.has(key)&&cost(tile)>0){frame.deferred.set(key,tile);return;}
+    if(!visibleKeys.has(key))frame.empty.set(key,tile);
+   }
+   return release.apply(this,args);
+  }};releaseHooks.set(tile,saved);return saved;
+ }
+ manager.update=function(...args){`);
+  text=replace(text,'inUpdate=true;restored=false;visibleKeys=null;const deferred=new Map(),empty=new Map(),undo=[];', 'inUpdate=true;restored=false;visibleKeys=null;const deferred=new Map(),empty=new Map(),undo=[],previousReleaseContext=releaseContext;releaseContext={deferred,empty};');
+  const start=text.indexOf('  for(const [key,tile] of Object.entries(target)){');
+  const end=text.indexOf('  let changed;',start);
+  if(start<0||end<0)throw Error('Release-hook integration changed');
+  text=text.slice(0,start)+`  for(const key in target){if(!Object.hasOwn(target,key))continue;const tile=target[key],release=tile.releaseRTT;if(typeof release!=='function')continue;
+   const hook=releaseHook(tile,key,release);tile.releaseRTT=hook.wrapper;undo.push(hook);
+  }
+`+text.slice(end);
+  text=replace(text,'inUpdate=false;undo.forEach(fn=>fn());','inUpdate=false;for(const hook of undo)hook.tile.releaseRTT=hook.release;releaseContext=previousReleaseContext;');
+  const transitionStart=text.indexOf('  const desired=manager._renderableTilesKeys,desiredSet=');
+  const transitionEnd=text.indexOf('  trim();\n  // Native RTT refinement',transitionStart);
+  if(transitionStart<0||transitionEnd<0)throw Error('Transition integration changed');
+  let transition=text.slice(transitionStart,transitionEnd);
+  transition=replace(transition,'const desired=manager._renderableTilesKeys,desiredSet=new Set(desired),previousSet=new Set(previousKeys),chosen=', 'const desiredSet=new Set(desired),chosen=');
+  transition=replace(transition,'  const reconcile=heldSince.size>0||desired.length!==previousKeys.length||desired.some(key=>!previousSet.has(key));\n','');
+  transition=replace(transition,'  if(reconcile)for(const key of desired)', '  for(const key of desired)');
+  text=text.slice(0,transitionStart)+`  const desired=manager._renderableTilesKeys;
+  const sameOrder=desired.length===previousKeys.length&&desired.every((key,i)=>key===previousKeys[i]);
+  const reconcile=heldSince.size>0||desired.length!==previousKeys.length||!sameOrder&&(()=>{const previousSet=new Set(previousKeys);return desired.some(key=>!previousSet.has(key));})();
+  if(reconcile){
+`+transition+'  }else stableTransitionSkips++;\n'+text.slice(transitionEnd);
+  text=replace(text,'...coordinateIndexes.stats(),terrainCoordinatePairsVisited:', '...coordinateIndexes.stats(),stableTransitionSkips,terrainCoordinatePairsVisited:');
+ }
+
  if(name==='bottleneck-diagnostics.js'){
   text=replace(text,'function attach(map,',profileMainThread.toString()+'\nfunction attach(map,');
   text=replace(text,'let gpuStatus=', 'let mainThread=null;\n let gpuStatus=');

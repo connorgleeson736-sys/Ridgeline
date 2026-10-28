@@ -148,3 +148,7 @@ Expires unusable compressed tiles before admission/prefetch decisions, removes r
 ## 0.14.1 follow-up audit
 
 Removes a redundant response-body buffer copy, reuses unchanged exact imagery coverage indexes, avoids empty route-overlay selection work, and adds opt-in component timings/native counters to diagnostic exports with an Android JSON save picker. No rendering-quality changes. See [PERFORMANCE-AUDIT.md](PERFORMANCE-AUDIT.md) for reviewed areas, rejected experiments, remaining device-measurement gaps and how to collect a report.
+
+## 0.15.0 measured terrain-adapter CPU reductions
+
+Reuses geographic coordinate indexes while keeping native matrices fresh, caches temporary release functions per tile, and skips transition scaffolding for unchanged tile membership. Native source/detail/invalidation policies are preserved. See [MAIN-THREAD-OPTIMISATIONS.md](MAIN-THREAD-OPTIMISATIONS.md) for measurements, lifecycle coverage and limits. Base APK only.

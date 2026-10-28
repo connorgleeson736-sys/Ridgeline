@@ -42,3 +42,7 @@ Original + Direct; original terrain/image detail policies; unchanged mesh-select
 - [Cesium Globe cache and screen-space controls](https://github.com/CesiumGS/cesium/blob/main/packages/engine/Source/Scene/Globe.js): budgeted tile retention is separate from screen-space quality.
 - [OkHttp cache implementation](https://github.com/square/okhttp/blob/parent-4.12.0/okhttp/src/main/kotlin/okhttp3/Cache.kt): native cached-response handling and freshness.
 - [Fetch body extraction specification](https://fetch.spec.whatwg.org/#concept-bodyinit-extract): buffer-source Response bodies snapshot the input; retained buffers still require independent ownership at transferable protocol boundaries.
+
+## Follow-up implementation: 0.15.0
+
+[MAIN-THREAD-OPTIMISATIONS.md](MAIN-THREAD-OPTIMISATIONS.md) records the selected larger CPU changes: reusable geographic indexes, release-wrapper reuse and a stable-membership transition fast path, with before/after fixtures and explicit preservation of native invalidation and matrix calculation. Device-specific bottlenecks still require a phone trace.

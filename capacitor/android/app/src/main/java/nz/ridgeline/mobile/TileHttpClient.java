@@ -125,7 +125,7 @@ final class TileHttpClient implements AutoCloseable {
       TileAddress tile, String url, boolean sample, TileDispatcher.Publication<Resource> output)
       throws IOException {
     Request request =
-        new Request.Builder().url(url).header("User-Agent", "Ridgeline-Android/0.14.1").build();
+        new Request.Builder().url(url).header("User-Agent", "Ridgeline-Android/0.15.0").build();
     Call call = (sample ? sampling : client).newCall(request);
     output.onCancel(call::cancel);
     SharedTileBody body = null;
