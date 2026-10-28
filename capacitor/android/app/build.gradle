@@ -3,12 +3,13 @@ apply plugin: 'com.android.application'
 android {
     namespace = "nz.ridgeline.mobile"
     compileSdk = rootProject.ext.compileSdkVersion
+    testBuildType "performance"
     defaultConfig {
         applicationId "nz.ridgeline.mobile"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 19
-        versionName "0.16.0"
+        versionCode 20
+        versionName "0.17.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
             noCompress 'bin'
@@ -26,6 +27,14 @@ android {
         preview {
             initWith release
             signingConfig signingConfigs.debug
+            matchingFallbacks = ['release']
+        }
+        performance {
+            initWith preview
+            applicationIdSuffix ".performance"
+            versionNameSuffix "-performance"
+            resValue "string", "app_name", "Ridgeline 3D Performance"
+            resValue "string", "title_activity_main", "Ridgeline 3D Performance"
             matchingFallbacks = ['release']
         }
         release {

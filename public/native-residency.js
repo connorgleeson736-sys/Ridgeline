@@ -6,7 +6,7 @@
 // Only zoom-independent pixel projections may bypass zoom-only baking.
 // Vector geometry with a real bucket, patterns, dynamic paint and custom
 // layers retain native zoom invalidation (constant-width lines still change).
-function zoomIndependent(tile,style,coords,zoom,layerIds=style?._order){
+function zoomIndependent(tile,style,coords,zoom,layerIds=style?._order,paintChecks){
  if(!style?._order||!coords||!Number.isFinite(zoom))return false;let raster=false;
  for(const id of layerIds){const layer=style._layers[id];if(!layer||layer.isHidden?.(zoom))continue;
   if(['symbol','circle','fill-extrusion','heatmap'].includes(layer.type))continue;
@@ -14,8 +14,11 @@ function zoomIndependent(tile,style,coords,zoom,layerIds=style?._order){
    for(const q of coords[layer.source]?.[tile.tileID.key]||[]){const source=style.tileManagers?.[layer.source]?.getTile?.(q);if(!source||typeof source.getBucket!=='function'||source.getBucket(layer))return false;}continue;
   }
   if(!['raster','background'].includes(layer.type)||typeof layer.serialize!=='function'||layer.hasTransition?.())return false;
-  raster=true;const paint=layer.serialize().paint||{};
-  for(const [key,value]of Object.entries(paint))if(key.endsWith('-pattern')&&value||Array.isArray(value)&&typeof value[0]==='string'||value&&typeof value==='object'&&!Array.isArray(value))return false;
+  raster=true;let safe=paintChecks?.get(layer);
+  if(safe===undefined){const paint=layer.serialize().paint||{};safe=true;
+   for(const [key,value]of Object.entries(paint))if(key.endsWith('-pattern')&&value||Array.isArray(value)&&typeof value[0]==='string'||value&&typeof value==='object'&&!Array.isArray(value)){safe=false;break;}
+   paintChecks?.set(layer,safe);
+  }if(!safe)return false;
  }return raster;
 }
 // Keep a compact, clipped resolution requirement for each imagery source
@@ -93,7 +96,7 @@ function retainDrapes(manager,painter,{bytes=96*1048576,clock=()=>root.performan
   const regular=manager._getTerrainCoordsForRegularTile;
   function coordinates(id){if(this!==manager||!scope?.coordinatePreparation)return regular.call(this,id);return relatedCoordinates(this,regular,id,scope,(all,used)=>{coordinateCandidates+=used;coordinateSkipped+=all-used;});}
   if(typeof regular==='function')manager._getTerrainCoordsForRegularTile=coordinates;
-  function prepareCovered(...args){this._ridgeCostPerPatch=budget.begin(args[0],args[1],args[2]);const previous=scope;scope={style:args[0],undo:[],coordinatePreparation:!Object.values(args[0]?._layers||{}).some(layer=>layer.type==='custom')};try{return prepare.apply(this,args);}finally{for(const restore of scope.undo)restore();scope=previous;}}
+  function prepareCovered(...args){this._ridgeCostPerPatch=budget.begin(args[0],args[1],args[2]);const previous=scope;scope={style:args[0],undo:[],paintChecks:new Map(),coordinatePreparation:!Object.values(args[0]?._layers||{}).some(layer=>layer.type==='custom')};try{return prepare.apply(this,args);}finally{for(const restore of scope.undo)restore();scope=previous;}}
   function preservePhoto(tile,keep){const release=tile.releaseRTT;tile.releaseRTT=function(...params){const saved=keep.map(({index})=>[index,tile.rttObjects[index]]);for(const[index]of saved)tile.rttObjects[index]=undefined;try{return release.apply(this,params);}finally{for(const[index,obj]of saved)tile.rttObjects[index]=obj;for(const row of keep)for(const source of row.sources){const next=rtt._rttFingerprints[source]?.[tile.tileID.key];if(next)tile.rttFingerprint[source]=next;}partialZoomReuses+=saved.length;}};scope.undo.push(()=>{tile.releaseRTT=release;});}
   function differenceCovered(tile){let reason=difference.call(this,tile);if(reason==='none'&&!dirty.has(tile)){if(returns.has(tile))returnMetrics.reasons.none++;return reason;}if((reason==='none'||reason==='zoom')&&dirty.has(tile))reason='sourceTiles';
    if(reason!=='none'&&returns.has(tile))root.RidgeTileTrace?.emit('rtt-invalidated','terrain-rtt',tile.tileID.canonical,{reason});
@@ -105,13 +108,13 @@ function retainDrapes(manager,painter,{bytes=96*1048576,clock=()=>root.performan
     for(const [source,rows]of Object.entries(this._rttFingerprints)){const next=rows[tile.tileID.key];if(next)tile.rttFingerprint[source]=next;}
     returnMetrics.zoomReuse++;return'none';
    }
-   if(reason==='sourceTiles'&&!dirty.has(tile)&&saved?.owner===tile.rttObjects&&saved.stableZoom&&covered(tile)&&scope?.style&&zoomIndependent(tile,scope.style,this._coordsAscending,this._lastPrepareZoom)&&lowerQuality(tile,saved.quality,this,root.RidgeTerrainStreaming?.completeCoverage)){
+   if(reason==='sourceTiles'&&!dirty.has(tile)&&saved?.owner===tile.rttObjects&&saved.stableZoom&&covered(tile)&&scope?.style&&zoomIndependent(tile,scope.style,this._coordsAscending,this._lastPrepareZoom,undefined,scope.paintChecks)&&lowerQuality(tile,saved.quality,this,root.RidgeTerrainStreaming?.completeCoverage)){
     // Returning source selection may temporarily contain only a coarse parent.
     // Keep sharper finished pixels without waiting for source reactivation.
     returnMetrics.qualityHolds++;return'none';
    }
    if((reason==='sourceTiles'||reason==='zoom')&&cost(tile)>0&&covered(tile)&&!currentReadiness()(tile.tileID)){deferredRefreshes++;return'none';}
-   if(reason==='zoom'&&!dirty.has(tile)&&scope?.undo){const keep=(stableStacks.get(tile)||[]).filter(row=>row&&tile.rttObjects[row.index]===row.owner&&row.owner&&zoomIndependent(tile,scope.style,this._coordsAscending,this._lastPrepareZoom,row.ids));if(keep.length)preservePhoto(tile,keep);}
+   if(reason==='zoom'&&!dirty.has(tile)&&scope?.undo){const keep=(stableStacks.get(tile)||[]).filter(row=>row&&tile.rttObjects[row.index]===row.owner&&row.owner&&zoomIndependent(tile,scope.style,this._coordsAscending,this._lastPrepareZoom,row.ids,scope.paintChecks));if(keep.length)preservePhoto(tile,keep);}
    return reason;
   }
   const rttTypes=new Set(['background','fill','line','raster','hillshade','color-relief']);

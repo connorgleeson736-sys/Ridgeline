@@ -10,7 +10,7 @@ import java.util.Map;
 
 final class TileGateway {
   private final TileRequestRegistry requests;
-  private final ConnectivityManager connectivity;
+  private final TileConnectivity connectivity;
   private final Context context;
 
   TileGateway(Context context) {
@@ -20,12 +20,11 @@ final class TileGateway {
   TileGateway(Context context, TileRequestRegistry requests) {
     this.context = context.getApplicationContext();
     this.requests = requests;
-    connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+    connectivity = TileConnectivity.get(context);
   }
 
   private boolean connected() {
-    NetworkCapabilities caps = connectivity.getNetworkCapabilities(connectivity.getActiveNetwork());
-    return caps != null && caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+    return connectivity.connected();
   }
 
   public WebResourceResponse intercept(WebResourceRequest request) {

@@ -1,3 +1,5 @@
+> **0.17.0 Performance comparison build:** see [changes, verification, installation and speed-estimate limits](PERFORMANCE-0.17.0.md). Use the `performance` Gradle variant for the separate `nz.ridgeline.mobile.performance` app; it preserves the normal installed preview and its private data.
+
 # Ridgeline 3D for Android
 
 This Capacitor app packages the website's own patched MapLibre GL JS 6.14.0 renderer, UI, route editor, and elevation chart. **Original + Direct is the only renderer.** Terrain is a real elevation mesh rendered with WebGL inside Android WebView. This is a web renderer in a native Android shell, rather than MapLibre Native. The existing native app in `../android` remains a separate application.

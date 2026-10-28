@@ -24,8 +24,9 @@ final class TileDispatcher<T> implements AutoCloseable {
   private final int limit, backgroundLimit;
   private final ExecutorService workers;
   private final LinkedHashMap<String, Job> jobs = new LinkedHashMap<>();
+  private final Set<Job> waiting = new LinkedHashSet<>();
   private int active, background;
-  private boolean closed;
+  private volatile boolean closed;
   private long started, shared, cancelled, finished;
   private final AtomicLong sequence = new AtomicLong();
 
@@ -56,7 +57,8 @@ final class TileDispatcher<T> implements AutoCloseable {
     final Transfer<T> transfer;
     final CompletableFuture<T> ready = new CompletableFuture<>();
     final Set<Lease> users = new HashSet<>();
-    boolean running, backgroundSlot, stopped, done, completed;
+    boolean running, backgroundSlot, done, completed;
+    volatile boolean stopped;
     Runnable stop = () -> {};
 
     Job(String key, Transfer<T> transfer) {
@@ -77,17 +79,17 @@ final class TileDispatcher<T> implements AutoCloseable {
 
     @Override
     public void onCancel(Runnable action) {
+      boolean run;
       synchronized (TileDispatcher.this) {
         stop = action;
-        if (stopped) action.run();
+        run = stopped;
       }
+      if (run) action.run();
     }
 
     @Override
     public boolean cancelled() {
-      synchronized (TileDispatcher.this) {
-        return stopped || closed;
-      }
+      return stopped || closed;
     }
 
     @Override
@@ -140,56 +142,70 @@ final class TileDispatcher<T> implements AutoCloseable {
 
     void onClose(Runnable action) {
       synchronized (TileDispatcher.this) {
-        if (released) action.run();
-        else closers.add(action);
+        if (!released) { closers.add(action); return; }
       }
+      action.run();
     }
 
     @Override
     public void close() {
+      Runnable unsubscribe, stop = null;
+      List<Runnable> release;
+      boolean queued = false;
       synchronized (TileDispatcher.this) {
         if (released) return;
         released = true;
-        unwatch.run();
-        job.users.remove(this);
-        ready.completeExceptionally(abort());
-        for (Runnable r : closers) r.run();
+        unsubscribe = unwatch;
+        release = new ArrayList<>(closers);
         closers.clear();
-        if (job.users.isEmpty() && !job.done && !job.completed) {
+        job.users.remove(this);
+        if (job.users.isEmpty() && !job.done && !job.completed && !job.stopped) {
           job.stopped = true;
           cancelled++;
-          job.stop.run();
+          stop = job.stop;
           if (!job.running) {
             jobs.remove(job.key, job);
-            job.ready.completeExceptionally(abort());
+            waiting.remove(job);
+            queued = true;
           }
         }
         pump();
       }
+      // Never call body readers, HTTP cancellation or future continuations
+      // while owning the dispatcher monitor.
+      unsubscribe.run();
+      ready.completeExceptionally(abort());
+      for (Runnable action : release) action.run();
+      if (stop != null) stop.run();
+      if (queued) job.ready.completeExceptionally(abort());
     }
   }
 
-  synchronized Lease acquire(String key, TileDemand demand, Transfer<T> transfer)
-      throws IOException {
-    if (closed || demand.cancelled()) throw abort();
-    Job job = jobs.get(key);
-    if (job == null || job.stopped) {
-      if (jobs.size() >= 512) throw new IOException("Map request queue is full.");
-      job = new Job(key, transfer);
-      jobs.put(key, job);
-    } else shared++;
-    Lease lease = new Lease(job, demand);
-    job.users.add(lease);
-    lease.unwatch =
-        demand.watch(
-            () -> {
-              synchronized (TileDispatcher.this) {
-                if (demand.cancelled()) lease.close();
-                else pump();
-              }
-            });
-    if (lease.released) lease.unwatch.run();
-    if (!lease.released) pump();
+  Lease acquire(String key, TileDemand demand, Transfer<T> transfer) throws IOException {
+    Lease lease;
+    synchronized (this) {
+      if (closed || demand.cancelled()) throw abort();
+      Job job = jobs.get(key);
+      if (job == null || job.stopped || job.completed) {
+        if (jobs.size() >= 512) throw new IOException("Map request queue is full.");
+        job = new Job(key, transfer);
+        jobs.put(key, job);
+        waiting.add(job);
+      } else shared++;
+      lease = new Lease(job, demand);
+      job.users.add(lease);
+    }
+    Runnable unsubscribe = demand.watch(() -> {
+      if (demand.cancelled()) lease.close();
+      else synchronized (TileDispatcher.this) { pump(); }
+    });
+    boolean released;
+    synchronized (this) {
+      lease.unwatch = unsubscribe;
+      released = lease.released;
+      if (!released) pump();
+    }
+    if (released) unsubscribe.run();
     return lease;
   }
 
@@ -197,19 +213,21 @@ final class TileDispatcher<T> implements AutoCloseable {
     if (closed) return;
     while (active < limit) {
       Job best = null;
-      boolean foregroundWaiting =
-          jobs.values().stream().anyMatch(j -> !j.running && !j.stopped && j.priority() < 100);
-      for (Job j : jobs.values()) {
-        if (j.running || j.stopped || j.users.isEmpty()) continue;
+      int bestPriority = Integer.MAX_VALUE;
+      for (Job j : waiting) {
+        if (j.stopped || j.users.isEmpty()) continue;
         int p = j.priority();
-        if (p >= 100 && (foregroundWaiting || background >= backgroundLimit)) continue;
-        if (best == null || p < best.priority() || p == best.priority() && j.order < best.order)
+        if (p >= 100 && background >= backgroundLimit) continue;
+        if (p < bestPriority || p == bestPriority && j.order < best.order) {
           best = j;
+          bestPriority = p;
+        }
       }
       if (best == null) return;
       Job next = best;
+      waiting.remove(next);
       next.running = true;
-      next.backgroundSlot = next.priority() >= 100;
+      next.backgroundSlot = bestPriority >= 100;
       active++;
       if (next.backgroundSlot) background++;
       started++;
@@ -243,7 +261,7 @@ final class TileDispatcher<T> implements AutoCloseable {
         "background",
         (long) background,
         "queued",
-        jobs.values().stream().filter(j -> !j.running).count(),
+        (long) waiting.size(),
         "started",
         started,
         "shared",
@@ -259,14 +277,20 @@ final class TileDispatcher<T> implements AutoCloseable {
   }
 
   @Override
-  public synchronized void close() {
-    closed = true;
-    for (Job j : jobs.values()) {
-      j.stopped = true;
+  public void close() {
+    List<Job> stopped;
+    synchronized (this) {
+      if (closed) return;
+      closed = true;
+      stopped = new ArrayList<>(jobs.values());
+      for (Job j : stopped) j.stopped = true;
+      jobs.clear();
+      waiting.clear();
+    }
+    for (Job j : stopped) {
       j.stop.run();
       j.ready.completeExceptionally(abort());
     }
-    jobs.clear();
     workers.shutdownNow();
   }
 }

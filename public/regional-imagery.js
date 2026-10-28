@@ -53,11 +53,11 @@ function create({fetcher=(...a)=>root.fetch(...a),meta=root.RidgeWestCoastFootpr
   try{return await root.RidgeRegionalBlend.composite({...data,mask:data.linz&&!data.overlay?mask:Promise.resolve(null),checkCancelled:()=>{if(dead||signal?.aborted)throw Scheduler.abort();}});}finally{mask?.then(m=>m.close()).catch(()=>{});mask=null;fallbackBusy=false;}
  }
  const schedule=(run,signal,options)=>scheduler.schedule(run,signal,options);
- async function regionalFetch(url,options={}){
+ async function regionalFetch(url,options={},catalogReady=false){
   if(dead||options.signal?.aborted)throw Object.assign(Error('Cancelled'),{name:'AbortError'});
   const u=new URL(url,'https://viewer.invalid'),q=u.hostname==='basemaps.linz.govt.nz'&&u.pathname.match(/^\/v1\/tiles\/aerial\/WebMercatorQuad\/(\d+)\/(\d+)\/(\d+)\.webp$/);
   if(!q)return fetcher(url,options);
-  if(root.RidgeImageryCatalog)await root.RidgeImageryCatalog.ensure(options.ridgeOriginal?{z:+q[1],x:+q[2],y:+q[3]}:undefined);meta??=root.RidgeWestCoastFootprint;south??=root.RidgeSouthOverviews;
+  if(!catalogReady&&root.RidgeImageryCatalog)await root.RidgeImageryCatalog.ensure(options.ridgeOriginal?{z:+q[1],x:+q[2],y:+q[3]}:undefined);meta??=root.RidgeWestCoastFootprint;south??=root.RidgeSouthOverviews;
   const compensate=u.searchParams.get('ridge-grade')==='snow-v3',useReference=reference&&u.searchParams.get('ridge-reference')===reference.version;u.searchParams.delete('ridge-reference');
   // This flag belongs to our byte-cache key, never to the upstream LINZ API.
   u.searchParams.delete('ridge-grade');u.searchParams.delete('ridge-gap');url=u.toString();

@@ -18,10 +18,15 @@ function vectorAlpha(meta,z,x,y,w,h){
  return data;
 }
 async function composite({linz,esri,fine=[],z,x,y,esriZ=z,meta,mask,overlay=false,hardMask=false,compensate=false,checkCancelled=()=>{}},environment=root){
- checkCancelled();const decoded=await Promise.allSettled([linz?environment.createImageBitmap(new Blob([linz])):Promise.resolve(null),environment.createImageBitmap(new Blob([esri])),linz&&!overlay&&!meta?.rings?mask:Promise.resolve(null),...fine.map(row=>environment.createImageBitmap(new Blob([row.data])))]);
- const a=decoded[0].status==='fulfilled'?decoded[0].value:null,b=decoded[1].status==='fulfilled'?decoded[1].value:null,m=decoded[2].status==='fulfilled'?decoded[2].value:null;
+ checkCancelled();let disposed=false;const owned=[];
+ const decode=async data=>{const bitmap=await environment.createImageBitmap(new Blob([data]));
+  try{checkCancelled();if(disposed)throw cancelled();}catch(error){bitmap.close();throw error;}
+  owned.push(bitmap);return bitmap;
+ };
+ let a,b,m,decoded;
  try{
-  checkCancelled();const failed=decoded.find(row=>row.status==='rejected');if(failed)throw failed.reason;
+  decoded=await Promise.all([linz?decode(linz):null,decode(esri),linz&&!overlay&&!meta?.rings?mask:null,...fine.map(row=>decode(row.data))]);
+  [a,b,m]=decoded;checkCancelled();
   if(a&&(a.width!==b.width||a.height!==b.height))throw Error('Imagery dimensions differ');
   const w=a?.width||b.width,h=a?.height||b.height,canvas=new environment.OffscreenCanvas(w,h),ctx=canvas.getContext('2d',compensate?{willReadFrequently:true}:undefined),factor=2**(z-esriZ);
   if(w>512||h>512)throw Error('Unexpected imagery dimensions');
@@ -36,7 +41,7 @@ async function composite({linz,esri,fine=[],z,x,y,esriZ=z,meta,mask,overlay=fals
    const scale=2**(z-meta.z)*w/256,dx=(meta.x/2**meta.z-x/2**z)*2**z*w,dy=(meta.y/2**meta.z-y/2**z)*2**z*h;
    if(meta.rings){const pixels=ac.createImageData(w,h);pixels.data.set(vectorAlpha(meta,z,x,y,w,h));
     if(fine.length){const survey=new environment.OffscreenCanvas(w,h),sc=survey.getContext('2d',{willReadFrequently:true});
-     for(let i=0;i<fine.length;i++){const bitmap=decoded[i+3].value,ff=2**(z-fine[i].z);sc.drawImage(bitmap,(x%ff)*bitmap.width/ff,(y%ff)*bitmap.height/ff,bitmap.width/ff,bitmap.height/ff,0,0,w,h);}
+     for(let i=0;i<fine.length;i++){const bitmap=decoded[i+3],ff=2**(z-fine[i].z);sc.drawImage(bitmap,(x%ff)*bitmap.width/ff,(y%ff)*bitmap.height/ff,bitmap.width/ff,bitmap.height/ff,0,0,w,h);}
      const valid=sc.getImageData(0,0,w,h).data;for(let i=3;i<valid.length;i+=4)if(valid[i]>0)pixels.data[i]=0;
     }
     ac.putImageData(pixels,0,0);}else{if(hardMask)ac.imageSmoothingEnabled=false;ac.drawImage(m,dx,dy,meta.width*scale,meta.height*scale);}
@@ -44,7 +49,7 @@ async function composite({linz,esri,fine=[],z,x,y,esriZ=z,meta,mask,overlay=fals
    oc.drawImage(a,0,0,w,h);oc.drawImage(canvas,0,0);result=out;
   }
   checkCancelled();const blob=await result.convertToBlob({type:'image/png'});checkCancelled();const data=await blob.arrayBuffer();checkCancelled();return data;
- }finally{a?.close();b?.close();for(const row of decoded.slice(3))if(row.status==='fulfilled')row.value?.close();}
+ }finally{disposed=true;for(const bitmap of owned)bitmap.close();owned.length=0;}
 }
 
 const api={composite,cancelled,vectorAlpha};if(typeof module!=='undefined')module.exports=api;else root.RidgeRegionalBlend=api;
