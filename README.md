@@ -1,5 +1,20 @@
 # Ridgeline Android downloads
 
+## Latest performance comparison: 0.17.0 — side-by-side app
+
+**[Download Ridgeline 3D Performance 0.17.0 Base APK — 26.9 MB](Ridgeline-3D-0.17.0-Performance-Base.apk)**
+
+Choose **Download raw file**, then install. This is a separate app named **Ridgeline 3D Performance** (`nz.ridgeline.mobile.performance`). It uses a new development signer and **does not replace or access the normal installed app's private data**. Its settings, LINZ key, saved maps, routes and cache start separately. Keep your original app installed. Match settings and warm both apps over the same area before comparing. Full imagery resolution, terrain detail, Original + Direct rendering and drawing resolution are preserved.
+
+Includes the reconciled 0.16.0 fixes plus indexed fallback selection, fewer repeated ancestor/source checks, bitmap cleanup, native dispatcher contention reductions, independent decode measurements/control, deferred saturated-queue rebuilding, fewer selection allocations, event-driven connectivity and a completed-transfer freshness fix. Default concurrency/cache budgets are unchanged. WebView inspection is enabled for a new phone trace.
+
+**Estimated benefit:** roughly **10–30% faster for CPU-bound, selection-heavy movement**, conditionally assuming the changed work accounts for 20–40% of frame time and its cost halves. **This is a planning estimate, not measured phone FPS.** The fallback subsystem alone is about 3× faster in a medium synthetic case and 9× in a large one; small cases improve less. GPU/network/memory pressure may make overall gains small or zero.
+
+Passed: **90 native/JVM tests, 55 mobile JavaScript tests, 17 focused tests against both source and generated app modules**, lint (zero errors), instrumentation-test compilation, browser workflow and real-worker transport, APK v2 signature/alignment, and packaged-asset checks. All 1,133 imagery/binary assets match 0.16.0 byte-for-byte. No physical-device benchmark or emulator execution was performed. Base build only; larger overview packs can be imported separately as before.
+
+[Findings and complete scope](Ridgeline-3D-0.17.0-findings.md) · [Validation](Ridgeline-3D-0.17.0-validation.json) · [Benchmark samples](Ridgeline-3D-0.17.0-benchmark.json) · [Checksum](Ridgeline-3D-0.17.0-Performance-Base.apk.sha256) · [Source commit](https://github.com/connorgleeson736-sys/Ridgeline/commit/fb32f6206353db1f3afc701977ab5444b3c49155)
+
+
 ## Diagnostic build: 0.16.0 — WebView CPU profiling
 
 **[Download 0.16.0 Profiling Base APK — 26.9 MB](Ridgeline-3D-0.16.0-Profiling-Base.apk)**
@@ -14,7 +29,7 @@ Verified: offline preview build, APK signature, matching signer, unchanged manif
 
 [Checksum](Ridgeline-3D-0.16.0-Profiling-Base.apk.sha256) · [Validation](Ridgeline-3D-0.16.0-Profiling-validation.json)
 
-## Latest: 0.16.0 — elevation-cache and invalidation work reductions
+## Latest standard preview: 0.16.0 — elevation-cache and invalidation work reductions
 
 **[Download 0.16.0 Base APK — 26.9 MB](Ridgeline-3D-0.16.0-Base.apk)**
 

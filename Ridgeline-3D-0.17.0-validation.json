@@ -1,0 +1,199 @@
+{
+  "version": "0.17.0-performance",
+  "versionCode": 20,
+  "variant": "Performance Base",
+  "applicationId": "nz.ridgeline.mobile.performance",
+  "appName": "Ridgeline 3D Performance",
+  "sideBySide": true,
+  "bytes": 26919498,
+  "sha256": "009c736e9e8f86e73ec1b41be09d75e80ecccc94695e659b1f556463bcc85869",
+  "sourceCommit": "fb32f6206353db1f3afc701977ab5444b3c49155",
+  "sourceBranch": "android-performance-0.17.0",
+  "referenceBranch": "android-preview-download",
+  "referenceBranchCommit": "a3f9046add3680f275733188a12aa0c014e50b5a",
+  "referenceVersion": "0.16.0",
+  "referenceSourceCommit": "c0b394125bc35f6236c645c68a4a3bb94d88ce55",
+  "nativeTests": {
+    "tests": 90,
+    "failures": 0,
+    "errors": 0
+  },
+  "javascriptTests": 55,
+  "focusedSourceTests": 17,
+  "focusedGeneratedTests": 17,
+  "lint": {
+    "status": "passed",
+    "errors": 0,
+    "warnings": 22
+  },
+  "instrumentation": "Performance instrumentation tests compiled, not executed",
+  "browserWorkflow": {
+    "status": "passed",
+    "softwareWebGL": true,
+    "controlledProviderRequests": 313,
+    "actualLargePackReads": 0,
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  "workerTransport": "passed with real browser workers and mocked Android control interface",
+  "signature": {
+    "v2Verified": true,
+    "signerSha256": "e3432d7c6a92c4dee9f7030ff299c8d85d90570bec665b6e0df0eb6b7fb93c61",
+    "matchesPreviousPreviewSigner": false,
+    "note": "New development signer; distinct package intentionally preserves existing app and data"
+  },
+  "zipAlignment": "4-byte and 16 KiB shared-library alignment verified",
+  "packagedAssetsMatchSyncedBuild": 1217,
+  "unchangedImageryAssetsComparedWith0160": 1133,
+  "unchangedQualityModules": [
+    "maplibre-direct-sampling.js",
+    "adaptive-terrain.js",
+    "motion-detail.js",
+    "surface-focus.js",
+    "performance.js",
+    "linz-topo.js",
+    "imagery.js",
+    "terrain-core.js",
+    "terrain-composition.js",
+    "assets/maplibre-gl-worker.mjs"
+  ],
+  "webFingerprint": "ace5c9b660f3cc5c830daffc4c5f6f2881c01f965ef5985cd98cb5fc8d9f67f2",
+  "webContentsDebuggingEnabled": true,
+  "fullApkBuilt": false,
+  "phoneFpsMeasured": false,
+  "estimate": {
+    "type": "conditional planning estimate, not a device measurement",
+    "overallCpuBoundSelectionHeavyImprovementPct": [
+      10,
+      30
+    ],
+    "assumptions": "Changed paths occupy 20\u201340% of elapsed frame work and their combined cost halves; approximately 11\u201325% Amdahl throughput gain, rounded to a planning range",
+    "limits": "GPU, bandwidth or OS memory reclaim can dominate; actual gain may be small or zero"
+  },
+  "subsystemBenchmark": {
+    "baselinePreview": "0.16.0",
+    "sourceCommit": "c0b394125bc35f6236c645c68a4a3bb94d88ce55",
+    "scope": "Native fallback-child lookup and retention only, synthetic CPU fixture; not phone FPS",
+    "rounds": 7,
+    "iterationsPerRound": 40,
+    "scenarios": [
+      {
+        "loaded": 32,
+        "missing": 16,
+        "baselineMs": 0.017803675000000397,
+        "currentMs": 0.015061525000000131,
+        "speedup": 1.1820632372884048,
+        "samplesMs": {
+          "baseline": [
+            0.034390974999999456,
+            0.015336175000000197,
+            0.018412825000000056,
+            0.0244316750000003,
+            0.017803675000000397,
+            0.01519797499999953,
+            0.013656900000000149
+          ],
+          "current": [
+            0.027232899999999914,
+            0.027515100000000105,
+            0.015061525000000131,
+            0.01200240000000008,
+            0.017381774999999777,
+            0.012472599999999546,
+            0.012948800000000205
+          ]
+        }
+      },
+      {
+        "loaded": 256,
+        "missing": 128,
+        "baselineMs": 0.2553867249999996,
+        "currentMs": 0.08391857499999986,
+        "speedup": 3.0432681322341333,
+        "samplesMs": {
+          "baseline": [
+            0.26518627500000064,
+            0.2765629749999995,
+            0.25451440000000003,
+            0.2553867249999996,
+            0.27284310000000006,
+            0.21669075000000007,
+            0.231831600000001
+          ],
+          "current": [
+            0.12009875000000036,
+            0.11854114999999936,
+            0.07961005000000014,
+            0.07810780000000009,
+            0.09991024999999994,
+            0.07878782500000056,
+            0.08391857499999986
+          ]
+        }
+      },
+      {
+        "loaded": 1024,
+        "missing": 512,
+        "baselineMs": 3.153927999999999,
+        "currentMs": 0.3395286249999998,
+        "speedup": 9.28913725610028,
+        "samplesMs": {
+          "baseline": [
+            3.3072101500000004,
+            3.069029950000001,
+            3.153927999999999,
+            3.0741277249999994,
+            3.3740065500000016,
+            3.1984302500000013,
+            3.1174614249999992
+          ],
+          "current": [
+            0.34755700000000045,
+            0.3395286249999998,
+            0.35043202500000065,
+            0.34256992500000083,
+            0.33870284999999856,
+            0.33323507499999894,
+            0.3265399500000001
+          ]
+        }
+      },
+      {
+        "loaded": 512,
+        "missing": 0,
+        "baselineMs": 0.007825049999996735,
+        "currentMs": 8.162500000139517e-05,
+        "speedup": 95.86584992175175,
+        "samplesMs": {
+          "baseline": [
+            0.010921000000001868,
+            0.012529425000002448,
+            0.0076260250000018456,
+            0.007825049999996735,
+            0.006391150000001744,
+            0.012028149999997595,
+            0.006584450000002562
+          ],
+          "current": [
+            8.49000000016531e-05,
+            7.534999999734283e-05,
+            8.287500000392356e-05,
+            7.63500000005024e-05,
+            8.162500000139517e-05,
+            7.934999999861247e-05,
+            9.390000000166764e-05
+          ]
+        }
+      }
+    ]
+  },
+  "additionalFixes": [
+    "Defer dirty image-queue rebuilds while saturated, retaining bounded stale-node compaction",
+    "Remove intermediate fallback-child selection arrays without changing native completeness decisions",
+    "One application-lifetime default-network callback removes normal per-tile connectivity binder queries",
+    "Completed transfer bodies cannot satisfy a new request before worker cleanup"
+  ],
+  "containsReconciledChanges": true,
+  "preservesFullImageryAndTerrainDetail": true,
+  "normalInstalledAppPrivateData": "Not shared; new app has separate settings, routes, downloaded regions and caches"
+}
