@@ -1,3 +1,5 @@
+> **Full Performance build:** [packaging and verification](PERFORMANCE-0.17.0-FULL.md). It includes all six overview imagery packs and updates the Performance Base app using the same signer.
+
 > **0.17.0 Performance comparison build:** see [changes, verification, installation and speed-estimate limits](PERFORMANCE-0.17.0.md). Use the `performance` Gradle variant for the separate `nz.ridgeline.mobile.performance` app; it preserves the normal installed preview and its private data.
 
 # Ridgeline 3D for Android

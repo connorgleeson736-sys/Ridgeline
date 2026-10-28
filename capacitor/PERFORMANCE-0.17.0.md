@@ -1,5 +1,8 @@
 # Ridgeline 3D Performance — 0.17.0
 
+> A **Full imagery APK** is now available with the same application code, package and signer. See [Full packaging and verification](PERFORMANCE-0.17.0-FULL.md). Earlier Base-specific checks below describe the initial release.
+
+
 Built 28 October 2026 (Melbourne), against the normal and Profiling 0.16.0 previews on `android-preview-download`, with source baseline `c0b394125bc35f6236c645c68a4a3bb94d88ce55`. Includes all reconciled fixes and the additional work below. Source changes are additive to the 0.15/0.16 app-specific optimisations.
 
 ## Installation and data
