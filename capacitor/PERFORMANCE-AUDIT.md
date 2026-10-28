@@ -46,3 +46,7 @@ Original + Direct; original terrain/image detail policies; unchanged mesh-select
 ## Follow-up implementation: 0.15.0
 
 [MAIN-THREAD-OPTIMISATIONS.md](MAIN-THREAD-OPTIMISATIONS.md) records the selected larger CPU changes: reusable geographic indexes, release-wrapper reuse and a stable-membership transition fast path, with before/after fixtures and explicit preservation of native invalidation and matrix calculation. Device-specific bottlenecks still require a phone trace.
+
+## Follow-up implementation: 0.16.0
+
+[CACHE-INVALIDATION-OPTIMISATIONS.md](CACHE-INVALIDATION-OPTIMISATIONS.md) describes removal of duplicate automatic WebView elevation persistence and the reduced allocation/texture-size work on tile arrivals, with before/after correctness and CPU fixtures. Saved regions and explicitly saved overview data are preserved.

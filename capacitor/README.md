@@ -152,3 +152,7 @@ Removes a redundant response-body buffer copy, reuses unchanged exact imagery co
 ## 0.15.0 measured terrain-adapter CPU reductions
 
 Reuses geographic coordinate indexes while keeping native matrices fresh, caches temporary release functions per tile, and skips transition scaffolding for unchanged tile membership. Native source/detail/invalidation policies are preserved. See [MAIN-THREAD-OPTIMISATIONS.md](MAIN-THREAD-OPTIMISATIONS.md) for measurements, lifecycle coverage and limits. Base APK only.
+
+## 0.16.0 duplicate elevation-cache and invalidation work
+
+Uses the shared native HTTP cache directly for map/profile elevation instead of duplicating automatic disk persistence in WebView. Retains height-memory reuse and persistent downloaded regions. Tile arrivals inspect RTT sizes only for geographically related patches and avoid merged active/warm arrays, preserving invalidation decisions. See [CACHE-INVALIDATION-OPTIMISATIONS.md](CACHE-INVALIDATION-OPTIMISATIONS.md). Base APK only.

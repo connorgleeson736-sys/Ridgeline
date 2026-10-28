@@ -5,8 +5,18 @@ function replace(text, from, to) {
  if(!text.includes(from))throw Error('Optimisation integration changed: '+from.slice(0,80));
  return text.replace(from,to);
 }
+function replaceEvery(text,from,to,count){if(text.split(from).length-1!==count)throw Error('Optimisation integration count changed');return text.replaceAll(from,to);}
 export function optimiseWeb(name,text){
  if(name==='native-residency.js'){
+  text=replace(text,' manager.releaseRTT=function(id){',` function relatedResidentTiles(id){
+  const related=[];
+  for(const tile of Object.values(target))if(tile.tileID.equals(id)||tile.tileID.isChildOf(id)||id.isChildOf(tile.tileID))related.push(tile);
+  for(const entry of warm.values()){const tile=entry.tile;if(tile.tileID.equals(id)||tile.tileID.isChildOf(id)||id.isChildOf(tile.tileID))related.push(tile);}
+  return related;
+ }
+ manager.releaseRTT=function(id){`);
+  text=replaceEvery(text,'for(const tile of [...Object.values(target),...[...warm.values()].map(entry=>entry.tile)])\n    if(cost(tile)>0&&(tile.tileID.equals(id)||tile.tileID.isChildOf(id)||id.isChildOf(tile.tileID)))', 'for(const tile of relatedResidentTiles(id))\n    if(cost(tile)>0)',2);
+
   text=replace(text,'function relatedCoordinates(manager,regular,id,scope,onCandidates=()=>{}){',createCoordinateIndexCache.toString()+"\nconst coordinateIndexes=createCoordinateIndexCache();\nfunction relatedCoordinates(manager,regular,id,scope,onCandidates=()=>{}){");
   text=replace(text,'if(!scope.coordinateIndex){const descendants=', 'if(!scope.coordinateIndex)scope.coordinateIndex=coordinateIndexes.get(manager,()=>{const descendants=');
   text=replace(text,'scope.coordinateIndex={descendants,exact,order:new Map(manager._renderableTilesKeys.map((key,index)=>[key,index]))};}', 'return {descendants,exact,order:new Map(manager._renderableTilesKeys.map((key,index)=>[key,index]))};});');
@@ -59,7 +69,12 @@ export function optimiseWeb(name,text){
   text=replace(text,"},url=root.URL.createObjectURL(new Blob([JSON.stringify(data,null,2)]","};if(await root.RidgeMobile?.exportDiagnostics?.(JSON.stringify(data,null,2)))return;const url=root.URL.createObjectURL(new Blob([JSON.stringify(data,null,2)]");
  }
 
- if(name==='response-cache.js')text=replace(text,'null:v.data.slice(0)','null:v.data');
+ if(name==='terrain-core.js')text=replace(text,'cacheStorage=root.caches','cacheStorage=null');
+ if(name==='response-cache.js'){
+  text=replace(text,'null:v.data.slice(0)','null:v.data');
+  text=replace(text,'cacheStorage=root.caches','cacheStorage=null');
+  text=replace(text,' let writes=0,cooldown=0;', ' if(!cacheStorage)return fetcher;\n let writes=0,cooldown=0;');
+ }
  if(name==='terrain-streaming.js'){
   text=replace(text,'function imageReadiness(map){',`const readinessChecks=new WeakMap();
 function readyCoverage(manager,ids){
