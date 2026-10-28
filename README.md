@@ -1,6 +1,16 @@
 # Ridgeline Android downloads
 
-## Latest: 0.13.1 — foreground loading without the extra native cap
+## Latest: 0.13.2 — stable resolution during movement
+
+**[Download 0.13.2 Base APK — 26.9 MB](Ridgeline-3D-0.13.2-Base.apk)**
+
+Choose **Download raw file**, then install over your current app. Removes automatic frame-rate-triggered rendering-resolution reductions during movement, preventing that drawing-buffer resize. Other detail settings, Original + Direct and maximum Topo detail are preserved. Website source is unchanged.
+
+Base only. Tests and optional validation were skipped at the user's request; no device benchmark is claimed.
+
+[Source commit](https://github.com/connorgleeson736-sys/Ridgeline/commit/7abccfc)
+
+## Previous: 0.13.1 — foreground loading without the extra native cap
 
 **[Download 0.13.1 Base APK — 26.9 MB](Ridgeline-3D-0.13.1-Base.apk)**
 
