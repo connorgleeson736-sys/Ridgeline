@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFile} from 'node:fs/promises';
-async function load(name,extra={}){const c={module:{exports:{}},URL,Response,AbortController,setTimeout,clearTimeout,...extra};c.globalThis=c;vm.runInNewContext(await readFile(new URL('../www/'+name,import.meta.url),'utf8'),c);return c.module.exports;}
+async function load(name,extra={}){const c={module:{exports:{}},URL,Response,Headers,AbortController,setTimeout,clearTimeout,...extra};c.globalThis=c;vm.runInNewContext(await readFile(new URL('../www/'+name,import.meta.url),'utf8'),c);return c.module.exports;}
 test('expired compressed tiles release reserved admission and speculative cache space',async()=>{
  let now=1000,fetches=0;const {createCache}=await load('tile-cache.js');
  const cache=createCache({maxBytes:2,maxItems:2,clock:()=>now,fetcher:async()=>{fetches++;return new Response(new Uint8Array([1]),{headers:{'Cache-Control':'max-age=1'}});}});
@@ -20,4 +20,9 @@ test('eviction keeps the same bounded coarse coverage without quadratic recounts
 });
 test('production imagery worker decodes directly without per-image SHA256',async()=>{
  const source=await readFile(new URL('../www/native-regional-worker.js',import.meta.url),'utf8');assert.doesNotMatch(source,/RidgeBitmapCache|native-bitmap-cache/);assert.match(source,/regional-imagery-worker/);
+});
+test('response bodies snapshot cached bytes without an extra explicit ArrayBuffer copy',async()=>{
+ const {create}=await load('response-cache.js');const api=create({fetcher:async()=>new Response(new Uint8Array([1,2,3]),{headers:{'cache-control':'max-age=60'}})});
+ const a=await api.fetch('image'),b=await api.fetch('image');const bytes=await a.arrayBuffer();new Uint8Array(bytes)[0]=99;
+ assert.deepEqual([...new Uint8Array(await b.arrayBuffer())],[1,2,3]);assert.deepEqual([...new Uint8Array(await(await api.fetch('image')).arrayBuffer())],[1,2,3]);api.destroy();
 });

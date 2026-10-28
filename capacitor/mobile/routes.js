@@ -23,9 +23,11 @@ export function attachRoutes(api,{button,el,showError}){
  function overlay(){
   if(!api.isReady())return;
   const passive=routes.filter(r=>opened.has(r.id)&&r.id!==active&&r.points.length>1),stamp=JSON.stringify(passive.map(r=>[r.id,records.get(r.id).version]));
+  if(!passive.length&&!map.getSource('other-routes')){overlayStamp=stamp;return;}
   if(map.getSource('other-routes')&&stamp===overlayStamp)return;
   const data={type:'FeatureCollection',features:passive.map(r=>({type:'Feature',properties:{},geometry:{type:'LineString',coordinates:r.points}}))};
-  if(!map.getSource('other-routes')){map.addSource('other-routes',{type:'geojson',data});map.addLayer({id:'other-routes-line',type:'line',source:'other-routes',paint:{'line-color':'#518999','line-width':3,'line-opacity':.9},layout:{'line-cap':'round','line-join':'round'}});}else map.getSource('other-routes').setData(data);
+  if(!map.getSource('other-routes')){map.addSource('other-routes',{type:'geojson',data});map.addLayer({id:'other-routes-line',type:'line',source:'other-routes',paint:{'line-color':'#518999','line-width':3,'line-opacity':.9},layout:{visibility:passive.length?'visible':'none','line-cap':'round','line-join':'round'}});}else map.getSource('other-routes').setData(data);
+  map.setLayoutProperty('other-routes-line','visibility',passive.length?'visible':'none');
   overlayStamp=stamp;
  }
  function fitOpened(){const b=[Infinity,Infinity,-Infinity,-Infinity];for(const route of routes)if(opened.has(route.id))for(const p of route.points){b[0]=Math.min(b[0],p[0]);b[1]=Math.min(b[1],p[1]);b[2]=Math.max(b[2],p[0]);b[3]=Math.max(b[3],p[1]);}if(Number.isFinite(b[0]))map.fitBounds([[b[0],b[1]],[b[2],b[3]]],{padding:{top:80,left:45,right:45,bottom:60},maxZoom:14,duration:0});}

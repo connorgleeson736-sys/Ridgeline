@@ -372,6 +372,22 @@ public final class RidgelineOfflinePlugin extends Plugin {
   }
 
   @PluginMethod
+  public void exportDiagnostics(PluginCall c) {
+    String text = c.getString("text", "");
+    if (text.length() > 2 * 1024 * 1024) {
+      c.reject("Diagnostic report exceeds the export size limit.");
+      return;
+    }
+    startActivityForResult(
+        c,
+        new Intent(Intent.ACTION_CREATE_DOCUMENT)
+            .addCategory(Intent.CATEGORY_OPENABLE)
+            .setType("application/json")
+            .putExtra(Intent.EXTRA_TITLE, "ridgeline-performance.json"),
+        "exportResult");
+  }
+
+  @PluginMethod
   public void exportGpx(PluginCall c) {
     if (c.getString("text", "").length() > 4 * 1024 * 1024) {
       c.reject("GPX exceeds the export size limit.");
@@ -404,7 +420,7 @@ public final class RidgelineOfflinePlugin extends Plugin {
         c,
         () -> {
           try (OutputStream out = getContext().getContentResolver().openOutputStream(uri, "wt")) {
-            if (out == null) throw new IOException("The GPX file could not be saved.");
+            if (out == null) throw new IOException("The file could not be saved.");
             out.write(c.getString("text", "").getBytes(StandardCharsets.UTF_8));
           }
           return new JSObject();

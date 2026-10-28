@@ -144,3 +144,7 @@ The Android build removes automatic frame-rate-triggered drawing-buffer downshif
 ## 0.14.0 cache and CPU efficiency
 
 Expires unusable compressed tiles before admission/prefetch decisions, removes repeated coarse-byte recounts during source eviction, batches native tile controls, removes per-image SHA256 decoding-cache overhead, memoises native saved-tile misses, and defers camera persistence to idle. Unchanged region lists reuse DOM and completed lists stop polling. Original + Direct, Topo zoom 18, all detail policies and the stable movement drawing buffer are preserved. See LOADING-OPTIMISATIONS.md for evidence and limitations. Base preview only.
+
+## 0.14.1 follow-up audit
+
+Removes a redundant response-body buffer copy, reuses unchanged exact imagery coverage indexes, avoids empty route-overlay selection work, and adds opt-in component timings/native counters to diagnostic exports with an Android JSON save picker. No rendering-quality changes. See [PERFORMANCE-AUDIT.md](PERFORMANCE-AUDIT.md) for reviewed areas, rejected experiments, remaining device-measurement gaps and how to collect a report.

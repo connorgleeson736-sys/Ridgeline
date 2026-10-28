@@ -22,7 +22,7 @@ try{
   localStorage.setItem('ridgeline-phone-mode-v1','1');localStorage.setItem('ridgeline-filtering-v1',JSON.stringify({bilinear:false,mipmaps:false,trilinear:false,anisotropic:false,fade:false,colour:false}));
   localStorage.setItem('ridgeline-routes-v1',JSON.stringify([{id:'second-route',name:'Second route',points:[[170.15,-43.58],[170.16,-43.59]],updated:'2026-10-27T00:00:00Z'}]));
   window.__nativeCalls=[];window.__regions=[{topo:true,zoom:16,id:'test-region',name:'Saved test region',state:'complete',done:12,total:12,bytes:1048576,bounds:[170.05,-43.65,170.2,-43.5]}];
-  const methods=['exportRegionPdf','estimateRegion','downloadRegion','getSettings','overviewStatus','listRegions','pauseRegion','resumeRegion','removeRegion','startLocation','stopLocation','addListener','removeListener'];
+  const methods=['exportDiagnostics','loadingStats','exportRegionPdf','estimateRegion','downloadRegion','getSettings','overviewStatus','listRegions','pauseRegion','resumeRegion','removeRegion','startLocation','stopLocation','addListener','removeListener'];
   window.Capacitor={PluginHeaders:[{name:'RidgelineOffline',methods:methods.map(name=>({name,rtype:'promise'}))}],nativePromise:async(plugin,method,args)=>{
    window.__nativeCalls.push({method,args});if(method==='estimateRegion')return {total:15,estimatedMiB:1.2,highMiB:1.5,samples:9};
    if(method==='getSettings')return {offlineOnly:false};
@@ -46,7 +46,13 @@ try{
  assert.equal(await page.locator('#phone-mode').isChecked(),false);let status=await page.evaluate(()=>RidgeMobile.status());assert.equal(status.terrain,true);assert.equal(status.direct.enabled,true);assert.equal(status.direct.supported,true);assert.equal(await page.locator('#labels').isChecked(),true);
  await page.locator('#layers-toggle').click();await page.locator('#imagery-detail').waitFor({state:'visible'});assert.equal(await page.locator('#loading-controls').isVisible(),false);assert.equal(await page.locator('#topo-names').isVisible(),true);assert.equal(await page.locator('#labels').isVisible(),false);
  await page.locator('#advanced-tab').click();assert.equal(await page.locator('#phone-mode').isVisible(),true);assert.equal(await page.locator('#hillshade').isVisible(),true);assert.equal(await page.locator('#imagery-detail').isVisible(),false);await page.locator('#basic-tab').click();assert.equal(await page.locator('#topographic-note').isVisible(),false);assert.equal(await page.locator('#topo-status').isVisible(),false);await page.getByRole('button',{name:'Close layers by returning to map',exact:true}).click({position:{x:20,y:300}});assert.equal(await page.locator('#layers-panel').isVisible(),false);
- console.log('Layer tabs checked');
+
+ const componentProfile=await page.evaluate(async()=>{const control=RidgeBottleneckDiagnostics.attach(__testMap);control.setEnabled(true);const center=__testMap.getCenter();for(let i=0;i<3;i++){const rendered=new Promise(r=>__testMap.once('render',r));__testMap.jumpTo({center:[center.lng+i*.001,center.lat]});await Promise.race([rendered,new Promise(r=>setTimeout(r,5000))]);}const result=control.snapshot().mainThreadBreakdown;control.destroy();return result;});
+ console.log('Component profile',JSON.stringify(componentProfile));
+ assert.ok(Object.values(componentProfile.components).some(c=>c.calls>0),'Real map calls populate component profile');
+ console.log('Main-thread component timings captured',JSON.stringify(componentProfile));
+ await page.locator('#layers-toggle').click();await page.locator('#advanced-tab').click();await page.locator('#performance-diagnostics').check();await page.locator('#performance-save').click();await page.waitForFunction(()=>__nativeCalls.some(c=>c.method==='exportDiagnostics'));assert.ok(await page.evaluate(()=>JSON.parse(__nativeCalls.find(c=>c.method==='exportDiagnostics').args.text).mainThreadBreakdown));await page.locator('#performance-close').click();await page.locator('#layers-toggle').click();await page.locator('#basic-tab').click();await page.locator('#layers-close').click();
+ console.log('Layer tabs and native diagnostic export checked');
  assert.equal(await page.locator('.map-launcher #plan-shortcut').count(),0);await page.locator('#planner-toggle').click();await page.getByRole('button',{name:'Create new route',exact:true}).click();await page.mouse.click(160,280);await page.waitForFunction(()=>RidgeMobile.status().points===1,null,{timeout:20000});await page.mouse.click(270,220);await page.locator('#finish').click();
  await page.waitForFunction(()=>globalThis.RidgeMobile.status().points===2,null,{timeout:20000});
  await page.waitForFunction(()=>globalThis.RidgeMobile.status().profile.some(p=>Number.isFinite(p.h)),null,{timeout:60000});

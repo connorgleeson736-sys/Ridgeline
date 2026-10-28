@@ -26,7 +26,7 @@ test('route cards reuse nodes and geometry, defer hidden work, and skip unchange
   const api={getMap:()=>map,isReady:()=>true,renameRoute:(id,name)=>{routes=routes.map(r=>r.id===id?{...r,name}:r);return true;},routes:()=>routes,activeRoute:()=>null};
   const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;},button=(text,fn)=>{const n=el('button',text);n.onclick=fn;return n;};
   const workspace=attachRoutes(api,{el,button,showError:e=>{throw e;}});workspace.render(routes,null);
-  assert.equal(document.querySelectorAll('.saved-item').length,0,'No hidden route cards built');
+  assert.equal(document.querySelectorAll('.saved-item').length,0,'No hidden route cards built');assert.equal(source,undefined,'No empty passive route source allocated');
   document.getElementById('sidebar').classList.add('open');await new Promise(r=>setImmediate(r));
   const cards=[...document.querySelectorAll('.saved-item')],previews=cards.map(n=>n.querySelector('svg'));assert.equal(cards.length,50);
   let created=0;const create=document.createElement.bind(document),createNS=document.createElementNS.bind(document);document.createElement=(...args)=>{created++;return create(...args);};document.createElementNS=(...args)=>{created++;return createNS(...args);};
