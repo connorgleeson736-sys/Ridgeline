@@ -1,0 +1,53 @@
+{
+  "version": "0.15.0",
+  "versionCode": 18,
+  "variant": "Base",
+  "bytes": 26916586,
+  "sha256": "320863187881e89c777f65f3ef1127a83b0fe04e911e8ae8beab2bb570d6dfa0",
+  "nativeTests": {
+    "tests": 85,
+    "failures": 0,
+    "errors": 0
+  },
+  "javascriptTests": 52,
+  "lint": "passed",
+  "instrumentation": "compiled, not executed",
+  "browserWorkflow": "passed; 25 actual overview reads; no page/console errors",
+  "transportBrowser": "passed",
+  "realPinnedEngineLifecycle": "before/after fixtures pass texture retention, identity reuse, source invalidation, focus refresh, context restore and cleanup",
+  "coordinateFixture": {
+    "beforeMs": 121.17,
+    "afterMs": 10.62,
+    "tiles": 256,
+    "frames": 40,
+    "sourceQueriesPerFrame": 16,
+    "identicalCandidates": true,
+    "nativeMatrices": "still invoked on each query; mocked in timing fixture"
+  },
+  "releaseFixture": {
+    "updates": 100,
+    "beforeFunctionIdentities": 101,
+    "afterFunctionIdentities": 2
+  },
+  "stableMembershipFixture": {
+    "updates": 100,
+    "beforeMapSetAllocations": 1000,
+    "afterMapSetAllocations": 200,
+    "nativeUpdatesBoth": 100
+  },
+  "unchangedGraphicsModules": [
+    "assets/maplibre-gl.mjs",
+    "assets/maplibre-gl-worker.mjs",
+    "maplibre-direct-sampling.js",
+    "adaptive-terrain.js",
+    "motion-detail.js",
+    "surface-focus.js",
+    "performance.js",
+    "linz-topo.js",
+    "imagery.js",
+    "regional-blend.js",
+    "terrain-composition.js"
+  ],
+  "phoneFpsMeasured": false,
+  "fullApkBuilt": false
+}

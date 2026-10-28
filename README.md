@@ -1,6 +1,22 @@
 # Ridgeline Android downloads
 
-## Latest: 0.14.1 — follow-up render-path audit
+## Latest: 0.15.0 — terrain-adapter CPU and allocation reductions
+
+**[Download 0.15.0 Base APK — 26.9 MB](Ridgeline-3D-0.15.0-Base.apk)**
+
+Choose **Download raw file**, then install over your current app. Same preview signer. Base only.
+
+- Reuses geographic terrain-coordinate indexes; native matrices still calculate freshly and changed membership/coordinates invalidate the index.
+- Caches temporary release functions per tile rather than allocating them every update, restoring original methods after each update and on exceptions.
+- Skips transition maps/sets when membership is unchanged and no transition is held. Native updates and texture invalidation still run.
+
+Controlled results: coordinate lookup about 121 ms → 11 ms over 40 preparation passes; release-function identities 101 → 2 over 100 updates; stable-frame Map/Set allocations 1,000 → 200 over 100 updates. These are CPU/allocation fixtures, not phone FPS.
+
+Passed: **85 Android/JVM tests, 52 JavaScript tests**, real pinned-engine texture lifecycle checks, lint, instrumentation-test compilation, full browser workflow and worker transport checks, APK signature and module comparisons. Original + Direct, imagery/terrain detail, Topo zoom 18 and movement drawing resolution remain unchanged.
+
+[Implementation and measurements](https://github.com/connorgleeson736-sys/Ridgeline/blob/main/capacitor/MAIN-THREAD-OPTIMISATIONS.md) · [Source commit](https://github.com/connorgleeson736-sys/Ridgeline/commit/04bf5f0) · [Checksum](Ridgeline-3D-0.15.0-Base.apk.sha256) · [Validation](Ridgeline-3D-0.15.0-validation.json)
+
+## Previous: 0.14.1 — follow-up render-path audit
 
 **[Download 0.14.1 Base APK — 26.9 MB](Ridgeline-3D-0.14.1-Base.apk)**
 
