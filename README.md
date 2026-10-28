@@ -1,6 +1,24 @@
 # Ridgeline Android downloads
 
-## Latest: 0.13.2 — stable resolution during movement
+## Latest: 0.14.0 — cache, eviction and main-thread efficiency
+
+**[Download 0.14.0 Base APK — 26.9 MB](Ridgeline-3D-0.14.0-Base.apk)**
+
+Choose **Download raw file**, then install over your current app. Uses the previous preview signer. No Full APK was built.
+
+- Removes expired compressed entries before cache-admission and prefetch decisions.
+- Reduces repeated eviction bookkeeping: 5,206 to 366 coordinate checks in a 100-tile fixture, with identical surviving tiles.
+- Eliminates redundant native request-begin calls and coalesces priority/completion/cancellation controls; 40 completions use one batch in the unit fixture.
+- Removes per-image hashing from production worker decoding and memoises repeated native offline lookup misses with commit-safe invalidation.
+- Defers view persistence until idle and avoids unchanged region-list rebuilding/idle polling.
+
+Original + Direct, imagery/terrain quality and maximum Topo detail are preserved. Eleven renderer/quality modules are byte-identical to 0.13.2. Source website files are unchanged.
+
+Passed: **85 native tests, 42 JavaScript tests**, lint, instrumentation-test compilation, real-worker batch/legacy transport checks, full browser workflow (25 actual precomputed imagery reads, no page/console errors), APK signature and packaging comparisons. These are correctness and operation-count results, not physical-phone FPS measurements.
+
+[Findings and limitations](https://github.com/connorgleeson736-sys/Ridgeline/blob/main/capacitor/LOADING-OPTIMISATIONS.md) · [Source commit](https://github.com/connorgleeson736-sys/Ridgeline/commit/f53616f) · [Checksum](Ridgeline-3D-0.14.0-Base.apk.sha256) · [Validation](Ridgeline-3D-0.14.0-validation.json)
+
+## Previous: 0.13.2 — stable resolution during movement
 
 **[Download 0.13.2 Base APK — 26.9 MB](Ridgeline-3D-0.13.2-Base.apk)**
 

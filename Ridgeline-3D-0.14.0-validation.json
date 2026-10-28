@@ -1,0 +1,42 @@
+{
+  "version": "0.14.0",
+  "variant": "Base",
+  "bytes": 26915438,
+  "sha256": "95d05dbed3c3123c31cbec17c1516d6a9d0ada733206756b7d927c1f621447e1",
+  "nativeTests": {
+    "tests": 85,
+    "failures": 0,
+    "errors": 0
+  },
+  "javascriptTests": 42,
+  "lint": "passed",
+  "androidInstrumentation": "compiled, not executed",
+  "webglWorkflow": "passed; 25 actual imagery reads; no page/console errors",
+  "browserTransport": "passed legacy and production batch worker priority/cancellation",
+  "graphicsModulesIdenticalTo0132": [
+    "assets/maplibre-gl.mjs",
+    "assets/maplibre-gl-worker.mjs",
+    "maplibre-direct-sampling.js",
+    "adaptive-terrain.js",
+    "motion-detail.js",
+    "surface-focus.js",
+    "performance.js",
+    "linz-topo.js",
+    "imagery.js",
+    "regional-blend.js",
+    "terrain-composition.js"
+  ],
+  "evictionFixture": {
+    "beforeCoordinateReads": 5206,
+    "afterCoordinateReads": 366,
+    "sameFiveSurvivors": true,
+    "evictions": 95
+  },
+  "bridgeFixture": {
+    "responses": 40,
+    "completionBatches": 1,
+    "productionBeginCalls": 0
+  },
+  "physicalDeviceBenchmark": false,
+  "fullApkBuilt": false
+}
