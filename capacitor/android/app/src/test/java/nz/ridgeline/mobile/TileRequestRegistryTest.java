@@ -6,6 +6,19 @@ import org.junit.Test;
 
 public class TileRequestRegistryTest {
   @Test
+  public void batchesPreservePromotionAndCancellationBeforeInterception() {
+    try (var r = new TileRequestRegistry()) {
+      String a = "a".repeat(32), b = "b".repeat(32);
+      var d = r.get(a, 200);
+      r.batch(a + ":0\n" + b + ":-1\ninvalid:0\n" + a + ":bad");
+      assertEquals(0, d.priority());
+      assertTrue(r.get(b, 0).cancelled());
+      r.batch(a + ":-2");
+      assertFalse(d.cancelled());
+    }
+  }
+
+  @Test
   public void cancellationBeforeInterceptionCannotStartAStaleRequest() {
     try (var r = new TileRequestRegistry()) {
       String id = "a".repeat(32);

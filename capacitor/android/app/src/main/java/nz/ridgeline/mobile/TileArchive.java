@@ -27,6 +27,7 @@ public final class TileArchive {
   private final AtomicFile index;
   private JSONObject regions;
   private final TileLookup lookup = new TileLookup(4096);
+  private final TileMissCache misses = new TileMissCache(4096);
   private final SharedTileStore store;
   private volatile Set<String> registered = Set.of();
   private volatile boolean legacy = true;
@@ -43,6 +44,7 @@ public final class TileArchive {
     Set<String> ids = new HashSet<>();
     for (var it = regions.keys(); it.hasNext(); ) ids.add(it.next());
     registered = Set.copyOf(ids);
+    misses.invalidate();
   }
 
   private TileArchive(Context c) {
@@ -71,7 +73,10 @@ public final class TileArchive {
           store,
           () -> registered,
           this,
-          lookup::invalidate,
+          name -> {
+            lookup.invalidate(name);
+            misses.invalidate();
+          },
           file -> {
             if (!file.delete() && file.exists())
               throw new IOException("Legacy map tile could not be removed");
@@ -225,7 +230,11 @@ public final class TileArchive {
 
   public synchronized boolean write(String id, TileAddress t, byte[] data) throws Exception {
     if (!active(id)) return false;
-    store.write(id, Map.of(t.id(), data));
+    try {
+      store.write(id, Map.of(t.id(), data));
+    } finally {
+      misses.invalidate();
+    }
     lookup.invalidate(t.id() + ".tile");
     return true;
   }
@@ -235,7 +244,11 @@ public final class TileArchive {
     if (!active(id, generation)) return false;
     Map<String, byte[]> rows = new LinkedHashMap<>();
     data.forEach((t, b) -> rows.put(t.id(), b));
-    store.write(id, rows);
+    try {
+      store.write(id, rows);
+    } finally {
+      misses.invalidate();
+    }
     data.keySet().forEach(t -> lookup.invalidate(t.id() + ".tile"));
     return true;
   }
@@ -258,9 +271,15 @@ public final class TileArchive {
   public byte[] read(TileAddress t) throws IOException {
     Set<String> ids = registered;
     if (ids.isEmpty()) return null;
+    long observed = misses.epoch();
+    if (misses.contains(t.id())) return null;
     boolean hadLegacy = legacy;
     byte[] bytes = store.readAny(ids, t.id());
-    if (bytes != null || !hadLegacy) return bytes;
+    if (bytes != null) return bytes;
+    if (!hadLegacy) {
+      misses.remember(t.id(), observed);
+      return null;
+    }
     InputStream opened;
     synchronized (this) {
       opened =
@@ -275,7 +294,10 @@ public final class TileArchive {
     // A descriptor opened under the region lock remains readable if its pathname
     // is removed on Android. Independent tile body reads no longer serialize.
     try (InputStream in = opened) {
-      return in == null ? store.readAny(registered, t.id()) : TileNetwork.read(in, TileNetwork.MAX);
+      byte[] result =
+          in == null ? store.readAny(registered, t.id()) : TileNetwork.read(in, TileNetwork.MAX);
+      if (result == null) misses.remember(t.id(), observed);
+      return result;
     }
   }
 

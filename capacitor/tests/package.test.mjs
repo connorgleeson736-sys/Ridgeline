@@ -21,6 +21,7 @@ test('rendering engine and quality policies are identical to website source',asy
 
 test('Topo retains zoom 18 and high-density source sizing',async()=>{const c={module:{exports:{}},devicePixelRatio:2};c.globalThis=c;vm.runInNewContext(await read('linz-topo.js'),c);const source=c.module.exports.source('test');assert.equal(source.maxzoom,18);assert.equal(source.tileSize,128);});
 test('shared resolution policy matches the website apart from the retained Topo enhancement',async()=>{
- const web=await readFile(new URL('../../public/performance.js',import.meta.url),'utf8');const app=await read('performance.js');
+ let web=await readFile(new URL('../../public/performance.js',import.meta.url),'utf8');const app=await read('performance.js');
+ const start=web.indexOf('  // A single, modest reduction only after sustained measured pressure.');const end=web.indexOf('\n };\n const onEnd=',start);web=web.slice(0,start)+web.slice(end);
  assert.equal(app.replace("const source=map.getSource('topo'),size=(lowPower()?1:native)>1?128:256;if(source&&source.tileSize!==size){source.tileSize=size;map._update?.(true);}",''),web);
 });

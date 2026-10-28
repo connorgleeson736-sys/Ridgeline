@@ -54,6 +54,25 @@ public final class TileRequestRegistry implements AutoCloseable {
     if (valid(id)) get(id, 0).cancel();
   }
 
+  /** Coalesced controls only. Initial priority already travels in request headers. */
+  @JavascriptInterface
+  public void batch(String updates) {
+    if (updates == null || updates.length() > 65536) return;
+    String[] rows = updates.split("\n");
+    if (rows.length > 1024) return;
+    for (String row : rows) {
+      if (row.length() < 34 || row.charAt(32) != ':') continue;
+      String id = row.substring(0, 32);
+      if (!valid(id)) continue;
+      try {
+        int p = Integer.parseInt(row.substring(33));
+        if (p == -1) cancel(id);
+        else if (p >= 0 && p <= 1000) priority(id, p);
+      } catch (NumberFormatException ignored) {
+      }
+    }
+  }
+
   @Override
   public synchronized void close() {
     closed = true;

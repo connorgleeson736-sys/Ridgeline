@@ -3,7 +3,7 @@
 const MESSAGE='__ridge_transport_v1',abort=()=>Object.assign(Error('Map request cancelled'),{name:'AbortError'});
 function install({send,fetcher=root.fetch.bind(root),timers=root}={}){
  if(root.__ridgeTransportInstalled)return root.__ridgeTransportInstalled;
- const active=new Map(),workers=new Set();let timer=null,dead=false;
+ const active=new Map();let timer=null,dead=false;
  function control(op,id,priority){try{send(op,id,priority);}catch{}}
  function score(options){let p;try{p=options.ridgePriority?.()??options.priority;const rank=Number(options.ridgeRank?.())||0;return Math.max(0,Math.min(1000,Math.round(p==='low'?200+Math.max(0,rank):rank>=100?100+rank:Math.max(0,rank))));}catch{return 0;}}
  function pump(){timer=null;for(const [id,j]of active){const p=score(j.options);if(p!==j.priority){j.priority=p;control('priority',id,p);}}if(active.size)timer=timers.setTimeout(pump,120);}
@@ -49,14 +49,22 @@ function install({send,fetcher=root.fetch.bind(root),timers=root}={}){
  }
  const Worker=root.Worker;
  if(Worker)root.Worker=class extends Worker{
-  constructor(...args){super(...args);if(String(args[0]).includes("native-regional-worker"))workers.add(this);const ids=new Set();this.addEventListener('message',e=>{const m=e.data;if(!m||m[MESSAGE]!==true)return;e.stopImmediatePropagation();if(m.op==='begin')ids.add(m.id);if(m.op==='cancel')ids.delete(m.id);control(m.op,m.id,m.priority);},{capture:true});const terminate=this.terminate.bind(this);this.terminate=()=>{for(const id of ids)control('cancel',id);ids.clear();workers.delete(this);terminate();};this.addEventListener('error',()=>{for(const id of ids)control('cancel',id);ids.clear();});}
+  constructor(...args){super(...args);const ids=new Set();this.addEventListener('message',e=>{const m=e.data;if(!m||m[MESSAGE]!==true)return;e.stopImmediatePropagation();if(m.op==='begin')ids.add(m.id);if(m.op==='cancel')ids.delete(m.id);control(m.op,m.id,m.priority);},{capture:true});const terminate=this.terminate.bind(this);this.terminate=()=>{for(const id of ids)control('cancel',id);ids.clear();terminate();};this.addEventListener('error',()=>{for(const id of ids)control('cancel',id);ids.clear();});}
  };
  root.fetch=fetch;
- const api={fetch,stats:()=>({active:active.size}),trim(){for(const w of workers)w.postMessage({__ridgeTrimImages:true});},destroy(){dead=true;for(const id of [...active.keys()])done(id);}};
+ const api={fetch,stats:()=>({active:active.size}),trim(){},destroy(){dead=true;for(const id of [...active.keys()])done(id);}};
  root.addEventListener?.('pagehide',()=>{for(const id of [...active.keys()])done(id);});
  root.__ridgeTransportInstalled=api;return api;
 }
 function installWorker(){if(root.location?.origin!=='https://localhost')return;return install({send:(op,id,priority)=>root.postMessage({[MESSAGE]:true,op,id,priority})});}
-function installPage(){if(root.location?.origin!=='https://localhost'||!root.RidgeTileControl)return;return install({send:(op,id,priority)=>{if(op==='cancel')root.RidgeTileControl.cancel(id);else root.RidgeTileControl[op](id,priority);}});}
+function installPage(){
+ if(root.location?.origin!=='https://localhost'||!root.RidgeTileControl)return;
+ const native=root.RidgeTileControl;
+ if(typeof native.batch!=='function')return install({send:(op,id,priority)=>{if(op==='cancel')native.cancel(id);else native[op](id,priority);}});
+ const queued=new Map();let timer=null;
+ function flush(){if(timer!==null)root.clearTimeout(timer);timer=null;if(!queued.size)return;const rows=[...queued].map(([id,p])=>id+':'+p);queued.clear();for(let i=0;i<rows.length;i+=512)native.batch(rows.slice(i,i+512).join('\n'));}
+ const api=install({send:(op,id,priority)=>{if(op==='begin')return;queued.set(id,op==='cancel'?-1:priority);if(timer===null)timer=root.setTimeout(flush,0);}});
+ root.addEventListener?.('pagehide',flush);return api;
+}
 const api={install,installPage,installWorker};if(typeof module!=='undefined')module.exports=api;else root.RidgeNativeTransport=api;
 })(globalThis);

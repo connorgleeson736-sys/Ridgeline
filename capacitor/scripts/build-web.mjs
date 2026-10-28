@@ -3,6 +3,7 @@ import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 import {parseHTML} from 'linkedom';
 import {build} from 'esbuild';
+import {optimiseWeb} from './optimise-web.mjs';
 import {createReadStream} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {resetWebsiteRenderPreferences} from '../mobile/render-preferences.js';
@@ -73,7 +74,7 @@ await writeFile(path.join(out,'viewer.mjs'),viewer);
 // through the native archive layer. No base64 tile bridge or JS tile copies.
 const hosts=[['https://basemaps.linz.govt.nz','https://localhost/_ridge/linz'],['https://services.arcgisonline.com','https://localhost/_ridge/esri'],['https://s3.amazonaws.com/elevation-tiles-prod','https://localhost/_ridge/mapzen']];
 for(const name of await readdir(out))if(/\.(?:m?js)$/.test(name)){
- let text=await readFile(path.join(out,name),'utf8');for(const [from,to] of hosts)text=text.replaceAll(from,to);
+ let text=optimiseWeb(name,await readFile(path.join(out,name),'utf8'));for(const [from,to] of hosts)text=text.replaceAll(from,to);
  text=text.replaceAll("u.hostname==='basemaps.linz.govt.nz'&&u.pathname.match(","u.hostname==='localhost'&&u.pathname.replace(/^\\/_ridge\\/linz/,'').match(");
  if(name==='gap-imagery.js')text=text.replace("if(fail)throw fail.reason;","if(fail&&fineRequests.length&&a?.ok&&b?.ok)return base(url,options);if(fail)throw fail.reason;");
  // Server-side packed overviews are not part of a static Capacitor app.
@@ -125,7 +126,7 @@ await cp(path.join(base,'mobile/native-bitmap-cache.js'),path.join(out,'native-b
 await writeFile(path.join(out,'native-transport-worker.mjs'),"import './native-transport.js';globalThis.RidgeNativeTransport.installWorker();\n");
 await writeFile(path.join(out,'native-map-worker.mjs'),"import './native-transport-worker.mjs';import './assets/maplibre-gl-worker.mjs?v=6.14.0';\n");
 await writeFile(path.join(out,'native-terrain-worker.js'),"importScripts('/native-transport.js');RidgeNativeTransport.installWorker();importScripts('/terrain-worker.js?v=5');\n");
-await writeFile(path.join(out,'native-regional-worker.js'),"importScripts('/native-transport.js','/native-bitmap-cache.js');RidgeNativeTransport.installWorker();RidgeBitmapCache.install();importScripts('/regional-imagery-worker.js?v=8');\n");
+await writeFile(path.join(out,'native-regional-worker.js'),"importScripts('/native-transport.js');RidgeNativeTransport.installWorker();importScripts('/regional-imagery-worker.js?v=8');\n");
 const {document}=parseHTML(await readFile(path.join(out,'index.html'),'utf8'));
 document.documentElement.setAttribute('data-overviews-bundled',String(bundled));
 const nativeBootstrap=document.createElement('script');nativeBootstrap.textContent=await readFile(path.join(base,'mobile/native-transport.js'),'utf8')+'\nRidgeNativeTransport.installPage();';document.head.prepend(nativeBootstrap);

@@ -33,5 +33,14 @@ test('mid-body failures recover only from saved coverage and never cache a coars
 test('absolute upstream expiry is not restarted when a streamed body finishes',async()=>{const x=setup(async()=>new Response('tile',{headers:{'Cache-Control':'max-age=3600','X-Ridge-Expires-At':String(Date.now()-1000)}}));try{const r=await x.api.fetch(tile);await r.arrayBuffer();assert.equal(r.headers.get('Cache-Control'),'no-store');}finally{x.api.destroy();}});
 test('worker messages reach native control and terminating a worker releases its requests',()=>{
  class Worker extends EventTarget{postMessage(m){this.sent=m;}terminate(){this.terminated=true;}}
- const x=setup(async()=>new Response(''),{Worker});try{const worker=new x.c.Worker('/native-regional-worker.js');let applicationMessages=0;worker.addEventListener('message',()=>applicationMessages++);worker.dispatchEvent(new MessageEvent('message',{data:{__ridge_transport_v1:true,op:'begin',id:'1'.repeat(32),priority:0}}));assert.equal(applicationMessages,0);assert.equal(x.calls[0].op,'begin');x.api.trim();assert.equal(worker.sent.__ridgeTrimImages,true);worker.terminate();assert.equal(x.calls.at(-1).op,'cancel');assert.equal(worker.terminated,true);}finally{x.api.destroy();}
+ const x=setup(async()=>new Response(''),{Worker});try{const worker=new x.c.Worker('/native-regional-worker.js');let applicationMessages=0;worker.addEventListener('message',()=>applicationMessages++);worker.dispatchEvent(new MessageEvent('message',{data:{__ridge_transport_v1:true,op:'begin',id:'1'.repeat(32),priority:0}}));assert.equal(applicationMessages,0);assert.equal(x.calls[0].op,'begin');x.api.trim();assert.equal(worker.sent,undefined);worker.terminate();assert.equal(x.calls.at(-1).op,'cancel');assert.equal(worker.terminated,true);}finally{x.api.destroy();}
+});
+test('page coalesces native controls and omits redundant begin bridge calls',async()=>{
+ const batches=[],scheduled=new Map();let serial=0;
+ const c={module:{exports:{}},URL,Request,Response,Headers,ReadableStream,Blob,crypto:webcrypto,location:{origin:'https://localhost',href:'https://localhost/'},fetch:async()=>new Response('exact'),RidgeTileControl:{batch:rows=>batches.push(rows)},setTimeout:fn=>{scheduled.set(++serial,fn);return serial;},clearTimeout:id=>scheduled.delete(id)};c.globalThis=c;
+ vm.runInNewContext(source,c);const api=c.module.exports.installPage();
+ const replies=await Promise.all(Array.from({length:40},()=>api.fetch(tile)));
+ await Promise.all(replies.map(r=>r.arrayBuffer()));
+ for(const [id,fn]of [...scheduled]){scheduled.delete(id);fn();}
+ assert.equal(batches.length,1);assert.equal(batches[0].split('\n').length,40);assert.ok(batches[0].split('\n').every(row=>/^[a-f0-9]{32}:-1$/.test(row)));api.destroy();
 });

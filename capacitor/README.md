@@ -140,3 +140,7 @@ Removes the extra eight-transfer native cap. Foreground requests, including fres
 ## 0.13.2 stable movement resolution
 
 The Android build removes automatic frame-rate-triggered drawing-buffer downshifts during movement. Frame-health reporting, explicit quality settings, movement-detail controls and maximum Topo detail remain unchanged. The website source is unchanged. Base APK only; tests and lint skipped at user request.
+
+## 0.14.0 cache and CPU efficiency
+
+Expires unusable compressed tiles before admission/prefetch decisions, removes repeated coarse-byte recounts during source eviction, batches native tile controls, removes per-image SHA256 decoding-cache overhead, memoises native saved-tile misses, and defers camera persistence to idle. Unchanged region lists reuse DOM and completed lists stop polling. Original + Direct, Topo zoom 18, all detail policies and the stable movement drawing buffer are preserved. See LOADING-OPTIMISATIONS.md for evidence and limitations. Base preview only.

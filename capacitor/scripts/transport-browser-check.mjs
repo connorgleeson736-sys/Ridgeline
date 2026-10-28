@@ -31,6 +31,19 @@ try{
  const count=await page.evaluate(()=>__controls.filter(c=>c.op==='begin').length);
  await page.evaluate(()=>{window.second=new Worker('/worker-check.js');second.postMessage('start');});await page.waitForFunction(n=>__controls.filter(c=>c.op==='begin').length>n,count);
  const id=await page.evaluate(()=>__controls.filter(c=>c.op==='begin').at(-1).id);await page.evaluate(()=>second.terminate());await page.waitForFunction(id=>__controls.some(c=>c.op==='cancel'&&c.id===id),id);
+ // Exercise the production batch interface with real worker messages.
+ const batchPage=await context.newPage();
+ await batchPage.addInitScript(()=>{window.__batches=[];RidgeTileControl.batch=rows=>__batches.push(...rows.split('\n'));});
+ await batchPage.goto('https://localhost/');await batchPage.addScriptTag({url:'/native-transport.js'});await batchPage.evaluate(()=>RidgeNativeTransport.installPage());
+ await batchPage.evaluate(()=>{window.__messages=[];window.worker=new Worker('/worker-check.js');worker.onmessage=e=>__messages.push(e.data);worker.postMessage('start');});
+ await batchPage.waitForTimeout(250);
+ await batchPage.evaluate(()=>worker.postMessage('promote'));
+ await batchPage.waitForFunction(()=>__batches.some(r=>r.endsWith(':0')));
+ await batchPage.evaluate(()=>worker.postMessage('cancel'));
+ await batchPage.waitForFunction(()=>__messages.some(m=>m.error==='AbortError'));
+ await batchPage.waitForFunction(()=>__batches.some(r=>r.endsWith(':-1')));
+ assert.equal(await batchPage.evaluate(()=>__messages.some(m=>m.__ridge_transport_v1)),false);
+ await batchPage.close();
  for(const request of requests)assert.match(request.headers['x-ridge-request'],/^[a-f0-9]{32}$/);
  await page.addScriptTag({url:'/native-bitmap-cache.js'});await page.addScriptTag({url:'/imagery.js'});await page.addScriptTag({url:'/regional-blend.js'});
  const pixels=await page.evaluate(async()=>{
