@@ -136,3 +136,7 @@ Original + Direct, highest implemented Topo detail, imagery pixels and PDF detai
 ## 0.13.1 foreground loading
 
 Removes the extra eight-transfer native cap. Foreground requests, including fresh disk-cache hits, no longer wait for unrelated network transfers. Existing renderer loading settings remain effective, while background transfers retain their two-transfer limit. Rendering, maximum Topo detail and the 256 MB online cache are unchanged. Only the Base preview APK is published for this update.
+
+## 0.13.2 stable movement resolution
+
+The Android build removes automatic frame-rate-triggered drawing-buffer downshifts during movement. Frame-health reporting, explicit quality settings, movement-detail controls and maximum Topo detail remain unchanged. The website source is unchanged. Base APK only; tests and lint skipped at user request.

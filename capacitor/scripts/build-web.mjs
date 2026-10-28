@@ -84,6 +84,8 @@ for(const name of await readdir(out))if(/\.(?:m?js)$/.test(name)){
  }
  if(name==='linz-topo.js'){text=replace(text,'maxzoom:16','maxzoom:18');text=replace(text,'tileSize:256','tileSize:(root.devicePixelRatio||1)>1?128:256');}
  if(name==='performance.js')text=replace(text,"setRatio(lowPower()?1:native);return;", "const source=map.getSource('topo'),size=(lowPower()?1:native)>1?128:256;if(source&&source.tileSize!==size){source.tileSize=size;map._update?.(true);}setRatio(lowPower()?1:native);return;");
+ // Keep the app drawing buffer stable during gestures; retain frame-health reporting.
+ if(name==='performance.js')text=replace(text,"  // A single, modest reduction only after sustained measured pressure.\n  if(!reduced&&intervals.length===24&&now-started>750&&ratio>.75){\n   const sorted=intervals.slice().sort((a,b)=>a-b);\n   if(sorted[17]>28){const next=Math.max(.75,ratio<=1?Math.round(ratio*.85*20)/20:Math.floor(ratio*.85*4)/4);if(next<ratio-.08){reduced=true;downshifts++;healthySince=0;if(next<1)pressureCeiling=next;if(phoneActive)phoneCeiling=Math.min(phoneCeiling,next);setRatio(next);}}\n  }",'');
  if(name==='tile-cache.js')text=replace(text,'},grace);return true;','},job.prefetchOnly?0:grace);return true;');
  if(name==='response-cache.js'){
   text=replace(text,"const response=v=>new Response([204,205,304].includes(v.status)?null:v.data.slice(0),{status:v.status,headers:v.headers});","const response=v=>new Response([204,205,304].includes(v.status)?null:v.data.slice(0),{status:v.status,headers:ridgeFresh(v.headers,v.until)});");
