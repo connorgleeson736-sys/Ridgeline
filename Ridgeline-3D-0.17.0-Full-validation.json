@@ -1,0 +1,110 @@
+{
+  "version": "0.17.0-performance",
+  "versionCode": 20,
+  "variant": "Performance Full",
+  "applicationId": "nz.ridgeline.mobile.performance",
+  "appName": "Ridgeline 3D Performance",
+  "bytes": 391683624,
+  "sha256": "6e40929e6697ea9b158235f8fa780192331649bdc268be2d00666f7bd8752294",
+  "sourceCommit": "12da664ea164083341b2feb0d8df4b7b4f741b44",
+  "sourceBranch": "android-performance-0.17.0",
+  "referenceBranch": "android-preview-download",
+  "samePackageVersionAndSignerAsPerformanceBase": true,
+  "updatesPerformanceBaseWithoutRemovingItsData": true,
+  "separateFromNormalRidgeline": true,
+  "signerSha256": "e3432d7c6a92c4dee9f7030ff299c8d85d90570bec665b6e0df0eb6b7fb93c61",
+  "signatureV2Verified": true,
+  "zipAlignmentVerified": true,
+  "fullApkBuilt": true,
+  "bundledOverviewPacks": 6,
+  "bundledPackBytes": 364762502,
+  "includedOverviewZooms": [
+    0,
+    12
+  ],
+  "coverage": "South Island, Rakiura and nearby islands; imagery only. Elevation and finer imagery still require region downloads.",
+  "noSeparateImportOrFirstLaunchExtraction": true,
+  "allOriginalOverviewImages": 5344,
+  "existingCoarseImages": 67,
+  "distinctAddedImages": 5277,
+  "coordinates": 5255,
+  "rawNaturalMappings": 10510,
+  "all256x256WebP": true,
+  "packVerification": {
+    "packs": [
+      {
+        "file": "assets/public/overview-packs/7241afa52abbc95e0226d1f1964832e1646076857c9b489f52443ecc9c2b8b03.bin",
+        "bytes": 62857520,
+        "sha256": "7241afa52abbc95e0226d1f1964832e1646076857c9b489f52443ecc9c2b8b03",
+        "storedUncompressed": true
+      },
+      {
+        "file": "assets/public/overview-packs/0b72203a46ec5c96ad0b9074b6f2335941458d80eb44f936fe6150b9d21914a9.bin",
+        "bytes": 62851044,
+        "sha256": "0b72203a46ec5c96ad0b9074b6f2335941458d80eb44f936fe6150b9d21914a9",
+        "storedUncompressed": true
+      },
+      {
+        "file": "assets/public/overview-packs/bc0dd4764ca150cb54bb463c3bc3e80b9fb5af0591764caa7778d90cfef36b21.bin",
+        "bytes": 62908832,
+        "sha256": "bc0dd4764ca150cb54bb463c3bc3e80b9fb5af0591764caa7778d90cfef36b21",
+        "storedUncompressed": true
+      },
+      {
+        "file": "assets/public/overview-packs/add2b4659a74691e8e3346df5f41d5592796013199eb7de88dcb9fd640a606b2.bin",
+        "bytes": 62867886,
+        "sha256": "add2b4659a74691e8e3346df5f41d5592796013199eb7de88dcb9fd640a606b2",
+        "storedUncompressed": true
+      },
+      {
+        "file": "assets/public/overview-packs/8431d7e8360b82383121e5e5537f9e2b207d788ec2e808ce1be0daedd7a5519d.bin",
+        "bytes": 62886568,
+        "sha256": "8431d7e8360b82383121e5e5537f9e2b207d788ec2e808ce1be0daedd7a5519d",
+        "storedUncompressed": true
+      },
+      {
+        "file": "assets/public/overview-packs/20c7da20bac6c00a048c1b3af93a3d7681e7bdae850d4246916ce60897b495b3.bin",
+        "bytes": 50390652,
+        "sha256": "20c7da20bac6c00a048c1b3af93a3d7681e7bdae850d4246916ce60897b495b3",
+        "storedUncompressed": true
+      }
+    ],
+    "changedEntries": [
+      "assets/public/index.html",
+      "assets/public/overview-manifest.json"
+    ],
+    "addedEntries": [
+      "assets/public/overview-packs/0b72203a46ec5c96ad0b9074b6f2335941458d80eb44f936fe6150b9d21914a9.bin",
+      "assets/public/overview-packs/20c7da20bac6c00a048c1b3af93a3d7681e7bdae850d4246916ce60897b495b3.bin",
+      "assets/public/overview-packs/7241afa52abbc95e0226d1f1964832e1646076857c9b489f52443ecc9c2b8b03.bin",
+      "assets/public/overview-packs/8431d7e8360b82383121e5e5537f9e2b207d788ec2e808ce1be0daedd7a5519d.bin",
+      "assets/public/overview-packs/add2b4659a74691e8e3346df5f41d5592796013199eb7de88dcb9fd640a606b2.bin",
+      "assets/public/overview-packs/bc0dd4764ca150cb54bb463c3bc3e80b9fb5af0591764caa7778d90cfef36b21.bin"
+    ],
+    "removedEntries": [],
+    "baseAndFullCodeIdentical": true
+  },
+  "baseReferenceSha256": "009c736e9e8f86e73ec1b41be09d75e80ecccc94695e659b1f556463bcc85869",
+  "nativeTests": {
+    "tests": 90,
+    "failures": 0,
+    "errors": 0,
+    "rerunForFull": true
+  },
+  "javascriptTests": 55,
+  "javascriptFailures": 0,
+  "lint": "passed, zero errors",
+  "browserWorkflow": {
+    "passed": true,
+    "bundledOverviewData": true,
+    "actualPrecomputedReads": 25,
+    "providerFixtureRequests": 293,
+    "pageErrors": [],
+    "consoleErrors": [],
+    "androidBridge": "mocked",
+    "webGL": "software"
+  },
+  "instrumentation": "Compiled during Base validation; unchanged native code. No device/emulator execution.",
+  "phoneFpsMeasured": false,
+  "performanceChanges": "All 0.17.0 Performance Base fixes retained; no new speed claim for bundling data."
+}

@@ -1,5 +1,18 @@
 # Ridgeline Android downloads
 
+## Full Performance installer: 0.17.0 — all overview imagery included
+
+**[Download Ridgeline 3D Performance 0.17.0 Full APK — 391.7 MB](Ridgeline-3D-0.17.0-Performance-Full.apk)**
+
+Choose **Download raw file**. Install over **Ridgeline 3D Performance 0.17.0 Base** to keep that app's routes, settings and downloads. **Same package, version and signer as Performance Base.** Do not uninstall it first. The separate normal Ridgeline app remains untouched.
+
+All **5,344 original overview images** are included: zooms **0–12** for South Island, Rakiura and nearby islands. The six additional packs (364.8 MB) are inside the APK, verified and stored uncompressed for immediate range reads. **No separate imports or first-launch extraction.** Offline elevation/3D terrain and finer imagery still need selected-region downloads.
+
+All performance fixes and app code match Performance Base byte-for-byte. The only differences are six imagery packs plus the bundled-data flag and its UI metadata. Same full resolution, colours, terrain detail and renderer. The Full data build passed **90 native tests, 55 JavaScript tests, lint, signature/alignment, all six embedded pack hashes, all added WebP dimensions, and a browser workflow with 25 actual pack-image reads**. No new phone-speed measurement is claimed.
+
+[Full validation](Ridgeline-3D-0.17.0-Full-validation.json) · [Packaging findings](Ridgeline-3D-0.17.0-Full-findings.md) · [Checksum](Ridgeline-3D-0.17.0-Performance-Full.apk.sha256) · [Source commit](https://github.com/connorgleeson736-sys/Ridgeline/commit/12da664ea164083341b2feb0d8df4b7b4f741b44)
+
+
 ## Latest performance comparison: 0.17.0 — side-by-side app
 
 **[Download Ridgeline 3D Performance 0.17.0 Base APK — 26.9 MB](Ridgeline-3D-0.17.0-Performance-Base.apk)**
