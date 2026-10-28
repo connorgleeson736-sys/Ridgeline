@@ -1,6 +1,21 @@
 # Ridgeline Android downloads
 
-## Latest: 0.15.0 — terrain-adapter CPU and allocation reductions
+## Latest: 0.16.0 — elevation-cache and invalidation work reductions
+
+**[Download 0.16.0 Base APK — 26.9 MB](Ridgeline-3D-0.16.0-Base.apk)**
+
+Choose **Download raw file**, then install over your current app. Same preview signer. Base only.
+
+- Map/profile elevation now uses shared native HTTP persistence directly rather than duplicate automatic WebView disk caching. Decoded-height memory reuse, saved regions and explicitly saved overviews remain supported.
+- Arrivals inspect terrain texture sizes only for geographically related patches and avoid intermediate warm/merged tile arrays. Source-membership filters and invalidation outcomes are preserved.
+
+One affected patch among 1,000 requires one RTT inspection instead of 1,000. A synthetic 500-arrival CPU fixture improved from about 34 ms to 14 ms; an empty-texture case also improved. These are controlled work measurements, not phone FPS.
+
+Passed: **85 Android/JVM tests, 55 JavaScript tests**, lint, instrumentation-test compilation, browser workflow (25 actual overview reads, no page/console errors), worker transport, signing and APK comparisons. Eleven graphics/quality modules are identical to 0.15.0; profile terrain decoding differs only in the default cache setting.
+
+[Findings and scope](https://github.com/connorgleeson736-sys/Ridgeline/blob/main/capacitor/CACHE-INVALIDATION-OPTIMISATIONS.md) · [Source commit](https://github.com/connorgleeson736-sys/Ridgeline/commit/c0b3941) · [Checksum](Ridgeline-3D-0.16.0-Base.apk.sha256) · [Validation](Ridgeline-3D-0.16.0-validation.json)
+
+## Previous: 0.15.0 — terrain-adapter CPU and allocation reductions
 
 **[Download 0.15.0 Base APK — 26.9 MB](Ridgeline-3D-0.15.0-Base.apk)**
 

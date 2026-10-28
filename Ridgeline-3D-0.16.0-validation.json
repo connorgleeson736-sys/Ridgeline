@@ -1,0 +1,47 @@
+{
+  "version": "0.16.0",
+  "versionCode": 19,
+  "variant": "Base",
+  "bytes": 26916634,
+  "sha256": "8176289ff233702777205bd8f94f3737620fc256c8bb7debeea003806d1c0522",
+  "nativeTests": {
+    "tests": 85,
+    "failures": 0,
+    "errors": 0
+  },
+  "javascriptTests": 55,
+  "lint": "passed",
+  "instrumentation": "compiled, not executed",
+  "browserWorkflow": "passed; 25 actual imagery reads; no page/console errors",
+  "workerTransport": "passed",
+  "invalidationFixtures": "same active/warm, vector, parent, hidden-provider, unrelated and empty-texture decisions; one matching patch costs one RTT inspection rather than 1000",
+  "elevationFixtures": "zero default WebView CacheStorage opens; original bytes/headers and decoded heights; memory LRU reuse retained",
+  "invalidationCpuFixture": {
+    "events": 500,
+    "residentPatches": 1000,
+    "beforeMs": 34.3,
+    "afterMs": 13.5,
+    "note": "Synthetic Node fixture, not phone FPS"
+  },
+  "emptyRttCpuFixture": {
+    "beforeMs": 36.7,
+    "afterMs": 19.0,
+    "invalidationsBoth": 0
+  },
+  "unchangedGraphicsModules": [
+    "assets/maplibre-gl.mjs",
+    "assets/maplibre-gl-worker.mjs",
+    "maplibre-direct-sampling.js",
+    "adaptive-terrain.js",
+    "motion-detail.js",
+    "surface-focus.js",
+    "performance.js",
+    "linz-topo.js",
+    "imagery.js",
+    "regional-blend.js",
+    "terrain-composition.js"
+  ],
+  "terrainCoreOnlyCacheDefaultChanged": true,
+  "phoneFpsMeasured": false,
+  "fullApkBuilt": false
+}
