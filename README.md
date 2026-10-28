@@ -1,6 +1,26 @@
 # Ridgeline Android downloads
 
-## Full Performance installer: 0.17.0 — all overview imagery included
+## Latest Performance installer: 0.18.0 Full — additional selection CPU work
+
+**[Download Ridgeline 3D Performance 0.18.0 Full APK — 391.7 MB](Ridgeline-3D-0.18.0-Performance-Full.apk)**
+
+Choose **Download raw file**, then install over **Ridgeline 3D Performance 0.17.0**. Same Performance package and signer, higher version code: keep the app installed to retain its settings, routes, downloads and cache. The normal Ridgeline app remains separate.
+
+Includes all earlier reconciled changes plus three new reductions inside native selection/preparation:
+
+- Reuses exact camera-invariant LOD integrals instead of repeating them for every candidate tile.
+- Uses native parent keys directly instead of constructing thousands of temporary DEM tile IDs.
+- Reuses exact tile-local projection matrices in a bounded 128-entry memo, with independent outputs.
+
+All **5,344 original overview images** remain included at the same resolution. South Island, Rakiura and nearby islands, zooms 0–12; elevation and finer imagery still require region downloads. All 1,139 image/binary assets, native bytecode, quality policies, workers and shader definitions remain unchanged from 0.17.0 Full. Original + Direct and drawing resolution are preserved.
+
+**No phone speedup is established.** The user found no noticeable improvement in 0.17.0. New warmed cloud CPU fixtures measure approximately 6.4× faster LOD arithmetic, 2.3× faster sparse DEM lookup and 1.4× faster filtered tile-local projection. These are subsystem measurements and cannot predict app FPS or loading time.
+
+Verified: 57,512 exact policy comparisons, 64 identical ordered tile-selection scenes, 2,500 matching DEM lookups, 600 matrix/isolation cases; 90 native/JVM tests, 55 mobile JavaScript tests, 17 focused tests on source and generated modules; lint (zero errors), instrumentation compilation, browser workflow with 25 actual pack reads, worker transport and pixel checks, APK signing/alignment and full asset comparison. No device/emulator execution.
+
+[Detailed findings and audit coverage](Ridgeline-3D-0.18.0-findings.md) · [Validation](Ridgeline-3D-0.18.0-validation.json) · [Benchmark samples](Ridgeline-3D-0.18.0-benchmarks.json) · [Checksum](Ridgeline-3D-0.18.0-Performance-Full.apk.sha256) · [Source commit](https://github.com/connorgleeson736-sys/Ridgeline/commit/d880143418ac46ece98adff0b3b2fbaedf044d46)
+
+## Previous Full Performance installer: 0.17.0 — all overview imagery included
 
 **[Download Ridgeline 3D Performance 0.17.0 Full APK — 391.7 MB](Ridgeline-3D-0.17.0-Performance-Full.apk)**
 
@@ -13,7 +33,7 @@ All performance fixes and app code match Performance Base byte-for-byte. The onl
 [Full validation](Ridgeline-3D-0.17.0-Full-validation.json) · [Packaging findings](Ridgeline-3D-0.17.0-Full-findings.md) · [Checksum](Ridgeline-3D-0.17.0-Performance-Full.apk.sha256) · [Source commit](https://github.com/connorgleeson736-sys/Ridgeline/commit/12da664ea164083341b2feb0d8df4b7b4f741b44)
 
 
-## Latest performance comparison: 0.17.0 — side-by-side app
+## Previous performance comparison: 0.17.0 — side-by-side app
 
 **[Download Ridgeline 3D Performance 0.17.0 Base APK — 26.9 MB](Ridgeline-3D-0.17.0-Performance-Base.apk)**
 
@@ -21,7 +41,7 @@ Choose **Download raw file**, then install. This is a separate app named **Ridge
 
 Includes the reconciled 0.16.0 fixes plus indexed fallback selection, fewer repeated ancestor/source checks, bitmap cleanup, native dispatcher contention reductions, independent decode measurements/control, deferred saturated-queue rebuilding, fewer selection allocations, event-driven connectivity and a completed-transfer freshness fix. Default concurrency/cache budgets are unchanged. WebView inspection is enabled for a new phone trace.
 
-**Estimated benefit:** roughly **10–30% faster for CPU-bound, selection-heavy movement**, conditionally assuming the changed work accounts for 20–40% of frame time and its cost halves. **This is a planning estimate, not measured phone FPS.** The fallback subsystem alone is about 3× faster in a medium synthetic case and 9× in a large one; small cases improve less. GPU/network/memory pressure may make overall gains small or zero.
+**User feedback:** no noticeable improvement in 0.17.0. Its previous conditional 10–30% planning estimate was not a measured phone result and should not be treated as an expected gain. See the 0.18.0 findings for the additional audit and remaining measurement gaps.
 
 Passed: **90 native/JVM tests, 55 mobile JavaScript tests, 17 focused tests against both source and generated app modules**, lint (zero errors), instrumentation-test compilation, browser workflow and real-worker transport, APK v2 signature/alignment, and packaged-asset checks. All 1,133 imagery/binary assets match 0.16.0 byte-for-byte. No physical-device benchmark or emulator execution was performed. Base build only; larger overview packs can be imported separately as before.
 
