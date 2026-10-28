@@ -1,0 +1,15 @@
+{
+  "version": "0.13.1",
+  "variant": "Base",
+  "bytes": 26914074,
+  "sha256": "23e92c4453c00dc9e05a1d654d4163c3318953283c885ff55e6961015a0893b8",
+  "jvmTests": 82,
+  "javascriptTests": 36,
+  "failures": 0,
+  "lint": "passed",
+  "previewBuild": "passed",
+  "graphicsParity": "8 graphics modules byte-identical to 0.13.0 Base",
+  "regression": "16 blocked foreground downloads do not block a fresh HTTP cache hit or a seventeenth network transfer",
+  "deviceBenchmark": false,
+  "fullApkBuilt": false
+}

@@ -1,6 +1,20 @@
 # Ridgeline Android downloads
 
-## Latest: 0.13.0 — native scheduling, streaming and shared offline storage
+## Latest: 0.13.1 — foreground loading without the extra native cap
+
+**[Download 0.13.1 Base APK — 26.9 MB](Ridgeline-3D-0.13.1-Base.apk)**
+
+Choose **Download raw file** on the APK page. Install over the existing app; the signer matches previous previews. No Full APK was built for this update. Existing imported imagery and saved regions remain supported.
+
+- Removes the fixed eight-transfer native foreground limit; the renderer's existing loading controls govern image demand.
+- Fresh native HTTP-cache hits no longer queue behind unrelated network downloads.
+- Background work retains its separate two-transfer limit. Cancellation, cache freshness/validation, Original + Direct and maximum Topo detail remain unchanged.
+
+Passed: 82 native tests, 36 JavaScript tests, Android lint, Base preview build and APK signature verification. The new real-HTTP regression test holds 16 transfers open while a fresh cache hit and another new transfer complete independently. Eight graphics modules are byte-identical to 0.13.0 Base. No phone performance benchmark is claimed.
+
+[Checksum](Ridgeline-3D-0.13.1-Base.apk.sha256) · [Validation](Ridgeline-3D-0.13.1-validation.json) · [Source commit](https://github.com/connorgleeson736-sys/Ridgeline/commit/547783b)
+
+## Previous: 0.13.0 — native scheduling, streaming and shared offline storage
 
 | Build | Download | Size |
 | --- | --- | --- |
