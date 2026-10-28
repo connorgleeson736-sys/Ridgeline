@@ -3,7 +3,7 @@
   "version": "6.14.0",
   "npm_integrity": "sha512-L7U9y9TyPJ3P/JJbW+eH+A3FzdPq+3fnZFqqeCwf/S6cRGganHwVI5b/C8/zOYzreUzsloDPZVVaMQA94wOt4A==",
   "files": {
-    "maplibre-gl.mjs": "df0be12287f47e790fd65ab4c0a766ce6b1a576608953266146b5d427ee7c24d",
+    "maplibre-gl.mjs": "37611c5ee952f5fcb76215a1be4b9fdcfde8bf415a8493db435fd05d3a7727fb",
     "maplibre-gl-worker.mjs": "5f1e2f0e1624082b7e88a06e4c86085992b0f8c02929801e552f3f7a119856a9",
     "maplibre-gl.css": "bacba6a85a867fcf602f2ff88331b8acf7edf3fbd063a519888cfbff39970193"
   },
@@ -42,6 +42,21 @@
       "id": "RIDGE_SCHEDULER_V2",
       "script": "scripts/patch-image-scheduler.py",
       "scope": "Indexed image admission, adaptive ready reserve, optional tracing and bounded moving RTT refresh; no shaders or terrain data changes."
+    },
+    {
+      "id": "RIDGE_LOD_INVARIANTS_V1",
+      "script": "scripts/patch-lod-invariants.py",
+      "scope": "Reuse native integrals only when FOV, vertical distance and range match exactly; preserve native arithmetic, per-tile distance, selection and detail."
+    },
+    {
+      "id": "RIDGE_TERRAIN_MATRICES_V1",
+      "script": "scripts/patch-terrain-matrices.py",
+      "scope": "Reuse at most 128 exact native tile-local projection matrices, preserving native arithmetic, fresh output ownership, camera transforms and custom tile-range projection."
+    },
+    {
+      "id": "RIDGE_DEM_PARENT_KEYS_V1",
+      "script": "scripts/patch-dem-parent-keys.py",
+      "scope": "Use the pinned native calculateScaledKey for DEM ancestry lookups; preserve exact lookup keys/order, cache reads, min/max zoom and fallback behavior."
     }
   ]
 }

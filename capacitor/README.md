@@ -1,3 +1,5 @@
+> **Latest Performance build: 0.18.0 Full.** [Additional selection CPU findings, exact quality checks and measurement limits](PERFORMANCE-0.18.0.md). All original overview imagery is included; updates the existing Performance app with its data retained. No phone speedup is established.
+
 > **Full Performance build:** [packaging and verification](PERFORMANCE-0.17.0-FULL.md). It includes all six overview imagery packs and updates the Performance Base app using the same signer.
 
 > **0.17.0 Performance comparison build:** see [changes, verification, installation and speed-estimate limits](PERFORMANCE-0.17.0.md). Use the `performance` Gradle variant for the separate `nz.ridgeline.mobile.performance` app; it preserves the normal installed preview and its private data.

@@ -1,3 +1,5 @@
+> **Superseded by [0.18.0](PERFORMANCE-0.18.0.md).** The user reports no noticeable improvement in 0.17.0. Its conditional 10–30% estimate below was not a measured device result and should not be treated as an expected gain.
+
 # Ridgeline 3D Performance — 0.17.0
 
 > A **Full imagery APK** is now available with the same application code, package and signer. See [Full packaging and verification](PERFORMANCE-0.17.0-FULL.md). Earlier Base-specific checks below describe the initial release.
