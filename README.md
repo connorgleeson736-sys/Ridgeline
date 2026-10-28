@@ -1,6 +1,21 @@
 # Ridgeline Android downloads
 
-## Latest: 0.14.0 — cache, eviction and main-thread efficiency
+## Latest: 0.14.1 — follow-up render-path audit
+
+**[Download 0.14.1 Base APK — 26.9 MB](Ridgeline-3D-0.14.1-Base.apk)**
+
+Choose **Download raw file**, then install over the existing app. Same preview signer; Base only.
+
+- Reuses exact imagery coverage when the ready coordinates are unchanged. The fixture builds one index across 101 checks; holes and changed coordinates still invalidate it.
+- Removes an explicit shared-response buffer copy while keeping consumers isolated.
+- Avoids allocating an empty passive-route source and hides empty waypoint rendering.
+- Diagnostic reports now include opt-in main-thread component timings and native loading counters, with Android's JSON save picker.
+
+Passed: 85 native tests, 46 JavaScript tests, lint, instrumentation-test compilation, browser route/offline/Topo workflow, real component capture and mocked native diagnostic export, APK signing and renderer/quality parity checks. Eleven graphics/quality modules match 0.14.0 exactly. No physical-phone speed claim is made.
+
+[Broader audit, reviewed areas and remaining gaps](https://github.com/connorgleeson736-sys/Ridgeline/blob/main/capacitor/PERFORMANCE-AUDIT.md) · [Source commit](https://github.com/connorgleeson736-sys/Ridgeline/commit/d448d64) · [Checksum](Ridgeline-3D-0.14.1-Base.apk.sha256) · [Validation](Ridgeline-3D-0.14.1-validation.json)
+
+## Previous: 0.14.0 — cache, eviction and main-thread efficiency
 
 **[Download 0.14.0 Base APK — 26.9 MB](Ridgeline-3D-0.14.0-Base.apk)**
 

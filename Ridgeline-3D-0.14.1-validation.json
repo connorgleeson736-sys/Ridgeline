@@ -1,0 +1,18 @@
+{
+  "version": "0.14.1",
+  "versionCode": 17,
+  "variant": "Base",
+  "bytes": 26915990,
+  "sha256": "542ac34b4503f887974af50ef02b78eed8523193839fabd96f8c964a86859da0",
+  "nativeTests": 85,
+  "javascriptTests": 46,
+  "lint": "passed",
+  "instrumentation": "compiled, not executed",
+  "browserWorkflow": "passed; 25 actual overview reads; no page or console errors",
+  "newDiagnosticChecks": "real renderer component timings and mocked native JSON save call passed",
+  "coverageReuseFixture": "101 unchanged readiness checks build one index; missing/changed coordinates invalidate; saved closures immutable",
+  "responseOwnership": "changing one consumer buffer cannot change another or cached input",
+  "quality": "11 renderer/quality modules byte-identical to 0.14.0; source zooms and mesh selection unchanged",
+  "physicalPhoneComparison": false,
+  "fullApkBuilt": false
+}
