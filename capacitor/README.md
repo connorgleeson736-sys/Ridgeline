@@ -132,3 +132,7 @@ The renderer's existing cancellation/priority signals now reach Android, includi
 Offline regions use a shared content-addressed SQLite store with indexed coordinates and per-region ownership. Different source versions remain byte-exact. Existing files migrate in small committed/checkpointed batches; failures retain readable originals. Three bounded download producers share native admission and commit batches, with retry/backoff and generation checks. Once migrated, saved maps require 0.13.0 or later.
 
 Original + Direct, highest implemented Topo detail, imagery pixels and PDF detail remain unchanged. See [implementation, safeguards, research and validation](LOADING-OPTIMISATIONS.md). Run `node scripts/transport-browser-check.mjs` for real-worker control and pixel-equivalence checks; `await RidgeMobile.loadingStats()` supplies native counters during manual phone profiling.
+
+## 0.13.1 foreground loading
+
+Removes the extra eight-transfer native cap. Foreground requests, including fresh disk-cache hits, no longer wait for unrelated network transfers. Existing renderer loading settings remain effective, while background transfers retain their two-transfer limit. Rendering, maximum Topo detail and the 256 MB online cache are unchanged. Only the Base preview APK is published for this update.

@@ -84,6 +84,41 @@ public class TileHttpClientTest {
   }
 
   @Test
+  public void foregroundAndFreshCacheDoNotWaitForBusyNetworkSlots() throws Exception {
+    // Seed one genuinely fresh disk-cache entry, then hold more than the old
+    // eight-transfer ceiling. A new visible miss and the hit must both proceed.
+    assertArrayEquals(bytes, load("/cached").data());
+    CountDownLatch arrived = new CountDownLatch(16), release = new CountDownLatch(1);
+    handler =
+        e -> {
+          if (e.getPath().startsWith("/hold")) {
+            arrived.countDown();
+            if (!release.await(10, TimeUnit.SECONDS)) throw new IOException("Timed out");
+          }
+          return reply(200, "public, max-age=60", bytes);
+        };
+    ExecutorService callers = Executors.newCachedThreadPool();
+    List<Future<?>> held = new ArrayList<>();
+    try {
+      for (int j = 0; j < 16; j++) {
+        final int id = j;
+        held.add(callers.submit(() -> load("/hold" + id)));
+      }
+      assertTrue("Foreground transfers must exceed eight", arrived.await(5, TimeUnit.SECONDS));
+      Future<byte[]> cached = callers.submit(() -> load("/cached").data());
+      assertArrayEquals(bytes, cached.get(2, TimeUnit.SECONDS));
+      Future<byte[]> fresh = callers.submit(() -> load("/visible").data());
+      assertArrayEquals(bytes, fresh.get(2, TimeUnit.SECONDS));
+      assertEquals("Cache hit must not contact server", 18, requests.get());
+      assertTrue(cache.hitCount() >= 1);
+    } finally {
+      release.countDown();
+      for (Future<?> f : held) f.get(5, TimeUnit.SECONDS);
+      callers.shutdownNow();
+    }
+  }
+
+  @Test
   public void repeatAndEstimateSamplesReuseExactBytes() throws Exception {
     assertArrayEquals(bytes, http.load(tile, url("/tile"), true).data());
     assertArrayEquals(bytes, load("/tile").data());

@@ -52,7 +52,7 @@ final class TileHttpClient implements AutoCloseable {
 
   private final OkHttpClient client, sampling;
   private final Validator validator;
-  private final TileDispatcher<Resource> dispatcher = new TileDispatcher<>(8, 2);
+  private final TileDispatcher<Resource> dispatcher = new TileDispatcher<>(2);
 
   static OkHttpClient create(File directory) {
     return new OkHttpClient.Builder()
@@ -125,7 +125,7 @@ final class TileHttpClient implements AutoCloseable {
       TileAddress tile, String url, boolean sample, TileDispatcher.Publication<Resource> output)
       throws IOException {
     Request request =
-        new Request.Builder().url(url).header("User-Agent", "Ridgeline-Android/0.13.0").build();
+        new Request.Builder().url(url).header("User-Agent", "Ridgeline-Android/0.13.1").build();
     Call call = (sample ? sampling : client).newCall(request);
     output.onCancel(call::cancel);
     SharedTileBody body = null;

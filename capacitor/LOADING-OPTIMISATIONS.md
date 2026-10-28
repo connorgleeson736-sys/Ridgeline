@@ -1,4 +1,4 @@
-# Loading and caching — Android 0.13.0
+# Loading and caching — Android 0.13.1
 
 The website's renderer already supplies scheduling, JavaScript cancellation, prepare-ahead loading, encoded-input caching, texture reuse and composition-plan reuse. Version 0.13.0 improves those systems' integration with Android and adds bounded native storage/transfer improvements. It does not introduce another renderer or lower source detail.
 
@@ -14,7 +14,7 @@ The website's renderer already supplies scheduling, JavaScript cancellation, pre
 | Offline lookup/storage | Individual files in region directories, with a recent-path memo | SQLite indexes coordinates and region ownership. Identical payloads share a content hash; different versions remain distinct |
 | Region downloads | Each region fetched tiles serially | Three bounded producers share native admission, commit small batches and honour retry/backoff and cancellation |
 
-Native admission has eight transfer slots and admits at most two background transfers at once, leaving capacity for visible work. Interactive size estimates precede region downloads, which precede speculative warmups. Existing renderer admission limits still apply. A background transfer already in progress is not forcibly cancelled merely because a visible request arrives; subscriber cancellation can release it when its work is obsolete.
+Version 0.13.1 removes the additional native foreground-transfer cap. The renderer's existing loading controls (8 moving / 12 stationary by default, configurable up to 96) govern image demand without a second eight-slot restriction underneath them. Foreground requests start independently on reusable idle-expiring threads, so fresh OkHttp disk-cache hits no longer queue behind unrelated network transfers. Cache lookup, expiry/revalidation, validation, streaming and cancellation remain unchanged. At most two background transfers are admitted; estimates precede downloads and speculative preparation. The existing 512-entry outstanding-request guard remains for runaway demand, rather than imposing a normal transfer limit. This is not a claim of measured physical-device speedup.
 
 A main-page control object exposes only begin/priority/cancel operations for bounded random request IDs. Workers forward these messages through their parent, and worker termination releases its requests. The interface is installed before the first document loads. Provider URLs remain allowlisted; control headers are not forwarded upstream and do not fragment the provider HTTP-cache key. No base64 image bridge is used.
 

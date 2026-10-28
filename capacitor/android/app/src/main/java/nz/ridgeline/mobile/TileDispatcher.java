@@ -5,7 +5,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 
-/** Bounded shared transfers, dynamic demand priority and subscriber-aware cancellation. */
+/** Shared transfers, dynamic background priority and subscriber-aware cancellation. */
 final class TileDispatcher<T> implements AutoCloseable {
   interface Transfer<T> {
     void run(Publication<T> output) throws Exception;
@@ -29,17 +29,25 @@ final class TileDispatcher<T> implements AutoCloseable {
   private long started, shared, cancelled, finished;
   private final AtomicLong sequence = new AtomicLong();
 
+  /** Production: the renderer owns foreground concurrency; only background work queues. */
+  TileDispatcher(int backgroundLimit) {
+    this(Integer.MAX_VALUE, backgroundLimit);
+  }
+
+  /** Explicit total limits are retained for scheduler tests. */
   TileDispatcher(int limit, int backgroundLimit) {
     this.limit = limit;
     this.backgroundLimit = Math.min(limit, backgroundLimit);
+    ThreadFactory factory =
+        r -> {
+          Thread t = new Thread(r, "ridge-transfer");
+          t.setDaemon(true);
+          return t;
+        };
     workers =
-        Executors.newFixedThreadPool(
-            limit,
-            r -> {
-              Thread t = new Thread(r, "ridge-transfer");
-              t.setDaemon(true);
-              return t;
-            });
+        limit == Integer.MAX_VALUE
+            ? Executors.newCachedThreadPool(factory)
+            : Executors.newFixedThreadPool(limit, factory);
   }
 
   private final class Job implements Publication<T> {
