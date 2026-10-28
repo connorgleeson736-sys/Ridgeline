@@ -1,5 +1,19 @@
 # Ridgeline Android downloads
 
+## Diagnostic build: 0.16.0 — WebView CPU profiling
+
+**[Download 0.16.0 Profiling Base APK — 26.9 MB](Ridgeline-3D-0.16.0-Profiling-Base.apk)**
+
+Choose **Download raw file**, then install over your current 0.16.0 preview. Same application ID, version code and signing certificate; keep the app installed to preserve its data. This is a diagnostic alternative to the normal Base build below.
+
+The only changed APK entry is `assets/capacitor.config.json`, adding `android.webContentsDebuggingEnabled: true`. All 1,654 other file entries, including renderer JavaScript, native code, manifest, imagery and terrain settings, are byte-identical to the original 0.16.0 Base APK. It keeps the same release-mode build configuration.
+
+To record: enable USB debugging on your Android phone, connect and authorise your laptop, open desktop Chrome at `chrome://inspect/#devices`, enable Discover USB devices, open Ridgeline and click Inspect beneath its WebView. In Performance, record 20–30 seconds of panning/zooming, stop, and save the trace. Keep CPU throttling off and JavaScript samples enabled; screenshots can be disabled to reduce overhead. The normal Base APK below restores the original inspection setting when installed again.
+
+Verified: offline preview build, APK signature, matching signer, unchanged manifest and complete APK-entry comparison. No emulator/device profiling run was performed.
+
+[Checksum](Ridgeline-3D-0.16.0-Profiling-Base.apk.sha256) · [Validation](Ridgeline-3D-0.16.0-Profiling-validation.json)
+
 ## Latest: 0.16.0 — elevation-cache and invalidation work reductions
 
 **[Download 0.16.0 Base APK — 26.9 MB](Ridgeline-3D-0.16.0-Base.apk)**

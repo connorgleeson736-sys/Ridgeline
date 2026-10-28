@@ -1,0 +1,20 @@
+{
+  "version": "0.16.0",
+  "versionCode": 19,
+  "variant": "Profiling Base",
+  "bytes": 26916662,
+  "sha256": "cef449bc6cc35c2741ef68f1a644124af413923da410354aecbf83fdfd35d404",
+  "sourceCommit": "c0b394125bc35f6236c645c68a4a3bb94d88ce55",
+  "webContentsDebuggingEnabled": true,
+  "releaseModeUnchanged": true,
+  "manifestUnchanged": true,
+  "unchangedEntries": 1654,
+  "onlyChangedNonSignatureEntry": "assets/capacitor.config.json",
+  "configChange": "android.webContentsDebuggingEnabled=true",
+  "normalGeneratedConfigRestored": true,
+  "phoneValidation": "Not performed; no emulator used",
+  "buildCommand": "capacitor/scripts/cloud-build.sh --offline :app:assemblePreview; set generated capacitor.config.json flag true for build and restore afterwards",
+  "signingVerification": "apksigner v2 verified",
+  "signerSha256": "c475ac25a331015896bf65a4222833f6a5b2cb14dc30d6eeaa955b5b40169c98",
+  "sameSignerAs0160": true
+}
