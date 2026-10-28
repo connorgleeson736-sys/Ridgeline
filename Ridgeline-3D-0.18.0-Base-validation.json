@@ -1,0 +1,72 @@
+{
+  "version": "0.18.0-performance",
+  "versionCode": 21,
+  "variant": "Performance Base",
+  "applicationId": "nz.ridgeline.mobile.performance",
+  "appName": "Ridgeline 3D Performance",
+  "sourceCommit": "d880143418ac46ece98adff0b3b2fbaedf044d46",
+  "sourceBranch": "android-performance-0.18.0",
+  "referenceBranch": "android-preview-download",
+  "referenceCommit": "68e6cedd60b1b516bf993433cd73f492e120eaae",
+  "referenceFullApkSha256": "b4d286f5d6835447237eecaa15d5ee9a8bdf2870d56133c699f0b9ec3a173ffd",
+  "bytes": 26920390,
+  "sha256": "0c452e427e7d4fda13950ebae61be06d8f93c804ede644d0a8c496d72ab2fa14",
+  "signerSha256": "e3432d7c6a92c4dee9f7030ff299c8d85d90570bec665b6e0df0eb6b7fb93c61",
+  "sameSignerPackageVersionAs018Full": true,
+  "signatureV2Verified": true,
+  "zipAlignmentVerifiedIncluding16KiB": true,
+  "allOptimisationsAndQualityPoliciesIdenticalToFull": true,
+  "bundledLargeOverviewPacks": 0,
+  "bundledCoarseOverviewImages": 67,
+  "bundledCoarseOverviewZooms": [
+    0,
+    8
+  ],
+  "nativeCodeIdenticalToFullThatPassed90Tests": true,
+  "mobileJavaScriptTests": {
+    "passed": 55,
+    "failed": 0
+  },
+  "lint": {
+    "errors": 0,
+    "warnings": 22
+  },
+  "browserWorkflow": {
+    "actualPackImageReads": 0,
+    "controlledProviderRequests": 320,
+    "baseZipImportAvailable": true,
+    "pageErrors": [],
+    "consoleErrors": [],
+    "softwareWebGL": true,
+    "mockedAndroidControls": true
+  },
+  "deviceSpeedupMeasured": false,
+  "packagingComparison": {
+    "baseline": "0.18.0 Performance Full",
+    "bytes": 26920390,
+    "sha256": "0c452e427e7d4fda13950ebae61be06d8f93c804ede644d0a8c496d72ab2fa14",
+    "removed": [
+      "assets/public/overview-packs/0b72203a46ec5c96ad0b9074b6f2335941458d80eb44f936fe6150b9d21914a9.bin",
+      "assets/public/overview-packs/20c7da20bac6c00a048c1b3af93a3d7681e7bdae850d4246916ce60897b495b3.bin",
+      "assets/public/overview-packs/7241afa52abbc95e0226d1f1964832e1646076857c9b489f52443ecc9c2b8b03.bin",
+      "assets/public/overview-packs/8431d7e8360b82383121e5e5537f9e2b207d788ec2e808ce1be0daedd7a5519d.bin",
+      "assets/public/overview-packs/add2b4659a74691e8e3346df5f41d5592796013199eb7de88dcb9fd640a606b2.bin",
+      "assets/public/overview-packs/bc0dd4764ca150cb54bb463c3bc3e80b9fb5af0591764caa7778d90cfef36b21.bin"
+    ],
+    "added": [],
+    "changedSharedEntries": [
+      "assets/public/index.html",
+      "assets/public/overview-manifest.json"
+    ],
+    "unchangedImageBinaryAssets": 1133,
+    "allGeneratedAssetsMatch": true,
+    "nativeBytecodeAndManifestIdentical": true,
+    "allApplicationCodeIdentical": true,
+    "bundledOverviewPacks": 0,
+    "bundledCoarseOverviewImages": 67,
+    "bundledCoarseOverviewZooms": [
+      0,
+      8
+    ]
+  }
+}

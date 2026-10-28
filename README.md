@@ -1,8 +1,14 @@
 # Ridgeline Android downloads
 
-## Latest Performance installer: 0.18.0 Full — additional selection CPU work
+## Latest Performance installers: 0.18.0 — Full or Base
 
 **[Download Ridgeline 3D Performance 0.18.0 Full APK — 391.7 MB](Ridgeline-3D-0.18.0-Performance-Full.apk)**
+
+**[Download Ridgeline 3D Performance 0.18.0 Base APK — 26.9 MB](Ridgeline-3D-0.18.0-Performance-Base.apk)**
+
+The smaller **Base** installer contains the same optimisations, renderer, resolution and terrain detail. It keeps the 67 coarse overview images and leaves out the six large overview packs. Use online imagery, existing saved regions or import the overview ZIPs for additional coverage. Base and Full use the same Performance package, version and signer; either installs over the Performance app without uninstalling it.
+
+[Base packaging checks](Ridgeline-3D-0.18.0-Base-validation.json) · [Base notes](Ridgeline-3D-0.18.0-Base-findings.md) · [Base checksum](Ridgeline-3D-0.18.0-Performance-Base.apk.sha256)
 
 Choose **Download raw file**, then install over **Ridgeline 3D Performance 0.17.0**. Same Performance package and signer, higher version code: keep the app installed to retain its settings, routes, downloads and cache. The normal Ridgeline app remains separate.
 
