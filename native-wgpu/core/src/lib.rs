@@ -206,3 +206,5 @@ mod terrain_tests {
         assert!(rows.len() < 32);
     }
 }
+
+pub mod heightfield;

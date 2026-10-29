@@ -67,7 +67,7 @@ then upstream LINZ. `RidgeGapAtlas` + wrapper suppresses the legacy West Coast
 fallback path. Do not accidentally apply both geographic compositors.
 
 Six overview ZIPs contain six immutable .bin payloads (364,762,502 original bytes).
-Full APK bundles all payloads uncompressed for direct range access, plus67 coarse
+Full APK bundles all six original ZIPs uncompressed for direct payload range access, plus67 coarse
 images, coarse gap overlays and Cook snapshots. 5,255 range coordinates include
 raw/natural variants. They are imagery coverage, not offline DEM or all-NZ data.
 Native range/bitmap proof must run on Android as well as host hash verification.

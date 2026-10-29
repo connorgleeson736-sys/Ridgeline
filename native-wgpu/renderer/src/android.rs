@@ -310,3 +310,86 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_plan(
         _ => 0,
     }
 }
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_stats(
+    env: *mut jni::sys::JNIEnv,
+    _class: jni::sys::jclass,
+    output: jni::sys::jobject,
+) -> i32 {
+    let mut env = unsafe { jni::EnvUnowned::from_raw(env) };
+    match env
+        .with_env(|env| -> Result<i32, jni::errors::Error> {
+            let output = unsafe { jni::objects::JByteBuffer::from_raw(env, output) };
+            if env.get_direct_buffer_capacity(&output)? < 12 {
+                return Ok(0);
+            }
+            let Ok(states) = states().lock() else {
+                return Ok(0);
+            };
+            let bytes = unsafe {
+                std::slice::from_raw_parts_mut(env.get_direct_buffer_address(&output)?, 12)
+            };
+            let values = [
+                states.len() as u32,
+                states
+                    .values()
+                    .map(|s| s.renderer.frames)
+                    .sum::<u64>()
+                    .min(u32::MAX as u64) as u32,
+                states
+                    .values()
+                    .map(|s| s.renderer.resident_count() as u32)
+                    .sum(),
+            ];
+            for (slot, value) in bytes.chunks_exact_mut(4).zip(values) {
+                slot.copy_from_slice(&value.to_le_bytes());
+            }
+            Ok(1)
+        })
+        .into_outcome()
+    {
+        jni::Outcome::Ok(result) => result,
+        _ => 0,
+    }
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_pick(
+    env: *mut jni::sys::JNIEnv,
+    _class: jni::sys::jclass,
+    handle: i64,
+    x: f64,
+    y: f64,
+    output: jni::sys::jobject,
+) -> u8 {
+    let mut env = unsafe { jni::EnvUnowned::from_raw(env) };
+    match env
+        .with_env(|env| -> Result<u8, jni::errors::Error> {
+            let output = unsafe { jni::objects::JByteBuffer::from_raw(env, output) };
+            if env.get_direct_buffer_capacity(&output)? < 24 {
+                return Ok(0);
+            }
+            let Ok(mut states) = states().lock() else {
+                return Ok(0);
+            };
+            let Some(state) = states.get_mut(&(handle as u64)) else {
+                return Ok(0);
+            };
+            let Some(point) = state.renderer.pick_at(x, y) else {
+                return Ok(0);
+            };
+            let bytes = unsafe {
+                std::slice::from_raw_parts_mut(env.get_direct_buffer_address(&output)?, 24)
+            };
+            for (slot, value) in bytes.chunks_exact_mut(8).zip(point) {
+                slot.copy_from_slice(&value.to_le_bytes());
+            }
+            Ok(1)
+        })
+        .into_outcome()
+    {
+        jni::Outcome::Ok(result) => result,
+        _ => 0,
+    }
+}

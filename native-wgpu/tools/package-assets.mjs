@@ -1,5 +1,5 @@
 // Build-time extraction only. The APK contains JSON/data, never this JS runtime.
-import fs from 'node:fs';import path from 'node:path';import vm from 'node:vm';import crypto from 'node:crypto';
+import {execFileSync} from 'node:child_process';import fs from 'node:fs';import path from 'node:path';import vm from 'node:vm';import crypto from 'node:crypto';
 const root=path.resolve(import.meta.dirname,'../..'),out=path.join(root,'native-wgpu/android/app/src/main/assets');fs.mkdirSync(out,{recursive:true});
 const load=name=>{const c={};vm.runInNewContext(fs.readFileSync(path.join(root,'public',name),'utf8'),c);return c;};
 const gap=load('gap-imagery-atlas.js').RidgeGapAtlas,south=load('south-overviews.js').RidgeSouthOverviews;
@@ -17,10 +17,13 @@ for(const entry of Object.values(reference.tiles))for(const name of (typeof entr
  const relative=name.replace(/^\//,'');if(!/^assets\/cook-reference-v1\/[a-f0-9]{24}\.webp$/.test(relative))throw Error('Invalid reference image path');
  const dest=path.join(out,relative);fs.mkdirSync(path.dirname(dest),{recursive:true});fs.copyFileSync(path.join(root,'public',relative),dest);
 }
-fs.writeFileSync(path.join(out,'overview-index.json'),JSON.stringify(overview));fs.writeFileSync(path.join(out,'gap-atlas.json'),JSON.stringify(gap));
+fs.writeFileSync(path.join(out,'gap-atlas.json'),JSON.stringify(gap));
 for(const entry of Object.values(gap.coarse||{})){const name=entry.url?.replace(/^\//,'');if(!name?.startsWith('assets/'))continue;const dest=path.join(out,name);fs.mkdirSync(path.dirname(dest),{recursive:true});fs.copyFileSync(path.join(root,'public',name),dest);}
 const full=process.env.RIDGELINE_BUNDLE_OVERVIEWS!=='0';
-if(full){const source=process.env.RIDGELINE_OVERVIEW_DATA||path.join(root,'capacitor/overview-data');fs.mkdirSync(path.join(out,'overview-packs'),{recursive:true});
- for(const pack of catalog.files){const input=path.join(source,pack.sha256+'.bin'),data=fs.readFileSync(input);if(data.length!==pack.bytes||crypto.createHash('sha256').update(data).digest('hex')!==pack.sha256)throw Error('Invalid overview pack');fs.copyFileSync(input,path.join(out,'overview-packs',pack.sha256+'.bin'));}
-}else fs.rmSync(path.join(out,'overview-packs'),{recursive:true,force:true});
+const packOutput=path.join(out,'overview-packs');fs.rmSync(packOutput,{recursive:true,force:true});
+overview.archives={};
+if(full){const source=process.env.RIDGELINE_OVERVIEW_ZIPS||path.join(root,'overview-packs');
+ overview.archives=JSON.parse(execFileSync('python3',[path.join(root,'native-wgpu/tools/package-archives.py'),source,packOutput],{encoding:'utf8',maxBuffer:1024*1024}));
+}
+fs.writeFileSync(path.join(out,'overview-index.json'),JSON.stringify(overview));
 console.log(JSON.stringify({full,packCount:full?catalog.files.length:0,coarseImages:copied.size,gapEntries:Object.keys(gap.entries).length,overviewCoordinates:Object.keys(catalog.tiles).length,referenceCoordinates:Object.keys(reference.tiles).length}));

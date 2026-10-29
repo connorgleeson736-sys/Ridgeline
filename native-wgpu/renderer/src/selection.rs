@@ -4,6 +4,7 @@ use crate::{TileId, camera_matrix};
 use glam::{Mat4, Vec4};
 use std::{cmp::Ordering, collections::BinaryHeap};
 
+#[derive(Clone, Copy)]
 pub struct View {
     pub width: u32,
     pub height: u32,
@@ -105,7 +106,7 @@ pub fn plan(view: &View, budget: usize) -> Vec<TileId> {
     });
     leaves.into_iter().map(|c| c.id).collect()
 }
-fn visible_box(matrix: Mat4, lo: [f32; 3], hi: [f32; 3]) -> bool {
+pub(crate) fn visible_box(matrix: Mat4, lo: [f32; 3], hi: [f32; 3]) -> bool {
     let points: [Vec4; 8] = std::array::from_fn(|i| {
         matrix
             * Vec4::new(

@@ -21,7 +21,7 @@ report. Never claim device validation without executing it.
 
 ## Milestones and gates
 
-- [ ] M1 Audit exact app, camera, shaders, imagery/catalogs, storage, route/UI behavior;
+- [x] M1 Audit exact app, camera, shaders, imagery/catalogs, storage, route/UI behavior;
       research current official Rust/wgpu/Android/MapLibre documentation and record sources.
 - [ ] M2 Installable minimal native terrain+imagery proof with real decoded DEM,
       actual images, correct projection, depth, sky, lifecycle and touch camera.
@@ -47,6 +47,14 @@ Reference capture tolerances must be documented before calling parity achieved.
 Original data stays untouched; use a separate application ID and private data.
 No secrets/keystores in source; the existing public client key may be reused as
 explicitly requested, with licensing/attribution preserved.
+
+## Current proof status
+
+M1 audit is recorded in native-wgpu/research/AUDIT-018.md. M2 has real Android
+wgpu imagery rendering and six-pack reads on a controlled synthetic height fixture,
+plus reference camera/geometry tests. Real LINZ DEM and terrain visual parity are
+still blocked by the pending network configuration; M2 remains open. No later
+feature or release milestone is complete.
 
 ## Resume
 

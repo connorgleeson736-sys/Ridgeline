@@ -19,6 +19,7 @@ class ProofActivity: Activity() {
     @Volatile private var closed = false
     override fun onCreate(state: Bundle?) {
         super.onCreate(state)
+        ProofState.activity.set(this);ProofState.sixPacksRead=false
         terrain = TerrainView(this)
         val label = TextView(this).apply {
             text="CONTROLLED TEST · flat synthetic height / real Cook imagery"
@@ -45,6 +46,8 @@ class ProofActivity: Activity() {
                     check(bitmap.width==256&&bitmap.height==256);bitmap.recycle();remaining.remove(row.getString("file"))
                 }
                 check(remaining.isEmpty()){"Not all six packs exercised"}
+                ProofState.sixPacksRead=true
+                android.util.Log.i("RidgelineProof","All six APK pack ranges decoded")
                 for(x in 3983..3984)for(y in 2599..2600){
                     val entry=index.getJSONObject("reference").get("12/$x/$y")
                     val path=if(entry is JSONObject)entry.getString("natural")else entry.toString()
@@ -60,7 +63,14 @@ class ProofActivity: Activity() {
             }catch(e:Exception){if(!closed)runOnUiThread{label.text="Controlled fixture failed: ${e.javaClass.simpleName}: ${e.message}"}}
         },"native-proof-fixture").start()
     }
+    internal fun pickCenter(callback:(DoubleArray?)->Unit){terrain.pick(terrain.width/2.0,terrain.height/2.0,callback)}
+    internal fun showSurface(value:Boolean){terrain.visibility=if(value)android.view.View.VISIBLE else android.view.View.GONE}
     override fun onResume(){super.onResume();if(::terrain.isInitialized)terrain.setActive(true)}
     override fun onPause(){if(::terrain.isInitialized)terrain.setActive(false);super.onPause()}
-    override fun onDestroy(){closed=true;terrain.close();super.onDestroy()}
+    override fun onDestroy(){closed=true;ProofState.activity.compareAndSet(this,null);terrain.close();super.onDestroy()}
+}
+
+internal object ProofState {
+ val activity=java.util.concurrent.atomic.AtomicReference<ProofActivity?>(null)
+ @Volatile var sixPacksRead=false
 }

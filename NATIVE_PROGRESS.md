@@ -177,3 +177,56 @@ native/backend compatibility with actual logs. Rebuild ARM optimized device APK
 with latest source (mips/selection/JNI changes), run all tests/lint/package checks,
 commit. Live DEM/visual acceptance still needs the pending network draft publish;
 then complete parity before migrating the full planner/UI. Do not stop at a plan.
+
+## Successful controlled Android rendering and exact original ZIP packaging
+
+Optimized x86_64 retry renders genuine Cook imagery on the controlled flat height
+fixture. Captures now committed under native-wgpu/validation/ in portrait and
+landscape. Android ATD had debug.hwui.drawing_enabled=0, explaining missing native
+UI in initial screenshots. Set it to1 and restart app; native TextView and wgpu
+SurfaceView render together. Manual background/resume and rotation both render.
+This is actual Android integration evidence, NOT real-terrain or phone validation.
+
+Important packaging correction: six original overview ZIPs are ZIP_STORED inside,
+so can preserve the literal original ZIPs as requested without extraction or
+payload duplication. package-archives.py verifies original outer SHA/size plus
+inner payload SHA/size; generated catalog gives native absolute range offsets.
+All six exact ZIPs are now stored uncompressed in APK and read directly through
+AssetFileDescriptor/FileChannel. The wrappers add just1,404bytes over payloads.
+Verifier proves six originals,364,762,502payloadbytes/5277ranges +67coarseimages,
+and zero JS/HTML/WebView/Capacitor runtime assets/references. Updated build input
+is RIDGELINE_OVERVIEW_ZIPS pointing to original preview overview-packs directory.
+Older log entries describing .bin-only packaging are superseded by this change.
+
+Added frustum culling of retained GPU regions using their actual DEM extrema and
+coverage-aware eviction: preserve visible partial parents without real fallback;
+evict redundant or off-screen data first. GPU smoke passes after these changes.
+Native picking now retains a bounded CPU copy of the rendered height grid, uses
+2D cell traversal and exact triangle intersections clipped to the same ownership
+regions, avoiding GPU readback and full mesh scans. Eleven pure-core tests pass,
+including600rays compared with exhaustive triangle search, exact edge hits,
+missing-data rejection, clipped regions and triangle-vs-bilinear interpolation.
+GPU draw/readback + center terrain pick also passes. Picking is wired as an
+asynchronous native call; gesture anchoring/collision behavior still open.
+
+Reproducible build script passed for optimized ARM64+ARMv7 debug APK:
+395,702,587bytes,SHA269df0794365fa390af6b34ac41cb1d511df59576020e0768dbe8dc602cce6b6,
+v2signature and16KiB ZIP alignment pass. This earlier artifact predates the latest
+picking/visibility/original-ZIP changes; do not present it as the final build.
+
+Added debug-only platform Instrumentation checking native frames, exact flat-field
+terrain pick, all six ZIP reads, surface destroy/recreate, rotated activity and
+zero retained native surfaces after finish. Latest Full x86_64 instrumentation APK
+is installing from immutable /workspace/native-artifacts/Ridgeline-Native-Six-Zips-Proof-x86_64.apk.
+No automated lifecycle result yet. Logs /tmp/ridge-native-original-zips-install.log.
+
+User action: network status still revision1/allowedHosts[]. Sent a single async
+follow-up asking user to publish the saved network draft. Continue independent
+work; do not bypass policy or claim live LINZ validation. M1 audit marked complete;
+M2 remains open until real terrain/source parity is demonstrated.
+
+Exact next step: wait for current APK install while working independently, run
+`python3 native-wgpu/tools/emulator-adb.py 'am instrument -w nz.ridgeline.nativeapp/.ProofInstrumentation'`,
+inspect/fix failures; rebuild latest optimized ARM APK using new ZIP input and
+verify all tests/package/signature/alignment. Keep feature migration and M2 gates
+honest. Commit and push the separate native source branch for resumability.

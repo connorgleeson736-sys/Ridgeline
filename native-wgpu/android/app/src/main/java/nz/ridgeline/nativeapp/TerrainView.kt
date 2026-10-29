@@ -50,6 +50,11 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
  fun upload(z:Int,x:Int,y:Int,heights:ByteBuffer,rgba:ByteBuffer){
   uploads.offer(GpuUploadQueue.Tile(GpuUploadQueue.Id(z,x,y),heights,rgba));requestFrame()
  }
+ fun pick(x:Double,y:Double,callback:(DoubleArray?)->Unit){gpu.post{
+  val output=ByteBuffer.allocateDirect(24).order(java.nio.ByteOrder.LITTLE_ENDIAN)
+  val point=if(live&&handle!=0L&&NativeBridge.pick(handle,x,y,output))DoubleArray(3){output.double}else null
+  post{callback(point)}
+ }}
  fun centerHeight(value:Float){centerElevation=value;requestFrame()}
  private val scaler=ScaleGestureDetector(context,object:ScaleGestureDetector.SimpleOnScaleGestureListener(){override fun onScale(detector:ScaleGestureDetector):Boolean{zoom=(zoom+ln(detector.scaleFactor.toDouble())/ln(2.0)).coerceIn(4.0,19.0);changed();return true}})
  private val gestures=GestureDetector(context,object:GestureDetector.SimpleOnGestureListener(){override fun onDown(e:MotionEvent)=true;override fun onDoubleTap(e:MotionEvent):Boolean{zoom=(zoom+1).coerceAtMost(19.0);changed();return true}

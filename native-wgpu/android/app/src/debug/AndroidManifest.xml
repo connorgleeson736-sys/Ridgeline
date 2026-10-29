@@ -2,4 +2,5 @@
  <application>
   <activity android:name=".ProofActivity" android:exported="true" android:label="Ridgeline controlled GPU fixture"/>
  </application>
+ <instrumentation android:name=".ProofInstrumentation" android:targetPackage="nz.ridgeline.nativeapp" android:functionalTest="true"/>
 </manifest>

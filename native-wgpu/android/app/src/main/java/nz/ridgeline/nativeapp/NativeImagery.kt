@@ -44,13 +44,15 @@ class NativeImagery(
         val row=entry.optJSONObject("natural") ?: entry
         val file=row.getString("file"); val offset=row.getLong("offset"); val length=row.getInt("bytes")
         require(file.matches(Regex("[a-f0-9]{64}")) && offset>=0 && length in 20..1048576)
-        val descriptor=try { context.assets.openFd("overview-packs/$file.bin") } catch(_:FileNotFoundException) { return null }
+        val archive=catalog.getJSONObject("archives").optJSONObject(file) ?: return null
+        val base=archive.getLong("offset");require(base>=0&&offset+length<=archive.getLong("bytes"))
+        val descriptor=try { context.assets.openFd(archive.getString("asset")) } catch(_:FileNotFoundException) { return null }
         return descriptor.use { asset ->
-            require(offset+length<=asset.length)
+            require(base+offset+length<=asset.length)
             asset.createInputStream().use { input ->
                 val bytes=ByteArray(length); val target=ByteBuffer.wrap(bytes)
                 while(target.hasRemaining()) {
-                    val count=input.channel.read(target,asset.startOffset+offset+target.position())
+                    val count=input.channel.read(target,asset.startOffset+base+offset+target.position())
                     check(count>0) { "Incomplete overview image" }
                 }
                 bytes

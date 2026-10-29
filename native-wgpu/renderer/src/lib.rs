@@ -1,7 +1,7 @@
 //! Native terrain GPU proof. Camera/lighting/feature parity is an open gate.
 use glam::{Mat4, Vec3};
 pub use ridgeline_core::{TileId, mercator, terrain_rgb};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use wgpu::util::DeviceExt;
 mod mipmaps;
 pub mod selection;
@@ -22,6 +22,7 @@ struct Tile {
     bind: wgpu::BindGroup,
     _texture: wgpu::Texture,
     used: u64,
+    field: ridgeline_core::heightfield::Heightfield,
 }
 pub struct Renderer {
     pub device: wgpu::Device,
@@ -47,6 +48,7 @@ pub struct Renderer {
     budget: usize,
     clock: u64,
     center: [f64; 2],
+    last_view: Option<selection::View>,
 }
 impl Renderer {
     pub async fn new(
@@ -207,6 +209,7 @@ impl Renderer {
             budget: 96,
             clock: 0,
             center: [0.5, 0.5],
+            last_view: None,
         })
     }
     fn depth(d: &wgpu::Device, w: u32, h: u32) -> wgpu::Texture {
@@ -317,6 +320,11 @@ impl Renderer {
                 bind,
                 _texture: texture,
                 used: self.clock,
+                field: ridgeline_core::heightfield::Heightfield::new(
+                    128,
+                    heights.to_vec().into_boxed_slice(),
+                )
+                .map_err(str::to_owned)?,
             },
         );
         self.trim();
@@ -338,11 +346,52 @@ impl Renderer {
     }
     fn trim(&mut self) {
         while self.tiles.len() > self.budget {
-            // Keep nearby useful ancestors and recently used off-screen data. Prefer
-            // old distant tiles for eviction; distance is measured in each tile's units.
+            // Protect a visible source if removing it would expose an uncovered
+            // region. Fine tiles may fall back to an existing real ancestor;
+            // a partial parent's unfilled siblings must never disappear.
+            let mut protected = HashSet::new();
+            if let Some(view) = self.last_view {
+                let (matrix, ppm) = camera_matrix(
+                    view.width,
+                    view.height,
+                    view.center,
+                    view.zoom,
+                    view.bearing,
+                    view.pitch,
+                    view.elevation,
+                );
+                let world = 512. * 2f64.powf(view.zoom);
+                for row in
+                    ridgeline_core::resident_cover(&self.tiles.keys().copied().collect::<Vec<_>>())
+                {
+                    let mut ancestor = row.source.parent();
+                    let mut fallback = false;
+                    while let Some(id) = ancestor {
+                        if self.tiles.contains_key(&id) {
+                            fallback = true;
+                            break;
+                        }
+                        ancestor = id.parent();
+                    }
+                    if !fallback
+                        && Self::visible(
+                            &row,
+                            &self.tiles[&row.source],
+                            matrix,
+                            view.center,
+                            world,
+                            ppm,
+                            view.elevation,
+                        )
+                    {
+                        protected.insert(row.source);
+                    }
+                }
+            }
             let victim = self
                 .tiles
                 .iter()
+                .filter(|(id, _)| !protected.contains(id))
                 .max_by(|(a, ta), (b, tb)| {
                     let score = |id: &TileId, t: &Tile| {
                         let bounds = id.bounds();
@@ -354,9 +403,120 @@ impl Renderer {
                     score(a, ta).total_cmp(&score(b, tb))
                 })
                 .map(|(id, _)| *id)
+                .or_else(|| {
+                    self.tiles
+                        .iter()
+                        .max_by_key(|(_, tile)| tile.used)
+                        .map(|(id, _)| *id)
+                })
                 .unwrap();
             self.tiles.remove(&victim);
         }
+    }
+    fn visible(
+        row: &ridgeline_core::CoverRegion,
+        tile: &Tile,
+        matrix: Mat4,
+        center: [f64; 2],
+        world: f64,
+        ppm: f32,
+        elevation: f32,
+    ) -> bool {
+        let b = row.region.bounds();
+        selection::visible_box(
+            matrix,
+            [
+                ((b[0] - center[0]) * world) as f32,
+                ((center[1] - b[3]) * world) as f32,
+                (tile.field.min - elevation) * ppm,
+            ],
+            [
+                ((b[2] - center[0]) * world) as f32,
+                ((center[1] - b[1]) * world) as f32,
+                (tile.field.max - elevation) * ppm,
+            ],
+        )
+    }
+    pub fn pick_at(&mut self, x: f64, y: f64) -> Option<[f64; 3]> {
+        let view = self.last_view?;
+        self.pick(&view, x, y)
+    }
+    /// Closest actual rendered terrain intersection; never reads GPU depth or
+    /// invents a plane for missing tiles. Uses the same triangles and ownership.
+    pub fn pick(&mut self, view: &selection::View, x: f64, y: f64) -> Option<[f64; 3]> {
+        if !x.is_finite() || !y.is_finite() || view.width == 0 || view.height == 0 {
+            return None;
+        }
+        if self.cover_dirty {
+            self.rebuild_cover();
+            self.cover_dirty = false;
+        }
+        let (matrix, ppm) = camera_matrix(
+            view.width,
+            view.height,
+            view.center,
+            view.zoom,
+            view.bearing,
+            view.pitch,
+            view.elevation,
+        );
+        let inverse = matrix.inverse();
+        let ndc = glam::Vec4::new(
+            (x / view.width as f64 * 2. - 1.) as f32,
+            (1. - y / view.height as f64 * 2.) as f32,
+            0.,
+            1.,
+        );
+        let a = inverse * ndc;
+        let b = inverse * glam::Vec4::new(ndc.x, ndc.y, 1., 1.);
+        let origin = a.truncate() / a.w;
+        let far = b.truncate() / b.w;
+        let direction = (far - origin).normalize();
+        let world = 512. * 2f64.powf(view.zoom);
+        let mut best: Option<(f64, [f64; 3])> = None;
+        for row in &self.cover {
+            let bounds = row.source.bounds();
+            let span = bounds[2] - bounds[0];
+            let clip = row.region.bounds();
+            let ray = ridgeline_core::heightfield::Ray {
+                origin: [
+                    (view.center[0] + origin.x as f64 / world - bounds[0]) / span,
+                    (view.center[1] - origin.y as f64 / world - bounds[1]) / span,
+                    view.elevation as f64 + origin.z as f64 / ppm as f64,
+                ],
+                direction: [
+                    direction.x as f64 / world / span,
+                    -direction.y as f64 / world / span,
+                    direction.z as f64 / ppm as f64,
+                ],
+            };
+            if let Some(hit) = self.tiles[&row.source].field.intersect_region(
+                ray,
+                [
+                    (clip[0] - bounds[0]) / span,
+                    (clip[1] - bounds[1]) / span,
+                    (clip[2] - bounds[0]) / span,
+                    (clip[3] - bounds[1]) / span,
+                ],
+            ) {
+                if best.as_ref().is_none_or(|(t, _)| hit.t < *t) {
+                    let mx = bounds[0] + hit.point[0] * span;
+                    let my = bounds[1] + hit.point[1] * span;
+                    best = Some((
+                        hit.t,
+                        [
+                            mx * 360. - 180.,
+                            (std::f64::consts::PI * (1. - 2. * my))
+                                .sinh()
+                                .atan()
+                                .to_degrees(),
+                            hit.point[2],
+                        ],
+                    ));
+                }
+            }
+        }
+        best.map(|(_, point)| point)
     }
     pub fn render(
         &mut self,
@@ -393,7 +553,30 @@ impl Renderer {
         self.center = center;
         // The cached cover partitions coarse fallback and fine terrain; each ground
         // location has exactly one owner. No overlapping parent/child depth fighting.
-        let rows = &self.cover;
+        self.last_view = Some(selection::View {
+            width: self.width,
+            height: self.height,
+            center,
+            zoom,
+            bearing,
+            pitch,
+            elevation,
+        });
+        let rows: Vec<_> = self
+            .cover
+            .iter()
+            .filter(|row| {
+                Self::visible(
+                    row,
+                    &self.tiles[&row.source],
+                    matrix,
+                    center,
+                    world,
+                    px_meter,
+                    elevation,
+                )
+            })
+            .collect();
         let data: Vec<[f32; 8]> = rows
             .iter()
             .map(|row| {

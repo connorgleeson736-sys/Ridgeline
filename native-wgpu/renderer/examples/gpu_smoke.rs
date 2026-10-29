@@ -90,6 +90,9 @@ async fn run() {
         &[36, 113, 74, 255],
         "exact reference affine grade"
     );
+    let point = r.pick_at(128., 128.).expect("native terrain ray hit");
+    assert!((point[0] - (center[0] * 360. - 180.)).abs() < 1e-6);
+    assert!((point[2] - 1000.).abs() < 1e-6);
     // One detailed child must replace precisely its quadrant, leaving the other
     // three supplied by the parent. Render order is irrelevant to ownership.
     r.upload(
