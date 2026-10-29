@@ -1,0 +1,8 @@
+{
+  "before": "before-transparent-mips.png",
+  "after": "after-validated-mips.png",
+  "device": "API30 AOSP ATD x86_64; software GLES",
+  "camera": "MainActivity default camera; same screen dimensions",
+  "observation": "Large grey triangular gaps visible before are absent in the fresh after capture. Snow and imagery are visible across those areas.",
+  "limits": "Qualitative native-before/after; capture residency is not synchronized. No reference pixel parity, cross-LOD acceptance or phone performance claim."
+}

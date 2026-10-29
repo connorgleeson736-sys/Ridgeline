@@ -1,0 +1,3 @@
+INSTRUMENTATION_RESULT: levelsBadPixelsMinAlpha=[0, 0, 255];[1, 0, 255];[2, 0, 255];[3, 0, 255];[4, 0, 255];[5, 0, 255];[6, 0, 255];[7, 0, 255];[8, 0, 255]
+INSTRUMENTATION_RESULT: mipmapProof=PASS: full original level0 and all8derived levels retain exact checker mean and opacity
+INSTRUMENTATION_CODE: -1

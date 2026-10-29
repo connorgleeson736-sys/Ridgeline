@@ -41,17 +41,32 @@ fn read(r: &Renderer, output: &wgpu::Texture) -> Vec<u8> {
     result
 }
 async fn run() {
-    let instance = wgpu::Instance::new(wgpu::InstanceDescriptor::new_without_display_handle());
+    let mut descriptor = wgpu::InstanceDescriptor::new_without_display_handle();
+    if std::env::args().any(|v| v == "--gles") {
+        descriptor.backends = wgpu::Backends::GL;
+    }
+    let instance = wgpu::Instance::new(descriptor);
     let mut r = Renderer::new_with_mipmap_mode(
         &instance,
         None,
         Some(wgpu::TextureFormat::Rgba8Unorm),
         256,
         256,
-        std::env::args().any(|v| v == "--render-mips"),
+        if std::env::args().any(|v| v == "--cpu-mips") {
+            ridgeline_renderer::MipmapMode::Cpu
+        } else if std::env::args().any(|v| v == "--render-mips") {
+            ridgeline_renderer::MipmapMode::Render
+        } else {
+            ridgeline_renderer::MipmapMode::Auto
+        },
     )
     .await
     .expect("adapter/device");
+    let mips = r.mipmap_diagnostics().expect("mip readback");
+    assert!(
+        mips.iter().all(|row| row[1] == 0 && row[2] == 255),
+        "every source/mip pixel must retain exact colour and opacity: {mips:?}"
+    );
     let output = r.device.create_texture(&wgpu::TextureDescriptor {
         label: Some("proof"),
         size: wgpu::Extent3d {
@@ -235,7 +250,13 @@ async fn run() {
         Some(wgpu::TextureFormat::Rgba8Unorm),
         256,
         256,
-        std::env::args().any(|v| v == "--render-mips"),
+        if std::env::args().any(|v| v == "--cpu-mips") {
+            ridgeline_renderer::MipmapMode::Cpu
+        } else if std::env::args().any(|v| v == "--render-mips") {
+            ridgeline_renderer::MipmapMode::Render
+        } else {
+            ridgeline_renderer::MipmapMode::Auto
+        },
     )
     .await
     .unwrap();

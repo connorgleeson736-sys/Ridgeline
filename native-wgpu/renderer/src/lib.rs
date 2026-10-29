@@ -3,8 +3,15 @@ use glam::{Mat4, Vec3};
 pub use ridgeline_core::{TileId, mercator, terrain_rgb};
 use std::collections::{HashMap, HashSet};
 use wgpu::util::DeviceExt;
+mod diagnostics;
 mod mipmaps;
 pub mod selection;
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum MipmapMode {
+    Auto,
+    Render,
+    Cpu,
+}
 #[repr(C)]
 #[derive(Clone, Copy, PartialEq, bytemuck::Pod, bytemuck::Zeroable)]
 struct Scene {
@@ -73,7 +80,15 @@ impl Renderer {
         width: u32,
         height: u32,
     ) -> Result<Self, String> {
-        Self::new_with_mipmap_mode(instance, surface, requested_format, width, height, false).await
+        Self::new_with_mipmap_mode(
+            instance,
+            surface,
+            requested_format,
+            width,
+            height,
+            MipmapMode::Auto,
+        )
+        .await
     }
     /// The render path is also exposed for exact backend comparison on the host.
     pub async fn new_with_mipmap_mode(
@@ -82,7 +97,7 @@ impl Renderer {
         requested_format: Option<wgpu::TextureFormat>,
         width: u32,
         height: u32,
-        force_render_mips: bool,
+        mipmap_mode: MipmapMode,
     ) -> Result<Self, String> {
         let adapter = instance
             .request_adapter(&wgpu::RequestAdapterOptions {
@@ -194,7 +209,15 @@ impl Renderer {
             mipmap_filter: wgpu::MipmapFilterMode::Linear,
             ..Default::default()
         });
-        let mipmaps = mipmaps::Mipmaps::new(&device, force_render_mips);
+        let mipmaps = if mipmap_mode == MipmapMode::Cpu {
+            mipmaps::Mipmaps::cpu()
+        } else {
+            mipmaps::Mipmaps::new(
+                &device,
+                mipmap_mode == MipmapMode::Render,
+                adapter.get_info().backend == wgpu::Backend::Gl,
+            )
+        };
         let idx = ridgeline_core::surface::GridRect {
             x0: 0,
             y0: 0,
@@ -229,7 +252,7 @@ impl Renderer {
             mapped_at_creation: false,
         });
         let depth = Self::depth(&device, width, height);
-        Ok(Self {
+        let mut renderer = Self {
             device,
             queue,
             format,
@@ -265,7 +288,21 @@ impl Renderer {
             clock: 0,
             center: [0.5, 0.5],
             last_view: None,
-        })
+        };
+        if adapter.get_info().backend == wgpu::Backend::Gl && mipmap_mode == MipmapMode::Auto {
+            let gpu = renderer.mipmap_diagnostics()?;
+            if gpu.iter().any(|v| v[1] != 0 || v[2] != 255) {
+                renderer.mipmaps = mipmaps::Mipmaps::cpu();
+                let cpu = renderer.mipmap_diagnostics()?;
+                if cpu.iter().any(|v| v[1] != 0 || v[2] != 255) {
+                    return Err("No exact full-quality mip backend passed device readback".into());
+                }
+            }
+        }
+        Ok(renderer)
+    }
+    pub fn uses_cpu_mips(&self) -> bool {
+        self.mipmaps.is_cpu()
     }
     fn depth(d: &wgpu::Device, w: u32, h: u32) -> wgpu::Texture {
         d.create_texture(&wgpu::TextureDescriptor {
@@ -406,7 +443,8 @@ impl Renderer {
                 depth_or_array_layers: 1,
             },
         );
-        self.mipmaps.generate(&self.device, &self.queue, &texture);
+        self.mipmaps
+            .generate(&self.device, &self.queue, &texture, rgba);
         let view = texture.create_view(&Default::default());
         let bind = self.device.create_bind_group(&wgpu::BindGroupDescriptor {
             label: None,

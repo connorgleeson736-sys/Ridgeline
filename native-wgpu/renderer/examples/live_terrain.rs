@@ -49,14 +49,24 @@ async fn run() {
         x: 1991,
         y: 1300,
     };
-    let instance = wgpu::Instance::new(wgpu::InstanceDescriptor::new_without_display_handle());
+    let mut descriptor = wgpu::InstanceDescriptor::new_without_display_handle();
+    if std::env::args().any(|v| v == "--gles") {
+        descriptor.backends = wgpu::Backends::GL;
+    }
+    let instance = wgpu::Instance::new(descriptor);
     let mut r = Renderer::new_with_mipmap_mode(
         &instance,
         None,
         Some(wgpu::TextureFormat::Rgba8Unorm),
         256,
         256,
-        std::env::args().any(|v| v == "--render-mips"),
+        if std::env::args().any(|v| v == "--cpu-mips") {
+            ridgeline_renderer::MipmapMode::Cpu
+        } else if std::env::args().any(|v| v == "--render-mips") {
+            ridgeline_renderer::MipmapMode::Render
+        } else {
+            ridgeline_renderer::MipmapMode::Auto
+        },
     )
     .await
     .expect("GPU adapter");

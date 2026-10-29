@@ -68,6 +68,7 @@ class ProofActivity: Activity() {
         },"native-proof-fixture").start()
     }
     internal fun independentSourcesReady()=terrain.residentSourceCounts()==(4 to 4)
+    internal fun checkMips(callback:(IntArray?)->Unit){terrain.checkMipmapContent(callback)}
     internal fun pickCenter(callback:(DoubleArray?)->Unit){terrain.pick(terrain.width/2.0,terrain.height/2.0,callback)}
     internal fun showSurface(value:Boolean){terrain.visibility=if(value)android.view.View.VISIBLE else android.view.View.GONE}
     override fun onResume(){super.onResume();if(::terrain.isInitialized)terrain.setActive(true)}

@@ -1,5 +1,5 @@
-//! Full-resolution level0 is untouched. Both backends average the same four
-//! texels; render passes support adapters without compute/storage textures.
+//! Full-resolution level0 is untouched. All paths average the same four texels;
+//! startup-validated CPU generation supports drivers with broken GPU mip writes.
 const SOURCE: &str = r#"
 @group(0) @binding(0) var source:texture_2d<f32>;
 fn mean(p:vec2<i32>)->vec4<f32>{
@@ -7,15 +7,70 @@ fn mean(p:vec2<i32>)->vec4<f32>{
 }
 "#;
 enum Pipeline {
+    Cpu,
     Compute(wgpu::ComputePipeline),
     Render(wgpu::RenderPipeline),
 }
 pub struct Mipmaps {
     pipeline: Pipeline,
-    layout: wgpu::BindGroupLayout,
+    layout: Option<wgpu::BindGroupLayout>,
+    separate_levels: bool,
 }
 impl Mipmaps {
-    pub fn new(device: &wgpu::Device, force_render: bool) -> Self {
+    pub fn cpu() -> Self {
+        Self {
+            pipeline: Pipeline::Cpu,
+            layout: None,
+            separate_levels: false,
+        }
+    }
+    pub fn is_cpu(&self) -> bool {
+        matches!(self.pipeline, Pipeline::Cpu)
+    }
+    fn generate_cpu(queue: &wgpu::Queue, texture: &wgpu::Texture, rgba: &[u8]) {
+        let mut previous = std::borrow::Cow::Borrowed(rgba);
+        let mut width = texture.width() as usize;
+        for level in 1..texture.mip_level_count() {
+            let next_width = (width / 2).max(1);
+            let mut next = vec![0u8; next_width * next_width * 4];
+            for y in 0..next_width {
+                for x in 0..next_width {
+                    for c in 0..4 {
+                        let a = previous[(y * 2 * width + x * 2) * 4 + c] as f32 / 255.;
+                        let b = previous[(y * 2 * width + x * 2 + 1) * 4 + c] as f32 / 255.;
+                        let d = previous[((y * 2 + 1) * width + x * 2) * 4 + c] as f32 / 255.;
+                        let e = previous[((y * 2 + 1) * width + x * 2 + 1) * 4 + c] as f32 / 255.;
+                        next[(y * next_width + x) * 4 + c] = (((a + b + d + e) * 0.25) * 255.)
+                            .round_ties_even()
+                            .clamp(0., 255.)
+                            as u8;
+                    }
+                }
+            }
+            queue.write_texture(
+                wgpu::TexelCopyTextureInfo {
+                    texture,
+                    mip_level: level,
+                    origin: wgpu::Origin3d::ZERO,
+                    aspect: wgpu::TextureAspect::All,
+                },
+                &next,
+                wgpu::TexelCopyBufferLayout {
+                    offset: 0,
+                    bytes_per_row: Some(next_width as u32 * 4),
+                    rows_per_image: Some(next_width as u32),
+                },
+                wgpu::Extent3d {
+                    width: next_width as u32,
+                    height: next_width as u32,
+                    depth_or_array_layers: 1,
+                },
+            );
+            previous = std::borrow::Cow::Owned(next);
+            width = next_width;
+        }
+    }
+    pub fn new(device: &wgpu::Device, force_render: bool, separate_levels: bool) -> Self {
         let l = device.limits();
         let compute = !force_render
             && l.max_compute_workgroups_per_dimension >= 16
@@ -84,18 +139,41 @@ impl Mipmaps {
             let layout = p.get_bind_group_layout(0);
             (Pipeline::Render(p), layout)
         };
-        Self { pipeline, layout }
+        Self {
+            pipeline,
+            layout: Some(layout),
+            separate_levels,
+        }
     }
     pub fn destination_usage(&self) -> wgpu::TextureUsages {
+        if self.separate_levels {
+            wgpu::TextureUsages::empty()
+        } else {
+            self.target_usage()
+        }
+    }
+    fn target_usage(&self) -> wgpu::TextureUsages {
         match self.pipeline {
+            Pipeline::Cpu => wgpu::TextureUsages::empty(),
             Pipeline::Compute(_) => wgpu::TextureUsages::STORAGE_BINDING,
             Pipeline::Render(_) => wgpu::TextureUsages::RENDER_ATTACHMENT,
         }
     }
-    pub fn generate(&self, device: &wgpu::Device, queue: &wgpu::Queue, texture: &wgpu::Texture) {
+    pub fn generate(
+        &self,
+        device: &wgpu::Device,
+        queue: &wgpu::Queue,
+        texture: &wgpu::Texture,
+        rgba: &[u8],
+    ) {
+        if self.is_cpu() {
+            Self::generate_cpu(queue, texture, rgba);
+            return;
+        }
         let mut encoder = device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
             label: Some("bounded imagery mip upload"),
         });
+        let mut levels: Vec<wgpu::Texture> = Vec::new();
         for level in 1..texture.mip_level_count() {
             let view = |mip| {
                 texture.create_view(&wgpu::TextureViewDescriptor {
@@ -104,8 +182,37 @@ impl Mipmaps {
                     ..Default::default()
                 })
             };
-            let source = view(level - 1);
-            let destination = view(level);
+            // GLES texture views can alias base/max mip state. Single-level
+            // intermediates keep textureLoad(0) exact and avoid framebuffer feedback.
+            // Vulkan keeps the original direct-to-mip path with no extra copies.
+            let intermediate = self.separate_levels.then(|| {
+                device.create_texture(&wgpu::TextureDescriptor {
+                    label: Some("non-aliasing imagery mip"),
+                    size: wgpu::Extent3d {
+                        width: (texture.width() >> level).max(1),
+                        height: (texture.height() >> level).max(1),
+                        depth_or_array_layers: 1,
+                    },
+                    mip_level_count: 1,
+                    sample_count: 1,
+                    dimension: wgpu::TextureDimension::D2,
+                    format: wgpu::TextureFormat::Rgba8Unorm,
+                    usage: wgpu::TextureUsages::COPY_SRC
+                        | wgpu::TextureUsages::TEXTURE_BINDING
+                        | self.target_usage(),
+                    view_formats: &[],
+                })
+            });
+            let source = if let Some(previous) = levels.last() {
+                previous.create_view(&Default::default())
+            } else {
+                view(level - 1)
+            };
+            let destination = if let Some(target) = &intermediate {
+                target.create_view(&Default::default())
+            } else {
+                view(level)
+            };
             let mut entries = vec![wgpu::BindGroupEntry {
                 binding: 0,
                 resource: wgpu::BindingResource::TextureView(&source),
@@ -118,10 +225,11 @@ impl Mipmaps {
             }
             let bind = device.create_bind_group(&wgpu::BindGroupDescriptor {
                 label: None,
-                layout: &self.layout,
+                layout: self.layout.as_ref().expect("GPU mip layout"),
                 entries: &entries,
             });
             match &self.pipeline {
+                Pipeline::Cpu => unreachable!(),
                 Pipeline::Compute(pipeline) => {
                     let mut pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor {
                         label: Some("imagery mip level"),
@@ -153,6 +261,19 @@ impl Mipmaps {
                     pass.set_bind_group(0, &bind, &[]);
                     pass.draw(0..3, 0..1);
                 }
+            }
+            if let Some(target) = intermediate {
+                encoder.copy_texture_to_texture(
+                    target.as_image_copy(),
+                    wgpu::TexelCopyTextureInfo {
+                        texture,
+                        mip_level: level,
+                        origin: wgpu::Origin3d::ZERO,
+                        aspect: wgpu::TextureAspect::All,
+                    },
+                    target.size(),
+                );
+                levels.push(target);
             }
         }
         queue.submit([encoder.finish()]);

@@ -62,7 +62,7 @@ class ProofInstrumentation: Instrumentation() {
             runOnMainSync { first.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE }
             await("activity recreation") { ProofState.activity.get()?.let{it!==first}==true }
             await("rotated surface and packs") { ProofState.sixPacksRead && ProofState.activity.get()?.independentSourcesReady()==true && stats().let{it[0]==1&&it[1]>0&&it[2]==4} }
-            result.putString("nativeProof","PASS: Vulkan/wgpu independent geometry/image uploads and crop, exact terrain pick, six APK pack range decodes, surface destruction/recreation, rotated activity")
+            result.putString("nativeProof","PASS: native wgpu independent geometry/image uploads and crop, exact terrain pick, six APK pack range decodes, surface destruction/recreation, rotated activity")
             result.putString("scope","Synthetic flat height fixture; not real-terrain parity or phone performance")
             runOnMainSync { ProofState.activity.get()?.finish() }
             await("all native surfaces released") { stats()[0]==0 }

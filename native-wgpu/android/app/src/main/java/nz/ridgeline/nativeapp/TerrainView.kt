@@ -111,6 +111,11 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     fun upload(z:Int,x:Int,y:Int,heights:ByteBuffer,rgba:ByteBuffer){if(uploads.offer(GpuUploadQueue.Tile(GpuUploadQueue.Id(z,x,y),heights,rgba)))requestFrame()}
     fun uploadGeometry(z:Int,x:Int,y:Int,data:ByteBuffer){if(uploads.offer(GpuUploadQueue.Tile(GpuUploadQueue.Id(z,x,y),data,GpuUploadQueue.EMPTY,GpuUploadQueue.Kind.GEOMETRY)))requestFrame()}
     fun uploadImage(z:Int,x:Int,y:Int,data:ByteBuffer){if(uploads.offer(GpuUploadQueue.Tile(GpuUploadQueue.Id(z,x,y),GpuUploadQueue.EMPTY,data,GpuUploadQueue.Kind.IMAGE)))requestFrame()}
+    internal fun checkMipmapContent(callback:(IntArray?)->Unit){gpu.post{
+        val output=ByteBuffer.allocateDirect(108).order(ByteOrder.LITTLE_ENDIAN)
+        val result=if(live&&handle!=0L&&NativeBridge.mipmapProof(handle,output))IntArray(27){output.int}else null
+        post{callback(result)}
+    }}
     fun pick(x:Double,y:Double,callback:(DoubleArray?)->Unit) {
         gpu.post {
             val output=ByteBuffer.allocateDirect(24).order(ByteOrder.LITTLE_ENDIAN)

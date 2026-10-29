@@ -95,7 +95,7 @@ host where adb's default home is read-only; it is never included in the APK.
 ## Open acceptance gates
 
 The current published environment permits genuine LINZ DEM/imagery requests;
-host GPU rendering/picking and same-LOD edges pass. Android live integration and
+host GPU rendering/picking and same-LOD edges pass. Android30 production-loader integration and terrain picking pass;
 cross-LOD/visual parity still need verification. Terrain collision/gesture anchoring/inertia, real LOD stitching/fades,
 lighting/fog checks, route/planner/profile migration, overlays/labels/settings,
 location/offline management and physical-phone benchmarks remain incomplete.
@@ -143,3 +143,38 @@ buffers against the pre-optimization algorithm and genuine LINZ pixels against
 the previous GPU checkpoint. All25Android tests and19Rust tests pass; no device
 speedup is inferred. Details/hashes: validation/quality-work/. Latest local APK:
 `artifacts/Ridgeline-Native-Quality-Work-Debug.apk`. Live Android/visual gates remain open.
+
+
+## Latest Android compatibility checkpoint
+
+Android30ATD software-emulator runs now pass controlled lifecycle/rotation,
+SQLite/GPX, genuine production loading/picking, and exact nine-level mip readback.
+See `validation/android30/`. This supersedes earlier installation-blocker notes;
+real-view/reference visual acceptance and phone performance remain open.
+The latest normal local artifact is
+`artifacts/Ridgeline-Native-Validated-Mips-Debug.apk` (SHA in the validation audit).
+All three optimized ABIs and all six unchanged original ZIPs are included.
+
+The renderer attempts one native graphics backend at a time. GLES initialization
+checks actual mip pixels once; broken GPU mip generation switches to a validated
+CPU chain with unchanged original256pxlevel0, all9levels and existing filtering.
+Working adapters retain GPU mip generation. This check is never in the frame loop.
+Explicit device content regression:
+
+```sh
+adb shell am instrument -w nz.ridgeline.nativeapp/.MipmapProofInstrumentation
+```
+
+For managed HTTPS proxy tests only, set `RIDGELINE_DEBUG_CA_PEM` to the configured
+public CA PEM when building a separate local test APK. Generated debug resources
+restrict that anchor to the three source domains; no CA is stored in source and
+TLS/hostname verification stays enabled. Unset the variable and rebuild to obtain
+the normal system-trust APK. Verify no `res/raw/ridgeline_session_ca.crt` is present.
+Release does not use this debug configuration. Do not distribute the local trust
+profile as the normal artifact.
+
+Official adb works with writable `ANDROID_USER_HOME`; this session used
+`adb -P 5038 connect 127.0.0.1:5555` and
+`adb -P 5038 -s 127.0.0.1:5555 install --no-streaming -r APK`.
+Large streaming installs stalled in the minimal helper, so use official adb for
+APK transfer. The minimal transport remains a read-only diagnostic alternative.

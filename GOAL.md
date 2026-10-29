@@ -50,12 +50,15 @@ explicitly requested, with licensing/attribution preserved.
 
 ## Current proof status
 
-M1 audit is recorded in native-wgpu/research/AUDIT-018.md. M2 has real Android
-wgpu imagery rendering and six-pack reads on a controlled synthetic height fixture,
-plus reference camera/geometry tests. Genuine LINZ DEM/aerial host GPU execution and same-LOD shared edges now pass
-(see validation/live-linz). Android live loading, cross-LOD stitching and terrain
-visual parity remain unverified; M2 remains open. No later
-feature or release milestone is complete.
+M1 audit is recorded in native-wgpu/research/AUDIT-018.md. M2 has genuine
+LINZ host GPU execution, same-LOD shared edges, and Android30 production-loader
+integration with rendered-terrain picking. Controlled Android lifecycle, rotation,
+six-pack reads and SQLite/GPX checks pass. Device readback exposed transparent
+GLES mip levels; a startup-validated fallback now passes all nine levels without
+reducing level0 or detail. Local provider tests use a separate debug-only managed
+proxy trust profile; normal APKs contain no session CA. Real-view visual capture,
+cross-LOD stitching, reference appearance and interaction acceptance remain open.
+M2 remains open; no later feature or release milestone is complete.
 
 ## Resume
 

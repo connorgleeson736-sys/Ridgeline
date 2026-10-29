@@ -609,3 +609,59 @@ available. Forced-render and compute host GPU suites pass; genuine oblique RGB
 captures match between both mipmap backends. Latest APK rebuild/reinstall and
 controlled/live instrumentation reruns are in progress; do not infer AndroidGPU
 or live-source success yet. Results will be appended after commands finish.
+
+## Android30 native presentation, genuine loading and mip-content diagnosis
+
+Continued after7b35071. A clean API30ATD software emulator now supports installation
+and actual platform checks. Native surface ownership was the next blocker:
+initializing Vulkan and GLES together connected the same Android buffer queue
+more than once. Single-backend attempts, an explicit Android display handle and
+scoped surface-configuration validation now allow GLES presentation. Failed API
+state drops before fallback; the working API is preferred on surface recreation.
+No phone benchmark is implied by software-emulator results.
+
+Controlled instrumentation passes native imagery/geometry pools, terrain pick,
+six original ZIP reads, surface destruction/recreation and rotation, with zero
+remaining native surfaces. Platform SQLite/GPX integration passes. Genuine
+LiveProofInstrumentation passes production TileLoader source residency and actual
+terrain pick170.14190780126034,-43.595099224916105,3688.406470926.
+These tests do not require or establish cross-LOD/visual/gesture parity.
+
+Provider transport was TLS trust, not authorization: the managed proxy public CA
+verifies LINZ on the host, while the clean emulator lacked that anchor. Optional
+RIDGELINE_DEBUG_CA_PEM now generates debug-only network security resources for
+exactly LINZ basemaps, Esri imagery and S3, retaining TLS/hostname checks. No CA is
+committed. Normal build has system anchors only; separate local test APK includes
+the managed public CA. Audit confirms625assets/native-library entries identical
+between profiles and no session anchor in the normal APK. Release is unaffected.
+
+The first genuine Android capture had large grey gaps. Host GPU smoke alone did
+not catch the cause: an opt-in device mip readback found original level0correct,
+but all8derived levels fully transparent. Cached JPEG/WebP source bodies were all
+opaque. A failing GLES adapter now switches to CPU-generated complete mip chains
+only after an actual startup readback fails; the fallback must pass that same
+readback or initialization fails. Healthy GPU paths remain GPU-generated. Original
+256pxRGBA level0is untouched, all9levels/filtering/geometry retained. This is a
+compatibility correction, not a claim of reduced CPU work or phone speedup.
+Readback occurs on GLES initialization or explicit diagnostics, never each frame.
+
+Latest Android MipmapProofInstrumentation passes every pixel/all9levels with
+minimum alpha255. Controlled and live integration both pass again afterward.
+Host Vulkan/GLES CPU fallback suites pass exact checker, grade/crop/coverage,
+mixed-LOD skirts and forced24byteindexpressure. Genuine host CPU/GPU mip capture
+comparison differs in3RGBbytes by at most1step; do not call it pixel-identical.
+All22Rust tests and25Android tests pass; lint/build and all3optimizedABIs succeed.
+Normal frozen artifact: artifacts/Ridgeline-Native-Validated-Mips-Debug.apk,
+SHA2568ad58495bd9a40c4ba1c4decf714419a907f36e432963dc8c69e3fb20c7bdd7b.
+Evidence in native-wgpu/validation/android30, including the original mip failure.
+
+A fresh standalone real-view capture now shows continuous mountain imagery where
+large grey triangular gaps appeared before. Before/after PNGs and capture scope
+are saved in validation/android30. This is qualitative native-before/after evidence
+with unsynchronized residency, not reference pixel parity. The successful
+integration assertion is not a visual-hole regression test. Do not mark M2/M3
+complete until genuine settled terrain/LOD captures and same-camera0.18comparison
+are accepted. Full native UI remains incomplete and gated on renderer proof.
+Capacitor/android/public and all6originalZIPs remain unchanged. Overall estimate
+remains approximately25percent of the complete app. Next: finish real-view capture,
+check remaining gaps, then exact reference camera/terrain/fog/gesture comparison.
