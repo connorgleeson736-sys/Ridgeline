@@ -641,3 +641,125 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_mipmapPro
         _ => 0,
     }
 }
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_routes(
+    env: *mut jni::sys::JNIEnv,
+    _class: jni::sys::jclass,
+    handle: i64,
+    input: jni::sys::jobject,
+) -> u8 {
+    let mut env = unsafe { jni::EnvUnowned::from_raw(env) };
+    match env
+        .with_env(|env| -> Result<u8, jni::errors::Error> {
+            let input = unsafe { jni::objects::JByteBuffer::from_raw(env, input) };
+            let size = env.get_direct_buffer_capacity(&input)?;
+            if !(4..=1_601_000).contains(&size) {
+                return Ok(0);
+            }
+            let bytes =
+                unsafe { std::slice::from_raw_parts(env.get_direct_buffer_address(&input)?, size) };
+            let mut offset = 4;
+            let count = u32::from_le_bytes(bytes[..4].try_into().unwrap()) as usize;
+            if count > 50 {
+                return Ok(0);
+            }
+            let mut paths = Vec::with_capacity(count);
+            let mut total = 0;
+            for _ in 0..count {
+                if offset + 12 > size {
+                    return Ok(0);
+                }
+                let count =
+                    u32::from_le_bytes(bytes[offset..offset + 4].try_into().unwrap()) as usize;
+                let color = u32::from_le_bytes(bytes[offset + 4..offset + 8].try_into().unwrap());
+                let selected =
+                    i32::from_le_bytes(bytes[offset + 8..offset + 12].try_into().unwrap());
+                offset += 12;
+                total += count;
+                if count > 2000 || total > 100000 || offset + count * 16 > size {
+                    return Ok(0);
+                }
+                let mut points = Vec::with_capacity(count);
+                for pair in bytes[offset..offset + count * 16].chunks_exact(16) {
+                    let lon = f64::from_le_bytes(pair[..8].try_into().unwrap());
+                    let lat = f64::from_le_bytes(pair[8..].try_into().unwrap());
+                    if !lon.is_finite()
+                        || !lat.is_finite()
+                        || !(165.0..=180.0).contains(&lon)
+                        || !(-49.0..=-33.0).contains(&lat)
+                    {
+                        return Ok(0);
+                    }
+                    points.push(mercator(lon, lat));
+                }
+                offset += count * 16;
+                paths.push(RoutePath {
+                    points,
+                    color: [
+                        ((color >> 16) & 255) as f32 / 255.,
+                        ((color >> 8) & 255) as f32 / 255.,
+                        (color & 255) as f32 / 255.,
+                        ((color >> 24) & 255) as f32 / 255.,
+                    ],
+                    selected: if selected >= 0 {
+                        Some(selected as usize)
+                    } else {
+                        None
+                    },
+                });
+            }
+            if offset != size {
+                return Ok(0);
+            }
+            let Ok(mut states) = states().lock() else {
+                return Ok(0);
+            };
+            let Some(state) = states.get_mut(&(handle as u64)) else {
+                return Ok(0);
+            };
+            state.renderer.set_routes(paths);
+            Ok(1)
+        })
+        .into_outcome()
+    {
+        jni::Outcome::Ok(v) => v,
+        _ => 0,
+    }
+}
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_waypoints(
+    env: *mut jni::sys::JNIEnv,
+    _class: jni::sys::jclass,
+    handle: i64,
+    output: jni::sys::jobject,
+) -> i32 {
+    let mut env = unsafe { jni::EnvUnowned::from_raw(env) };
+    match env
+        .with_env(|env| -> Result<i32, jni::errors::Error> {
+            let output = unsafe { jni::objects::JByteBuffer::from_raw(env, output) };
+            let size = env.get_direct_buffer_capacity(&output)?;
+            let Ok(states) = states().lock() else {
+                return Ok(0);
+            };
+            let Some(state) = states.get(&(handle as u64)) else {
+                return Ok(0);
+            };
+            let points = state.renderer.project_waypoints();
+            if points.len() * 12 > size {
+                return Ok(0);
+            }
+            let bytes = unsafe {
+                std::slice::from_raw_parts_mut(env.get_direct_buffer_address(&output)?, size)
+            };
+            for (slot, value) in bytes.chunks_exact_mut(4).zip(points.iter().flatten()) {
+                slot.copy_from_slice(&value.to_le_bytes());
+            }
+            Ok(points.len() as i32)
+        })
+        .into_outcome()
+    {
+        jni::Outcome::Ok(v) => v,
+        _ => 0,
+    }
+}

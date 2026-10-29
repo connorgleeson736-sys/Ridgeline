@@ -128,5 +128,13 @@ class RouteController(
             post{reset(points,"Combined route",null,false);opened.clear();dirty=true;emit(Change.OPENED);save(0)}
         }catch(e:Exception){post{busy=false;error=e.message?:"Routes could not be combined.";emit(Change.VIEW)}}}
     }}
-    override fun close(){closed=true;listeners.clear();io.shutdown()}
+    fun flush(){if(!closed)save(0)}
+    override fun close(){
+        if(closed)return
+        closed=true;listeners.clear();timer?.cancel(false)
+        val points=editor.points;val title=name;val key=id
+        val pending=dirty&&(points.isNotEmpty()||key!=null)
+        io.execute{try{if(pending)storage.save(key,title,points)}finally{(storage as? AutoCloseable)?.close()}}
+        io.shutdown()
+    }
 }

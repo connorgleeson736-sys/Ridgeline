@@ -71,6 +71,68 @@ impl Heightfield {
             h + (1. - fx) * (self.height(x, y + 1) - h) + (1. - fy) * (self.height(x + 1, y) - h)
         })
     }
+    /// Exact polyline draping: split at grid edges and triangle diagonals.
+    /// This visits crossed cells only and never resamples the full height field.
+    pub fn drape_segment(&self, a: [f64; 2], b: [f64; 2], clip: [f64; 4]) -> Vec<[f64; 3]> {
+        let d = [b[0] - a[0], b[1] - a[1]];
+        let mut lo = 0f64;
+        let mut hi = 1f64;
+        for axis in 0..2 {
+            if d[axis] == 0. {
+                if a[axis] < clip[axis] || a[axis] > clip[axis + 2] {
+                    return vec![];
+                }
+            } else {
+                let x = (clip[axis] - a[axis]) / d[axis];
+                let y = (clip[axis + 2] - a[axis]) / d[axis];
+                lo = lo.max(x.min(y));
+                hi = hi.min(x.max(y));
+            }
+        }
+        if hi <= lo {
+            return vec![];
+        }
+        let n = self.cells as f64;
+        let mut cuts = vec![lo, hi];
+        for axis in 0..2 {
+            if d[axis] != 0. {
+                let u = a[axis] + d[axis] * lo;
+                let v = a[axis] + d[axis] * hi;
+                let first = (u.min(v) * n).ceil().max(0.) as usize;
+                let last = (u.max(v) * n).floor().min(n) as usize;
+                for k in first..=last {
+                    let t = (k as f64 / n - a[axis]) / d[axis];
+                    if t > lo && t < hi {
+                        cuts.push(t);
+                    }
+                }
+            }
+        }
+        cuts.sort_by(f64::total_cmp);
+        cuts.dedup_by(|a, b| (*a - *b).abs() < 1e-12);
+        let mut diagonals = Vec::new();
+        let sum = d[0] + d[1];
+        if sum != 0. {
+            for pair in cuts.windows(2) {
+                let mid = (pair[0] + pair[1]) * 0.5;
+                let x = ((a[0] + d[0] * mid) * n).floor().clamp(0., n - 1.);
+                let y = ((a[1] + d[1] * mid) * n).floor().clamp(0., n - 1.);
+                let t = ((x + y + 1.) / n - a[0] - a[1]) / sum;
+                if t > pair[0] + 1e-12 && t < pair[1] - 1e-12 {
+                    diagonals.push(t);
+                }
+            }
+        }
+        cuts.extend(diagonals);
+        cuts.sort_by(f64::total_cmp);
+        cuts.into_iter()
+            .filter_map(|t| {
+                let u = (a[0] + d[0] * t).clamp(0., 1.);
+                let v = (a[1] + d[1] * t).clamp(0., 1.);
+                self.sample(u, v).map(|h| [u, v, h])
+            })
+            .collect()
+    }
     pub fn intersect(&self, ray: Ray) -> Option<Hit> {
         self.intersect_region(ray, [0., 0., 1., 1.])
     }
@@ -314,5 +376,25 @@ mod tests {
                 _ => panic!("ray {i}: {actual:?} vs {expected:?}"),
             }
         }
+    }
+}
+
+#[cfg(test)]
+#[test]
+fn draped_segments_follow_every_crossed_triangle_instead_of_cutting_through_ridges() {
+    let field = Heightfield::new(
+        2,
+        vec![0., 12., 0., 3., 28., 2., 0., 5., 0.].into_boxed_slice(),
+    )
+    .unwrap();
+    let points = field.drape_segment([-0.2, 0.13], [1.2, 0.91], [0., 0., 1., 1.]);
+    assert!(points.len() > 4);
+    assert!((points[0][0]).abs() < 1e-12);
+    assert!((points.last().unwrap()[0] - 1.).abs() < 1e-12);
+    for pair in points.windows(2) {
+        let u = (pair[0][0] + pair[1][0]) * 0.5;
+        let v = (pair[0][1] + pair[1][1]) * 0.5;
+        let h = (pair[0][2] + pair[1][2]) * 0.5;
+        assert!((field.sample(u, v).unwrap() - h).abs() < 1e-9);
     }
 }

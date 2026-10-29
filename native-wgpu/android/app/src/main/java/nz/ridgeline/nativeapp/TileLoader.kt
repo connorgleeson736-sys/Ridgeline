@@ -222,8 +222,26 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         }
         rgba.rewind(); return rgba
     }
+    private val profileJobs=Executors.newSingleThreadScheduledExecutor()
+    private var profileJob:Future<*>?=null
+    private val profileRevision=AtomicLong()
+    fun profile(points:List<Coordinate>,callback:(List<NativeGeo.ProfilePoint>)->Unit){
+        val revision=profileRevision.incrementAndGet();profileJob?.cancel(true)
+        val samples=NativeGeo.samples(points)
+        profileJob=profileJobs.schedule({
+            val result=ArrayList<NativeGeo.ProfilePoint>(samples.size)
+            for(p in samples){
+                if(dead||revision!=profileRevision.get()||Thread.currentThread().isInterrupted)return@schedule
+                val mx=(p.point.longitude+180)/360
+                val my=(1-asinh(tan(Math.toRadians(p.point.latitude)))/PI)/2
+                val height=try{DemSampling.point(14,mx,my){raw(Id(it.z,it.x,it.y))}?.toDouble()}catch(_:Exception){null}
+                result.add(p.copy(height=height))
+            }
+            view.post{if(!dead&&revision==profileRevision.get())callback(result)}
+        },350,TimeUnit.MILLISECONDS)
+    }
     fun close() {
-        dead = true; timer?.cancel(true); scheduler.shutdownNow(); workers.shutdownNow()
+        dead = true; profileRevision.incrementAndGet();profileJob?.cancel(true);profileJobs.shutdownNow();timer?.cancel(true); scheduler.shutdownNow(); workers.shutdownNow()
         client.dispatcher.cancelAll(); client.connectionPool.evictAll(); client.cache?.close(); client.dispatcher.executorService.shutdown(); synchronized(ready) { ready.clear(); readyBytes=0 }; synchronized(decoded) { decoded.clear() }
     }
 }

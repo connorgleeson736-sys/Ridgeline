@@ -5,6 +5,8 @@ use std::collections::{HashMap, HashSet};
 use wgpu::util::DeviceExt;
 mod diagnostics;
 mod mipmaps;
+mod routes;
+pub use routes::RoutePath;
 pub mod selection;
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum MipmapMode {
@@ -59,6 +61,11 @@ pub struct Renderer {
     depth: wgpu::Texture,
     width: u32,
     height: u32,
+    route_gpu: routes::RouteGpu,
+    route_paths: Vec<RoutePath>,
+    route_dirty: bool,
+    route_anchor: [f64; 2],
+    route_waypoints: Vec<Option<[f64; 3]>>,
     pub frames: u64,
     pub drawn_triangles: u32,
     pub drawn_surface_triangles: u32,
@@ -252,6 +259,7 @@ impl Renderer {
             mapped_at_creation: false,
         });
         let depth = Self::depth(&device, width, height);
+        let route_gpu = routes::RouteGpu::new(&device, format);
         let mut renderer = Self {
             device,
             queue,
@@ -277,6 +285,11 @@ impl Renderer {
             depth,
             width,
             height,
+            route_gpu,
+            route_paths: vec![],
+            route_dirty: true,
+            route_anchor: [0.5, 0.5],
+            route_waypoints: vec![],
             frames: 0,
             drawn_triangles: 0,
             drawn_surface_triangles: 0,
@@ -402,6 +415,7 @@ impl Renderer {
             },
         );
         self.trim_geometry();
+        self.route_dirty = true;
         self.cover_dirty = true;
         Ok(())
     }
@@ -564,6 +578,7 @@ impl Renderer {
                 })
                 .unwrap();
             self.tiles.remove(&victim);
+            self.route_dirty = true;
         }
     }
     fn trim_images(&mut self) {
@@ -756,6 +771,9 @@ impl Renderer {
             self.rebuild_cover();
             self.cover_dirty = false;
         }
+        if self.route_dirty {
+            self.rebuild_routes();
+        }
         let world = 512. * 2f64.powf(zoom);
         let (matrix, px_meter) = camera_matrix(
             self.width,
@@ -765,6 +783,24 @@ impl Renderer {
             bearing,
             pitch,
             elevation,
+        );
+        let route_view = selection::View {
+            width: self.width,
+            height: self.height,
+            center,
+            zoom,
+            bearing,
+            pitch,
+            elevation,
+        };
+        let route_scale = 2f64.powf(zoom - self.logical_zoom.unwrap_or(zoom)) as f32;
+        self.route_gpu.camera(
+            &self.queue,
+            matrix,
+            self.route_anchor,
+            &route_view,
+            px_meter,
+            route_scale,
         );
         let scene = Scene {
             matrix: matrix.to_cols_array(),
@@ -971,6 +1007,7 @@ impl Renderer {
                     pass.draw_indexed(0..(buffer.size() / 4) as u32, 0, 0..1);
                 }
             }
+            self.route_gpu.draw(&mut pass);
         }
         self.queue.submit([encoder.finish()]);
         self.frames += 1;

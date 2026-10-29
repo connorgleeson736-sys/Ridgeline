@@ -802,3 +802,34 @@ native feature UI. No new Android runtime/visual-parity claim.
 Latest normal Base download now includes source4c0b942(parent DEM fix plus native
 map controls). Stable path:native-wgpu/checkpoints/Ridgeline-Native-Base.apk;
 checksum/build-scopeJSON adjacent. Six original ZIPs remain separate and intact.
+
+
+## Priority change and native planner integration
+
+User now explicitly prioritizes performance/full visual and data quality over exact
+0.18pixel matching, authorizes continued implementation to completion, and wants
+fewer repeated checks. GOAL.md records this; exact reference matching no longer
+blocks feature UI. Existing Capacitor/olderAndroid/public and6originalZIPs remain
+untouched; Base APKs remain the requested normal checkpoint format.
+
+Connected existing native route controller/SQLite/GPX backend to native planner:
+create/open/rename/delete, autosave/status, undo, point deletion, insertion near
+segments, long-press waypoint dragging with coalesced terrain picks, multiple
+shown routes, combine, fit, SAF GPX import/export and elevation profile. Profile
+jobs are debounced/cancelled, use real DEMs, leave missing data incomplete, and
+cache the chart path; no chart redraw loop on camera movement. Metadata-only lists
+still avoid decoding unused routes. Close flushes queued route edits before DB
+close; file/storage/network work stays off UI thread.
+
+New Rust/wgpu route overlay follows crossed heightfield cells and actual triangle
+diagonals, depth tests lines/waypoints against terrain, and rebases around one
+route origin. Geometry is retained across idle/camera motion; only camera uniforms
+change. Geometry/source refinement or route changes rebuild it. No GPU depth
+readback or terrain/imagery resolution reduction. Active waypoint projection is
+CPU matrix math for picking UI; drag requests coalesce and preview never saves.
+
+Focused checks: route/controller/GPX tests and Kotlin assembly pass; exact draping
+invariant and route GPU fixture pass (1024affected pixels; no geometry uploads on
+idle/pan), plus existing GPU smoke on the changed pipeline. All3Android JNI ABIs
+are rebuilding; Android UI/runtime execution is still pending. No finished-app,
+phone-speedup or complete feature-acceptance claim at this source checkpoint.

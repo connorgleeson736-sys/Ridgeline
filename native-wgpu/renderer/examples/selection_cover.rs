@@ -15,7 +15,9 @@ fn main() {
         pitch: 58.,
         elevation,
     };
-    println!("{{\"width\":320,\"height\":640,\"elevation\":{elevation},\"geometryBudget\":48,\"imageBudget\":96,");
+    println!(
+        "{{\"width\":320,\"height\":640,\"elevation\":{elevation},\"geometryBudget\":48,\"imageBudget\":96,"
+    );
     for (i, (name, budget, target, max_zoom)) in [
         ("geometry", 48, 431., 22),
         ("images", 96, 256. / 2f64.powf(0.25), 19),
@@ -28,7 +30,11 @@ fn main() {
             .iter()
             .map(|id| format!("[{}, {}, {}]", id.z, id.x, id.y))
             .collect();
-        println!("\"{name}\":[{}]{}", rows.join(","), if i == 0 { "," } else { "" });
+        println!(
+            "\"{name}\":[{}]{}",
+            rows.join(","),
+            if i == 0 { "," } else { "" }
+        );
     }
     println!("}}");
 }

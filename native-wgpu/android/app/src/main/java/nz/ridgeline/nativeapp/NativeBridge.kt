@@ -9,6 +9,8 @@ object NativeBridge {
  @JvmStatic external fun residency(handle:Long,output:ByteBuffer):Boolean
  @JvmStatic external fun pick(handle:Long,x:Double,y:Double,output:ByteBuffer):Boolean
  @JvmStatic external fun mipmapProof(handle:Long,output:ByteBuffer):Boolean
+ @JvmStatic external fun routes(handle:Long,input:ByteBuffer):Boolean
+ @JvmStatic external fun waypoints(handle:Long,output:ByteBuffer):Int
  @JvmStatic external fun stats(output:ByteBuffer):Int
  @JvmStatic external fun plan(width:Int,height:Int,longitude:Double,latitude:Double,zoom:Double,bearing:Float,pitch:Float,elevation:Float,budget:Int,target:Double,maxZoom:Int,output:ByteBuffer):Int
  @JvmStatic external fun tileBudget(handle:Long,tiles:Int)

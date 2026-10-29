@@ -15,6 +15,7 @@ import android.widget.TextView
 class MainActivity:Activity(){
     private lateinit var terrain:TerrainView
     private lateinit var loader:TileLoader
+    private lateinit var planner:PlannerUi
     private fun dp(value:Int)=(value*resources.displayMetrics.density+.5f).toInt()
     override fun onCreate(state:Bundle?){
         super.onCreate(state)
@@ -58,8 +59,10 @@ class MainActivity:Activity(){
         setContentView(root)
         loader=TileLoader(this,terrain)
         terrain.onCamera={loader.cameraChanged()};terrain.onData={loader.cameraChanged()}
+        planner=PlannerUi(this,root,terrain,loader)
     }
     override fun onResume(){super.onResume();if(::terrain.isInitialized)terrain.setActive(true)}
-    override fun onPause(){if(::terrain.isInitialized)terrain.setActive(false);super.onPause()}
-    override fun onDestroy(){if(::loader.isInitialized)loader.close();if(::terrain.isInitialized)terrain.close();super.onDestroy()}
+    override fun onActivityResult(request:Int,result:Int,data:android.content.Intent?){super.onActivityResult(request,result,data);if(::planner.isInitialized)planner.result(request,result,data)}
+    override fun onPause(){if(::planner.isInitialized)planner.pause();if(::terrain.isInitialized)terrain.setActive(false);super.onPause()}
+    override fun onDestroy(){if(::planner.isInitialized)planner.close();if(::loader.isInitialized)loader.close();if(::terrain.isInitialized)terrain.close();super.onDestroy()}
 }

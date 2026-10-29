@@ -35,6 +35,36 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     val centerElevation get()=cameraPose.elevation
     val pixelScale:Double get()=resources.displayMetrics.density.toDouble()
     val renderZoom:Double get()=zoom+ln(pixelScale)/ln(2.0)
+    var onMapTap:((Double,Double,Int)->Unit)?=null
+    var onWaypointDragStart:((Int)->Boolean)?=null
+    var onWaypointDrag:((Coordinate)->Unit)?=null
+    var onWaypointDragEnd:((Boolean)->Unit)?=null
+    @Volatile private var routePacket:ByteBuffer?=null
+    private var appliedRoutes:ByteBuffer?=null
+    private val projectedBytes=ByteBuffer.allocateDirect(2000*12).order(ByteOrder.LITTLE_ENDIAN)
+    @Volatile private var projected=FloatArray(0)
+    fun projectedWaypoints()=projected
+    fun routes(paths:List<Triple<List<Coordinate>,Int,Int>>){
+        val buffer=ByteBuffer.allocateDirect(4+paths.sumOf{12+it.first.size*16}).order(ByteOrder.LITTLE_ENDIAN)
+        buffer.putInt(paths.size)
+        for((points,color,selected)in paths){buffer.putInt(points.size);buffer.putInt(color);buffer.putInt(selected);for(p in points){buffer.putDouble(p.longitude);buffer.putDouble(p.latitude)}}
+        buffer.rewind();routePacket=buffer;requestFrame()
+    }
+    private fun nearestWaypoint(x:Double,y:Double):Int {
+        val points=projected;val radius=20*pixelScale;var best=radius*radius;var found=-1
+        for(i in 0 until points.size/3)if(points[i*3+2]>0){val dx=x-points[i*3];val dy=y-points[i*3+1];val d=dx*dx+dy*dy;if(d<best){best=d;found=i}}
+        return found
+    }
+    fun focus(points:List<Coordinate>){
+        if(points.isEmpty())return
+        val minLon=points.minOf{it.longitude};val maxLon=points.maxOf{it.longitude}
+        val minLat=points.minOf{it.latitude};val maxLat=points.maxOf{it.latitude}
+        val span=max((maxLon-minLon)/360,(asinh(tan(Math.toRadians(maxLat)))-asinh(tan(Math.toRadians(minLat))))/(2*PI))
+        val size=min(width/pixelScale,height/pixelScale)*.65
+        val z=if(span>0)ln(size/(512*span))/ln(2.0) else 15.0
+        cameraPose=cameraPose.copy(longitude=(minLon+maxLon)/2,latitude=(minLat+maxLat)/2,zoom=z.coerceIn(4.0,19.0),pitch=min(pitch,45f));changed()
+    }
+    fun goTo(point:Coordinate){cameraPose=cameraPose.copy(longitude=point.longitude,latitude=point.latitude);changed()}
     var onCamera:()->Unit={}
     var onData:()->Unit={}
     var onStatus:(String)->Unit={}
@@ -70,9 +100,14 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         };accepted=accepted||ok}
         if(rows.isNotEmpty())refreshResidency()
         if(accepted)post{onStatus("");onData()}
+        val packet=routePacket
+        if(packet!=null&&packet!==appliedRoutes&&NativeBridge.routes(handle,packet))appliedRoutes=packet
         val pose=cameraPose // One immutable snapshot, no mixed camera revisions.
         val shown=NativeBridge.render(handle,width,height,pose.longitude,pose.latitude,pose.zoom+ln(pixelScale)/ln(2.0),pose.zoom,pose.bearing,pose.pitch,pose.elevation)
-        if(shown){presentationFailures=0;presentedPose=pose}else {
+        if(shown){presentationFailures=0;presentedPose=pose
+            val count=NativeBridge.waypoints(handle,projectedBytes)
+            projectedBytes.rewind();projected=FloatArray(count*3){projectedBytes.float}
+        }else {
             presentationFailures++
             if(presentationFailures<=8)requestFrame(minOf(250L,16L shl presentationFailures)) else post{onStatus("GPU presentation unavailable")}
         }
@@ -92,7 +127,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             if(!live||generation.get()!=token)return@post
             val created=NativeBridge.create(surface,width,height)
             if(!live||generation.get()!=token){if(created!=0L)NativeBridge.destroy(created);return@post}
-            handle=created;presentationFailures=0
+            handle=created;appliedRoutes=null;presentationFailures=0
             if(handle!=0L){val am=context.getSystemService(android.app.ActivityManager::class.java);NativeBridge.tileBudget(handle,if(am.isLowRamDevice)32 else (am.memoryClass/2).coerceIn(64,128))}
             post{onStatus(if(created==0L)"Native GPU initialization failed"else "Loading terrain and imagery…")};requestFrame()
         }
@@ -144,8 +179,28 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             zoomBy(ln(detector.scaleFactor.toDouble())/ln(2.0));return true
         }
     })
+    private var draggingWaypoint=false
+    private var dragEpoch=0L
+    private var dragBusy=false
+    private var dragTarget:Triple<Double,Double,Boolean>?=null
+    private fun dragPick(x:Double,y:Double,finish:Boolean){
+        dragTarget=Triple(x,y,finish);drainDrag()
+    }
+    private fun drainDrag(){
+        if(dragBusy)return
+        val target=dragTarget?:return;dragTarget=null;dragBusy=true;val token=dragEpoch
+        pick(target.first,target.second){hit->
+            dragBusy=false
+            if(token==dragEpoch&&draggingWaypoint){
+                if(hit!=null)onWaypointDrag?.invoke(Coordinate(hit[0],hit[1]))
+                if(target.third&&dragTarget==null){draggingWaypoint=false;onWaypointDragEnd?.invoke(true)}else drainDrag()
+            }
+        }
+    }
     private val gestures=GestureDetector(context,object:GestureDetector.SimpleOnGestureListener(){
         override fun onDown(e:MotionEvent)=true
+        override fun onSingleTapConfirmed(e:MotionEvent):Boolean {onMapTap?.invoke(e.x.toDouble(),e.y.toDouble(),nearestWaypoint(e.x.toDouble(),e.y.toDouble()));return true}
+        override fun onLongPress(e:MotionEvent){val index=nearestWaypoint(e.x.toDouble(),e.y.toDouble());if(index>=0&&onWaypointDragStart?.invoke(index)==true){dragEpoch++;draggingWaypoint=true;performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)}}
         override fun onDoubleTap(e:MotionEvent):Boolean{zoomBy(1.0);return true}
         override fun onScroll(a:MotionEvent?,b:MotionEvent,dx:Float,dy:Float):Boolean {
             if(b.pointerCount!=1||scaler.isInProgress)return true
@@ -158,6 +213,10 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     private var lastAngle=0.0
     private var lastY=0f
     override fun onTouchEvent(event:MotionEvent):Boolean {
+        if(draggingWaypoint){
+            if(event.actionMasked==MotionEvent.ACTION_CANCEL||event.pointerCount>1){dragEpoch++;draggingWaypoint=false;dragTarget=null;onWaypointDragEnd?.invoke(false)}
+            else {if(event.actionMasked==MotionEvent.ACTION_MOVE||event.actionMasked==MotionEvent.ACTION_UP)dragPick(event.x.toDouble(),event.y.toDouble(),event.actionMasked==MotionEvent.ACTION_UP);return true}
+        }
         scaler.onTouchEvent(event);gestures.onTouchEvent(event)
         if(event.pointerCount==2){
             val angle=atan2((event.getY(1)-event.getY(0)).toDouble(),(event.getX(1)-event.getX(0)).toDouble());val y=(event.getY(0)+event.getY(1))/2

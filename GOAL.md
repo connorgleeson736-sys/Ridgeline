@@ -2,6 +2,14 @@
 
 Status: IN PROGRESS. Do not label a prototype as the complete app.
 
+## Current user priorities
+
+User explicitly prioritizes speed/performance and full visual/data quality over
+exactly copying0.18.0. Deliver usable native features now; exact pixel/LOD matching
+is diagnostic, not a gate blocking UI migration. Keep checks targeted, preserve
+original imagery/terrain resolution and all6sourceZIPs, and publish small Base
+APK checkpoints without bundled large imagery packs. Keep Capacitor intact.
+
 ## Authoritative reference
 
 Capacitor 0.18.0 source d880143418ac46ece98adff0b3b2fbaedf044d46;
