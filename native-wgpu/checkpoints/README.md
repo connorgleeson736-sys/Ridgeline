@@ -1,12 +1,21 @@
 # Native Android checkpoints — incomplete prototypes
 
 Latest smaller build: [Ridgeline-Native-Base.apk](Ridgeline-Native-Base.apk).
-Source checkpoint `4c0b942`; signed debug APK, approximately32MB, all three ABIs.
-Includes corrected parent-DEM ownership, zoom/north-up buttons and native source
-attribution. Omits the six large overview ZIPs; retains67coarse overview images
-and full-resolution online sources. Detailed imagery and DEM require network.
-Six affected DEM tests and assembly pass; new Android visual/runtime acceptance
-is pending. No session CA is included. Checksum and build scope are alongside it.
+Source checkpoint `3d29322`; signed debug Base APK, all three ABIs.
+Includes corrected terrain-anchored pan/pinch direction, held/eased center height,
+current-view HLOD ownership, close-up full-source detail selection and prioritized
+progressive loading. Also includes the saved native planner/offline/location work.
+Omits the six large overview ZIPs; retains67coarse overview images and original
+full-resolution online sources. Detailed imagery and DEM require network or
+saved regions. All six original ZIPs and older Full checkpoint remain available.
+
+Focused input/selection/demand checks pass. Actual Android controlled pitched drag
+and immediate-release checks pass; GPU LOD reversal is pixel-identical for the
+same view. Highest LINZ aerial19/DEM18 inputs at default focus return200.
+Real-terrain visual acceptance, full transition smoothing and phone performance
+remain open. No session CA is included. Checksum/build scope are alongside it.
+See [evidence](../validation/gestures-loading/) and
+[MapLibre implementation study](../research/MAPLIBRE-GESTURES-HLOD.md).
 
 Earlier Base: [Ridgeline-Native-Base-a585548.apk](Ridgeline-Native-Base-a585548.apk).
 
@@ -28,11 +37,10 @@ integration used a separate local debug trust profile with identical native
 libraries/assets. Before/after captures and exact scope are in
 [validation/android30](../validation/android30/).
 
-This remains approximately25percent of the complete migration. Reference visual
-parity, real cross-LOD transitions, complete camera interactions, native planning
-UI/features and physical-phone performance are not accepted. This APK exposes
-the terrain prototype, not the completed app. See [GOAL.md](../../GOAL.md) and
-[NATIVE_PROGRESS.md](../../NATIVE_PROGRESS.md) for outstanding work.
+The native migration remains incomplete. Real cross-LOD transitions, remaining
+camera/UI features and physical-phone performance are not accepted. The latest
+Base includes more native features than the older Full artifact. See
+[GOAL.md](../../GOAL.md) and [NATIVE_PROGRESS.md](../../NATIVE_PROGRESS.md).
 
 The APK is stored with Git LFS. Its checksum is in the adjacent `.sha256` file.
 No debug keystore or session certificate is committed.

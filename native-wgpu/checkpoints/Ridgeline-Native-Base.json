@@ -1,8 +1,8 @@
 {
-  "sourceCheckpoint": "4c0b942",
+  "sourceCheckpoint": "3d293224f26a51eb05f616bb27c591f3df724647",
   "apk": "Ridgeline-Native-Base.apk",
-  "bytes": 31435569,
-  "sha256": "8356fd3956566aca3efd189194222a9cdd1409b15ccd17cff1dc33dcc5a616f6",
+  "bytes": 31536089,
+  "sha256": "099694243028e7b9dbb2781ec9175a8a2b30572f538c34a3ce31a6c08d4cdda5",
   "largeOverviewPacks": 0,
   "coarseImageryFiles": 67,
   "abis": [
@@ -12,9 +12,12 @@
   ],
   "managedSessionCa": false,
   "changes": [
-    "Reference parent DEM ownership",
-    "Native zoom and north-up controls",
-    "Native LINZ and Esri attribution"
+    "Terrain-anchored pan and pinch with corrected direction",
+    "Held/eased camera elevation",
+    "Demand-owned HLOD eliminates cached-descendant ownership hysteresis",
+    "Distance/focus LOD restores maximum close-up source detail",
+    "Prioritized progressive loading, separate terrain and imagery workers, bounded retries",
+    "Native planner, GPU routes, profiles, offline regions and one-shot location checkpoint"
   ],
-  "validation": "Six affected DEM sampling tests pass; assembly and signature pass. New Android runtime and visual acceptance remain pending."
+  "validation": "Focused gesture, demand and selection tests pass. Native Android controlled drag and immediate release pass; GPU ownership replay passes. Genuine highest LINZ source bodies available at default focus. Signature and Base payload verified. Real-terrain visual acceptance, full transitions and phone performance remain open."
 }
