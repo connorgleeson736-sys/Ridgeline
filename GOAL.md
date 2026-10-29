@@ -10,6 +10,13 @@ is diagnostic, not a gate blocking UI migration. Keep checks targeted, preserve
 original imagery/terrain resolution and all6sourceZIPs, and publish small Base
 APK checkpoints without bundled large imagery packs. Keep Capacitor intact.
 
+User confirmed the customRust/wgpu direction: match0.18MapLibre gesture/camera,
+caching andterrain behavior closely, but prioritize maximumperformance over exact
+internal structure. KeepDirectimagery/sharedterrain resources andeliminateunused
+work. User chose1GBadaptiveautomaticcache andimmediateimageryreplacement(nofades).
+Askexecutivequestions forvisiblebehavior/resourcepolicy; routineimplementation is
+autonomous. Preferfocusedchanged-pathchecks andinstallableAPKcheckpoints.
+
 ## Authoritative reference
 
 Capacitor 0.18.0 source d880143418ac46ece98adff0b3b2fbaedf044d46;

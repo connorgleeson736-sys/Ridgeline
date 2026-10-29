@@ -234,3 +234,18 @@ real loaded fallback coverage. Detail requests keep their slots, downloads have
 separate bounded terrain/imagery workers, and transient failures retry with backoff.
 Full mesh/image resolution, filtering, source ceilings and six source ZIPs remain
 unchanged. See [research and remaining transitions](research/MAPLIBRE-GESTURES-HLOD.md).
+
+
+## MapLibre 6.14 behavior with a focused terrain pipeline
+
+Latest implementation adds reference-style momentum, intentional pinch/rotation/
+tilt thresholds and directions, smooth zoom controls, eye/near-plane terrain
+clearance and grounding from actual rendered geometry. The terrain uses one shared
+full-detail grid with exact per-tile float heights. Automatic HTTP cache is up to
+1GB, adapted to free storage, with deduplicated body requests and retained GPU
+cache recency. User selected immediate imagery replacement; there is no fade loop.
+
+See [reference code, decisions and remaining differences](research/MAPLIBRE-614-ADAPTATION.md).
+This is an implementation checkpoint, not a phone-performance or full-MapLibre
+acceptance claim. Full source imagery/mesh detail, six original ZIPs and Capacitor
+remain preserved; normal downloadable APK stays the smaller Base variant.
