@@ -1,0 +1,6 @@
+/target/
+/android/local.properties
+/android/.gradle/
+/android/**/build/
+/android/app/src/main/jniLibs/
+/android/app/src/main/assets/overview-packs/

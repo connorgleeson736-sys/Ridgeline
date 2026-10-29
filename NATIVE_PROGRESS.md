@@ -22,3 +22,20 @@ Exact next step: fetch official wgpu current Cargo/example/docs and Android surf
 lifecycle guidance; inspect Capacitor camera/terrain shaders/routing/native storage
 and existing Compose planner; write concrete parity audit and architecture decision;
 install Rust/NDK and implement the smallest terrain/imagery proof.
+
+## Toolchain and initial pure core
+
+Installed Rust stable 1.99.1 with CARGO_HOME=/workspace/android-tools/cargo and
+RUSTUP_HOME=/workspace/android-tools/rustup. Android aarch64 target install started.
+Official source snapshots fetched using raw.githubusercontent.com; GitHub REST API
+is proxy-denied. Read research/DECISIONS.md for source URLs and provisional choices.
+Rust workspace started: core geographic/height encoding primitives and renderer
+crate pinned to wgpu 30.0.1. NDK 29.0.14206865 install started via SDK manager with
+Java proxy/CA flags. No GPU implementation, Android native migration build or
+parity validation exists yet. Cargo dependency resolution initially caught an
+incorrect ndk feature name; corrected to rwh_06/nativewindow before compilation.
+
+Running commands/logs: /tmp/ridge-native-core-test.log, /tmp/ridge-native-ndk-install.log,
+/tmp/ridge-native-rust-target.log. Exact next step: finish these commands, run core
+tests (fix any failures), then implement SurfaceView/JNI wgpu surface and textured
+DEM mesh prototype. Do not confuse the stub renderer module with working rendering.

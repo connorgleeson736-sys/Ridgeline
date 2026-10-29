@@ -1,0 +1,15 @@
+[package]
+name = "ridgeline-renderer"
+version = "0.1.0"
+edition = "2024"
+[lib]
+crate-type = ["cdylib", "rlib"]
+[dependencies]
+ridgeline-core = { path = "../core" }
+wgpu = { version = "=30.0.1", default-features = false, features = ["vulkan", "gles", "wgsl"] }
+glam = "=0.34.1"
+pollster = "=1.0.1"
+bytemuck = { version = "=1.25.2", features = ["derive"] }
+[target.'cfg(target_os = "android")'.dependencies]
+ndk = { version = "=0.9.0", features = ["rwh_06", "nativewindow"] }
+jni = "=0.22.4"
