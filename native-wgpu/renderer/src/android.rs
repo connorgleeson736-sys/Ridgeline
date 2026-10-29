@@ -207,3 +207,19 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_upload(
         _ => 0,
     }
 }
+
+#[unsafe(no_mangle)]
+pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_tileBudget(
+    _env: *mut c_void,
+    _class: *mut c_void,
+    handle: i64,
+    tiles: i32,
+) {
+    protect(|| {
+        if let Ok(mut states) = states().lock() {
+            if let Some(s) = states.get_mut(&(handle as u64)) {
+                s.renderer.set_tile_budget(tiles.max(0) as usize);
+            }
+        }
+    });
+}

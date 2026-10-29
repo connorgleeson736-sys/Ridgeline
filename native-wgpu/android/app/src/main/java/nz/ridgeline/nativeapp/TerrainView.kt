@@ -21,17 +21,31 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
  @Volatile var centerElevation=2500f; private set
  var onCamera:()->Unit={}
  var onStatus:(String)->Unit={}
+ private val uploads=GpuUploadQueue(96)
  private val queued=java.util.concurrent.atomic.AtomicBoolean(false)
- private val frame=object:Runnable {override fun run(){queued.set(false);if(live&&active&&handle!=0L)NativeBridge.render(handle,width,height,longitude,latitude,zoom,bearing,pitch,centerElevation)}}
- private fun requestFrame(){if(live&&active&&queued.compareAndSet(false,true))gpu.post(frame)}
+ private val frame=object:Runnable {override fun run(){
+  queued.set(false)
+  if(live&&active&&handle!=0L){
+   // At most two full native tiles (~650KiB input) per frame. Coalescing avoids
+   // an unbounded Handler backlog when the camera changes faster than upload.
+   for(tile in uploads.take(2))if(NativeBridge.upload(handle,tile.id.z,tile.id.x,tile.id.y,tile.heights,tile.rgba))post{onStatus("")}
+   NativeBridge.render(handle,width,height,longitude,latitude,zoom,bearing,pitch,centerElevation)
+   if(uploads.isNotEmpty())requestFrame()
+  }
+ }}
+ private fun requestFrame(){if(live&&active&&queued.compareAndSet(false,true))gpu.postDelayed(frame,16)}
  private fun changed(){requestFrame();onCamera()}
  init {holder.addCallback(this)}
- override fun surfaceCreated(holder:SurfaceHolder){live=true;gpu.post{handle=NativeBridge.create(holder.surface,width,height);post{onStatus(if(handle==0L)"Native GPU initialization failed" else "Loading terrain and imagery…")};requestFrame()};changed()}
+ override fun surfaceCreated(holder:SurfaceHolder){live=true;gpu.post{handle=NativeBridge.create(holder.surface,width,height)
+  if(handle!=0L){val am=context.getSystemService(android.app.ActivityManager::class.java);NativeBridge.tileBudget(handle,if(am.isLowRamDevice)32 else (am.memoryClass/2).coerceIn(64,128))}
+  post{onStatus(if(handle==0L)"Native GPU initialization failed" else "Loading terrain and imagery…")};requestFrame()};changed()}
  override fun surfaceChanged(holder:SurfaceHolder,format:Int,width:Int,height:Int){requestFrame()}
  override fun surfaceDestroyed(holder:SurfaceHolder){live=false;gpu.removeCallbacks(frame);queued.set(false);val done=CountDownLatch(1);gpu.post{if(handle!=0L)NativeBridge.destroy(handle);handle=0L;done.countDown()};done.await(5,TimeUnit.SECONDS)}
  fun setActive(value:Boolean){active=value;gpu.removeCallbacks(frame);queued.set(false);if(value&&live)requestFrame()}
- fun close(){active=false;live=false;gpu.removeCallbacks(frame);queued.set(false);gpu.post{if(handle!=0L)NativeBridge.destroy(handle);handle=0;thread.quitSafely()}}
- fun upload(z:Int,x:Int,y:Int,heights:ByteBuffer,rgba:ByteBuffer){gpu.post{if(handle!=0L&&NativeBridge.upload(handle,z,x,y,heights,rgba))post{onStatus("");requestFrame()}}}
+ fun close(){active=false;live=false;uploads.clear();gpu.removeCallbacks(frame);queued.set(false);gpu.post{if(handle!=0L)NativeBridge.destroy(handle);handle=0;thread.quitSafely()}}
+ fun upload(z:Int,x:Int,y:Int,heights:ByteBuffer,rgba:ByteBuffer){
+  uploads.offer(GpuUploadQueue.Tile(GpuUploadQueue.Id(z,x,y),heights,rgba));requestFrame()
+ }
  fun centerHeight(value:Float){centerElevation=value;requestFrame()}
  private val scaler=ScaleGestureDetector(context,object:ScaleGestureDetector.SimpleOnScaleGestureListener(){override fun onScale(detector:ScaleGestureDetector):Boolean{zoom=(zoom+ln(detector.scaleFactor.toDouble())/ln(2.0)).coerceIn(4.0,19.0);changed();return true}})
  private val gestures=GestureDetector(context,object:GestureDetector.SimpleOnGestureListener(){override fun onDown(e:MotionEvent)=true;override fun onDoubleTap(e:MotionEvent):Boolean{zoom=(zoom+1).coerceAtMost(19.0);changed();return true}

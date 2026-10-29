@@ -1,4 +1,6 @@
 //! Pure, host-testable geographic and terrain primitives. No Android or browser runtime.
+/// MapLibre altitude uses its mean Earth radius (6371008.8m), not EPSG:3857 radius.
+pub const ALTITUDE_CIRCUMFERENCE: f64 = 40030228.88407185;
 pub const EARTH_CIRCUMFERENCE: f64 = 40075016.68557849;
 pub fn mercator(lon: f64, lat: f64) -> [f64; 2] {
     let lat = lat.clamp(-85.0511287798066, 85.0511287798066).to_radians();

@@ -339,30 +339,22 @@ impl Renderer {
         elevation: f32,
     ) {
         let world = 512. * 2f64.powf(zoom);
-        let px_meter = (world
-            / ridgeline_core::EARTH_CIRCUMFERENCE
-            / (2. * std::f64::consts::PI * (center[1] - 0.5))
-                .cosh()
-                .recip()) as f32;
-        let distance = self.height as f32 * 1.5;
-        let b = bearing.to_radians();
-        let p = pitch.to_radians();
-        let at = Vec3::new(0., 0., elevation * px_meter);
-        let eye = at + Vec3::new(-b.sin() * p.sin(), -b.cos() * p.sin(), p.cos()) * distance;
-        let up = Vec3::new(-b.sin() * p.cos(), b.cos() * p.cos(), p.sin());
-        let matrix = perspective(
-            36.8698976f32.to_radians(),
-            self.width as f32 / self.height as f32,
-            self.height as f32 / 50.,
-            distance * 200.,
-        ) * look_at(eye, at, up);
+        let (matrix, px_meter) = camera_matrix(
+            self.width,
+            self.height,
+            center,
+            zoom,
+            bearing,
+            pitch,
+            elevation,
+        );
         self.queue.write_buffer(
             &self.scene,
             0,
             bytemuck::bytes_of(&Scene {
                 matrix: matrix.to_cols_array(),
                 grade: [0.058, 1., 0.25, 1. / 0.74],
-                metrics: [px_meter, 0., 0., 0.],
+                metrics: [px_meter, elevation, 0., 0.],
             }),
         );
         self.center = center;
@@ -448,6 +440,74 @@ impl Renderer {
         self.queue.submit([encoder.finish()]);
         self.frames += 1;
     }
+}
+
+/// MapLibre Mercator camera rebased around the center before Float32 conversion.
+/// Unpadded viewport, no roll. Padding/terrain collision/gesture parity remain open.
+pub fn camera_matrix(
+    width: u32,
+    height: u32,
+    center: [f64; 2],
+    zoom: f64,
+    bearing: f32,
+    pitch: f32,
+    elevation: f32,
+) -> (Mat4, f32) {
+    let world = 512. * 2f64.powf(zoom);
+    let px_meter = (world / ridgeline_core::ALTITUDE_CIRCUMFERENCE
+        * (2. * std::f64::consts::PI * (center[1] - 0.5)).cosh()) as f32;
+    let distance = height as f32 * 1.5;
+    let b = bearing.to_radians();
+    let p = pitch.to_radians();
+    let at = Vec3::ZERO;
+    let eye = at + Vec3::new(-b.sin() * p.sin(), -b.cos() * p.sin(), p.cos()) * distance;
+    let up = Vec3::new(b.sin() * p.cos(), b.cos() * p.cos(), p.sin());
+    (
+        perspective(
+            36.8698976f32.to_radians(),
+            width as f32 / height as f32,
+            height as f32 / 50.,
+            camera_depth_range(height, px_meter as f64, pitch as f64, elevation as f64, 0.).1
+                as f32,
+        ) * look_at(eye, at, up),
+        px_meter,
+    )
+}
+
+/// Official MapLibre unpadded/zero-roll near/far and horizon policy, including
+/// altitude and a conservative minimum terrain elevation. Pixel units.
+pub fn camera_depth_range(
+    height: u32,
+    px_meter: f64,
+    pitch: f64,
+    elevation: f64,
+    min_elevation: f64,
+) -> (f64, f64) {
+    let distance = height as f64 * 1.5;
+    let p = pitch.to_radians();
+    let cos = p.cos();
+    let camera_alt = elevation + distance * cos / px_meter;
+    let minimum = elevation.min(min_elevation).min(camera_alt - 100.);
+    let far_distance = (distance + elevation * px_meter / cos).max(distance / 2.);
+    let a = if minimum < 0. {
+        far_distance - minimum * px_meter / cos
+    } else {
+        far_distance
+    };
+    let half_fov = 36.86989764584402f64.to_radians() / 2.;
+    let length = |angle: f64| {
+        angle.sin() * a
+            / (std::f64::consts::FRAC_PI_2 - p - angle)
+                .clamp(0.01, std::f64::consts::PI - 0.01)
+                .sin()
+    };
+    let horizon = (std::f64::consts::FRAC_PI_2 - p).tan() * 0.85;
+    let horizon = horizon.min((89.25f64.to_radians() - p).tan());
+    let horizon_angle = horizon.atan().max(0.75f64.to_radians());
+    (
+        height as f64 / 50.,
+        (p.sin() * length(half_fov).min(length(horizon_angle)) + a) * 1.01,
+    )
 }
 
 fn perspective(fov: f32, aspect: f32, near: f32, far: f32) -> Mat4 {

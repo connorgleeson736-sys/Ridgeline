@@ -5,7 +5,7 @@ struct Scene { matrix: mat4x4<f32>, grade: vec4<f32>, metrics: vec4<f32> };
 struct Out { @builtin(position) position: vec4<f32>, @location(0) uv: vec2<f32>, @location(1) @interpolate(flat) clip: vec4<f32> };
 @vertex fn vs(@location(0) vertex: vec3<f32>, @location(1) tile: vec4<f32>, @location(2) clip: vec4<f32>) -> Out {
  var o:Out;
- o.position=scene.matrix*vec4<f32>(tile.x+vertex.x*tile.z,tile.y-vertex.y*tile.z,vertex.z*scene.metrics.x,1.);
+ o.position=scene.matrix*vec4<f32>(tile.x+vertex.x*tile.z,tile.y-vertex.y*tile.z,(vertex.z-scene.metrics.y)*scene.metrics.x,1.);
  o.uv=vertex.xy;o.clip=clip;return o;
 }
 @fragment fn fs(i:Out)->@location(0) vec4<f32>{

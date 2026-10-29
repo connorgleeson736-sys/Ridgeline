@@ -102,3 +102,30 @@ pending the previously requested environment draft publish.
 Exact next step: run GPU parent/fine coverage and memory-bound tests; rebuild both
 Android ABIs with the current library, package the verified imagery/reference data,
 run Android surface/lifecycle proof on the emulator, and audit reference camera.
+
+## Camera equivalence and bounded upload scheduling
+
+Generated camera fixtures directly from the authoritative bundled MapLibre engine:
+1,712 screen projections across NZ positions, zoom5/11.9/16/19, bearings, pitches
+and phone/landscape sizes. Native Rust passes with worst screen deviation
+0.00390625px. Near/far and horizon policy also match numerically (unpadded, zero
+roll, default minimum elevation). This exposed and fixed prototype camera-up sign
+and altitude scaling: MapLibre uses mean Earth circumference 40,030,228.88407185m,
+not the EPSG:3857 circumference. Rebase altitude as well as horizontal position
+before Float32 GPU transforms to keep close high-elevation views stable.
+
+This does NOT prove terrain collision, gesture anchor/inertia, padding/fitRoute,
+real DEM shape or visual parity. Those remain explicit acceptance items.
+
+Android GPU uploads now coalesce by tile identity, bound pending ownership and
+upload at most two complete tile payloads per frame. Device memory class sets
+GPU residency; paused apps stop frames. Added queue burst/dedup unit test (must
+rerun latest build). GPU smoke additionally verifies exact graded pixel, one fine
+child plus parent siblings without uncovered pixels and a 24-tile residency cap.
+
+Software Android emulator reached boot_completed=1 and package service is ready.
+Direct standard local ADB protocol tooling avoids changing read-only host HOME.
+First APK install before package service was ready failed with Broken pipe; retry
+with full x86_64 APK is running. System image had a system-server restart during
+slow software boot; these logs are not app crashes. Need actual app launch, GPU
+surface and lifecycle evidence before claiming emulator validation.
