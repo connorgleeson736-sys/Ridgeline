@@ -230,3 +230,47 @@ Exact next step: wait for current APK install while working independently, run
 inspect/fix failures; rebuild latest optimized ARM APK using new ZIP input and
 verify all tests/package/signature/alignment. Keep feature migration and M2 gates
 honest. Commit and push the separate native source branch for resumability.
+
+## Automated proof passed; independent route/profile backend migration
+
+Full x86_64 original-six-ZIP proof installed successfully. Platform Instrumentation
+passes native frame/pick, all6ZIPrange decodes, surface destroy/recreate, rotation,
+and remainingNativeSurfaces=0. Emulator log also shows VkDevice/VkInstance destruction.
+
+Replaced fixed16ms Handler scheduling with display Choreographer callbacks on the
+GPU owner Looper, retaining dirty-only rendering and two-upload budget. One immutable
+CameraPose snapshot now feeds a frame/selection; generation checks discard obsolete
+surface initialization, and resized surfaces request fresh viewport selection.
+The complete automated proof passed AGAIN after this scheduling change.
+
+Independent M4 backend work (not yet wired into app UI): NativeGeo matches100
+reference route/profile cases (lengths, distance locators, samples, missing-height
+statistics), including exact binary rounding boundaries. RouteEditor preserves
+append/insert limits,50undo snapshots, selected-point restoration and one snapshot
+per completed drag/cancel behavior. Native GPX handles current2MiB/2000point/NZ/
+single-track semantics, namespace alternatives, escaping and full coordinate precision.
+
+Added application-private SQLite route primitive: WAL/full-sync transactions,50
+records, stable IDs, original creation ordering, metadata-only list reads and one
+changed route write. Coordinates use lossless Float64 BLOBs (32,008bytes for2000
+points), avoiding whole-library JSON serialization and unused route decoding.
+Async autosave controller and native UI still need implementation; do not claim
+route feature migration complete based on these primitives.
+
+Host Android unit suite now12tests passes, including reference goldens, GPX,
+editor and binary storage tests; lint/build pass. Extended ACTUAL Android
+Instrumentation additionally passes exact Float64 SQLite save/load, edit/name
+ordering,50-record transaction rollback, close/reopen persistence and native GPX
+roundtrip. Saved result in validation/emulator-vsync-data-instrumentation.txt.
+Current installed test artifact is /workspace/native-artifacts/Ridgeline-Native-Vsync-Data-Proof-x86_64.apk.
+
+Native source branch was pushed successfully to origin/native-rust-wgpu atf3d828c
+before this backend checkpoint. Original preview branch/artifacts are unchanged.
+Network draft still pending user publication; async question remains open.
+
+Exact next step: implement/test the I/O autosave/session controller and native
+route overlay/UI against reference behavior while retaining explicit real-DEM/
+visual gates. Confirm network status when user replies, fetch actual LINZ DEM and
+same-camera reference captures, complete cross-LOD terrain/gesture parity. Rebuild
+latest ARM release-equivalent debug APK and verify literal6ZIPs/signature/alignment
+before final release. Current prototype remains feature-incomplete.

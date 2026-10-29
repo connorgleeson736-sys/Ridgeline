@@ -31,12 +31,12 @@ The packaging step validates the original ZIP hashes and their inner payloads ag
 native-wgpu/tools/build-android.sh
 ```
 
-The default builds an optimized ARM64 and ARMv7 native libraries inside a signed debuggable
+The default builds optimized ARM64 and ARMv7 native libraries inside a signed debuggable
 APK, bundling all six original overview ZIPs and their payloads (364,762,502 unchanged bytes).
 It bundles the six exact original ZIPs, checked against `overview-archives.json`.
 Their payloads are already STORED, so Android reads WebP byte ranges directly
-inside the ZIP assets. No extraction or duplicate .bin files are needed. All67
-coarse images, gap overlays and37Cook reference coordinates are also preserved.
+inside the ZIP assets. No extraction or duplicate .bin files are needed. All 67
+coarse images, gap overlays and 37 Cook reference coordinates are also preserved.
 Generated packs, libraries, build outputs and debug keystores are not committed.
 
 Output: `native-wgpu/artifacts/Ridgeline-Native-Prototype-Debug.apk` plus checksum.
@@ -81,7 +81,8 @@ adb shell am instrument -w nz.ridgeline.nativeapp/.ProofInstrumentation
 ```
 
 This checks native frames, six original ZIP range reads, exact terrain picking on
-the controlled flat fixture, surface release/recreation and activity rotation.
+the controlled flat fixture, surface release/recreation, activity rotation and
+native SQLite/GPX data behavior.
 It explicitly excludes real-terrain parity and physical-phone performance.
 
 `tools/emulator-adb.py` implements standard direct local ADB for the restricted

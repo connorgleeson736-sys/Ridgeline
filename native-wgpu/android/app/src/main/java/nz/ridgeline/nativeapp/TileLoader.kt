@@ -75,7 +75,8 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private fun loadView() {
         if (dead) return
         val output=planBuffer;output.rewind()
-        val count=NativeBridge.plan(view.width,view.height,view.longitude,view.latitude,view.renderZoom,view.bearing,view.pitch,view.centerElevation,readyLimit,output)
+        val pose=view.cameraPose
+        val count=NativeBridge.plan(view.width,view.height,pose.longitude,pose.latitude,pose.zoom+ln(view.pixelScale)/ln(2.0),pose.bearing,pose.pitch,pose.elevation,readyLimit,output)
         val leaves=List(count){Id(output.int,output.int,output.int)}
         val ranked=LinkedHashMap<Id,Int>()
         // Request useful real-data ancestors first. Off-screen ready data remains
