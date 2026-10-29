@@ -760,3 +760,27 @@ Base packaging follow-up: incremental Android packager retained deleted Full ZIP
 bodies as unreferenced bytes. Recreated only packageDebug state/output, producing
 a genuinely smaller Base archive; signature and actual file-size bound checked.
 Source/code/native libraries unchanged; no broad test rerun.
+
+
+## Reference geometry-to-DEM ownership correction
+
+Production terrain now implements exact0.18TerrainSourceCache deltaZoom=1:
+sourceZoom=clamp(geometryZoom-1,0,18). Geometry and camera ground queries use the
+same source mapping. Original256pxDEM inputs,129x129vertices, pixel-center halo,
+same-source nodata parents and source ceiling18 are retained. This removes the
+incorrect extra DEM source level relative to the reference; it does not globally
+cap terrain detail or change imagery. The generic old mesh sampler remains for
+unchanged bitwise compatibility regressions, separate from production ownership.
+
+Ran only6affected DemSampling tests and assembled the Base APK. Analytic full-buffer
+cases verify every vertex with parent source coordinates, adjacent geometry,
+source ceiling and overscaled geometry. Original frozen sampling regressions and
+captured genuine reference ground-pixel case still pass. No full Rust/emulator/
+lint cycle repeated for this data-policy correction. Android visual execution of
+the new policy remains pending; no new full-parity or phone-performance claim.
+
+Saved the existing selection diagnostic left uncommitted by the environment
+interruption. At320x640with explicit48/96budgets and reference camera height,
+heuristic native center geometry isz13versus referencez12. Ownership correction
+is complete, but exact LOD cover selection/transitions remain a separate blocker;
+do not tune down a target just to make one captured view match.

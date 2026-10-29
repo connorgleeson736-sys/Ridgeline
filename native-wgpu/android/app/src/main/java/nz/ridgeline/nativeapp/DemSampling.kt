@@ -6,6 +6,11 @@ import kotlin.math.*
 /** Exact original pixel-centre sampling, with no redundant interpolation at integer pixels. */
 object DemSampling {
     data class Raster(val id:GpuUploadQueue.Id,val samples:FloatArray)
+    /** Exact0.18TerrainSourceCache deltaZoom=1; original DEM ceiling stays18. */
+    fun terrainSourceZoom(geometryZoom:Int):Int {
+        require(geometryZoom in 0..22)
+        return (geometryZoom-1).coerceIn(0,18)
+    }
     fun sample(record:Raster,gx:Double,gy:Double,z:Int):Float {
         val scale=2.0.pow(z-record.id.z)
         val px=((gx+.5)/scale-.5-record.id.x*256).coerceIn(0.0,255.0)
@@ -33,8 +38,9 @@ object DemSampling {
         return (a*(1-fx)*(1-fy)+b*fx*(1-fy)+c*(1-fx)*fy+d*fx*fy).toFloat().takeIf{it.isFinite()}
     }
     /** Fetch only DEM tiles touched by the full-resolution mesh and its pixel-centre halo. */
-    fun footprint(z:Int,x:Int,y:Int):Set<GpuUploadQueue.Id> {
-        val dz=min(z,18);val factor=1 shl(z-dz);val n=1 shl dz
+    fun footprint(z:Int,x:Int,y:Int,sourceZoom:Int=min(z,18)):Set<GpuUploadQueue.Id> {
+        require(sourceZoom in 0..min(z,18))
+        val dz=sourceZoom;val factor=1 shl(z-dz);val n=1 shl dz
         fun lo(v:Int)=floor(v*256.0/factor-.5).toInt()
         fun hi(v:Int)=floor((v*256.0+256)/factor-.5).toInt()+1
         val ids=LinkedHashSet<GpuUploadQueue.Id>()
@@ -43,9 +49,15 @@ object DemSampling {
                 ids.add(GpuUploadQueue.Id(dz,Math.floorMod(tx,n),ty.coerceIn(0,n-1)))
         return ids
     }
-    fun mesh(z:Int,x:Int,y:Int,output:ByteBuffer,load:(GpuUploadQueue.Id)->Raster) {
-        val dz=min(z,18);val factor=1 shl(z-dz);val n=1 shl dz
-        val halo=footprint(z,x,y).associateWith(load)
+    /** Generic same-zoom sampler retained for compatibility/height-buffer regressions. */
+    fun mesh(z:Int,x:Int,y:Int,output:ByteBuffer,load:(GpuUploadQueue.Id)->Raster) =
+        meshAtSourceZoom(z,x,y,min(z,18),output,load)
+    /** Production terrain ownership matches the authoritative reference. */
+    fun terrainMesh(z:Int,x:Int,y:Int,output:ByteBuffer,load:(GpuUploadQueue.Id)->Raster) =
+        meshAtSourceZoom(z,x,y,terrainSourceZoom(z),output,load)
+    private fun meshAtSourceZoom(z:Int,x:Int,y:Int,dz:Int,output:ByteBuffer,load:(GpuUploadQueue.Id)->Raster) {
+        val factor=1 shl(z-dz);val n=1 shl dz
+        val halo=footprint(z,x,y,dz).associateWith(load)
         fun height(gx:Int,gy:Int):Float {
             val px=Math.floorMod(gx,n*256);val py=gy.coerceIn(0,n*256-1)
             val record=halo.getValue(GpuUploadQueue.Id(dz,px/256,py/256))

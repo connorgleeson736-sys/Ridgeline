@@ -168,3 +168,12 @@ not justification to reduce the original maximum source detail. Exported cover
 and center height: validation/reference-host/report.json. Native center-ground
 interpolation is tested independently; accepted multi-LOD ownership/camera
 comparison remains open.
+
+
+Parent DEM ownership is now ported in production through
+DemSampling.terrainSourceZoom/terrainMesh, with the same129x129vertices, original
+pixel-center halo sampling and source ceiling18. The earlier generic mesh sampler
+remains as a compatibility regression entry point; TileLoader uses terrainMesh.
+The native heuristic geometry cover still selects a finer center mesh than the
+reference in the representative default view. Exact multi-view LOD selection,
+transitions and full visual acceptance remain open.

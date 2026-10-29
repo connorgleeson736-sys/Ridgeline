@@ -144,7 +144,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         val mx=(pose.longitude+180)/360
         val my=(1-asinh(tan(Math.toRadians(pose.latitude)))/PI)/2
         val height=synchronized(decoded){
-            DemSampling.point(min(id.z,18),mx,my){decoded[Id(it.z,it.x,it.y)]}
+            DemSampling.point(DemSampling.terrainSourceZoom(id.z),mx,my){decoded[Id(it.z,it.x,it.y)]}
         }?:return
         view.post{if(!dead&&view.cameraPose==pose)view.centerHeight(height)}
     }
@@ -207,7 +207,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     }
     private fun loadGeometry(id: Id): ByteBuffer {
         val heights=ByteBuffer.allocateDirect(129*129*4).order(ByteOrder.LITTLE_ENDIAN)
-        DemSampling.mesh(id.z,id.x,id.y,heights){raw(Id(it.z,it.x,it.y))}
+        DemSampling.terrainMesh(id.z,id.x,id.y,heights){raw(Id(it.z,it.x,it.y))}
         return heights
     }
     private fun loadImage(id:Id):ByteBuffer {

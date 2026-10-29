@@ -108,6 +108,24 @@ class DemSamplingTest {
   pixels[y*256+x]=3651.2f;pixels[y*256+x+1]=3566.4f
   pixels[(y+1)*256+x]=3668f;pixels[(y+1)*256+x+1]=3589.6f
   val raster=LegacyDem(LegacyId(11,1991,1300),pixels)
-  assertEquals(3648.731912109524,DemSampling.point(11,mx,my){raster}!!.toDouble(),.001)
+  assertEquals(3648.731912109524,DemSampling.point(DemSampling.terrainSourceZoom(12),mx,my){raster}!!.toDouble(),.001)
+ }
+ @Test fun referenceTerrainOwnershipRetainsAllVerticesAndTheOriginalSourceCeiling(){
+  for(id in listOf(LegacyId(12,3983,2600),LegacyId(12,3984,2600),LegacyId(19,509800,332800),LegacyId(22,4078407,2662407))){
+   val dz=(id.z-1).coerceIn(0,18);assertEquals(dz,DemSampling.terrainSourceZoom(id.z))
+   val factor=1 shl(id.z-dz);val ax=id.x/factor;val ay=id.y/factor
+   val records=HashMap<LegacyId,LegacyDem>();val output=ByteBuffer.allocate(129*129*4).order(ByteOrder.LITTLE_ENDIAN)
+   DemSampling.terrainMesh(id.z,id.x,id.y,output){source->
+    assertEquals(dz,source.z)
+    records.getOrPut(source){LegacyDem(source,FloatArray(65536){i->1000f+(source.x*256+i%256-ax*256)*.125f+(source.y*256+i/256-ay*256)*.25f})}
+   }
+   for(y in 0..128)for(x in 0..128){
+    val px=(id.x*256.0+x*2)/factor-.5-ax*256
+    val py=(id.y*256.0+y*2)/factor-.5-ay*256
+    assertEquals((1000+px*.125+py*.25).toFloat(),output.float,0f)
+   }
+   assertFalse(output.hasRemaining())
+  }
+  assertEquals(0,DemSampling.terrainSourceZoom(0));assertEquals(0,DemSampling.terrainSourceZoom(1))
  }
 }
