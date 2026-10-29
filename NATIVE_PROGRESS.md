@@ -681,3 +681,27 @@ User explicitly requested a repository APK checkpoint before usage limits.
 Normal complete-data/all3ABI debug build is now in native-wgpu/checkpoints using
 GitLFS, with checksum and scope README. It contains no session trust anchor.
 Do not replace it with the separately generated local managed-proxy test APK.
+
+
+## Reproducible exact-APK reference capture on supported Chromium
+
+Refreshed android-preview-download:still39431dad/0.18Full, source d880143.
+The API30reference syntax error is exactly the packaged module's top-level await,
+unsupported by WebView83. Used unchanged APK assets on Chromium154instead, with
+explicitly reproduced local provider/range transport, system/proxy TLS verification
+and genuine original inputs. New tools/capture-reference.py checks the full APK
+hash, records served-body hashes and rejects unsettled/error runs. Production
+reference source/shaders and all quality settings stay unchanged. No Android
+reference success or full parity is inferred from this host result.
+
+Settled320x640camera:170.14219572,-43.5955671,zoom11.9,bearing-24,pitch58,
+pixelRatio1; loaded/tilesReadytrue, no script or provider failures. Reference
+clamps center elevation to3648.731912109524m. Native prototype still held3724m,
+a concrete camera discrepancy to resolve before pixel comparison. Canvas/fullUI
+captures and182body hashes are in validation/reference-host. Ground-centering
+correction and stronger live frame assertions are being implemented separately;
+this checkpoint only establishes the supported-host authoritative reference.
+
+Removed8superseded generated local APK copies to recover3.2GB. Latest normal,
+local trust test, committed checkpoint, authoritative reference APK, all6literal
+originalZIPs, source data and evidence remain intact.

@@ -178,3 +178,26 @@ Official adb works with writable `ANDROID_USER_HOME`; this session used
 `adb -P 5038 -s 127.0.0.1:5555 install --no-streaming -r APK`.
 Large streaming installs stalled in the minimal helper, so use official adb for
 APK transfer. The minimal transport remains a read-only diagnostic alternative.
+
+
+## Supported-host capture of the exact reference APK
+
+```sh
+python native-wgpu/tools/capture-reference.py /path/to/Ridgeline-3D-0.18.0-Performance-Full.apk /path/to/external-capture-output
+```
+
+Requires Python Playwright and current Chromium (`--chromium` overrides its path).
+The tool rejects any APK whose hash differs from the published0.18Fullbinary.
+It serves unchanged packaged assets and original overview byte ranges, reproduces
+only the native HTTP transport, and fetches genuine providers through inherited
+proxy/CA trust. No certificate checks are disabled and no source URLs/client keys
+are logged. Cached fixture bodies expire after6hours. Saved body hashes, exact
+camera/viewport, loading state, errors and transport failures accompany captures.
+Unsettled/error runs fail. The map canvas is read inside its render callback,
+without altering production shaders, quality policy or preserveDrawingBuffer.
+
+`validation/reference-host/` records a settled320x640default view with no script
+or transport errors. Reference center elevation is3648.731912109524m, clamped to
+terrain; the earlier native default held3724m. Host reference capture is now
+available; Android reference execution, matched native pixels and acceptance of
+real LOD/gesture/sky behavior remain separate open gates.
