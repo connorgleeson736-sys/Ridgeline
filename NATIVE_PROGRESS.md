@@ -412,3 +412,22 @@ building the whole UI around this renderer. Once network publishing recovers,
 validate live terrain seams/LOD/picking/colour, then prove draped native overlays
 and bind the already-tested route controller to native UI. Later milestones stay
 open in GOAL.md.
+
+Independent-source emulator follow-up: frozen x86 APK32561d59… installed; Android
+platform instrumentation PASSES with geometryz11/photosz12, exact center pick,
+sixZIPreads, surface destruction/recreation, rotatedActivity, SQLite/GPX checks;
+remainingNativeSurfaces=0. Result saved as independent-sources-android-instrumentation.txt.
+Universal debug APK with ARM64/ARMv7/x86_64 also assembled; packaging audit,
+APK v2 signature verification and zipalign16KiB pass. ARM code cross-built only,
+not executed on a physical phone. Remote checkpointb959bae pushed successfully.
+
+Corrected portrait capture now replaced with original-pack independent-source
+fixture. It remains explicitly labelled synthetic flat terrain; no visual parity
+inference. Prior Cook fixture capture is superseded, retained only in Git history.
+Remaining pipeline tuning: drop obsolete queued uploads promptly on demand changes
+and measure eviction/re-admission during gestures; hard count/byte budgets alone
+do not prove stable memory or prevent all reloads. Do not callM5complete.
+Corrected landscape capture replaced too; both reviewed to confirm original-pack
+photos and explicit synthetic-fixture label. These demonstrate functioning drawing,
+not seamless real-terrain/imagery-source transition acceptance. All tests and
+native sources are checkpointed; awaiting usable provider access forM2realDEMproof.
