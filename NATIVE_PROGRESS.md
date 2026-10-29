@@ -129,3 +129,51 @@ First APK install before package service was ready failed with Broken pipe; retr
 with full x86_64 APK is running. System image had a system-server restart during
 slow software boot; these logs are not app crashes. Need actual app launch, GPU
 surface and lifecycle evidence before claiming emulator validation.
+
+## Viewport selection, filtering and actual Android integration attempts
+
+Repository audit now durable in native-wgpu/research/AUDIT-018.md, including
+route/profile contracts, original JSON trace limits, exact source chain and
+remaining acceptance gates. Latest preview branch independently remains39431dad.
+Additional current official-source snapshots/hashes recorded in research/.
+
+Replaced temporary3×3 loader requests with native conservative viewport quadtree,
+bounded96-target test plans, prioritized refinement heap, actual parent requests
+and retained ready data. Phone density is included in the native projection;
+initial camera now uses exact Aoraki coordinates/elevation3724m. Plan tests verify
+center coverage and no ancestor overlap at multiple pitches/zooms. Unknown DEM
+extrema are conservatively0..4000m for visibility only; actual terrain is never
+synthesized. Real per-tile extrema, stitching and movement policy remain open.
+
+GPU cover recomputes once per changed residency batch; duplicate JNI uploads touch
+resident content without rebuilding height arrays. Image resources now close on
+all success/error paths. Dedicated priority workers, bounded streams and HTTP
+cache cleanup are present; combined peak memory still needs measured budgets.
+Added GPU9-level imagery mips and supported anisotropy; GPU checkerboard
+minification readback passes while full-resolution level0 remains unchanged.
+
+Rust optimized libraries compile for ARM64, ARMv7 and x86_64. Added reproducible
+build script, pinned/checksummed Gradle wrapper, overview ZIP extractor and APK
+verifier. Full x86_64 packaging verifies6unchanged packs/364,762,502bytes,
+5,277unique packed photo ranges (plus67coarse) and no web assets/WebView/Capacitor
+DEX references. This is packaging evidence, not feature completion.
+
+Emulator first boot took≈397s without KVM. Full debug fixture APK installed and
+activity launched, but the host emulator segfaulted in SwiftShader after logging
+unsupported WGSL debug OpSource metadata. Disabled optional InstanceFlags::DEBUG,
+retaining validation. Second boot≈210s; optimized APK installs successfully and
+ProofActivity launches (am start statusok). Vulkan device creation and first
+sync export are logged. Screenshot initially black; inspecting warm UI/capture
+before claiming surface success. Debug fixture is explicitly labeled synthetic
+flat heights/genuine Cook imagery; it never appears as live-source fallback.
+
+Cloud selection benchmark:500 warmed calls, median33.42µs/p9583.024µs with95–96
+leaves/96budget. This is isolated optimized cloud CPU selection only, not a phone
+speed estimate, full frame time, or a comparison with the trace's nested timings.
+
+Exact next step: finish optimized emulator fixture capture and six-pack range-read
+check; test surface recreation/background. If emulator rendering fails, diagnose
+native/backend compatibility with actual logs. Rebuild ARM optimized device APK
+with latest source (mips/selection/JNI changes), run all tests/lint/package checks,
+commit. Live DEM/visual acceptance still needs the pending network draft publish;
+then complete parity before migrating the full planner/UI. Do not stop at a plan.

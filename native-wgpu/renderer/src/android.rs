@@ -8,6 +8,21 @@ use std::{
         atomic::{AtomicU64, Ordering},
     },
 };
+#[link(name = "log")]
+unsafe extern "C" {
+    fn __android_log_write(
+        priority: i32,
+        tag: *const std::ffi::c_char,
+        text: *const std::ffi::c_char,
+    ) -> i32;
+}
+fn log(message: &str) {
+    if let Ok(text) = std::ffi::CString::new(message) {
+        unsafe {
+            __android_log_write(4, c"RidgelineNative".as_ptr(), text.as_ptr());
+        }
+    }
+}
 struct AndroidState {
     surface: wgpu::Surface<'static>,
     renderer: Renderer,
@@ -34,8 +49,12 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_create(
         let result = (|| -> Result<i64, String> {
             let window = unsafe { NativeWindow::from_surface(env.cast(), surface.cast()) }
                 .ok_or("No native window")?;
-            let instance =
-                wgpu::Instance::new(wgpu::InstanceDescriptor::new_without_display_handle());
+            let mut descriptor = wgpu::InstanceDescriptor::new_without_display_handle();
+            // Older Vulkan drivers (including emulator SwiftShader) reject the
+            // newly standardized WGSL OpSource debug-language enum. Source debug
+            // metadata is optional; retain API validation without emitting it.
+            descriptor.flags.remove(wgpu::InstanceFlags::DEBUG);
+            let instance = wgpu::Instance::new(descriptor);
             // SAFETY: AndroidState owns ANativeWindow until after Surface drops.
             let target = wgpu::SurfaceTargetUnsafe::RawHandle {
                 raw_display_handle: Some(raw_window_handle::AndroidDisplayHandle::new().into()),
@@ -80,7 +99,7 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_create(
         match result {
             Ok(id) => id,
             Err(e) => {
-                eprintln!("Ridgeline native initialization: {e}");
+                log(&format!("Initialization failed: {e}"));
                 0
             }
         }
@@ -173,6 +192,20 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_upload(
             {
                 return Ok(0);
             }
+            let Ok(mut states) = states().lock() else {
+                return Ok(0);
+            };
+            let Some(s) = states.get_mut(&(handle as u64)) else {
+                return Ok(0);
+            };
+            let id = TileId {
+                z: z as u8,
+                x: x as u32,
+                y: y as u32,
+            };
+            if s.renderer.touch(id) {
+                return Ok(1);
+            }
             let bytes = unsafe {
                 std::slice::from_raw_parts(env.get_direct_buffer_address(&heights)?, 129 * 129 * 4)
             };
@@ -183,23 +216,7 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_upload(
             let rgba = unsafe {
                 std::slice::from_raw_parts(env.get_direct_buffer_address(&rgba)?, 256 * 256 * 4)
             };
-            let Ok(mut states) = states().lock() else {
-                return Ok(0);
-            };
-            let Some(s) = states.get_mut(&(handle as u64)) else {
-                return Ok(0);
-            };
-            Ok(s.renderer
-                .upload(
-                    TileId {
-                        z: z as u8,
-                        x: x as u32,
-                        y: y as u32,
-                    },
-                    &heights,
-                    rgba,
-                )
-                .is_ok() as u8)
+            Ok(s.renderer.upload(id, &heights, rgba).is_ok() as u8)
         })
         .into_outcome()
     {
@@ -222,4 +239,74 @@ pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_tileBudget(
             }
         }
     });
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_plan(
+    env: *mut jni::sys::JNIEnv,
+    _class: jni::sys::jclass,
+    w: i32,
+    h: i32,
+    lon: f64,
+    lat: f64,
+    zoom: f64,
+    bearing: f32,
+    pitch: f32,
+    elevation: f32,
+    budget: i32,
+    output: jni::sys::jobject,
+) -> i32 {
+    let mut env = unsafe { jni::EnvUnowned::from_raw(env) };
+    match env
+        .with_env(|env| -> Result<i32, jni::errors::Error> {
+            if w < 1
+                || h < 1
+                || ![
+                    lon,
+                    lat,
+                    zoom,
+                    bearing as f64,
+                    pitch as f64,
+                    elevation as f64,
+                ]
+                .iter()
+                .all(|v| v.is_finite())
+            {
+                return Ok(0);
+            }
+            let output = unsafe { jni::objects::JByteBuffer::from_raw(env, output) };
+            let capacity = env.get_direct_buffer_capacity(&output)?;
+            let ids = crate::selection::plan(
+                &crate::selection::View {
+                    width: w as u32,
+                    height: h as u32,
+                    center: mercator(lon, lat),
+                    zoom,
+                    bearing,
+                    pitch,
+                    elevation,
+                },
+                budget.max(16) as usize,
+            );
+            if capacity < ids.len() * 12 {
+                return Ok(0);
+            }
+            let bytes = unsafe {
+                std::slice::from_raw_parts_mut(
+                    env.get_direct_buffer_address(&output)?,
+                    ids.len() * 12,
+                )
+            };
+            for (row, id) in bytes.chunks_exact_mut(12).zip(&ids) {
+                for (slot, n) in row.chunks_exact_mut(4).zip([id.z as u32, id.x, id.y]) {
+                    slot.copy_from_slice(&n.to_le_bytes());
+                }
+            }
+            Ok(ids.len() as i32)
+        })
+        .into_outcome()
+    {
+        jni::Outcome::Ok(result) => result,
+        _ => 0,
+    }
 }

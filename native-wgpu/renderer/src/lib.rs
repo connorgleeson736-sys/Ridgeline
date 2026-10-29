@@ -3,6 +3,8 @@ use glam::{Mat4, Vec3};
 pub use ridgeline_core::{TileId, mercator, terrain_rgb};
 use std::collections::HashMap;
 use wgpu::util::DeviceExt;
+mod mipmaps;
+pub mod selection;
 #[repr(C)]
 #[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]
 struct Scene {
@@ -30,6 +32,7 @@ pub struct Renderer {
     scene_bind: wgpu::BindGroup,
     texture_layout: wgpu::BindGroupLayout,
     sampler: wgpu::Sampler,
+    mipmaps: mipmaps::Mipmaps,
     indices: wgpu::Buffer,
     index_count: u32,
     instances: wgpu::Buffer,
@@ -39,6 +42,7 @@ pub struct Renderer {
     height: u32,
     pub frames: u64,
     cover: Vec<ridgeline_core::CoverRegion>,
+    cover_dirty: bool,
     instance_capacity: usize,
     budget: usize,
     clock: u64,
@@ -143,12 +147,23 @@ impl Renderer {
             }],
         });
         let texture_layout = pipeline.get_bind_group_layout(1);
+        let anisotropy = if adapter
+            .get_downlevel_capabilities()
+            .flags
+            .contains(wgpu::DownlevelFlags::ANISOTROPIC_FILTERING)
+        {
+            16
+        } else {
+            1
+        };
         let sampler = device.create_sampler(&wgpu::SamplerDescriptor {
+            anisotropy_clamp: anisotropy,
             mag_filter: wgpu::FilterMode::Linear,
             min_filter: wgpu::FilterMode::Linear,
             mipmap_filter: wgpu::MipmapFilterMode::Linear,
             ..Default::default()
         });
+        let mipmaps = mipmaps::Mipmaps::new(&device);
         let mut idx = Vec::<u32>::new();
         for y in 0..128 {
             for x in 0..128 {
@@ -177,6 +192,7 @@ impl Renderer {
             scene_bind,
             texture_layout,
             sampler,
+            mipmaps,
             indices,
             index_count: idx.len() as u32,
             instances,
@@ -186,6 +202,7 @@ impl Renderer {
             height,
             frames: 0,
             cover: Vec::new(),
+            cover_dirty: true,
             instance_capacity: 256,
             budget: 96,
             clock: 0,
@@ -213,6 +230,16 @@ impl Renderer {
         self.height = h.max(1);
         self.depth = Self::depth(&self.device, self.width, self.height);
     }
+    /// Touch immutable resident content without rebuilding JNI input or GPU data.
+    pub fn touch(&mut self, id: TileId) -> bool {
+        if let Some(tile) = self.tiles.get_mut(&id) {
+            self.clock += 1;
+            tile.used = self.clock;
+            true
+        } else {
+            false
+        }
+    }
     /// Proof input: height values sampled on the native 129x129 mesh, unmodified metres.
     pub fn upload(&mut self, id: TileId, heights: &[f32], rgba: &[u8]) -> Result<(), String> {
         if heights.len() != 129 * 129
@@ -221,11 +248,10 @@ impl Renderer {
         {
             return Err("Invalid terrain/image payload".into());
         }
-        self.clock += 1;
-        if let Some(tile) = self.tiles.get_mut(&id) {
-            tile.used = self.clock;
+        if self.touch(id) {
             return Ok(());
         }
+        self.clock += 1;
         let v: Vec<Vertex> = (0..129 * 129)
             .map(|i| Vertex {
                 position: [(i % 129) as f32 / 128., (i / 129) as f32 / 128., heights[i]],
@@ -245,11 +271,13 @@ impl Renderer {
                 height: 256,
                 depth_or_array_layers: 1,
             },
-            mip_level_count: 1,
+            mip_level_count: 9,
             sample_count: 1,
             dimension: wgpu::TextureDimension::D2,
             format: wgpu::TextureFormat::Rgba8Unorm,
-            usage: wgpu::TextureUsages::TEXTURE_BINDING | wgpu::TextureUsages::COPY_DST,
+            usage: wgpu::TextureUsages::TEXTURE_BINDING
+                | wgpu::TextureUsages::COPY_DST
+                | wgpu::TextureUsages::STORAGE_BINDING,
             view_formats: &[],
         });
         self.queue.write_texture(
@@ -266,6 +294,7 @@ impl Renderer {
                 depth_or_array_layers: 1,
             },
         );
+        self.mipmaps.generate(&self.device, &self.queue, &texture);
         let view = texture.create_view(&Default::default());
         let bind = self.device.create_bind_group(&wgpu::BindGroupDescriptor {
             label: None,
@@ -291,14 +320,14 @@ impl Renderer {
             },
         );
         self.trim();
-        self.rebuild_cover();
+        self.cover_dirty = true;
         Ok(())
     }
-    /// Budget includes geometry + RGBA image storage (~462KiB/tile), not depth/surface.
+    /// Budget includes geometry + RGBA image storage (~539KiB/tile with mipmaps), not depth/surface.
     pub fn set_tile_budget(&mut self, tiles: usize) {
         self.budget = tiles.clamp(24, 192);
         self.trim();
-        self.rebuild_cover();
+        self.cover_dirty = true;
     }
     pub fn resident_count(&self) -> usize {
         self.tiles.len()
@@ -338,6 +367,10 @@ impl Renderer {
         pitch: f32,
         elevation: f32,
     ) {
+        if self.cover_dirty {
+            self.rebuild_cover();
+            self.cover_dirty = false;
+        }
         let world = 512. * 2f64.powf(zoom);
         let (matrix, px_meter) = camera_matrix(
             self.width,

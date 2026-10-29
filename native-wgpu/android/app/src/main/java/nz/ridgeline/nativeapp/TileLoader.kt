@@ -41,6 +41,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private val demJobs = ConcurrentHashMap<Id, CompletableFuture<Dem>>()
     private val jobs = ConcurrentHashMap<Id, Task>()
     private val sequence = AtomicLong()
+    private val planBuffer=ByteBuffer.allocateDirect(512*12).order(ByteOrder.LITTLE_ENDIAN)
     @Volatile private var dead = false
     @Volatile private var wanted = emptySet<Id>()
     private var timer: ScheduledFuture<*>? = null
@@ -73,20 +74,14 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     }
     private fun loadView() {
         if (dead) return
-        val z = (ceil(view.zoom).toInt() + 1).coerceIn(5, 19)
-        val mx = (view.longitude + 180) / 360
-        val my = (1 - asinh(tan(Math.toRadians(view.latitude))) / PI) / 2
-        val cx = floor(mx * (1 shl z)).toInt(); val cy = floor(my * (1 shl z)).toInt()
-        val ranked = LinkedHashMap<Id, Int>()
-        // Ready ancestors provide real-data coverage while detailed descendants load.
-        for (level in min(8, z) until z) {
-            val n = 1 shl level
-            ranked[Id(level, floor(mx * n).toInt(), floor(my * n).toInt())] = level - 8
-        }
-        for (dy in -1..1) for (dx in -1..1) {
-            val id = Id(z, cx + dx, cy + dy)
-            if (id.x in 0 until (1 shl z) && id.y in 0 until (1 shl z)) ranked[id] = 20 + dx * dx + dy * dy
-        }
+        val output=planBuffer;output.rewind()
+        val count=NativeBridge.plan(view.width,view.height,view.longitude,view.latitude,view.renderZoom,view.bearing,view.pitch,view.centerElevation,readyLimit,output)
+        val leaves=List(count){Id(output.int,output.int,output.int)}
+        val ranked=LinkedHashMap<Id,Int>()
+        // Request useful real-data ancestors first. Off-screen ready data remains
+        // in bounded caches; only obsolete pending work loses its queue slot.
+        for(leaf in leaves){var parent=leaf;while(parent.z>min(8,leaf.z)){parent=parent.parent();ranked.putIfAbsent(parent,parent.z-8)}}
+        for((index,id)in leaves.withIndex())ranked[id]=20+index
         wanted = ranked.keys.toSet()
         for ((id, task) in jobs) if (id !in wanted && workers.remove(task)) jobs.remove(id, task)
         for ((id, priority) in ranked) {
@@ -196,6 +191,6 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     }
     fun close() {
         dead = true; timer?.cancel(true); scheduler.shutdownNow(); workers.shutdownNow()
-        client.dispatcher.cancelAll(); synchronized(ready) { ready.clear() }; synchronized(decoded) { decoded.clear() }
+        client.dispatcher.cancelAll(); client.connectionPool.evictAll(); client.cache?.close(); client.dispatcher.executorService.shutdown(); synchronized(ready) { ready.clear() }; synchronized(decoded) { decoded.clear() }
     }
 }

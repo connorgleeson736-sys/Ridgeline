@@ -120,6 +120,35 @@ async fn run() {
         bytes.chunks_exact(4).all(|p| p != [189, 203, 208, 255]),
         "no uncovered fallback pixels"
     );
+    // A minified 1px black/white checker must sample the generated pyramid,
+    // not uninitialized levels or shimmer between original individual pixels.
+    let checker: Vec<u8> = (0..256 * 256)
+        .flat_map(|i| {
+            let c = if (i % 256 + i / 256) % 2 == 0 { 0 } else { 255 };
+            [c, c, c, 255]
+        })
+        .collect();
+    let check_id = TileId {
+        z: 12,
+        x: parent.x + 1,
+        y: parent.y,
+    };
+    let b = check_id.bounds();
+    r.upload(check_id, &heights, &checker).unwrap();
+    r.render(
+        &output.create_view(&Default::default()),
+        [(b[0] + b[2]) / 2., (b[1] + b[3]) / 2.],
+        8.,
+        0.,
+        0.,
+        1000.,
+    );
+    let bytes = read(&r, &output);
+    assert_eq!(
+        &bytes[(128 * 256 + 128) * 4..][..4],
+        &[136, 136, 136, 255],
+        "minified checker mip average and reference grade"
+    );
     // The hard budget holds during a burst of unrelated new uploads.
     r.set_tile_budget(24);
     for x in 0..80 {
@@ -128,6 +157,6 @@ async fn run() {
         assert!(r.resident_count() <= 24);
     }
     println!(
-        "PASS GPU: exact grade, fine-child/coarse-parent ownership, no fallback holes, bounded 24-tile residency. Synthetic geometry; no phone benchmark or real-terrain parity claim."
+        "PASS GPU: exact grade, fine-child/coarse-parent ownership, no fallback holes, trilinear mipmap average, bounded 24-tile residency. Synthetic geometry; no phone benchmark or real-terrain parity claim."
     );
 }

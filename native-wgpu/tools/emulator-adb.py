@@ -52,6 +52,7 @@ class Emulator:
                 sys.stdout.buffer.write(data);self.send(b'OKAY',1,remote)
             elif cmd==b'CLSE':
                 self.send(b'CLSE',1,remote);break
+            elif cmd==b'OKAY': continue # An outstanding final write acknowledgement may arrive after stdin completes.
             else: raise RuntimeError('Unexpected ADB packet: '+str(cmd))
         self.socket.close()
 
