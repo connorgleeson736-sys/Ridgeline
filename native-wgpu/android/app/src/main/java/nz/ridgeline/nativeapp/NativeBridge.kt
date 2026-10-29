@@ -6,6 +6,7 @@ object NativeBridge {
  @JvmStatic external fun create(surface:Surface,width:Int,height:Int):Long
  @JvmStatic external fun uploadGeometry(handle:Long,z:Int,x:Int,y:Int,data:ByteBuffer):Boolean
  @JvmStatic external fun uploadImage(handle:Long,z:Int,x:Int,y:Int,data:ByteBuffer):Boolean
+ @JvmStatic external fun demand(handle:Long,input:ByteBuffer):Boolean
  @JvmStatic external fun residency(handle:Long,output:ByteBuffer):Boolean
  @JvmStatic external fun pick(handle:Long,x:Double,y:Double,output:ByteBuffer):Boolean
  @JvmStatic external fun mipmapProof(handle:Long,output:ByteBuffer):Boolean

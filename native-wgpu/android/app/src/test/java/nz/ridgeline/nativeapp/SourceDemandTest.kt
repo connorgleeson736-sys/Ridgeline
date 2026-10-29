@@ -14,6 +14,13 @@ class SourceDemandTest {
   val leaf=GpuUploadQueue.Id(12,3984,2600)
   val demand=SourceDemand.bounded(listOf(leaf),16)
   assertTrue(demand.containsKey(leaf));assertEquals(5,demand.size)
+  assertTrue(demand[GpuUploadQueue.Id(11,1992,1300)]!!<demand[leaf]!!)
   assertEquals(0,demand[GpuUploadQueue.Id(8,249,162)])
+ }
+ @Test fun visibleDetailIsNeverEvictedToMakeRoomForAncestors(){
+  val leaves=(0..23).map{GpuUploadQueue.Id(18,254000+it,166000)}
+  val demand=SourceDemand.bounded(leaves,32)
+  assertTrue(demand.size<=32);assertTrue(demand.keys.containsAll(leaves))
+  assertTrue(demand.containsKey(GpuUploadQueue.Id(17,127000,83000)))
  }
 }

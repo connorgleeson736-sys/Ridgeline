@@ -329,6 +329,77 @@ async fn run() {
         seam.drawn_triangles, triangles,
         "index-cache pressure must not change geometry"
     );
+    // Cached children must not dictate a new coarser view. Replay both directions
+    // with identical residency: pixel output must depend on demand, not history.
+    seam.set_demand(vec![parent], vec![parent]);
+    seam.render(
+        &output.create_view(&Default::default()),
+        focus,
+        13.5,
+        90.,
+        75.,
+        1500.,
+    );
+    let coarse = read(&seam, &output);
+    assert_ne!(
+        coarse, closed,
+        "coarse demand must retire cached fine ownership"
+    );
+    let desired: Vec<_> = std::iter::once(parent).chain(parent.children()).collect();
+    seam.set_demand(desired.clone(), desired);
+    seam.render(
+        &output.create_view(&Default::default()),
+        focus,
+        13.5,
+        90.,
+        75.,
+        1500.,
+    );
+    let fine = read(&seam, &output);
+    assert_eq!(
+        fine, closed,
+        "unready siblings must retain their loaded parent"
+    );
+    assert_ne!(
+        coarse, fine,
+        "ready requested fine detail must immediately display"
+    );
+    seam.set_demand(vec![parent], vec![parent]);
+    seam.render(
+        &output.create_view(&Default::default()),
+        focus,
+        13.5,
+        90.,
+        75.,
+        1500.,
+    );
+    assert_eq!(
+        coarse,
+        read(&seam, &output),
+        "same demand must yield same pixels after reversing LOD"
+    );
+    let uploads = (
+        seam.scene_uploads,
+        seam.instance_uploads,
+        seam.route_uploads(),
+    );
+    seam.render(
+        &output.create_view(&Default::default()),
+        focus,
+        13.5,
+        90.,
+        75.,
+        1500.,
+    );
+    assert_eq!(
+        uploads,
+        (
+            seam.scene_uploads,
+            seam.instance_uploads,
+            seam.route_uploads()
+        ),
+        "settled frame must not transfer unchanged state"
+    );
     // The hard budget holds during a burst of unrelated new uploads.
     r.set_tile_budget(24);
     for x in 0..80 {

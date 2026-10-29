@@ -1,9 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
  <application android:networkSecurityConfig="@xml/ridgeline_debug_network">
   <activity android:name=".ProofActivity" android:exported="true" android:label="Ridgeline controlled GPU fixture"/>
+  <activity android:name=".GestureProofActivity" android:exported="false"/>
  </application>
  <instrumentation android:name=".ProofInstrumentation" android:targetPackage="nz.ridgeline.nativeapp" android:functionalTest="true"/>
  <instrumentation android:name=".LiveProofInstrumentation" android:targetPackage="nz.ridgeline.nativeapp" android:functionalTest="true"/>
  <instrumentation android:name=".MipmapProofInstrumentation" android:targetPackage="nz.ridgeline.nativeapp" android:functionalTest="true"/>
  <instrumentation android:name=".PlannerProofInstrumentation" android:targetPackage="nz.ridgeline.nativeapp" android:functionalTest="true"/>
+ <instrumentation android:name=".GestureProofInstrumentation" android:targetPackage="nz.ridgeline.nativeapp" android:functionalTest="true"/>
 </manifest>

@@ -220,3 +220,17 @@ The native prototype now has zoom-in, zoom-out and north-up buttons, and clickab
 LINZ/Esri attribution. It preserves the full rendering surface underneath native
 controls. Terrain ownership now matches the reference parent DEM mapping; exact
 LOD cover, gestures/collision, transitions and full route/planner UI remain open.
+
+## Anchored gestures and current-view loading checkpoint
+
+Pan/pinch/rotate/tilt now hold a geographic terrain anchor under the finger or
+pinch centroid. Center elevation stays fixed through the gesture and eases after
+release. A native Android controlled drag run measured 0.0235m terrain-anchor drift;
+this proves the test gesture, not real-terrain visual acceptance or phone speed.
+
+GPU cache residency is separate from the current ideal HLOD cover. Cached children
+no longer force detail on a view that requests a parent; missing ideals retain
+real loaded fallback coverage. Detail requests keep their slots, downloads have
+separate bounded terrain/imagery workers, and transient failures retry with backoff.
+Full mesh/image resolution, filtering, source ceilings and six source ZIPs remain
+unchanged. See [research and remaining transitions](research/MAPLIBRE-GESTURES-HLOD.md).

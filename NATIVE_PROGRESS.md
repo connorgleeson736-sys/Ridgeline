@@ -843,3 +843,58 @@ edits still need compilation. All three route-enabled JNI ABIs were built. Actua
 Android planner UI opened, but provider requests timed out and the grounded route
 fixture did not complete. No new Android terrain acceptance or phone-speed claim.
 Next user priority is MapLibre-like anchored gestures, stable view/loading and HLOD.
+
+## MapLibre-style anchored gestures and demand-owned HLOD
+
+Read current MapLibre GL JS/native gesture, terrain-anchor tests, inertia, raster
+fades and tile-pyramid sources, plus Cesium screen-space-error traversal. Exact
+revisions/links and applied/open behaviors: native-wgpu/research/MAPLIBRE-GESTURES-HLOD.md.
+Replaced incremental centre-plane pan with one geographic terrain anchor per
+pan/pinch/rotate/tilt gesture. Camera moves opposite finger; map content follows.
+A single rendered-terrain pick fixes anchor elevation, with fixed center-plane
+fallback when missing. Center elevation is held through gesture and eased after
+release. Pointer count changes rebase, async callbacks reject stale gestures.
+
+Separated GPU cache residency from requested render ownership. Ready ideal sources
+supersede cached descendants; missing ideals keep real loaded parent/children.
+This fixes history-dependent LOD ownership. Detail leaves no longer get collapsed
+merely to pay for full ancestor chains. DEM/image workers have independent bounded
+slots, queued priorities refresh, source failures get bounded retries, and demand
+updates run during dragging at most every50ms. Same source ceilings/full imagery,
+mesh resolution/filtering and upload budgets; original6ZIPs and Capacitor untouched.
+
+Focused evidence:3camera tests(including32pitch/bearing/density combinations and
+pinch),3source-demand tests,2newcoverownership tests pass. GPU readback proves
+repeated coarse/fine/coarse demand produces identical coarse pixels; missing
+siblings retain parent pixels, and settled frames repeat no scene/instance/route
+uploads. One actual Android30GLES controlled diagonal pitched drag passes with
+0.023479336975551036m anchor drift. Test is explicitly synthetic/offline and needs
+no imagery packs or provider CA. All3optimizedJNI ABIs compile. No new phone
+benchmark or real-terrain visual acceptance. HLOD geomorph/image fades, inertia,
+collision and full terrain-aware cover remain open; this addresses concrete input,
+height-snap, cache-ownership and loading-starvation problems without claiming all
+renderer behavior complete.
+
+
+User highlighted closest-zoom detail again. Reproduced geometry selection stuck at
+z16 at camera19 even with a level camera: identical projected depths gave distant
+conservative mountain bounds the same split priority as the focus. Read MapLibre
+Native's distanceLOD/minimum center-radius and JS variable-zoom cover. Replaced
+score with tile-bound distance/pitch-area metric; prioritize center branch and
+one-tile focus neighborhood. Camera still4..19 (same reference), sources still
+DEM18/photo19/geometry22. Zoom19 now requests centergeometry20/21(fullDEM18) and
+photo19 at0/45/58/75/80pitch within existing36/72leafbudgets. Closest detail download
+now precedes intermediate fallback chains. Selection regression covers maximum
+source detail plus bounded non-overlapping coverage. No new GPU shader or mesh/
+image downsampling. Actual provider availability and phone visuals remain separate.
+The native Android immediate-release drag case also passes(0.0951m drift), so a
+quick gesture cannot disappear while its asynchronous start pick is pending.
+
+Real provider check at default Aoraki focus also succeeds: LINZ aerial z19 and
+terrain-RGB DEM z18 both returnHTTP200, original256x256images; DEMalpha255throughout.
+Provider tile coordinates/body hashes are recorded without URLs/client key in
+validation/gestures-loading/providers.json. This establishes available real highest
+source inputs at this focus, not new Android live-terrain or visual acceptance.
+Fallback spare slots now favor broad coverage plus nearest parents rather than
+spending the pool on all intermediate levels; closest parent and fine leaf start
+promptly. Three focused source-demand tests pass after this ordering change.

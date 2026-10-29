@@ -763,3 +763,56 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_waypoints
         _ => 0,
     }
 }
+
+/// Immutable bounded source demand, applied by the GPU owner before uploads.
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_demand(
+    env: *mut jni::sys::JNIEnv,
+    _class: jni::sys::jclass,
+    handle: i64,
+    input: jni::sys::jobject,
+) -> u8 {
+    let mut env = unsafe { jni::EnvUnowned::from_raw(env) };
+    match env
+        .with_env(|env| -> Result<u8, jni::errors::Error> {
+            let input = unsafe { jni::objects::JByteBuffer::from_raw(env, input) };
+            let size = env.get_direct_buffer_capacity(&input)?;
+            if !(8..=4616).contains(&size) {
+                return Ok(0);
+            }
+            let bytes =
+                unsafe { std::slice::from_raw_parts(env.get_direct_buffer_address(&input)?, size) };
+            let read = |i: usize| u32::from_le_bytes(bytes[i..i + 4].try_into().unwrap());
+            let g = read(0) as usize;
+            let n = read(4) as usize;
+            if g > 192 || n > 192 || size != 8 + (g + n) * 12 {
+                return Ok(0);
+            }
+            let mut ids = Vec::with_capacity(g + n);
+            for i in 0..g + n {
+                let pos = 8 + i * 12;
+                let z = read(pos);
+                let x = read(pos + 4);
+                let y = read(pos + 8);
+                if z > 22 || x >= 1u32 << z || y >= 1u32 << z {
+                    return Ok(0);
+                }
+                ids.push(TileId { z: z as u8, x, y });
+            }
+            let Ok(mut states) = states().lock() else {
+                return Ok(0);
+            };
+            let Some(state) = states.get_mut(&(handle as u64)) else {
+                return Ok(0);
+            };
+            state
+                .renderer
+                .set_demand(ids[..g].to_vec(), ids[g..].to_vec());
+            Ok(1)
+        })
+        .into_outcome()
+    {
+        jni::Outcome::Ok(v) => v,
+        _ => 0,
+    }
+}

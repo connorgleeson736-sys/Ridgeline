@@ -73,6 +73,7 @@ pub struct Renderer {
     pub logical_zoom: Option<f64>,
     cover: Vec<ridgeline_core::CoverRegion>,
     cover_dirty: bool,
+    demand: Option<(Vec<TileId>, Vec<TileId>)>,
     instance_capacity: usize,
     budget: usize,
     clock: u64,
@@ -296,6 +297,7 @@ impl Renderer {
             logical_zoom: None,
             cover: Vec::new(),
             cover_dirty: true,
+            demand: None,
             instance_capacity: 256,
             budget: 96,
             clock: 0,
@@ -503,13 +505,46 @@ impl Renderer {
     pub fn image_count(&self) -> usize {
         self.images.len()
     }
+    pub fn set_demand(&mut self, geometry: Vec<TileId>, images: Vec<TileId>) {
+        let next = Some((geometry, images));
+        if self.demand != next {
+            self.demand = next;
+            self.cover_dirty = true;
+        }
+    }
+    fn active_sources(&self, geometry: bool) -> Vec<TileId> {
+        let available: Vec<_> = if geometry {
+            self.tiles.keys().copied().collect()
+        } else {
+            self.images.keys().copied().collect()
+        };
+        if let Some((g, i)) = &self.demand {
+            let requested = if geometry { g } else { i };
+            // Demand contains fallback requests too. Only its finest disjoint leaves
+            // describe ideal ownership; ancestors remain cached, not forced owners.
+            let ideal: Vec<_> = requested
+                .iter()
+                .copied()
+                .filter(|id| {
+                    !requested
+                        .iter()
+                        .any(|other| id != other && id.contains(*other))
+                })
+                .collect();
+            ridgeline_core::demanded_sources(&available, &ideal)
+        } else {
+            available
+        }
+    }
     fn rebuild_cover(&mut self) {
-        self.cover =
-            ridgeline_core::resident_cover(&self.tiles.keys().copied().collect::<Vec<_>>());
-        self.draws = ridgeline_core::surface::surface_cover(
-            &self.tiles.keys().copied().collect::<Vec<_>>(),
-            &self.images.keys().copied().collect::<Vec<_>>(),
-        );
+        let geometry = self.active_sources(true);
+        let images = self.active_sources(false);
+        let cover = ridgeline_core::resident_cover(&geometry);
+        if self.cover != cover {
+            self.route_dirty = true;
+            self.cover = cover;
+        }
+        self.draws = ridgeline_core::surface::surface_cover(&geometry, &images);
     }
     fn trim_geometry(&mut self) {
         while self.tiles.len() > self.geometry_budget {
@@ -555,6 +590,14 @@ impl Renderer {
                     }
                 }
             }
+            if let Some((wanted, _)) = &self.demand {
+                protected.extend(
+                    wanted
+                        .iter()
+                        .filter(|id| self.tiles.contains_key(id))
+                        .copied(),
+                );
+            }
             let victim = self
                 .tiles
                 .iter()
@@ -573,6 +616,7 @@ impl Renderer {
                 .or_else(|| {
                     self.tiles
                         .iter()
+                        .filter(|(id, _)| self.demand.as_ref().is_none_or(|(g, _)| !g.contains(id)))
                         .max_by_key(|(_, tile)| tile.used)
                         .map(|(id, _)| *id)
                 })
@@ -627,6 +671,14 @@ impl Renderer {
                     }
                 }
             }
+            if let Some((_, wanted)) = &self.demand {
+                protected.extend(
+                    wanted
+                        .iter()
+                        .filter(|id| self.images.contains_key(id))
+                        .copied(),
+                );
+            }
             let victim = self
                 .images
                 .iter()
@@ -645,6 +697,7 @@ impl Renderer {
                 .or_else(|| {
                     self.images
                         .iter()
+                        .filter(|(id, _)| self.demand.as_ref().is_none_or(|(_, i)| !i.contains(id)))
                         .max_by_key(|(_, tile)| tile.used)
                         .map(|(id, _)| *id)
                 })

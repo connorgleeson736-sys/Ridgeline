@@ -142,6 +142,32 @@ pub fn resident_cover(available: &[TileId]) -> Vec<CoverRegion> {
     );
     out
 }
+/// Choose render owners from the current ideal cover, not every cached descendant.
+/// Ready ideal tiles win immediately. Missing ideals keep real loaded children
+/// and their nearest loaded ancestor until replacement is ready.
+pub fn demanded_sources(available: &[TileId], ideal: &[TileId]) -> Vec<TileId> {
+    use std::collections::HashSet;
+    let exact: HashSet<_> = available.iter().copied().collect();
+    let mut selected = HashSet::new();
+    for target in ideal {
+        if exact.contains(target) {
+            selected.insert(*target);
+            continue;
+        }
+        selected.extend(available.iter().copied().filter(|id| target.contains(*id)));
+        let mut ancestor = target.parent();
+        while let Some(id) = ancestor {
+            if exact.contains(&id) {
+                selected.insert(id);
+                break;
+            }
+            ancestor = id.parent();
+        }
+    }
+    let mut out: Vec<_> = selected.into_iter().collect();
+    out.sort_by_key(|id| (id.z, id.x, id.y));
+    out
+}
 #[cfg(test)]
 mod terrain_tests {
     use super::*;
@@ -210,3 +236,40 @@ mod terrain_tests {
 pub mod heightfield;
 
 pub mod surface;
+
+#[cfg(test)]
+mod demand_tests {
+    use super::*;
+    #[test]
+    fn ready_ideal_wins_over_cached_descendants_in_either_camera_direction() {
+        let p = TileId {
+            z: 10,
+            x: 991,
+            y: 650,
+        };
+        let c = p.children()[0];
+        let fine = c.children()[0];
+        assert_eq!(demanded_sources(&[p, c, fine], &[p]), vec![p]);
+        assert_eq!(demanded_sources(&[p, c, fine], &[c]), vec![c]);
+        let fallback = demanded_sources(&[p, fine], &[c]);
+        assert!(fallback.contains(&p) && fallback.contains(&fine));
+        assert_eq!(demanded_sources(&[fine, c, p], &[c]), vec![c]);
+    }
+    #[test]
+    fn missing_ideal_keeps_real_parent_until_its_children_arrive() {
+        let p = TileId {
+            z: 10,
+            x: 991,
+            y: 650,
+        };
+        let desired = p.children();
+        assert_eq!(demanded_sources(&[p], &desired), vec![p]);
+        let mut available = vec![p, desired[0]];
+        let fallback = demanded_sources(&available, &desired);
+        let cover = resident_cover(&fallback);
+        assert_eq!(cover.iter().filter(|r| r.source == p).count(), 3);
+        available.extend_from_slice(&desired[1..]);
+        assert_eq!(demanded_sources(&available, &desired).len(), 4);
+        assert!(!demanded_sources(&available, &desired).contains(&p));
+    }
+}

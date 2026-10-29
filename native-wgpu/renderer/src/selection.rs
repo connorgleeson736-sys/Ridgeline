@@ -17,10 +17,13 @@ pub struct View {
 struct Candidate {
     id: TileId,
     score: f64,
+    focus: u8,
 }
 impl PartialEq for Candidate {
     fn eq(&self, other: &Self) -> bool {
-        self.id == other.id && self.score.to_bits() == other.score.to_bits()
+        self.id == other.id
+            && self.score.to_bits() == other.score.to_bits()
+            && self.focus == other.focus
     }
 }
 impl Eq for Candidate {}
@@ -31,9 +34,12 @@ impl PartialOrd for Candidate {
 }
 impl Ord for Candidate {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.score.total_cmp(&other.score).then_with(|| {
-            (self.id.z, self.id.x, self.id.y).cmp(&(other.id.z, other.id.x, other.id.y))
-        })
+        self.focus
+            .cmp(&other.focus)
+            .then_with(|| self.score.total_cmp(&other.score))
+            .then_with(|| {
+                (self.id.z, self.id.x, self.id.y).cmp(&(other.id.z, other.id.x, other.id.y))
+            })
     }
 }
 /// A non-overlapping quadtree cover within NZ. Budget limits requests, never
@@ -54,6 +60,20 @@ pub fn plan_with_target(view: &View, budget: usize, target: f64, max_zoom: u8) -
         view.elevation,
     );
     let world = 512. * 2f64.powf(view.zoom);
+    let distance_to_center = view.height as f64 * 1.5;
+    let pitch = (view.pitch as f64).to_radians();
+    let bearing = (view.bearing as f64).to_radians();
+    let eye = [
+        -bearing.sin() * pitch.sin() * distance_to_center,
+        -bearing.cos() * pitch.sin() * distance_to_center,
+    ];
+    let vertical_distance = pitch.cos() * distance_to_center;
+    // Like MapLibre Native's tileLodMinRadius, reserve fine cover around the
+    // surface focus before spending the remaining budget at the horizon.
+    let focus_zoom = (view.zoom + (512. / target).log2())
+        .ceil()
+        .clamp(4., max_zoom as f64);
+    let focus_radius = 2f64.powf(-focus_zoom);
     let nz0 = crate::mercator(165., -33.);
     let nz1 = crate::mercator(180., -49.);
     let candidate = |id: TileId| -> Option<Candidate> {
@@ -74,11 +94,32 @@ pub fn plan_with_target(view: &View, budget: usize, target: f64, max_zoom: u8) -
         ) {
             return None;
         }
-        let middle = matrix * Vec4::new((x0 + x1) / 2., (y0 + y1) / 2., 0., 1.);
+        // MapLibre Native's distance mode measures distance to the tile bounds,
+        // with a sqrt(cos(pitch-to-tile)) area correction. Projected centre depth
+        // alone gives every flat-camera tile the same priority: conservative tall
+        // terrain boxes then consume the budget far away and strand the focus at z16.
+        let dx = (x0 as f64 - eye[0]).max(0.).max(eye[0] - x1 as f64);
+        let dy = (y1 as f64 - eye[1]).max(0.).max(eye[1] - y0 as f64);
+        let distance = (dx * dx + dy * dy + vertical_distance * vertical_distance).sqrt();
+        let cosine = vertical_distance / distance;
         let size = (b[2] - b[0]) * world;
-        let distance = (middle.w as f64 - size * 0.71).max(view.height as f64 / 50.);
-        let score = size * (view.height as f64 * 1.5) / distance;
-        Some(Candidate { id, score })
+        let score = size * distance_to_center / distance * (cosine / pitch.cos()).sqrt();
+        let focus = if b[0] <= view.center[0]
+            && view.center[0] < b[2]
+            && b[1] <= view.center[1]
+            && view.center[1] < b[3]
+        {
+            2
+        } else if b[0] < view.center[0] + focus_radius
+            && b[2] > view.center[0] - focus_radius
+            && b[1] < view.center[1] + focus_radius
+            && b[3] > view.center[1] - focus_radius
+        {
+            1
+        } else {
+            0
+        };
+        Some(Candidate { id, score, focus })
     };
     let Some(root) = candidate(TileId { z: 0, x: 0, y: 0 }) else {
         return Vec::new();
@@ -135,6 +176,40 @@ pub(crate) fn visible_box(matrix: Mat4, lo: [f32; 3], hi: [f32; 3]) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn close_zoom_keeps_maximum_source_detail_at_the_surface_focus() {
+        let center = crate::mercator(170.14219572, -43.5955671);
+        for pitch in [0., 45., 58., 75., 80.] {
+            let view = View {
+                width: 320,
+                height: 640,
+                center,
+                zoom: 19.,
+                bearing: -24.,
+                pitch,
+                elevation: 3670.,
+            };
+            for (budget, target, maximum) in [(36, 431., 22), (72, 256. / 2f64.powf(0.25), 19)] {
+                let ids = plan_with_target(&view, budget, target, maximum);
+                let focus = TileId {
+                    z: 22,
+                    x: (center[0] * (1u32 << 22) as f64) as u32,
+                    y: (center[1] * (1u32 << 22) as f64) as u32,
+                };
+                let selected = ids.iter().find(|id| id.contains(focus)).unwrap();
+                println!(
+                    "close detail pitch={pitch} sourceMax={maximum} centerLevel={} count={}",
+                    selected.z,
+                    ids.len()
+                );
+                assert!(
+                    selected.z >= 19,
+                    "close center remains coarse: {}",
+                    selected.z
+                );
+            }
+        }
+    }
     #[test]
     fn covers_center_without_overlap_or_unbounded_requests() {
         for pitch in [0., 58., 85.] {

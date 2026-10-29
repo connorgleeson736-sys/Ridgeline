@@ -1,0 +1,2 @@
+PASS native gesture: fixed terrain anchor, diagonal pitched drag, 0.023479336975551036m drift; immediate-release drag 0.09506256469382861m drift; synthetic fixture, not real-terrain visual acceptance
+

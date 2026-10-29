@@ -61,8 +61,13 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     @Volatile private var wanted = emptySet<Source>()
     private var timer: ScheduledFuture<*>? = null
     private val scheduler = Executors.newSingleThreadScheduledExecutor()
-    // Bounded workers, priority queue, no multiplication of network concurrency for halos.
-    private val workers = ThreadPoolExecutor(3, 3, 0, TimeUnit.MILLISECONDS, PriorityBlockingQueue<Runnable>())
+    // DEM halo work cannot occupy every imagery worker. Four bounded requests,
+    // shared DEM futures, and no per-halo executor multiplication.
+    private val geometryWorkers = ThreadPoolExecutor(2,2,0,TimeUnit.MILLISECONDS,PriorityBlockingQueue<Runnable>())
+    private val imageWorkers = ThreadPoolExecutor(2,2,0,TimeUnit.MILLISECONDS,PriorityBlockingQueue<Runnable>())
+    private fun workers(source:Source)=if(source.geometry)geometryWorkers else imageWorkers
+    private data class Failure(val attempts:Int,val retryAt:Long)
+    private val failures=ConcurrentHashMap<Source,Failure>()
     private fun upload(source:Source,data:ByteBuffer) {
         val id=source.id
         if(source.geometry)view.uploadGeometry(id.z,id.x,id.y,data)
@@ -76,6 +81,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             try {
                 if (dead || source !in wanted || resident(source)) return
                 val data = if(source.geometry)loadGeometry(source.id)else loadImage(source.id)
+                failures.remove(source)
                 if (!dead) {
                     synchronized(ready) {
                         ready.put(source,data)?.let{readyBytes-=it.capacity()}
@@ -85,6 +91,10 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
                     if (source in wanted&&!resident(source)) upload(source,data)
                 }
             } catch (e: Exception) {
+                val attempt=(failures[source]?.attempts?:0)+1
+                val delay=when(attempt){1->1000L;2->4000L;else->15000L}
+                failures[source]=Failure(attempt,android.os.SystemClock.elapsedRealtime()+delay)
+                if(!dead&&!offlineOnly&&source in wanted&&attempt<=3)runCatching{scheduler.schedule({cameraChanged()},delay,TimeUnit.MILLISECONDS)}
                 if (!dead && context.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE != 0)
                     android.util.Log.w("RidgelineSource","Load failed: ${e.javaClass.simpleName}; cause=${e.cause?.javaClass?.simpleName}")
                 if (!dead && source in wanted) view.post { view.onStatus("Terrain load failed: " +
@@ -98,12 +108,12 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         if(!dead&&timer==null)timer=scheduler.schedule({
             synchronized(this){timer=null}
             loadView()
-        },100,TimeUnit.MILLISECONDS)
+        },50,TimeUnit.MILLISECONDS)
     }
     private fun sourcePlan(geometry:Boolean,key:DemandPlanKey):List<Id> {
         val pose=key.pose
         val output=planBuffer;output.rewind()
-        val budget=if(geometry)geometryLimit else imageLimit
+        val budget=maxOf(16,(if(geometry)geometryLimit else imageLimit)*3/4)
         val count=NativeBridge.plan(key.width,key.height,pose.longitude,pose.latitude,
             pose.zoom,pose.bearing,pose.pitch,pose.elevation,budget,
             if(geometry)431.0 else 256.0/2.0.pow(.25),if(geometry)22 else 19,output)
@@ -132,14 +142,18 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         wanted = ranked.keys.toSet()
         view.updateUploadDemand(wanted.filter{it.geometry}.map{it.id.gpu()}.toSet(),
             wanted.filter{!it.geometry}.map{it.id.gpu()}.toSet())
-        for ((source, task) in jobs) if (source !in wanted && workers.remove(task)) jobs.remove(source, task)
+        failures.keys.removeAll{it !in wanted}
+        // Queued tasks must inherit the latest screen priority after a pan.
+        for ((source, task) in jobs) if ((source !in wanted||ranked[source]!=task.priority) && workers(source).remove(task)) jobs.remove(source, task)
         for ((source, priority) in ranked) {
             if(resident(source))continue
             val old = synchronized(ready) { ready[source] }
             if (old != null) { upload(source,old); continue }
+            val failure=failures[source]
+            if(failure!=null&&android.os.SystemClock.elapsedRealtime()<failure.retryAt)continue
             val task = Task(source, priority)
             if (jobs.putIfAbsent(source, task) == null && !dead) {
-                try{workers.execute(task)}catch(_:RejectedExecutionException){jobs.remove(source,task)}
+                try{workers(source).execute(task)}catch(_:RejectedExecutionException){jobs.remove(source,task)}
             }
         }
     }
@@ -291,8 +305,8 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         },350,TimeUnit.MILLISECONDS)
     }
     fun close() {
-        dead = true;downloadCancel.set(true);downloadJobs.shutdown(); profileRevision.incrementAndGet();profileJob?.cancel(true);profileJobs.shutdownNow();timer?.cancel(true); scheduler.shutdownNow(); workers.shutdownNow()
+        dead = true;downloadCancel.set(true);downloadJobs.shutdown(); profileRevision.incrementAndGet();profileJob?.cancel(true);profileJobs.shutdownNow();timer?.cancel(true); scheduler.shutdownNow(); geometryWorkers.shutdownNow();imageWorkers.shutdownNow()
         client.dispatcher.cancelAll(); client.connectionPool.evictAll(); client.cache?.close(); client.dispatcher.executorService.shutdown(); synchronized(ready) { ready.clear(); readyBytes=0 }; synchronized(decoded) { decoded.clear() }
-        Thread({downloadJobs.awaitTermination(60,TimeUnit.SECONDS);profileJobs.awaitTermination(60,TimeUnit.SECONDS);workers.awaitTermination(60,TimeUnit.SECONDS);offline.close()},"ridgeline-offline-close").start()
+        Thread({downloadJobs.awaitTermination(60,TimeUnit.SECONDS);profileJobs.awaitTermination(60,TimeUnit.SECONDS);geometryWorkers.awaitTermination(60,TimeUnit.SECONDS);imageWorkers.awaitTermination(60,TimeUnit.SECONDS);offline.close()},"ridgeline-offline-close").start()
     }
 }
