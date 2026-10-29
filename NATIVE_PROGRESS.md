@@ -665,3 +665,19 @@ are accepted. Full native UI remains incomplete and gated on renderer proof.
 Capacitor/android/public and all6originalZIPs remain unchanged. Overall estimate
 remains approximately25percent of the complete app. Next: finish real-view capture,
 check remaining gaps, then exact reference camera/terrain/fog/gesture comparison.
+
+
+Reference runtime follow-up: unchanged authoritative0.18FullAPK installed beside
+native app (SHA matches published b4d286f5...). Its first launch timed out; WebView
+inspection then confirmed complete document but no canvas or map engine. Exact
+reload emitted SyntaxError:Unexpected reserved word,line1783. This API30image has
+WebView83.0.4103.120. Splash/state/errors are recorded in validation/android30;
+this is a reference-runtime compatibility blocker, not a native parity failure.
+Do not patch the reference to silently bypass it. Next reference step is a modern
+supported WebView/runtime or the exact packaged assets on supported Chromium,
+then camera-matched captures with source/elevation settings recorded.
+
+User explicitly requested a repository APK checkpoint before usage limits.
+Normal complete-data/all3ABI debug build is now in native-wgpu/checkpoints using
+GitLFS, with checksum and scope README. It contains no session trust anchor.
+Do not replace it with the separately generated local managed-proxy test APK.

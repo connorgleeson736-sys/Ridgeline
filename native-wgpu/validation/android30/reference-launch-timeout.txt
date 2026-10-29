@@ -1,0 +1,6 @@
+Starting: Intent { cmp=nz.ridgeline.mobile.performance/nz.ridgeline.mobile.MainActivity }
+Status: timeout
+LaunchState: UNKNOWN (-1)
+Activity: nz.ridgeline.mobile.performance/nz.ridgeline.mobile.MainActivity
+WaitTime: 13399
+Complete
