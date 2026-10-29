@@ -784,3 +784,17 @@ interruption. At320x640with explicit48/96budgets and reference camera height,
 heuristic native center geometry isz13versus referencez12. Ownership correction
 is complete, but exact LOD cover selection/transitions remain a separate blocker;
 do not tune down a target just to make one captured view match.
+
+
+## Native map navigation controls and attribution
+
+Added native Android zoom-in/out and north-up controls, plus LINZ imagery/elevation
+and Esri gap attribution links. These are minimal map controls for the renderer
+prototype, not the full planner UI. Pinch, double-tap and buttons share one bounded
+zoom update; unchanged zoom or an already-north bearing does not schedule a frame
+or source replan. Rendering resolution is unchanged behind native overlays.
+Compiled/assembled once; no new test suite for these reversible widget bindings.
+Build wrapper now recreates only APK packaging state to prevent stale Full payload
+bytes in future Base outputs, retaining compile/dependency caches. Next acceptance
+work remains exact LOD cover and camera/transition behavior, followed by full
+native feature UI. No new Android runtime/visual-parity claim.

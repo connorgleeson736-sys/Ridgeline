@@ -131,14 +131,22 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         val next=cameraPose.copy(elevation=value);groundedPose=next
         if(next!=cameraPose){cameraPose=next;changed()}
     }
+    fun zoomBy(delta:Double){
+        if(!delta.isFinite())return
+        val next=cameraPose.copy(zoom=(zoom+delta).coerceIn(4.0,19.0))
+        if(next!=cameraPose){cameraPose=next;changed()}
+    }
+    fun northUp(){
+        if(bearing!=0f){cameraPose=cameraPose.copy(bearing=0f);changed()}
+    }
     private val scaler=ScaleGestureDetector(context,object:ScaleGestureDetector.SimpleOnScaleGestureListener(){
         override fun onScale(detector:ScaleGestureDetector):Boolean {
-            cameraPose=cameraPose.copy(zoom=(zoom+ln(detector.scaleFactor.toDouble())/ln(2.0)).coerceIn(4.0,19.0));changed();return true
+            zoomBy(ln(detector.scaleFactor.toDouble())/ln(2.0));return true
         }
     })
     private val gestures=GestureDetector(context,object:GestureDetector.SimpleOnGestureListener(){
         override fun onDown(e:MotionEvent)=true
-        override fun onDoubleTap(e:MotionEvent):Boolean{cameraPose=cameraPose.copy(zoom=(zoom+1).coerceAtMost(19.0));changed();return true}
+        override fun onDoubleTap(e:MotionEvent):Boolean{zoomBy(1.0);return true}
         override fun onScroll(a:MotionEvent?,b:MotionEvent,dx:Float,dy:Float):Boolean {
             if(b.pointerCount!=1||scaler.isInProgress)return true
             val pose=cameraPose;val world=512*2.0.pow(pose.zoom)*pixelScale;val angle=Math.toRadians(pose.bearing.toDouble())

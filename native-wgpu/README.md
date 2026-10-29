@@ -201,3 +201,22 @@ or transport errors. Reference center elevation is3648.731912109524m, clamped to
 terrain; the earlier native default held3724m. Host reference capture is now
 available; Android reference execution, matched native pixels and acceptance of
 real LOD/gesture/sky behavior remain separate open gates.
+
+
+## Smaller Base build and native map controls
+
+The user-requested Base checkpoint omits the six large overview ZIPs and retains
+67coarse imagery files. Missing bundled ranges use the existing full-resolution
+online source chain. Terrain detail and imagery filtering are unchanged. Original
+ZIPs and the earlier Full checkpoint remain available separately.
+
+Build with `RIDGELINE_BUNDLE_OVERVIEWS=0 native-wgpu/tools/build-android.sh`.
+The wrapper recreates APK packaging state so switching Full to Base removes stale
+payload bytes as well as ZIP directory entries. Existing compile/download caches
+are preserved. Base cannot run the controlled six-pack instrumentation fixture;
+that fixture requires the Full build. Latest downloads: [checkpoints](checkpoints/).
+
+The native prototype now has zoom-in, zoom-out and north-up buttons, and clickable
+LINZ/Esri attribution. It preserves the full rendering surface underneath native
+controls. Terrain ownership now matches the reference parent DEM mapping; exact
+LOD cover, gestures/collision, transitions and full route/planner UI remain open.

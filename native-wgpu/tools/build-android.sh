@@ -29,6 +29,9 @@ for RIDGELINE_ABI in "${RIDGELINE_ABI_LIST[@]}"; do
  cp "$RIDGELINE_NATIVE_ROOT/target/$RIDGELINE_TARGET/$RIDGELINE_PROFILE/libridgeline_renderer.so" "$RIDGELINE_LIB_DIR/"
  "$RIDGELINE_LLVM/llvm-strip" --strip-unneeded "$RIDGELINE_LIB_DIR/libridgeline_renderer.so"
 done
+# Incremental APK ZIPs can retain deleted Full-pack bodies as unused bytes.
+# Recreate packaging only; compilation and dependency caches remain reusable.
+rm -rf -- "$RIDGELINE_NATIVE_ROOT/android/app/build/intermediates/incremental/packageDebug" "$RIDGELINE_NATIVE_ROOT/android/app/build/outputs/apk/debug"
 "${RIDGELINE_GRADLE:-$RIDGELINE_NATIVE_ROOT/android/gradlew}" --max-workers="${RIDGELINE_GRADLE_WORKERS:-2}" -p "$RIDGELINE_NATIVE_ROOT/android" -PridgelineAbis="$RIDGELINE_ABIS" :app:testDebugUnitTest :app:assembleDebug :app:lintDebug
 # Freeze a reviewable artifact; never rebuild a file while it is being installed.
 mkdir -p "$RIDGELINE_NATIVE_ROOT/artifacts"
