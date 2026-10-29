@@ -33,9 +33,15 @@ Native data path now uses actual same-source parents on 404/nodata and real
 neighbor halos. Synthetic geometry exists only in labeled tests.
 
 Default mesh granularity128; reference mesh adds lowered boundary skirts through
-`u_ele_delta`. The native prototype has the 128-cell heightfield but does not yet
-have equivalent cross-LOD skirts/stitching/morphing. Shared same-LOD endpoints
-have deterministic halo tests; that is not cross-LOD visual acceptance.
+`u_ele_delta`. The native prototype retains the128-cell heightfield and now adds lowered
+boundary skirts using the exact mean-Earth-circumference / 2^logicalZoom /5 rule.
+Physical framebuffer zoom is passed separately so density does not shorten skirts.
+A controlled mixed-LOD GPU fixture closes36092exposed background pixels; original
+surface vertices/triangles and full photo pixels are preserved. Geometry vertex
+storage doubles to399384bytes/source, within the existing hard source-count cap;
+combined peak memory and device impact remain unmeasured. Shared same-LOD endpoints
+also have deterministic halo tests. This does not establish real-source cross-LOD
+visual acceptance, morphing/fades or terrain collision.
 
 Default Mist sky/background is #bdcbd0. All sky/horizon/fog colors use the selected
 preset. Sky paint: fog-ground-blend1, horizon-fog-blend0, sky-horizon-blend0,

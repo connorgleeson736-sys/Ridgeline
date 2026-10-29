@@ -51,6 +51,9 @@ pub struct Renderer {
     height: u32,
     pub frames: u64,
     pub drawn_triangles: u32,
+    pub drawn_surface_triangles: u32,
+    /// Android camera projection uses physical pixels; skirts use logical zoom.
+    pub logical_zoom: Option<f64>,
     cover: Vec<ridgeline_core::CoverRegion>,
     cover_dirty: bool,
     instance_capacity: usize,
@@ -175,16 +178,16 @@ impl Renderer {
             ..Default::default()
         });
         let mipmaps = mipmaps::Mipmaps::new(&device);
-        let mut idx = Vec::<u32>::new();
-        for y in 0..128 {
-            for x in 0..128 {
-                let a = y * 129 + x;
-                idx.extend([a, a + 129, a + 1, a + 1, a + 129, a + 130]);
-            }
+        let idx = ridgeline_core::surface::GridRect {
+            x0: 0,
+            y0: 0,
+            x1: 128,
+            y1: 128,
         }
+        .indices_with_skirts();
         let indices = device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("shared terrain subrect index atlas"),
-            size: (8 * 128 * 128 * 6 * 4) as u64,
+            size: (9 * 128 * 128 * 6 * 4) as u64,
             usage: wgpu::BufferUsages::INDEX | wgpu::BufferUsages::COPY_DST,
             mapped_at_creation: false,
         });
@@ -230,6 +233,8 @@ impl Renderer {
             height,
             frames: 0,
             drawn_triangles: 0,
+            drawn_surface_triangles: 0,
+            logical_zoom: None,
             cover: Vec::new(),
             cover_dirty: true,
             instance_capacity: 256,
@@ -299,11 +304,12 @@ impl Renderer {
             return Ok(());
         }
         self.clock += 1;
-        let v: Vec<Vertex> = (0..129 * 129)
+        let mut v: Vec<Vertex> = (0..129 * 129)
             .map(|i| Vertex {
                 position: [(i % 129) as f32 / 128., (i / 129) as f32 / 128., heights[i]],
             })
             .collect();
+        v.extend_from_within(..); // Same full-resolution surface plus lowered boundary vertices.
         let vertices = self
             .device
             .create_buffer_init(&wgpu::util::BufferInitDescriptor {
@@ -693,7 +699,12 @@ impl Renderer {
             bytemuck::bytes_of(&Scene {
                 matrix: matrix.to_cols_array(),
                 grade: [0.058, 1., 0.25, 1. / 0.74],
-                metrics: [px_meter, elevation, 0., 0.],
+                metrics: [
+                    px_meter,
+                    elevation,
+                    ridgeline_core::surface::skirt_length(self.logical_zoom.unwrap_or(zoom)) as f32,
+                    0.,
+                ],
             }),
         );
         self.center = center;
@@ -769,10 +780,10 @@ impl Renderer {
             .collect();
         for rect in &rects {
             if !self.index_ranges.contains_key(rect) {
-                let ids = rect.indices();
+                let ids = rect.indices_with_skirts();
                 let start = self.index_next;
                 let end = start + ids.len() as u32;
-                if end <= 8 * 128 * 128 * 6 {
+                if end <= 9 * 128 * 128 * 6 {
                     self.queue.write_buffer(
                         &self.indices,
                         start as u64 * 4,
@@ -783,6 +794,10 @@ impl Renderer {
                 }
             }
         }
+        self.drawn_surface_triangles = rects
+            .iter()
+            .map(|r| (r.x1 - r.x0) as u32 * (r.y1 - r.y0) as u32 * 2)
+            .sum();
         self.drawn_triangles = rects
             .iter()
             .map(|rect| {

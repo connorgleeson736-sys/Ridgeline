@@ -161,9 +161,14 @@ async fn run() {
     assert_eq!(at(64, 192), &[36, 113, 74, 255]);
     assert_eq!(at(192, 192), expected_red.as_slice());
     assert_eq!(
-        r.drawn_triangles,
+        r.drawn_surface_triangles,
         128 * 128 * 2,
         "four full-resolution child photos share exactly one native grid"
+    );
+    assert_eq!(
+        r.drawn_triangles - r.drawn_surface_triangles,
+        2048,
+        "four child-photo boundaries have independent skirt quads"
     );
     // A minified 1px black/white checker must sample the generated pyramid,
     // not uninitialized levels or shimmer between original individual pixels.
@@ -193,6 +198,67 @@ async fn run() {
         &bytes[(128 * 256 + 128) * 4..][..4],
         &[136, 136, 136, 255],
         "minified checker mip average and reference grade"
+    );
+    // An intentionally discontinuous parent/child height fixture exposes a
+    // vertical LOD gap. Skirts must close pixels, not merely increase indices.
+    let mut seam = Renderer::new(
+        &instance,
+        None,
+        Some(wgpu::TextureFormat::Rgba8Unorm),
+        256,
+        256,
+    )
+    .await
+    .unwrap();
+    let output = seam.device.create_texture(&wgpu::TextureDescriptor {
+        label: Some("LOD seam readback"),
+        size: wgpu::Extent3d {
+            width: 256,
+            height: 256,
+            depth_or_array_layers: 1,
+        },
+        mip_level_count: 1,
+        sample_count: 1,
+        dimension: wgpu::TextureDimension::D2,
+        format: wgpu::TextureFormat::Rgba8Unorm,
+        usage: wgpu::TextureUsages::RENDER_ATTACHMENT | wgpu::TextureUsages::COPY_SRC,
+        view_formats: &[],
+    });
+    seam.upload(parent, &heights, &green).unwrap();
+    let high = parent.children()[1];
+    seam.upload(high, &vec![2000.; 129 * 129], &red).unwrap();
+    let pb = parent.bounds();
+    let focus = [(pb[0] + pb[2]) / 2., pb[1] + (pb[3] - pb[1]) / 4.];
+    seam.logical_zoom = Some(40.); // Negligible depth: a diagnostic control, not an app setting.
+    seam.render(
+        &output.create_view(&Default::default()),
+        focus,
+        13.5,
+        90.,
+        75.,
+        1500.,
+    );
+    let open = read(&seam, &output);
+    seam.logical_zoom = Some(13.5);
+    seam.render(
+        &output.create_view(&Default::default()),
+        focus,
+        13.5,
+        90.,
+        75.,
+        1500.,
+    );
+    let closed = read(&seam, &output);
+    let sky = |p: &[u8]| p == [189, 203, 208, 255];
+    let repaired = open
+        .chunks_exact(4)
+        .zip(closed.chunks_exact(4))
+        .filter(|(a, b)| sky(a) && !sky(b))
+        .count();
+    println!("Skirt discontinuity fixture repaired {repaired} exposed background pixels");
+    assert!(
+        repaired > 100,
+        "skirts must visibly close a parent/fine boundary gap"
     );
     // The hard budget holds during a burst of unrelated new uploads.
     r.set_tile_budget(24);

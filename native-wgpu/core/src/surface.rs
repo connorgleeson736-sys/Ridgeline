@@ -48,6 +48,37 @@ impl GridRect {
             y1: ((r[3] - g[1]) * scale).ceil().clamp(1., 128.) as u16,
         }
     }
+    /// A second copy of the grid is lowered by the vertex shader. Boundary quads
+    /// close the selected source subrectangle without changing surface samples.
+    pub fn indices_with_skirts(self) -> Vec<u32> {
+        let mut ids = self.indices();
+        let mut edge = |a: u32, b: u32| {
+            let lower_a = a + 129 * 129;
+            let lower_b = b + 129 * 129;
+            ids.extend([a, lower_a, b, b, lower_a, lower_b]);
+        };
+        for x in self.x0..self.x1 {
+            edge(
+                self.y0 as u32 * 129 + x as u32,
+                self.y0 as u32 * 129 + x as u32 + 1,
+            );
+            edge(
+                self.y1 as u32 * 129 + x as u32 + 1,
+                self.y1 as u32 * 129 + x as u32,
+            );
+        }
+        for y in self.y0..self.y1 {
+            edge(
+                (y as u32 + 1) * 129 + self.x0 as u32,
+                y as u32 * 129 + self.x0 as u32,
+            );
+            edge(
+                y as u32 * 129 + self.x1 as u32,
+                (y as u32 + 1) * 129 + self.x1 as u32,
+            );
+        }
+        ids
+    }
     pub fn indices(self) -> Vec<u32> {
         let mut ids =
             Vec::with_capacity((self.x1 - self.x0) as usize * (self.y1 - self.y0) as usize * 6);
@@ -117,5 +148,70 @@ mod tests {
         };
         let r = GridRect::for_region(p, c);
         assert_eq!(r.indices().len(), 6);
+    }
+}
+
+/// MapLibre 6.14 getSkirtLength uses mean Earth circumference and logical zoom.
+pub fn skirt_length(logical_zoom: f64) -> f64 {
+    crate::ALTITUDE_CIRCUMFERENCE / 2f64.powf(logical_zoom.max(0.)) / 5.
+}
+#[cfg(test)]
+mod skirt_tests {
+    use super::*;
+    #[test]
+    fn skirts_preserve_surface_and_connect_each_selected_boundary_segment() {
+        for r in [
+            GridRect {
+                x0: 0,
+                y0: 0,
+                x1: 128,
+                y1: 128,
+            },
+            GridRect {
+                x0: 32,
+                y0: 64,
+                x1: 64,
+                y1: 96,
+            },
+            GridRect {
+                x0: 127,
+                y0: 0,
+                x1: 128,
+                y1: 1,
+            },
+        ] {
+            let base = r.indices();
+            let all = r.indices_with_skirts();
+            assert_eq!(&all[..base.len()], base);
+            let segments = 2 * ((r.x1 - r.x0) + (r.y1 - r.y0)) as usize;
+            assert_eq!(all.len() - base.len(), segments * 6);
+            for q in all[base.len()..].chunks_exact(6) {
+                assert_eq!(q[1], q[0] + 129 * 129);
+                assert_eq!(q[3], q[2]);
+                assert_eq!(q[4], q[1]);
+                assert_eq!(q[5], q[2] + 129 * 129);
+                for v in [q[0], q[2]] {
+                    let x = v % 129;
+                    let y = v / 129;
+                    assert!(
+                        x == r.x0 as u32
+                            || x == r.x1 as u32
+                            || y == r.y0 as u32
+                            || y == r.y1 as u32
+                    );
+                }
+                assert!(
+                    (q[0] as i64 - q[2] as i64).abs() == 1
+                        || (q[0] as i64 - q[2] as i64).abs() == 129
+                );
+                assert!(q.iter().all(|v| *v < 2 * 129 * 129));
+            }
+        }
+    }
+    #[test]
+    fn reference_skirt_length_uses_logical_zoom_not_framebuffer_density() {
+        assert!((skirt_length(12.) - 1954.6010197300707).abs() < 1e-6);
+        assert_eq!(skirt_length(-1.), skirt_length(0.));
+        assert_eq!(skirt_length(13.) * 2., skirt_length(12.));
     }
 }

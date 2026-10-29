@@ -9,9 +9,9 @@ import struct
 import sys
 
 class Emulator:
-    def __init__(self, port=5555):
+    def __init__(self, port=5555, timeout=90):
         self.socket = socket.create_connection(('127.0.0.1', port), 10)
-        self.socket.settimeout(90)
+        self.socket.settimeout(timeout)
         self.send(b'CNXN',0x01000000,1024*1024,b'host::\0')
         cmd, _, self.maximum, _ = self.recv()
         if cmd != b'CNXN':
@@ -57,5 +57,5 @@ class Emulator:
         self.socket.close()
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('command');p.add_argument('--input');p.add_argument('--port',type=int,default=5555)
-    args=p.parse_args();Emulator(args.port).run(args.command,args.input)
+    p=argparse.ArgumentParser();p.add_argument('command');p.add_argument('--input');p.add_argument('--port',type=int,default=5555);p.add_argument('--timeout',type=float,default=90)
+    args=p.parse_args();Emulator(args.port,args.timeout).run(args.command,args.input)

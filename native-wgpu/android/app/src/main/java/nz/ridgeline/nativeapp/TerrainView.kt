@@ -68,7 +68,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         if(rows.isNotEmpty())refreshResidency()
         if(accepted)post{onStatus("");onData()}
         val pose=cameraPose // One immutable snapshot, no mixed camera revisions.
-        val shown=NativeBridge.render(handle,width,height,pose.longitude,pose.latitude,pose.zoom+ln(pixelScale)/ln(2.0),pose.bearing,pose.pitch,pose.elevation)
+        val shown=NativeBridge.render(handle,width,height,pose.longitude,pose.latitude,pose.zoom+ln(pixelScale)/ln(2.0),pose.zoom,pose.bearing,pose.pitch,pose.elevation)
         if(shown)presentationFailures=0 else {
             presentationFailures++
             if(presentationFailures<=8)requestFrame(minOf(250L,16L shl presentationFailures)) else post{onStatus("GPU presentation unavailable")}

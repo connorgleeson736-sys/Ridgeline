@@ -12,6 +12,6 @@ object NativeBridge {
  @JvmStatic external fun plan(width:Int,height:Int,longitude:Double,latitude:Double,zoom:Double,bearing:Float,pitch:Float,elevation:Float,budget:Int,target:Double,maxZoom:Int,output:ByteBuffer):Int
  @JvmStatic external fun tileBudget(handle:Long,tiles:Int)
  @JvmStatic external fun destroy(handle:Long)
- @JvmStatic external fun render(handle:Long,width:Int,height:Int,longitude:Double,latitude:Double,zoom:Double,bearing:Float,pitch:Float,elevation:Float):Boolean
+ @JvmStatic external fun render(handle:Long,width:Int,height:Int,longitude:Double,latitude:Double,zoom:Double,logicalZoom:Double,bearing:Float,pitch:Float,elevation:Float):Boolean
  @JvmStatic external fun upload(handle:Long,z:Int,x:Int,y:Int,heights:ByteBuffer,rgba:ByteBuffer):Boolean
 }

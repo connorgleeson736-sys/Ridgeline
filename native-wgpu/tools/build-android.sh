@@ -3,6 +3,10 @@ set -euo pipefail
 RIDGELINE_NATIVE_ROOT="$(cd -- "$(dirname -- "$0")/.." && pwd)"
 : "${ANDROID_HOME:?Set ANDROID_HOME to the Android SDK directory}"
 : "${JAVA_HOME:?Set JAVA_HOME to JDK 21}"
+if [[ ! -x "$JAVA_HOME/bin/javac" ]]; then
+ echo "JAVA_HOME must point to a full JDK 21 (javac is missing), not a JRE." >&2
+ exit 69
+fi
 RIDGELINE_NDK="$ANDROID_HOME/ndk/29.0.14206865"
 RIDGELINE_LLVM="$RIDGELINE_NDK/toolchains/llvm/prebuilt/linux-x86_64/bin"
 RIDGELINE_CARGO="${RIDGELINE_CARGO:-cargo}"
@@ -25,7 +29,7 @@ for RIDGELINE_ABI in "${RIDGELINE_ABI_LIST[@]}"; do
  cp "$RIDGELINE_NATIVE_ROOT/target/$RIDGELINE_TARGET/$RIDGELINE_PROFILE/libridgeline_renderer.so" "$RIDGELINE_LIB_DIR/"
  "$RIDGELINE_LLVM/llvm-strip" --strip-unneeded "$RIDGELINE_LIB_DIR/libridgeline_renderer.so"
 done
-"${RIDGELINE_GRADLE:-$RIDGELINE_NATIVE_ROOT/android/gradlew}" -p "$RIDGELINE_NATIVE_ROOT/android" -PridgelineAbis="$RIDGELINE_ABIS" :app:testDebugUnitTest :app:assembleDebug :app:lintDebug
+"${RIDGELINE_GRADLE:-$RIDGELINE_NATIVE_ROOT/android/gradlew}" --max-workers="${RIDGELINE_GRADLE_WORKERS:-2}" -p "$RIDGELINE_NATIVE_ROOT/android" -PridgelineAbis="$RIDGELINE_ABIS" :app:testDebugUnitTest :app:assembleDebug :app:lintDebug
 # Freeze a reviewable artifact; never rebuild a file while it is being installed.
 mkdir -p "$RIDGELINE_NATIVE_ROOT/artifacts"
 cp "$RIDGELINE_NATIVE_ROOT/android/app/build/outputs/apk/debug/app-debug.apk" "$RIDGELINE_NATIVE_ROOT/artifacts/Ridgeline-Native-Prototype-Debug.apk"

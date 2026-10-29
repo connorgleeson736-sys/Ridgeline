@@ -479,3 +479,45 @@ TileLoader and genuine source residency/picking (no synthetic fallback). Compile
 and lint passes; Android execution is still pending slow unaccelerated emulator
 boot. Host oblique real-terrain capture saved separately. Neither this capture
 nor packaging establishes same-camera reference parity or completedM2/M3.
+
+## Reference-scaled boundary skirts and current Android execution blocker
+
+Implemented lowered boundary skirts on selected native geometry subrectangles.
+Surface samples and128-cell triangle grids are unchanged; imagery remains original
+256px plus existing GPU mips. Skirt depth matches authoritative MapLibre6.14:
+meanEarthCircumference /2^max(logicalZoom,0) /5. Added separate logicalZoom to the
+Android render JNI call; framebuffer projection still uses full drawing density.
+Skirt vertices duplicate the surface buffer (399384GPU bytes/source vs199692).
+Existing source-count caps remain; combined device peak memory is not yet measured.
+Picking continues to use genuine surface heights, not lowered curtains.
+
+Host19Rust tests pass, including preserving every base index and exact boundary
+connectivity; all20Android tests pass,0lint errors/16warnings. Controlled GPU
+readback shows36092background pixels closed at an intentionally discontinuous
+parent/fine boundary. Existing exact-grade/source-crop/mip/residency checks and
+actual LINZ draw/1087mcenter pick still pass. This is a boundary-gap mechanism
+proof, not accepted real-terrain visual parity or morphing/fades. All3optimized
+ABIs rebuilt; frozen Skirt-Proof APK is signed/aligned with6unchanged originalZIPs.
+Hash/report: validation/skirts/universal-apk.json. No APK/toolchain committed.
+
+Esri imagery and S3Terrarium also returnHTTP200and decode256px (host requests).
+Full build script reproduced successfully; added early fullJDK/javac preflight
+and configurable default2Gradle workers. ADB helper now accepts a response timeout.
+
+Current emulator cannot provide valid app execution evidence: initial software
+boot showed system-level DeadSystemException events, and package/settings/activity
+services disappear before app installation. No Ridgeline process ran in those
+attempts. Rebooted retained AVD; unsupported ro.hw_timeout_multiplier boot override
+was rejected. Android supported watchdog_timeout_millis setting was confirmed at
+600000and boot_completed at1, but installer still lost package service. Failed
+attempts do not mean the APK failed. No /dev/kvm is available; root cause beyond
+these system-service observations remains unconfirmed. Do not retry unchanged
+install commands or claim this session's emulator validation passed.
+
+Exact next step: establish a stable Android runtime (or physical device), install
+frozen latest Skirt-Proof APK, run ProofInstrumentation then LiveProofInstrumentation,
+and compare genuine same-camera terrain/LOD/colour/fog/gesture captures to0.18Full.
+Continue source-independent parity work if the runtime remains unavailable; full
+native UI remains gated on critical renderer proof. Capacitor/android/public source
+and original overview ZIPs remain untouched. Overall completion estimated≈25%,
+withM1complete, M2partial, M3–M6open; never describe this as the finished app.

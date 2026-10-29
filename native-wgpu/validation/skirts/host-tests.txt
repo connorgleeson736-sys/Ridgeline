@@ -1,0 +1,52 @@
+   Compiling ridgeline-core v0.1.0 (/workspace/Ridgeline/native-wgpu/core)
+   Compiling ridgeline-renderer v0.1.0 (/workspace/Ridgeline/native-wgpu/renderer)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.78s
+     Running unittests src/lib.rs (native-wgpu/target/debug/deps/ridgeline_core-dd3d7f541af8d3f4)
+
+running 17 tests
+test heightfield::tests::sampling_matches_triangles_not_bilinear ... ok
+test surface::skirt_tests::reference_skirt_length_uses_logical_zoom_not_framebuffer_density ... ok
+test surface::tests::detail_can_be_sharper_than_a_retained_photo ... ok
+test surface::tests::missing_image_is_not_invented ... ok
+test heightfield::tests::exact_flat_edges_and_missing_data ... ok
+test surface::tests::tiny_image_regions_keep_the_actual_parent_triangle ... ok
+test terrain_tests::absent_halo_is_not_zero_height ... ok
+test terrain_tests::coarse_parent_fills_three_siblings_without_overlap ... ok
+test terrain_tests::complete_children_replace_parent ... ok
+test terrain_tests::halo_has_identical_samples_on_shared_edges ... ok
+test terrain_tests::long_zoom_jump_preserves_exact_coverage ... ok
+test tests::adjacent_tiles_share_exact_edges ... ok
+test tests::encoding_is_height_not_channel_interpolation ... ok
+test tests::projection_reference ... ok
+test surface::tests::sharper_photos_do_not_refine_geometry ... ok
+test surface::skirt_tests::skirts_preserve_surface_and_connect_each_selected_boundary_segment ... ok
+test heightfield::tests::traversal_matches_exhaustive_triangle_oracle ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+
+     Running unittests src/lib.rs (native-wgpu/target/debug/deps/ridgeline_renderer-2bf2ea180decc94a)
+
+running 1 test
+test selection::tests::covers_center_without_overlap_or_unbounded_requests ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/camera.rs (native-wgpu/target/debug/deps/camera-3f14e20b83f21397)
+
+running 1 test
+test authoritative_reference_screen_positions ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+   Doc-tests ridgeline_core
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests ridgeline_renderer
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

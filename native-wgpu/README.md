@@ -127,3 +127,11 @@ and ANDROID_USER_HOME=/workspace/android-tools/android-user. Proxy Java download
 must use the inherited HTTP proxy and managed CA trust; this session used the
 system Java truststore /etc/ssl/certs/java/cacerts, without disabling TLS checks.
 Use Gradle --max-workers=2 during concurrent software emulator testing.
+
+Native skirts now use the reference logical-zoom depth rule and preserve every
+surface sample. Geometry vertex storage is399384bytes/source; source budgets
+remain bounded, but combined device memory and visual parity are still open.
+`gpu_smoke` includes a visible mixed-LOD gap regression. Latest frozen local build:
+`artifacts/Ridgeline-Native-Skirt-Proof-Debug.apk`; audit/hash in validation/skirts.
+This session's software emulator repeatedly lost Android package/activity services
+before installation, so its new instrumentation checks remain unverified.

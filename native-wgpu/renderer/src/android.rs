@@ -127,6 +127,7 @@ pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_render(
     lon: f64,
     lat: f64,
     zoom: f64,
+    logical_zoom: f64,
     bearing: f32,
     pitch: f32,
     elevation: f32,
@@ -156,6 +157,7 @@ pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_render(
             }
             _ => return 0,
         };
+        s.renderer.logical_zoom = Some(logical_zoom);
         s.renderer.render(
             &frame.texture.create_view(&Default::default()),
             mercator(lon, lat),
