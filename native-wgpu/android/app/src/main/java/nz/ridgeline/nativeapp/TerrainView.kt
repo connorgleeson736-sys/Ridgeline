@@ -107,6 +107,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         active=false;live=false;generation.incrementAndGet();uploads.clear();queued.set(false)
         gpu.post{choreographer.removeFrameCallback(vsync);if(handle!=0L)NativeBridge.destroy(handle);handle=0;thread.quitSafely()}
     }
+    fun updateUploadDemand(geometry:Set<GpuUploadQueue.Id>,images:Set<GpuUploadQueue.Id>){uploads.updateDemand(geometry,images)}
     fun upload(z:Int,x:Int,y:Int,heights:ByteBuffer,rgba:ByteBuffer){uploads.offer(GpuUploadQueue.Tile(GpuUploadQueue.Id(z,x,y),heights,rgba));requestFrame()}
     fun uploadGeometry(z:Int,x:Int,y:Int,data:ByteBuffer){uploads.offer(GpuUploadQueue.Tile(GpuUploadQueue.Id(z,x,y),data,GpuUploadQueue.EMPTY,GpuUploadQueue.Kind.GEOMETRY));requestFrame()}
     fun uploadImage(z:Int,x:Int,y:Int,data:ByteBuffer){uploads.offer(GpuUploadQueue.Tile(GpuUploadQueue.Id(z,x,y),GpuUploadQueue.EMPTY,data,GpuUploadQueue.Kind.IMAGE));requestFrame()}

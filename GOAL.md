@@ -52,8 +52,9 @@ explicitly requested, with licensing/attribution preserved.
 
 M1 audit is recorded in native-wgpu/research/AUDIT-018.md. M2 has real Android
 wgpu imagery rendering and six-pack reads on a controlled synthetic height fixture,
-plus reference camera/geometry tests. Real LINZ DEM and terrain visual parity are
-still blocked by the pending network configuration; M2 remains open. No later
+plus reference camera/geometry tests. Genuine LINZ DEM/aerial host GPU execution and same-LOD shared edges now pass
+(see validation/live-linz). Android live loading, cross-LOD stitching and terrain
+visual parity remain unverified; M2 remains open. No later
 feature or release milestone is complete.
 
 ## Resume

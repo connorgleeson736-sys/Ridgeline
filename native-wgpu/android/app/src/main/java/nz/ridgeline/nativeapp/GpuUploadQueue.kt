@@ -6,7 +6,21 @@ class GpuUploadQueue(private val capacity:Int) {
     data class Id(val z:Int,val x:Int,val y:Int){val packed get()=(z.toLong() shl 44)or(x.toLong() shl 22)or y.toLong()}
     data class Tile(val id:Id,val heights:ByteBuffer,val rgba:ByteBuffer,val kind:Kind=Kind.COMBINED){val bytes get()=heights.capacity()+rgba.capacity()}
     private val entries=LinkedHashMap<Pair<Id,Kind>,Tile>()
-    @Synchronized fun offer(tile:Tile){val key=tile.id to tile.kind;entries.remove(key);entries[key]=tile;while(entries.size>capacity)entries.remove(entries.keys.first())}
+    private var demand:Pair<Set<Id>,Set<Id>>?=null
+    private fun wanted(tile:Tile):Boolean {
+        val current=demand?:return true // Controlled fixtures need no viewport demand.
+        return when(tile.kind){
+            Kind.GEOMETRY->tile.id in current.first
+            Kind.IMAGE->tile.id in current.second
+            Kind.COMBINED->tile.id in current.first||tile.id in current.second
+        }
+    }
+    /** Prune queued ownership only; resident fallback coverage remains intact. */
+    @Synchronized fun updateDemand(geometry:Set<Id>,images:Set<Id>){
+        demand=geometry.toSet() to images.toSet()
+        entries.entries.removeAll{!wanted(it.value)}
+    }
+    @Synchronized fun offer(tile:Tile){if(!wanted(tile))return;val key=tile.id to tile.kind;entries.remove(key);entries[key]=tile;while(entries.size>capacity)entries.remove(entries.keys.first())}
     @Synchronized fun take(count:Int,byteBudget:Int=Int.MAX_VALUE):List<Tile>{
         val out=ArrayList<Tile>(count);val iter=entries.entries.iterator();var bytes=0
         while(out.size<count&&iter.hasNext()){val row=iter.next().value;if(bytes+row.bytes>byteBudget)break;out.add(row);bytes+=row.bytes;iter.remove()};return out

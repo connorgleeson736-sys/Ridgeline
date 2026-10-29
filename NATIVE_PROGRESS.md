@@ -453,3 +453,29 @@ refreshed download branch to /workspace/native-reference; native Android build a
 emulator toolchain restoration are in progress. No generated toolchain/APK committed.
 M2/M3 remain open: cross-LOD stitching, oblique same-camera reference captures,
 live Android loading and gesture/terrain collision acceptance must precede full UI.
+
+## Source-demand upload pruning and rebuilt native APK
+
+Queued uploads now adopt immutable geometry/image demand sets and release obsolete
+queued ownership immediately on viewport-plan changes. Late in-flight results
+cannot displace wanted uploads; re-admission remains allowed. This does not evict
+resident fallback tiles or reduce source/drawing resolution. Added regression for
+independent source kinds, late completion and re-admission. All20Android host
+unit tests pass (none skipped); assembleDebug/lintDebug pass. All3native ABIs
+cross-compiled optimized. APK signature/16KiB ZIP alignment and exact6originalZIP
+packaging audit pass. Frozen artifact is native-wgpu/artifacts/
+Ridgeline-Native-Live-Proof-Debug.apk (not committed); hashes in validation/live-linz.
+
+Restored actual0.18Full reference APK through GitLFS (the Git blob is only a pointer)
+and audited it: same b4d286f… SHA,630gap entries,67coarse photos,6original payloads,
+no Cook substitution. Original Capacitor/android/public sources remain untouched.
+System Java was a JRE without javac; replaced with full Temurin21.0.13, verified
+against official Adoptium API checksum. Managed Java CA trust retained. Earlier
+parallel Gradle clients were stopped; successful final run used writable caches,
+fullJDK and max-workers2. Recreated toolchain/build files stay outside Git.
+
+Added opt-in debug LiveProofInstrumentation exercising MainActivity/production
+TileLoader and genuine source residency/picking (no synthetic fallback). Compiles
+and lint passes; Android execution is still pending slow unaccelerated emulator
+boot. Host oblique real-terrain capture saved separately. Neither this capture
+nor packaging establishes same-camera reference parity or completedM2/M3.

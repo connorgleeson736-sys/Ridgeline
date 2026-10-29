@@ -126,6 +126,24 @@ async fn run() {
         ppm.extend_from_slice(&p[..3]);
     }
     std::fs::write(dir.join("native-live.ppm"), ppm).unwrap();
+    r.render(
+        &output.create_view(&Default::default()),
+        center,
+        12.,
+        -24.,
+        58.,
+        elevation as f32,
+    );
+    let oblique = read(&r, &output);
+    assert_ne!(
+        oblique, pixels,
+        "pitch must change the real terrain projection"
+    );
+    let mut capture = b"P6\n256 256\n255\n".to_vec();
+    for pixel in oblique.chunks_exact(4) {
+        capture.extend_from_slice(&pixel[..3]);
+    }
+    std::fs::write(dir.join("native-oblique.ppm"), capture).unwrap();
     println!(
         "Live LINZ GPU draw, 129 exact shared edge samples, full 256px imagery, center pick height={:.3}m expected={:.3}m: PASS. Not visual parity or Android execution.",
         hit[2], elevation

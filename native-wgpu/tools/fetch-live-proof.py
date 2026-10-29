@@ -36,7 +36,7 @@ pixels = {}
 for yy in range(y-1,y+2):
     for xx in range(x-1,x+3):
         im = fetch('elevation',xx,yy)
-        rows = list(im.getdata())
+        rows = list(im.get_flattened_data()) if hasattr(im, "get_flattened_data") else list(im.getdata())
         assert all(v[3] == 255 for v in rows), 'nodata needs production parent fallback; do not fabricate heights'
         pixels[xx,yy] = [-10000 + (r*65536+g*256+b)*.1 for r,g,b,_ in rows]
 def height(gx,gy):

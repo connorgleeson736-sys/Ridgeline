@@ -94,8 +94,9 @@ host where adb's default home is read-only; it is never included in the APK.
 
 ## Open acceptance gates
 
-Live LINZ DEM/imagery checks currently need the environment network draft to be
-published. Terrain collision/gesture anchoring/inertia, real LOD stitching/fades,
+The current published environment permits genuine LINZ DEM/imagery requests;
+host GPU rendering/picking and same-LOD edges pass. Android live integration and
+cross-LOD/visual parity still need verification. Terrain collision/gesture anchoring/inertia, real LOD stitching/fades,
 lighting/fog checks, route/planner/profile migration, overlays/labels/settings,
 location/offline management and physical-phone benchmarks remain incomplete.
 Do not confuse build success or subpixel numeric camera agreement with complete
@@ -111,3 +112,18 @@ Then run `VK_ICD_FILENAMES=/usr/lib/chromium/vk_swiftshader_icd.json cargo run -
 The example validates exact shared edges, executes native GPU draw/readback and
 checks the center pick against the real mesh. `native-live.ppm` is a host capture.
 This does not establish Android loader execution, cross-LOD seams or visual parity.
+
+
+For opt-in production-loader integration on Android, use
+`adb shell am instrument -w nz.ridgeline.nativeapp/.LiveProofInstrumentation`.
+Unlike ProofInstrumentation, this launches MainActivity and requires genuine
+geometry/image source residency and a terrain pick; it has no synthetic fallback.
+A passing run is Android integration evidence, not visual or gesture parity.
+
+The preinstalled system Java may be a JRE without javac. Use a full JDK21 (the
+current session verified Temurin21.0.13 against official Adoptium metadata).
+Keep caches writable, e.g. GRADLE_USER_HOME=/workspace/android-tools/gradle-cache
+and ANDROID_USER_HOME=/workspace/android-tools/android-user. Proxy Java downloads
+must use the inherited HTTP proxy and managed CA trust; this session used the
+system Java truststore /etc/ssl/certs/java/cacerts, without disabling TLS checks.
+Use Gradle --max-workers=2 during concurrent software emulator testing.

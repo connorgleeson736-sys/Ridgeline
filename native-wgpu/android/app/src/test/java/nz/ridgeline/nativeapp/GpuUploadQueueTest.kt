@@ -22,4 +22,21 @@ class GpuUploadQueueTest {
   assertTrue(q.isNotEmpty());assertEquals(GpuUploadQueue.Kind.IMAGE,q.take(4,300).single().kind)
   assertFalse(q.isNotEmpty())
  }
+ @Test fun changedViewportDropsQueuedAndLateSourcesIndependently(){
+  val q=GpuUploadQueue(8)
+  val a=GpuUploadQueue.Id(11,1991,1300);val b=GpuUploadQueue.Id(12,3982,2600)
+  val data=ByteBuffer.allocate(16)
+  fun tile(id:GpuUploadQueue.Id,kind:GpuUploadQueue.Kind)=GpuUploadQueue.Tile(id,data,GpuUploadQueue.EMPTY,kind)
+  q.offer(tile(a,GpuUploadQueue.Kind.GEOMETRY))
+  q.offer(tile(a,GpuUploadQueue.Kind.IMAGE))
+  q.updateDemand(setOf(a),setOf(b))
+  // An obsolete in-flight completion cannot displace demanded sources.
+  q.offer(tile(a,GpuUploadQueue.Kind.IMAGE))
+  q.offer(tile(b,GpuUploadQueue.Kind.IMAGE))
+  assertEquals(listOf(a to GpuUploadQueue.Kind.GEOMETRY,b to GpuUploadQueue.Kind.IMAGE),q.take(8).map{it.id to it.kind})
+  q.updateDemand(emptySet(),emptySet())
+  q.offer(tile(b,GpuUploadQueue.Kind.IMAGE));assertFalse(q.isNotEmpty())
+  q.updateDemand(setOf(a),setOf(b))
+  q.offer(tile(b,GpuUploadQueue.Kind.IMAGE));assertEquals(b,q.take(1).single().id)
+ }
 }

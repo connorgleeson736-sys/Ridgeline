@@ -107,6 +107,8 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             for((id,priority)in demand)ranked[Source(Id(id.z,id.x,id.y),geometry)]=priority
         }
         wanted = ranked.keys.toSet()
+        view.updateUploadDemand(wanted.filter{it.geometry}.map{it.id.gpu()}.toSet(),
+            wanted.filter{!it.geometry}.map{it.id.gpu()}.toSet())
         for ((source, task) in jobs) if (source !in wanted && workers.remove(task)) jobs.remove(source, task)
         for ((source, priority) in ranked) {
             if(resident(source))continue
