@@ -42,7 +42,7 @@ fn read(r: &Renderer, output: &wgpu::Texture) -> Vec<u8> {
 }
 async fn run() {
     let mut descriptor = wgpu::InstanceDescriptor::new_without_display_handle();
-    descriptor.backends = wgpu::Backends::VULKAN;
+    descriptor.backends = if std::env::args().any(|s|s=="--gles"){wgpu::Backends::GL}else{wgpu::Backends::VULKAN};
     let instance = wgpu::Instance::new(descriptor);
     let mut r = Renderer::new(
         &instance,

@@ -23,7 +23,12 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     private var handle=0L
     @Volatile private var live=false
     @Volatile private var active=true
-    @Volatile var cameraPose=CameraPose();private set
+    private val cameraPreferences=context.getSharedPreferences("camera",0)
+    @Volatile var cameraPose=runCatching{
+        CameraPose(Double.fromBits(cameraPreferences.getLong("lon",170.14219572.toBits())),Double.fromBits(cameraPreferences.getLong("lat",(-43.5955671).toBits())),Double.fromBits(cameraPreferences.getLong("zoom",11.9.toBits())),cameraPreferences.getFloat("bearing",-24f),cameraPreferences.getFloat("pitch",58f),cameraPreferences.getFloat("elevation",3724f)).also{
+            require(it.longitude in 165.0..180.0&&it.latitude in -49.0..-33.0&&it.zoom in 4.0..19.0&&it.bearing.isFinite()&&it.pitch in 0f..85f&&it.elevation.isFinite())
+        }
+    }.getOrElse{CameraPose()};private set
     @Volatile private var groundedPose:CameraPose?=null
     @Volatile private var presentedPose:CameraPose?=null
     internal fun groundedFrameReady()=groundedPose==cameraPose&&presentedPose==cameraPose
@@ -140,7 +145,9 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         gpu.post{choreographer.removeFrameCallback(vsync);if(handle!=0L)NativeBridge.destroy(handle);handle=0L;done.countDown()}
         done.await(5,TimeUnit.SECONDS)
     }
-    fun setActive(value:Boolean){active=value;cancelFrames();if(value&&live)requestFrame()}
+    fun setActive(value:Boolean){
+        if(!value){val pose=cameraPose;cameraPreferences.edit().putLong("lon",pose.longitude.toBits()).putLong("lat",pose.latitude.toBits()).putLong("zoom",pose.zoom.toBits()).putFloat("bearing",pose.bearing).putFloat("pitch",pose.pitch).putFloat("elevation",pose.elevation).apply()}
+        active=value;cancelFrames();if(value&&live)requestFrame()}
     fun close() {
         active=false;live=false;generation.incrementAndGet();uploads.clear();queued.set(false)
         gpu.post{choreographer.removeFrameCallback(vsync);if(handle!=0L)NativeBridge.destroy(handle);handle=0;thread.quitSafely()}
@@ -204,10 +211,15 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         override fun onDoubleTap(e:MotionEvent):Boolean{zoomBy(1.0);return true}
         override fun onScroll(a:MotionEvent?,b:MotionEvent,dx:Float,dy:Float):Boolean {
             if(b.pointerCount!=1||scaler.isInProgress)return true
-            val pose=cameraPose;val world=512*2.0.pow(pose.zoom)*pixelScale;val angle=Math.toRadians(pose.bearing.toDouble())
-            val longitude=pose.longitude+(dx*cos(angle)+dy*sin(angle))/world*360
-            val my=(1-asinh(tan(Math.toRadians(pose.latitude)))/PI)/2+(dy*cos(angle)-dx*sin(angle))/world
-            cameraPose=pose.copy(longitude=longitude.coerceIn(165.0,180.0),latitude=Math.toDegrees(atan(sinh(PI*(1-2*my)))).coerceIn(-49.0,-33.0));changed();return true
+            val pose=cameraPose;val world=512*2.0.pow(pose.zoom)*pixelScale
+            val before=CameraMath.offset(width,height,pose.bearing,pose.pitch,b.x+dx.toDouble(),b.y+dy.toDouble())
+            val after=CameraMath.offset(width,height,pose.bearing,pose.pitch,b.x.toDouble(),b.y.toDouble())
+            if(before!=null&&after!=null){
+                val longitude=pose.longitude+(before.first-after.first)/world*360
+                val my=CameraMath.mercatorY(pose.latitude)-(before.second-after.second)/world
+                val next=pose.copy(longitude=longitude.coerceIn(165.0,180.0),latitude=CameraMath.latitude(my).coerceIn(-49.0,-33.0))
+                if(next!=pose){cameraPose=next;changed()}
+            };return true
         }
     })
     private var lastAngle=0.0

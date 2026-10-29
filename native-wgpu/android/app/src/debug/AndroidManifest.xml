@@ -5,4 +5,5 @@
  <instrumentation android:name=".ProofInstrumentation" android:targetPackage="nz.ridgeline.nativeapp" android:functionalTest="true"/>
  <instrumentation android:name=".LiveProofInstrumentation" android:targetPackage="nz.ridgeline.nativeapp" android:functionalTest="true"/>
  <instrumentation android:name=".MipmapProofInstrumentation" android:targetPackage="nz.ridgeline.nativeapp" android:functionalTest="true"/>
+ <instrumentation android:name=".PlannerProofInstrumentation" android:targetPackage="nz.ridgeline.nativeapp" android:functionalTest="true"/>
 </manifest>

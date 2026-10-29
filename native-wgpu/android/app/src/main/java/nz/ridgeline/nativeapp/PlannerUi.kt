@@ -20,7 +20,7 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
     private val main=Handler(Looper.getMainLooper())
     private val files=Executors.newSingleThreadExecutor()
     private val preferences=activity.getSharedPreferences("planner",0)
-    private val controller=RouteController(RouteDatabase(activity),java.util.concurrent.Executor{main.post(it)})
+    internal val controller=RouteController(RouteDatabase(activity),java.util.concurrent.Executor{main.post(it)})
     private val passive=linkedMapOf<String,List<Coordinate>>()
     private val loading=hashSetOf<String>()
     private var lastPaths=emptyList<Triple<List<Coordinate>,Int,Int>>()
@@ -29,6 +29,7 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
     private var profilePoints=emptyList<Coordinate>()
     private var export:Pair<String,List<Coordinate>>?=null
     private var restoring=false
+    private var restoreId:String?=null
     private var closed=false
     private var changingTitle=false
     private var lastId:String?=null
@@ -51,7 +52,7 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         heading.addView(title,LinearLayout.LayoutParams(0,dp(44),1f));heading.addView(button("×"){controller.unload()},LinearLayout.LayoutParams(dp(44),dp(44)))
         panel.addView(heading)
         val scroll=HorizontalScrollView(activity).apply{isHorizontalScrollBarEnabled=false}
-        for(view in listOf(edit,undo,delete,button("Fit"){terrain.focus(controller.state.points)},button("GPX"){exportGpx()}))tools.addView(view,LinearLayout.LayoutParams(-2,dp(42)))
+        for(view in listOf(edit,undo,delete,button("Fit"){terrain.focus(controller.state.points)},button("Profile"){val visible=chart.visibility!=View.VISIBLE;chart.visibility=if(visible)View.VISIBLE else View.GONE;caption.visibility=chart.visibility},button("GPX"){exportGpx()}))tools.addView(view,LinearLayout.LayoutParams(-2,dp(42)))
         scroll.addView(tools);panel.addView(scroll)
         panel.addView(summary);panel.addView(chart,LinearLayout.LayoutParams(-1,dp(84)));panel.addView(caption)
         root.addView(panel,FrameLayout.LayoutParams(-1,-2,Gravity.BOTTOM).apply{bottomMargin=dp(46);marginStart=dp(8);marginEnd=dp(8)})
@@ -81,7 +82,7 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         terrain.onWaypointDrag={controller.previewDrag(it)}
         terrain.onWaypointDragEnd={if(it)controller.finishDrag()else controller.cancelDrag()}
         controller.observe{state,change->
-            if(!restoring&&state.loaded){restoring=true;val old=preferences.getString("active",null);if(old!=null&&state.records.any{it.id==old})main.post{controller.open(old)}}
+            if(!restoring&&state.loaded){restoring=true;val old=preferences.getString("active",null);if(old!=null&&state.records.any{it.id==old}){restoreId=old;main.post{controller.open(old)}}}
             panel.visibility=if(state.drawing||state.points.isNotEmpty()||state.id!=null)View.VISIBLE else View.GONE
             if(title.text.toString()!=state.name&&!title.hasFocus()){changingTitle=true;title.setText(state.name);changingTitle=false}
             edit.text=if(state.drawing)"Done"else"Edit";edit.isEnabled=state.loaded&&!state.busy
@@ -92,10 +93,11 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
             if(state.id!=lastId){lastId=state.id;preferences.edit().apply{if(state.id==null)remove("active")else putString("active",state.id)}.apply()}
             if(state.id!=null)passive[state.id]=state.points
             syncRoutes()
-            if(change==RouteController.Change.OPENED&&state.points.isNotEmpty())terrain.focus(state.points)
+            if(change==RouteController.Change.OPENED&&state.points.isNotEmpty()){if(state.id!=restoreId)terrain.focus(state.points);restoreId=null}
             if(state.points!=profilePoints&&change!=RouteController.Change.PREVIEW){
                 profilePoints=state.points;chart.data(emptyList());caption.text=if(state.points.size>=2)"Loading elevation profile…"else"Long-press a waypoint to drag it."
                 if(state.points.size>=2)loader.profile(state.points){values->
+                    if(closed||profilePoints!=state.points)return@profile
                     chart.data(values);val totals=NativeGeo.totals(values.map{it.height})
                     caption.text="↑ ${totals.ascent.roundToInt()} m   ↓ ${totals.descent.roundToInt()} m   High ${totals.high?.roundToInt()?:"—"} m${if(totals.complete)""else" · incomplete coverage"}"
                 }
@@ -165,6 +167,7 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
             }else if(snapshot!=null){activity.contentResolver.openOutputStream(uri,"wt")?.use{it.write(GpxCodec.encode(snapshot.first,snapshot.second))}?:error("GPX could not be saved");main.post{toast("GPX saved")}}
         }catch(e:Exception){main.post{if(!closed)toast(e.message?:"File operation failed")}}}
     }
+    fun back():Boolean{if(controller.state.drawing){controller.drawing(false);return true};if(controller.state.id!=null||controller.state.points.isNotEmpty()){controller.unload();return true};return false}
     fun pause(){controller.flush()}
     override fun close(){closed=true;controller.close();files.shutdown()}
     private fun formatDistance(m:Double)=if(m>=1000)String.format(java.util.Locale.ROOT,"%.2f km",m/1000)else"${m.roundToInt()} m"

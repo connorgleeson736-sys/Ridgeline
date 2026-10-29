@@ -833,3 +833,13 @@ invariant and route GPU fixture pass (1024affected pixels; no geometry uploads o
 idle/pan), plus existing GPU smoke on the changed pipeline. All3Android JNI ABIs
 are rebuilding; Android UI/runtime execution is still pending. No finished-app,
 phone-speedup or complete feature-acceptance claim at this source checkpoint.
+
+## Restored feature workspace checkpoint
+
+Preserved the interrupted native offline-region store/downloader, one-shot location,
+camera preferences/perspective pan and planner integration fixture. Kotlin assembly
+and focused camera checks passed before interruption; the final small profile/cache
+edits still need compilation. All three route-enabled JNI ABIs were built. Actual
+Android planner UI opened, but provider requests timed out and the grounded route
+fixture did not complete. No new Android terrain acceptance or phone-speed claim.
+Next user priority is MapLibre-like anchored gestures, stable view/loading and HLOD.

@@ -35,6 +35,13 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private fun linz(kind: String, id: Id, ext: String): String =
         "https://basemaps.linz.govt.nz/v1/tiles/$kind/WebMercatorQuad/${id.z}/${id.x}/${id.y}.$ext?" +
             (if (kind == "elevation") "pipeline=terrain-rgb&" else "") + "api=$key"
+    private val offline=OfflineStore(context)
+    private val downloadJobs=Executors.newSingleThreadExecutor()
+    private val regionContext=ThreadLocal<String>()
+    private val downloadCancel=java.util.concurrent.atomic.AtomicBoolean(false)
+    private val preferences=context.getSharedPreferences("display",0)
+    @Volatile var offlineOnly=preferences.getBoolean("offlineOnly",false);private set
+    fun offlineOnly(value:Boolean){offlineOnly=value;preferences.edit().putBoolean("offlineOnly",value).apply();cameraChanged()}
     private val imagery = NativeImagery(context, ::fetch) { z, x, y -> linz("aerial", Id(z, x, y), "webp") }
     private val am = context.getSystemService(ActivityManager::class.java)
     private val imageLimit = if (am.isLowRamDevice) 32 else (am.memoryClass / 2).coerceIn(64, 128)
@@ -150,7 +157,11 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     }
     private fun fetch(url: String): ByteArray {
         check(!dead)
-        val request = Request.Builder().url(url).header("User-Agent", "Ridgeline-Native/0.1.0").build()
+        val region=regionContext.get()
+        offline.read(url)?.let{if(region!=null)offline.keep(region,url,it);return it}
+        val request = Request.Builder().url(url).header("User-Agent", "Ridgeline-Native/0.1.0").apply{
+            if(offlineOnly&&region==null)cacheControl(CacheControl.FORCE_CACHE)
+        }.build()
         client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) throw TileHttpException(response.code)
             val body = response.body ?: throw IOException("Empty tile")
@@ -164,7 +175,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
                 if (source.read(sink, minOf(8192L, remaining)) == -1L) break
             }
             require(sink.size <= 8 * 1024 * 1024)
-            return sink.readByteArray()
+            val bytes=sink.readByteArray();if(region!=null)offline.keep(region,url,bytes);return bytes
         }
     }
     private fun demPixels(data: ByteArray): FloatArray {
@@ -222,6 +233,45 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         }
         rgba.rewind(); return rgba
     }
+    data class Bounds(val west:Double,val south:Double,val east:Double,val north:Double)
+    private fun regionTiles(bounds:Bounds,maxZoom:Int):List<Id>{
+        require(maxZoom in 8..19&&bounds.west>=165&&bounds.east<=180&&bounds.south>=-49&&bounds.north<=-33&&bounds.west<bounds.east&&bounds.south<bounds.north){"Choose a valid New Zealand region."}
+        val result=ArrayList<Id>()
+        for(z in 0..maxZoom){
+            val n=1 shl z
+            fun x(v:Double)=floor((v+180)/360*n).toInt().coerceIn(0,n-1)
+            fun y(v:Double)=floor((1-asinh(tan(Math.toRadians(v)))/PI)/2*n).toInt().coerceIn(0,n-1)
+            val x0=x(bounds.west);val x1=x(bounds.east);val y0=y(bounds.north);val y1=y(bounds.south)
+            require(result.size.toLong()+(x1-x0+1).toLong()*(y1-y0+1)<=2000){"Choose a smaller region or lower offline detail (2,000 image tiles per region)."}
+            for(yy in y0..y1)for(xx in x0..x1)result.add(Id(z,xx,yy))
+        };return result
+    }
+    fun regionEstimate(bounds:Bounds,maxZoom:Int)=regionTiles(bounds,maxZoom).size
+    fun regions(callback:(List<OfflineStore.Region>)->Unit){downloadJobs.execute{val rows=offline.regions();view.post{if(!dead)callback(rows)}}}
+    fun removeRegion(id:String,callback:()->Unit){downloadJobs.execute{offline.delete(id);view.post{if(!dead)callback()}}}
+    fun cancelDownload(){downloadCancel.set(true)}
+    fun downloadRegion(name:String,bounds:Bounds,maxZoom:Int,progress:(String)->Unit,done:()->Unit){
+        val tiles=regionTiles(bounds,maxZoom);downloadCancel.set(false)
+        downloadJobs.execute{
+            val region=offline.begin(name);regionContext.set(region);val demDone=HashSet<Id>()
+            fun checkActive(){check(!dead&&!downloadCancel.get()){ "Download cancelled" }}
+            fun dem(id:Id){
+                if(!demDone.add(id))return;checkActive()
+                val pixels=try{demPixels(fetch(linz("elevation",id,"png")))}catch(e:TileHttpException){if(e.code==404&&id.z>0)null else throw e}
+                if((pixels==null||pixels.any{!it.isFinite()})&&id.z>0)dem(id.parent())
+            }
+            try{
+                for((index,id)in tiles.withIndex()){
+                    checkActive();imagery.load(id.z,id.x,id.y)
+                    val dz=min(id.z,18);val f=1 shl(id.z-dz);val n=1 shl dz
+                    for(dy in -1..1)for(dx in -1..1)dem(Id(dz,Math.floorMod(id.x/f+dx,n),(id.y/f+dy).coerceIn(0,n-1)))
+                    if(index%5==0||index==tiles.lastIndex)view.post{if(!dead)progress("${index+1}/${tiles.size} image tiles · terrain included")}
+                }
+                offline.status(region,"Ready")
+            }catch(e:Exception){offline.status(region,if(downloadCancel.get()||dead)"Partial · cancelled"else"Partial · source unavailable")}
+            finally{regionContext.remove();view.post{if(!dead)done()}}
+        }
+    }
     private val profileJobs=Executors.newSingleThreadScheduledExecutor()
     private var profileJob:Future<*>?=null
     private val profileRevision=AtomicLong()
@@ -241,7 +291,8 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         },350,TimeUnit.MILLISECONDS)
     }
     fun close() {
-        dead = true; profileRevision.incrementAndGet();profileJob?.cancel(true);profileJobs.shutdownNow();timer?.cancel(true); scheduler.shutdownNow(); workers.shutdownNow()
+        dead = true;downloadCancel.set(true);downloadJobs.shutdown(); profileRevision.incrementAndGet();profileJob?.cancel(true);profileJobs.shutdownNow();timer?.cancel(true); scheduler.shutdownNow(); workers.shutdownNow()
         client.dispatcher.cancelAll(); client.connectionPool.evictAll(); client.cache?.close(); client.dispatcher.executorService.shutdown(); synchronized(ready) { ready.clear(); readyBytes=0 }; synchronized(decoded) { decoded.clear() }
+        Thread({downloadJobs.awaitTermination(60,TimeUnit.SECONDS);profileJobs.awaitTermination(60,TimeUnit.SECONDS);workers.awaitTermination(60,TimeUnit.SECONDS);offline.close()},"ridgeline-offline-close").start()
     }
 }
