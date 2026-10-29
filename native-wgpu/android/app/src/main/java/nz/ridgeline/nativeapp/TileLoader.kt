@@ -26,8 +26,10 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         fun gpu() = GpuUploadQueue.Id(z,x,y)
     }
     private data class Source(val id:Id,val geometry:Boolean)
+    // Automatic HTTP cache is disposable. Saved regions/packs are never evicted here.
+    val automaticCacheBytes=minOf(1_000_000_000L,(context.cacheDir.usableSpace/8).coerceAtLeast(4_194_304L))
     private val client = OkHttpClient.Builder()
-        .cache(Cache(File(context.cacheDir, "native-http-v1"), 256_000_000))
+        .cache(Cache(File(context.cacheDir, "native-http-v1"), automaticCacheBytes))
         .connectTimeout(12, TimeUnit.SECONDS).readTimeout(15, TimeUnit.SECONDS).build()
     private val key = context.assets.open("map-defaults.json").use {
         JSONObject(it.readBytes().toString(Charsets.UTF_8)).getString("linzApiKey")
@@ -54,10 +56,11 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private val demJobs = ConcurrentHashMap<Id, CompletableFuture<Dem>>()
     private val jobs = ConcurrentHashMap<Source, Task>()
     private val sequence = AtomicLong()
-    private data class Plan(val ranked:Map<Source,Int>,val centerGeometry:Id?)
+    private data class Plan(val ranked:Map<Source,Int>)
     private val plans=DemandPlanCache<DemandPlanKey,Plan>()
     private val planBuffer=ByteBuffer.allocateDirect(512*12).order(ByteOrder.LITTLE_ENDIAN)
     @Volatile private var dead = false
+    @Volatile private var active = true
     @Volatile private var wanted = emptySet<Source>()
     private var timer: ScheduledFuture<*>? = null
     private val scheduler = Executors.newSingleThreadScheduledExecutor()
@@ -86,7 +89,10 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
                     synchronized(ready) {
                         ready.put(source,data)?.let{readyBytes-=it.capacity()}
                         readyBytes+=data.capacity()
-                        while(readyBytes>readyByteLimit){val first=ready.keys.first();readyBytes-=ready.remove(first)!!.capacity()}
+                        while(readyBytes>readyByteLimit){
+                            val first=ready.keys.firstOrNull{it !in wanted}?:ready.keys.first()
+                            readyBytes-=ready.remove(first)!!.capacity()
+                        }
                     }
                     if (source in wanted&&!resident(source)) upload(source,data)
                 }
@@ -105,7 +111,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     fun cameraChanged() = synchronized(this) {
         // Throttle using the latest immutable camera; a continuous drag must not
         // indefinitely postpone source selection, as a cancel/reschedule debounce did.
-        if(!dead&&timer==null)timer=scheduler.schedule({
+        if(!dead&&active&&timer==null)timer=scheduler.schedule({
             synchronized(this){timer=null}
             loadView()
         },50,TimeUnit.MILLISECONDS)
@@ -120,7 +126,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         return List(count){Id(output.int,output.int,output.int)}
     }
     private fun loadView() {
-        if (dead||view.width==0||view.height==0) return
+        if (dead||!active||view.width==0||view.height==0) return
         val key=DemandPlanKey((view.width/view.pixelScale).roundToInt().coerceAtLeast(1),
             (view.height/view.pixelScale).roundToInt().coerceAtLeast(1),view.cameraPose)
         val plan=plans.get(key) {
@@ -130,15 +136,9 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             val demand=SourceDemand.bounded(ids.map{it.gpu()},if(geometry)geometryLimit else imageLimit)
             for((id,priority)in demand)next[Source(Id(id.z,id.x,id.y),geometry)]=priority
           }
-          val mx=(key.pose.longitude+180)/360
-          val my=(1-asinh(tan(Math.toRadians(key.pose.latitude)))/PI)/2
-          val center=next.keys.asSequence().filter{it.geometry}.map{it.id}.filter{
-              val n=2.0.pow(it.z);floor(mx*n).toInt()==it.x&&floor(my*n).toInt()==it.y
-          }.maxByOrNull{it.z}
-          Plan(next.toMap(),center)
+          Plan(next.toMap())
         }
         val ranked=plan.ranked
-        reconcileCenterHeight(key.pose,plan.centerGeometry)
         wanted = ranked.keys.toSet()
         view.updateUploadDemand(wanted.filter{it.geometry}.map{it.id.gpu()}.toSet(),
             wanted.filter{!it.geometry}.map{it.id.gpu()}.toSet())
@@ -157,24 +157,26 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             }
         }
     }
-    private fun reconcileCenterHeight(pose:CameraPose,id:Id?) {
-        // Follow the finest demanded center geometry only after it is resident.
-        // Coarse arrival cannot snap the initial alpine camera down to a broad
-        // regional average while the actual center surface is still loading.
-        if(id==null||!view.isResident(id.gpu(),true))return
-        val mx=(pose.longitude+180)/360
-        val my=(1-asinh(tan(Math.toRadians(pose.latitude)))/PI)/2
-        val height=synchronized(decoded){
-            DemSampling.point(DemSampling.terrainSourceZoom(id.z),mx,my){decoded[Id(it.z,it.x,it.y)]}
-        }?:return
-        view.post{if(!dead&&view.cameraPose==pose)view.centerHeight(height)}
-    }
-    private fun fetch(url: String): ByteArray {
+    private data class FetchKey(val url:String,val offline:Boolean)
+    private val bodyJobs=ConcurrentHashMap<FetchKey,CompletableFuture<ByteArray>>()
+    private fun fetch(url:String):ByteArray{
         check(!dead)
-        val region=regionContext.get()
-        offline.read(url)?.let{if(region!=null)offline.keep(region,url,it);return it}
+        val key=FetchKey(url,offlineOnly&&regionContext.get()==null)
+        val future=CompletableFuture<ByteArray>();val existing=bodyJobs.putIfAbsent(key,future)
+        val bytes=if(existing!=null){
+            try{existing.get()}catch(e:ExecutionException){throw(e.cause as? Exception?:IOException("Shared tile request failed"))}
+        }else try{
+            fetchBody(url,key.offline).also{future.complete(it)}
+        }catch(e:Exception){future.completeExceptionally(e);throw e}
+        finally{bodyJobs.remove(key,future)}
+        regionContext.get()?.let{offline.keep(it,url,bytes)}
+        return bytes
+    }
+    private fun fetchBody(url: String,cacheOnly:Boolean): ByteArray {
+        check(!dead)
+        offline.read(url)?.let{return it}
         val request = Request.Builder().url(url).header("User-Agent", "Ridgeline-Native/0.1.0").apply{
-            if(offlineOnly&&region==null)cacheControl(CacheControl.FORCE_CACHE)
+            if(cacheOnly)cacheControl(CacheControl.FORCE_CACHE)
         }.build()
         client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) throw TileHttpException(response.code)
@@ -189,7 +191,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
                 if (source.read(sink, minOf(8192L, remaining)) == -1L) break
             }
             require(sink.size <= 8 * 1024 * 1024)
-            val bytes=sink.readByteArray();if(region!=null)offline.keep(region,url,bytes);return bytes
+            return sink.readByteArray()
         }
     }
     private fun demPixels(data: ByteArray): FloatArray {
@@ -304,6 +306,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             view.post{if(!dead&&revision==profileRevision.get())callback(result)}
         },350,TimeUnit.MILLISECONDS)
     }
+    fun setActive(value:Boolean){active=value;if(value)cameraChanged()}
     fun close() {
         dead = true;downloadCancel.set(true);downloadJobs.shutdown(); profileRevision.incrementAndGet();profileJob?.cancel(true);profileJobs.shutdownNow();timer?.cancel(true); scheduler.shutdownNow(); geometryWorkers.shutdownNow();imageWorkers.shutdownNow()
         client.dispatcher.cancelAll(); client.connectionPool.evictAll(); client.cache?.close(); client.dispatcher.executorService.shutdown(); synchronized(ready) { ready.clear(); readyBytes=0 }; synchronized(decoded) { decoded.clear() }

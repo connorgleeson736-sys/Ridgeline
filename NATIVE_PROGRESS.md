@@ -923,3 +923,27 @@ this ispayload accounting, notphoneFPS. GPU fixturepasses Vulkan andGLES, includ
 mixedLODskirts,detailownership,filtering andboundedcache. ExistingcontrolledAndroid
 inputfixture updated toholdbeforerelease so it stillisolatesanchoringfrommomentum;
 notrerunatthischeckpoint. MapLibreBSDnotice includedinsource andassetpackaging.
+
+
+## Cache retention, terrain camera safety and performance decisions
+
+User reaffirmed maximumperformance over copyingMapLibrestructure and chose immediate
+imageryreplacement (nofades). Directshader keepsoneimagerysample, nofadeframe-loop
+orintermediatedrape targets. Userchose1GBautomaticdiskcache, adaptivelylimitedby
+free space; explicitoffline regions andall6originalpacks excludedfromeviction.
+HTTPsourcebodyrequests nowdeduplicateacross imagery/DEM/profile/downloadworkers,
+retainingHTTPexpiration/conditionalrequests andseparateoffline-onlypolicy. Shared
+responses stilljoin eachsavedregion; originalproviderexceptiontypes preserved.
+CPUreadycacheevictsnonwantedentries first;GPUcacheLRUusesactualrendereduse instead
+ofuploadage. Viewselectionstopswhilebackgrounded andresumesfromlatestcamera.
+
+Camera safety follows exact6.14eye+3x3nearclip sampling againstresidentrealheight
+fields, withoutGPUreadback. It lifts a buriedcamera beforedraw andcorrects only
+currentcamera revisions. Centre grounding uses theactualrenderedtrianglefield
+only once finestrequestedcentresourceisready, soevicting decodedDEMcache cannot
+leaveheightstale. Safetyquerycacheinvalidates oncamera/viewport/demand/geometry
+changes; imageryarrival/routeupdates donotrecomputeunchangednearplanechecks.
+Pinch/rotate/tilt releasecoast now survivesquicktwo-to-one-to-zeropointerrelease,
+withoutaddingcentroidjumps toonefingerdrag. Normalzoom4..19,terrainceilings,
+originalmips/filtering/fullsurfacesamples retained. DedicatedGPUclearance/payload
+checks pass; Kotlinintegrationcompiles. No newAndroidruntimeorphonebenchmarkclaim.

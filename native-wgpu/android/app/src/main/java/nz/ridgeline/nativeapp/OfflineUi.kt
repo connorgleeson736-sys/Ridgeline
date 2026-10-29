@@ -15,6 +15,7 @@ class OfflineUi(private val activity:Activity,root:FrameLayout,private val terra
         val list=LinearLayout(activity).apply{orientation=LinearLayout.VERTICAL}
         val status=TextView(activity)
         val dialog=AlertDialog.Builder(activity).setTitle("Offline maps").setView(ScrollView(activity).apply{addView(content)}).setNegativeButton("Close",null).create()
+        content.addView(TextView(activity).apply{text="Automatic cache: up to ${loader.automaticCacheBytes/1_000_000} MB, adjusted for free storage. Saved regions are kept separately.";textSize=12f})
         content.addView(CheckBox(activity).apply{text="Offline only";isChecked=loader.offlineOnly;setOnCheckedChangeListener{_,checked->loader.offlineOnly(checked)}})
         content.addView(TextView(activity).apply{text="Saved regions include imagery and terrain. Saved data stays on this device until you delete it.";textSize=12f})
         content.addView(button("Download around map center"){if(downloading)Toast.makeText(activity,"A region is already downloading.",Toast.LENGTH_SHORT).show()else{dialog.dismiss();newRegion()}})

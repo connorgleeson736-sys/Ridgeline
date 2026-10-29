@@ -3,6 +3,7 @@ use glam::{Mat4, Vec3};
 pub use ridgeline_core::{TileId, mercator, terrain_rgb};
 use std::collections::{HashMap, HashSet};
 use wgpu::util::DeviceExt;
+mod camera_safety;
 mod diagnostics;
 mod mipmaps;
 mod routes;
@@ -528,7 +529,7 @@ impl Renderer {
         self.cover_dirty = true;
         Ok(())
     }
-    /// Budget includes geometry + RGBA image storage (~539KiB/tile with mipmaps), not depth/surface.
+    /// Bounded geometry height fields and original RGBA mip pyramids; excludes surface/depth.
     pub fn set_tile_budget(&mut self, tiles: usize) {
         self.budget = tiles.clamp(24, 192);
         self.geometry_budget = (self.budget / 2).clamp(16, 96);
@@ -1107,6 +1108,16 @@ impl Renderer {
             self.route_gpu.draw(&mut pass);
         }
         self.queue.submit([encoder.finish()]);
+        // Cache age follows actual use, including panning back to already-loaded sources.
+        self.clock += 1;
+        for row in &rows {
+            if let Some(tile) = self.tiles.get_mut(&row.geometry) {
+                tile.used = self.clock;
+            }
+            if let Some(image) = self.images.get_mut(&row.image) {
+                image.used = self.clock;
+            }
+        }
         self.frames += 1;
     }
 }

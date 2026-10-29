@@ -400,6 +400,29 @@ async fn run() {
         ),
         "settled frame must not transfer unchanged state"
     );
+    let hb = high.bounds();
+    let hc = [(hb[0] + hb[2]) / 2., (hb[1] + hb[3]) / 2.];
+    seam.set_demand(vec![high], vec![high]);
+    let safety = seam.camera_safety(&ridgeline_renderer::selection::View {
+        width: 256,
+        height: 256,
+        center: hc,
+        zoom: 19.,
+        bearing: 0.,
+        pitch: 75.,
+        elevation: 0.,
+    });
+    assert!(
+        safety[0] > 1900.,
+        "eye and near-plane clearance must lift a buried alpine camera"
+    );
+    assert_eq!(safety[1], 2000.);
+    assert_eq!(safety[2], high.z as f32);
+    assert_eq!(
+        seam.terrain_gpu_payload_bytes(),
+        266256 + seam.geometry_count() as u64 * 66564,
+        "shared grid keeps every exact f32 height without per-tile duplicated vertices"
+    );
     // The hard budget holds during a burst of unrelated new uploads.
     r.set_tile_budget(24);
     for x in 0..80 {

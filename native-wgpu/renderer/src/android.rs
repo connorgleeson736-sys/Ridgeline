@@ -816,3 +816,70 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_demand(
         _ => 0,
     }
 }
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_cameraSafety(
+    env: *mut jni::sys::JNIEnv,
+    _class: jni::sys::jclass,
+    handle: i64,
+    w: i32,
+    h: i32,
+    lon: f64,
+    lat: f64,
+    zoom: f64,
+    bearing: f32,
+    pitch: f32,
+    elevation: f32,
+    output: jni::sys::jobject,
+) -> u8 {
+    let mut env = unsafe { jni::EnvUnowned::from_raw(env) };
+    match env
+        .with_env(|env| -> Result<u8, jni::errors::Error> {
+            if w <= 0
+                || h <= 0
+                || ![
+                    lon,
+                    lat,
+                    zoom,
+                    bearing as f64,
+                    pitch as f64,
+                    elevation as f64,
+                ]
+                .iter()
+                .all(|x| x.is_finite())
+            {
+                return Ok(0);
+            }
+            let output = unsafe { jni::objects::JByteBuffer::from_raw(env, output) };
+            if env.get_direct_buffer_capacity(&output)? < 12 {
+                return Ok(0);
+            }
+            let Ok(mut states) = states().lock() else {
+                return Ok(0);
+            };
+            let Some(state) = states.get_mut(&(handle as u64)) else {
+                return Ok(0);
+            };
+            let values = state.renderer.camera_safety(&crate::selection::View {
+                width: w as u32,
+                height: h as u32,
+                center: mercator(lon, lat),
+                zoom,
+                bearing,
+                pitch,
+                elevation,
+            });
+            let bytes = unsafe {
+                std::slice::from_raw_parts_mut(env.get_direct_buffer_address(&output)?, 12)
+            };
+            for (slot, value) in bytes.chunks_exact_mut(4).zip(values) {
+                slot.copy_from_slice(&value.to_le_bytes());
+            }
+            Ok(1)
+        })
+        .into_outcome()
+    {
+        jni::Outcome::Ok(result) => result,
+        _ => 0,
+    }
+}
