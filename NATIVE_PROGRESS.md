@@ -69,3 +69,36 @@ Exact next step: add deterministic neighbor-halo mesh/seam tests and parent-cove
 selection, port genuine bundled overview routing/range reads and gap masks, then
 run the Android native surface on an emulator if feasible (no /dev/kvm currently).
 Native UI/route migration must wait for the critical renderer proof acceptance gate.
+
+## Geographic imagery and bounded native residency checkpoint
+
+Data-only native port now selects original LINZ, all 630 reviewed geographic gap
+entries, coarse gap overlays, z18 Esri parent crops, fine-survey alpha veto, and
+37 Cook reference coordinates. Six original binary overview payloads are verified
+by SHA-256/length before packaging, preserving 364,762,502 bytes plus coarse images.
+No JavaScript is packaged or executed by the native app. Build-time Node only
+extracts reference data and generates independent algorithm outputs.
+
+Validation: 2,520 native Kotlin routing cases and 360 masks exactly match executed
+0.18 JavaScript reference outputs; polygon-hole test also passes. Android unit
+suite (2 tests), assembleDebug and lintDebug passed before addition of Cook data.
+Need rerun packaging/build after that addition. No live data or phone claim.
+
+Tile loader now uses pipeline=terrain-rgb, deduplicated neighbor DEM downloads,
+real parent fallback on 404/nodata, global pixel-centre halo sampling, bounded
+memory caches based on Android memory class, three priority workers and removal
+of obsolete queued jobs. GPU renderer now bounds tile residency and uses cached
+non-overlapping ancestor/descendant coverage. Controlled GPU smoke still passes.
+These are not a finished viewport LOD system: frustum selection, LOD stitching,
+mips, fades, bounded upload scheduling and actual camera parity remain open.
+
+Android emulator system image and Rust x86_64 target installed. Software emulator
+started without KVM; boot is slow. x86_64 native library compiles. adb cannot create
+its default auth directory under read-only /home/agent; investigating an explicit
+writable config/transport. Logs in /tmp/ridge-native-{emulator,x86-build}.log.
+Network policy still has no additional approved hosts; real DEM validation blocked
+pending the previously requested environment draft publish.
+
+Exact next step: run GPU parent/fine coverage and memory-bound tests; rebuild both
+Android ABIs with the current library, package the verified imagery/reference data,
+run Android surface/lifecycle proof on the emulator, and audit reference camera.

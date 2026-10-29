@@ -6,7 +6,8 @@ android {
  ndkVersion="29.0.14206865"
  compileOptions {sourceCompatibility=JavaVersion.VERSION_21;targetCompatibility=JavaVersion.VERSION_21}
  packaging {jniLibs {useLegacyPackaging=false}}
+ testOptions {unitTests.all {it.systemProperty("ridgeline.assets",file("src/main/assets").absolutePath);it.systemProperty("ridgeline.fixtures",file("src/test/fixtures").absolutePath)}}
  androidResources {noCompress += "bin"}
 }
 kotlin {compilerOptions {jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)}}
-dependencies { implementation("com.squareup.okhttp3:okhttp:4.12.0") }
+dependencies { testImplementation("junit:junit:4.13.2"); testImplementation("org.json:json:20250517"); implementation("com.squareup.okhttp3:okhttp:4.12.0") }

@@ -4,3 +4,7 @@
 /android/**/build/
 /android/app/src/main/jniLibs/
 /android/app/src/main/assets/overview-packs/
+
+/android/app/src/main/assets/assets/
+/android/app/src/main/assets/overview-index.json
+/android/app/src/main/assets/gap-atlas.json

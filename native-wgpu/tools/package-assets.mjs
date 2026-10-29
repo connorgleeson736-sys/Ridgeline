@@ -1,0 +1,26 @@
+// Build-time extraction only. The APK contains JSON/data, never this JS runtime.
+import fs from 'node:fs';import path from 'node:path';import vm from 'node:vm';import crypto from 'node:crypto';
+const root=path.resolve(import.meta.dirname,'../..'),out=path.join(root,'native-wgpu/android/app/src/main/assets');fs.mkdirSync(out,{recursive:true});
+const load=name=>{const c={};vm.runInNewContext(fs.readFileSync(path.join(root,'public',name),'utf8'),c);return c;};
+const gap=load('gap-imagery-atlas.js').RidgeGapAtlas,south=load('south-overviews.js').RidgeSouthOverviews;
+if(Object.values(gap.entries).some(e=>!e.vector))throw Error('Non-vector gap atlas requires legacy mask support');
+const catalog=JSON.parse(fs.readFileSync(path.join(root,'capacitor/overview-catalog.json'),'utf8'));
+const overview={...catalog,coarse:{}};const copied=new Set();
+for(const [key,entry]of Object.entries(south.tiles)){
+ if(+key.split('/')[0]>8)continue;
+ const select=row=>{if(!row?.url)return null;const name=row.url.replace(/^\//,'');if(!/^assets\/south-overviews-v1\/[a-f0-9]+\.webp$/.test(name))throw Error('Invalid overview path');const dest=path.join(out,name);fs.mkdirSync(path.dirname(dest),{recursive:true});fs.copyFileSync(path.join(root,'public',name),dest);copied.add(name);return name;};
+ const raw=select(entry.raw||entry),natural=select(entry.natural||entry);if(raw&&natural)overview.coarse[key]={raw,natural};
+}
+const reference=load('cook-reference-overviews.js').RidgeReferenceOverviews;
+overview.reference=reference.tiles;
+for(const entry of Object.values(reference.tiles))for(const name of (typeof entry==='string'?[entry]:Object.values(entry))){
+ const relative=name.replace(/^\//,'');if(!/^assets\/cook-reference-v1\/[a-f0-9]{24}\.webp$/.test(relative))throw Error('Invalid reference image path');
+ const dest=path.join(out,relative);fs.mkdirSync(path.dirname(dest),{recursive:true});fs.copyFileSync(path.join(root,'public',relative),dest);
+}
+fs.writeFileSync(path.join(out,'overview-index.json'),JSON.stringify(overview));fs.writeFileSync(path.join(out,'gap-atlas.json'),JSON.stringify(gap));
+for(const entry of Object.values(gap.coarse||{})){const name=entry.url?.replace(/^\//,'');if(!name?.startsWith('assets/'))continue;const dest=path.join(out,name);fs.mkdirSync(path.dirname(dest),{recursive:true});fs.copyFileSync(path.join(root,'public',name),dest);}
+const full=process.env.RIDGELINE_BUNDLE_OVERVIEWS!=='0';
+if(full){const source=process.env.RIDGELINE_OVERVIEW_DATA||path.join(root,'capacitor/overview-data');fs.mkdirSync(path.join(out,'overview-packs'),{recursive:true});
+ for(const pack of catalog.files){const input=path.join(source,pack.sha256+'.bin'),data=fs.readFileSync(input);if(data.length!==pack.bytes||crypto.createHash('sha256').update(data).digest('hex')!==pack.sha256)throw Error('Invalid overview pack');fs.copyFileSync(input,path.join(out,'overview-packs',pack.sha256+'.bin'));}
+}else fs.rmSync(path.join(out,'overview-packs'),{recursive:true,force:true});
+console.log(JSON.stringify({full,packCount:full?catalog.files.length:0,coarseImages:copied.size,gapEntries:Object.keys(gap.entries).length,overviewCoordinates:Object.keys(catalog.tiles).length,referenceCoordinates:Object.keys(reference.tiles).length}));
