@@ -22,6 +22,7 @@ class NativeImagery(
     private val fetch: (String) -> ByteArray,
     private val linz: (Int, Int, Int) -> String,
 ) {
+    private class FineTransportFailure(cause:java.io.IOException):java.io.IOException(cause)
     private val catalog by lazy { json("overview-index.json") }
     private val atlas by lazy { json("gap-atlas.json") }
     private data class Meta(val data: JSONObject, val outer: List<List<SourceGeometry.Point>>,
@@ -60,8 +61,6 @@ class NativeImagery(
         }
     }
     private fun base(z:Int,x:Int,y:Int):Bitmap {
-        val reference=catalog.getJSONObject("reference").opt("$z/$x/$y")
-        if(reference!=null) return bitmap(asset(if(reference is JSONObject) reference.getString("natural") else reference.toString()))
         return bitmap((if(z<=12) saved(z,x,y) else null) ?: fetch(linz(z,x,y)))
     }
     private fun rings(rows:JSONArray?):List<List<SourceGeometry.Point>> = if(rows==null) emptyList() else List(rows.length()) { i ->
@@ -106,7 +105,7 @@ class NativeImagery(
                         // The packaged preview retains original data if supplementary
                         // fine survey alpha cannot be fetched. Never create a hole.
                         if(onSeam && fine!=null) try { vetoFine(mask,fine,z,x,y) }
-                            catch(e:Exception) { if(Thread.currentThread().isInterrupted) throw e; return@originalScope pixels(original) }
+                            catch(e:FineTransportFailure) { if(Thread.currentThread().isInterrupted) throw e; return@originalScope pixels(original) }
                         val a=pixels(original); val b=pixels(cropped)
                         IntArray(a.size) { if(mask[it]) b[it] else a[it] }
                     }
@@ -121,7 +120,8 @@ class NativeImagery(
                 val row=fine.getJSONObject(i); val name=row.getString("name")
                 val fz=minOf(z,row.optInt("maxZoom",19),19); val f=1 shl(z-fz)
                 val url=linz(fz,x/f,y/f).replace("/aerial/","/$name/").replace(".webp?",".png?")
-                bitmap(fetch(url)).using { drawCrop(canvas,it,x,y,f) }
+                val bytes=try{fetch(url)}catch(e:java.io.IOException){if(e is TileHttpException)throw e;throw FineTransportFailure(e)}
+                bitmap(bytes).using { drawCrop(canvas,it,x,y,f) }
             }
             val valid=pixels(survey)
             for(i in mask.indices) if(Color.alpha(valid[i])>0) mask[i]=false

@@ -59,3 +59,16 @@ bilinear, mipmaps, trilinear and anisotropy enabled. Added GPU-only downsample
 chain (level0 remains original), linear trilinear sampler and16x anisotropy where
 adapter capabilities support it. Minified checkerboard GPU readback matches the
 expected affine graded average. Optional filtering toggles still need native UI.
+
+
+## Correction: packaged Android source is authoritative
+
+The website root includes Cook reference substitutions, but Capacitor build-web.mjs
+explicitly strips their selector/import and excludes their assets. Confirmed in the
+actual0.18Full APK: zero Cook entries and no ridge-reference selector. The initial
+native port incorrectly carried website-only replacements; removed before UI
+migration and release. Current native data path and debug fixture use the original
+bundled South Island packs. Earlier Cook screenshots prove GPU mechanics only.
+Build-web also changes Direct default, topo source limits/density, mobile waypoint
+selection, fit padding, label visibility and provider-failure behavior. Always
+inspect actual packaged assets plus build-time adaptations, not public/ alone.

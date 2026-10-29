@@ -61,16 +61,18 @@ supplement failure retains original imagery in the packaged preview patch.
 Native Kotlin selection/masks match 2,520/360 original algorithm cases exactly.
 Bitmap interpolation, alpha rounding and photographic colors still need captures.
 
-For LINZ base responses, `regional-imagery.js` first checks37 Cook reference
-coordinates (through z14), then bundled South Island overview ranges/coarse files,
-then upstream LINZ. `RidgeGapAtlas` + wrapper suppresses the legacy West Coast
+For LINZ base responses, the packaged Capacitor build checks bundled South Island
+overview ranges/coarse files, then upstream LINZ. It explicitly strips the website
+Cook reference selector and excludes all Cook substitution assets. `RidgeGapAtlas` + wrapper suppresses the legacy West Coast
 fallback path. Do not accidentally apply both geographic compositors.
 
 Six overview ZIPs contain six immutable .bin payloads (364,762,502 original bytes).
 Full APK bundles all six original ZIPs uncompressed for direct payload range access, plus67 coarse
-images, coarse gap overlays and Cook snapshots. 5,255 range coordinates include
+images, coarse gap overlays. 5,255 range coordinates include
 raw/natural variants. They are imagery coverage, not offline DEM or all-NZ data.
-Native range/bitmap proof must run on Android as well as host hash verification.
+Native range/bitmap proof runs on Android as well as host hash verification.
+Earlier prototype Cook fixtures were website-only and prove GPU mechanics, not
+Android reference appearance; the current fixture uses original bundled pack tiles.
 
 ## Routes and interaction contracts to migrate
 

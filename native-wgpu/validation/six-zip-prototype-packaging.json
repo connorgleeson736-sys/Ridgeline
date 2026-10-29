@@ -1,8 +1,8 @@
 {
   "scope": "Prototype packaging only, not feature/device/visual acceptance",
-  "apk": "Ridgeline-Native-Six-Zips-Proof-x86_64.apk",
-  "bytes": 393349498,
-  "sha256": "21327a574b4b9d36e6e3ffd341cada8d08153719243bd25f4c2a66c45d6653db",
+  "apk": "Ridgeline-Native-Reference-Proof-x86_64.apk",
+  "bytes": 393342650,
+  "sha256": "fa2ebcc362b1b24956631044c36992b0456972a2a8e26ae5d567bd10a952595a",
   "nativeLibraries": [
     "lib/x86_64/libridgeline_renderer.so"
   ],

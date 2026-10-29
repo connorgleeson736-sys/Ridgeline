@@ -11,12 +11,8 @@ for(const [key,entry]of Object.entries(south.tiles)){
  const select=row=>{if(!row?.url)return null;const name=row.url.replace(/^\//,'');if(!/^assets\/south-overviews-v1\/[a-f0-9]+\.webp$/.test(name))throw Error('Invalid overview path');const dest=path.join(out,name);fs.mkdirSync(path.dirname(dest),{recursive:true});fs.copyFileSync(path.join(root,'public',name),dest);copied.add(name);return name;};
  const raw=select(entry.raw||entry),natural=select(entry.natural||entry);if(raw&&natural)overview.coarse[key]={raw,natural};
 }
-const reference=load('cook-reference-overviews.js').RidgeReferenceOverviews;
-overview.reference=reference.tiles;
-for(const entry of Object.values(reference.tiles))for(const name of (typeof entry==='string'?[entry]:Object.values(entry))){
- const relative=name.replace(/^\//,'');if(!/^assets\/cook-reference-v1\/[a-f0-9]{24}\.webp$/.test(relative))throw Error('Invalid reference image path');
- const dest=path.join(out,relative);fs.mkdirSync(path.dirname(dest),{recursive:true});fs.copyFileSync(path.join(root,'public',relative),dest);
-}
+// Capacitor0.18 explicitly excludes website-only Cook substitutions.
+fs.rmSync(path.join(out,'assets/cook-reference-v1'),{recursive:true,force:true});
 fs.writeFileSync(path.join(out,'gap-atlas.json'),JSON.stringify(gap));
 for(const entry of Object.values(gap.coarse||{})){const name=entry.url?.replace(/^\//,'');if(!name?.startsWith('assets/'))continue;const dest=path.join(out,name);fs.mkdirSync(path.dirname(dest),{recursive:true});fs.copyFileSync(path.join(root,'public',name),dest);}
 const full=process.env.RIDGELINE_BUNDLE_OVERVIEWS!=='0';
@@ -26,4 +22,4 @@ if(full){const source=process.env.RIDGELINE_OVERVIEW_ZIPS||path.join(root,'overv
  overview.archives=JSON.parse(execFileSync('python3',[path.join(root,'native-wgpu/tools/package-archives.py'),source,packOutput],{encoding:'utf8',maxBuffer:1024*1024}));
 }
 fs.writeFileSync(path.join(out,'overview-index.json'),JSON.stringify(overview));
-console.log(JSON.stringify({full,packCount:full?catalog.files.length:0,coarseImages:copied.size,gapEntries:Object.keys(gap.entries).length,overviewCoordinates:Object.keys(catalog.tiles).length,referenceCoordinates:Object.keys(reference.tiles).length}));
+console.log(JSON.stringify({full,packCount:full?catalog.files.length:0,coarseImages:copied.size,gapEntries:Object.keys(gap.entries).length,overviewCoordinates:Object.keys(catalog.tiles).length}));

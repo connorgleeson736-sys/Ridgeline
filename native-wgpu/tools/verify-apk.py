@@ -19,6 +19,8 @@ catalog=json.loads((root/'capacitor/overview-catalog.json').read_text())
 original_archives={p['payload']:p for p in json.loads((root/'native-wgpu/overview-archives.json').read_text())['files']}
 with zipfile.ZipFile(args.apk) as apk:
     names=apk.namelist()
+    assert not any('cook-reference' in n for n in names),'Website-only Cook substitution in Android APK'
+    assert 'reference' not in json.loads(apk.read('assets/overview-index.json')),'Website reference source enabled'
     assert not any(n.endswith(('.js','.mjs','.html')) for n in names), 'Unexpected web runtime assets'
     for name in names:
         if name.endswith('.dex'):

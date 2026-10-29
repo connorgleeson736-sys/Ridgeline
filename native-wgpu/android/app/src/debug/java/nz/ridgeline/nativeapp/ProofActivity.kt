@@ -22,7 +22,7 @@ class ProofActivity: Activity() {
         ProofState.activity.set(this);ProofState.sixPacksRead=false
         terrain = TerrainView(this)
         val label = TextView(this).apply {
-            text="CONTROLLED TEST · flat synthetic height / real Cook imagery"
+            text="CONTROLLED TEST · flat synthetic height / original bundled overview imagery"
             setTextColor(Color.BLACK);setBackgroundColor(Color.WHITE);setPadding(16,40,16,16)
         }
         val root = FrameLayout(this);root.addView(terrain,FrameLayout.LayoutParams(-1,-1))
@@ -49,9 +49,8 @@ class ProofActivity: Activity() {
                 ProofState.sixPacksRead=true
                 android.util.Log.i("RidgelineProof","All six APK pack ranges decoded")
                 for(x in 3983..3984)for(y in 2599..2600){
-                    val entry=index.getJSONObject("reference").get("12/$x/$y")
-                    val path=if(entry is JSONObject)entry.getString("natural")else entry.toString()
-                    val bitmap=assets.open(path.removePrefix("/")).use {BitmapFactory.decodeStream(it)}?:error("Reference decode")
+                    val bytes=imagery.saved(12,x,y)?:error("Packaged reference tile missing")
+                    val bitmap=BitmapFactory.decodeByteArray(bytes,0,bytes.size)?:error("Overview decode")
                     val pixels=IntArray(65536);bitmap.getPixels(pixels,0,256,0,0,256,256);bitmap.recycle()
                     val heights=ByteBuffer.allocateDirect(129*129*4).order(ByteOrder.LITTLE_ENDIAN)
                     repeat(129*129){heights.putFloat(3724f)};heights.rewind()

@@ -308,3 +308,51 @@ Exact next step: push this tested checkpoint; bind RouteController to native
 planner/sidebar/sheet/profile UI and terrain overlay interactions. Continue
 remaining rendering/gesture/real-DEM parity gates when networking is available.
 Do not claim the whole application, speedup or physical phone validation complete.
+
+## Critical packaged-reference correction before UI migration
+
+Found and corrected an audit/port error: website public/ includes Cook reference
+substitutions, but Capacitor build-web.mjs deliberately removes their selector,
+import and assets. Actual0.18Full APK confirms zero Cook entries/selector and
+Direct=true. Native main imagery path and debug fixture now exclude Cook and use
+original bundled South Island overview images. Earlier committed screenshots are
+historical GPU mechanics evidence only, not accepted Android reference imagery.
+Need replace captures with corrected fixture images before reporting parity.
+
+Added audit-reference-apk.py against actual0.18Full APK (SHAb4d286f…): exact630
+atlas entries,58coarse coordinates/67photo files, every coarse overlay image and
+all6original payload hashes match. Native APK verifier now rejects Cook assets or
+reference selectors. Corrected full x86_64 APK installed and automated GPU/pick/
+sixZIP/lifecycle/SQLite/GPX proof PASSES again. Saved latest result and packaging
+record under validation/. Source masks/goldens and all16host tests/build/lint pass.
+
+Also narrowed fine-survey fallback to match packaged behavior: network transport
+failure retains original imagery; HTTP failure or invalid bitmap propagates tile
+failure so a ready parent remains visible. Previous catch-all was too permissive.
+
+Performance architecture finding: prototype couples129mesh and image tiles and
+selects from physical drawing pixels. Reference independently controls geometry
+(default tileSize round(512/2^.25)=431logicalpx) and imagery (256tile plus .25bias),
+with drawing ratio normally1.5, sharpening up to2 atzoom>=15. Native benchmark
+same-camera: physical basis96tiles vs logical63; these are prototype counts, not
+phone speedups. Reference terrain proxy without fetched DEM requests9z11 tiles at
+411×731 before applying detail policy. Must decouple geometry/image residency and
+source selection before accepting performance/LOD parity, rather than overbuild
+meshes for high-resolution photos. Native render remains full-resolution for now;
+no quality reduction is authorized as an assumed speed fix.
+
+Lyon current official release1.0.23/README researched for future native vector
+route overlays. No new dependency or route renderer committed yet. Preferred
+future tile-only overlay RTT preserves draping and avoids copying base imagery;
+prove it before entire UI migration. Route backend/controller is independent and
+tested, not a claim that UI migration is done.
+
+User publishing issue remains platform-side/unexplained: saved draft3 has not
+applied to running revision1. Already gave reload/retry/support guidance; do not
+repeat permission prompts or bypass policy. Continue independent work.
+
+Exact next step: checkpoint this correction, then separate terrain/image pools,
+plans and upload paths with GPU/readback/picking regression tests; keep legacy
+combined upload API for existing proof fixture. Adapt tile loader to logical-pixel
+independent plans and bound both budgets. Then native overlay/UI binding. Live DEM
+and visual parity gate remains open pending network or genuine source fixtures.

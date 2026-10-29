@@ -4,6 +4,11 @@ use ridgeline_renderer::{
     selection::{View, plan},
 };
 fn main() {
+    for (label,width,height,zoom) in [("logical",411,731,11.9),("physical",1080,1920,11.9+2.625f64.log2())] {
+        let ids=plan(&View{width,height,center:mercator(170.14219572,-43.5955671),zoom,bearing:-24.,pitch:58.,elevation:3724.},96);
+        let mut levels=std::collections::BTreeMap::new();for id in &ids{*levels.entry(id.z).or_insert(0)+=1;}
+        println!("Selection basis {label}: {} tiles, zooms {levels:?}",ids.len());
+    }
     let mut times = Vec::new();
     let mut counts = Vec::new();
     for i in 0..600 {

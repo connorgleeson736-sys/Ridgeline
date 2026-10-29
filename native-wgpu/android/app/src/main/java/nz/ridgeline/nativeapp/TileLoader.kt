@@ -15,6 +15,8 @@ import java.util.concurrent.*
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.math.*
 
+internal class TileHttpException(val code:Int):IOException("Provider HTTP $code")
+
 /** Native-source prototype; viewport/LOD parity and performance acceptance remain open. */
 class TileLoader(private val context: Context, private val view: TerrainView) {
     private data class Id(val z: Int, val x: Int, val y: Int) {
@@ -22,7 +24,6 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     }
     private data class Dem(val id: Id, val samples: FloatArray)
     private data class Payload(val heights: ByteBuffer, val rgba: ByteBuffer)
-    private class ProviderError(val code: Int): IOException("Provider HTTP $code")
     private val client = OkHttpClient.Builder()
         .cache(Cache(File(context.cacheDir, "native-http-v1"), 256_000_000))
         .connectTimeout(12, TimeUnit.SECONDS).readTimeout(15, TimeUnit.SECONDS).build()
@@ -64,7 +65,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
                 }
             } catch (e: Exception) {
                 if (!dead && id in wanted) view.post { view.onStatus("Terrain load failed: " +
-                    (if (e is ProviderError) "provider HTTP ${e.code}" else "source unavailable")) }
+                    (if (e is TileHttpException) "provider HTTP ${e.code}" else "source unavailable")) }
             } finally { jobs.remove(id, this) }
         }
     }
@@ -96,7 +97,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         check(!dead)
         val request = Request.Builder().url(url).header("User-Agent", "Ridgeline-Native/0.1.0").build()
         client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) throw ProviderError(response.code)
+            if (!response.isSuccessful) throw TileHttpException(response.code)
             val body = response.body ?: throw IOException("Empty tile")
             // Bound the stream itself, including chunked responses, before allocation grows.
             require(body.contentLength() <= 8 * 1024 * 1024)
@@ -139,7 +140,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         if (existing != null) return existing.get()
         try {
             val pixels = try { demPixels(fetch(linz("elevation", id, "png"))) }
-                catch (e: ProviderError) { if (e.code == 404 && id.z > 0) null else throw e }
+                catch (e: TileHttpException) { if (e.code == 404 && id.z > 0) null else throw e }
             val record = if (pixels == null) raw(id.parent()) else {
                 if (pixels.any { !it.isFinite() }) {
                     check(id.z > 0) { "Missing root elevation" }

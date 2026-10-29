@@ -36,7 +36,8 @@ APK, bundling all six original overview ZIPs and their payloads (364,762,502 unc
 It bundles the six exact original ZIPs, checked against `overview-archives.json`.
 Their payloads are already STORED, so Android reads WebP byte ranges directly
 inside the ZIP assets. No extraction or duplicate .bin files are needed. All 67
-coarse images, gap overlays and 37 Cook reference coordinates are also preserved.
+coarse images and gap overlays are preserved. Website-only Cook substitutions
+are excluded, matching the packaged0.18Capacitor APK.
 Generated packs, libraries, build outputs and debug keystores are not committed.
 
 Output: `native-wgpu/artifacts/Ridgeline-Native-Prototype-Debug.apk` plus checksum.
@@ -71,7 +72,7 @@ and bounded residency on controlled synthetic geometry.
 Normal emulator testing uses `adb install -r APK`, then
 `adb shell am start -n nz.ridgeline.nativeapp/.MainActivity`. Debug-only
 `.ProofActivity` explicitly labels its synthetic flat elevation while rendering
-real Cook imagery and exercising one range/bitmap decode from each overview pack.
+original bundled overview imagery and exercising one range/bitmap decode from each overview pack.
 It forbids network requests and is not a terrain preview or fallback mechanism.
 For a platform-only automated integration run:
 
