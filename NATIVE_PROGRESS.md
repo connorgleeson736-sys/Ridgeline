@@ -521,3 +521,12 @@ Continue source-independent parity work if the runtime remains unavailable; full
 native UI remains gated on critical renderer proof. Capacitor/android/public source
 and original overview ZIPs remain untouched. Overall completion estimated≈25%,
 withM1complete, M2partial, M3–M6open; never describe this as the finished app.
+
+Emulator diagnostic follow-up: focused crash buffer reports Android system process
+IllegalStateException "Lost network stack" during startup, plus unrelated Bluetooth
+SIGABRT and DeadSystemException cascades. Android's own message says lost network
+stack is a side effect and earlier logs are needed for root cause; do not claim
+watchdog, networking policy or Ridgeline caused it. Package/activity services were
+absent in subsequent checks despite stale boot_completed=1. No app process/install
+success or instrumentation pass exists for this current session. Toolchain/build,
+source hashes and hostGPU checks are independent successful evidence.
