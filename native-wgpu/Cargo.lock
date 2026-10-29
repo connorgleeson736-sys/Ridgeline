@@ -731,6 +731,7 @@ dependencies = [
  "jni",
  "ndk",
  "pollster",
+ "raw-window-handle",
  "ridgeline-core",
  "wgpu",
 ]

@@ -13,3 +13,5 @@ bytemuck = { version = "=1.25.2", features = ["derive"] }
 [target.'cfg(target_os = "android")'.dependencies]
 ndk = { version = "=0.9.0", features = ["rwh_06", "nativewindow"] }
 jni = "=0.22.4"
+
+raw-window-handle = "=0.6.2"
