@@ -798,3 +798,7 @@ Build wrapper now recreates only APK packaging state to prevent stale Full paylo
 bytes in future Base outputs, retaining compile/dependency caches. Next acceptance
 work remains exact LOD cover and camera/transition behavior, followed by full
 native feature UI. No new Android runtime/visual-parity claim.
+
+Latest normal Base download now includes source4c0b942(parent DEM fix plus native
+map controls). Stable path:native-wgpu/checkpoints/Ridgeline-Native-Base.apk;
+checksum/build-scopeJSON adjacent. Six original ZIPs remain separate and intact.

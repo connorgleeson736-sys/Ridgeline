@@ -1,11 +1,14 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest smaller build: [Ridgeline-Native-Base-a585548.apk](Ridgeline-Native-Base-a585548.apk).
-Source checkpoint `a585548`; signed debug APK, approximately32MB, all three ABIs.
-Omits the six large overview ZIPs; retains67coarse overview images and original
-imagery resolution/terrain policy. Detailed imagery and DEM require network.
-It contains the newer center-grounding code (28unit tests pass); Android execution
-of that new grounding behavior remains pending. No session CA is included.
+Latest smaller build: [Ridgeline-Native-Base.apk](Ridgeline-Native-Base.apk).
+Source checkpoint `4c0b942`; signed debug APK, approximately32MB, all three ABIs.
+Includes corrected parent-DEM ownership, zoom/north-up buttons and native source
+attribution. Omits the six large overview ZIPs; retains67coarse overview images
+and full-resolution online sources. Detailed imagery and DEM require network.
+Six affected DEM tests and assembly pass; new Android visual/runtime acceptance
+is pending. No session CA is included. Checksum and build scope are alongside it.
+
+Earlier Base: [Ridgeline-Native-Base-a585548.apk](Ridgeline-Native-Base-a585548.apk).
 
 The older Full checkpoint below retains all six original packs.
 

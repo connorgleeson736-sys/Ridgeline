@@ -1,0 +1,20 @@
+{
+  "sourceCheckpoint": "4c0b942",
+  "apk": "Ridgeline-Native-Base.apk",
+  "bytes": 31435569,
+  "sha256": "8356fd3956566aca3efd189194222a9cdd1409b15ccd17cff1dc33dcc5a616f6",
+  "largeOverviewPacks": 0,
+  "coarseImageryFiles": 67,
+  "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86_64"
+  ],
+  "managedSessionCa": false,
+  "changes": [
+    "Reference parent DEM ownership",
+    "Native zoom and north-up controls",
+    "Native LINZ and Esri attribution"
+  ],
+  "validation": "Six affected DEM sampling tests pass; assembly and signature pass. New Android runtime and visual acceptance remain pending."
+}
