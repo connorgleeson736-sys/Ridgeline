@@ -254,6 +254,8 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_plan(
     pitch: f32,
     elevation: f32,
     budget: i32,
+    target: f64,
+    max_zoom: i32,
     output: jni::sys::jobject,
 ) -> i32 {
     let mut env = unsafe { jni::EnvUnowned::from_raw(env) };
@@ -276,7 +278,10 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_plan(
             }
             let output = unsafe { jni::objects::JByteBuffer::from_raw(env, output) };
             let capacity = env.get_direct_buffer_capacity(&output)?;
-            let ids = crate::selection::plan(
+            if !target.is_finite() {
+                return Ok(0);
+            }
+            let ids = crate::selection::plan_with_target(
                 &crate::selection::View {
                     width: w as u32,
                     height: h as u32,
@@ -287,6 +292,8 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_plan(
                     elevation,
                 },
                 budget.max(16) as usize,
+                target,
+                max_zoom.clamp(4, 22) as u8,
             );
             if capacity < ids.len() * 12 {
                 return Ok(0);
@@ -384,6 +391,138 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_pick(
             };
             for (slot, value) in bytes.chunks_exact_mut(8).zip(point) {
                 slot.copy_from_slice(&value.to_le_bytes());
+            }
+            Ok(1)
+        })
+        .into_outcome()
+    {
+        jni::Outcome::Ok(result) => result,
+        _ => 0,
+    }
+}
+
+unsafe fn upload_source(
+    env: *mut jni::sys::JNIEnv,
+    handle: i64,
+    z: i32,
+    x: i32,
+    y: i32,
+    data: jni::sys::jobject,
+    geometry: bool,
+) -> u8 {
+    let mut env = unsafe { jni::EnvUnowned::from_raw(env) };
+    match env
+        .with_env(|env| -> Result<u8, jni::errors::Error> {
+            if !(0..=22).contains(&z) || x < 0 || y < 0 || x >= 1i32 << z || y >= 1i32 << z {
+                return Ok(0);
+            }
+            let data = unsafe { jni::objects::JByteBuffer::from_raw(env, data) };
+            let size = if geometry {
+                129 * 129 * 4
+            } else {
+                256 * 256 * 4
+            };
+            if env.get_direct_buffer_capacity(&data)? != size {
+                return Ok(0);
+            }
+            let Ok(mut states) = states().lock() else {
+                return Ok(0);
+            };
+            let Some(state) = states.get_mut(&(handle as u64)) else {
+                return Ok(0);
+            };
+            let id = TileId {
+                z: z as u8,
+                x: x as u32,
+                y: y as u32,
+            };
+            if if geometry {
+                state.renderer.touch_geometry(id)
+            } else {
+                state.renderer.touch_image(id)
+            } {
+                return Ok(1);
+            }
+            let bytes =
+                unsafe { std::slice::from_raw_parts(env.get_direct_buffer_address(&data)?, size) };
+            Ok(if geometry {
+                let heights: Vec<f32> = bytes
+                    .chunks_exact(4)
+                    .map(|b| f32::from_le_bytes(b.try_into().unwrap()))
+                    .collect();
+                state.renderer.upload_geometry(id, &heights)
+            } else {
+                state.renderer.upload_image(id, bytes)
+            }
+            .is_ok() as u8)
+        })
+        .into_outcome()
+    {
+        jni::Outcome::Ok(result) => result,
+        _ => 0,
+    }
+}
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_uploadGeometry(
+    env: *mut jni::sys::JNIEnv,
+    _class: jni::sys::jclass,
+    handle: i64,
+    z: i32,
+    x: i32,
+    y: i32,
+    data: jni::sys::jobject,
+) -> u8 {
+    unsafe { upload_source(env, handle, z, x, y, data, true) }
+}
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_uploadImage(
+    env: *mut jni::sys::JNIEnv,
+    _class: jni::sys::jclass,
+    handle: i64,
+    z: i32,
+    x: i32,
+    y: i32,
+    data: jni::sys::jobject,
+) -> u8 {
+    unsafe { upload_source(env, handle, z, x, y, data, false) }
+}
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_residency(
+    env: *mut jni::sys::JNIEnv,
+    _class: jni::sys::jclass,
+    handle: i64,
+    output: jni::sys::jobject,
+) -> u8 {
+    let mut env = unsafe { jni::EnvUnowned::from_raw(env) };
+    match env
+        .with_env(|env| -> Result<u8, jni::errors::Error> {
+            let output = unsafe { jni::objects::JByteBuffer::from_raw(env, output) };
+            let Ok(states) = states().lock() else {
+                return Ok(0);
+            };
+            let Some(state) = states.get(&(handle as u64)) else {
+                return Ok(0);
+            };
+            let g = state.renderer.tiles.len();
+            let images = state.renderer.images.len();
+            let size = 8 + (g + images) * 8;
+            if env.get_direct_buffer_capacity(&output)? < size {
+                return Ok(0);
+            }
+            let bytes = unsafe {
+                std::slice::from_raw_parts_mut(env.get_direct_buffer_address(&output)?, size)
+            };
+            bytes[..4].copy_from_slice(&(g as u32).to_le_bytes());
+            bytes[4..8].copy_from_slice(&(images as u32).to_le_bytes());
+            for (slot, id) in bytes[8..].chunks_exact_mut(8).zip(
+                state
+                    .renderer
+                    .tiles
+                    .keys()
+                    .chain(state.renderer.images.keys()),
+            ) {
+                let key = ((id.z as u64) << 44) | ((id.x as u64) << 22) | id.y as u64;
+                slot.copy_from_slice(&key.to_le_bytes());
             }
             Ok(1)
         })

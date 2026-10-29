@@ -48,7 +48,7 @@ class ProofInstrumentation: Instrumentation() {
             verifyNativeRouteData()
             result.putString("nativeDataProof","PASS: exact Float64 route storage, CRUD order, transaction limit rollback, database reopen, native GPX round trip")
             val first=startActivitySync(Intent(targetContext,ProofActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as ProofActivity
-            await("first native frame and six pack reads") { ProofState.sixPacksRead && stats().let{it[0]==1&&it[1]>0&&it[2]==4} }
+            await("first native frame and six pack reads") { ProofState.sixPacksRead && ProofState.activity.get()?.independentSourcesReady()==true && stats().let{it[0]==1&&it[1]>0&&it[2]==4} }
             val picked=java.util.concurrent.atomic.AtomicReference<DoubleArray?>()
             val done=java.util.concurrent.CountDownLatch(1)
             runOnMainSync {first.pickCenter{point->picked.set(point);done.countDown()}}
@@ -58,11 +58,11 @@ class ProofInstrumentation: Instrumentation() {
             runOnMainSync { first.showSurface(false) }
             await("surface destruction") { stats()[0]==0 }
             runOnMainSync { first.showSurface(true) }
-            await("surface recreation and retained buffers") { stats().let{it[0]==1&&it[1]>0&&it[2]==4} }
+            await("surface recreation and retained buffers") { ProofState.activity.get()?.independentSourcesReady()==true && stats().let{it[0]==1&&it[1]>0&&it[2]==4} }
             runOnMainSync { first.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE }
             await("activity recreation") { ProofState.activity.get()?.let{it!==first}==true }
-            await("rotated surface and packs") { ProofState.sixPacksRead && stats().let{it[0]==1&&it[1]>0&&it[2]==4} }
-            result.putString("nativeProof","PASS: Vulkan/wgpu frame, exact terrain pick, six APK pack range decodes, surface destruction/recreation, rotated activity")
+            await("rotated surface and packs") { ProofState.sixPacksRead && ProofState.activity.get()?.independentSourcesReady()==true && stats().let{it[0]==1&&it[1]>0&&it[2]==4} }
+            result.putString("nativeProof","PASS: Vulkan/wgpu independent geometry/image uploads and crop, exact terrain pick, six APK pack range decodes, surface destruction/recreation, rotated activity")
             result.putString("scope","Synthetic flat height fixture; not real-terrain parity or phone performance")
             runOnMainSync { ProofState.activity.get()?.finish() }
             await("all native surfaces released") { stats()[0]==0 }

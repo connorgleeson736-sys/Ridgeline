@@ -19,10 +19,13 @@ struct Vertex {
 }
 struct Tile {
     vertices: wgpu::Buffer,
+    used: u64,
+    field: ridgeline_core::heightfield::Heightfield,
+}
+struct ImageTile {
     bind: wgpu::BindGroup,
     _texture: wgpu::Texture,
     used: u64,
-    field: ridgeline_core::heightfield::Heightfield,
 }
 pub struct Renderer {
     pub device: wgpu::Device,
@@ -38,10 +41,16 @@ pub struct Renderer {
     index_count: u32,
     instances: wgpu::Buffer,
     tiles: HashMap<TileId, Tile>,
+    images: HashMap<TileId, ImageTile>,
+    draws: Vec<ridgeline_core::surface::SurfacePatch>,
+    index_ranges: HashMap<ridgeline_core::surface::GridRect, (u32, u32)>,
+    index_next: u32,
+    geometry_budget: usize,
     depth: wgpu::Texture,
     width: u32,
     height: u32,
     pub frames: u64,
+    pub drawn_triangles: u32,
     cover: Vec<ridgeline_core::CoverRegion>,
     cover_dirty: bool,
     instance_capacity: usize,
@@ -109,9 +118,9 @@ impl Renderer {
                         attributes: &wgpu::vertex_attr_array![0=>Float32x3],
                     }),
                     Some(wgpu::VertexBufferLayout {
-                        array_stride: 32,
+                        array_stride: 48,
                         step_mode: wgpu::VertexStepMode::Instance,
-                        attributes: &wgpu::vertex_attr_array![1=>Float32x4,2=>Float32x4],
+                        attributes: &wgpu::vertex_attr_array![1=>Float32x4,2=>Float32x4,3=>Float32x4],
                     }),
                 ],
             },
@@ -173,14 +182,26 @@ impl Renderer {
                 idx.extend([a, a + 129, a + 1, a + 1, a + 129, a + 130]);
             }
         }
-        let indices = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("shared grid"),
-            contents: bytemuck::cast_slice(&idx),
-            usage: wgpu::BufferUsages::INDEX,
+        let indices = device.create_buffer(&wgpu::BufferDescriptor {
+            label: Some("shared terrain subrect index atlas"),
+            size: (8 * 128 * 128 * 6 * 4) as u64,
+            usage: wgpu::BufferUsages::INDEX | wgpu::BufferUsages::COPY_DST,
+            mapped_at_creation: false,
         });
+        queue.write_buffer(&indices, 0, bytemuck::cast_slice(&idx));
+        let mut index_ranges = HashMap::new();
+        index_ranges.insert(
+            ridgeline_core::surface::GridRect {
+                x0: 0,
+                y0: 0,
+                x1: 128,
+                y1: 128,
+            },
+            (0, idx.len() as u32),
+        );
         let instances = device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("tile instances"),
-            size: 256 * 32,
+            size: 256 * 48,
             usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
             mapped_at_creation: false,
         });
@@ -199,10 +220,16 @@ impl Renderer {
             index_count: idx.len() as u32,
             instances,
             tiles: HashMap::new(),
+            images: HashMap::new(),
+            draws: Vec::new(),
+            index_ranges,
+            index_next: idx.len() as u32,
+            geometry_budget: 48,
             depth,
             width,
             height,
             frames: 0,
+            drawn_triangles: 0,
             cover: Vec::new(),
             cover_dirty: true,
             instance_capacity: 256,
@@ -233,8 +260,7 @@ impl Renderer {
         self.height = h.max(1);
         self.depth = Self::depth(&self.device, self.width, self.height);
     }
-    /// Touch immutable resident content without rebuilding JNI input or GPU data.
-    pub fn touch(&mut self, id: TileId) -> bool {
+    pub fn touch_geometry(&mut self, id: TileId) -> bool {
         if let Some(tile) = self.tiles.get_mut(&id) {
             self.clock += 1;
             tile.used = self.clock;
@@ -243,15 +269,33 @@ impl Renderer {
             false
         }
     }
-    /// Proof input: height values sampled on the native 129x129 mesh, unmodified metres.
-    pub fn upload(&mut self, id: TileId, heights: &[f32], rgba: &[u8]) -> Result<(), String> {
-        if heights.len() != 129 * 129
-            || rgba.len() != 256 * 256 * 4
-            || heights.iter().any(|h| !h.is_finite())
-        {
-            return Err("Invalid terrain/image payload".into());
+    pub fn touch_image(&mut self, id: TileId) -> bool {
+        if let Some(tile) = self.images.get_mut(&id) {
+            self.clock += 1;
+            tile.used = self.clock;
+            true
+        } else {
+            false
         }
-        if self.touch(id) {
+    }
+    pub fn touch(&mut self, id: TileId) -> bool {
+        let g = self.touch_geometry(id);
+        let i = self.touch_image(id);
+        g && i
+    }
+    /// Compatibility path for controlled fixtures; production loads sources independently.
+    pub fn upload(&mut self, id: TileId, heights: &[f32], rgba: &[u8]) -> Result<(), String> {
+        if rgba.len() != 256 * 256 * 4 {
+            return Err("Invalid imagery payload".into());
+        }
+        self.upload_geometry(id, heights)?;
+        self.upload_image(id, rgba)
+    }
+    pub fn upload_geometry(&mut self, id: TileId, heights: &[f32]) -> Result<(), String> {
+        if heights.len() != 129 * 129 || heights.iter().any(|h| !h.is_finite()) {
+            return Err("Invalid geometry payload".into());
+        }
+        if self.touch_geometry(id) {
             return Ok(());
         }
         self.clock += 1;
@@ -267,6 +311,30 @@ impl Renderer {
                 contents: bytemuck::cast_slice(&v),
                 usage: wgpu::BufferUsages::VERTEX,
             });
+        self.tiles.insert(
+            id,
+            Tile {
+                vertices,
+                used: self.clock,
+                field: ridgeline_core::heightfield::Heightfield::new(
+                    128,
+                    heights.to_vec().into_boxed_slice(),
+                )
+                .map_err(str::to_owned)?,
+            },
+        );
+        self.trim_geometry();
+        self.cover_dirty = true;
+        Ok(())
+    }
+    pub fn upload_image(&mut self, id: TileId, rgba: &[u8]) -> Result<(), String> {
+        if rgba.len() != 256 * 256 * 4 {
+            return Err("Invalid imagery payload".into());
+        }
+        if self.touch_image(id) {
+            return Ok(());
+        }
+        self.clock += 1;
         let texture = self.device.create_texture(&wgpu::TextureDescriptor {
             label: Some("actual imagery"),
             size: wgpu::Extent3d {
@@ -313,39 +381,45 @@ impl Renderer {
                 },
             ],
         });
-        self.tiles.insert(
+        self.images.insert(
             id,
-            Tile {
-                vertices,
+            ImageTile {
                 bind,
                 _texture: texture,
                 used: self.clock,
-                field: ridgeline_core::heightfield::Heightfield::new(
-                    128,
-                    heights.to_vec().into_boxed_slice(),
-                )
-                .map_err(str::to_owned)?,
             },
         );
-        self.trim();
+        self.trim_images();
         self.cover_dirty = true;
         Ok(())
     }
     /// Budget includes geometry + RGBA image storage (~539KiB/tile with mipmaps), not depth/surface.
     pub fn set_tile_budget(&mut self, tiles: usize) {
         self.budget = tiles.clamp(24, 192);
-        self.trim();
+        self.geometry_budget = (self.budget / 2).clamp(16, 96);
+        self.trim_geometry();
+        self.trim_images();
         self.cover_dirty = true;
     }
     pub fn resident_count(&self) -> usize {
+        self.tiles.len().max(self.images.len())
+    }
+    pub fn geometry_count(&self) -> usize {
         self.tiles.len()
+    }
+    pub fn image_count(&self) -> usize {
+        self.images.len()
     }
     fn rebuild_cover(&mut self) {
         self.cover =
             ridgeline_core::resident_cover(&self.tiles.keys().copied().collect::<Vec<_>>());
+        self.draws = ridgeline_core::surface::surface_cover(
+            &self.tiles.keys().copied().collect::<Vec<_>>(),
+            &self.images.keys().copied().collect::<Vec<_>>(),
+        );
     }
-    fn trim(&mut self) {
-        while self.tiles.len() > self.budget {
+    fn trim_geometry(&mut self) {
+        while self.tiles.len() > self.geometry_budget {
             // Protect a visible source if removing it would expose an uncovered
             // region. Fine tiles may fall back to an existing real ancestor;
             // a partial parent's unfilled siblings must never disappear.
@@ -413,6 +487,77 @@ impl Renderer {
             self.tiles.remove(&victim);
         }
     }
+    fn trim_images(&mut self) {
+        while self.images.len() > self.budget {
+            let mut protected = HashSet::new();
+            if let Some(view) = self.last_view {
+                let (matrix, ppm) = camera_matrix(
+                    view.width,
+                    view.height,
+                    view.center,
+                    view.zoom,
+                    view.bearing,
+                    view.pitch,
+                    view.elevation,
+                );
+                let world = 512. * 2f64.powf(view.zoom);
+                for row in
+                    ridgeline_core::resident_cover(&self.images.keys().copied().collect::<Vec<_>>())
+                {
+                    let mut ancestor = row.source.parent();
+                    let mut fallback = false;
+                    while let Some(id) = ancestor {
+                        if self.images.contains_key(&id) {
+                            fallback = true;
+                            break;
+                        }
+                        ancestor = id.parent();
+                    }
+                    let b = row.region.bounds();
+                    if !fallback
+                        && selection::visible_box(
+                            matrix,
+                            [
+                                ((b[0] - view.center[0]) * world) as f32,
+                                ((view.center[1] - b[3]) * world) as f32,
+                                (-100. - view.elevation) * ppm,
+                            ],
+                            [
+                                ((b[2] - view.center[0]) * world) as f32,
+                                ((view.center[1] - b[1]) * world) as f32,
+                                (4000. - view.elevation) * ppm,
+                            ],
+                        )
+                    {
+                        protected.insert(row.source);
+                    }
+                }
+            }
+            let victim = self
+                .images
+                .iter()
+                .filter(|(id, _)| !protected.contains(id))
+                .max_by(|(a, ta), (b, tb)| {
+                    let score = |id: &TileId, used: u64| {
+                        let q = id.bounds();
+                        let size = q[2] - q[0];
+                        let dx = ((q[0] + q[2]) / 2. - self.center[0]) / size;
+                        let dy = ((q[1] + q[3]) / 2. - self.center[1]) / size;
+                        (dx * dx + dy * dy).sqrt().ln_1p() + (self.clock - used) as f64 / 32.
+                    };
+                    score(a, ta.used).total_cmp(&score(b, tb.used))
+                })
+                .map(|(id, _)| *id)
+                .or_else(|| {
+                    self.images
+                        .iter()
+                        .max_by_key(|(_, tile)| tile.used)
+                        .map(|(id, _)| *id)
+                })
+                .unwrap();
+            self.images.remove(&victim);
+        }
+    }
     fn visible(
         row: &ridgeline_core::CoverRegion,
         tile: &Tile,
@@ -473,9 +618,10 @@ impl Renderer {
         let far = b.truncate() / b.w;
         let direction = (far - origin).normalize();
         let world = 512. * 2f64.powf(view.zoom);
+        let max_t = (far - origin).length() as f64;
         let mut best: Option<(f64, [f64; 3])> = None;
-        for row in &self.cover {
-            let bounds = row.source.bounds();
+        for row in &self.draws {
+            let bounds = row.geometry.bounds();
             let span = bounds[2] - bounds[0];
             let clip = row.region.bounds();
             let ray = ridgeline_core::heightfield::Ray {
@@ -490,7 +636,7 @@ impl Renderer {
                     direction.z as f64 / ppm as f64,
                 ],
             };
-            if let Some(hit) = self.tiles[&row.source].field.intersect_region(
+            if let Some(hit) = self.tiles[&row.geometry].field.intersect_region(
                 ray,
                 [
                     (clip[0] - bounds[0]) / span,
@@ -499,7 +645,7 @@ impl Renderer {
                     (clip[3] - bounds[1]) / span,
                 ],
             ) {
-                if best.as_ref().is_none_or(|(t, _)| hit.t < *t) {
+                if hit.t <= max_t && best.as_ref().is_none_or(|(t, _)| hit.t < *t) {
                     let mx = bounds[0] + hit.point[0] * span;
                     let my = bounds[1] + hit.point[1] * span;
                     best = Some((
@@ -563,12 +709,15 @@ impl Renderer {
             elevation,
         });
         let rows: Vec<_> = self
-            .cover
+            .draws
             .iter()
             .filter(|row| {
                 Self::visible(
-                    row,
-                    &self.tiles[&row.source],
+                    &ridgeline_core::CoverRegion {
+                        source: row.geometry,
+                        region: row.region,
+                    },
+                    &self.tiles[&row.geometry],
                     matrix,
                     center,
                     world,
@@ -577,12 +726,14 @@ impl Renderer {
                 )
             })
             .collect();
-        let data: Vec<[f32; 8]> = rows
+        let data: Vec<[f32; 12]> = rows
             .iter()
             .map(|row| {
-                let b = row.source.bounds();
+                let b = row.geometry.bounds();
                 let region = row.region.bounds();
                 let size = b[2] - b[0];
+                let image = row.image.bounds();
+                let image_size = image[2] - image[0];
                 [
                     ((b[0] - center[0]) * world) as f32,
                     ((center[1] - b[1]) * world) as f32,
@@ -592,6 +743,10 @@ impl Renderer {
                     ((region[1] - b[1]) / size) as f32,
                     ((region[2] - b[0]) / size) as f32,
                     ((region[3] - b[1]) / size) as f32,
+                    (size / image_size) as f32,
+                    (size / image_size) as f32,
+                    ((b[0] - image[0]) / image_size) as f32,
+                    ((b[1] - image[1]) / image_size) as f32,
                 ]
             })
             .collect();
@@ -599,7 +754,7 @@ impl Renderer {
             self.instance_capacity = data.len().next_power_of_two();
             self.instances = self.device.create_buffer(&wgpu::BufferDescriptor {
                 label: Some("tile instances"),
-                size: (self.instance_capacity * 32) as u64,
+                size: (self.instance_capacity * 48) as u64,
                 usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
                 mapped_at_creation: false,
             });
@@ -608,6 +763,35 @@ impl Renderer {
             self.queue
                 .write_buffer(&self.instances, 0, bytemuck::cast_slice(&data));
         }
+        let rects: Vec<_> = rows
+            .iter()
+            .map(|row| ridgeline_core::surface::GridRect::for_region(row.geometry, row.region))
+            .collect();
+        for rect in &rects {
+            if !self.index_ranges.contains_key(rect) {
+                let ids = rect.indices();
+                let start = self.index_next;
+                let end = start + ids.len() as u32;
+                if end <= 8 * 128 * 128 * 6 {
+                    self.queue.write_buffer(
+                        &self.indices,
+                        start as u64 * 4,
+                        bytemuck::cast_slice(&ids),
+                    );
+                    self.index_ranges.insert(*rect, (start, end));
+                    self.index_next = end;
+                }
+            }
+        }
+        self.drawn_triangles = rects
+            .iter()
+            .map(|rect| {
+                self.index_ranges
+                    .get(rect)
+                    .map_or(self.index_count, |(a, b)| b - a)
+                    / 3
+            })
+            .sum();
         let mut encoder = self.device.create_command_encoder(&Default::default());
         let depth = self.depth.create_view(&Default::default());
         {
@@ -643,14 +827,19 @@ impl Renderer {
             pass.set_bind_group(0, &self.scene_bind, &[]);
             pass.set_index_buffer(self.indices.slice(..), wgpu::IndexFormat::Uint32);
             for (i, row) in rows.iter().enumerate() {
-                let tile = &self.tiles[&row.source];
-                pass.set_bind_group(1, &tile.bind, &[]);
+                let tile = &self.tiles[&row.geometry];
+                pass.set_bind_group(1, &self.images[&row.image].bind, &[]);
                 pass.set_vertex_buffer(0, tile.vertices.slice(..));
                 pass.set_vertex_buffer(
                     1,
-                    self.instances.slice((i * 32) as u64..((i + 1) * 32) as u64),
+                    self.instances.slice((i * 48) as u64..((i + 1) * 48) as u64),
                 );
-                pass.draw_indexed(0..self.index_count, 0, 0..1);
+                let (start, end) = self
+                    .index_ranges
+                    .get(&rects[i])
+                    .copied()
+                    .unwrap_or((0, self.index_count));
+                pass.draw_indexed(start..end, 0, 0..1);
             }
         }
         self.queue.submit([encoder.finish()]);

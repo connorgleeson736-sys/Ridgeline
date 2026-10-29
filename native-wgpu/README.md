@@ -64,10 +64,13 @@ VK_ICD_FILENAMES=/path/to/software-vulkan-icd.json \
 
 `build-android.sh` runs Android unit tests, lint and assembly. Unit tests compare
 2,520 source-routing cases and 360 exact masks to the original algorithms, plus
-holes and upload queue burst behavior. Rust tests cover DEM encoding, shared halo
+holes, budgeted source/fallback demand, independent upload coalescing and byte limits. Rust tests cover DEM encoding, shared halo
 samples, parent cover, bounded viewport selection and 1,712 camera projections.
 GPU proof checks exact colour grading, parent/child ownership, fallback coverage
-and bounded residency on controlled synthetic geometry.
+independent full-resolution image/geometry LOD with exact UV crops and bounded
+residency on controlled synthetic geometry. Source selection uses logical pixels;
+terrain (431px target) and photo detail (256px / 2^.25) have separate plans,
+LRU pools and upload jobs. Rendering still uses the full surface resolution.
 
 Normal emulator testing uses `adb install -r APK`, then
 `adb shell am start -n nz.ridgeline.nativeapp/.MainActivity`. Debug-only
@@ -81,7 +84,7 @@ adb shell setprop debug.hwui.drawing_enabled 1 # Android ATD images disable UI d
 adb shell am instrument -w nz.ridgeline.nativeapp/.ProofInstrumentation
 ```
 
-This checks native frames, six original ZIP range reads, exact terrain picking on
+This checks independent geometry/photo uploads, native frames, six original ZIP range reads, exact terrain picking on
 the controlled flat fixture, surface release/recreation, activity rotation and
 native SQLite/GPX data behavior.
 It explicitly excludes real-terrain parity and physical-phone performance.

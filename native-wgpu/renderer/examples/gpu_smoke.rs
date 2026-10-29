@@ -123,6 +123,48 @@ async fn run() {
         bytes.chunks_exact(4).all(|p| p != [189, 203, 208, 255]),
         "no uncovered fallback pixels"
     );
+    // Independent photographic detail must not duplicate/refine the terrain grid.
+    let detailed = TileId {
+        z: 12,
+        x: 4000,
+        y: 2600,
+    };
+    let d = detailed.bounds();
+    let old_geometry = r.geometry_count();
+    r.upload_geometry(detailed, &heights).unwrap();
+    let stripe: Vec<u8> = (0..256 * 256)
+        .flat_map(|i| {
+            if i % 256 < 128 {
+                [200, 70, 30, 255]
+            } else {
+                [40, 120, 80, 255]
+            }
+        })
+        .collect();
+    let expected_red = pixel(64, 64).to_vec();
+    for child in detailed.children() {
+        r.upload_image(child, &stripe).unwrap();
+    }
+    assert_eq!(r.geometry_count(), old_geometry + 1);
+    r.render(
+        &output.create_view(&Default::default()),
+        [(d[0] + d[2]) / 2., (d[1] + d[3]) / 2.],
+        12.,
+        0.,
+        0.,
+        1000.,
+    );
+    let bytes = read(&r, &output);
+    let at = |x: usize, y: usize| &bytes[(y * 256 + x) * 4..][..4];
+    assert_eq!(at(64, 64), &[36, 113, 74, 255]);
+    assert_eq!(at(192, 64), expected_red.as_slice());
+    assert_eq!(at(64, 192), &[36, 113, 74, 255]);
+    assert_eq!(at(192, 192), expected_red.as_slice());
+    assert_eq!(
+        r.drawn_triangles,
+        128 * 128 * 2,
+        "four full-resolution child photos share exactly one native grid"
+    );
     // A minified 1px black/white checker must sample the generated pyramid,
     // not uninitialized levels or shimmer between original individual pixels.
     let checker: Vec<u8> = (0..256 * 256)
@@ -160,6 +202,6 @@ async fn run() {
         assert!(r.resident_count() <= 24);
     }
     println!(
-        "PASS GPU: exact grade, fine-child/coarse-parent ownership, no fallback holes, trilinear mipmap average, bounded 24-tile residency. Synthetic geometry; no phone benchmark or real-terrain parity claim."
+        "PASS GPU: exact grade, fine-child/coarse-parent ownership, no fallback holes, independent image/geometry LOD and exact crop UV, trilinear mipmap average, bounded 24-tile residency. Synthetic geometry; no phone benchmark or real-terrain parity claim."
     );
 }

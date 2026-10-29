@@ -28,7 +28,11 @@ class ProofActivity: Activity() {
         val root = FrameLayout(this);root.addView(terrain,FrameLayout.LayoutParams(-1,-1))
         root.addView(label,FrameLayout.LayoutParams(-1,-2));setContentView(root)
         terrain.onStatus = { label.text="CONTROLLED TEST · synthetic flat elevation / genuine imagery\n$it" }
-        fun upload() {for(row in ready)terrain.upload(row.id.z,row.id.x,row.id.y,row.heights,row.rgba)}
+        fun upload() {for(row in ready)when(row.kind){
+            GpuUploadQueue.Kind.GEOMETRY->terrain.uploadGeometry(row.id.z,row.id.x,row.id.y,row.heights)
+            GpuUploadQueue.Kind.IMAGE->terrain.uploadImage(row.id.z,row.id.x,row.id.y,row.rgba)
+            GpuUploadQueue.Kind.COMBINED->error("Proof requires independent sources")
+        }}
         terrain.onCamera = { upload() }
         Thread({
             try {
@@ -56,12 +60,14 @@ class ProofActivity: Activity() {
                     repeat(129*129){heights.putFloat(3724f)};heights.rewind()
                     val rgba=ByteBuffer.allocateDirect(256*256*4)
                     for(p in pixels){rgba.put(Color.red(p).toByte());rgba.put(Color.green(p).toByte());rgba.put(Color.blue(p).toByte());rgba.put(255.toByte())};rgba.rewind()
-                    ready.add(GpuUploadQueue.Tile(GpuUploadQueue.Id(12,x,y),heights,rgba))
+                    ready.add(GpuUploadQueue.Tile(GpuUploadQueue.Id(11,x/2,y/2),heights,GpuUploadQueue.EMPTY,GpuUploadQueue.Kind.GEOMETRY))
+                    ready.add(GpuUploadQueue.Tile(GpuUploadQueue.Id(12,x,y),GpuUploadQueue.EMPTY,rgba,GpuUploadQueue.Kind.IMAGE))
                 }
                 if(!closed)runOnUiThread{upload();label.text="CONTROLLED TEST · synthetic flat elevation / genuine imagery\nSix APK pack range reads and bitmap decodes passed"}
             }catch(e:Exception){if(!closed)runOnUiThread{label.text="Controlled fixture failed: ${e.javaClass.simpleName}: ${e.message}"}}
         },"native-proof-fixture").start()
     }
+    internal fun independentSourcesReady()=terrain.residentSourceCounts()==(4 to 4)
     internal fun pickCenter(callback:(DoubleArray?)->Unit){terrain.pick(terrain.width/2.0,terrain.height/2.0,callback)}
     internal fun showSurface(value:Boolean){terrain.visibility=if(value)android.view.View.VISIBLE else android.view.View.GONE}
     override fun onResume(){super.onResume();if(::terrain.isInitialized)terrain.setActive(true)}

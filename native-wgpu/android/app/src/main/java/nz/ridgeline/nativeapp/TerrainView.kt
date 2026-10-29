@@ -33,8 +33,22 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     val pixelScale:Double get()=resources.displayMetrics.density.toDouble()
     val renderZoom:Double get()=zoom+ln(pixelScale)/ln(2.0)
     var onCamera:()->Unit={}
+    var onData:()->Unit={}
     var onStatus:(String)->Unit={}
-    private val uploads=GpuUploadQueue(96)
+    private val uploads=GpuUploadQueue(192)
+    private data class Residency(val geometry:LongArray,val images:LongArray)
+    @Volatile private var residency=Residency(LongArray(0),LongArray(0))
+    private val residencyBytes=ByteBuffer.allocateDirect(4096).order(ByteOrder.LITTLE_ENDIAN)
+    fun isResident(id:GpuUploadQueue.Id,geometry:Boolean)=if(geometry)residency.geometry.contains(id.packed)else residency.images.contains(id.packed)
+    internal fun residentSourceCounts()=residency.let{it.geometry.size to it.images.size}
+    private fun refreshResidency(){
+        val token=generation.get();residencyBytes.rewind()
+        if(NativeBridge.residency(handle,residencyBytes)){
+            val g=residencyBytes.int;val i=residencyBytes.int
+            val next=Residency(LongArray(g){residencyBytes.long},LongArray(i){residencyBytes.long})
+            if(live&&generation.get()==token)residency=next
+        }
+    }
     private val queued=AtomicBoolean(false)
     private val generation=AtomicLong()
     private var presentationFailures=0
@@ -44,8 +58,15 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     private fun drawFrame() {
         queued.set(false)
         if(!live||!active||handle==0L)return
-        // At most two full native tiles (~650KiB input) per display frame.
-        for(tile in uploads.take(2))if(NativeBridge.upload(handle,tile.id.z,tile.id.x,tile.id.y,tile.heights,tile.rgba))post{onStatus("")}
+        // Bounded source count and input bytes per display frame (650KiB).
+        val rows=uploads.take(4,650*1024);var accepted=false
+        for(tile in rows){val id=tile.id;val ok=when(tile.kind){
+            GpuUploadQueue.Kind.COMBINED->NativeBridge.upload(handle,id.z,id.x,id.y,tile.heights,tile.rgba)
+            GpuUploadQueue.Kind.GEOMETRY->NativeBridge.uploadGeometry(handle,id.z,id.x,id.y,tile.heights)
+            GpuUploadQueue.Kind.IMAGE->NativeBridge.uploadImage(handle,id.z,id.x,id.y,tile.rgba)
+        };accepted=accepted||ok}
+        if(rows.isNotEmpty())refreshResidency()
+        if(accepted)post{onStatus("");onData()}
         val pose=cameraPose // One immutable snapshot, no mixed camera revisions.
         val shown=NativeBridge.render(handle,width,height,pose.longitude,pose.latitude,pose.zoom+ln(pixelScale)/ln(2.0),pose.bearing,pose.pitch,pose.elevation)
         if(shown)presentationFailures=0 else {
@@ -76,7 +97,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     }
     override fun surfaceChanged(holder:SurfaceHolder,format:Int,width:Int,height:Int){changed()}
     override fun surfaceDestroyed(holder:SurfaceHolder) {
-        live=false;generation.incrementAndGet();queued.set(false)
+        live=false;generation.incrementAndGet();residency=Residency(LongArray(0),LongArray(0));queued.set(false)
         val done=CountDownLatch(1)
         gpu.post{choreographer.removeFrameCallback(vsync);if(handle!=0L)NativeBridge.destroy(handle);handle=0L;done.countDown()}
         done.await(5,TimeUnit.SECONDS)
@@ -87,6 +108,8 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         gpu.post{choreographer.removeFrameCallback(vsync);if(handle!=0L)NativeBridge.destroy(handle);handle=0;thread.quitSafely()}
     }
     fun upload(z:Int,x:Int,y:Int,heights:ByteBuffer,rgba:ByteBuffer){uploads.offer(GpuUploadQueue.Tile(GpuUploadQueue.Id(z,x,y),heights,rgba));requestFrame()}
+    fun uploadGeometry(z:Int,x:Int,y:Int,data:ByteBuffer){uploads.offer(GpuUploadQueue.Tile(GpuUploadQueue.Id(z,x,y),data,GpuUploadQueue.EMPTY,GpuUploadQueue.Kind.GEOMETRY));requestFrame()}
+    fun uploadImage(z:Int,x:Int,y:Int,data:ByteBuffer){uploads.offer(GpuUploadQueue.Tile(GpuUploadQueue.Id(z,x,y),GpuUploadQueue.EMPTY,data,GpuUploadQueue.Kind.IMAGE));requestFrame()}
     fun pick(x:Double,y:Double,callback:(DoubleArray?)->Unit) {
         gpu.post {
             val output=ByteBuffer.allocateDirect(24).order(ByteOrder.LITTLE_ENDIAN)

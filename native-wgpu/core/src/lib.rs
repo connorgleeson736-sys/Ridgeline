@@ -208,3 +208,5 @@ mod terrain_tests {
 }
 
 pub mod heightfield;
+
+pub mod surface;

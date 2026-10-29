@@ -356,3 +356,59 @@ plans and upload paths with GPU/readback/picking regression tests; keep legacy
 combined upload API for existing proof fixture. Adapt tile loader to logical-pixel
 independent plans and bound both budgets. Then native overlay/UI binding. Live DEM
 and visual parity gate remains open pending network or genuine source fixtures.
+
+### 2026-10-29 — Independent native geometry and image LOD checkpoint
+
+Separated geometry/heightfield and full-resolution photo pools, upload methods,
+source ownership and plans. Full original 256px imagery is unchanged; photo mips
+remain GPU-generated. Geometry uses the reference default431logicalpx target,
+photos256/2^.25logicalpx, independent ceilings22/19. Source selection no longer
+uses Android drawing-density zoom; the actual framebuffer stays full resolution.
+LOD error/frustum policy is still a prototype, not accepted terrain parity.
+
+Intersections of two disjoint source covers produce unique drawable regions.
+Subrectangle shared index ranges avoid drawing an entire128mesh for every photo.
+The controlled GPU readback test proves four child photos correctly cropped on
+one parent geometry with32768 triangles total; no terrain accuracy or phone FPS
+claim follows from this synthetic fixture. Picking uses this same visible source
+intersection and now rejects hits beyond the camera far plane.
+
+Android loader schedules geometry and photo jobs independently across the same
+3workers; DEM halos and HTTP dedup/cache remain. Native residency is mirrored to
+avoid decoding/uploading already-resident sources. CPU ready data is byte-bounded;
+queued uploads coalesce by source type and obey650KiB +4source/frame limits.
+Fallback ancestors now count inside each source budget; demand coarsening retains
+coverage under pressure. Replaced a cancel/reschedule debounce that could starve
+loading during a continuous drag with latest-camera100ms throttling. Off-screen
+retention and eviction transition behavior still require real-device movement
+validation; obsolete in-flight shared HTTP requests are not yet demand-refcounted.
+
+Commands/results: cargo fmt; cargo test --locked --workspace:17tests PASS;
+softwareVulkan gpu_smoke PASS; cross-release builds forARM64,ARMv7,x86_64 PASS;
+Gradle offline testDebugUnitTest/assembleDebug/lintDebug:19tests PASS,0lint errors,
+13existing/prototype localization warnings. Exact commands are in README/build
+script; this session uses android-tools toolchain directories from earlier log.
+Current full x86 APK packaging passes:6exact originalZIPs/364762502payload bytes,
+5277photo ranges, no web runtime and no website-only Cook substitutions. Packaging
+report and host/GPU/selection results are saved under native-wgpu/validation/.
+Raw leaf counts at411×731/defaultcamera:32geometry,79images, before ancestor
+budgeting; old coupled physical selection hit96meshes. These counts/host timing
+are architecture diagnostics only, not a measurement of faster phone behavior.
+
+Emulator fixture now uses geometryz11 and independent photosz12, verifying both
+source pools before accepting a frame. Installation/instrumentation result will
+be appended after it completes; do not infer device validation from host tests.
+
+Publishing issue rechecked: saved draftrevision3 remains unpublished against live
+runtime/spec1. Diagnostics exposes no retained records and tools expose no
+publish/restart operation. Cannot diagnose the platform failure or repair its
+publishing job from here. Required provider hosts remain unavailable; no bypass.
+The original app and committed native branch remain preserved.
+
+Exact next step: finish independent-source Android instrumentation, replace old
+Cook-fixture captures with corrected original-pack fixture captures, checkpoint
+and push. Real DEM/imagery proof remains a blockingM2 acceptance requirement before
+building the whole UI around this renderer. Once network publishing recovers,
+validate live terrain seams/LOD/picking/colour, then prove draped native overlays
+and bind the already-tested route controller to native UI. Later milestones stay
+open in GOAL.md.

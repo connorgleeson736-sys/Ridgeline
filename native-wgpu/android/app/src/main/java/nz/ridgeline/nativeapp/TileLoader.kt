@@ -21,9 +21,10 @@ internal class TileHttpException(val code:Int):IOException("Provider HTTP $code"
 class TileLoader(private val context: Context, private val view: TerrainView) {
     private data class Id(val z: Int, val x: Int, val y: Int) {
         fun parent() = Id(z - 1, x / 2, y / 2)
+        fun gpu() = GpuUploadQueue.Id(z,x,y)
     }
     private data class Dem(val id: Id, val samples: FloatArray)
-    private data class Payload(val heights: ByteBuffer, val rgba: ByteBuffer)
+    private data class Source(val id:Id,val geometry:Boolean)
     private val client = OkHttpClient.Builder()
         .cache(Cache(File(context.cacheDir, "native-http-v1"), 256_000_000))
         .connectTimeout(12, TimeUnit.SECONDS).readTimeout(15, TimeUnit.SECONDS).build()
@@ -35,62 +36,86 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             (if (kind == "elevation") "pipeline=terrain-rgb&" else "") + "api=$key"
     private val imagery = NativeImagery(context, ::fetch) { z, x, y -> linz("aerial", Id(z, x, y), "webp") }
     private val am = context.getSystemService(ActivityManager::class.java)
-    private val readyLimit = if (am.isLowRamDevice) 32 else (am.memoryClass / 4).coerceIn(48, 96)
+    private val imageLimit = if (am.isLowRamDevice) 32 else (am.memoryClass / 2).coerceIn(64, 128)
+    private val geometryLimit = (imageLimit/2).coerceIn(16,96)
+    private val readyByteLimit = imageLimit * 256*256*4 + geometryLimit * 129*129*4
+    private var readyBytes = 0
     private val demLimit = if (am.isLowRamDevice) 24 else (am.memoryClass / 2).coerceIn(48, 128)
-    private val ready = LinkedHashMap<Id, Payload>(16, .75f, true)
+    private val ready = LinkedHashMap<Source, ByteBuffer>(16, .75f, true)
     private val decoded = LinkedHashMap<Id, Dem>(16, .75f, true)
     private val demJobs = ConcurrentHashMap<Id, CompletableFuture<Dem>>()
-    private val jobs = ConcurrentHashMap<Id, Task>()
+    private val jobs = ConcurrentHashMap<Source, Task>()
     private val sequence = AtomicLong()
     private val planBuffer=ByteBuffer.allocateDirect(512*12).order(ByteOrder.LITTLE_ENDIAN)
     @Volatile private var dead = false
-    @Volatile private var wanted = emptySet<Id>()
+    @Volatile private var wanted = emptySet<Source>()
     private var timer: ScheduledFuture<*>? = null
     private val scheduler = Executors.newSingleThreadScheduledExecutor()
     // Bounded workers, priority queue, no multiplication of network concurrency for halos.
     private val workers = ThreadPoolExecutor(3, 3, 0, TimeUnit.MILLISECONDS, PriorityBlockingQueue<Runnable>())
-    private inner class Task(val id: Id, val priority: Int): Runnable, Comparable<Task> {
+    private fun upload(source:Source,data:ByteBuffer) {
+        val id=source.id
+        if(source.geometry)view.uploadGeometry(id.z,id.x,id.y,data)
+        else view.uploadImage(id.z,id.x,id.y,data)
+    }
+    private fun resident(source:Source)=view.isResident(source.id.gpu(),source.geometry)
+    private inner class Task(val source: Source, val priority: Int): Runnable, Comparable<Task> {
         private val order = sequence.getAndIncrement()
         override fun compareTo(other: Task) = compareValuesBy(this, other, { it.priority }, { it.order })
         override fun run() {
             try {
-                if (dead || id !in wanted) return
-                val tile = load(id)
+                if (dead || source !in wanted || resident(source)) return
+                val data = if(source.geometry)loadGeometry(source.id)else loadImage(source.id)
                 if (!dead) {
                     synchronized(ready) {
-                        ready[id] = tile
-                        while (ready.size > readyLimit) ready.remove(ready.keys.first())
+                        ready.put(source,data)?.let{readyBytes-=it.capacity()}
+                        readyBytes+=data.capacity()
+                        while(readyBytes>readyByteLimit){val first=ready.keys.first();readyBytes-=ready.remove(first)!!.capacity()}
                     }
-                    if (id in wanted) view.upload(id.z, id.x, id.y, tile.heights, tile.rgba)
+                    if (source in wanted&&!resident(source)) upload(source,data)
                 }
             } catch (e: Exception) {
-                if (!dead && id in wanted) view.post { view.onStatus("Terrain load failed: " +
+                if (!dead && source in wanted) view.post { view.onStatus("Terrain load failed: " +
                     (if (e is TileHttpException) "provider HTTP ${e.code}" else "source unavailable")) }
-            } finally { jobs.remove(id, this) }
+            } finally { jobs.remove(source, this) }
         }
     }
     fun cameraChanged() = synchronized(this) {
-        timer?.cancel(false)
-        timer = scheduler.schedule(::loadView, 100, TimeUnit.MILLISECONDS)
+        // Throttle using the latest immutable camera; a continuous drag must not
+        // indefinitely postpone source selection, as a cancel/reschedule debounce did.
+        if(!dead&&timer==null)timer=scheduler.schedule({
+            synchronized(this){timer=null}
+            loadView()
+        },100,TimeUnit.MILLISECONDS)
+    }
+    private fun sourcePlan(geometry:Boolean,pose:CameraPose):List<Id> {
+        val output=planBuffer;output.rewind()
+        val budget=if(geometry)geometryLimit else imageLimit
+        val count=NativeBridge.plan((view.width/view.pixelScale).roundToInt().coerceAtLeast(1),
+            (view.height/view.pixelScale).roundToInt().coerceAtLeast(1),pose.longitude,pose.latitude,
+            pose.zoom,pose.bearing,pose.pitch,pose.elevation,budget,
+            if(geometry)431.0 else 256.0/2.0.pow(.25),if(geometry)22 else 19,output)
+        return List(count){Id(output.int,output.int,output.int)}
     }
     private fun loadView() {
-        if (dead) return
-        val output=planBuffer;output.rewind()
+        if (dead||view.width==0||view.height==0) return
         val pose=view.cameraPose
-        val count=NativeBridge.plan(view.width,view.height,pose.longitude,pose.latitude,pose.zoom+ln(view.pixelScale)/ln(2.0),pose.bearing,pose.pitch,pose.elevation,readyLimit,output)
-        val leaves=List(count){Id(output.int,output.int,output.int)}
-        val ranked=LinkedHashMap<Id,Int>()
-        // Request useful real-data ancestors first. Off-screen ready data remains
-        // in bounded caches; only obsolete pending work loses its queue slot.
-        for(leaf in leaves){var parent=leaf;while(parent.z>min(8,leaf.z)){parent=parent.parent();ranked.putIfAbsent(parent,parent.z-8)}}
-        for((index,id)in leaves.withIndex())ranked[id]=20+index
+        val ranked=LinkedHashMap<Source,Int>()
+        for(geometry in listOf(true,false)) {
+            val ids=sourcePlan(geometry,pose)
+            val demand=SourceDemand.bounded(ids.map{it.gpu()},if(geometry)geometryLimit else imageLimit)
+            for((id,priority)in demand)ranked[Source(Id(id.z,id.x,id.y),geometry)]=priority
+        }
         wanted = ranked.keys.toSet()
-        for ((id, task) in jobs) if (id !in wanted && workers.remove(task)) jobs.remove(id, task)
-        for ((id, priority) in ranked) {
-            val old = synchronized(ready) { ready[id] }
-            if (old != null) { view.upload(id.z, id.x, id.y, old.heights, old.rgba); continue }
-            val task = Task(id, priority)
-            if (jobs.putIfAbsent(id, task) == null && !dead) workers.execute(task)
+        for ((source, task) in jobs) if (source !in wanted && workers.remove(task)) jobs.remove(source, task)
+        for ((source, priority) in ranked) {
+            if(resident(source))continue
+            val old = synchronized(ready) { ready[source] }
+            if (old != null) { upload(source,old); continue }
+            val task = Task(source, priority)
+            if (jobs.putIfAbsent(source, task) == null && !dead) {
+                try{workers.execute(task)}catch(_:RejectedExecutionException){jobs.remove(source,task)}
+            }
         }
     }
     private fun fetch(url: String): ByteArray {
@@ -158,8 +183,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         } catch (e: Exception) { future.completeExceptionally(e); throw e }
         finally { demJobs.remove(id, future) }
     }
-    private fun load(id: Id): Payload {
-        val image = imagery.load(id.z, id.x, id.y)
+    private fun loadGeometry(id: Id): ByteBuffer {
         val dz = min(id.z, 18); val factor = 1 shl (id.z - dz); val n = 1 shl dz
         val tx = id.x / factor; val ty = id.y / factor
         val halo = HashMap<Id, Dem>()
@@ -181,6 +205,10 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
                 height(ix,iy+1)*(1-fx)*fy + height(ix+1,iy+1)*fx*fy).toFloat()
             require(h.isFinite()); heights.putFloat(h)
         }
+        heights.rewind();return heights
+    }
+    private fun loadImage(id:Id):ByteBuffer {
+        val image = imagery.load(id.z, id.x, id.y)
         val rgba = ByteBuffer.allocateDirect(256 * 256 * 4)
         for (p in image) {
             val a = Color.alpha(p)
@@ -189,10 +217,10 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             rgba.put(((Color.green(p) * a + 127) / 255).toByte())
             rgba.put(((Color.blue(p) * a + 127) / 255).toByte()); rgba.put(a.toByte())
         }
-        heights.rewind(); rgba.rewind(); return Payload(heights, rgba)
+        rgba.rewind(); return rgba
     }
     fun close() {
         dead = true; timer?.cancel(true); scheduler.shutdownNow(); workers.shutdownNow()
-        client.dispatcher.cancelAll(); client.connectionPool.evictAll(); client.cache?.close(); client.dispatcher.executorService.shutdown(); synchronized(ready) { ready.clear() }; synchronized(decoded) { decoded.clear() }
+        client.dispatcher.cancelAll(); client.connectionPool.evictAll(); client.cache?.close(); client.dispatcher.executorService.shutdown(); synchronized(ready) { ready.clear(); readyBytes=0 }; synchronized(decoded) { decoded.clear() }
     }
 }

@@ -39,6 +39,11 @@ impl Ord for Candidate {
 /// A non-overlapping quadtree cover within NZ. Budget limits requests, never
 /// removes an existing parent in favour of an unready child.
 pub fn plan(view: &View, budget: usize) -> Vec<TileId> {
+    plan_with_target(view, budget, 256., 19)
+}
+pub fn plan_with_target(view: &View, budget: usize, target: f64, max_zoom: u8) -> Vec<TileId> {
+    let target = target.clamp(32., 1024.);
+    let max_zoom = max_zoom.clamp(4, 22);
     let (matrix, ppm) = camera_matrix(
         view.width,
         view.height,
@@ -83,7 +88,7 @@ pub fn plan(view: &View, budget: usize) -> Vec<TileId> {
     let mut leaves = Vec::with_capacity(budget);
     pending.push(root);
     while let Some(next) = pending.pop() {
-        if next.id.z >= 19 || (next.score <= 256. && next.id.z >= 4) {
+        if next.id.z >= max_zoom || (next.score <= target && next.id.z >= 4) {
             leaves.push(next);
             continue;
         }

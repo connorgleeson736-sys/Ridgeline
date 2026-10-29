@@ -1,13 +1,56 @@
 //! Cloud CPU workload only. Does not predict phone FPS or download completion.
 use ridgeline_renderer::{
     mercator,
-    selection::{View, plan},
+    selection::{View, plan, plan_with_target},
 };
 fn main() {
-    for (label,width,height,zoom) in [("logical",411,731,11.9),("physical",1080,1920,11.9+2.625f64.log2())] {
-        let ids=plan(&View{width,height,center:mercator(170.14219572,-43.5955671),zoom,bearing:-24.,pitch:58.,elevation:3724.},96);
-        let mut levels=std::collections::BTreeMap::new();for id in &ids{*levels.entry(id.z).or_insert(0)+=1;}
-        println!("Selection basis {label}: {} tiles, zooms {levels:?}",ids.len());
+    for (label, width, height, zoom) in [
+        ("logical", 411, 731, 11.9),
+        ("physical", 1080, 1920, 11.9 + 2.625f64.log2()),
+    ] {
+        let ids = plan(
+            &View {
+                width,
+                height,
+                center: mercator(170.14219572, -43.5955671),
+                zoom,
+                bearing: -24.,
+                pitch: 58.,
+                elevation: 3724.,
+            },
+            96,
+        );
+        let mut levels = std::collections::BTreeMap::new();
+        for id in &ids {
+            *levels.entry(id.z).or_insert(0) += 1;
+        }
+        println!(
+            "Selection basis {label}: {} tiles, zooms {levels:?}",
+            ids.len()
+        );
+    }
+    let view = View {
+        width: 411,
+        height: 731,
+        center: mercator(170.14219572, -43.5955671),
+        zoom: 11.9,
+        bearing: -24.,
+        pitch: 58.,
+        elevation: 3724.,
+    };
+    for (label, target, ceiling, budget) in [
+        ("independent geometry", 431., 22, 64),
+        ("independent images", 256. / 2f64.powf(0.25), 19, 128),
+    ] {
+        let ids = plan_with_target(&view, budget, target, ceiling);
+        let mut levels = std::collections::BTreeMap::new();
+        for id in &ids {
+            *levels.entry(id.z).or_insert(0) += 1;
+        }
+        println!(
+            "Raw visible leaf selection {label}: {} tiles, zooms {levels:?}; excludes fallback ancestors",
+            ids.len()
+        );
     }
     let mut times = Vec::new();
     let mut counts = Vec::new();
