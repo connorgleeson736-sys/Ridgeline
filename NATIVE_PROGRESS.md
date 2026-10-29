@@ -898,3 +898,28 @@ source inputs at this focus, not new Android live-terrain or visual acceptance.
 Fallback spare slots now favor broad coverage plus nearest parents rather than
 spending the pool on all intermediate levels; closest parent and fine leaf start
 promptly. Three focused source-demand tests pass after this ordering change.
+
+
+## MapLibre6.14camera and shared-grid checkpoint
+
+User confirms customRust/wgpu architecture and asks close0.18behavior, fewer broad
+checks, online/upstreamcode research and executive questions. User chose0.18camera
+feel and1GBadaptiveautomaticcache (separate savedregions/packs). Exact6.14.0
+handler_inertia.ts, camera.ts, two_fingers_touch.ts and terrain.ts read fromupstream;
+0.18bundledprovenance confirms6.14.0. Mainreference refreshed unchanged.
+
+Added bounded60ms/160msreleasevelocityhistory, referencepan/zoom/bearing/pitch
+speed/deceleration/linearity, interruptibleeasing, smooth300mszoom/north/doubletap,
+terrainanchorheldthroughmomentum. Corrected twofingerrotation/tiltsigns; deliberate
+parallelfingerpitch(-0.5degrees/logicalpixel),pinch0.1activation and25pxrotation
+threshold nowfollowreference. Threefocusedmotion/gesturetests andKotlincompilepass.
+Pinch-releasecoastacrosspointercountchanges still needsfinalintegration.
+
+Terrainnowsharesonefull129x129surface+skirtUVgrid, withoneR32Floatheighttexture
+pertile instead ofduplicatepositionbuffers. Alloriginalf32heightbits, diagonals,
+triangles,skirts,CPUterrainqueries,independentimagery/mips retained. RawGPUterrain
+payload per tile falls399384->66564bytes, plusone266256bytegrid perrenderer;
+this ispayload accounting, notphoneFPS. GPU fixturepasses Vulkan andGLES, including
+mixedLODskirts,detailownership,filtering andboundedcache. ExistingcontrolledAndroid
+inputfixture updated toholdbeforerelease so it stillisolatesanchoringfrommomentum;
+notrerunatthischeckpoint. MapLibreBSDnotice includedinsource andassetpackaging.

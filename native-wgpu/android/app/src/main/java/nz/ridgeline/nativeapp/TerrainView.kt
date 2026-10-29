@@ -152,10 +152,10 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         done.await(5,TimeUnit.SECONDS)
     }
     fun setActive(value:Boolean){
-        if(!value){elevationAnimation?.cancel();gestureEpoch++;gestureActive=false;val pose=cameraPose;cameraPreferences.edit().putLong("lon",pose.longitude.toBits()).putLong("lat",pose.latitude.toBits()).putLong("zoom",pose.zoom.toBits()).putFloat("bearing",pose.bearing).putFloat("pitch",pose.pitch).putFloat("elevation",pose.elevation).apply()}
+        if(!value){stopMotion();elevationAnimation?.cancel();gestureEpoch++;gestureActive=false;val pose=cameraPose;cameraPreferences.edit().putLong("lon",pose.longitude.toBits()).putLong("lat",pose.latitude.toBits()).putLong("zoom",pose.zoom.toBits()).putFloat("bearing",pose.bearing).putFloat("pitch",pose.pitch).putFloat("elevation",pose.elevation).apply()}
         active=value;cancelFrames();if(value&&live)requestFrame()}
     fun close() {
-        elevationAnimation?.cancel();active=false;live=false;generation.incrementAndGet();uploads.clear();queued.set(false)
+        stopMotion();elevationAnimation?.cancel();active=false;live=false;generation.incrementAndGet();uploads.clear();queued.set(false)
         gpu.post{choreographer.removeFrameCallback(vsync);if(handle!=0L)NativeBridge.destroy(handle);handle=0;thread.quitSafely()}
     }
     fun updateUploadDemand(geometry:Set<GpuUploadQueue.Id>,images:Set<GpuUploadQueue.Id>){
@@ -201,12 +201,19 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         }
     }
     fun zoomBy(delta:Double){
-        if(!delta.isFinite())return
-        val next=cameraPose.copy(zoom=(zoom+delta).coerceIn(4.0,19.0))
-        if(next!=cameraPose){cameraPose=next;changed()}
+        if(delta.isFinite())easeControls((zoom+delta).coerceIn(4.0,19.0),bearing,width*.5,height*.5)
     }
     fun northUp(){
-        if(bearing!=0f){cameraPose=cameraPose.copy(bearing=0f);changed()}
+        val difference=(((bearing+180f)%360f+360f)%360f)-180f
+        if(abs(difference)>.001f)easeControls(zoom,bearing-difference,width*.5,height*.5)
+    }
+    private var programmaticEase=false
+    private var pendingEase:GestureMotion.Coast?=null
+    private fun easeControls(targetZoom:Double,targetBearing:Float,x:Double,y:Double){
+        if(targetZoom==zoom&&targetBearing==bearing)return
+        beginGesture(x,y)
+        programmaticEase=true
+        pendingEase=GestureMotion.Coast(300,0.0,0.0,targetZoom-zoom,(targetBearing-bearing).toDouble(),0.0)
     }
     // One terrain plane per gesture. Loading/refinement cannot change its sensitivity.
     private var gestureEpoch=0L
@@ -218,17 +225,35 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     private var touchZoom=zoom
     private var touchBearing=bearing
     private var touchPitch=pitch
-    private var lastSpan=0.0
-    private var lastAngle=0.0
-    private var lastFocusY=0.0
+    private val motion=GestureMotion()
+    private val twoFingers=TwoFingerGesture()
+    private var motionAnimation:android.animation.ValueAnimator?=null
+    private var pendingCoast:GestureMotion.Coast?=null
+    private fun stopMotion(){programmaticEase=false;pendingEase=null;motionAnimation?.removeAllListeners();motionAnimation?.cancel();motionAnimation=null;pendingCoast=null;motion.clear()}
+    private fun recordMotion(time:Long){motion.record(GestureMotion.Sample(time,touchX/pixelScale,touchY/pixelScale,touchZoom,touchBearing.toDouble(),touchPitch.toDouble()))}
+    private fun startCoast(coast:GestureMotion.Coast,inertia:Boolean=true){
+        val x=touchX;val y=touchY;val z=touchZoom;val b=touchBearing;val p=touchPitch
+        motionAnimation=android.animation.ValueAnimator.ofFloat(0f,1f).apply{
+            duration=coast.duration
+            interpolator=if(inertia)android.view.animation.PathInterpolator(0f,0f,.3f,1f)else android.view.animation.PathInterpolator(.25f,.1f,.25f,1f)
+            addUpdateListener{val t=(it.animatedValue as Float).toDouble()
+                touchX=x+coast.x*pixelScale*t;touchY=y+coast.y*pixelScale*t
+                touchZoom=(z+coast.zoom*t).coerceIn(4.0,19.0);touchBearing=b+(coast.bearing*t).toFloat();touchPitch=(p+(coast.pitch*t).toFloat()).coerceIn(0f,85f)
+                applyGesture()
+            }
+            addListener(object:android.animation.AnimatorListenerAdapter(){override fun onAnimationEnd(animation:android.animation.Animator){motionAnimation=null;programmaticEase=false;endGesture()}})
+            start()
+        }
+    }
     private var multiTouch=false
     private fun beginGesture(x:Double,y:Double){
-        elevationAnimation?.cancel();pendingGround=null;gestureActive=true
+        stopMotion();elevationAnimation?.cancel();pendingGround=null;gestureActive=true
         finishGesturePending=false
         val token=++gestureEpoch;touchX=x;touchY=y;touchZoom=zoom;touchBearing=bearing;touchPitch=pitch
         val pose=cameraPose
         gestureAnchor=CameraMath.anchor(pose,width,height,pixelScale,x,y)
         anchorPending=true
+        recordMotion(android.os.SystemClock.uptimeMillis())
         gpu.post{
             // Pick and pose are from the same presented frame, never a newer UI pose.
             val rendered=presentedPose
@@ -242,7 +267,8 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
                     if(real!=null)gestureAnchor=real
                 }
                 applyGesture()
-                if(finishGesturePending)endGesture()
+                val ease=pendingEase;pendingEase=null
+                if(ease!=null)startCoast(ease,false)else if(finishGesturePending)endGesture()
             }
         }
     }
@@ -253,8 +279,11 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         if(next!=cameraPose){cameraPose=next;changed()}
     }
     private fun endGesture(){
+        if(programmaticEase)return
         if(anchorPending){finishGesturePending=true;return}
         finishGesturePending=false
+        val coast=pendingCoast;pendingCoast=null
+        if(coast!=null){startCoast(coast);return}
         gestureActive=false;gestureEpoch++;anchorPending=false;gestureAnchor=null
         pendingGround?.let{centerHeight(it)};pendingGround=null
         onCamera()
@@ -281,14 +310,9 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         override fun onDown(e:MotionEvent)=true
         override fun onSingleTapConfirmed(e:MotionEvent):Boolean {onMapTap?.invoke(e.x.toDouble(),e.y.toDouble(),nearestWaypoint(e.x.toDouble(),e.y.toDouble()));return true}
         override fun onLongPress(e:MotionEvent){val index=nearestWaypoint(e.x.toDouble(),e.y.toDouble());if(index>=0&&onWaypointDragStart?.invoke(index)==true){dragEpoch++;draggingWaypoint=true;performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)}}
-        override fun onDoubleTap(e:MotionEvent):Boolean{
-            val anchor=CameraMath.anchor(cameraPose,width,height,pixelScale,e.x.toDouble(),e.y.toDouble())
-            val pose=cameraPose.copy(zoom=(zoom+1).coerceIn(4.0,19.0))
-            val next=anchor?.let{CameraMath.anchored(pose,it,width,height,pixelScale,e.x.toDouble(),e.y.toDouble())}?:pose
-            cameraPose=next;touchZoom=next.zoom;changed();return true
-        }
+        override fun onDoubleTap(e:MotionEvent):Boolean{easeControls((zoom+1).coerceIn(4.0,19.0),bearing,e.x.toDouble(),e.y.toDouble());return true}
         override fun onScroll(a:MotionEvent?,b:MotionEvent,dx:Float,dy:Float):Boolean {
-            if(b.pointerCount==1&&!multiTouch){touchX=b.x.toDouble();touchY=b.y.toDouble();applyGesture()}
+            if(b.pointerCount==1&&!multiTouch){touchX=b.x.toDouble();touchY=b.y.toDouble();applyGesture();recordMotion(b.eventTime)}
             return true
         }
     })
@@ -307,29 +331,22 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             MotionEvent.ACTION_POINTER_DOWN->{
                 multiTouch=true
                 val f=focusOf(event);beginGesture(f.first,f.second)
-                lastSpan=hypot((event.getX(1)-event.getX(0)).toDouble(),(event.getY(1)-event.getY(0)).toDouble())
-                lastAngle=atan2((event.getY(1)-event.getY(0)).toDouble(),(event.getX(1)-event.getX(0)).toDouble());lastFocusY=f.second
+                twoFingers.start(event.getX(0)/pixelScale,event.getY(0)/pixelScale,event.getX(1)/pixelScale,event.getY(1)/pixelScale)
             }
             MotionEvent.ACTION_MOVE->if(event.pointerCount==2){
                 val f=focusOf(event)
-                val span=hypot((event.getX(1)-event.getX(0)).toDouble(),(event.getY(1)-event.getY(0)).toDouble())
-                val angle=atan2((event.getY(1)-event.getY(0)).toDouble(),(event.getX(1)-event.getX(0)).toDouble())
-                if(lastSpan>0&&span>0){
-                    val zoomDelta=ln(span/lastSpan)/ln(2.0)
-                    val rotation=atan2(sin(angle-lastAngle),cos(angle-lastAngle))
-                    touchZoom=(touchZoom+zoomDelta).coerceIn(4.0,19.0)
-                    touchBearing+=Math.toDegrees(rotation).toFloat()
-                    // Two parallel vertical fingers tilt; pinch and rotation keep their pivot.
-                    if(abs(zoomDelta)<.015&&abs(rotation)<.015)touchPitch=(touchPitch+(f.second-lastFocusY).toFloat()/pixelScale.toFloat()*.12f).coerceIn(0f,80f)
-                    touchX=f.first;touchY=f.second;applyGesture()
-                }
-                lastSpan=span;lastAngle=angle;lastFocusY=f.second
+                val delta=twoFingers.move(event.getX(0)/pixelScale,event.getY(0)/pixelScale,event.getX(1)/pixelScale,event.getY(1)/pixelScale,event.eventTime)
+                touchZoom=(touchZoom+delta.zoom).coerceIn(4.0,19.0)
+                touchBearing+=delta.bearing.toFloat();touchPitch=(touchPitch+delta.pitch.toFloat()).coerceIn(0f,85f)
+                if(!delta.tilting){touchX=f.first;touchY=f.second}
+                applyGesture();recordMotion(event.eventTime)
             }
             MotionEvent.ACTION_POINTER_UP->{val f=focusOf(event,event.actionIndex);multiTouch=event.pointerCount-1>1;beginGesture(f.first,f.second)}
         }
         gestures.onTouchEvent(event)
         if(event.actionMasked==MotionEvent.ACTION_UP||event.actionMasked==MotionEvent.ACTION_CANCEL){
-            if(event.actionMasked==MotionEvent.ACTION_CANCEL){gestureEpoch++;anchorPending=false}
+            if(event.actionMasked==MotionEvent.ACTION_CANCEL){gestureEpoch++;anchorPending=false;motion.clear();pendingCoast=null}
+            else if(!programmaticEase)pendingCoast=motion.finish(event.eventTime)
             endGesture();parent?.requestDisallowInterceptTouchEvent(false)}
         return true
     }

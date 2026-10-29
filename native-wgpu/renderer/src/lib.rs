@@ -24,10 +24,11 @@ struct Scene {
 #[repr(C)]
 #[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]
 struct Vertex {
-    position: [f32; 3],
+    position: [f32; 2],
 }
 struct Tile {
-    vertices: wgpu::Buffer,
+    height_bind: wgpu::BindGroup,
+    _heights: wgpu::Texture,
     used: u64,
     field: ridgeline_core::heightfield::Heightfield,
 }
@@ -48,6 +49,8 @@ pub struct Renderer {
     pub instance_uploads: u64,
     scene_bind: wgpu::BindGroup,
     texture_layout: wgpu::BindGroupLayout,
+    height_layout: wgpu::BindGroupLayout,
+    grid: wgpu::Buffer,
     sampler: wgpu::Sampler,
     mipmaps: mipmaps::Mipmaps,
     indices: wgpu::Buffer,
@@ -156,9 +159,9 @@ impl Renderer {
                 compilation_options: Default::default(),
                 buffers: &[
                     Some(wgpu::VertexBufferLayout {
-                        array_stride: 12,
+                        array_stride: 8,
                         step_mode: wgpu::VertexStepMode::Vertex,
-                        attributes: &wgpu::vertex_attr_array![0=>Float32x3],
+                        attributes: &wgpu::vertex_attr_array![0=>Float32x2],
                     }),
                     Some(wgpu::VertexBufferLayout {
                         array_stride: 48,
@@ -201,6 +204,18 @@ impl Renderer {
             }],
         });
         let texture_layout = pipeline.get_bind_group_layout(1);
+        let height_layout = pipeline.get_bind_group_layout(2);
+        let mut vertices: Vec<Vertex> = (0..129 * 129)
+            .map(|i| Vertex {
+                position: [(i % 129) as f32 / 128., (i / 129) as f32 / 128.],
+            })
+            .collect();
+        vertices.extend_from_within(..); // Same surface UVs and skirt UVs, shared by every tile.
+        let grid = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("shared full-detail terrain grid"),
+            contents: bytemuck::cast_slice(&vertices),
+            usage: wgpu::BufferUsages::VERTEX,
+        });
         let anisotropy = if adapter
             .get_downlevel_capabilities()
             .flags
@@ -273,6 +288,8 @@ impl Renderer {
             instance_uploads: 0,
             scene_bind,
             texture_layout,
+            height_layout,
+            grid,
             sampler,
             mipmaps,
             indices,
@@ -391,23 +408,46 @@ impl Renderer {
             return Ok(());
         }
         self.clock += 1;
-        let mut v: Vec<Vertex> = (0..129 * 129)
-            .map(|i| Vertex {
-                position: [(i % 129) as f32 / 128., (i / 129) as f32 / 128., heights[i]],
-            })
-            .collect();
-        v.extend_from_within(..); // Same full-resolution surface plus lowered boundary vertices.
-        let vertices = self
-            .device
-            .create_buffer_init(&wgpu::util::BufferInitDescriptor {
-                label: Some("tile vertices"),
-                contents: bytemuck::cast_slice(&v),
-                usage: wgpu::BufferUsages::VERTEX,
-            });
+        // Preserve each f32 height exactly; only the invariant grid is shared.
+        let heights_texture = self.device.create_texture(&wgpu::TextureDescriptor {
+            label: Some("exact 129 terrain heights"),
+            size: wgpu::Extent3d {
+                width: 129,
+                height: 129,
+                depth_or_array_layers: 1,
+            },
+            mip_level_count: 1,
+            sample_count: 1,
+            dimension: wgpu::TextureDimension::D2,
+            format: wgpu::TextureFormat::R32Float,
+            usage: wgpu::TextureUsages::TEXTURE_BINDING | wgpu::TextureUsages::COPY_DST,
+            view_formats: &[],
+        });
+        self.queue.write_texture(
+            heights_texture.as_image_copy(),
+            bytemuck::cast_slice(heights),
+            wgpu::TexelCopyBufferLayout {
+                offset: 0,
+                bytes_per_row: Some(129 * 4),
+                rows_per_image: Some(129),
+            },
+            heights_texture.size(),
+        );
+        let height_bind = self.device.create_bind_group(&wgpu::BindGroupDescriptor {
+            label: Some("terrain height field"),
+            layout: &self.height_layout,
+            entries: &[wgpu::BindGroupEntry {
+                binding: 0,
+                resource: wgpu::BindingResource::TextureView(
+                    &heights_texture.create_view(&Default::default()),
+                ),
+            }],
+        });
         self.tiles.insert(
             id,
             Tile {
-                vertices,
+                height_bind,
+                _heights: heights_texture,
                 used: self.clock,
                 field: ridgeline_core::heightfield::Heightfield::new(
                     128,
@@ -498,6 +538,9 @@ impl Renderer {
     }
     pub fn resident_count(&self) -> usize {
         self.tiles.len().max(self.images.len())
+    }
+    pub fn terrain_gpu_payload_bytes(&self) -> u64 {
+        self.grid.size() + self.tiles.len() as u64 * 129 * 129 * 4
     }
     pub fn geometry_count(&self) -> usize {
         self.tiles.len()
@@ -1042,7 +1085,8 @@ impl Renderer {
             for (i, row) in rows.iter().enumerate() {
                 let tile = &self.tiles[&row.geometry];
                 pass.set_bind_group(1, &self.images[&row.image].bind, &[]);
-                pass.set_vertex_buffer(0, tile.vertices.slice(..));
+                pass.set_vertex_buffer(0, self.grid.slice(..));
+                pass.set_bind_group(2, &tile.height_bind, &[]);
                 pass.set_vertex_buffer(
                     1,
                     self.instances.slice((i * 48) as u64..((i + 1) * 48) as u64),

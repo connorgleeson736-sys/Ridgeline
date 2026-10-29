@@ -23,3 +23,7 @@ if(full){const source=process.env.RIDGELINE_OVERVIEW_ZIPS||path.join(root,'overv
 }
 fs.writeFileSync(path.join(out,'overview-index.json'),JSON.stringify(overview));
 console.log(JSON.stringify({full,packCount:full?catalog.files.length:0,coarseImages:copied.size,gapEntries:Object.keys(gap.entries).length,overviewCoordinates:Object.keys(catalog.tiles).length}));
+
+// Retain the notice for algorithms adapted from the reference MapLibre engine.
+fs.mkdirSync(path.join(out,'licenses'),{recursive:true});
+fs.copyFileSync(path.join(root,'native-wgpu/licenses/maplibre-gl-js.txt'),path.join(out,'licenses/maplibre-gl-js.txt'));

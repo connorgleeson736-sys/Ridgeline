@@ -57,6 +57,7 @@ class GestureProofInstrumentation:Instrumentation(){
             SystemClock.sleep(80)
             val dx=view.width*.12;val dy=view.height*.06
             for(i in 1..12){event(MotionEvent.ACTION_MOVE,x+dx*i/12,y+dy*i/12);SystemClock.sleep(20)}
+            SystemClock.sleep(180) // Hold before release: test drag anchoring separately from momentum.
             event(MotionEvent.ACTION_UP,x+dx,y+dy)
             val frameDeadline=SystemClock.uptimeMillis()+10000
             while(!view.frameReady()&&SystemClock.uptimeMillis()<frameDeadline)SystemClock.sleep(20)
