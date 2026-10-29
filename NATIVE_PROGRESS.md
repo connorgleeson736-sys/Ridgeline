@@ -755,3 +755,8 @@ Normal trust only, no session CA. APK/checksum are in native-wgpu/checkpoints;
 previous Full checkpoint and all6original source ZIPs remain intact. User asked
 to focus on implementation with fewer repeated checks. Continuing terrain source
 ownership correction; latest Android grounding execution still pending.
+
+Base packaging follow-up: incremental Android packager retained deleted Full ZIP
+bodies as unreferenced bytes. Recreated only packageDebug state/output, producing
+a genuinely smaller Base archive; signature and actual file-size bound checked.
+Source/code/native libraries unchanged; no broad test rerun.
