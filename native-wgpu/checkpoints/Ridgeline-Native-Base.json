@@ -1,8 +1,8 @@
 {
-  "sourceCheckpoint": "3d293224f26a51eb05f616bb27c591f3df724647",
+  "sourceCheckpoint": "40d278887128b50a6c8bb8209683ed4580b6068f",
   "apk": "Ridgeline-Native-Base.apk",
-  "bytes": 31536089,
-  "sha256": "099694243028e7b9dbb2781ec9175a8a2b30572f538c34a3ce31a6c08d4cdda5",
+  "bytes": 31559809,
+  "sha256": "301488d08668ea2375263598ce44fb95678e74f4e64e135c9c912bc545208d67",
   "largeOverviewPacks": 0,
   "coarseImageryFiles": 67,
   "abis": [
@@ -11,13 +11,18 @@
     "x86_64"
   ],
   "managedSessionCa": false,
+  "choices": {
+    "cameraReference": "Ridgeline0.18 / MapLibreGLJS6.14",
+    "automaticCacheMaximumBytes": 1000000000,
+    "automaticCacheAdaptation": "limited by free cache storage",
+    "imageryFadeMilliseconds": 0
+  },
   "changes": [
-    "Terrain-anchored pan and pinch with corrected direction",
-    "Held/eased camera elevation",
-    "Demand-owned HLOD eliminates cached-descendant ownership hysteresis",
-    "Distance/focus LOD restores maximum close-up source detail",
-    "Prioritized progressive loading, separate terrain and imagery workers, bounded retries",
-    "Native planner, GPU routes, profiles, offline regions and one-shot location checkpoint"
+    "Reference release momentum and two-finger gesture signs/activation",
+    "Smooth anchored zoom/doubletap/north controls",
+    "Exact shared terrain grid and per-tile R32Float heights",
+    "Eye/near-plane terrain clearance, actual rendered centre grounding",
+    "Deduplicated source body requests, active-use cache recency and background selection pause"
   ],
-  "validation": "Focused gesture, demand and selection tests pass. Native Android controlled drag and immediate release pass; GPU ownership replay passes. Genuine highest LINZ source bodies available at default focus. Signature and Base payload verified. Real-terrain visual acceptance, full transitions and phone performance remain open."
+  "validation": "Three focused gesture tests pass; Kotlin compilation and all three optimized JNI ABIs/build pass. Vulkan/GLES shared-grid checks and dedicated CPU terrain-clearance/payload checks pass. Signature and normal Base payload verified. No new Android runtime/phone performance or complete MapLibre-equivalence claim."
 }

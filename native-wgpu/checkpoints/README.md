@@ -1,21 +1,18 @@
 # Native Android checkpoints — incomplete prototypes
 
 Latest smaller build: [Ridgeline-Native-Base.apk](Ridgeline-Native-Base.apk).
-Source checkpoint `3d29322`; signed debug Base APK, all three ABIs.
-Includes corrected terrain-anchored pan/pinch direction, held/eased center height,
-current-view HLOD ownership, close-up full-source detail selection and prioritized
-progressive loading. Also includes the saved native planner/offline/location work.
-Omits the six large overview ZIPs; retains67coarse overview images and original
-full-resolution online sources. Detailed imagery and DEM require network or
-saved regions. All six original ZIPs and older Full checkpoint remain available.
+Source checkpoint `40d2788`; signed debug Base APK, 31.6MB, all three ABIs.
+Includes MapLibre6.14-style release momentum, corrected deliberate two-finger
+rotation/tilt, smooth anchored controls, terrain clearance and centre grounding,
+shared full-detail terrain grid, improved cache reuse and deduplicated requests.
+User choices: up to1GBadaptiveautomaticcache, immediateimageryreplacement(nofades).
 
-Focused input/selection/demand checks pass. Actual Android controlled pitched drag
-and immediate-release checks pass; GPU LOD reversal is pixel-identical for the
-same view. Highest LINZ aerial19/DEM18 inputs at default focus return200.
-Real-terrain visual acceptance, full transition smoothing and phone performance
-remain open. No session CA is included. Checksum/build scope are alongside it.
-See [evidence](../validation/gestures-loading/) and
-[MapLibre implementation study](../research/MAPLIBRE-GESTURES-HLOD.md).
+Omits the six large overview ZIPs; retains67coarse images and full-resolution online
+sources. Original6ZIPs and olderFullcheckpoint remain preserved. Normal system
+trust, no session CA. Focused gesture/GPU checks and build pass; no new Android
+runtime or phone performance acceptance. Checksum/build scope are alongside it.
+See [evidence](../validation/maplibre-behavior/) and
+[reference code and deliberate differences](../research/MAPLIBRE-614-ADAPTATION.md).
 
 Earlier Base: [Ridgeline-Native-Base-a585548.apk](Ridgeline-Native-Base-a585548.apk).
 

@@ -947,3 +947,13 @@ Pinch/rotate/tilt releasecoast now survivesquicktwo-to-one-to-zeropointerrelease
 withoutaddingcentroidjumps toonefingerdrag. Normalzoom4..19,terrainceilings,
 originalmips/filtering/fullsurfacesamples retained. DedicatedGPUclearance/payload
 checks pass; Kotlinintegrationcompiles. No newAndroidruntimeorphonebenchmarkclaim.
+
+LatestnormalBaseAPKbuiltfrom40d2788withall3optimizedABIs, fullheight/imagequality,
+newsharedgrid/clearance/cache/camera code, packagedMapLibreBSDnotice andno6large
+packs/sessionCA. Signaturepasses. Size31559809bytes; SHA256
+301488d08668ea2375263598ce44fb95678e74f4e64e135c9c912bc545208d67.
+Scope/evidence in validation/maplibre-behavior andresearch/MAPLIBRE-614-ADAPTATION.md.
+No fullemulator/lint/testloops repeated; no phoneperformance claim. Preserve
+performance-first choices whencontinuing: matchbehavior, avoidunusedMapLibre
+infrastructure; improve actualterrain-awareselection/idlecamera re-solve only
+wherevisiblebenefit orprofilingjustifiescost. ExistingCapacitorapp untouched.
