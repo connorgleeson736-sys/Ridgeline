@@ -1,0 +1,27 @@
+{
+  "androidUnitTests": {
+    "tests": 25,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "rustHostTests": 19,
+  "lintErrors": 0,
+  "lintWarnings": 16,
+  "oldNewDemBufferComparisons": 16,
+  "heightSamplesCompared": 266256,
+  "overscaledInteriorDemTilesBefore": 9,
+  "overscaledInteriorDemTilesAfter": 1,
+  "samePlanRequests": 100,
+  "samePlanBuilds": 1,
+  "duplicatePendingOffers": 100,
+  "duplicateExtraFrameRequests": 0,
+  "unchangedGpuFramePixels": "exact match",
+  "unchangedSceneAndInstanceWrites": "zero additional transfers",
+  "refinedSourceInstances": "updated",
+  "genuineLinzObliqueRgbBytes": "exact match to skirt checkpoint",
+  "signatureVerified": true,
+  "zipalign16KiB": true,
+  "phoneFpsAndVisualParity": "unverified",
+  "androidLiveExecution": "still blocked by prior emulator system-service instability"
+}

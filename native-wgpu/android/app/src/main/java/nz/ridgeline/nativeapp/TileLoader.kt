@@ -15,6 +15,8 @@ import java.util.concurrent.*
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.math.*
 
+private typealias Dem = DemSampling.Raster
+
 internal class TileHttpException(val code:Int):IOException("Provider HTTP $code")
 
 /** Native-source prototype; viewport/LOD parity and performance acceptance remain open. */
@@ -23,7 +25,6 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         fun parent() = Id(z - 1, x / 2, y / 2)
         fun gpu() = GpuUploadQueue.Id(z,x,y)
     }
-    private data class Dem(val id: Id, val samples: FloatArray)
     private data class Source(val id:Id,val geometry:Boolean)
     private val client = OkHttpClient.Builder()
         .cache(Cache(File(context.cacheDir, "native-http-v1"), 256_000_000))
@@ -46,6 +47,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private val demJobs = ConcurrentHashMap<Id, CompletableFuture<Dem>>()
     private val jobs = ConcurrentHashMap<Source, Task>()
     private val sequence = AtomicLong()
+    private val plans=DemandPlanCache<DemandPlanKey,Map<Source,Int>>()
     private val planBuffer=ByteBuffer.allocateDirect(512*12).order(ByteOrder.LITTLE_ENDIAN)
     @Volatile private var dead = false
     @Volatile private var wanted = emptySet<Source>()
@@ -88,23 +90,27 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             loadView()
         },100,TimeUnit.MILLISECONDS)
     }
-    private fun sourcePlan(geometry:Boolean,pose:CameraPose):List<Id> {
+    private fun sourcePlan(geometry:Boolean,key:DemandPlanKey):List<Id> {
+        val pose=key.pose
         val output=planBuffer;output.rewind()
         val budget=if(geometry)geometryLimit else imageLimit
-        val count=NativeBridge.plan((view.width/view.pixelScale).roundToInt().coerceAtLeast(1),
-            (view.height/view.pixelScale).roundToInt().coerceAtLeast(1),pose.longitude,pose.latitude,
+        val count=NativeBridge.plan(key.width,key.height,pose.longitude,pose.latitude,
             pose.zoom,pose.bearing,pose.pitch,pose.elevation,budget,
             if(geometry)431.0 else 256.0/2.0.pow(.25),if(geometry)22 else 19,output)
         return List(count){Id(output.int,output.int,output.int)}
     }
     private fun loadView() {
         if (dead||view.width==0||view.height==0) return
-        val pose=view.cameraPose
-        val ranked=LinkedHashMap<Source,Int>()
-        for(geometry in listOf(true,false)) {
-            val ids=sourcePlan(geometry,pose)
+        val key=DemandPlanKey((view.width/view.pixelScale).roundToInt().coerceAtLeast(1),
+            (view.height/view.pixelScale).roundToInt().coerceAtLeast(1),view.cameraPose)
+        val ranked=plans.get(key) {
+          val next=LinkedHashMap<Source,Int>()
+          for(geometry in listOf(true,false)) {
+            val ids=sourcePlan(geometry,key)
             val demand=SourceDemand.bounded(ids.map{it.gpu()},if(geometry)geometryLimit else imageLimit)
-            for((id,priority)in demand)ranked[Source(Id(id.z,id.x,id.y),geometry)]=priority
+            for((id,priority)in demand)next[Source(Id(id.z,id.x,id.y),geometry)]=priority
+          }
+          next.toMap()
         }
         wanted = ranked.keys.toSet()
         view.updateUploadDemand(wanted.filter{it.geometry}.map{it.id.gpu()}.toSet(),
@@ -152,15 +158,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             }
         } finally { bitmap.recycle() }
     }
-    private fun sample(record: Dem, gx: Double, gy: Double, z: Int): Float {
-        val scale = 2.0.pow(z - record.id.z)
-        val px = ((gx + .5) / scale - .5 - record.id.x * 256).coerceIn(0.0, 255.0)
-        val py = ((gy + .5) / scale - .5 - record.id.y * 256).coerceIn(0.0, 255.0)
-        val x = floor(px).toInt(); val y = floor(py).toInt(); val fx = px - x; val fy = py - y
-        fun h(a: Int, b: Int) = record.samples[b * 256 + a]
-        return (h(x,y)*(1-fx)*(1-fy) + h(min(255,x+1),y)*fx*(1-fy) +
-            h(x,min(255,y+1))*(1-fx)*fy + h(min(255,x+1),min(255,y+1))*fx*fy).toFloat()
-    }
+    private fun sample(record:Dem,gx:Double,gy:Double,z:Int)=DemSampling.sample(record,gx,gy,z)
     private fun raw(id: Id): Dem {
         synchronized(decoded) { decoded[id]?.let { return it } }
         val future = CompletableFuture<Dem>(); val existing = demJobs.putIfAbsent(id, future)
@@ -175,7 +173,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
                     for (y in 0..255) for (x in 0..255) if (!pixels[y * 256 + x].isFinite())
                         pixels[y * 256 + x] = sample(parent, id.x * 256.0 + x, id.y * 256.0 + y, id.z)
                 }
-                Dem(id, pixels)
+                Dem(id.gpu(), pixels)
             }
             synchronized(decoded) {
                 decoded[id] = record
@@ -186,28 +184,9 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         finally { demJobs.remove(id, future) }
     }
     private fun loadGeometry(id: Id): ByteBuffer {
-        val dz = min(id.z, 18); val factor = 1 shl (id.z - dz); val n = 1 shl dz
-        val tx = id.x / factor; val ty = id.y / factor
-        val halo = HashMap<Id, Dem>()
-        for (dy in -1..1) for (dx in -1..1) {
-            val neighbor = Id(dz, Math.floorMod(tx + dx, n), (ty + dy).coerceIn(0, n - 1))
-            if (neighbor !in halo) halo[neighbor] = raw(neighbor)
-        }
-        fun height(gx: Int, gy: Int): Float {
-            val x = Math.floorMod(gx, n * 256); val y = gy.coerceIn(0, n * 256 - 1)
-            val record = halo.getValue(Id(dz, x / 256, y / 256))
-            return sample(record, x.toDouble(), y.toDouble(), dz)
-        }
-        val heights = ByteBuffer.allocateDirect(129 * 129 * 4).order(ByteOrder.LITTLE_ENDIAN)
-        for (y in 0..128) for (x in 0..128) {
-            val px = (id.x * 256.0 + x * 2.0) / factor - .5
-            val py = (id.y * 256.0 + y * 2.0) / factor - .5
-            val ix = floor(px).toInt(); val iy = floor(py).toInt(); val fx = px - ix; val fy = py - iy
-            val h = (height(ix,iy)*(1-fx)*(1-fy) + height(ix+1,iy)*fx*(1-fy) +
-                height(ix,iy+1)*(1-fx)*fy + height(ix+1,iy+1)*fx*fy).toFloat()
-            require(h.isFinite()); heights.putFloat(h)
-        }
-        heights.rewind();return heights
+        val heights=ByteBuffer.allocateDirect(129*129*4).order(ByteOrder.LITTLE_ENDIAN)
+        DemSampling.mesh(id.z,id.x,id.y,heights){raw(Id(it.z,it.x,it.y))}
+        return heights
     }
     private fun loadImage(id:Id):ByteBuffer {
         val image = imagery.load(id.z, id.x, id.y)

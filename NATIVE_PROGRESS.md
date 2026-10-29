@@ -530,3 +530,45 @@ watchdog, networking policy or Ridgeline caused it. Package/activity services we
 absent in subsequent checks despite stale boot_completed=1. No app process/install
 success or instrumentation pass exists for this current session. Toolchain/build,
 source hashes and hostGPU checks are independent successful evidence.
+
+## Quality-preserving CPU/GPU work removal
+
+Continued from7a3e659 on native-rust-wgpu. Removed repeated viewport selection on
+accepted-data callbacks by caching one immutable combined geometry/photo demand
+plan keyed by all camera fields and logical viewport dimensions. Residency and
+missing-source scheduling are still reconciled on every callback, so an evicted
+source or recreated surface can be refilled without changing camera. Failed plan
+builds cannot publish a stale value under a new key. No LOD/detail policy changed.
+
+DEM geometry now loads only source tiles touched by its exact pixel-centre mesh
+footprint. A representative interior z20 mesh uses1z18DEM instead of9; standard
+z18stilluses all9halo tiles, boundary z19uses4. Exact same-level integer samples
+avoid a redundant bilinear read; true parent fallback retains original sampling.
+Frozen checkpoint7a3e659 algorithm is the test oracle. All266256height samples in
+16full-buffer comparisons match byte-for-byte across source/overscaled zooms,
+world wrap/poles, parent fallback and signed zero. Initial test caught negative
+zero behavior; the zero path retains original arithmetic, assertions unchanged.
+These are source lookup/operation reductions, not measured device timing.
+
+Duplicate pending immutable payloads no longer call requestFrame again. New
+buffer ownership and re-admission after draining still work. GPU scene/instance
+buffers are transferred only when their contents change; rendering itself still
+occurs whenever requested. A data refinement still updates instance ownership;
+unchanged camera uniforms are reused. Full framebuffer,128-cell surface/skirt
+geometry,256px source imagery, grade/mips/filtering and budgets remain unchanged.
+The extra retained instance snapshot is bounded by existing visible source cover.
+
+Validation: all25Android tests pass, no skips/failures;19Rust host tests pass;
+lint0errors/16warnings; all3optimizedABIs rebuilt. Existing GPU exact-grade,
+parent/fine coverage, crop, mips,36092-pixel skirt-gap and residency regressions
+pass, including pixel-identical repeated frames with zero additional uniform/
+instance transfers. Genuine LINZ GPU draw/pick passes; oblique capture RGB bytes
+exactly equal previous skirt checkpoint. APK signature/16KiB alignment and all6
+originalZIP hashes pass. Report: validation/quality-work/checks.json. Frozen APK:
+artifacts/Ridgeline-Native-Quality-Work-Debug.apk (generated, not committed).
+No Capacitor/android/public source changes; no overview ZIP modifications.
+
+No phone FPS or live-Android/visual acceptance claim: previous emulator system
+service failure remains unresolved and this checkpoint does not change that
+runtime. Next critical gate remains stable Android execution of controlled/live
+instrumentation and genuine same-camera0.18reference comparisons before full UI.

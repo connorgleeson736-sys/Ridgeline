@@ -6,7 +6,7 @@ use wgpu::util::DeviceExt;
 mod mipmaps;
 pub mod selection;
 #[repr(C)]
-#[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]
+#[derive(Clone, Copy, PartialEq, bytemuck::Pod, bytemuck::Zeroable)]
 struct Scene {
     matrix: [f32; 16],
     grade: [f32; 4],
@@ -33,6 +33,10 @@ pub struct Renderer {
     pub format: wgpu::TextureFormat,
     pipeline: wgpu::RenderPipeline,
     scene: wgpu::Buffer,
+    last_scene: Option<Scene>,
+    last_instances: Vec<[f32; 12]>,
+    pub scene_uploads: u64,
+    pub instance_uploads: u64,
     scene_bind: wgpu::BindGroup,
     texture_layout: wgpu::BindGroupLayout,
     sampler: wgpu::Sampler,
@@ -215,6 +219,10 @@ impl Renderer {
             format,
             pipeline,
             scene,
+            last_scene: None,
+            last_instances: Vec::new(),
+            scene_uploads: 0,
+            instance_uploads: 0,
             scene_bind,
             texture_layout,
             sampler,
@@ -693,20 +701,22 @@ impl Renderer {
             pitch,
             elevation,
         );
-        self.queue.write_buffer(
-            &self.scene,
-            0,
-            bytemuck::bytes_of(&Scene {
-                matrix: matrix.to_cols_array(),
-                grade: [0.058, 1., 0.25, 1. / 0.74],
-                metrics: [
-                    px_meter,
-                    elevation,
-                    ridgeline_core::surface::skirt_length(self.logical_zoom.unwrap_or(zoom)) as f32,
-                    0.,
-                ],
-            }),
-        );
+        let scene = Scene {
+            matrix: matrix.to_cols_array(),
+            grade: [0.058, 1., 0.25, 1. / 0.74],
+            metrics: [
+                px_meter,
+                elevation,
+                ridgeline_core::surface::skirt_length(self.logical_zoom.unwrap_or(zoom)) as f32,
+                0.,
+            ],
+        };
+        if self.last_scene != Some(scene) {
+            self.queue
+                .write_buffer(&self.scene, 0, bytemuck::bytes_of(&scene));
+            self.last_scene = Some(scene);
+            self.scene_uploads += 1;
+        }
         self.center = center;
         // The cached cover partitions coarse fallback and fine terrain; each ground
         // location has exactly one owner. No overlapping parent/child depth fighting.
@@ -770,9 +780,13 @@ impl Renderer {
                 mapped_at_creation: false,
             });
         }
-        if !data.is_empty() {
-            self.queue
-                .write_buffer(&self.instances, 0, bytemuck::cast_slice(&data));
+        if data != self.last_instances {
+            if !data.is_empty() {
+                self.queue
+                    .write_buffer(&self.instances, 0, bytemuck::cast_slice(&data));
+                self.instance_uploads += 1;
+            }
+            self.last_instances = data;
         }
         let rects: Vec<_> = rows
             .iter()

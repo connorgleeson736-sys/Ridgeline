@@ -39,4 +39,14 @@ class GpuUploadQueueTest {
   q.updateDemand(setOf(a),setOf(b))
   q.offer(tile(b,GpuUploadQueue.Kind.IMAGE));assertEquals(b,q.take(1).single().id)
  }
+ @Test fun repeatedReadyPayloadDoesNotScheduleExtraFramesButNewOwnershipDoes(){
+  val q=GpuUploadQueue(8);val id=GpuUploadQueue.Id(11,1991,1300)
+  val h=ByteBuffer.allocate(16);val image=ByteBuffer.allocate(16)
+  val first=GpuUploadQueue.Tile(id,h,image)
+  assertTrue(q.offer(first));repeat(100){assertFalse(q.offer(first.copy()))}
+  assertSame(h,q.take(1).single().heights)
+  assertTrue(q.offer(first)) // Re-admit after draining/surface recreation.
+  assertTrue(q.offer(first.copy(rgba=ByteBuffer.allocate(16)))) // Replacement cannot be dropped.
+  assertEquals(1,q.take(8).size)
+ }
 }

@@ -90,6 +90,25 @@ async fn run() {
         &[36, 113, 74, 255],
         "exact reference affine grade"
     );
+    let counts = (r.scene_uploads, r.instance_uploads);
+    r.render(
+        &output.create_view(&Default::default()),
+        center,
+        12.,
+        0.,
+        0.,
+        1000.,
+    );
+    assert_eq!(
+        read(&r, &output),
+        bytes,
+        "unchanged frame must remain pixel identical"
+    );
+    assert_eq!(
+        (r.scene_uploads, r.instance_uploads),
+        counts,
+        "unchanged GPU buffers must not be resent"
+    );
     let point = r.pick_at(128., 128.).expect("native terrain ray hit");
     assert!((point[0] - (center[0] * 360. - 180.)).abs() < 1e-6);
     assert!((point[2] - 1000.).abs() < 1e-6);
@@ -122,6 +141,14 @@ async fn run() {
     assert!(
         bytes.chunks_exact(4).all(|p| p != [189, 203, 208, 255]),
         "no uncovered fallback pixels"
+    );
+    assert_eq!(
+        r.scene_uploads, counts.0,
+        "new tile data does not change camera uniforms"
+    );
+    assert!(
+        r.instance_uploads > counts.1,
+        "refined source cover must update instances"
     );
     // Independent photographic detail must not duplicate/refine the terrain grid.
     let detailed = TileId {

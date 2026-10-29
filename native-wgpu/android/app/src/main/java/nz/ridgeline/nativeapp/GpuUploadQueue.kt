@@ -20,7 +20,14 @@ class GpuUploadQueue(private val capacity:Int) {
         demand=geometry.toSet() to images.toSet()
         entries.entries.removeAll{!wanted(it.value)}
     }
-    @Synchronized fun offer(tile:Tile){if(!wanted(tile))return;val key=tile.id to tile.kind;entries.remove(key);entries[key]=tile;while(entries.size>capacity)entries.remove(entries.keys.first())}
+    @Synchronized fun offer(tile:Tile):Boolean {
+        if(!wanted(tile))return false
+        val key=tile.id to tile.kind;val old=entries[key]
+        if(old!=null&&old.heights===tile.heights&&old.rgba===tile.rgba)return false
+        entries.remove(key);entries[key]=tile
+        while(entries.size>capacity)entries.remove(entries.keys.first())
+        return true
+    }
     @Synchronized fun take(count:Int,byteBudget:Int=Int.MAX_VALUE):List<Tile>{
         val out=ArrayList<Tile>(count);val iter=entries.entries.iterator();var bytes=0
         while(out.size<count&&iter.hasNext()){val row=iter.next().value;if(bytes+row.bytes>byteBudget)break;out.add(row);bytes+=row.bytes;iter.remove()};return out

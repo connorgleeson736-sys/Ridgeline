@@ -135,3 +135,11 @@ remain bounded, but combined device memory and visual parity are still open.
 `artifacts/Ridgeline-Native-Skirt-Proof-Debug.apk`; audit/hash in validation/skirts.
 This session's software emulator repeatedly lost Android package/activity services
 before installation, so its new instrumentation checks remain unverified.
+
+Latest quality-preserving work-removal checkpoint: cached viewport demand plans,
+exact DEM footprint/integer sampling, duplicate pending upload suppression, and
+unchanged GPU scene/instance transfer suppression. Tests compare complete height
+buffers against the pre-optimization algorithm and genuine LINZ pixels against
+the previous GPU checkpoint. All25Android tests and19Rust tests pass; no device
+speedup is inferred. Details/hashes: validation/quality-work/. Latest local APK:
+`artifacts/Ridgeline-Native-Quality-Work-Debug.apk`. Live Android/visual gates remain open.
