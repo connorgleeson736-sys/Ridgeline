@@ -431,3 +431,25 @@ Corrected landscape capture replaced too; both reviewed to confirm original-pack
 photos and explicit synthetic-fixture label. These demonstrate functioning drawing,
 not seamless real-terrain/imagery-source transition acceptance. All tests and
 native sources are checkpointed; awaiting usable provider access forM2realDEMproof.
+
+## 2026-10-29 — Published environment, genuine LINZ host proof
+
+Resumed exact ddee0d3 on native-rust-wgpu; refreshed authoritative download branch
+and confirmed it still advertises 0.18.0/source d880143. Capacitor remains untouched.
+New runtime has enforced unrestricted HTTP policy. Actual LINZ terrain-rgb PNG and
+aerial WebP requests now succeed (HTTP200,256x256). No new key was requested.
+
+Added reproducible fetch-live-proof.py (Pillow) and live_terrain Rust GPU example.
+Fetched12genuine halo DEMs and2original aerial tiles at Aoraki z11. No fallback or
+fabricated elevations. Source hashes/lengths are saved in validation/live-linz.
+129shared mesh-edge samples agree exactly; heights span450.8–3671.2m. Actual native
+softwareVulkan draw/readback passes and center terrain pick matches1087.000m.
+Full256px input imagery retained. Saved top-down host capture is evidence of real
+input execution only, not visual parity, Android loader parity or phone performance.
+
+Restored Rust1.99.1/Cargo and locked host tests (17pass), JDK21 plus pinned Android
+SDK/NDK under /workspace/android-tools. Extracted original6overview ZIPs from the
+refreshed download branch to /workspace/native-reference; native Android build and
+emulator toolchain restoration are in progress. No generated toolchain/APK committed.
+M2/M3 remain open: cross-LOD stitching, oblique same-camera reference captures,
+live Android loading and gesture/terrain collision acceptance must precede full UI.

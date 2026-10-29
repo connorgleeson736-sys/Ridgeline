@@ -1,0 +1,4 @@
+   Compiling ridgeline-renderer v0.1.0 (/workspace/Ridgeline/native-wgpu/renderer)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.22s
+     Running `native-wgpu/target/debug/examples/live_terrain /workspace/native-provider-fixtures/live-proof`
+Live LINZ GPU draw, 129 exact shared edge samples, full 256px imagery, center pick height=1087.000m expected=1087.000m: PASS. Not visual parity or Android execution.

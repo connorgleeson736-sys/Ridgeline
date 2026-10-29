@@ -100,3 +100,14 @@ lighting/fog checks, route/planner/profile migration, overlays/labels/settings,
 location/offline management and physical-phone benchmarks remain incomplete.
 Do not confuse build success or subpixel numeric camera agreement with complete
 visual or interaction parity. See the durable progress log for the exact next step.
+
+## Genuine LINZ host proof (network now available)
+
+With Pillow installed, run `python native-wgpu/tools/fetch-live-proof.py /workspace/native-provider-fixtures/live-proof`.
+This fetches actual 256px LINZ elevation/aerial inputs using the existing authorized
+client configuration without logging the key. It fails on transport/nodata instead
+of synthesizing a replacement. It emits source hashes and two adjacent129meshes.
+Then run `VK_ICD_FILENAMES=/usr/lib/chromium/vk_swiftshader_icd.json cargo run --locked --manifest-path native-wgpu/Cargo.toml -p ridgeline-renderer --example live_terrain -- /workspace/native-provider-fixtures/live-proof`.
+The example validates exact shared edges, executes native GPU draw/readback and
+checks the center pick against the real mesh. `native-live.ppm` is a host capture.
+This does not establish Android loader execution, cross-LOD seams or visual parity.
