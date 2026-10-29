@@ -47,7 +47,8 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private val demJobs = ConcurrentHashMap<Id, CompletableFuture<Dem>>()
     private val jobs = ConcurrentHashMap<Source, Task>()
     private val sequence = AtomicLong()
-    private val plans=DemandPlanCache<DemandPlanKey,Map<Source,Int>>()
+    private data class Plan(val ranked:Map<Source,Int>,val centerGeometry:Id?)
+    private val plans=DemandPlanCache<DemandPlanKey,Plan>()
     private val planBuffer=ByteBuffer.allocateDirect(512*12).order(ByteOrder.LITTLE_ENDIAN)
     @Volatile private var dead = false
     @Volatile private var wanted = emptySet<Source>()
@@ -105,15 +106,22 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         if (dead||view.width==0||view.height==0) return
         val key=DemandPlanKey((view.width/view.pixelScale).roundToInt().coerceAtLeast(1),
             (view.height/view.pixelScale).roundToInt().coerceAtLeast(1),view.cameraPose)
-        val ranked=plans.get(key) {
+        val plan=plans.get(key) {
           val next=LinkedHashMap<Source,Int>()
           for(geometry in listOf(true,false)) {
             val ids=sourcePlan(geometry,key)
             val demand=SourceDemand.bounded(ids.map{it.gpu()},if(geometry)geometryLimit else imageLimit)
             for((id,priority)in demand)next[Source(Id(id.z,id.x,id.y),geometry)]=priority
           }
-          next.toMap()
+          val mx=(key.pose.longitude+180)/360
+          val my=(1-asinh(tan(Math.toRadians(key.pose.latitude)))/PI)/2
+          val center=next.keys.asSequence().filter{it.geometry}.map{it.id}.filter{
+              val n=2.0.pow(it.z);floor(mx*n).toInt()==it.x&&floor(my*n).toInt()==it.y
+          }.maxByOrNull{it.z}
+          Plan(next.toMap(),center)
         }
+        val ranked=plan.ranked
+        reconcileCenterHeight(key.pose,plan.centerGeometry)
         wanted = ranked.keys.toSet()
         view.updateUploadDemand(wanted.filter{it.geometry}.map{it.id.gpu()}.toSet(),
             wanted.filter{!it.geometry}.map{it.id.gpu()}.toSet())
@@ -127,6 +135,18 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
                 try{workers.execute(task)}catch(_:RejectedExecutionException){jobs.remove(source,task)}
             }
         }
+    }
+    private fun reconcileCenterHeight(pose:CameraPose,id:Id?) {
+        // Follow the finest demanded center geometry only after it is resident.
+        // Coarse arrival cannot snap the initial alpine camera down to a broad
+        // regional average while the actual center surface is still loading.
+        if(id==null||!view.isResident(id.gpu(),true))return
+        val mx=(pose.longitude+180)/360
+        val my=(1-asinh(tan(Math.toRadians(pose.latitude)))/PI)/2
+        val height=synchronized(decoded){
+            DemSampling.point(min(id.z,18),mx,my){decoded[Id(it.z,it.x,it.y)]}
+        }?:return
+        view.post{if(!dead&&view.cameraPose==pose)view.centerHeight(height)}
     }
     private fun fetch(url: String): ByteArray {
         check(!dead)

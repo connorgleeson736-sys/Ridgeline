@@ -153,3 +153,18 @@ exact touch/inertia/terrain collision, cross-LOD seams and no texture popping.
 Then migrate route/UI features using golden state transitions and installable
 checkpoints. Physical-phone cold/warm/movement/settled traces are required for
 performance comparisons; list device, build, settings and exact workload.
+
+
+## Capture follow-up: geometry and DEM zoom are distinct
+
+Supported-host execution of the unchanged0.18FullAPK exports12default-view
+terrain geometry tiles. Center geometry12/3983/2600samplesDEM11/1991/1300,
+although z12DEM requests are also present. Exact packaged TerrainSourceCache
+constructor setsdeltaZoom=1; getSourceTile choosesoverscaledZ-deltaZoom capped
+at the source maximum, then parent fallback if unavailable. The128-cell mesh
+and full256pxDEM sources remain separate. Native currently uses min(geometryZoom,18)
+for its mesh inputs; that is a remaining source-ownership parity discrepancy,
+not justification to reduce the original maximum source detail. Exported cover
+and center height: validation/reference-host/report.json. Native center-ground
+interpolation is tested independently; accepted multi-LOD ownership/camera
+comparison remains open.

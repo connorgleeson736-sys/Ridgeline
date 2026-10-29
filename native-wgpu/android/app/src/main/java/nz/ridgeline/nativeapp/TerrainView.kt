@@ -24,6 +24,9 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     @Volatile private var live=false
     @Volatile private var active=true
     @Volatile var cameraPose=CameraPose();private set
+    @Volatile private var groundedPose:CameraPose?=null
+    @Volatile private var presentedPose:CameraPose?=null
+    internal fun groundedFrameReady()=groundedPose==cameraPose&&presentedPose==cameraPose
     val longitude get()=cameraPose.longitude
     val latitude get()=cameraPose.latitude
     val zoom get()=cameraPose.zoom
@@ -69,7 +72,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         if(accepted)post{onStatus("");onData()}
         val pose=cameraPose // One immutable snapshot, no mixed camera revisions.
         val shown=NativeBridge.render(handle,width,height,pose.longitude,pose.latitude,pose.zoom+ln(pixelScale)/ln(2.0),pose.zoom,pose.bearing,pose.pitch,pose.elevation)
-        if(shown)presentationFailures=0 else {
+        if(shown){presentationFailures=0;presentedPose=pose}else {
             presentationFailures++
             if(presentationFailures<=8)requestFrame(minOf(250L,16L shl presentationFailures)) else post{onStatus("GPU presentation unavailable")}
         }
@@ -97,7 +100,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     }
     override fun surfaceChanged(holder:SurfaceHolder,format:Int,width:Int,height:Int){changed()}
     override fun surfaceDestroyed(holder:SurfaceHolder) {
-        live=false;generation.incrementAndGet();residency=Residency(LongArray(0),LongArray(0));queued.set(false)
+        live=false;presentedPose=null;generation.incrementAndGet();residency=Residency(LongArray(0),LongArray(0));queued.set(false)
         val done=CountDownLatch(1)
         gpu.post{choreographer.removeFrameCallback(vsync);if(handle!=0L)NativeBridge.destroy(handle);handle=0L;done.countDown()}
         done.await(5,TimeUnit.SECONDS)
@@ -123,7 +126,11 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             post{callback(point)}
         }
     }
-    fun centerHeight(value:Float){if(value.isFinite()){cameraPose=cameraPose.copy(elevation=value);changed()}}
+    fun centerHeight(value:Float){
+        if(!value.isFinite())return
+        val next=cameraPose.copy(elevation=value);groundedPose=next
+        if(next!=cameraPose){cameraPose=next;changed()}
+    }
     private val scaler=ScaleGestureDetector(context,object:ScaleGestureDetector.SimpleOnScaleGestureListener(){
         override fun onScale(detector:ScaleGestureDetector):Boolean {
             cameraPose=cameraPose.copy(zoom=(zoom+ln(detector.scaleFactor.toDouble())/ln(2.0)).coerceIn(4.0,19.0));changed();return true

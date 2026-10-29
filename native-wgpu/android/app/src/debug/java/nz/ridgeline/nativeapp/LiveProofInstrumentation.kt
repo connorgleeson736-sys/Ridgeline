@@ -26,7 +26,7 @@ class LiveProofInstrumentation: Instrumentation() {
             activity=startActivitySync(Intent(targetContext,MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
             val surface=terrain(activity.window.decorView)?:error("No native terrain surface")
             val deadline=SystemClock.elapsedRealtime()+300000
-            while(surface.residentSourceCounts().let{it.first==0||it.second==0}) {
+            while(surface.residentSourceCounts().let{it.first==0||it.second==0}||!surface.groundedFrameReady()) {
                 check(SystemClock.elapsedRealtime()<deadline){"Timed out awaiting genuine geometry and imagery; inspect provider/TLS/GPU logs"}
                 Thread.sleep(100)
             }
@@ -37,6 +37,8 @@ class LiveProofInstrumentation: Instrumentation() {
             check(hit.all{it.isFinite()}&&hit[2] in -500.0..4000.0){"Invalid NZ terrain pick"}
             result.putString("nativeLiveProof","PASS: production TileLoader, real source pools, rendered terrain picking")
             result.putString("pickedLonLatHeight",hit.joinToString(","))
+            result.putString("groundedCameraPose",surface.cameraPose.toString())
+            result.putString("groundedFrame","PASS: finest demanded center geometry resident; original DEM ground sampled and new camera frame presented")
             result.putString("scope","Live Android integration only; not cross-LOD, visual parity or phone performance")
             finish(Activity.RESULT_OK,result)
         } catch(e:Throwable) {

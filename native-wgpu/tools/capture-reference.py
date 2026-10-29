@@ -101,7 +101,8 @@ async def main():
   await page.screenshot(path=str(OUT/'reference-full.png'))
   image=await page.evaluate("new Promise(resolve=>{const m=__referenceApi.getMap();m.once('render',()=>resolve(m.getCanvas().toDataURL('image/png')));m.triggerRepaint()})")
   (OUT/'reference-canvas.png').write_bytes(base64.b64decode(image.split(',',1)[1]))
-  report={'scope':'Unchanged APK assets in host Chromium with reproduced local HTTP provider/range transport; not Android reference execution or native visual parity','browser':browser.version,'apkSha256':apk_sha,'state':state,'errors':errors,'transportFailures':failures,'assetsAndSources':records}
+  cover=await page.evaluate("(()=>{const terrain=__referenceApi.getMap().terrain;return terrain.tileManager.getRenderableTiles().map(t=>({geometry:t.tileID.canonical,source:terrain.tileManager.getSourceTile(t.tileID,true)?.tileID.canonical}))})()")
+  report={'terrainCover':cover,'scope':'Unchanged APK assets in host Chromium with reproduced local HTTP provider/range transport; not Android reference execution or native visual parity','browser':browser.version,'apkSha256':apk_sha,'state':state,'errors':errors,'transportFailures':failures,'assetsAndSources':records}
   (OUT/'report.json').write_text(json.dumps(report,indent=2)+'\n')
   await browser.close()
   if not state or not state['loaded'] or not state['tiles'] or state['moving'] or errors or any(k!='404' for k in failures):

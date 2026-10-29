@@ -705,3 +705,39 @@ this checkpoint only establishes the supported-host authoritative reference.
 Removed8superseded generated local APK copies to recover3.2GB. Latest normal,
 local trust test, committed checkpoint, authoritative reference APK, all6literal
 originalZIPs, source data and evidence remain intact.
+
+
+## Native center grounding and exact reference DEM cover
+
+Native TileLoader now queries the original pixel-centre DEM at the camera center
+once the finest demanded center geometry is resident. Available decoded sources
+only; no new downloads or synthetic plane/zero fallback. Missing halo retains the
+previous camera height. Posted updates compare the entire immutable camera pose,
+so movement invalidates stale asynchronous results. Unchanged heights mark the
+grounding state without calling changed/requestFrame or rebuilding a plan. The
+center geometry is cached with the existing demand plan. Actual source pixels
+use direct reads; parent fallback preserves the original interpolation.
+
+TerrainView records the presented camera pose; strengthened live integration now
+requires a grounded frame before picking. Mesh/imagery resolution, all height
+buffers, nine mip levels, source ceilings and original ZIPs remain untouched.
+All28Android tests pass, including analytic four-tile seams, wrap/poles, missing
+halos, real parent fallback and four genuine LINZ source pixels matching the
+captured reference center within.001m(Float32quantization only). Lint/build,
+normal APK signature/16KiB alignment and all6originalZIP hashes pass. All3ABIs
+use the unchanged optimized native libraries. Normal/local-test625asset/library
+entries match; the normal APK contains no managed-session CA. Audit and sampler
+provenance are in validation/ground-camera. New Android live verification is
+pending: earlier emulator exited; cloud environment restart interrupted its boot.
+Previous checkpoint's Android passes remain valid only for that checkpoint.
+
+The reference capture now exports actual rendered terrain cover, not just source
+requests. Default view has12geometry tiles: center geometry12/3983/2600uses
+DEM11/1991/1300. Exact engine TerrainSourceCache has deltaZoom=1 and maps geometry
+zoom to source zoom minus1, capped at source maxzoom. Merely fetching z12DEM does
+not mean that tile is the active center source. Four z11pixels give reference
+3648.731912109524m; the available z12source gives3672.6977629647536m. Native source
+mapping/LOD still differs; do not force a captured height, lower a source ceiling,
+or claim full camera/terrain parity from the interpolation unit test. Next: finish
+new grounded Android proof, then port/verify exact geometry-to-DEM ownership and
+LOD policy with genuine multi-zoom captures before opening full UI migration.

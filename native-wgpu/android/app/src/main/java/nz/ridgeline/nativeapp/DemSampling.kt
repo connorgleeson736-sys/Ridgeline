@@ -15,6 +15,23 @@ object DemSampling {
         return (h(x,y)*(1-fx)*(1-fy)+h(min(255,x+1),y)*fx*(1-fy)+
             h(x,min(255,y+1))*(1-fx)*fy+h(min(255,x+1),min(255,y+1))*fx*fy).toFloat()
     }
+    /** Pixel-centre bilinear ground height from available original DEMs only.
+     * Missing source/halo stays missing; camera queries never start downloads. */
+    fun point(z:Int,mx:Double,my:Double,available:(GpuUploadQueue.Id)->Raster?):Float? {
+        if(z !in 0..18||!mx.isFinite()||!my.isFinite()||my !in 0.0..1.0)return null
+        val n=1 shl z;val size=n*256
+        val px=(mx-floor(mx))*size-.5;val py=my*size-.5
+        val ix=floor(px).toInt();val iy=floor(py).toInt();val fx=px-ix;val fy=py-iy
+        fun height(x:Int,y:Int):Float? {
+            val gx=Math.floorMod(x,size);val gy=y.coerceIn(0,size-1)
+            val record=available(GpuUploadQueue.Id(z,gx/256,gy/256))?:return null
+            val exact=record.samples[(gy%256)*256+gx%256]
+            return (if(record.id.z==z&&exact!=0f)exact else sample(record,gx.toDouble(),gy.toDouble(),z)).takeIf{it.isFinite()}
+        }
+        val a=height(ix,iy)?:return null;val b=height(ix+1,iy)?:return null
+        val c=height(ix,iy+1)?:return null;val d=height(ix+1,iy+1)?:return null
+        return (a*(1-fx)*(1-fy)+b*fx*(1-fy)+c*(1-fx)*fy+d*fx*fy).toFloat().takeIf{it.isFinite()}
+    }
     /** Fetch only DEM tiles touched by the full-resolution mesh and its pixel-centre halo. */
     fun footprint(z:Int,x:Int,y:Int):Set<GpuUploadQueue.Id> {
         val dz=min(z,18);val factor=1 shl(z-dz);val n=1 shl dz

@@ -1,4 +1,174 @@
 {
+  "terrainCover": [
+    {
+      "geometry": {
+        "z": 12,
+        "x": 3983,
+        "y": 2600,
+        "key": "6cccvcc"
+      },
+      "source": {
+        "z": 11,
+        "x": 1991,
+        "y": 1300,
+        "key": "1l3uvbb"
+      }
+    },
+    {
+      "geometry": {
+        "z": 12,
+        "x": 3984,
+        "y": 2600,
+        "key": "6cccwcc"
+      },
+      "source": {
+        "z": 11,
+        "x": 1992,
+        "y": 1300,
+        "key": "1l3uwbb"
+      }
+    },
+    {
+      "geometry": {
+        "z": 12,
+        "x": 3983,
+        "y": 2599,
+        "key": "6c973cc"
+      },
+      "source": {
+        "z": 11,
+        "x": 1991,
+        "y": 1299,
+        "key": "1l29zbb"
+      }
+    },
+    {
+      "geometry": {
+        "z": 12,
+        "x": 3984,
+        "y": 2599,
+        "key": "6c974cc"
+      },
+      "source": {
+        "z": 11,
+        "x": 1992,
+        "y": 1299,
+        "key": "1l2a0bb"
+      }
+    },
+    {
+      "geometry": {
+        "z": 12,
+        "x": 3983,
+        "y": 2601,
+        "key": "6cfincc"
+      },
+      "source": {
+        "z": 11,
+        "x": 1991,
+        "y": 1300,
+        "key": "1l3uvbb"
+      }
+    },
+    {
+      "geometry": {
+        "z": 12,
+        "x": 3982,
+        "y": 2599,
+        "key": "6c972cc"
+      },
+      "source": {
+        "z": 11,
+        "x": 1991,
+        "y": 1299,
+        "key": "1l29zbb"
+      }
+    },
+    {
+      "geometry": {
+        "z": 12,
+        "x": 3983,
+        "y": 2598,
+        "key": "6c61bcc"
+      },
+      "source": {
+        "z": 11,
+        "x": 1991,
+        "y": 1299,
+        "key": "1l29zbb"
+      }
+    },
+    {
+      "geometry": {
+        "z": 12,
+        "x": 3982,
+        "y": 2598,
+        "key": "6c61acc"
+      },
+      "source": {
+        "z": 11,
+        "x": 1991,
+        "y": 1299,
+        "key": "1l29zbb"
+      }
+    },
+    {
+      "geometry": {
+        "z": 11,
+        "x": 1990,
+        "y": 1299,
+        "key": "1l29ybb"
+      },
+      "source": {
+        "z": 10,
+        "x": 995,
+        "y": 649,
+        "key": "e9k3aa"
+      }
+    },
+    {
+      "geometry": {
+        "z": 11,
+        "x": 1991,
+        "y": 1298,
+        "key": "1l0p3bb"
+      },
+      "source": {
+        "z": 10,
+        "x": 995,
+        "y": 649,
+        "key": "e9k3aa"
+      }
+    },
+    {
+      "geometry": {
+        "z": 11,
+        "x": 1990,
+        "y": 1298,
+        "key": "1l0p2bb"
+      },
+      "source": {
+        "z": 10,
+        "x": 995,
+        "y": 649,
+        "key": "e9k3aa"
+      }
+    },
+    {
+      "geometry": {
+        "z": 10,
+        "x": 995,
+        "y": 648,
+        "key": "e8rnaa"
+      },
+      "source": {
+        "z": 9,
+        "x": 497,
+        "y": 324,
+        "key": "3kdt99"
+      }
+    }
+  ],
   "scope": "Unchanged APK assets in host Chromium with reproduced local HTTP provider/range transport; not Android reference execution or native visual parity",
   "browser": "154.0.8037.57",
   "apkSha256": "b4d286f5d6835447237eecaa15d5ee9a8bdf2870d56133c699f0b9ec3a173ffd",
@@ -60,24 +230,19 @@
       "bytes": 2113,
       "kind": "unchanged-apk-asset"
     },
-    "/assets/maplibre-gl.mjs": {
-      "sha256": "37611c5ee952f5fcb76215a1be4b9fdcfde8bf415a8493db435fd05d3a7727fb",
-      "bytes": 1090114,
-      "kind": "unchanged-apk-asset"
-    },
     "/filtering-controls.js": {
       "sha256": "d1ee11b2b61c5e861463aa73e4a2b989d19fec644b0790d39975bf2d184df5d6",
       "bytes": 3678,
       "kind": "unchanged-apk-asset"
     },
+    "/assets/maplibre-gl.mjs": {
+      "sha256": "37611c5ee952f5fcb76215a1be4b9fdcfde8bf415a8493db435fd05d3a7727fb",
+      "bytes": 1090114,
+      "kind": "unchanged-apk-asset"
+    },
     "/build-info.js": {
       "sha256": "4f7a5682c0210f6e57d9d149479005a3b03c0ae0e2acdfb29668cc0f968e053e",
       "bytes": 6383,
-      "kind": "unchanged-apk-asset"
-    },
-    "/sky-colours.js": {
-      "sha256": "ba70d4e9700e55107193b67b46c3b59977f01f34d67105ea77117bce1aec60f4",
-      "bytes": 1715,
       "kind": "unchanged-apk-asset"
     },
     "/tile-trace.js": {
@@ -90,14 +255,14 @@
       "bytes": 5376,
       "kind": "unchanged-apk-asset"
     },
+    "/sky-colours.js": {
+      "sha256": "ba70d4e9700e55107193b67b46c3b59977f01f34d67105ea77117bce1aec60f4",
+      "bytes": 1715,
+      "kind": "unchanged-apk-asset"
+    },
     "/geo.js": {
       "sha256": "2569e3bba730c660c0fe3a8e8bd634b441e6b1f31c6be8aebf4bfab6e6cb696b",
       "bytes": 4588,
-      "kind": "unchanged-apk-asset"
-    },
-    "/alpine-data.js": {
-      "sha256": "2fc5beeb69580967886a1cb1e4bb0511f99e842991b5aa7ef025c50eb57168fd",
-      "bytes": 6610,
       "kind": "unchanged-apk-asset"
     },
     "/alpine-labels.js": {
@@ -105,9 +270,9 @@
       "bytes": 919,
       "kind": "unchanged-apk-asset"
     },
-    "/loading-controls.js": {
-      "sha256": "3099789e5d8c8dd33327d566b44d2b46f22317f3a2b0730b646e6512e6260cad",
-      "bytes": 3656,
+    "/alpine-data.js": {
+      "sha256": "2fc5beeb69580967886a1cb1e4bb0511f99e842991b5aa7ef025c50eb57168fd",
+      "bytes": 6610,
       "kind": "unchanged-apk-asset"
     },
     "/topographic-overlays.js": {
@@ -120,9 +285,9 @@
       "bytes": 5339,
       "kind": "unchanged-apk-asset"
     },
-    "/performance.js": {
-      "sha256": "0ca7181d2088282f568a45c67c9fa75fc35f3734ee96665a60c90f3867866fc2",
-      "bytes": 7986,
+    "/loading-controls.js": {
+      "sha256": "3099789e5d8c8dd33327d566b44d2b46f22317f3a2b0730b646e6512e6260cad",
+      "bytes": 3656,
       "kind": "unchanged-apk-asset"
     },
     "/adaptive-terrain.js": {
@@ -130,9 +295,24 @@
       "bytes": 13919,
       "kind": "unchanged-apk-asset"
     },
+    "/performance.js": {
+      "sha256": "0ca7181d2088282f568a45c67c9fa75fc35f3734ee96665a60c90f3867866fc2",
+      "bytes": 7986,
+      "kind": "unchanged-apk-asset"
+    },
     "/terrain-streaming.js": {
       "sha256": "4b05235ef554cde7ad57e1267eb50ac0abd28e8fe4d8d64d832c86c93e1329ba",
       "bytes": 3650,
+      "kind": "unchanged-apk-asset"
+    },
+    "/dem-revision.js": {
+      "sha256": "6a904188236a035208358a01426511b5fd4ddf7efa4b0a695e368e034f6993d7",
+      "bytes": 2372,
+      "kind": "unchanged-apk-asset"
+    },
+    "/terrain-visibility.js": {
+      "sha256": "8ab2b8c3e12330a451d162527b575378b0aee49435ba9d66d343bb4258ade1a7",
+      "bytes": 6317,
       "kind": "unchanged-apk-asset"
     },
     "/raster-residency.js": {
@@ -145,14 +325,9 @@
       "bytes": 7008,
       "kind": "unchanged-apk-asset"
     },
-    "/provider-health.js": {
-      "sha256": "ba624b2bed4d42f150cae85a087cda10a3a2636a2907a7ccc0ef1a381e66e37a",
-      "bytes": 4525,
-      "kind": "unchanged-apk-asset"
-    },
-    "/terrain-visibility.js": {
-      "sha256": "8ab2b8c3e12330a451d162527b575378b0aee49435ba9d66d343bb4258ade1a7",
-      "bytes": 6317,
+    "/maplibre-direct-sampling.js": {
+      "sha256": "8bf7c4aae62c2cae8e7d9746927ddb7dfee70bd8ac6417adf39ebef7e74db197",
+      "bytes": 12880,
       "kind": "unchanged-apk-asset"
     },
     "/tile-retry.js": {
@@ -160,14 +335,9 @@
       "bytes": 2889,
       "kind": "unchanged-apk-asset"
     },
-    "/maplibre-direct-sampling.js": {
-      "sha256": "8bf7c4aae62c2cae8e7d9746927ddb7dfee70bd8ac6417adf39ebef7e74db197",
-      "bytes": 12880,
-      "kind": "unchanged-apk-asset"
-    },
-    "/dem-revision.js": {
-      "sha256": "6a904188236a035208358a01426511b5fd4ddf7efa4b0a695e368e034f6993d7",
-      "bytes": 2372,
+    "/provider-health.js": {
+      "sha256": "ba624b2bed4d42f150cae85a087cda10a3a2636a2907a7ccc0ef1a381e66e37a",
+      "bytes": 4525,
       "kind": "unchanged-apk-asset"
     },
     "/navigation-policy.js": {
@@ -175,19 +345,14 @@
       "bytes": 3909,
       "kind": "unchanged-apk-asset"
     },
-    "/native-residency.js": {
-      "sha256": "7301021e8c3c4d678bd1653fb20131e183734f6070bfd8111f677618b0f13d89",
-      "bytes": 40591,
-      "kind": "unchanged-apk-asset"
-    },
     "/imagery-diagnostics.js": {
       "sha256": "14e637819c66f5eafec2c36e2539fce454321cbee7f73454c48ec4c56f36db47",
       "bytes": 7165,
       "kind": "unchanged-apk-asset"
     },
-    "/linz-topo.js": {
-      "sha256": "a8aafb4d98519419e879667606129c33c13db389c8a89a3c872ec96c8d158203",
-      "bytes": 683,
+    "/native-residency.js": {
+      "sha256": "7301021e8c3c4d678bd1653fb20131e183734f6070bfd8111f677618b0f13d89",
+      "bytes": 40591,
       "kind": "unchanged-apk-asset"
     },
     "/imagery.js": {
@@ -195,24 +360,24 @@
       "bytes": 2906,
       "kind": "unchanged-apk-asset"
     },
-    "/route-interactions.js": {
-      "sha256": "74698dd9e0f5606fe4b79f0aae5d8029007df8b680b460b73db123b5ce4537bf",
-      "bytes": 10750,
-      "kind": "unchanged-apk-asset"
-    },
     "/bottleneck-diagnostics.js": {
       "sha256": "41805acf86980b7717606963373eb24520f31b16035aa4c0f50f8090e208b3f2",
       "bytes": 15424,
       "kind": "unchanged-apk-asset"
     },
+    "/linz-topo.js": {
+      "sha256": "a8aafb4d98519419e879667606129c33c13db389c8a89a3c872ec96c8d158203",
+      "bytes": 683,
+      "kind": "unchanged-apk-asset"
+    },
+    "/route-interactions.js": {
+      "sha256": "74698dd9e0f5606fe4b79f0aae5d8029007df8b680b460b73db123b5ce4537bf",
+      "bytes": 10750,
+      "kind": "unchanged-apk-asset"
+    },
     "/route-geometry.js": {
       "sha256": "c9fcd1e12264d899003034baa538f9ec837a19a86688ca8b579d53c9e554af20",
       "bytes": 3193,
-      "kind": "unchanged-apk-asset"
-    },
-    "/regional-blend.js": {
-      "sha256": "5ea0354022942cadf7f68c965e45e3316c2398f79f69fdbb7a06609c1f33cdc6",
-      "bytes": 4245,
       "kind": "unchanged-apk-asset"
     },
     "/elevation-chart.js": {
@@ -225,19 +390,24 @@
       "bytes": 4441,
       "kind": "unchanged-apk-asset"
     },
+    "/regional-blend.js": {
+      "sha256": "5ea0354022942cadf7f68c965e45e3316c2398f79f69fdbb7a06609c1f33cdc6",
+      "bytes": 4245,
+      "kind": "unchanged-apk-asset"
+    },
     "/imagery-preload.js": {
       "sha256": "c517ff084d09d4887c88c874cdd391deb8a13eb797e39cfa647597e86ffd4bc1",
       "bytes": 6450,
       "kind": "unchanged-apk-asset"
     },
-    "/prepare-ahead.js": {
-      "sha256": "b54180440f4449f27c3f8113cc183c44dac2ea7b1807efb1aa7722c079b4b958",
-      "bytes": 21073,
-      "kind": "unchanged-apk-asset"
-    },
     "/continuous-coverage.js": {
       "sha256": "a44bf33528900da63bf0fb99139bd8a9317bade60a3c85b747a55377d8bc7485",
       "bytes": 2826,
+      "kind": "unchanged-apk-asset"
+    },
+    "/prepare-ahead.js": {
+      "sha256": "b54180440f4449f27c3f8113cc183c44dac2ea7b1807efb1aa7722c079b4b958",
+      "bytes": 21073,
       "kind": "unchanged-apk-asset"
     },
     "/selection-interval.js": {
@@ -250,19 +420,14 @@
       "bytes": 2955,
       "kind": "unchanged-apk-asset"
     },
-    "/response-cache.js": {
-      "sha256": "31e8cd36b4ab48ca2a98513576c5dd0d258dd510af0606b8687c08a2f3e4840d",
-      "bytes": 6975,
-      "kind": "unchanged-apk-asset"
-    },
     "/imagery-boundary-data.js": {
       "sha256": "da133d3113b9f612377ac45677f1c40b1ee1f9bf9ca26b56d96e26fd1bbc711a",
       "bytes": 130,
       "kind": "unchanged-apk-asset"
     },
-    "/imagery-boundary.js": {
-      "sha256": "6ff7fe558e6cd92e3a04bc74d8ee264af234fb166dc9cc2a672492131da5d215",
-      "bytes": 2436,
+    "/response-cache.js": {
+      "sha256": "31e8cd36b4ab48ca2a98513576c5dd0d258dd510af0606b8687c08a2f3e4840d",
+      "bytes": 6975,
       "kind": "unchanged-apk-asset"
     },
     "/imagery-catalog-index.js": {
@@ -270,19 +435,24 @@
       "bytes": 15742,
       "kind": "unchanged-apk-asset"
     },
+    "/imagery-boundary.js": {
+      "sha256": "6ff7fe558e6cd92e3a04bc74d8ee264af234fb166dc9cc2a672492131da5d215",
+      "bytes": 2436,
+      "kind": "unchanged-apk-asset"
+    },
     "/imagery-catalog.mjs": {
       "sha256": "03b32604e5268a70a8a3343bb3d32e5fe9db03ad6b1bb565d20866eb7463ff39",
       "bytes": 1120,
       "kind": "unchanged-apk-asset"
     },
-    "/regional-scheduler.js": {
-      "sha256": "213cdee8c57f627533efe8ab5fda227db23faafb931754be6a5473c5ba11c608",
-      "bytes": 2629,
-      "kind": "unchanged-apk-asset"
-    },
     "/regional-imagery.js": {
       "sha256": "119894d7dc3d6832dd7b7583ef1a2cbc65c3a78f98c0669e4af16da76497d929",
       "bytes": 13922,
+      "kind": "unchanged-apk-asset"
+    },
+    "/regional-scheduler.js": {
+      "sha256": "213cdee8c57f627533efe8ab5fda227db23faafb931754be6a5473c5ba11c608",
+      "bytes": 2629,
       "kind": "unchanged-apk-asset"
     },
     "/nz-overview.js": {
@@ -330,22 +500,17 @@
       "bytes": 6425,
       "kind": "unchanged-apk-asset"
     },
+    "/west-coast-footprint.js": {
+      "sha256": "f90229267bc4f12a7de6d501d74b8bfa93e6c452104f6a67b6343d7c2cbddc47",
+      "bytes": 60041,
+      "kind": "unchanged-apk-asset"
+    },
     "7564a350b7346ac6cf455e877a73f3b64592836ffcf78cbc98f07f1dd054eb6c": {
       "host": "basemaps.linz.govt.nz",
       "path": "/v1/tiles/aerial/WebMercatorQuad/13/7965/5198.webp",
       "sha256": "d2af65193ede6c47c143825fb8049462cf29d6846fe97275b9110b26faf4c67a",
       "bytes": 16364,
       "cacheHit": true
-    },
-    "/west-coast-footprint.js": {
-      "sha256": "f90229267bc4f12a7de6d501d74b8bfa93e6c452104f6a67b6343d7c2cbddc47",
-      "bytes": 60041,
-      "kind": "unchanged-apk-asset"
-    },
-    "/assets/imagery-boundary-v4/335bcd9378652dfa88919f3b.geojson": {
-      "sha256": "335bcd9378652dfa88919f3bf19e002627ac95bc7160e33b6a0d6009d58c0354",
-      "bytes": 281906,
-      "kind": "unchanged-apk-asset"
     },
     "12c53bdbdc06aadea6dce15ccdeb42c213e46715007f13a48188c5acb42632f7": {
       "host": "basemaps.linz.govt.nz",
@@ -354,6 +519,11 @@
       "bytes": 16938,
       "cacheHit": true
     },
+    "/gap-imagery-atlas.js": {
+      "sha256": "3dae8e5bf93ae3a8ccde54b864e684fb258936e7bcd10b9fab64c3d4865996bd",
+      "bytes": 732851,
+      "kind": "unchanged-apk-asset"
+    },
     "3ace22134d8f77e1e3140bda759b36d23d477b7dc5cc2afd3ccce9ecc5cdba42": {
       "host": "basemaps.linz.govt.nz",
       "path": "/v1/tiles/aerial/WebMercatorQuad/13/7967/5196.webp",
@@ -361,16 +531,51 @@
       "bytes": 17854,
       "cacheHit": true
     },
-    "/gap-imagery-atlas.js": {
-      "sha256": "3dae8e5bf93ae3a8ccde54b864e684fb258936e7bcd10b9fab64c3d4865996bd",
-      "bytes": 732851,
+    "/assets/imagery-boundary-v4/335bcd9378652dfa88919f3b.geojson": {
+      "sha256": "335bcd9378652dfa88919f3bf19e002627ac95bc7160e33b6a0d6009d58c0354",
+      "bytes": 281906,
       "kind": "unchanged-apk-asset"
+    },
+    "006b58354a3ce0f4ad91bb77c926db138198c305d47f9b978cb51b6821ec8f4a": {
+      "host": "basemaps.linz.govt.nz",
+      "path": "/v1/tiles/topographic-v2/3857/11/1991/1299.pbf",
+      "sha256": "1d7a965386d00d3e1c63657b1a4293fb3c548a42205c1c11478b7ab7805e3532",
+      "bytes": 91268,
+      "cacheHit": true
+    },
+    "ee48a49467f9bf94e9b4efc8f9095c8ef13b7eeefa2f27f6342e92ef9ea92c29": {
+      "host": "basemaps.linz.govt.nz",
+      "path": "/v1/tiles/topographic-v2/3857/11/1991/1298.pbf",
+      "sha256": "ed3f66cacf25a33ee7ba0d85245e369fb880a2a9887f69bdfe359e7a119db5a5",
+      "bytes": 54205,
+      "cacheHit": true
+    },
+    "be460d06b38a534558104aa94da78d9ed98203b35ada15f8870041020746ebf8": {
+      "host": "basemaps.linz.govt.nz",
+      "path": "/v1/tiles/topographic-v2/3857/12/3983/2601.pbf",
+      "sha256": "014ea197752cf27cb2a124f1b86413d994bba7af6dfbddf5b2773116f289f43e",
+      "bytes": 33757,
+      "cacheHit": true
+    },
+    "a617c8d4e7c3ce540cfd8c39bf16456936752f3fe1a748132af39ef5a05bd509": {
+      "host": "basemaps.linz.govt.nz",
+      "path": "/v1/tiles/topographic-v2/3857/12/3984/2601.pbf",
+      "sha256": "79891aeaaa6daf94bdd47a620d45b855fd25ba2f6233e25106fc49e4de49b00b",
+      "bytes": 27966,
+      "cacheHit": true
     },
     "6e975a9cc096bfc0921cce6740b3c1a12ca71ae1f1938b51c5dc8449210b1ecc": {
       "host": "basemaps.linz.govt.nz",
       "path": "/v1/tiles/elevation/WebMercatorQuad/5/31/20.png",
       "sha256": "eb11f3027f242ee2deb3bf024bf22d5db8ea8d038c6ca86574310b496678fb87",
       "bytes": 11717,
+      "cacheHit": true
+    },
+    "9e080e622d9d6c91b9670898faeccd02ff5a0ca24651aa7aea9f6cde660cc489": {
+      "host": "basemaps.linz.govt.nz",
+      "path": "/v1/tiles/topographic-v2/3857/11/1992/1299.pbf",
+      "sha256": "26474db3a9775622132045f646c1ddde5c65a48367dd9127f4df2bfcbebf3fcc",
+      "bytes": 73353,
       "cacheHit": true
     },
     "bd70030df172f97af94580add02000b5d985dee2c91d9d4f99110086331b95b9": {
@@ -380,11 +585,18 @@
       "bytes": 155298,
       "cacheHit": true
     },
-    "4989844a1cfbf349c2889dcb7b9128291fb10ab0f5e7006433789de563795736": {
+    "ed88fd9b664f8d0cba20991ffbe62f6391eda64b23ba006b6a711e86cf946cae": {
       "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/elevation/WebMercatorQuad/11/1991/1300.png",
-      "sha256": "1e76b737ce62f42bcf1e74250d57aaf5d196d029714fd7e039fe3ba9b227d8e7",
-      "bytes": 117952,
+      "path": "/v1/tiles/topographic-v2/3857/12/3983/2600.pbf",
+      "sha256": "6a7a53d0a40232b261da512f34799234967dbc1fba02c278ef2450ebe61f50f4",
+      "bytes": 33547,
+      "cacheHit": true
+    },
+    "460774195d4dcf04545709625c62008c43445cd2de37f24972bc1973e90f1c49": {
+      "host": "basemaps.linz.govt.nz",
+      "path": "/v1/tiles/topographic-v2/3857/12/3984/2600.pbf",
+      "sha256": "06aa8bbc90a7e9c0e351fa19ec85b65cf819f8a12469c804d71b9d94cd1a8c4e",
+      "bytes": 24379,
       "cacheHit": true
     },
     "d1fcbe32989feaae513a455b3921533c0de4d7a244aedb513cd0aa40c7e8edfa": {
@@ -415,11 +627,25 @@
       "bytes": 13352,
       "cacheHit": true
     },
+    "58b1941e682ae8bcea3ab05d7cfc4883dc6dbe1771e9b4685d9f8d987a361111": {
+      "host": "services.arcgisonline.com",
+      "path": "/ArcGIS/rest/services/World_Imagery/MapServer/tile/13/5199/7967",
+      "sha256": "392ccb106377f02c73329a90132cb6988fa4bcc4097a66ea1492df52bcf5085f",
+      "bytes": 17208,
+      "cacheHit": true
+    },
     "2227d4d0a6df609d76026c15d388cbf19685460dd4135701b5ddb89157e01da8": {
       "host": "basemaps.linz.govt.nz",
       "path": "/v1/tiles/canterbury-2015-2016-0.3m/WebMercatorQuad/13/7967/5199.png",
       "sha256": "bff73fff7c176f200557966aed2da99262aada69b46534ee2a8274b852fded1e",
       "bytes": 22184,
+      "cacheHit": true
+    },
+    "c6d3b960d92754f8a7ff6eb8e56be2b60af92212b0324f7979fac839f94e14ad": {
+      "host": "basemaps.linz.govt.nz",
+      "path": "/v1/tiles/west-coast-2016-2017-0.3m/WebMercatorQuad/13/7967/5199.png",
+      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4",
+      "bytes": 355,
       "cacheHit": true
     },
     "f8e3a4669954d3bf6f500e729ffd9f06aaeb9eb67b57bd35fb7e572f1dd4298e": {
@@ -429,11 +655,11 @@
       "bytes": 14502,
       "cacheHit": true
     },
-    "c6d3b960d92754f8a7ff6eb8e56be2b60af92212b0324f7979fac839f94e14ad": {
+    "b544897fa84d407ac223e368e912e5965117019937e12c3f0b3d1afe70358bd1": {
       "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/west-coast-2016-2017-0.3m/WebMercatorQuad/13/7967/5199.png",
-      "sha256": "33ee22458c347f6efd343ddf977a61bc596787a00ded8090fed46fea1551ecf4",
-      "bytes": 355,
+      "path": "/v1/tiles/aerial/WebMercatorQuad/13/7968/5199.webp",
+      "sha256": "1c01eee098c6a319d60de485a1c5928169c54c7f0bc8a85514d2991994d741d9",
+      "bytes": 10724,
       "cacheHit": true
     },
     "fc26bd9db991aa7646eccd0ca51879f45b7eacf4457866caa8d347f7180d6da9": {
@@ -450,58 +676,11 @@
       "bytes": 41743,
       "cacheHit": true
     },
-    "58b1941e682ae8bcea3ab05d7cfc4883dc6dbe1771e9b4685d9f8d987a361111": {
-      "host": "services.arcgisonline.com",
-      "path": "/ArcGIS/rest/services/World_Imagery/MapServer/tile/13/5199/7967",
-      "sha256": "392ccb106377f02c73329a90132cb6988fa4bcc4097a66ea1492df52bcf5085f",
-      "bytes": 17208,
-      "cacheHit": true
-    },
-    "b544897fa84d407ac223e368e912e5965117019937e12c3f0b3d1afe70358bd1": {
-      "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/aerial/WebMercatorQuad/13/7968/5199.webp",
-      "sha256": "1c01eee098c6a319d60de485a1c5928169c54c7f0bc8a85514d2991994d741d9",
-      "bytes": 10724,
-      "cacheHit": true
-    },
-    "f2c356743ef9fbec1c9001f85dd16254a22df7219dfcbf90075b149d38d93a55": {
-      "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/aerial/WebMercatorQuad/13/7966/5199.webp",
-      "sha256": "5cf9fb2bf6348118ccb39445f487dba941967bb3ecc9d4ce993b51f9871e236f",
-      "bytes": 18492,
-      "cacheHit": true
-    },
-    "c5096bd574afd8c7015c83d1c5e51a9a459f4e9142eb2ef5fe696d6778a9e373": {
-      "host": "services.arcgisonline.com",
-      "path": "/ArcGIS/rest/services/World_Imagery/MapServer/tile/13/5199/7966",
-      "sha256": "18cc36bc617029147096bd282e0398bd921dba8701472c0da0231defb7977630",
-      "bytes": 17489,
-      "cacheHit": true
-    },
     "df8a6d1996f4e08a388f7a69dd0a43dfd72bdf8cef4187d7f1e8978c411509c8": {
       "host": "services.arcgisonline.com",
       "path": "/ArcGIS/rest/services/World_Imagery/MapServer/tile/13/5199/7968",
       "sha256": "3dd209a829925b58657f152d8a20252d39f9da13840cdfc3a76c3b9f4fad1ccf",
       "bytes": 14301,
-      "cacheHit": true
-    },
-    "6da0bf2667145c2f6f43ef3bb7b60600467dc53eecfeacad7b431a34ecf1c8fe": {
-      "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/canterbury-2015-2016-0.3m/WebMercatorQuad/13/7968/5199.png",
-      "sha256": "5528484226142e609e792c1b29d9da20f8bac0074da417b69aeddac965da0e77",
-      "bytes": 79121,
-      "cacheHit": true
-    },
-    "/native-regional-worker.js": {
-      "sha256": "6b613e16c93c5ec5b177afd7ed2738de6f15d01f27c7a5f5acf6a61c207e57e0",
-      "bytes": 125,
-      "kind": "unchanged-apk-asset"
-    },
-    "08fb71d3bfcf18bd6230f5c4c6ef80b12dfa6c11908ff189884b4f56b3810aef": {
-      "host": "services.arcgisonline.com",
-      "path": "/ArcGIS/rest/services/World_Imagery/MapServer/tile/13/5198/7967",
-      "sha256": "7bcf3102734d90cd62df46f3bf53e1bd3c981fbf01961bb253bf00c5962076d0",
-      "bytes": 11812,
       "cacheHit": true
     },
     "52eaf6ee672ef575eba242d56c48319d9fa30c551f0e5bd409af4e7f693013ae": {
@@ -511,11 +690,11 @@
       "bytes": 355,
       "cacheHit": true
     },
-    "37edf0c2e68fe327accf6e7838aff07a2dce960736dc4dc9c5d9d82868ba433d": {
-      "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/aerial/WebMercatorQuad/13/7967/5198.webp",
-      "sha256": "44b570c6b0174bdf5dbb09588e6927aa2b9aa6ef8bfa3ac1df8b9851c61e2b31",
-      "bytes": 5276,
+    "c5096bd574afd8c7015c83d1c5e51a9a459f4e9142eb2ef5fe696d6778a9e373": {
+      "host": "services.arcgisonline.com",
+      "path": "/ArcGIS/rest/services/World_Imagery/MapServer/tile/13/5199/7966",
+      "sha256": "18cc36bc617029147096bd282e0398bd921dba8701472c0da0231defb7977630",
+      "bytes": 17489,
       "cacheHit": true
     },
     "90c1ea546705a3269daa4de9a8bb40fc95a15feb6f019f349532862d17e3f461": {
@@ -523,6 +702,13 @@
       "path": "/v1/tiles/west-coast-2016-2017-0.3m/WebMercatorQuad/13/7966/5199.png",
       "sha256": "921c10c692123813b8fc12f4814d2990a61ad2e1d3fb7022c12a56fb062a9b4f",
       "bytes": 10084,
+      "cacheHit": true
+    },
+    "08fb71d3bfcf18bd6230f5c4c6ef80b12dfa6c11908ff189884b4f56b3810aef": {
+      "host": "services.arcgisonline.com",
+      "path": "/ArcGIS/rest/services/World_Imagery/MapServer/tile/13/5198/7967",
+      "sha256": "7bcf3102734d90cd62df46f3bf53e1bd3c981fbf01961bb253bf00c5962076d0",
+      "bytes": 11812,
       "cacheHit": true
     },
     "85d21eae06e0474d716de4c54df9635a76180fb0c38d3650165baf952ae86413": {
@@ -553,11 +739,46 @@
       "bytes": 15958,
       "cacheHit": true
     },
+    "f099d1f3d3f6952c24bc36ac06899059794160aa1530a768eb3af8aa0107802e": {
+      "host": "basemaps.linz.govt.nz",
+      "path": "/v1/tiles/west-coast-2016-2017-0.3m/WebMercatorQuad/13/7966/5198.png",
+      "sha256": "d30e2333e0f4869100aead2085f209b302bfca47c20ccee2a808bd997df08781",
+      "bytes": 136846,
+      "cacheHit": true
+    },
+    "b429865d6d528ae60a4ea66164f744586bb40ca2e8cd92439325e0ce3146f543": {
+      "host": "basemaps.linz.govt.nz",
+      "path": "/v1/tiles/aerial/WebMercatorQuad/13/7965/5199.webp",
+      "sha256": "5be663380c0e6a1cb438bf1e7fcd168ea82293868579f1201e9db665ad2ed848",
+      "bytes": 15956,
+      "cacheHit": true
+    },
     "b648c563f23196d18a311f90bd248f81923ce1eaa60785c0bfa2df81be2e9096": {
       "host": "services.arcgisonline.com",
       "path": "/ArcGIS/rest/services/World_Imagery/MapServer/tile/13/5199/7965",
       "sha256": "a9623306a87a3f3a2934ab03fa4bba4d9030597db28b51e437d3ce66be21377b",
       "bytes": 14458,
+      "cacheHit": true
+    },
+    "6da0bf2667145c2f6f43ef3bb7b60600467dc53eecfeacad7b431a34ecf1c8fe": {
+      "host": "basemaps.linz.govt.nz",
+      "path": "/v1/tiles/canterbury-2015-2016-0.3m/WebMercatorQuad/13/7968/5199.png",
+      "sha256": "5528484226142e609e792c1b29d9da20f8bac0074da417b69aeddac965da0e77",
+      "bytes": 79121,
+      "cacheHit": true
+    },
+    "37edf0c2e68fe327accf6e7838aff07a2dce960736dc4dc9c5d9d82868ba433d": {
+      "host": "basemaps.linz.govt.nz",
+      "path": "/v1/tiles/aerial/WebMercatorQuad/13/7967/5198.webp",
+      "sha256": "44b570c6b0174bdf5dbb09588e6927aa2b9aa6ef8bfa3ac1df8b9851c61e2b31",
+      "bytes": 5276,
+      "cacheHit": true
+    },
+    "f2c356743ef9fbec1c9001f85dd16254a22df7219dfcbf90075b149d38d93a55": {
+      "host": "basemaps.linz.govt.nz",
+      "path": "/v1/tiles/aerial/WebMercatorQuad/13/7966/5199.webp",
+      "sha256": "5cf9fb2bf6348118ccb39445f487dba941967bb3ecc9d4ce993b51f9871e236f",
+      "bytes": 18492,
       "cacheHit": true
     },
     "19acbadf3dbaa81b3b0342fa2ca0c342989487e05af4fe90223b12f0d1b6e8fd": {
@@ -574,11 +795,11 @@
       "bytes": 17720,
       "cacheHit": true
     },
-    "9555686ca76016fca5b0f60be394bfedb9dd05bc8c1c5a71275169c03774114e": {
+    "1e64583f38bdd7f0cb7d2bf6491b726f6f133913ffa4a3223937b99399cc5175": {
       "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/aerial/WebMercatorQuad/14/15936/10400.webp",
-      "sha256": "868f664c062e28a645565b1fc351c895e74ab8594bec342ca5162dafcc9938b2",
-      "bytes": 6142,
+      "path": "/v1/tiles/west-coast-2016-2017-0.3m/WebMercatorQuad/13/7967/5197.png",
+      "sha256": "8509e9537e74462caa2ecdc78d7453a142b5354d0c0e1aa58773682d2b073c2c",
+      "bytes": 132517,
       "cacheHit": true
     },
     "20ecaa8e0853865788d26e3f2931326c5259fdcf30071d931adf8407c8c44cf4": {
@@ -588,32 +809,37 @@
       "bytes": 91656,
       "cacheHit": true
     },
-    "b429865d6d528ae60a4ea66164f744586bb40ca2e8cd92439325e0ce3146f543": {
+    "4989844a1cfbf349c2889dcb7b9128291fb10ab0f5e7006433789de563795736": {
       "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/aerial/WebMercatorQuad/13/7965/5199.webp",
-      "sha256": "5be663380c0e6a1cb438bf1e7fcd168ea82293868579f1201e9db665ad2ed848",
-      "bytes": 15956,
+      "path": "/v1/tiles/elevation/WebMercatorQuad/11/1991/1300.png",
+      "sha256": "1e76b737ce62f42bcf1e74250d57aaf5d196d029714fd7e039fe3ba9b227d8e7",
+      "bytes": 117952,
       "cacheHit": true
     },
-    "1e64583f38bdd7f0cb7d2bf6491b726f6f133913ffa4a3223937b99399cc5175": {
+    "9555686ca76016fca5b0f60be394bfedb9dd05bc8c1c5a71275169c03774114e": {
       "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/west-coast-2016-2017-0.3m/WebMercatorQuad/13/7967/5197.png",
-      "sha256": "8509e9537e74462caa2ecdc78d7453a142b5354d0c0e1aa58773682d2b073c2c",
-      "bytes": 132517,
+      "path": "/v1/tiles/aerial/WebMercatorQuad/14/15936/10400.webp",
+      "sha256": "868f664c062e28a645565b1fc351c895e74ab8594bec342ca5162dafcc9938b2",
+      "bytes": 6142,
       "cacheHit": true
     },
-    "7f494a14ae0eb69cc4e4dbb01828840552f4896da3b87c96db11c375a69fca84": {
+    "/native-regional-worker.js": {
+      "sha256": "6b613e16c93c5ec5b177afd7ed2738de6f15d01f27c7a5f5acf6a61c207e57e0",
+      "bytes": 125,
+      "kind": "unchanged-apk-asset"
+    },
+    "a923b1b4b72fc5fbaeb1b4eceed6a89b4f9709380bc6c3452f9ed19f5cf09d40": {
       "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/elevation/WebMercatorQuad/12/3984/2600.png",
-      "sha256": "661203eb8108d5eda55d6692738f008b28cfb1aa09d79d701e64576a0e6cece0",
-      "bytes": 145931,
+      "path": "/v1/tiles/topographic-v2/3857/11/1992/1300.pbf",
+      "sha256": "ded54c637d40feb76fad534399787a6e4a2cd0ae1f67073243bec4181d34a423",
+      "bytes": 85127,
       "cacheHit": true
     },
-    "f099d1f3d3f6952c24bc36ac06899059794160aa1530a768eb3af8aa0107802e": {
+    "7e24aaaf31b64af93c347936ee180983a58598083444aa43742b3cf03d84c433": {
       "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/west-coast-2016-2017-0.3m/WebMercatorQuad/13/7966/5198.png",
-      "sha256": "d30e2333e0f4869100aead2085f209b302bfca47c20ccee2a808bd997df08781",
-      "bytes": 136846,
+      "path": "/v1/tiles/topographic-v2/3857/10/996/649.pbf",
+      "sha256": "ea382a511dd356ce18026ecc49e1a015da12473ffd179e38d96c183d61d2df49",
+      "bytes": 198557,
       "cacheHit": true
     },
     "/regional-imagery-worker.js": {
@@ -621,32 +847,25 @@
       "bytes": 1614,
       "kind": "unchanged-apk-asset"
     },
-    "9e080e622d9d6c91b9670898faeccd02ff5a0ca24651aa7aea9f6cde660cc489": {
+    "4ffdc6328600aabbf9cd93e92b36026ba5a03c02154aa54ec9eb9353374845d4": {
       "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/topographic-v2/3857/11/1992/1299.pbf",
-      "sha256": "26474db3a9775622132045f646c1ddde5c65a48367dd9127f4df2bfcbebf3fcc",
-      "bytes": 73353,
+      "path": "/v1/tiles/topographic-v2/3857/11/1990/1298.pbf",
+      "sha256": "8a086c24941db77b46532cb7416910eccb624f2cf2fe2ae66d4c63ffef63b2ba",
+      "bytes": 18605,
       "cacheHit": true
     },
-    "ed88fd9b664f8d0cba20991ffbe62f6391eda64b23ba006b6a711e86cf946cae": {
+    "4546bc0a82fe1de17190dbb0c43bc515fa1b2ce8e8bd223dc7f35c8e68bdbec2": {
       "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/topographic-v2/3857/12/3983/2600.pbf",
-      "sha256": "6a7a53d0a40232b261da512f34799234967dbc1fba02c278ef2450ebe61f50f4",
-      "bytes": 33547,
+      "path": "/v1/tiles/topographic-v2/3857/11/1991/1300.pbf",
+      "sha256": "19e5aa422d6e4cc09478e943936e922e5fa2b6b5ad7debfc5643c1f8c3a02a22",
+      "bytes": 95332,
       "cacheHit": true
     },
-    "460774195d4dcf04545709625c62008c43445cd2de37f24972bc1973e90f1c49": {
+    "28b4bd549660abaf2a7e237854ad79131fa78d00e8e10ee62777e162bbf2a1e3": {
       "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/topographic-v2/3857/12/3984/2600.pbf",
-      "sha256": "06aa8bbc90a7e9c0e351fa19ec85b65cf819f8a12469c804d71b9d94cd1a8c4e",
-      "bytes": 24379,
-      "cacheHit": true
-    },
-    "8e1e66f713790e9e623a560c4005ed601bdb018ae1b44b093d1c4c84ca07035c": {
-      "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/topographic-v2/3857/11/1990/1299.pbf",
-      "sha256": "c07c41e9220e5c45308ccd77df00d7dd3638186795de8811fe120d1e645ab817",
-      "bytes": 60558,
+      "path": "/v1/tiles/topographic-v2/3857/10/995/649.pbf",
+      "sha256": "eb3db6fd5aaa9988f61c087883f1e12a97a6444aad859079b26ed254bfc63671",
+      "bytes": 132827,
       "cacheHit": true
     },
     "c3e092e5048c8c1864f0111013251b125491abc9413c25ded5832819dc5ba86f": {
@@ -656,25 +875,11 @@
       "bytes": 11492,
       "cacheHit": true
     },
-    "46fc241cd4e9b6110296f416336de781829aeed05d259d10a0cfa9755ab0e8c6": {
+    "8e1e66f713790e9e623a560c4005ed601bdb018ae1b44b093d1c4c84ca07035c": {
       "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/aerial/WebMercatorQuad/14/15936/10401.webp",
-      "sha256": "3fa38d972dfae9938c54715307ebc72d711adbf26655c5c5cbfc3164594a292c",
-      "bytes": 9144,
-      "cacheHit": true
-    },
-    "a85d68fbba387ad22e0578b5db74ab0b9daf2d45eb1765661c05c17d524e74de": {
-      "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/elevation/WebMercatorQuad/11/1992/1300.png",
-      "sha256": "8f6e0a6865d487a1d4234aae392ce1560d2a01819acfa9802ca5ea1505d37e49",
-      "bytes": 107269,
-      "cacheHit": true
-    },
-    "7593c3f4b6f59ad7f89d4114448644c84a3acbf909208882cd5db35df8f2fdcd": {
-      "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/elevation/WebMercatorQuad/12/3983/2599.png",
-      "sha256": "eb0fc749e5909f0dfde52e60a42fd58c035881e3e595d1e5bda4d9f44d97289c",
-      "bytes": 149333,
+      "path": "/v1/tiles/topographic-v2/3857/11/1990/1299.pbf",
+      "sha256": "c07c41e9220e5c45308ccd77df00d7dd3638186795de8811fe120d1e645ab817",
+      "bytes": 60558,
       "cacheHit": true
     },
     "f4a610222315acaa347bc0d9ca4d3ffb75b2737a373133a9877cbf9e3b7bc6e9": {
@@ -684,11 +889,32 @@
       "bytes": 82917,
       "cacheHit": true
     },
-    "006b58354a3ce0f4ad91bb77c926db138198c305d47f9b978cb51b6821ec8f4a": {
+    "7f494a14ae0eb69cc4e4dbb01828840552f4896da3b87c96db11c375a69fca84": {
       "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/topographic-v2/3857/11/1991/1299.pbf",
-      "sha256": "1d7a965386d00d3e1c63657b1a4293fb3c548a42205c1c11478b7ab7805e3532",
-      "bytes": 91268,
+      "path": "/v1/tiles/elevation/WebMercatorQuad/12/3984/2600.png",
+      "sha256": "661203eb8108d5eda55d6692738f008b28cfb1aa09d79d701e64576a0e6cece0",
+      "bytes": 145931,
+      "cacheHit": true
+    },
+    "a85d68fbba387ad22e0578b5db74ab0b9daf2d45eb1765661c05c17d524e74de": {
+      "host": "basemaps.linz.govt.nz",
+      "path": "/v1/tiles/elevation/WebMercatorQuad/11/1992/1300.png",
+      "sha256": "8f6e0a6865d487a1d4234aae392ce1560d2a01819acfa9802ca5ea1505d37e49",
+      "bytes": 107269,
+      "cacheHit": true
+    },
+    "46fc241cd4e9b6110296f416336de781829aeed05d259d10a0cfa9755ab0e8c6": {
+      "host": "basemaps.linz.govt.nz",
+      "path": "/v1/tiles/aerial/WebMercatorQuad/14/15936/10401.webp",
+      "sha256": "3fa38d972dfae9938c54715307ebc72d711adbf26655c5c5cbfc3164594a292c",
+      "bytes": 9144,
+      "cacheHit": true
+    },
+    "7593c3f4b6f59ad7f89d4114448644c84a3acbf909208882cd5db35df8f2fdcd": {
+      "host": "basemaps.linz.govt.nz",
+      "path": "/v1/tiles/elevation/WebMercatorQuad/12/3983/2599.png",
+      "sha256": "eb0fc749e5909f0dfde52e60a42fd58c035881e3e595d1e5bda4d9f44d97289c",
+      "bytes": 149333,
       "cacheHit": true
     },
     "3b643ba2e008af2dcc9a169b82f1d30c8ff70d281a3a6bf2749b5ec9a22a6c69": {
@@ -698,39 +924,11 @@
       "bytes": 112851,
       "cacheHit": true
     },
-    "be460d06b38a534558104aa94da78d9ed98203b35ada15f8870041020746ebf8": {
-      "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/topographic-v2/3857/12/3983/2601.pbf",
-      "sha256": "014ea197752cf27cb2a124f1b86413d994bba7af6dfbddf5b2773116f289f43e",
-      "bytes": 33757,
-      "cacheHit": true
-    },
-    "a617c8d4e7c3ce540cfd8c39bf16456936752f3fe1a748132af39ef5a05bd509": {
-      "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/topographic-v2/3857/12/3984/2601.pbf",
-      "sha256": "79891aeaaa6daf94bdd47a620d45b855fd25ba2f6233e25106fc49e4de49b00b",
-      "bytes": 27966,
-      "cacheHit": true
-    },
-    "ee48a49467f9bf94e9b4efc8f9095c8ef13b7eeefa2f27f6342e92ef9ea92c29": {
-      "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/topographic-v2/3857/11/1991/1298.pbf",
-      "sha256": "ed3f66cacf25a33ee7ba0d85245e369fb880a2a9887f69bdfe359e7a119db5a5",
-      "bytes": 54205,
-      "cacheHit": true
-    },
     "671d2a562a5397c76474d35c1f593f57f048618244115522aeb12c5acf9ea12c": {
       "host": "basemaps.linz.govt.nz",
       "path": "/v1/tiles/elevation/WebMercatorQuad/10/995/649.png",
       "sha256": "564d0154f84e0f2e4a0a1cf32162225c294f7244da838bfa27359186a4a38a39",
       "bytes": 77938,
-      "cacheHit": true
-    },
-    "4ffdc6328600aabbf9cd93e92b36026ba5a03c02154aa54ec9eb9353374845d4": {
-      "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/topographic-v2/3857/11/1990/1298.pbf",
-      "sha256": "8a086c24941db77b46532cb7416910eccb624f2cf2fe2ae66d4c63ffef63b2ba",
-      "bytes": 18605,
       "cacheHit": true
     },
     "5d0ee1284432f12cc74dd124659335cac4c5e241a7642a7f0520206c9c72dbd3": {
@@ -775,6 +973,34 @@
       "bytes": 13854,
       "cacheHit": true
     },
+    "cb1d2463f62c0d79185c1cbc6dea269d7c4004a40d09a61edaa20b2c126e19a1": {
+      "host": "basemaps.linz.govt.nz",
+      "path": "/v1/tiles/topographic-v2/3857/10/995/650.pbf",
+      "sha256": "6e3f1625561e22e2004fe1eeebb6c7d3187d3223a7c5adb7b26d19d275cb0745",
+      "bytes": 212380,
+      "cacheHit": true
+    },
+    "0a2578a2a914589effeeb5ae9e93edf2894027d5d0083f60e35298555d005b26": {
+      "host": "basemaps.linz.govt.nz",
+      "path": "/v1/tiles/topographic-v2/3857/9/497/324.pbf",
+      "sha256": "f361370b86eeb62e1727abd1da34c67bc3f013c7d17f05ecf3d6e4a4c5822ba7",
+      "bytes": 53630,
+      "cacheHit": true
+    },
+    "b62fc3b7f4c648e67e1b088280d0995d251ff67d867e743ea54500c8860102cd": {
+      "host": "basemaps.linz.govt.nz",
+      "path": "/v1/tiles/topographic-v2/3857/9/498/324.pbf",
+      "sha256": "3ac0980493afa5378757031cd1d461e02912ff672d9758b7bb26c8571a5cb007",
+      "bytes": 192877,
+      "cacheHit": true
+    },
+    "e2b97f51e9f30eb4eec23259ddf78b2967cda89e9398b138a0bdb756f4225e85": {
+      "host": "basemaps.linz.govt.nz",
+      "path": "/v1/tiles/topographic-v2/3857/10/996/650.pbf",
+      "sha256": "20fafc796afff5067458ea36d01593fad5d13beb4f2d0b9184940aa8563fb88c",
+      "bytes": 198417,
+      "cacheHit": true
+    },
     "6d4ae11ab49b2d87718e888a1e2f7e7bcaf78e9d42bf1962f6a5043079f89c45": {
       "host": "basemaps.linz.govt.nz",
       "path": "/v1/tiles/aerial/WebMercatorQuad/14/15937/10401.webp",
@@ -789,18 +1015,18 @@
       "bytes": 6070,
       "cacheHit": true
     },
-    "ffa05a67f89c9bfe63a5f38b9424783d24fad93b227e84ecd60821afaff6793c": {
-      "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/aerial/WebMercatorQuad/14/15935/10403.webp",
-      "sha256": "be1767196c09a189e1ed1d848f0d998562e2f99a17ffa8e049320de03d4e6af4",
-      "bytes": 14504,
-      "cacheHit": true
-    },
     "1eadc2326b4d42bdbab95e63634d319172d44dd89d5d57a4fd3548801d1fc1a8": {
       "host": "basemaps.linz.govt.nz",
       "path": "/v1/tiles/aerial/WebMercatorQuad/14/15934/10403.webp",
       "sha256": "5c4c42b63bc344e4db249dd40750ed4d3e2ff8ca80bda1e177f38fa25405ba27",
       "bytes": 9782,
+      "cacheHit": true
+    },
+    "ffa05a67f89c9bfe63a5f38b9424783d24fad93b227e84ecd60821afaff6793c": {
+      "host": "basemaps.linz.govt.nz",
+      "path": "/v1/tiles/aerial/WebMercatorQuad/14/15935/10403.webp",
+      "sha256": "be1767196c09a189e1ed1d848f0d998562e2f99a17ffa8e049320de03d4e6af4",
+      "bytes": 14504,
       "cacheHit": true
     },
     "71f00ecec2c545c00c30891d8fa9370f9b206696cdbdd27887f23f2a613015b4": {
@@ -859,41 +1085,6 @@
       "bytes": 143188,
       "cacheHit": true
     },
-    "28b4bd549660abaf2a7e237854ad79131fa78d00e8e10ee62777e162bbf2a1e3": {
-      "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/topographic-v2/3857/10/995/649.pbf",
-      "sha256": "eb3db6fd5aaa9988f61c087883f1e12a97a6444aad859079b26ed254bfc63671",
-      "bytes": 132827,
-      "cacheHit": true
-    },
-    "7e24aaaf31b64af93c347936ee180983a58598083444aa43742b3cf03d84c433": {
-      "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/topographic-v2/3857/10/996/649.pbf",
-      "sha256": "ea382a511dd356ce18026ecc49e1a015da12473ffd179e38d96c183d61d2df49",
-      "bytes": 198557,
-      "cacheHit": true
-    },
-    "bc112a6973b1f3412eda7793a3faf873dfd07e4831060eefe91dcf1eafdf9a2a": {
-      "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/aerial/WebMercatorQuad/14/15937/10404.webp",
-      "sha256": "eb4e52f43e2664ac10cdeabf927ea41b66e2c5f16ad90b22f5f32279d82d43d1",
-      "bytes": 6120,
-      "cacheHit": true
-    },
-    "a923b1b4b72fc5fbaeb1b4eceed6a89b4f9709380bc6c3452f9ed19f5cf09d40": {
-      "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/topographic-v2/3857/11/1992/1300.pbf",
-      "sha256": "ded54c637d40feb76fad534399787a6e4a2cd0ae1f67073243bec4181d34a423",
-      "bytes": 85127,
-      "cacheHit": true
-    },
-    "4546bc0a82fe1de17190dbb0c43bc515fa1b2ce8e8bd223dc7f35c8e68bdbec2": {
-      "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/topographic-v2/3857/11/1991/1300.pbf",
-      "sha256": "19e5aa422d6e4cc09478e943936e922e5fa2b6b5ad7debfc5643c1f8c3a02a22",
-      "bytes": 95332,
-      "cacheHit": true
-    },
     "fcec8b212f97bfddb087e606a0aa87e63c7555c02641e6beccfb3a0fde9e06ce": {
       "host": "basemaps.linz.govt.nz",
       "path": "/v1/tiles/elevation/WebMercatorQuad/12/3982/2599.png",
@@ -922,6 +1113,13 @@
       "bytes": 4674,
       "cacheHit": true
     },
+    "2f6c7134bb0395da6c203edd573479fe97a64d22502b19809b24a37ca3c55d76": {
+      "host": "basemaps.linz.govt.nz",
+      "path": "/v1/tiles/aerial/WebMercatorQuad/14/15938/10405.webp",
+      "sha256": "2cda4da4ee9f2d1a569f27647d3934b8d6a9384fbc6d1996c14332dfd22aa04f",
+      "bytes": 10140,
+      "cacheHit": true
+    },
     "400996f11debb0e8e62081816261f423258f4df4b929c79e378b4cc3bf5f081a": {
       "host": "basemaps.linz.govt.nz",
       "path": "/v1/tiles/elevation/WebMercatorQuad/12/3983/2598.png",
@@ -943,39 +1141,32 @@
       "bytes": 75658,
       "cacheHit": true
     },
-    "0a2578a2a914589effeeb5ae9e93edf2894027d5d0083f60e35298555d005b26": {
+    "ea6ad2eeca89fe6827257b6e156eaa66113c60acf0ee5e40ac03df15c3e69d8a": {
       "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/topographic-v2/3857/9/497/324.pbf",
-      "sha256": "f361370b86eeb62e1727abd1da34c67bc3f013c7d17f05ecf3d6e4a4c5822ba7",
-      "bytes": 53630,
+      "path": "/v1/tiles/topographic-v2/3857/8/249/162.pbf",
+      "sha256": "2b4253e93d2cb176f78d126224bf2ee18fa5dd6300f542cbf6472efe8f83b60e",
+      "bytes": 112673,
       "cacheHit": true
     },
-    "cb1d2463f62c0d79185c1cbc6dea269d7c4004a40d09a61edaa20b2c126e19a1": {
+    "aced8d41af79429af42f867c858709c7f478ccda07bed0f8eb7c83344a0996b6": {
       "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/topographic-v2/3857/10/995/650.pbf",
-      "sha256": "6e3f1625561e22e2004fe1eeebb6c7d3187d3223a7c5adb7b26d19d275cb0745",
-      "bytes": 212380,
+      "path": "/v1/tiles/topographic-v2/3857/8/248/162.pbf",
+      "sha256": "2ed1ba306c176655fe5e457df7761466418c175ebca304efedc48ae15d20248a",
+      "bytes": 76258,
       "cacheHit": true
     },
-    "e2b97f51e9f30eb4eec23259ddf78b2967cda89e9398b138a0bdb756f4225e85": {
+    "b7961e5bb48c3884e4a5e4626a273cb3e1caf2f59798a16e4dcca4eb7b25fc99": {
       "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/topographic-v2/3857/10/996/650.pbf",
-      "sha256": "20fafc796afff5067458ea36d01593fad5d13beb4f2d0b9184940aa8563fb88c",
-      "bytes": 198417,
+      "path": "/v1/tiles/topographic-v2/3857/9/498/325.pbf",
+      "sha256": "61c7e306ec8481e5c8d77c1b46e674e782cc9bcf87ee2ca0c58478d7ed213a43",
+      "bytes": 184401,
       "cacheHit": true
     },
-    "afb2224c69ad1f5c8134a616a3a9d8e0d192ce3a840aa87f2cfdee915e6484aa": {
+    "f5d191b9283bd01deb9c92b4579349321e845dbfaccd389371cf9a01da9ea810": {
       "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/aerial/WebMercatorQuad/13/7966/5196.webp",
-      "sha256": "034438d7ad742a18a35940b8cf912011db4050146acfcd068983880d2dffabeb",
-      "bytes": 13542,
-      "cacheHit": true
-    },
-    "b62fc3b7f4c648e67e1b088280d0995d251ff67d867e743ea54500c8860102cd": {
-      "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/topographic-v2/3857/9/498/324.pbf",
-      "sha256": "3ac0980493afa5378757031cd1d461e02912ff672d9758b7bb26c8571a5cb007",
-      "bytes": 192877,
+      "path": "/v1/tiles/topographic-v2/3857/9/497/325.pbf",
+      "sha256": "2fd33f35963c16640433f40b89ddfbe8896b3f8691775fca4ec6af85adb08989",
+      "bytes": 177336,
       "cacheHit": true
     },
     "4db1bf95bc8be4979e5c0b7be5c81727a60127e9705eabefa00432db1e195dcc": {
@@ -983,6 +1174,13 @@
       "path": "/v1/tiles/elevation/WebMercatorQuad/12/3982/2598.png",
       "sha256": "3de4e808cf9648f2d126e3a7d3701d7e06e036350f443e2030919fba6f50728c",
       "bytes": 135946,
+      "cacheHit": true
+    },
+    "afb2224c69ad1f5c8134a616a3a9d8e0d192ce3a840aa87f2cfdee915e6484aa": {
+      "host": "basemaps.linz.govt.nz",
+      "path": "/v1/tiles/aerial/WebMercatorQuad/13/7966/5196.webp",
+      "sha256": "034438d7ad742a18a35940b8cf912011db4050146acfcd068983880d2dffabeb",
+      "bytes": 13542,
       "cacheHit": true
     },
     "/south-overviews.js": {
@@ -997,14 +1195,14 @@
       "bytes": 77544,
       "cacheHit": true
     },
-    "/_ridge/overviews/8431d7e8360b82383121e5e5537f9e2b207d788ec2e808ce1be0daedd7a5519d/47342272/81578": {
-      "sha256": "d10be3b158da35e6ea39975d8cc15c5130ed81769cfdbf33fa3371908cc2c289",
-      "bytes": 81578,
-      "kind": "original-apk-overview-range"
-    },
     "/_ridge/overviews/7241afa52abbc95e0226d1f1964832e1646076857c9b489f52443ecc9c2b8b03/5990960/77988": {
       "sha256": "054718d2b643ea175ab0159eeb01e3275af656c26fafd82af88735443e95367d",
       "bytes": 77988,
+      "kind": "original-apk-overview-range"
+    },
+    "/_ridge/overviews/8431d7e8360b82383121e5e5537f9e2b207d788ec2e808ce1be0daedd7a5519d/47342272/81578": {
+      "sha256": "d10be3b158da35e6ea39975d8cc15c5130ed81769cfdbf33fa3371908cc2c289",
+      "bytes": 81578,
       "kind": "original-apk-overview-range"
     },
     "/_ridge/overviews/add2b4659a74691e8e3346df5f41d5592796013199eb7de88dcb9fd640a606b2/60850392/79706": {
@@ -1019,6 +1217,13 @@
       "bytes": 86637,
       "cacheHit": true
     },
+    "d11e3f52a51872c6bf067e36fede0b13078af0ae75339658c51e5e01d131c43d": {
+      "host": "basemaps.linz.govt.nz",
+      "path": "/v1/tiles/topographic-v2/3857/7/124/81.pbf",
+      "sha256": "f0a623655f02f182d4247ec4fe7d544222b078b122aed0d4384c0f6f708cbfaf",
+      "bytes": 187735,
+      "cacheHit": true
+    },
     "/_ridge/overviews/8431d7e8360b82383121e5e5537f9e2b207d788ec2e808ce1be0daedd7a5519d/56079778/72902": {
       "sha256": "d74389bfeeeeadfc57e4b37693d01d4d78a0def2d4550ac075d324f68cd0a546",
       "bytes": 72902,
@@ -1028,6 +1233,13 @@
       "sha256": "eaa677b920026679fe170f60d0c70b6558fe23fd57eed454399d7b5964c9187e",
       "bytes": 71210,
       "kind": "original-apk-overview-range"
+    },
+    "82295e97ccad275e34540ea6cd7ab7e77a69b1877213f0d654d536437eaf237b": {
+      "host": "basemaps.linz.govt.nz",
+      "path": "/v1/tiles/topographic-v2/3857/6/62/40.pbf",
+      "sha256": "cb93be9c5bf2b4f07655fea23caae78f378c6059c46438403bffd34e8fc57dc0",
+      "bytes": 270735,
+      "cacheHit": true
     },
     "d7ae2f8978277978156e7756cc7132f11c27431753a74b94601c8ded0e425170": {
       "host": "basemaps.linz.govt.nz",
@@ -1083,48 +1295,6 @@
       "bytes": 2064,
       "kind": "original-apk-overview-range"
     },
-    "aced8d41af79429af42f867c858709c7f478ccda07bed0f8eb7c83344a0996b6": {
-      "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/topographic-v2/3857/8/248/162.pbf",
-      "sha256": "2ed1ba306c176655fe5e457df7761466418c175ebca304efedc48ae15d20248a",
-      "bytes": 76258,
-      "cacheHit": true
-    },
-    "ea6ad2eeca89fe6827257b6e156eaa66113c60acf0ee5e40ac03df15c3e69d8a": {
-      "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/topographic-v2/3857/8/249/162.pbf",
-      "sha256": "2b4253e93d2cb176f78d126224bf2ee18fa5dd6300f542cbf6472efe8f83b60e",
-      "bytes": 112673,
-      "cacheHit": true
-    },
-    "f5d191b9283bd01deb9c92b4579349321e845dbfaccd389371cf9a01da9ea810": {
-      "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/topographic-v2/3857/9/497/325.pbf",
-      "sha256": "2fd33f35963c16640433f40b89ddfbe8896b3f8691775fca4ec6af85adb08989",
-      "bytes": 177336,
-      "cacheHit": true
-    },
-    "b7961e5bb48c3884e4a5e4626a273cb3e1caf2f59798a16e4dcca4eb7b25fc99": {
-      "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/topographic-v2/3857/9/498/325.pbf",
-      "sha256": "61c7e306ec8481e5c8d77c1b46e674e782cc9bcf87ee2ca0c58478d7ed213a43",
-      "bytes": 184401,
-      "cacheHit": true
-    },
-    "d11e3f52a51872c6bf067e36fede0b13078af0ae75339658c51e5e01d131c43d": {
-      "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/topographic-v2/3857/7/124/81.pbf",
-      "sha256": "f0a623655f02f182d4247ec4fe7d544222b078b122aed0d4384c0f6f708cbfaf",
-      "bytes": 187735,
-      "cacheHit": true
-    },
-    "82295e97ccad275e34540ea6cd7ab7e77a69b1877213f0d654d536437eaf237b": {
-      "host": "basemaps.linz.govt.nz",
-      "path": "/v1/tiles/topographic-v2/3857/6/62/40.pbf",
-      "sha256": "cb93be9c5bf2b4f07655fea23caae78f378c6059c46438403bffd34e8fc57dc0",
-      "bytes": 270735,
-      "cacheHit": true
-    },
     "85c25d446a55019871763d415a2512daae0514d816f612a47eb340eca9c28b1f": {
       "host": "basemaps.linz.govt.nz",
       "path": "/v1/tiles/topographic-v2/3857/5/31/20.pbf",
@@ -1136,7 +1306,22 @@
       "host": "basemaps.linz.govt.nz",
       "path": "/v1/tiles/topographic-v2/3857/4/15/10.pbf",
       "sha256": "429f0633bad6237cf56512f87e3c47f34a3d2d9495e68babe9774c844ef0176a",
-      "bytes": 81178
+      "bytes": 81178,
+      "cacheHit": true
+    },
+    "672b627a5bd9f4ae85fbf44ce13d37c9aac405ddd4a1354a514f8c752a3a0c89": {
+      "host": "basemaps.linz.govt.nz",
+      "path": "/v1/tiles/topographic-v2/3857/3/7/5.pbf",
+      "sha256": "f0aef043b0e42a86dc30e22ab2338fd4f7ab10c65e4a4852f6c93c1496e36462",
+      "bytes": 45184,
+      "cacheHit": true
+    },
+    "ff68c41d64e40e0c03b7ece42287924fba78970cdeead7fbf010f3942cddf128": {
+      "host": "basemaps.linz.govt.nz",
+      "path": "/v1/tiles/topographic-v2/3857/2/3/2.pbf",
+      "sha256": "90fa0e17684a08baacec9299df2856c95e5e4c8fb38e4740d96ac02004da6c85",
+      "bytes": 50599,
+      "cacheHit": true
     }
   }
 }

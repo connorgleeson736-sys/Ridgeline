@@ -76,4 +76,38 @@ class DemSamplingTest {
   assertEquals(9,DemSampling.footprint(18,254900,166400).size)
   assertEquals(4,DemSampling.footprint(19,509800,332800).size)
  }
+ @Test fun cameraGroundUsesPixelCentersAndActualNeighborsWithoutFabricatedFallback(){
+  val z=2;val records=HashMap<LegacyId,LegacyDem>()
+  fun value(x:Int,y:Int)=1000f+Math.floorMod(x,17)*2+Math.floorMod(y,23)*3
+  fun source(id:LegacyId)=records.getOrPut(id){LegacyDem(id,FloatArray(65536){i->value(id.x*256+i%256,id.y*256+i/256)})}
+  // Independent analytic expectations for the ramp, including a four-tile
+  // seam, a fractional point, dateline wrap and both polar clamps.
+  for((mx,my,expected)in listOf(Triple(.25,.5,1017.5f),Triple(.2503,.5007,1020.2648f),
+      Triple(0.0,0.0,1003f),Triple(1.0,1.0,1036f),Triple(-.75,.5,1017.5f))){
+   assertEquals(expected,DemSampling.point(z,mx,my,::source)!!,0f)
+  }
+  assertNull(DemSampling.point(z,.25,.5){if(it.x==0)null else source(it)})
+  assertNull(DemSampling.point(z,Double.NaN,.5,::source))
+  assertNull(DemSampling.point(z,.25,-.01,::source))
+ }
+ @Test fun parentGroundSamplingRetainsTheRealParentRatherThanAZeroOrChildInvention(){
+  val parent=LegacyDem(LegacyId(1,0,0),FloatArray(65536){i->100f+i%256*.25f+i/256*.5f})
+  val fine=DemSampling.point(2,.16,.21){parent}
+  val coarse=DemSampling.point(1,.16,.21){parent}
+  assertEquals(173.865f,coarse!!,0f);assertEquals(173.865f,fine!!,0f)
+ }
+ @Test fun genuineReferenceDemCenterMatchesCaptured0_18GroundHeight(){
+  // Four original LINZ11/1991/1300pixels sampled by the exact0.18APK
+  // capture. The source hash and reference Float64 result are recorded in
+  // validation/reference-host; this permits only Float32 input quantization.
+  val mx=(170.14219572+180)/360
+  val my=(1-asinh(tan(Math.toRadians(-43.5955671)))/PI)/2
+  val x=floor((mx*2048-1991)*256-.5).toInt()
+  val y=floor((my*2048-1300)*256-.5).toInt()
+  val pixels=FloatArray(65536)
+  pixels[y*256+x]=3651.2f;pixels[y*256+x+1]=3566.4f
+  pixels[(y+1)*256+x]=3668f;pixels[(y+1)*256+x+1]=3589.6f
+  val raster=LegacyDem(LegacyId(11,1991,1300),pixels)
+  assertEquals(3648.731912109524,DemSampling.point(11,mx,my){raster}!!.toDouble(),.001)
+ }
 }

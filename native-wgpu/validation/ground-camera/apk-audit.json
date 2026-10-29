@@ -1,0 +1,60 @@
+{
+  "scope": "Prototype packaging only, not feature/device/visual acceptance",
+  "apk": "Ridgeline-Native-Grounded-Camera-Debug.apk",
+  "bytes": 400912291,
+  "sha256": "79a9b370c5d63abdfd3fc88065ebc3c12f27ae26bcb30ed6b64682ab5b85938a",
+  "nativeLibraries": [
+    "lib/arm64-v8a/libridgeline_renderer.so",
+    "lib/armeabi-v7a/libridgeline_renderer.so",
+    "lib/x86_64/libridgeline_renderer.so"
+  ],
+  "webRuntimeAssets": 0,
+  "webViewOrCapacitorDexReferences": 0,
+  "originalZipFiles": 6,
+  "overviewPayloadBytes": 364762502,
+  "imageRanges": 5277,
+  "packs": [
+    {
+      "sha256": "7241afa52abbc95e0226d1f1964832e1646076857c9b489f52443ecc9c2b8b03",
+      "bytes": 62857520,
+      "imageRanges": 916,
+      "originalZip": "Ridgeline-Overviews-0.3.0-1-of-6.zip",
+      "archiveSha256": "af5ec2aabca4a46a251033a686591c4fb325b7d244f2225d6246ab7d0bd5b5a7"
+    },
+    {
+      "sha256": "0b72203a46ec5c96ad0b9074b6f2335941458d80eb44f936fe6150b9d21914a9",
+      "bytes": 62851044,
+      "imageRanges": 923,
+      "originalZip": "Ridgeline-Overviews-0.3.0-2-of-6.zip",
+      "archiveSha256": "26f4d0b61468339a490f7830e6f4755148e6eab641d661154286b2a8a766f241"
+    },
+    {
+      "sha256": "bc0dd4764ca150cb54bb463c3bc3e80b9fb5af0591764caa7778d90cfef36b21",
+      "bytes": 62908832,
+      "imageRanges": 896,
+      "originalZip": "Ridgeline-Overviews-0.3.0-3-of-6.zip",
+      "archiveSha256": "7dd82e1675a9ead380b3a1fab9ca1b98c02341d72aecd9182293a4139c53f467"
+    },
+    {
+      "sha256": "add2b4659a74691e8e3346df5f41d5592796013199eb7de88dcb9fd640a606b2",
+      "bytes": 62867886,
+      "imageRanges": 905,
+      "originalZip": "Ridgeline-Overviews-0.3.0-4-of-6.zip",
+      "archiveSha256": "8e21484c083d3334066aa338c10d7411390d58a5c4b1a0e8897ca67b0138026a"
+    },
+    {
+      "sha256": "8431d7e8360b82383121e5e5537f9e2b207d788ec2e808ce1be0daedd7a5519d",
+      "bytes": 62886568,
+      "imageRanges": 917,
+      "originalZip": "Ridgeline-Overviews-0.3.0-5-of-6.zip",
+      "archiveSha256": "7c465a15634f2b22ca55e43fe62976d5ba45befe6ab9bdbcea681deaadb95ee3"
+    },
+    {
+      "sha256": "20c7da20bac6c00a048c1b3af93a3d7681e7bdae850d4246916ce60897b495b3",
+      "bytes": 50390652,
+      "imageRanges": 720,
+      "originalZip": "Ridgeline-Overviews-0.3.0-6-of-6.zip",
+      "archiveSha256": "a94e465377edca22fd515cbd8aa564130162a04a3605f02b874d2ec7001852d2"
+    }
+  ]
+}
