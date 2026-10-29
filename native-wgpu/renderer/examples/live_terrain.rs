@@ -50,12 +50,13 @@ async fn run() {
         y: 1300,
     };
     let instance = wgpu::Instance::new(wgpu::InstanceDescriptor::new_without_display_handle());
-    let mut r = Renderer::new(
+    let mut r = Renderer::new_with_mipmap_mode(
         &instance,
         None,
         Some(wgpu::TextureFormat::Rgba8Unorm),
         256,
         256,
+        std::env::args().any(|v| v == "--render-mips"),
     )
     .await
     .expect("GPU adapter");
@@ -94,6 +95,13 @@ async fn run() {
         )
         .unwrap();
         fields.push(heights);
+    }
+    if std::env::args().any(|v| v == "--independent-images") {
+        for (i, id) in parent.children().iter().enumerate() {
+            let image = std::fs::read(dir.join(format!("child{i}.rgba"))).unwrap();
+            assert_eq!(image.len(), 256 * 256 * 4);
+            r.upload_image(*id, &image).unwrap();
+        }
     }
     for j in 0..129 {
         assert_eq!(fields[0][j * 129 + 128], fields[1][j * 129]);
@@ -135,6 +143,27 @@ async fn run() {
         elevation as f32,
     );
     let oblique = read(&r, &output);
+    let args: Vec<_> = std::env::args().collect();
+    if let Some(i) = args.iter().position(|v| v == "--pick") {
+        let x: f64 = args.get(i + 1).expect("pick x").parse().unwrap();
+        let y: f64 = args.get(i + 2).expect("pick y").parse().unwrap();
+        if let Some(hit) = r.pick_at(x, y) {
+            let point = ridgeline_renderer::mercator(hit[0], hit[1]);
+            println!(
+                "Diagnostic ground uv=({:.10},{:.10}) height={:.3}",
+                (point[0] - bounds[0]) / (bounds[2] - bounds[0]),
+                (point[1] - bounds[1]) / (bounds[3] - bounds[1]),
+                hit[2]
+            );
+        } else {
+            println!("Diagnostic pick: no actual terrain hit");
+        }
+    }
+    println!(
+        "Visible triangles: surface={} skirts={}",
+        r.drawn_surface_triangles,
+        r.drawn_triangles - r.drawn_surface_triangles
+    );
     assert_ne!(
         oblique, pixels,
         "pitch must change the real terrain projection"

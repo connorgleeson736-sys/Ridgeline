@@ -77,6 +77,8 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
                     if (source in wanted&&!resident(source)) upload(source,data)
                 }
             } catch (e: Exception) {
+                if (!dead && context.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE != 0)
+                    android.util.Log.w("RidgelineSource","Load failed: ${e.javaClass.simpleName}; cause=${e.cause?.javaClass?.simpleName}")
                 if (!dead && source in wanted) view.post { view.onStatus("Terrain load failed: " +
                     (if (e is TileHttpException) "provider HTTP ${e.code}" else "source unavailable")) }
             } finally { jobs.remove(source, this) }

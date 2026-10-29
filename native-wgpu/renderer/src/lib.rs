@@ -42,12 +42,11 @@ pub struct Renderer {
     sampler: wgpu::Sampler,
     mipmaps: mipmaps::Mipmaps,
     indices: wgpu::Buffer,
-    index_count: u32,
     instances: wgpu::Buffer,
     tiles: HashMap<TileId, Tile>,
     images: HashMap<TileId, ImageTile>,
     draws: Vec<ridgeline_core::surface::SurfacePatch>,
-    index_ranges: HashMap<ridgeline_core::surface::GridRect, (u32, u32)>,
+    index_ranges: HashMap<(ridgeline_core::surface::GridRect, u8), (u32, u32)>,
     index_next: u32,
     geometry_budget: usize,
     depth: wgpu::Texture,
@@ -74,6 +73,17 @@ impl Renderer {
         width: u32,
         height: u32,
     ) -> Result<Self, String> {
+        Self::new_with_mipmap_mode(instance, surface, requested_format, width, height, false).await
+    }
+    /// The render path is also exposed for exact backend comparison on the host.
+    pub async fn new_with_mipmap_mode(
+        instance: &wgpu::Instance,
+        surface: Option<&wgpu::Surface<'_>>,
+        requested_format: Option<wgpu::TextureFormat>,
+        width: u32,
+        height: u32,
+        force_render_mips: bool,
+    ) -> Result<Self, String> {
         let adapter = instance
             .request_adapter(&wgpu::RequestAdapterOptions {
                 power_preference: wgpu::PowerPreference::HighPerformance,
@@ -95,7 +105,10 @@ impl Renderer {
                 .unwrap_or(formats[0])
         });
         let (device, queue) = adapter
-            .request_device(&wgpu::DeviceDescriptor::default())
+            .request_device(&wgpu::DeviceDescriptor {
+                required_limits: adapter.limits(),
+                ..Default::default()
+            })
             .await
             .map_err(|e| e.to_string())?;
         let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
@@ -181,7 +194,7 @@ impl Renderer {
             mipmap_filter: wgpu::MipmapFilterMode::Linear,
             ..Default::default()
         });
-        let mipmaps = mipmaps::Mipmaps::new(&device);
+        let mipmaps = mipmaps::Mipmaps::new(&device, force_render_mips);
         let idx = ridgeline_core::surface::GridRect {
             x0: 0,
             y0: 0,
@@ -198,12 +211,15 @@ impl Renderer {
         queue.write_buffer(&indices, 0, bytemuck::cast_slice(&idx));
         let mut index_ranges = HashMap::new();
         index_ranges.insert(
-            ridgeline_core::surface::GridRect {
-                x0: 0,
-                y0: 0,
-                x1: 128,
-                y1: 128,
-            },
+            (
+                ridgeline_core::surface::GridRect {
+                    x0: 0,
+                    y0: 0,
+                    x1: 128,
+                    y1: 128,
+                },
+                15,
+            ),
             (0, idx.len() as u32),
         );
         let instances = device.create_buffer(&wgpu::BufferDescriptor {
@@ -228,7 +244,6 @@ impl Renderer {
             sampler,
             mipmaps,
             indices,
-            index_count: idx.len() as u32,
             instances,
             tiles: HashMap::new(),
             images: HashMap::new(),
@@ -267,6 +282,18 @@ impl Renderer {
             usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
             view_formats: &[],
         })
+    }
+    /// Bounded index memory; pressure uses exact per-frame indices, never a coarser mesh.
+    pub fn set_index_cache_budget(&mut self, bytes: u64) {
+        let bytes = bytes.clamp(24, 9 * 128 * 128 * 6 * 4) / 4 * 4;
+        self.indices = self.device.create_buffer(&wgpu::BufferDescriptor {
+            label: Some("bounded terrain index atlas"),
+            size: bytes,
+            usage: wgpu::BufferUsages::INDEX | wgpu::BufferUsages::COPY_DST,
+            mapped_at_creation: false,
+        });
+        self.index_ranges.clear();
+        self.index_next = 0;
     }
     pub fn resize(&mut self, w: u32, h: u32) {
         self.width = w.max(1);
@@ -362,7 +389,7 @@ impl Renderer {
             format: wgpu::TextureFormat::Rgba8Unorm,
             usage: wgpu::TextureUsages::TEXTURE_BINDING
                 | wgpu::TextureUsages::COPY_DST
-                | wgpu::TextureUsages::STORAGE_BINDING,
+                | self.mipmaps.destination_usage(),
             view_formats: &[],
         });
         self.queue.write_texture(
@@ -790,14 +817,32 @@ impl Renderer {
         }
         let rects: Vec<_> = rows
             .iter()
-            .map(|row| ridgeline_core::surface::GridRect::for_region(row.geometry, row.region))
+            .map(|row| {
+                (
+                    ridgeline_core::surface::GridRect::for_region(row.geometry, row.region),
+                    ridgeline_core::surface::skirt_edges(row.geometry_region, row.region),
+                )
+            })
             .collect();
+        let unique: HashSet<_> = rects.iter().copied().collect();
+        let missing: u32 = unique
+            .iter()
+            .filter(|key| !self.index_ranges.contains_key(key))
+            .map(|(r, m)| r.index_count(*m))
+            .sum();
+        let capacity = (self.indices.size() / 4) as u32;
+        if self.index_next + missing > capacity {
+            // Retire stale ranges, not geometry quality, when the bounded atlas fills.
+            self.index_ranges.clear();
+            self.index_next = 0;
+        }
+        let mut overflow = HashMap::new();
         for rect in &rects {
-            if !self.index_ranges.contains_key(rect) {
-                let ids = rect.indices_with_skirts();
+            if !self.index_ranges.contains_key(rect) && !overflow.contains_key(rect) {
+                let ids = rect.0.indices_with_skirt_edges(rect.1);
                 let start = self.index_next;
                 let end = start + ids.len() as u32;
-                if end <= 9 * 128 * 128 * 6 {
+                if end <= capacity {
                     self.queue.write_buffer(
                         &self.indices,
                         start as u64 * 4,
@@ -805,19 +850,30 @@ impl Renderer {
                     );
                     self.index_ranges.insert(*rect, (start, end));
                     self.index_next = end;
+                } else {
+                    // A single frame may exceed the atlas: retain its exact indices.
+                    // Buffers live through this submission and are bounded by visible cover.
+                    let buffer =
+                        self.device
+                            .create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                                label: Some("exact visible index overflow"),
+                                contents: bytemuck::cast_slice(&ids),
+                                usage: wgpu::BufferUsages::INDEX,
+                            });
+                    overflow.insert(*rect, buffer);
                 }
             }
         }
         self.drawn_surface_triangles = rects
             .iter()
-            .map(|r| (r.x1 - r.x0) as u32 * (r.y1 - r.y0) as u32 * 2)
+            .map(|(r, _)| (r.x1 - r.x0) as u32 * (r.y1 - r.y0) as u32 * 2)
             .sum();
         self.drawn_triangles = rects
             .iter()
             .map(|rect| {
                 self.index_ranges
                     .get(rect)
-                    .map_or(self.index_count, |(a, b)| b - a)
+                    .map_or_else(|| (overflow[rect].size() / 4) as u32, |(a, b)| b - a)
                     / 3
             })
             .sum();
@@ -855,6 +911,7 @@ impl Renderer {
             pass.set_pipeline(&self.pipeline);
             pass.set_bind_group(0, &self.scene_bind, &[]);
             pass.set_index_buffer(self.indices.slice(..), wgpu::IndexFormat::Uint32);
+            let mut atlas_bound = true;
             for (i, row) in rows.iter().enumerate() {
                 let tile = &self.tiles[&row.geometry];
                 pass.set_bind_group(1, &self.images[&row.image].bind, &[]);
@@ -863,12 +920,18 @@ impl Renderer {
                     1,
                     self.instances.slice((i * 48) as u64..((i + 1) * 48) as u64),
                 );
-                let (start, end) = self
-                    .index_ranges
-                    .get(&rects[i])
-                    .copied()
-                    .unwrap_or((0, self.index_count));
-                pass.draw_indexed(start..end, 0, 0..1);
+                if let Some(&(start, end)) = self.index_ranges.get(&rects[i]) {
+                    if !atlas_bound {
+                        pass.set_index_buffer(self.indices.slice(..), wgpu::IndexFormat::Uint32);
+                        atlas_bound = true;
+                    }
+                    pass.draw_indexed(start..end, 0, 0..1);
+                } else {
+                    let buffer = &overflow[&rects[i]];
+                    pass.set_index_buffer(buffer.slice(..), wgpu::IndexFormat::Uint32);
+                    atlas_bound = false;
+                    pass.draw_indexed(0..(buffer.size() / 4) as u32, 0, 0..1);
+                }
             }
         }
         self.queue.submit([encoder.finish()]);

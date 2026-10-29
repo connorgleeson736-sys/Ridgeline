@@ -3,6 +3,8 @@ use crate::{TileId, resident_cover};
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct SurfacePatch {
     pub geometry: TileId,
+    /// Visible geometry ownership before photographic subdivision.
+    pub geometry_region: TileId,
     pub image: TileId,
     pub region: TileId,
 }
@@ -11,6 +13,7 @@ pub fn surface_cover(geometry: &[TileId], images: &[TileId]) -> Vec<SurfacePatch
     let photos = resident_cover(images);
     let mut out = Vec::new();
     for g in &ground {
+        let first = out.len();
         for i in &photos {
             let region = if g.region.contains(i.region) {
                 i.region
@@ -21,9 +24,21 @@ pub fn surface_cover(geometry: &[TileId], images: &[TileId]) -> Vec<SurfacePatch
             };
             out.push(SurfacePatch {
                 geometry: g.source,
+                geometry_region: g.region,
                 image: i.source,
                 region,
             });
+        }
+        // Omit photographic interior walls only for a complete image cover.
+        // Missing imagery must retain the old exposed-boundary curtains.
+        let area = |id: TileId| {
+            let b = id.bounds();
+            (b[2] - b[0]) * (b[3] - b[1])
+        };
+        if out[first..].iter().map(|row| area(row.region)).sum::<f64>() != area(g.region) {
+            for row in &mut out[first..] {
+                row.geometry_region = row.region;
+            }
         }
     }
     out
@@ -51,31 +66,51 @@ impl GridRect {
     /// A second copy of the grid is lowered by the vertex shader. Boundary quads
     /// close the selected source subrectangle without changing surface samples.
     pub fn indices_with_skirts(self) -> Vec<u32> {
+        self.indices_with_skirt_edges(15)
+    }
+    /// Edge bits: left1, right2, top4, bottom8. Photos never create geometry gaps.
+    pub fn index_count(self, mask: u8) -> u32 {
+        let w = (self.x1 - self.x0) as u32;
+        let h = (self.y1 - self.y0) as u32;
+        w * h * 6
+            + (u32::from(mask & 4 != 0) + u32::from(mask & 8 != 0)) * w * 6
+            + (u32::from(mask & 1 != 0) + u32::from(mask & 2 != 0)) * h * 6
+    }
+    pub fn indices_with_skirt_edges(self, mask: u8) -> Vec<u32> {
         let mut ids = self.indices();
+        ids.reserve(self.index_count(mask) as usize - ids.len());
         let mut edge = |a: u32, b: u32| {
             let lower_a = a + 129 * 129;
             let lower_b = b + 129 * 129;
             ids.extend([a, lower_a, b, b, lower_a, lower_b]);
         };
         for x in self.x0..self.x1 {
-            edge(
-                self.y0 as u32 * 129 + x as u32,
-                self.y0 as u32 * 129 + x as u32 + 1,
-            );
-            edge(
-                self.y1 as u32 * 129 + x as u32 + 1,
-                self.y1 as u32 * 129 + x as u32,
-            );
+            if mask & 4 != 0 {
+                edge(
+                    self.y0 as u32 * 129 + x as u32,
+                    self.y0 as u32 * 129 + x as u32 + 1,
+                );
+            }
+            if mask & 8 != 0 {
+                edge(
+                    self.y1 as u32 * 129 + x as u32 + 1,
+                    self.y1 as u32 * 129 + x as u32,
+                );
+            }
         }
         for y in self.y0..self.y1 {
-            edge(
-                (y as u32 + 1) * 129 + self.x0 as u32,
-                y as u32 * 129 + self.x0 as u32,
-            );
-            edge(
-                y as u32 * 129 + self.x1 as u32,
-                (y as u32 + 1) * 129 + self.x1 as u32,
-            );
+            if mask & 1 != 0 {
+                edge(
+                    (y as u32 + 1) * 129 + self.x0 as u32,
+                    y as u32 * 129 + self.x0 as u32,
+                );
+            }
+            if mask & 2 != 0 {
+                edge(
+                    y as u32 * 129 + self.x1 as u32,
+                    (y as u32 + 1) * 129 + self.x1 as u32,
+                );
+            }
         }
         ids
     }
@@ -213,5 +248,107 @@ mod skirt_tests {
         assert!((skirt_length(12.) - 1954.6010197300707).abs() < 1e-6);
         assert_eq!(skirt_length(-1.), skirt_length(0.));
         assert_eq!(skirt_length(13.) * 2., skirt_length(12.));
+    }
+}
+
+/// Keep skirts at terrain ownership edges; omit internal photographic boundaries.
+pub fn skirt_edges(ground: TileId, patch: TileId) -> u8 {
+    assert!(ground.contains(patch));
+    let g = ground.bounds();
+    let p = patch.bounds();
+    u8::from(p[0] == g[0])
+        | (u8::from(p[2] == g[2]) << 1)
+        | (u8::from(p[1] == g[1]) << 2)
+        | (u8::from(p[3] == g[3]) << 3)
+}
+#[cfg(test)]
+mod photographic_edge_tests {
+    use super::*;
+    #[test]
+    fn independent_photos_keep_every_surface_triangle_and_only_outer_skirts() {
+        let p = TileId {
+            z: 11,
+            x: 1991,
+            y: 1300,
+        };
+        let rows = surface_cover(&[p], &p.children());
+        let mut surfaces = Vec::new();
+        let mut skirt_indices = 0;
+        for row in rows {
+            assert_eq!(row.geometry_region, p);
+            let rect = GridRect::for_region(row.geometry, row.region);
+            let mask = skirt_edges(row.geometry_region, row.region);
+            assert_eq!(mask.count_ones(), 2);
+            let base = rect.indices();
+            let with_skirts = rect.indices_with_skirt_edges(mask);
+            assert_eq!(&with_skirts[..base.len()], base);
+            skirt_indices += with_skirts.len() - base.len();
+            surfaces.extend(base);
+        }
+        surfaces.sort();
+        let mut original = GridRect {
+            x0: 0,
+            y0: 0,
+            x1: 128,
+            y1: 128,
+        }
+        .indices();
+        original.sort();
+        assert_eq!(surfaces, original);
+        assert_eq!(skirt_indices, 512 * 6);
+    }
+    #[test]
+    fn terrain_refinement_and_missing_photos_preserve_ownership_boundary_walls() {
+        let p = TileId {
+            z: 11,
+            x: 1991,
+            y: 1300,
+        };
+        let child = p.children()[1];
+        let rows = surface_cover(&[p, child], &[p]);
+        assert_eq!(rows.len(), 4);
+        for row in rows {
+            assert_eq!(row.geometry_region, row.region);
+            assert_eq!(skirt_edges(row.geometry_region, row.region), 15);
+        }
+        let rows = surface_cover(&[p], &[child]);
+        assert_eq!(rows.len(), 1);
+        assert_eq!(rows[0].geometry_region, child);
+        assert_eq!(skirt_edges(rows[0].geometry_region, child), 15); // Missing photos retain exposed walls.
+    }
+}
+
+#[cfg(test)]
+mod index_budget_tests {
+    use super::*;
+    #[test]
+    fn exact_index_sizes_hold_for_all_edge_masks() {
+        for r in [
+            GridRect {
+                x0: 0,
+                y0: 0,
+                x1: 128,
+                y1: 128,
+            },
+            GridRect {
+                x0: 32,
+                y0: 16,
+                x1: 64,
+                y1: 48,
+            },
+            GridRect {
+                x0: 127,
+                y0: 3,
+                x1: 128,
+                y1: 4,
+            },
+        ] {
+            for mask in 0..16 {
+                assert_eq!(
+                    r.index_count(mask) as usize,
+                    r.indices_with_skirt_edges(mask).len()
+                );
+            }
+        }
     }
 }

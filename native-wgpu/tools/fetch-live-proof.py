@@ -7,6 +7,7 @@ from PIL import Image
 
 p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('output', type=pathlib.Path)
+p.add_argument('--child-images', action='store_true', help='Fetch four full-resolution child photos for independent-LOD validation')
 a = p.parse_args()
 a.output.mkdir(parents=True, exist_ok=True)
 root = pathlib.Path(__file__).resolve().parents[2]
@@ -15,9 +16,9 @@ z = 11
 x = int((170.1418 + 180) / 360 * 2**z)
 y = int((1-math.asinh(math.tan(math.radians(-43.595)))/math.pi)/2*2**z)
 records = []
-def fetch(kind, xx, yy):
+def fetch(kind, xx, yy, zoom=z):
     ext = 'png' if kind == 'elevation' else 'webp'
-    url = f'https://basemaps.linz.govt.nz/v1/tiles/{kind}/WebMercatorQuad/{z}/{xx}/{yy}.{ext}?'
+    url = f'https://basemaps.linz.govt.nz/v1/tiles/{kind}/WebMercatorQuad/{zoom}/{xx}/{yy}.{ext}?'
     url += ('pipeline=terrain-rgb&' if kind == 'elevation' else '') + 'api=' + key
     # Do not propagate exception URLs containing the public client key.
     try:
@@ -25,10 +26,10 @@ def fetch(kind, xx, yy):
             assert r.status == 200
             data = r.read()
     except Exception as e:
-        raise SystemExit(f'{kind} {z}/{xx}/{yy}: {type(e).__name__}, status {getattr(e,"code",None)}') from None
+        raise SystemExit(f'{kind} {zoom}/{xx}/{yy}: {type(e).__name__}, status {getattr(e,"code",None)}') from None
     im = Image.open(io.BytesIO(data)).convert('RGBA')
     assert im.size == (256, 256)
-    name = f'{kind}-{z}-{xx}-{yy}.{ext}'
+    name = f'{kind}-{zoom}-{xx}-{yy}.{ext}'
     (a.output/name).write_bytes(data)
     records.append(dict(file=name, bytes=len(data), sha256=hashlib.sha256(data).hexdigest()))
     return im
@@ -54,7 +55,11 @@ for i,m in enumerate(meshes):
     (a.output/f'tile{i}.heights').write_bytes(struct.pack('<'+'f'*len(m),*m))
     image = fetch('aerial',x+i,y)
     (a.output/f'tile{i}.rgba').write_bytes(image.tobytes())
-report=dict(provider='basemaps.linz.govt.nz',z=z,x=x,y=y,sharedEdgeSamples=129,
+if a.child_images:
+    for i in range(4):
+        image=fetch('aerial',x*2+i%2,y*2+i//2,z+1)
+        (a.output/f'child{i}.rgba').write_bytes(image.tobytes())
+report=dict(independentChildPhotos=a.child_images,provider='basemaps.linz.govt.nz',z=z,x=x,y=y,sharedEdgeSamples=129,
             sharedEdgeMaxErrorMetres=0,minimumMetres=min(map(min,meshes)),maximumMetres=max(map(max,meshes)),
             imagerySize=[256,256],records=records,
             limitation='Host fixture preparation; Android loader execution, cross-LOD stitching and visual parity remain unverified.')

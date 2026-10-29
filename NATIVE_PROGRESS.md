@@ -572,3 +572,40 @@ No phone FPS or live-Android/visual acceptance claim: previous emulator system
 service failure remains unresolved and this checkpoint does not change that
 runtime. Next critical gate remains stable Android execution of controlled/live
 instrumentation and genuine same-camera0.18reference comparisons before full UI.
+
+## Photographic skirt removal, exact index pressure and adapter compatibility
+
+Geometry cover now retains its ownership region across photographic subdivision.
+Full image coverage shares outer geometry skirts; missing photos conservatively
+keep all exposed walls. Independent full-resolution child photos no longer add
+internal curtains to the same mesh. Genuine LINZ test: same32768surface triangles,
+skirt triangles2048->1024. Topdown capture is byte-identical. Strict repeated
+oblique comparison differs at1of65536pixels: oldwhite/newterrain color beside
+internal boundaryv=.5; CPU terrain pick at that pixel givesv=.5000111955.
+This difference is recorded explicitly in strict-pixel-comparison.json; the full
+oblique equality assertion failed and was not relaxed into a passing parity claim.
+No source resolution, height samples, mips or filtering were reduced. No0.18
+visual parity claim follows from this native-before/after fixture.
+
+Bounded index atlas now compacts stale entries under pressure; a frame that still
+exceeds it uses exact transient index buffers, not the old broader-mesh fallback.
+GPU regression forces24-byte atlas and requires pixel- and triangle-identical
+mixed-LOD output. Existing36092-pixel boundary repair, exact grade/crop/filter/
+residency checks pass. All22Rust tests and25Android tests pass, lint0errors.
+All3optimized Android ABIs rebuilt; latest Compatible-Mips APK packaging audit,
+6originalZIPs, signature and16KiB alignment pass. Artifacts remain outside Git.
+
+A clean official Android30ATD image boots and installs the complete APK, avoiding
+the previous35image's failing system services. Actual platform route SQLite/GPX
+proof passes. Initial GPU proof times out: log confirms device creation requested
+compute-workgroup limit65535while this adapter allows0. Source loading also reports
+unavailable; it is not yet diagnosed as provider authorization or TLS failure.
+Added debug-only exception-class logging without provider URLs/key values.
+
+Renderer now requests the adapter's actual limits and selects render-pass mipmap
+generation when compute is unavailable. Both paths use the exact same4texel mean,
+retain original256pxlevel0and9levels, and hardware compute remains preferred where
+available. Forced-render and compute host GPU suites pass; genuine oblique RGB
+captures match between both mipmap backends. Latest APK rebuild/reinstall and
+controlled/live instrumentation reruns are in progress; do not infer AndroidGPU
+or live-source success yet. Results will be appended after commands finish.

@@ -42,12 +42,13 @@ fn read(r: &Renderer, output: &wgpu::Texture) -> Vec<u8> {
 }
 async fn run() {
     let instance = wgpu::Instance::new(wgpu::InstanceDescriptor::new_without_display_handle());
-    let mut r = Renderer::new(
+    let mut r = Renderer::new_with_mipmap_mode(
         &instance,
         None,
         Some(wgpu::TextureFormat::Rgba8Unorm),
         256,
         256,
+        std::env::args().any(|v| v == "--render-mips"),
     )
     .await
     .expect("adapter/device");
@@ -194,8 +195,8 @@ async fn run() {
     );
     assert_eq!(
         r.drawn_triangles - r.drawn_surface_triangles,
-        2048,
-        "four child-photo boundaries have independent skirt quads"
+        1024,
+        "four full-resolution child photos share only the original geometry boundary skirts"
     );
     // A minified 1px black/white checker must sample the generated pyramid,
     // not uninitialized levels or shimmer between original individual pixels.
@@ -228,12 +229,13 @@ async fn run() {
     );
     // An intentionally discontinuous parent/child height fixture exposes a
     // vertical LOD gap. Skirts must close pixels, not merely increase indices.
-    let mut seam = Renderer::new(
+    let mut seam = Renderer::new_with_mipmap_mode(
         &instance,
         None,
         Some(wgpu::TextureFormat::Rgba8Unorm),
         256,
         256,
+        std::env::args().any(|v| v == "--render-mips"),
     )
     .await
     .unwrap();
@@ -286,6 +288,25 @@ async fn run() {
     assert!(
         repaired > 100,
         "skirts must visibly close a parent/fine boundary gap"
+    );
+    let triangles = seam.drawn_triangles;
+    seam.set_index_cache_budget(24); // Deliberately force exact overflow buffers.
+    seam.render(
+        &output.create_view(&Default::default()),
+        focus,
+        13.5,
+        90.,
+        75.,
+        1500.,
+    );
+    assert_eq!(
+        read(&seam, &output),
+        closed,
+        "index-cache pressure must not change a pixel or omit skirts"
+    );
+    assert_eq!(
+        seam.drawn_triangles, triangles,
+        "index-cache pressure must not change geometry"
     );
     // The hard budget holds during a burst of unrelated new uploads.
     r.set_tile_budget(24);
