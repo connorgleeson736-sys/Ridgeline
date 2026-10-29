@@ -32,7 +32,7 @@ class RouteLimitException:IllegalStateException("50 route limit. Delete a route 
 
 /** Call from the controller's I/O executor. Separate application-private database.
  * WAL transactions change only one route; summaries never decode unused points. */
-class RouteDatabase(context:Context,name:String="routes-v1.sqlite"):SQLiteOpenHelper(context.applicationContext,name,null,1) {
+class RouteDatabase(context:Context,name:String="routes-v1.sqlite"):SQLiteOpenHelper(context.applicationContext,name,null,1),RouteStorage {
     init {setWriteAheadLoggingEnabled(true)}
     override fun onConfigure(db:SQLiteDatabase){db.execSQL("PRAGMA synchronous=FULL")}
     override fun onCreate(db:SQLiteDatabase) {
@@ -49,11 +49,11 @@ class RouteDatabase(context:Context,name:String="routes-v1.sqlite"):SQLiteOpenHe
     override fun onUpgrade(db:SQLiteDatabase,oldVersion:Int,newVersion:Int){error("Explicit route schema migration required")}
     private val summaryColumns=arrayOf("id","name","point_count","length_m","updated")
     private fun summary(cursor:android.database.Cursor)=RouteSummary(cursor.getString(0),cursor.getString(1),cursor.getInt(2),cursor.getDouble(3),cursor.getLong(4))
-    fun summaries():List<RouteSummary> = readableDatabase.query("routes",summaryColumns,null,null,null,null,"seq DESC").use { c ->buildList{while(c.moveToNext())add(summary(c))} }
-    fun load(id:String):SavedRoute? = readableDatabase.query("routes",summaryColumns+"coords","id=?",arrayOf(id),null,null,null).use { c ->
+    override fun summaries():List<RouteSummary> = readableDatabase.query("routes",summaryColumns,null,null,null,null,"seq DESC").use { c ->buildList{while(c.moveToNext())add(summary(c))} }
+    override fun load(id:String):SavedRoute? = readableDatabase.query("routes",summaryColumns+"coords","id=?",arrayOf(id),null,null,null).use { c ->
         if(!c.moveToFirst())null else {val metadata=summary(c);val points=RouteBlob.decode(c.getBlob(5));check(metadata.pointCount==points.size);SavedRoute(metadata,points)}
     }
-    @Synchronized fun save(id:String?,name:String,points:List<Coordinate>,now:Long=System.currentTimeMillis()):RouteSummary {
+    @Synchronized override fun save(id:String?,name:String,points:List<Coordinate>,now:Long):RouteSummary {
         val data=RouteBlob.encode(points)
         val title=name.trim().ifEmpty{"Untitled route"}.take(80)
         val db=writableDatabase;db.beginTransaction()
@@ -68,9 +68,9 @@ class RouteDatabase(context:Context,name:String="routes-v1.sqlite"):SQLiteOpenHe
             return RouteSummary(key,title,points.size,length,now)
         }finally {db.endTransaction()}
     }
-    @Synchronized fun delete(id:String):Boolean = writableDatabase.delete("routes","id=?",arrayOf(id))==1
-    @Synchronized fun rename(id:String,name:String,now:Long=System.currentTimeMillis()):Boolean {
-        val title=name.trim().take(80);require(title.isNotEmpty()){"Enter a route name"}
+    @Synchronized override fun delete(id:String):Boolean = writableDatabase.delete("routes","id=?",arrayOf(id))==1
+    @Synchronized override fun rename(id:String,name:String,now:Long):Boolean {
+        val title=name.trim();require(title.isNotEmpty()&&title.length<=80){"Use a route name of 1–80 characters."}
         return writableDatabase.update("routes",ContentValues().apply{put("name",title);put("updated",now)},"id=?",arrayOf(id))==1
     }
 }

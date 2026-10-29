@@ -274,3 +274,37 @@ visual gates. Confirm network status when user replies, fetch actual LINZ DEM an
 same-camera reference captures, complete cross-LOD terrain/gesture parity. Rebuild
 latest ARM release-equivalent debug APK and verify literal6ZIPs/signature/alignment
 before final release. Current prototype remains feature-incomplete.
+
+## Autosave session controller and stalled environment publishing
+
+Added RouteStorage interface and serial background RouteController. Stable IDs
+prevent duplicate new records when editing overtakes a save;400ms name debounce,
+immediate geometry commits, no writes for drag previews, one undo per drag,
+save-failure navigation gating, explicit retry, route open/unload/delete/rename/
+combine and opened-route state are implemented as backend session operations.
+Native UI binding remains the exact next feature step. Four concurrent/controller
+regressions pass: editing during first save creates one latest row; failed save
+blocks navigation and retry preserves edits; drag preview avoids disk writes;
+deleting one route at the50-record limit retries the current unsaved route.
+All16Android host unit tests and lint pass. Controller is not yet included in an
+emulator integration run; preceding vsync/data proof remains the actual platform
+result, not a claim about unimplemented UI.
+
+Further current-Capacitor audit: build-web.mjs injects authoritative mobile route
+open/unload/delete/rename/combine APIs (not just public/app.js). mobile.css reserves
+map height for snapped native-equivalent sheets; mobile.js also includes page-size
+region selection, topo-only downloads, PDF options/magnetic declination and saved
+region sidebar. These are in full feature parity scope. Do not silently omit them.
+
+User reported environment publishing has been loading for hours. Checked current
+runtime and saved draft: running/current spec revision1, no failure, no custom
+allowed hosts; draftrevision3 is saved with required7hosts. Diagnostic metadata
+history_status=not_found/records=[], no publish job or restart control exposed.
+Explained this is an unapplied publish, with no evidence of root cause; advised
+reloading settings/retrying once and platform support if still hung. Continuing
+independent work. Preserve source checkpoint before any environment restart.
+
+Exact next step: push this tested checkpoint; bind RouteController to native
+planner/sidebar/sheet/profile UI and terrain overlay interactions. Continue
+remaining rendering/gesture/real-DEM parity gates when networking is available.
+Do not claim the whole application, speedup or physical phone validation complete.
