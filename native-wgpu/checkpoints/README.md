@@ -1,4 +1,13 @@
-# Native Android checkpoint — incomplete prototype
+# Native Android checkpoints — incomplete prototypes
+
+Latest smaller build: [Ridgeline-Native-Base-a585548.apk](Ridgeline-Native-Base-a585548.apk).
+Source checkpoint `a585548`; signed debug APK, approximately36MB, all three ABIs.
+Omits the six large overview ZIPs; retains67coarse overview images and original
+imagery resolution/terrain policy. Detailed imagery and DEM require network.
+It contains the newer center-grounding code (28unit tests pass); Android execution
+of that new grounding behavior remains pending. No session CA is included.
+
+The older Full checkpoint below retains all six original packs.
 
 [Ridgeline-Native-Checkpoint-5c6d05b.apk](Ridgeline-Native-Checkpoint-5c6d05b.apk)
 is the normal signed debug build from source checkpoint `5c6d05b`.

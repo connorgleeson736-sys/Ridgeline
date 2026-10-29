@@ -741,3 +741,17 @@ mapping/LOD still differs; do not force a captured height, lower a source ceilin
 or claim full camera/terrain parity from the interpolation unit test. Next: finish
 new grounded Android proof, then port/verify exact geometry-to-DEM ownership and
 LOD policy with genuine multi-zoom captures before opening full UI migration.
+
+
+## User-requested smaller APK checkpoint
+
+Built normal Base APK from a585548 using existing RIDGELINE_BUNDLE_OVERVIEWS=0,
+without the six large overview packs. This changes bundled availability only:
+67coarse images remain; full256pxnetwork imagery, DEM detail, source ceilings,
+all3optimizednativeABIs and camera code match the latest normal Full build.
+Empty archive index makes NativeImagery use the existing network path. Signature,
+pack absence and native-library equality checked once; no unrelated test reruns.
+Normal trust only, no session CA. APK/checksum are in native-wgpu/checkpoints;
+previous Full checkpoint and all6original source ZIPs remain intact. User asked
+to focus on implementation with fewer repeated checks. Continuing terrain source
+ownership correction; latest Android grounding execution still pending.
