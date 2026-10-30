@@ -7,9 +7,40 @@ import kotlin.math.*
 
 class OfflineUi(private val activity:Activity,root:FrameLayout,private val terrain:TerrainView,private val loader:TileLoader){
     private var downloading=false
+    private var attaching=false
+    private val attachRequest=4301
+    private fun addImagery(){
+        if(attaching){Toast.makeText(activity,"Imagery attachment is still being checked.",Toast.LENGTH_SHORT).show();return}
+        val intent=android.content.Intent(android.content.Intent.ACTION_OPEN_DOCUMENT).apply{
+            addCategory(android.content.Intent.CATEGORY_OPENABLE);type="*/*"
+            putExtra(android.content.Intent.EXTRA_MIME_TYPES,arrayOf("application/zip","application/x-zip-compressed","application/octet-stream"))
+            putExtra(android.content.Intent.EXTRA_ALLOW_MULTIPLE,true)
+            addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION or android.content.Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+        }
+        runCatching{activity.startActivityForResult(intent,attachRequest)}.onFailure{Toast.makeText(activity,"No file picker is available.",Toast.LENGTH_LONG).show()}
+    }
+    fun result(request:Int,result:Int,data:android.content.Intent?){
+        if(request!=attachRequest||result!=Activity.RESULT_OK||data==null)return
+        val uris=if(data.clipData!=null)(0 until data.clipData!!.itemCount).map{data.clipData!!.getItemAt(it).uri}else listOfNotNull(data.data)
+        val selected=uris.distinct().take(6);if(selected.isEmpty())return
+        attaching=true
+        val progress=TextView(activity).apply{setPadding(dp(16),dp(12),dp(16),dp(12))}
+        val dialog=AlertDialog.Builder(activity).setTitle("Add imagery").setView(progress).create().apply{setCancelable(false);show()}
+        var complete=0;val errors=ArrayList<String>()
+        fun next(){
+            if(complete==selected.size){attaching=false;dialog.dismiss();Toast.makeText(activity,if(errors.isEmpty())"Imagery attached · ${loader.overviews.list().size}/6 packs"else errors.distinct().joinToString("\n"),Toast.LENGTH_LONG).show();show();return}
+            progress.text="Checking ZIP ${complete+1}/${selected.size}…\nOriginal files stay at their selected location."
+            val uri=selected[complete]
+            try{activity.contentResolver.takePersistableUriPermission(uri,android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)}catch(_:SecurityException){errors.add("Choose ZIPs stored in Files or Downloads so Ridgeline can retain access.");complete++;next();return}
+            loader.attachOverview(uri){error->
+                if(error!=null){errors.add(error);if(loader.overviews.list().none{it.uri==uri.toString()})runCatching{activity.contentResolver.releasePersistableUriPermission(uri,android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)}}
+                complete++;next()
+            }
+        };next()
+    }
     private fun dp(value:Int)=(value*activity.resources.displayMetrics.density+.5f).toInt()
     private fun button(label:String,action:()->Unit)=Button(activity).apply{text=label;textSize=12f;setOnClickListener{action()}}
-    init{root.addView(button("Offline"){show()},FrameLayout.LayoutParams(-2,dp(48),Gravity.TOP or Gravity.START).apply{leftMargin=dp(12);topMargin=dp(114)})}
+    init{root.addView(button("Offline / imagery"){show()},FrameLayout.LayoutParams(-2,dp(48),Gravity.TOP or Gravity.START).apply{leftMargin=dp(12);topMargin=dp(114)})}
     private fun show(){
         val content=LinearLayout(activity).apply{orientation=LinearLayout.VERTICAL;setPadding(dp(12),dp(8),dp(12),dp(8))}
         val list=LinearLayout(activity).apply{orientation=LinearLayout.VERTICAL}
@@ -17,6 +48,9 @@ class OfflineUi(private val activity:Activity,root:FrameLayout,private val terra
         val dialog=AlertDialog.Builder(activity).setTitle("Offline maps").setView(ScrollView(activity).apply{addView(content)}).setNegativeButton("Close",null).create()
         content.addView(TextView(activity).apply{text="Automatic cache: up to ${loader.automaticCacheBytes/1_000_000} MB, adjusted for free storage. Saved regions are kept separately.";textSize=12f})
         content.addView(CheckBox(activity).apply{text="Offline only";isChecked=loader.offlineOnly;setOnCheckedChangeListener{_,checked->loader.offlineOnly(checked)}})
+        content.addView(button("Add imagery ZIPs"){dialog.dismiss();addImagery()})
+        content.addView(TextView(activity).apply{text="Overview imagery: ${loader.overviews.list().size}/6 packs attached. Keep the ZIPs at their selected location. Overviews contain imagery; terrain needs a connection or a saved region.";textSize=12f})
+        for(pack in loader.overviews.list())content.addView(button("Detach ${pack.name}"){loader.detachOverview(pack.payload){dialog.dismiss();show()}})
         content.addView(TextView(activity).apply{text="Saved regions include imagery and terrain. Saved data stays on this device until you delete it.";textSize=12f})
         content.addView(button("Download around map center"){if(downloading)Toast.makeText(activity,"A region is already downloading.",Toast.LENGTH_SHORT).show()else{dialog.dismiss();newRegion()}})
         if(downloading)content.addView(button("Cancel current download"){loader.cancelDownload()})

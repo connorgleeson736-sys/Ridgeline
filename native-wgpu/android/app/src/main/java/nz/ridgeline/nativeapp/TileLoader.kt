@@ -44,7 +44,14 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private val preferences=context.getSharedPreferences("display",0)
     @Volatile var offlineOnly=preferences.getBoolean("offlineOnly",false);private set
     fun offlineOnly(value:Boolean){offlineOnly=value;preferences.edit().putBoolean("offlineOnly",value).apply();cameraChanged()}
-    private val imagery = NativeImagery(context, ::fetch) { z, x, y -> linz("aerial", Id(z, x, y), "webp") }
+    val overviews=OverviewAttachments(context)
+    private val attachmentJobs=Executors.newSingleThreadExecutor()
+    private val imagery = NativeImagery(context, ::fetch, {z,x,y->linz("aerial",Id(z,x,y),"webp")},overviews)
+    fun attachOverview(uri:android.net.Uri,done:(String?)->Unit){attachmentJobs.execute{
+        val error=try{overviews.attach(uri);failures.clear();cameraChanged();null}catch(e:Exception){e.message?:"Could not attach imagery ZIP."}
+        view.post{if(!dead)done(error)}
+    }}
+    fun detachOverview(payload:String,done:()->Unit){attachmentJobs.execute{overviews.detach(payload);view.post{if(!dead)done()}}}
     private val am = context.getSystemService(ActivityManager::class.java)
     private val imageLimit = if (am.isLowRamDevice) 32 else (am.memoryClass / 2).coerceIn(64, 128)
     private val geometryLimit = (imageLimit/2).coerceIn(16,96)
@@ -308,8 +315,8 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     }
     fun setActive(value:Boolean){active=value;if(value)cameraChanged()}
     fun close() {
-        dead = true;downloadCancel.set(true);downloadJobs.shutdown(); profileRevision.incrementAndGet();profileJob?.cancel(true);profileJobs.shutdownNow();timer?.cancel(true); scheduler.shutdownNow(); geometryWorkers.shutdownNow();imageWorkers.shutdownNow()
+        dead = true;attachmentJobs.shutdown();downloadCancel.set(true);downloadJobs.shutdown(); profileRevision.incrementAndGet();profileJob?.cancel(true);profileJobs.shutdownNow();timer?.cancel(true); scheduler.shutdownNow(); geometryWorkers.shutdownNow();imageWorkers.shutdownNow()
         client.dispatcher.cancelAll(); client.connectionPool.evictAll(); client.cache?.close(); client.dispatcher.executorService.shutdown(); synchronized(ready) { ready.clear(); readyBytes=0 }; synchronized(decoded) { decoded.clear() }
-        Thread({downloadJobs.awaitTermination(60,TimeUnit.SECONDS);profileJobs.awaitTermination(60,TimeUnit.SECONDS);geometryWorkers.awaitTermination(60,TimeUnit.SECONDS);imageWorkers.awaitTermination(60,TimeUnit.SECONDS);offline.close()},"ridgeline-offline-close").start()
+        Thread({downloadJobs.awaitTermination(60,TimeUnit.SECONDS);profileJobs.awaitTermination(60,TimeUnit.SECONDS);geometryWorkers.awaitTermination(60,TimeUnit.SECONDS);imageWorkers.awaitTermination(60,TimeUnit.SECONDS);attachmentJobs.awaitTermination(60,TimeUnit.SECONDS);overviews.close();offline.close()},"ridgeline-offline-close").start()
     }
 }

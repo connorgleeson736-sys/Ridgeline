@@ -11,3 +11,6 @@
 
 /artifacts/
 /android/.kotlin/
+
+/android/app/src/main/assets/licenses/
+/android/app/src/main/assets/overview-archives.json

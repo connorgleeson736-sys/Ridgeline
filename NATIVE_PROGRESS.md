@@ -957,3 +957,18 @@ No fullemulator/lint/testloops repeated; no phoneperformance claim. Preserve
 performance-first choices whencontinuing: matchbehavior, avoidunusedMapLibre
 infrastructure; improve actualterrain-awareselection/idlecamera re-solve only
 wherevisiblebenefit orprofilingjustifiescost. ExistingCapacitorapp untouched.
+
+
+## In-place overview ZIP attachments
+
+Userrequested Addimagery inthenextAPK, choseattach-existingfiles withoutcopies,
+anddelegatedadaptive/performancepolicy. NativeOffline/imagerymenu nowhas Addimagery
+ZIPs usingAndroidSAFmulti-select,persistedreadaccess,backgroundwholeZIPhash+size
+validationagainstthe6originalmanifest,payloadheadervalidation,anddirectpositional
+readsfromoneSTORED.binentry. Noextraction,resampling,duplicatepackstorage orfile
+modification. Attachedpacks surviveapprestartandbypassnetwork forcatalogtiles;
+unavailable/revokedattachments useexistingnetwork/bundledsourcefallback. Detach
+releasesaccess/handleswithoutdeletingphonefiles. Coarse67bundledimages andoriginal
+sixpacks preserved. Assetpackaging includesoriginalarchiveidentitymanifest and
+ignoresgeneratedlicense/manifestassets. Kotlincompilepasses; nativefilepicker/
+persistedURIexecution stillneedsAndroidruntimeacceptance. Nextbuildmustincludethis.

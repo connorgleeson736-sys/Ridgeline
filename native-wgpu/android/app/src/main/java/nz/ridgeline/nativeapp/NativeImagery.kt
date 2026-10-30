@@ -21,6 +21,7 @@ class NativeImagery(
     private val context: Context,
     private val fetch: (String) -> ByteArray,
     private val linz: (Int, Int, Int) -> String,
+    private val attachments:OverviewAttachments?=null,
 ) {
     private class FineTransportFailure(cause:java.io.IOException):java.io.IOException(cause)
     private val catalog by lazy { json("overview-index.json") }
@@ -45,6 +46,7 @@ class NativeImagery(
         val row=entry.optJSONObject("natural") ?: entry
         val file=row.getString("file"); val offset=row.getLong("offset"); val length=row.getInt("bytes")
         require(file.matches(Regex("[a-f0-9]{64}")) && offset>=0 && length in 20..1048576)
+        attachments?.read(file,offset,length)?.let{return it}
         val archive=catalog.getJSONObject("archives").optJSONObject(file) ?: return null
         val base=archive.getLong("offset");require(base>=0&&offset+length<=archive.getLong("bytes"))
         val descriptor=try { context.assets.openFd(archive.getString("asset")) } catch(_:FileNotFoundException) { return null }

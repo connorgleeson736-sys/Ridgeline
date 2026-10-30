@@ -17,6 +17,7 @@ class MainActivity:Activity(){
     private lateinit var loader:TileLoader
     private lateinit var planner:PlannerUi
     private lateinit var location:LocationUi
+    private lateinit var offlineUi:OfflineUi
     private fun dp(value:Int)=(value*resources.displayMetrics.density+.5f).toInt()
     override fun onCreate(state:Bundle?){
         super.onCreate(state)
@@ -61,7 +62,7 @@ class MainActivity:Activity(){
         loader=TileLoader(this,terrain)
         terrain.onCamera={loader.cameraChanged()};terrain.onData={loader.cameraChanged()}
         planner=PlannerUi(this,root,terrain,loader)
-        OfflineUi(this,root,terrain,loader)
+        offlineUi=OfflineUi(this,root,terrain,loader)
         location=LocationUi(this,root,terrain)
         if(android.os.Build.VERSION.SDK_INT>=33)onBackInvokedDispatcher.registerOnBackInvokedCallback(android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT){if(!planner.back())finish()}
     }
@@ -69,7 +70,7 @@ class MainActivity:Activity(){
     @Deprecated("Legacy Android back dispatch")
     override fun onBackPressed(){if(!::planner.isInitialized||!planner.back())super.onBackPressed()}
     override fun onRequestPermissionsResult(request:Int,permissions:Array<out String>,grants:IntArray){super.onRequestPermissionsResult(request,permissions,grants);if(::location.isInitialized&&grants.any{it==android.content.pm.PackageManager.PERMISSION_GRANTED})location.permission(request)}
-    override fun onActivityResult(request:Int,result:Int,data:android.content.Intent?){super.onActivityResult(request,result,data);if(::planner.isInitialized)planner.result(request,result,data)}
+    override fun onActivityResult(request:Int,result:Int,data:android.content.Intent?){super.onActivityResult(request,result,data);if(::planner.isInitialized)planner.result(request,result,data);if(::offlineUi.isInitialized)offlineUi.result(request,result,data)}
     override fun onPause(){if(::location.isInitialized)location.stop();if(::planner.isInitialized)planner.pause();if(::terrain.isInitialized)terrain.setActive(false);if(::loader.isInitialized)loader.setActive(false);super.onPause()}
     override fun onDestroy(){if(::planner.isInitialized)planner.close();if(::loader.isInitialized)loader.close();if(::terrain.isInitialized)terrain.close();super.onDestroy()}
 }
