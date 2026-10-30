@@ -256,10 +256,13 @@ impl Renderer {
             x1: 128,
             y1: 128,
         }
-        .indices_with_skirts();
+        .indices_with_skirts()
+        .into_iter()
+        .map(|i| i as u16)
+        .collect::<Vec<_>>();
         let indices = device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("shared terrain subrect index atlas"),
-            size: (9 * 128 * 128 * 6 * 4) as u64,
+            size: (9 * 128 * 128 * 6 * 2) as u64,
             usage: wgpu::BufferUsages::INDEX | wgpu::BufferUsages::COPY_DST,
             mapped_at_creation: false,
         });
@@ -369,7 +372,7 @@ impl Renderer {
     }
     /// Bounded index memory; pressure uses exact per-frame indices, never a coarser mesh.
     pub fn set_index_cache_budget(&mut self, bytes: u64) {
-        let bytes = bytes.clamp(24, 9 * 128 * 128 * 6 * 4) / 4 * 4;
+        let bytes = bytes.clamp(24, 9 * 128 * 128 * 6 * 2) / 4 * 4;
         self.indices = self.device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("bounded terrain index atlas"),
             size: bytes,
@@ -1071,7 +1074,7 @@ impl Renderer {
             .filter(|key| !self.index_ranges.contains_key(key))
             .map(|(r, m, s)| r.adaptive_index_count(*s, *m))
             .sum();
-        let capacity = (self.indices.size() / 4) as u32;
+        let capacity = (self.indices.size() / 2) as u32;
         if self.index_next + missing > capacity {
             // Retire stale ranges, not geometry quality, when the bounded atlas fills.
             self.index_ranges.clear();
@@ -1080,13 +1083,18 @@ impl Renderer {
         let mut overflow = HashMap::new();
         for rect in &rects {
             if !self.index_ranges.contains_key(rect) && !overflow.contains_key(rect) {
-                let ids = rect.0.adaptive_indices(rect.2, rect.1);
+                let ids: Vec<u16> = rect
+                    .0
+                    .adaptive_indices(rect.2, rect.1)
+                    .into_iter()
+                    .map(|i| i as u16)
+                    .collect();
                 let start = self.index_next;
                 let end = start + ids.len() as u32;
                 if end <= capacity {
                     self.queue.write_buffer(
                         &self.indices,
-                        start as u64 * 4,
+                        start as u64 * 2,
                         bytemuck::cast_slice(&ids),
                     );
                     self.index_ranges.insert(*rect, (start, end));
@@ -1114,7 +1122,7 @@ impl Renderer {
             .map(|rect| {
                 self.index_ranges
                     .get(rect)
-                    .map_or_else(|| (overflow[rect].size() / 4) as u32, |(a, b)| b - a)
+                    .map_or_else(|| (overflow[rect].size() / 2) as u32, |(a, b)| b - a)
                     / 3
             })
             .sum();
@@ -1151,7 +1159,7 @@ impl Renderer {
             });
             pass.set_pipeline(&self.pipeline);
             pass.set_bind_group(0, &self.scene_bind, &[]);
-            pass.set_index_buffer(self.indices.slice(..), wgpu::IndexFormat::Uint32);
+            pass.set_index_buffer(self.indices.slice(..), wgpu::IndexFormat::Uint16);
             let mut atlas_bound = true;
             pass.set_vertex_buffer(0, self.grid.slice(..));
             pass.set_vertex_buffer(1, self.instances.slice(..));
@@ -1178,16 +1186,16 @@ impl Renderer {
                 }
                 if let Some(&(start, end)) = self.index_ranges.get(&rects[i]) {
                     if !atlas_bound {
-                        pass.set_index_buffer(self.indices.slice(..), wgpu::IndexFormat::Uint32);
+                        pass.set_index_buffer(self.indices.slice(..), wgpu::IndexFormat::Uint16);
                         atlas_bound = true;
                     }
                     pass.draw_indexed(start..end, 0, i as u32..end_instance as u32);
                 } else {
                     let buffer = &overflow[&rects[i]];
-                    pass.set_index_buffer(buffer.slice(..), wgpu::IndexFormat::Uint32);
+                    pass.set_index_buffer(buffer.slice(..), wgpu::IndexFormat::Uint16);
                     atlas_bound = false;
                     pass.draw_indexed(
-                        0..(buffer.size() / 4) as u32,
+                        0..(buffer.size() / 2) as u32,
                         0,
                         i as u32..end_instance as u32,
                     );

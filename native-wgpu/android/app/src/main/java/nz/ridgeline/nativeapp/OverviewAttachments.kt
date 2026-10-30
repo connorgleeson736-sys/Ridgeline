@@ -67,6 +67,7 @@ class OverviewAttachments(private val context:Context):AutoCloseable {
     private fun open(pack:Pack):Handle{
         handles[pack.payload]?.let{return it}
         synchronized(this){
+            check(packs[pack.payload]?.uri==pack.uri){"Imagery attachment was detached."}
             handles[pack.payload]?.let{return it}
             val descriptor=context.contentResolver.openFileDescriptor(Uri.parse(pack.uri),"r")?:error("Imagery attachment is no longer available.")
             return Handle(ParcelFileDescriptor.AutoCloseInputStream(descriptor)).also{handles[pack.payload]=it}

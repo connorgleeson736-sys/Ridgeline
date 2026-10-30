@@ -67,7 +67,10 @@ Terrain grid and instance buffers bind once per pass. Image/height bindings chan
 only when needed, and adjacent compatible patches batch into instanced draws.
 Visible-patch, instance-data and adaptive-selection scratch storage is reused.
 The source upload now transfers ownership of its height vector rather than cloning
-it into the retained CPU field. No unchanged scene/instance transfer was added.
+it into the retained CPU field. Terrain indices now use16bits: every surface/skirt
+vertex ID is below33282, so this halves index-buffer storage and index-fetch bytes
+without changing a vertex or triangle. The fixed index atlas retains the same
+index capacity in half the GPU bytes. No unchanged scene/instance transfer was added.
 
 ## Focused evidence / limits
 

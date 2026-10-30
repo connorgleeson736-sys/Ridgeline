@@ -997,3 +997,12 @@ pixels; routegeometryrestoresfull128. VulkanandGLES executechangedterrainpath;
 cachepressurefixturekeepsdemandedterrain. No phoneFPSclaim. In-placeattachment
 pickercompiles andall6originalZIPheadersmatchnativeoffsetreader. NextnormalBase
 APKmustincludeAddimagery plus thesechanges; archivesremainexternal/user-owned.
+
+
+Further exactworkremoval: terrainindices nowUint16(all33282possibleverticesfit),
+halvingindexstorage/fetchbytes withunchangedtopology andsameboundedindexcapacity.
+Vulkan/GLES GPUfixtures passafterformat/instancing/scratchchanges. No terrainheight,
+imagefiltering,mips,sourceceilings ororiginalZIPdatareduced. Sourcevectorownership
+andbinding/scratchreuse are exactworkremoval; adaptivity remains the separately
+bounded0.18visualpolicy withroutegeometryprotected. Attachmentreaderdetach race
+nowrejectsstalepackhandles. Proceeding tobuildnormalBasewithAddimagery included.
