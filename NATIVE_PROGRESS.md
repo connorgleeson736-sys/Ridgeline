@@ -1203,3 +1203,8 @@ clamped32–96 MiB. UI shows recommended value and warns above it, specifically
 including A20 risk. Memory-pressure handling still clears disposable payloads.
 Focused budget/transport tests and lint pass; all slider values, immediate encoded
 shrink/zero/live response delivery/re-enable are covered. Native libraries unchanged.
+
+RAM-slider Base APK source `eef2ba7`: 31,866,304 bytes, SHA256
+`1fc293176f5180d4445e78a9ce4143af55bf93e7d6225dd6298b9877a20672c9`. All three optimized native libraries byte-identical to 033bec6;
+8 focused JVM checks, lint, assembly, signing and 16KiB alignment pass. No new
+GPU/phone run, large packs or session CA.

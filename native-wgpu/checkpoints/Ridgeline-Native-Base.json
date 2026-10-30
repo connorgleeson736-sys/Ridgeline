@@ -1,8 +1,8 @@
 {
-  "sourceCheckpoint": "033bec62c340fd05ba95a316b01604e6ce8c9062",
+  "sourceCheckpoint": "eef2ba7b594782174d2e05cb2dc15430582b3b09",
   "apk": "Ridgeline-Native-Base.apk",
   "bytes": 31866304,
-  "sha256": "e329eb1f39198424931b4a18e18e3617672d0d11a9a48ab17b3487c14f2b972c",
+  "sha256": "1fc293176f5180d4445e78a9ce4143af55bf93e7d6225dd6298b9877a20672c9",
   "largeOverviewPacks": 0,
   "coarseImageryFiles": 67,
   "abis": [
@@ -13,6 +13,7 @@
   "managedSessionCa": false,
   "addImagery": "Offline / imagery > Add imagery ZIPs; attach original files in place with persistent read access; up to six at once",
   "changes": [
+    "Live persisted 0-1000 MiB combined RAM tile-payload cache budget across encoded bodies, decoded DEM samples and prepared direct buffers; immediate trimming, conservative recommendation and high-budget warning",
     "Bounded lazy eight-layer imagery and R32Float height texture arrays with generation-owned slots, shared bindings and compatible instanced draws",
     "Automatic Vulkan arrays; automatic GLES pooled separate textures based on measured host GLES regression; Offline / imagery > GPU textures allows explicit selection",
     "Layer-aware full nine-level mip generation, reusable GLES scratch/bindings and startup layer/mip readback with exact fallback",
@@ -34,7 +35,7 @@
     "routeSourcesFullGeometry": true,
     "fullSourceHeightsRetained": true
   },
-  "validation": "26 core, 4 renderer and 1 CLI Rust tests pass; 58 JVM tests, zero failures. Vulkan/GLES smoke and three-mode five-trial image/recycle checks pass. All three optimized JNI ABIs, assembly, lint, signature and alignment pass. Host arrays: 32 to 4 texture allocation calls, 16 to 2 draws, identical pixels; GLES arrays slower, automatic GLES uses pooled separate textures. No A20 execution or FPS claim. No skirts; discontinuous/LOD edges may expose cracks.",
+  "validation": "8 focused RAM-budget/transport tests and Android lint/assembly/signature/16KiB alignment pass. All three optimized native libraries are byte-identical to source 033bec6 (previous Vulkan/GLES correctness evidence retained). No phone run or new GPU benchmark; no large packs/session CA.",
   "terrainSkirts": false,
   "prepareAhead": "Offline / imagery > Prepare nearby terrain while idle; default off",
   "textureBackend": {
@@ -54,5 +55,27 @@
     "zero": "disable and clear disposable disk caches at next launch",
     "savedRegionsAndAttachedZipsSeparate": true,
     "ramAndGpuSeparate": true
+  },
+  "ramTileCache": {
+    "rangeMiB": [
+      0,
+      1000
+    ],
+    "stepMiB": 1,
+    "applies": "immediately",
+    "zero": "no retained encoded/decoded/prepared tile payloads",
+    "partitionPercent": {
+      "encoded": 25,
+      "decoded": 25,
+      "prepared": 50
+    },
+    "default": "32 MiB low-RAM; otherwise memoryClass/4 clamped 32-96 MiB",
+    "excludes": [
+      "active loading/queued uploads",
+      "object and metadata overhead",
+      "renderer CPU working sets",
+      "GPU resources"
+    ],
+    "highBudgetWarning": true
   }
 }

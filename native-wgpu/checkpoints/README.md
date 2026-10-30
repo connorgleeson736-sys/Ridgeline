@@ -1,7 +1,7 @@
 # Native Android checkpoints — incomplete prototypes
 
 Latest smaller build: [Ridgeline-Native-Base.apk](Ridgeline-Native-Base.apk).
-Source checkpoint `033bec6`; signed debug Base APK, 31.9MB, all three ABIs.
+Source checkpoint `eef2ba7`; signed debug Base APK, 31.9MB, all three ABIs.
 
 This audit build adds **GPU texture arrays**, compatible instanced draws,
 reusable GLES mip resources, stable index suballocation and bulk pixel packing.
@@ -14,6 +14,13 @@ Changes apply after restarting the app; the current active limit is shown.
 Zero disables and clears automatic disk caches at next launch. Saved regions,
 attached imagery ZIPs and RAM/GPU working sets are separate.
 [Measured evidence and limits](../validation/comprehensive-audit/).
+
+**Combined RAM tile cache (0–1000 MiB)** is also in Offline / imagery and
+applies immediately. One retained-payload budget covers compressed downloaded
+bytes, decoded terrain and prepared terrain/imagery buffers. Zero clears/disables
+their retention. The setting persists; recommended defaults and a high-budget
+warning are shown. Active loading memory, renderer CPU working sets and GPU
+resources are separate. [Scope and checks](../validation/ram-cache-slider/).
 
 **Add your existing imagery:** open **Offline / imagery → Add imagery ZIPs**, then
 select the original Ridgeline overview ZIPs already on your phone (up to six at
