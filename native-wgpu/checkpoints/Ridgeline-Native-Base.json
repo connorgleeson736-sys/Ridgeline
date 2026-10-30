@@ -1,8 +1,8 @@
 {
-  "sourceCheckpoint": "3e9811bfe448251261937fbf270fbc9b718cdc66",
+  "sourceCheckpoint": "033bec62c340fd05ba95a316b01604e6ce8c9062",
   "apk": "Ridgeline-Native-Base.apk",
-  "bytes": 31716248,
-  "sha256": "9c9405eb6c91bcd318bc2eead7fba102f1e7c8d5441f9c952db7deb54a307393",
+  "bytes": 31866304,
+  "sha256": "e329eb1f39198424931b4a18e18e3617672d0d11a9a48ab17b3487c14f2b972c",
   "largeOverviewPacks": 0,
   "coarseImageryFiles": 67,
   "abis": [
@@ -13,13 +13,14 @@
   "managedSessionCa": false,
   "addImagery": "Offline / imagery > Add imagery ZIPs; attach original files in place with persistent read access; up to six at once",
   "changes": [
-    "Remove all terrain skirts, duplicate skirt vertices and CPU seam analysis; retain full original surface/boundary heights",
-    "Separate local/offline/HTTP-cache-only admission from async network and bounded resumable CPU preparation",
-    "Fresh encoded RAM cache with absolute expiry/source version metadata; no repeated original-body validation/hash for fresh prepared hits",
-    "Independent subscriber cancellation, actual last-reader HTTP cancellation, shared priority promotion and bounded 600ms quick-return grace",
-    "Adopt exact/sharper cached cover before redundant downloads; prefer complete sharper children and retain a bounded coarse reserve",
-    "Lossless completed boundary/crop RGBA cache and cached provider/native source-mapping plans",
-    "Tiny pressure/rate-limited predictions; optional expanded idle GPU preparation under Offline / imagery, default off"
+    "Bounded lazy eight-layer imagery and R32Float height texture arrays with generation-owned slots, shared bindings and compatible instanced draws",
+    "Automatic Vulkan arrays; automatic GLES pooled separate textures based on measured host GLES regression; Offline / imagery > GPU textures allows explicit selection",
+    "Layer-aware full nine-level mip generation, reusable GLES scratch/bindings and startup layer/mip readback with exact fallback",
+    "Stable coalescing index atlas evicts only off-current-frame patterns instead of resetting the whole atlas",
+    "Bulk owned-array ARGB to RGBA packing preserves exact integer premultiplication and cancellation",
+    "Offline / imagery automatic disk-cache slider, 0\u20131000 MiB; one allowance for HTTP, prepared terrain and finished imagery, adaptive free-storage cap",
+    "Cache size changes apply after app restart; zero disables and clears automatic disk caches on next launch; saved regions and attached ZIPs separate",
+    "Previous cache-revisit behaviors, Add imagery in-place attachment, full source quality and no-skirt terrain retained"
   ],
   "adaptiveTerrain": {
     "newErrorPixels": 0.6,
@@ -33,7 +34,25 @@
     "routeSourcesFullGeometry": true,
     "fullSourceHeightsRetained": true
   },
-  "validation": "18 focused JVM checks plus 26 core tests pass. Actual OkHttp disk-cache hit returns in 1.529095ms while eight foreground HTTP responses remain blocked (host fixture, not A20). Vulkan/GLES fixtures pass zero-skirt and existing surface/imagery checks. All three optimized JNI ABIs, assembly and signature pass. No new emulator/phone execution; mismatched height/LOD edges may show cracks without skirts.",
+  "validation": "26 core, 4 renderer and 1 CLI Rust tests pass; 58 JVM tests, zero failures. Vulkan/GLES smoke and three-mode five-trial image/recycle checks pass. All three optimized JNI ABIs, assembly, lint, signature and alignment pass. Host arrays: 32 to 4 texture allocation calls, 16 to 2 draws, identical pixels; GLES arrays slower, automatic GLES uses pooled separate textures. No A20 execution or FPS claim. No skirts; discontinuous/LOD edges may expose cracks.",
   "terrainSkirts": false,
-  "prepareAhead": "Offline / imagery > Prepare nearby terrain while idle; default off"
+  "prepareAhead": "Offline / imagery > Prepare nearby terrain while idle; default off",
+  "textureBackend": {
+    "automaticVulkan": "arrays",
+    "automaticGles": "pooled separate textures",
+    "override": "Offline / imagery > GPU textures",
+    "layersPerPage": 8,
+    "maxPagesPerPool": 25
+  },
+  "automaticDiskCache": {
+    "defaultMiB": 1000,
+    "rangeMiB": [
+      0,
+      1000
+    ],
+    "applies": "after app restart",
+    "zero": "disable and clear disposable disk caches at next launch",
+    "savedRegionsAndAttachedZipsSeparate": true,
+    "ramAndGpuSeparate": true
+  }
 }

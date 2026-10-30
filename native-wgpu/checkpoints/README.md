@@ -1,7 +1,19 @@
 # Native Android checkpoints — incomplete prototypes
 
 Latest smaller build: [Ridgeline-Native-Base.apk](Ridgeline-Native-Base.apk).
-Source checkpoint `3e9811b`; signed debug Base APK, 31.7MB, all three ABIs.
+Source checkpoint `033bec6`; signed debug Base APK, 31.9MB, all three ABIs.
+
+This audit build adds **GPU texture arrays**, compatible instanced draws,
+reusable GLES mip resources, stable index suballocation and bulk pixel packing.
+**Offline / imagery → GPU textures** selects Automatic, Compatibility or Texture
+arrays. Automatic uses arrays on Vulkan and pooled separate textures on GLES;
+host GLES arrays reduced draw/allocation calls but were slower overall.
+
+**Offline / imagery** also has a **0–1000 MiB automatic disk-cache slider**.
+Changes apply after restarting the app; the current active limit is shown.
+Zero disables and clears automatic disk caches at next launch. Saved regions,
+attached imagery ZIPs and RAM/GPU working sets are separate.
+[Measured evidence and limits](../validation/comprehensive-audit/).
 
 **Add your existing imagery:** open **Offline / imagery → Add imagery ZIPs**, then
 select the original Ridgeline overview ZIPs already on your phone (up to six at

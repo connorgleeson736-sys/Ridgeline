@@ -1181,3 +1181,6 @@ Validation: 26 core, 4 renderer and 1 CLI Rust tests pass; 58 JVM tests report
 zero failures. Vulkan/GLES smoke and five-trial three-mode pixel/recycle fixture
 pass. All three optimized JNI ABIs, assembly, lint, signature and alignment pass.
 Normal Base APK: 31,866,304 bytes; no large overview packs or session CA.
+
+Published Base source `033bec6`: 31,866,304 bytes, SHA256
+`e329eb1f39198424931b4a18e18e3617672d0d11a9a48ab17b3487c14f2b972c`. All three optimized ABIs; no large packs/session CA.
