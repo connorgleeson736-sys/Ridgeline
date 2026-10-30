@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="nz.ridgeline.nativeapp.GpuUploadQueueTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-30T02:54:47.880Z" hostname="5085ef76c66b" time="0.004">
+  <properties/>
+  <testcase name="burstsCoalesceAndRemainBounded" classname="nz.ridgeline.nativeapp.GpuUploadQueueTest" time="0.002"/>
+  <testcase name="separateSourcesCoalesceAndRespectBytes" classname="nz.ridgeline.nativeapp.GpuUploadQueueTest" time="0.001"/>
+  <testcase name="changedViewportDropsQueuedAndLateSourcesIndependently" classname="nz.ridgeline.nativeapp.GpuUploadQueueTest" time="0.001"/>
+  <testcase name="repeatedReadyPayloadDoesNotScheduleExtraFramesButNewOwnershipDoes" classname="nz.ridgeline.nativeapp.GpuUploadQueueTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

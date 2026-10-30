@@ -28,12 +28,18 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private data class Source(val id:Id,val geometry:Boolean)
     // Automatic HTTP cache is disposable. Saved regions/packs are never evicted here.
     val automaticCacheBytes=minOf(1_000_000_000L,(context.cacheDir.usableSpace/8).coerceAtLeast(4_194_304L))
+    private val preparedBytes=minOf(128L*1024*1024,automaticCacheBytes/8)
+    private val preparedWrites=ThreadPoolExecutor(1,1,0,TimeUnit.MILLISECONDS,ArrayBlockingQueue<Runnable>(8),ThreadFactory{work->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);work.run()},"RidgelinePreparedCache")},ThreadPoolExecutor.DiscardOldestPolicy())
     private val client = OkHttpClient.Builder()
-        .cache(Cache(File(context.cacheDir, "native-http-v1"), automaticCacheBytes))
+        .cache(Cache(File(context.cacheDir, "native-http-v1"), automaticCacheBytes-preparedBytes))
         .connectTimeout(12, TimeUnit.SECONDS).readTimeout(15, TimeUnit.SECONDS).build()
     private val key = context.assets.open("map-defaults.json").use {
         JSONObject(it.readBytes().toString(Charsets.UTF_8)).getString("linzApiKey")
     }
+    private val prepared by lazy{PreparedTerrainCache(File(context.cacheDir,"native-terrain-v2"),preparedBytes,"terrain-source-delta1-dem18-grid128-profile-v1:$key")}
+    private val preparation=PreparationControl()
+    private fun checkPreparation()=preparation.checkpoint()
+    private val geometryDependencies=ThreadLocal<MutableMap<GpuUploadQueue.Id,String>>()
     private fun linz(kind: String, id: Id, ext: String): String =
         "https://basemaps.linz.govt.nz/v1/tiles/$kind/WebMercatorQuad/${id.z}/${id.x}/${id.y}.$ext?" +
             (if (kind == "elevation") "pipeline=terrain-rgb&" else "") + "api=$key"
@@ -46,7 +52,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     fun offlineOnly(value:Boolean){offlineOnly=value;preferences.edit().putBoolean("offlineOnly",value).apply();cameraChanged()}
     val overviews=OverviewAttachments(context)
     private val attachmentJobs=Executors.newSingleThreadExecutor()
-    private val imagery = NativeImagery(context, ::fetch, {z,x,y->linz("aerial",Id(z,x,y),"webp")},overviews)
+    private val imagery = NativeImagery(context, ::fetch, {z,x,y->linz("aerial",Id(z,x,y),"webp")},overviews,::checkPreparation)
     fun attachOverview(uri:android.net.Uri,done:(String?)->Unit){attachmentJobs.execute{
         val error=try{overviews.attach(uri);failures.clear();cameraChanged();null}catch(e:Exception){e.message?:"Could not attach imagery ZIP."}
         view.post{if(!dead)done(error)}
@@ -59,8 +65,9 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private var readyBytes = 0
     private val demLimit = if (am.isLowRamDevice) 24 else (am.memoryClass / 2).coerceIn(48, 128)
     private val ready = LinkedHashMap<Source, ByteBuffer>(16, .75f, true)
-    private val decoded = LinkedHashMap<Id, Dem>(16, .75f, true)
-    private val demJobs = ConcurrentHashMap<Id, CompletableFuture<Dem>>()
+    private data class Decoded(val raster:Dem,val dependencies:List<PreparedTerrainCache.Dependency>)
+    private val decoded = LinkedHashMap<Id, Decoded>(16, .75f, true)
+    private val demJobs = ConcurrentHashMap<Id, CompletableFuture<Decoded>>()
     private val jobs = ConcurrentHashMap<Source, Task>()
     private val sequence = AtomicLong()
     private data class Plan(val ranked:Map<Source,Int>)
@@ -88,9 +95,12 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         private val order = sequence.getAndIncrement()
         override fun compareTo(other: Task) = compareValuesBy(this, other, { it.priority }, { it.order })
         override fun run() {
+            var aborted=false
             try {
                 if (dead || source !in wanted || resident(source)) return
+                preparation.enter{!dead&&active&&source in wanted}
                 val data = if(source.geometry)loadGeometry(source.id)else loadImage(source.id)
+                checkPreparation()
                 failures.remove(source)
                 if (!dead) {
                     synchronized(ready) {
@@ -103,6 +113,9 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
                     }
                     if (source in wanted&&!resident(source)) upload(source,data)
                 }
+            } catch (_:PreparationAborted) {
+                aborted=true
+                // Demand changed after I/O. No failure/backoff for intentionally skipped work.
             } catch (e: Exception) {
                 val attempt=(failures[source]?.attempts?:0)+1
                 val delay=when(attempt){1->1000L;2->4000L;else->15000L}
@@ -112,7 +125,10 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
                     android.util.Log.w("RidgelineSource","Load failed: ${e.javaClass.simpleName}; cause=${e.cause?.javaClass?.simpleName}")
                 if (!dead && source in wanted) view.post { view.onStatus("Terrain load failed: " +
                     (if (e is TileHttpException) "provider HTTP ${e.code}" else "source unavailable")) }
-            } finally { jobs.remove(source, this) }
+            } finally {
+                preparation.leave();geometryDependencies.remove();jobs.remove(source, this)
+                if(aborted&&!dead&&active&&source in wanted&&!resident(source))cameraChanged()
+            }
         }
     }
     fun cameraChanged() = synchronized(this) {
@@ -215,22 +231,37 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         } finally { bitmap.recycle() }
     }
     private fun sample(record:Dem,gx:Double,gy:Double,z:Int)=DemSampling.sample(record,gx,gy,z)
-    private fun raw(id: Id): Dem {
+    private fun raw(id:Id):Dem {
+        val record=rawRecord(id)
+        geometryDependencies.get()?.let{dependencies->for(dep in record.dependencies)dependencies[dep.id]=dep.fingerprint}
+        return record.raster
+    }
+    private fun rawRecord(id: Id): Decoded {
         synchronized(decoded) { decoded[id]?.let { return it } }
-        val future = CompletableFuture<Dem>(); val existing = demJobs.putIfAbsent(id, future)
+        val future = CompletableFuture<Decoded>(); val existing = demJobs.putIfAbsent(id, future)
         if (existing != null) return existing.get()
         try {
-            val pixels = try { demPixels(fetch(linz("elevation", id, "png"))) }
-                catch (e: TileHttpException) { if (e.code == 404 && id.z > 0) null else throw e }
-            val record = if (pixels == null) raw(id.parent()) else {
+            var missing=false
+            val bytes=try{fetch(linz("elevation",id,"png"))}catch(e:TileHttpException){if(e.code==404&&id.z>0){missing=true;null}else throw e}
+            val dependency=PreparedTerrainCache.Dependency(id.gpu(),if(missing)"404" else PreparedTerrainCache.digest(bytes!!))
+            // Shared source work finishes before a per-view cancellation checkpoint;
+            // aborting its owner must never poison another consumer's DEM future.
+            val pixels=bytes?.let(::demPixels)
+            val dependencies=LinkedHashMap<GpuUploadQueue.Id,String>();dependencies[dependency.id]=dependency.fingerprint
+            fun parent():Dem{
+                val row=rawRecord(id.parent());for(dep in row.dependencies)dependencies[dep.id]=dep.fingerprint
+                return row.raster
+            }
+            val raster = if (pixels == null) parent() else {
                 if (pixels.any { !it.isFinite() }) {
                     check(id.z > 0) { "Missing root elevation" }
-                    val parent = raw(id.parent())
+                    val coarse=parent()
                     for (y in 0..255) for (x in 0..255) if (!pixels[y * 256 + x].isFinite())
-                        pixels[y * 256 + x] = sample(parent, id.x * 256.0 + x, id.y * 256.0 + y, id.z)
+                        pixels[y * 256 + x] = sample(coarse, id.x * 256.0 + x, id.y * 256.0 + y, id.z)
                 }
                 Dem(id.gpu(), pixels)
             }
+            val record=Decoded(raster,dependencies.map{PreparedTerrainCache.Dependency(it.key,it.value)})
             synchronized(decoded) {
                 decoded[id] = record
                 while (decoded.size > demLimit) decoded.remove(decoded.keys.first())
@@ -240,16 +271,34 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         finally { demJobs.remove(id, future) }
     }
     private fun loadGeometry(id: Id): ByteBuffer {
+        checkPreparation()
+        var changed=false
+        val cached=prepared.get(id.gpu()){dep->
+            checkPreparation()
+            val source=Id(dep.id.z,dep.id.x,dep.id.y)
+            val fingerprint=try{PreparedTerrainCache.digest(fetch(linz("elevation",source,"png")))}catch(e:TileHttpException){if(e.code==404)"404"else throw e}
+            (fingerprint==dep.fingerprint).also{if(!it)changed=true}
+        }
+        checkPreparation()
+        if(cached!=null)return cached
+        if(changed)synchronized(decoded){decoded.clear()}
+        val dependencies=LinkedHashMap<GpuUploadQueue.Id,String>();geometryDependencies.set(dependencies)
         val heights=ByteBuffer.allocateDirect(129*129*4+16).order(ByteOrder.LITTLE_ENDIAN)
-        DemSampling.terrainMesh(id.z,id.x,id.y,heights){raw(Id(it.z,it.x,it.y))}
+        DemSampling.terrainMesh(id.z,id.x,id.y,heights,::checkPreparation){checkPreparation();raw(Id(it.z,it.x,it.y)).also{checkPreparation()}}
+        checkPreparation()
         heights.putDouble(129*129*4,Double.NaN);heights.putDouble(129*129*4+8,Double.NaN)
         NativeBridge.terrainProfile(heights)
+        checkPreparation()
+        val provenance=dependencies.map{PreparedTerrainCache.Dependency(it.key,it.value)}
+        if(!preparedWrites.isShutdown)runCatching{preparedWrites.execute{prepared.put(id.gpu(),heights,provenance)}}
         return heights
     }
     private fun loadImage(id:Id):ByteBuffer {
         val image = imagery.load(id.z, id.x, id.y)
+        checkPreparation()
         val rgba = ByteBuffer.allocateDirect(256 * 256 * 4)
-        for (p in image) {
+        for ((index,p) in image.withIndex()) {
+            if(index%4096==0)checkPreparation()
             val a = Color.alpha(p)
             // The reference shader receives premultiplied textures and unpremultiplies before grading.
             rgba.put(((Color.red(p) * a + 127) / 255).toByte())
@@ -321,7 +370,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     }
     fun setActive(value:Boolean){active=value;if(value)cameraChanged()}
     fun close() {
-        dead = true;attachmentJobs.shutdown();downloadCancel.set(true);downloadJobs.shutdown(); profileRevision.incrementAndGet();profileJob?.cancel(true);profileJobs.shutdownNow();timer?.cancel(true); scheduler.shutdownNow(); geometryWorkers.shutdownNow();imageWorkers.shutdownNow()
+        dead = true;preparedWrites.shutdownNow();attachmentJobs.shutdown();downloadCancel.set(true);downloadJobs.shutdown(); profileRevision.incrementAndGet();profileJob?.cancel(true);profileJobs.shutdownNow();timer?.cancel(true); scheduler.shutdownNow(); geometryWorkers.shutdownNow();imageWorkers.shutdownNow()
         client.dispatcher.cancelAll(); client.connectionPool.evictAll(); client.cache?.close(); client.dispatcher.executorService.shutdown(); synchronized(ready) { ready.clear(); readyBytes=0 }; synchronized(decoded) { decoded.clear() }
         Thread({downloadJobs.awaitTermination(60,TimeUnit.SECONDS);profileJobs.awaitTermination(60,TimeUnit.SECONDS);geometryWorkers.awaitTermination(60,TimeUnit.SECONDS);imageWorkers.awaitTermination(60,TimeUnit.SECONDS);attachmentJobs.awaitTermination(60,TimeUnit.SECONDS);overviews.close();offline.close()},"ridgeline-offline-close").start()
     }

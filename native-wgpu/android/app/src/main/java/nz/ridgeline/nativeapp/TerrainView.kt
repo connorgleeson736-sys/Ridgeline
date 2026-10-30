@@ -105,22 +105,35 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     private val vsync=Choreographer.FrameCallback{drawFrame()}
     private val adaptiveWake=Runnable{requestFrame()}
     private val retryWake=Runnable{requestFrame()}
+    private val uploadAdmission=UploadAdmission()
     private val clearanceBytes=ByteBuffer.allocateDirect(12).order(ByteOrder.LITTLE_ENDIAN)
     private fun drawFrame() {
         queued.set(false)
         if(!live||!active)return
         gpu.removeCallbacks(retryWake)
         if(handle==0L){recoverGpu();return}
-        // Bounded source count and input bytes per display frame (650KiB).
+        // Nonblocking completion polling measures real outstanding submissions.
+        // Keep the newest camera; do not queue more old frames behind a busy GPU.
+        val backlog=NativeBridge.gpuBacklog(handle)
+        if(backlog>=2){requestFrame();return}
         val demand=demandPacket
         if(demand!=null&&demand!==appliedDemand&&NativeBridge.demand(handle,demand)){appliedDemand=demand;safetyPose=null}
-        val rows=if(presentationFailures>0)emptyList()else uploads.take(if(gestureActive)1 else 2,650*1024);var accepted=false;var geometryChanged=false
-        for(tile in rows){val id=tile.id;val ok=when(tile.kind){
-            GpuUploadQueue.Kind.COMBINED->NativeBridge.upload(handle,id.z,id.x,id.y,tile.heights,tile.rgba)
-            GpuUploadQueue.Kind.GEOMETRY->NativeBridge.uploadGeometry(handle,id.z,id.x,id.y,tile.heights)
-            GpuUploadQueue.Kind.IMAGE->NativeBridge.uploadImage(handle,id.z,id.x,id.y,tile.rgba)
-        };accepted=accepted||ok;geometryChanged=geometryChanged||(ok&&tile.kind!=GpuUploadQueue.Kind.IMAGE)}
-        if(rows.isNotEmpty())refreshResidency()
+        val started=System.nanoTime();val allowance=uploadAdmission.allowance(gestureActive)
+        var count=0;var bytes=0;var accepted=false;var geometryChanged=false
+        while(presentationFailures==0){
+            val next=uploads.peek()?:break
+            if(!uploadAdmission.allows(next.kind,System.nanoTime()-started,count,bytes,next.bytes,allowance,backlog))break
+            val tile=uploads.take(1,650*1024).firstOrNull()?:break
+            val id=tile.id;val uploadStarted=System.nanoTime()
+            val ok=when(tile.kind){
+                GpuUploadQueue.Kind.COMBINED->NativeBridge.upload(handle,id.z,id.x,id.y,tile.heights,tile.rgba)
+                GpuUploadQueue.Kind.GEOMETRY->NativeBridge.uploadGeometry(handle,id.z,id.x,id.y,tile.heights)
+                GpuUploadQueue.Kind.IMAGE->NativeBridge.uploadImage(handle,id.z,id.x,id.y,tile.rgba)
+            }
+            uploadAdmission.uploaded(tile.kind,System.nanoTime()-uploadStarted)
+            count++;bytes+=tile.bytes;accepted=accepted||ok;geometryChanged=geometryChanged||(ok&&tile.kind!=GpuUploadQueue.Kind.IMAGE)
+        }
+        if(count>0)refreshResidency()
         if(accepted)post{onStatus("");onData()}
         val packet=routePacket
         if(packet!=null&&packet!==appliedRoutes&&NativeBridge.routes(handle,packet))appliedRoutes=packet
@@ -155,7 +168,9 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         if(gestureActive&&corrected!=requested)post{if(cameraPose==requested&&live&&active){
             cameraPose=corrected;applyGesture()
         }}
+        val renderStarted=System.nanoTime()
         val shown=NativeBridge.render(handle,width,height,pose.longitude,pose.latitude,pose.zoom+ln(pixelScale)/ln(2.0),pose.zoom,pose.bearing,pose.pitch,pose.elevation)
+        uploadAdmission.rendered(System.nanoTime()-renderStarted)
         if(shown>0){presentationFailures=0
             val previous=presentedPose;presentedPose=pose;presentedFrom=requested
             val rendered=pose

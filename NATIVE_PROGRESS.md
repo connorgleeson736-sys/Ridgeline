@@ -1043,3 +1043,34 @@ Original six ZIPs, full source quality, Add imagery and Capacitor app preserved.
 Latest normal Base APK from c602395: 31684240 bytes, SHA256
 18e11cf44922da81a4dfa4b5aafff6bbb4af91e6113ff1f1bc7439e785d9dea1. All three optimized JNI ABIs, assembly and signature pass.
 No packs/session CA; Add imagery retained. A20 runtime acceptance remains open.
+
+## Prepared cache, coordinated residency and cost-aware scheduling
+
+Implemented all four requested improvements. Prepared terrain uses bounded,
+lossless versioned disk entries with full halo/parent/404provenance, validated
+through normal HTTP/offline source access. Fast gzip writes use one background
+worker with8queued entries; interrupted/corrupt writes recover. Allocates1/8of
+existing automatic disk budget, at most128MiB, subtracting from HTTP cache.
+
+GPU photographs may borrow unused terrain payload space, retaining up to25%extra
+photos under the previous combined target. Active coverage protected; explicit
+count caps bound temporary protected-coverage debt. GPU/CPU caches still release
+off-demand data under real memory pressure. No quality/source-policy changes.
+
+Obsolete tasks skip later image decoding/composition/RGBA work, halo work and
+terrain rows, without canceling shared source I/O or poisoning DEM futures.
+Aborted tasks have no failure backoff and reschedule if demand returns in flight.
+Uploads learn actual JNI cost by kind and available render CPU time, keep byte/
+count limits, and gate new uploads/frames at2outstanding GPU submissions using
+completion callbacks and nonblocking polling. Latest camera retries nextvsync.
+
+Real-input host measurements and reproducible fixtures in validation/pipeline-cache:
+prepared-hit1.138ms vs cold-read/decode/mesh12.485ms; warm decoded mesh1.116ms,
+so no gain over decoded RAM. Obsolete mesh0.109ms vs1.116ms full.36-photo revisit
+4->0reuploads (40->36total),10%less upload/mip work. Vulkan36.979->35.995ms;
+GLES40.113->36.826ms medians across6alternating trials. Timing noisy; work counts
+stronger evidence. Pressure fixture bounds queued submissions12->2Vulkan/6->2GLES,
+identical final per-backend pixels; GLES pressure throughput is slower, documented.
+Light upload-cost replay shows no CPU improvement; no A20/FPSclaim.16focusedtests
+pass; GPU coverage/quality fixture, all3optimizedABIs, assembly/signature pass.
+Full imagery/heights/filters/mips, Add imagery, original6ZIPs andCapacitor intact.

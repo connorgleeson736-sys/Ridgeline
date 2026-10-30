@@ -1,0 +1,132 @@
+{
+  "scope": "Controlled host measurements, real LINZ input payloads. Not a phone benchmark or whole-app A/B.",
+  "preparation": {
+    "rawDiskDecodeAndMesh": {
+      "medianMs": 12.484943,
+      "p95Ms": 13.526232
+    },
+    "decodedMemoryMesh": {
+      "medianMs": 1.115772,
+      "p95Ms": 1.423346
+    },
+    "validatedPreparedDiskHit": {
+      "medianMs": 1.137585,
+      "p95Ms": 1.547884
+    },
+    "obsoleteAfter7Rows": {
+      "medianMs": 0.109204,
+      "p95Ms": 0.215605
+    },
+    "preparedWrite": {
+      "medianMs": 1.334281,
+      "p95Ms": 1.682858
+    }
+  },
+  "lossless": true,
+  "preparedStorageBytes": 44326,
+  "uncompressedBytes": 66580,
+  "uploadReplay": {
+    "fixedTwo": {
+      "framesOver4ms": 0,
+      "totalUploadCpuMs": 4.379795,
+      "frames": 20,
+      "maxUploadCpuMs": 0.302686
+    },
+    "costAware": {
+      "framesOver4ms": 0,
+      "totalUploadCpuMs": 4.379795,
+      "frames": 20,
+      "maxUploadCpuMs": 0.302686
+    }
+  },
+  "backends": {
+    "vulkan": {
+      "previous": {
+        "trials": 6,
+        "medianWorkloadMs": 36.9785,
+        "revisitUploads": 4,
+        "totalUploads": 40,
+        "generatedMipLevels": 320,
+        "residentPayloadBytes": 11717280,
+        "queuePressure": {
+          "queuePressure": true,
+          "coordinated": false,
+          "frames": 12,
+          "peakOutstandingSubmissions": 12,
+          "backpressureWaits": 0,
+          "elapsedUsIncludingGpuDrain": 537078,
+          "pixelHash": "5196dd076487c1df"
+        }
+      },
+      "coordinated": {
+        "trials": 6,
+        "medianWorkloadMs": 35.995000000000005,
+        "revisitUploads": 0,
+        "totalUploads": 36,
+        "generatedMipLevels": 288,
+        "residentPayloadBytes": 13115376,
+        "queuePressure": {
+          "queuePressure": true,
+          "coordinated": true,
+          "frames": 12,
+          "peakOutstandingSubmissions": 2,
+          "backpressureWaits": 5,
+          "elapsedUsIncludingGpuDrain": 522887,
+          "pixelHash": "5196dd076487c1df"
+        }
+      },
+      "residencyPressure": {
+        "residencyPressure": true,
+        "residentImages": 39,
+        "protectedImages": 32,
+        "protectedTerrain": 8,
+        "residentPayloadBytes": 14163948,
+        "targetBytes": 14379840
+      }
+    },
+    "gles": {
+      "previous": {
+        "trials": 6,
+        "medianWorkloadMs": 40.113,
+        "revisitUploads": 4,
+        "totalUploads": 40,
+        "generatedMipLevels": 320,
+        "residentPayloadBytes": 11717280,
+        "queuePressure": {
+          "queuePressure": true,
+          "coordinated": false,
+          "frames": 12,
+          "peakOutstandingSubmissions": 6,
+          "backpressureWaits": 0,
+          "elapsedUsIncludingGpuDrain": 111541,
+          "pixelHash": "04e781e394d15c90"
+        }
+      },
+      "coordinated": {
+        "trials": 6,
+        "medianWorkloadMs": 36.82599999999999,
+        "revisitUploads": 0,
+        "totalUploads": 36,
+        "generatedMipLevels": 288,
+        "residentPayloadBytes": 13115376,
+        "queuePressure": {
+          "queuePressure": true,
+          "coordinated": true,
+          "frames": 12,
+          "peakOutstandingSubmissions": 2,
+          "backpressureWaits": 4,
+          "elapsedUsIncludingGpuDrain": 130246,
+          "pixelHash": "04e781e394d15c90"
+        }
+      },
+      "residencyPressure": {
+        "residencyPressure": true,
+        "residentImages": 39,
+        "protectedImages": 32,
+        "protectedTerrain": 8,
+        "residentPayloadBytes": 14163948,
+        "targetBytes": 14379840
+      }
+    }
+  }
+}

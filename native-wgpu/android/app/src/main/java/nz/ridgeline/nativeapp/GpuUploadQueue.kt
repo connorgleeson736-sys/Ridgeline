@@ -32,6 +32,7 @@ class GpuUploadQueue(private val capacity:Int) {
         val out=ArrayList<Tile>(count);val iter=entries.entries.iterator();var bytes=0
         while(out.size<count&&iter.hasNext()){val row=iter.next().value;if(bytes+row.bytes>byteBudget)break;out.add(row);bytes+=row.bytes;iter.remove()};return out
     }
+    @Synchronized fun peek():Tile?=entries.values.firstOrNull()
     @Synchronized fun isNotEmpty()=entries.isNotEmpty()
     @Synchronized fun clear()=entries.clear()
     companion object{val EMPTY:ByteBuffer=ByteBuffer.allocateDirect(0)}

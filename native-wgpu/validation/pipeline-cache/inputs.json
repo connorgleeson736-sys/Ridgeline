@@ -1,0 +1,42 @@
+{
+  "source": "Genuine LINZ Aoraki source responses; no keys/URLs in fixture",
+  "files": [
+    {
+      "name": "elevation-11-1991-1299.png",
+      "bytes": 112851,
+      "sha256": "18c52664f83a44034e9e777e7214a58121db17004e4ae3909440b3e2b1432c27"
+    },
+    {
+      "name": "elevation-11-1991-1300.png",
+      "bytes": 117952,
+      "sha256": "1e76b737ce62f42bcf1e74250d57aaf5d196d029714fd7e039fe3ba9b227d8e7"
+    },
+    {
+      "name": "elevation-11-1992-1299.png",
+      "bytes": 114118,
+      "sha256": "bfa478bb8495d08d4c8efc4c4947ac3b28a2b6db22027af1f09ef682fc74d9e4"
+    },
+    {
+      "name": "elevation-11-1992-1300.png",
+      "bytes": 107269,
+      "sha256": "8f6e0a6865d487a1d4234aae392ce1560d2a01819acfa9802ca5ea1505d37e49"
+    },
+    {
+      "name": "tile0.heights",
+      "bytes": 66564,
+      "sha256": "c322a34717ee382c492a94a6230046b9110f6eb9a5339b543599514c468ac728"
+    },
+    {
+      "name": "tile0.rgba",
+      "bytes": 262144,
+      "sha256": "109e89821020fcd6dfe666bfa8ae8d94658102242c1ba66f7153873e76e57e47"
+    }
+  ],
+  "host": {
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.41",
+    "cpu": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           46 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  5\nOn-line CPU(s) list:                     0-4\nVendor ID:                               AuthenticAMD\nModel name:                              AMD EPYC 9V74 80-Core Processor\nCPU family:                              25\nModel:                                   17\nThread(s) per core:                      1\nCore(s) per socket:                      5\nSocket(s):                               1\nStepping:                                1\nBogoMIPS:                                5192.31\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm arch_capabilities\nHypervisor vendor:                       KVM\nVirtualization type:                     full\n"
+  },
+  "baseline": "Controlled policy A/B in the same binary, not two whole APKs",
+  "phoneTested": false,
+  "gpu": "SwiftShader Vulkan software GPU; GLES uses the available host EGL driver"
+}

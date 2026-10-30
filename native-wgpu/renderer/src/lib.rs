@@ -7,6 +7,7 @@ mod adaptive;
 mod camera_safety;
 mod diagnostics;
 mod mipmaps;
+mod residency;
 mod routes;
 mod seams;
 pub use routes::RoutePath;
@@ -66,6 +67,8 @@ pub struct Renderer {
     index_ranges: HashMap<(ridgeline_core::surface::GridRect, u8, u8), (u32, u32)>,
     index_next: u32,
     geometry_budget: usize,
+    residency_byte_budget: Option<u64>,
+    pending_frames: std::sync::Arc<std::sync::atomic::AtomicU32>,
     depth: wgpu::Texture,
     width: u32,
     height: u32,
@@ -340,6 +343,8 @@ impl Renderer {
             demand: None,
             instance_capacity: 256,
             budget: 96,
+            residency_byte_budget: None,
+            pending_frames: Default::default(),
             clock: 0,
             center: [0.5, 0.5],
             last_view: None,
@@ -485,6 +490,7 @@ impl Renderer {
             },
         );
         self.trim_geometry();
+        self.trim_joint();
         self.seams_dirty = true;
         if self.cover.iter().any(|row| row.source == id) {
             self.route_dirty = true;
@@ -556,11 +562,13 @@ impl Renderer {
             },
         );
         self.trim_images();
+        self.trim_joint();
         self.cover_dirty = true;
         Ok(())
     }
     /// Bounded geometry height fields and original RGBA mip pyramids; excludes surface/depth.
     pub fn set_tile_budget(&mut self, tiles: usize) {
+        self.residency_byte_budget = None;
         self.budget = tiles.clamp(24, 192);
         self.geometry_budget = (self.budget / 2).clamp(16, 96);
         self.trim_geometry();
@@ -595,6 +603,17 @@ impl Renderer {
         self.geometry_budget = tiles.clamp(16, 192);
         self.trim_geometry();
         self.cover_dirty = true;
+    }
+    pub fn outstanding_frames(&self) -> u32 {
+        self.pending_frames
+            .load(std::sync::atomic::Ordering::Acquire)
+    }
+    pub fn gpu_backlog(&self) -> u32 {
+        if self.device.poll(wgpu::PollType::Poll).is_err() {
+            return 0;
+        }
+        self.pending_frames
+            .load(std::sync::atomic::Ordering::Acquire)
     }
     pub fn resident_count(&self) -> usize {
         self.tiles.len().max(self.images.len())
@@ -1227,7 +1246,13 @@ impl Renderer {
             }
             self.route_gpu.draw(&mut pass);
         }
+        self.pending_frames
+            .fetch_add(1, std::sync::atomic::Ordering::Release);
         self.queue.submit([encoder.finish()]);
+        let pending = self.pending_frames.clone();
+        self.queue.on_submitted_work_done(move || {
+            pending.fetch_sub(1, std::sync::atomic::Ordering::Release);
+        });
         // Cache age follows actual use, including panning back to already-loaded sources.
         self.clock += 1;
         for row in &rows {

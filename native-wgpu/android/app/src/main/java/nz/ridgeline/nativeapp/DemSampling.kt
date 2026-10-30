@@ -53,9 +53,9 @@ object DemSampling {
     fun mesh(z:Int,x:Int,y:Int,output:ByteBuffer,load:(GpuUploadQueue.Id)->Raster) =
         meshAtSourceZoom(z,x,y,min(z,18),output,load)
     /** Production terrain ownership matches the authoritative reference. */
-    fun terrainMesh(z:Int,x:Int,y:Int,output:ByteBuffer,load:(GpuUploadQueue.Id)->Raster) =
-        meshAtSourceZoom(z,x,y,terrainSourceZoom(z),output,load)
-    private fun meshAtSourceZoom(z:Int,x:Int,y:Int,dz:Int,output:ByteBuffer,load:(GpuUploadQueue.Id)->Raster) {
+    fun terrainMesh(z:Int,x:Int,y:Int,output:ByteBuffer,check:()->Unit={},load:(GpuUploadQueue.Id)->Raster) =
+        meshAtSourceZoom(z,x,y,terrainSourceZoom(z),output,load,check)
+    private fun meshAtSourceZoom(z:Int,x:Int,y:Int,dz:Int,output:ByteBuffer,load:(GpuUploadQueue.Id)->Raster,check:()->Unit={}) {
         val factor=1 shl(z-dz);val n=1 shl dz
         val halo=footprint(z,x,y,dz).associateWith(load)
         fun height(gx:Int,gy:Int):Float {
@@ -66,12 +66,13 @@ object DemSampling {
             return if(record.id.z==dz&&exact!=0f)exact
                 else sample(record,px.toDouble(),py.toDouble(),dz)
         }
-        for(j in 0..128)for(i in 0..128) {
+        for(j in 0..128){check();for(i in 0..128) {
             val px=(x*256.0+i*2.0)/factor-.5;val py=(y*256.0+j*2.0)/factor-.5
             val ix=floor(px).toInt();val iy=floor(py).toInt();val fx=px-ix;val fy=py-iy
             val h=(height(ix,iy)*(1-fx)*(1-fy)+height(ix+1,iy)*fx*(1-fy)+
                 height(ix,iy+1)*(1-fx)*fy+height(ix+1,iy+1)*fx*fy).toFloat()
             require(h.isFinite());output.putFloat(h)
+        }
         }
         output.rewind()
     }

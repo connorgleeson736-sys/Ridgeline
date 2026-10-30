@@ -22,6 +22,7 @@ class NativeImagery(
     private val fetch: (String) -> ByteArray,
     private val linz: (Int, Int, Int) -> String,
     private val attachments:OverviewAttachments?=null,
+    private val checkPreparation:()->Unit={},
 ) {
     private class FineTransportFailure(cause:java.io.IOException):java.io.IOException(cause)
     private val catalog by lazy { json("overview-index.json") }
@@ -32,13 +33,14 @@ class NativeImagery(
     private fun json(name: String) = context.assets.open(name).use { JSONObject(it.readBytes().toString(Charsets.UTF_8)) }
     private fun asset(name: String) = context.assets.open(name.removePrefix("/")).use { it.readBytes() }
     private fun bitmap(bytes: ByteArray): Bitmap {
+        checkPreparation()
         val options = BitmapFactory.Options().apply { inScaled=false; inPreferredConfig=Bitmap.Config.ARGB_8888 }
         val result = BitmapFactory.decodeByteArray(bytes,0,bytes.size,options) ?: error("Imagery decode failed")
         if(result.width!=256 || result.height!=256) { result.recycle(); error("Unexpected imagery size") }
         return result
     }
     private inline fun <T> Bitmap.using(block:(Bitmap)->T):T = try { block(this) } finally { recycle() }
-    private fun pixels(bitmap:Bitmap) = IntArray(65536).also { bitmap.getPixels(it,0,256,0,0,256,256) }
+    private fun pixels(bitmap:Bitmap):IntArray {checkPreparation();return IntArray(65536).also { bitmap.getPixels(it,0,256,0,0,256,256) }}
     internal fun saved(z:Int,x:Int,y:Int):ByteArray? {
         val key="$z/$x/$y"
         catalog.getJSONObject("coarse").optJSONObject(key)?.let { return asset(it.getString("natural")) }
@@ -77,6 +79,7 @@ class NativeImagery(
     }
     fun load(z:Int,x:Int,y:Int):IntArray {
         require(z in 0..19 && x in 0 until (1 shl z) && y in 0 until (1 shl z))
+        checkPreparation()
         val az=atlas.getInt("z")
         val coarse=if(z<az) atlas.getJSONObject("coarse").optJSONObject("$z/$x/$y") else null
         val factor=2.0.pow(z-az)
@@ -100,6 +103,7 @@ class NativeImagery(
                         }
                     } else {
                         val m=entry!!.data
+                        checkPreparation()
                         val mask=SourceGeometry.mask(entry.outer,z,x,y,m.getInt("z"),m.getInt("x"),m.getInt("y"))
                         val size=256/factor; val px=x*size-m.getInt("x")*256; val py=y*size-m.getInt("y")*256
                         val onSeam=entry.seams.isNotEmpty() && SourceGeometry.relation(entry.seams,doubleArrayOf(px-2,py-2,px+size+2,py+size+2))!=-1
@@ -119,6 +123,7 @@ class NativeImagery(
         Bitmap.createBitmap(256,256,Bitmap.Config.ARGB_8888).using { survey ->
             val canvas=Canvas(survey)
             for(i in 0 until fine.length()) {
+                checkPreparation()
                 val row=fine.getJSONObject(i); val name=row.getString("name")
                 val fz=minOf(z,row.optInt("maxZoom",19),19); val f=1 shl(z-fz)
                 val url=linz(fz,x/f,y/f).replace("/aerial/","/$name/").replace(".webp?",".png?")
@@ -130,6 +135,7 @@ class NativeImagery(
         }
     }
     private fun crop(bitmap:Bitmap,x:Int,y:Int,factor:Int):Bitmap {
+        checkPreparation()
         val result=Bitmap.createBitmap(256,256,Bitmap.Config.ARGB_8888)
         try { drawCrop(Canvas(result),bitmap,x,y,factor); return result }
         catch(e:Exception) { result.recycle();throw e }
