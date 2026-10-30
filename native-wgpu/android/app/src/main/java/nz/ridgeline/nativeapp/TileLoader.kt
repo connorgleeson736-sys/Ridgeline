@@ -353,16 +353,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         awaitInputs(imagery.inputs(id.z,id.x,id.y))
         val image = imagery.load(id.z, id.x, id.y)
         checkPreparation()
-        val rgba = ByteBuffer.allocateDirect(256 * 256 * 4)
-        for ((index,p) in image.withIndex()) {
-            if(index%4096==0)checkPreparation()
-            val a = Color.alpha(p)
-            // The reference shader receives premultiplied textures and unpremultiplies before grading.
-            rgba.put(((Color.red(p) * a + 127) / 255).toByte())
-            rgba.put(((Color.green(p) * a + 127) / 255).toByte())
-            rgba.put(((Color.blue(p) * a + 127) / 255).toByte()); rgba.put(a.toByte())
-        }
-        rgba.rewind()
+        val rgba=PixelPacking.rgbaOwned(image,::checkPreparation)
         if(composed){val provenance=sourceRecords.get()?.values?.map{PreparedTerrainCache.Dependency(id.gpu(),it.fingerprint,it.until,it.key)}?:emptyList()
             if(provenance.all{it.until>System.currentTimeMillis()}&&!preparedWrites.isShutdown){val store=imageStore();runCatching{preparedWrites.execute{store.put(id.gpu(),rgba,provenance)}}}}
         return rgba
