@@ -1130,3 +1130,6 @@ Idle-preparationcompletionchecks nowpoll actualGPUcompletion ontheGPUownerthread
 withoutdrawinganotheridleframe. Avoidsastale last-framebacklogpreventingoptional
 preparationaftertheGPUhasalreadydrained. Kotlin/assembly/signaturepass; native
 librariesandearlierfocusedchecksunchanged.
+
+RefreshednormalBasefrom3e9811b: 31964120bytes,SHA256
+c655779bc85bd7a5fe5a628f35b08144fc7bf02675ae088f9d1e664d56e342a4. IncludesactualidleGPUcompletionpoll; no largepacks/sessionCA.

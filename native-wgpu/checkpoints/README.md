@@ -1,7 +1,7 @@
 # Native Android checkpoints — incomplete prototypes
 
 Latest smaller build: [Ridgeline-Native-Base.apk](Ridgeline-Native-Base.apk).
-Source checkpoint `a7cb004`; signed debug Base APK, 31.7MB, all three ABIs.
+Source checkpoint `3e9811b`; signed debug Base APK, 31.7MB, all three ABIs.
 
 **Add your existing imagery:** open **Offline / imagery → Add imagery ZIPs**, then
 select the original Ridgeline overview ZIPs already on your phone (up to six at
