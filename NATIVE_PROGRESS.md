@@ -1074,3 +1074,7 @@ identical final per-backend pixels; GLES pressure throughput is slower, document
 Light upload-cost replay shows no CPU improvement; no A20/FPSclaim.16focusedtests
 pass; GPU coverage/quality fixture, all3optimizedABIs, assembly/signature pass.
 Full imagery/heights/filters/mips, Add imagery, original6ZIPs andCapacitor intact.
+
+Latest normal Base APK from 0e2d7ee: 31919402 bytes, SHA256
+474ed2be9fa8157d45132a0b3ff851b577504594b26725137e92f3975f687c55. All3optimizedABIs/signature/assembly pass; no packs orsessionCA.
+Measurement scope and reproducible original-data fixture in validation/pipeline-cache.
