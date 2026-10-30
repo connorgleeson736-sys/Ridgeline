@@ -213,9 +213,13 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         // Restore already prepared parents before requesting more detailed work.
         // A zoom jump can skip several levels; the exact new plan need not name
         // the parent that was visible moments ago. Geometry/photos are independent.
+        val fallbackSources=HashSet<Source>()
+        for(source in wanted){var id=source.id;while(id.z>0){id=id.parent();val ancestor=Source(id,source.geometry);if(ancestor in wanted)fallbackSources.add(ancestor)}}
         val cachedParents=LinkedHashMap<Source,ByteBuffer>()
         for(source in wanted){
-            if(view.hasResidentCoverage(source.id.gpu(),source.geometry))continue
+            // A ready fine tile does not cover its parent's siblings. Restore
+            // backgrounds for ideal leaves, not recursively for fallback requests.
+            if(source in fallbackSources)continue
             val parent=synchronized(ready){CachedFallback.nearest(source.id.gpu()){id->ready[Source(Id(id.z,id.x,id.y),source.geometry)]}}
             if(parent!=null){val id=parent.first;val owner=Source(Id(id.z,id.x,id.y),source.geometry)
                 if(!resident(owner))cachedParents[owner]=parent.second}
@@ -231,7 +235,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         for(task in jobs.values){if(task.source in wanted)task.promote(ranked[task.source]?:0)else if(task.source in warmWanted&&prepareAhead&&!view.gestureInProgress){}else if(task !in returning)task.cancel()else task.park()}
         for((source,priority)in ranked){
             if(resident(source))continue
-            val fallback=ranked.keys.any{it.geometry==source.geometry&&it.id!=source.id&&source.id.gpu().contains(it.id.gpu())}
+            val fallback=source in fallbackSources
             if(view.hasResidentCoverage(source.id.gpu(),source.geometry,!fallback))continue
             val old=synchronized(ready){ready[source]};if(old!=null){upload(source,old);continue}
             val failure=failures[source];if(failure!=null&&android.os.SystemClock.elapsedRealtime()<failure.retryAt)continue

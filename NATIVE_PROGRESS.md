@@ -1267,3 +1267,8 @@ a safely covered source. This bounds soft coverage debt on GLES as well as array
 
 Parent-fallback Base source`1fd7000`: 31,930,328bytes, SHA256
 `d46046b0bb5271c49cf46e7390abe0da2f830186c4082a260c7f180f74865431`; all3optimizedABIs, no largepacks/sessionCA.
+
+Prepared-RAM background restoration also runs for ready GPU fine tiles: exact fine
+coverage cannot stand in for siblings of its parent. Only ideal leaves trigger
+restoration, avoiding recursive background requests for fallback entries. One
+bounded ancestor walk replaces repeated quadratic fallback classification.

@@ -11,7 +11,10 @@ Three concrete failures were addressed:
 2. Upload admission accepted exact planned IDs only. Zoom jumps can skip several
    levels, so a previously prepared cached grandparent was rejected. The loader
    now walks prepared RAM keys (up to22lookups, no I/O/decode) and offers the nearest
-   parent for missing GPU coverage, independently for terrain and photos. The
+   parent backdrop for ideal leaves, independently for terrain and photos, even
+   when the fine tile itself is already GPU-resident. Fallback requests do not
+   recursively restore further ancestors. One bounded ancestor walk also replaces
+   repeated quadratic fallback classification in the scheduling loop. The
    queue admits useful ancestors of current targets and gives coverage uploads
    priority. Unrelated/cancelled demand still prunes queues. Cache-only restoration
    here means an existing prepared RAM payload, not an arbitrary HTTP disk hit.
