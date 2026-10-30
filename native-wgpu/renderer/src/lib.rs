@@ -2,14 +2,18 @@
 use glam::{Mat4, Vec3};
 pub use ridgeline_core::{TileId, mercator, terrain_rgb};
 use std::collections::{HashMap, HashSet};
+use std::sync::Arc;
 use wgpu::util::DeviceExt;
 mod adaptive;
 mod camera_safety;
 mod cover_plans;
 mod diagnostics;
+mod index_atlas;
 mod mipmaps;
 mod residency;
 mod routes;
+mod texture_arrays;
+pub use mipmaps::MipmapStats;
 pub use routes::RoutePath;
 pub mod selection;
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -30,8 +34,15 @@ struct Scene {
 struct Vertex {
     position: [f32; 2],
 }
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum TextureBackend {
+    Auto,
+    Separate,
+    Arrays,
+}
 struct Tile {
-    height_bind: wgpu::BindGroup,
+    height_bind: Arc<wgpu::BindGroup>,
+    array: Option<texture_arrays::LayerLease>,
     _heights: wgpu::Texture,
     used: u64,
     field: ridgeline_core::heightfield::Heightfield,
@@ -39,7 +50,8 @@ struct Tile {
     adaptive_state: std::cell::Cell<adaptive::State>,
 }
 struct ImageTile {
-    bind: wgpu::BindGroup,
+    bind: Arc<wgpu::BindGroup>,
+    array: Option<texture_arrays::LayerLease>,
     _texture: wgpu::Texture,
     used: u64,
 }
@@ -50,12 +62,18 @@ pub struct Renderer {
     pipeline: wgpu::RenderPipeline,
     scene: wgpu::Buffer,
     last_scene: Option<Scene>,
-    last_instances: Vec<[f32; 12]>,
+    last_instances: Vec<[f32; 14]>,
     pub scene_uploads: u64,
     pub instance_uploads: u64,
     scene_bind: wgpu::BindGroup,
     texture_layout: wgpu::BindGroupLayout,
     height_layout: wgpu::BindGroupLayout,
+    image_arrays: Option<texture_arrays::TextureArrays>,
+    height_arrays: Option<texture_arrays::TextureArrays>,
+    pub texture_backend: TextureBackend,
+    pub texture_creations: u64,
+    pub last_frame_draw_calls: u64,
+    pub last_frame_texture_binds: u64,
     grid: wgpu::Buffer,
     sampler: wgpu::Sampler,
     mipmaps: mipmaps::Mipmaps,
@@ -64,8 +82,7 @@ pub struct Renderer {
     tiles: HashMap<TileId, Tile>,
     images: HashMap<TileId, ImageTile>,
     draws: Vec<ridgeline_core::surface::SurfacePatch>,
-    index_ranges: HashMap<(ridgeline_core::surface::GridRect, u8, u8), (u32, u32)>,
-    index_next: u32,
+    index_atlas: index_atlas::IndexAtlas,
     geometry_budget: usize,
     residency_byte_budget: Option<u64>,
     pending_frames: std::sync::Arc<std::sync::atomic::AtomicU32>,
@@ -78,7 +95,7 @@ pub struct Renderer {
     exact_route_sources: HashSet<TileId>,
     next_adaptive_frame: Option<u64>,
     adaptive_levels: HashMap<TileId, u8>,
-    instance_scratch: Vec<[f32; 12]>,
+    instance_scratch: Vec<[f32; 14]>,
     visible_scratch: Vec<ridgeline_core::surface::SurfacePatch>,
     route_anchor: [f64; 2],
     route_waypoints: Vec<Option<[f64; 3]>>,
@@ -124,6 +141,26 @@ impl Renderer {
         height: u32,
         mipmap_mode: MipmapMode,
     ) -> Result<Self, String> {
+        Self::new_with_texture_backend(
+            instance,
+            surface,
+            requested_format,
+            width,
+            height,
+            mipmap_mode,
+            TextureBackend::Auto,
+        )
+        .await
+    }
+    pub async fn new_with_texture_backend(
+        instance: &wgpu::Instance,
+        surface: Option<&wgpu::Surface<'_>>,
+        requested_format: Option<wgpu::TextureFormat>,
+        width: u32,
+        height: u32,
+        mipmap_mode: MipmapMode,
+        backend: TextureBackend,
+    ) -> Result<Self, String> {
         let adapter = instance
             .request_adapter(&wgpu::RequestAdapterOptions {
                 power_preference: wgpu::PowerPreference::HighPerformance,
@@ -151,9 +188,27 @@ impl Renderer {
             })
             .await
             .map_err(|e| e.to_string())?;
+        let supported = device.limits().max_texture_array_layers >= 8;
+        if backend == TextureBackend::Arrays && !supported {
+            return Err("Adapter does not support bounded texture arrays".into());
+        }
+        let arrays = supported
+            && (backend == TextureBackend::Arrays
+                || (backend == TextureBackend::Auto
+                    && adapter.get_info().backend != wgpu::Backend::Gl));
+        let source = if arrays {
+            include_str!("terrain.wgsl").replace("var photo: texture_2d<f32>","var photo: texture_2d_array<f32>").replace("var heights: texture_2d<f32>","var heights: texture_2d_array<f32>")
+            .replace("@location(2) @interpolate(flat) image: vec4<f32>","@location(2) @interpolate(flat) image: vec4<f32>, @location(3) @interpolate(flat) layer:f32")
+            .replace("@location(3) image: vec4<f32>)","@location(3) image: vec4<f32>, @location(4) layers:vec2<f32>)")
+            .replace("round(vertex*128.)),0)","round(vertex*128.)),i32(layers.y),0)")
+            .replace("o.image=image;return","o.image=image;o.layer=layers.x;return")
+            .replace("vec2<f32>(1.)),dx,dy)","vec2<f32>(1.)),i32(i.layer),dx,dy)")
+        } else {
+            include_str!("terrain.wgsl").to_owned()
+        };
         let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("terrain proof"),
-            source: wgpu::ShaderSource::Wgsl(include_str!("terrain.wgsl").into()),
+            source: wgpu::ShaderSource::Wgsl(source.into()),
         });
         let scene = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("scene"),
@@ -178,9 +233,9 @@ impl Renderer {
                         attributes: &wgpu::vertex_attr_array![0=>Float32x2],
                     }),
                     Some(wgpu::VertexBufferLayout {
-                        array_stride: 48,
+                        array_stride: 56,
                         step_mode: wgpu::VertexStepMode::Instance,
-                        attributes: &wgpu::vertex_attr_array![1=>Float32x4,2=>Float32x4,3=>Float32x4],
+                        attributes: &wgpu::vertex_attr_array![1=>Float32x4,2=>Float32x4,3=>Float32x4,4=>Float32x2],
                     }),
                 ],
             },
@@ -254,6 +309,31 @@ impl Renderer {
                 adapter.get_info().backend == wgpu::Backend::Gl,
             )
         };
+        let image_arrays = arrays.then(|| {
+            texture_arrays::TextureArrays::new(
+                256,
+                256,
+                9,
+                8,
+                192,
+                wgpu::TextureFormat::Rgba8Unorm,
+                wgpu::TextureUsages::TEXTURE_BINDING
+                    | wgpu::TextureUsages::COPY_DST
+                    | wgpu::TextureUsages::COPY_SRC
+                    | mipmaps.destination_usage(),
+            )
+        });
+        let height_arrays = arrays.then(|| {
+            texture_arrays::TextureArrays::new(
+                129,
+                129,
+                1,
+                8,
+                192,
+                wgpu::TextureFormat::R32Float,
+                wgpu::TextureUsages::TEXTURE_BINDING | wgpu::TextureUsages::COPY_DST,
+            )
+        });
         let idx = ridgeline_core::surface::GridRect {
             x0: 0,
             y0: 0,
@@ -271,23 +351,26 @@ impl Renderer {
             mapped_at_creation: false,
         });
         queue.write_buffer(&indices, 0, bytemuck::cast_slice(&idx));
-        let mut index_ranges = HashMap::new();
-        index_ranges.insert(
-            (
-                ridgeline_core::surface::GridRect {
-                    x0: 0,
-                    y0: 0,
-                    x1: 128,
-                    y1: 128,
-                },
-                0,
-                1,
-            ),
-            (0, idx.len() as u32),
-        );
+        let mut index_atlas = index_atlas::IndexAtlas::new((indices.size() / 2) as u32);
+        index_atlas
+            .allocate(
+                (
+                    ridgeline_core::surface::GridRect {
+                        x0: 0,
+                        y0: 0,
+                        x1: 128,
+                        y1: 128,
+                    },
+                    0,
+                    1,
+                ),
+                idx.len() as u32,
+                &HashSet::new(),
+            )
+            .unwrap();
         let instances = device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("tile instances"),
-            size: 256 * 48,
+            size: 256 * 56,
             usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
             mapped_at_creation: false,
         });
@@ -306,6 +389,16 @@ impl Renderer {
             scene_bind,
             texture_layout,
             height_layout,
+            image_arrays,
+            height_arrays,
+            texture_backend: if arrays {
+                TextureBackend::Arrays
+            } else {
+                TextureBackend::Separate
+            },
+            texture_creations: 0,
+            last_frame_draw_calls: 0,
+            last_frame_texture_binds: 0,
             grid,
             sampler,
             mipmaps,
@@ -314,8 +407,7 @@ impl Renderer {
             tiles: HashMap::new(),
             images: HashMap::new(),
             draws: Vec::new(),
-            index_ranges,
-            index_next: idx.len() as u32,
+            index_atlas,
             geometry_budget: 48,
             depth,
             width,
@@ -356,6 +448,33 @@ impl Renderer {
                 }
             }
         }
+        if arrays && mipmap_mode == MipmapMode::Auto {
+            let failed = renderer
+                .array_mipmap_diagnostics()
+                .map_or(true, |report| report.iter().any(|v| v[2] != 0));
+            if failed {
+                renderer.mipmaps = mipmaps::Mipmaps::cpu();
+                if renderer
+                    .array_mipmap_diagnostics()
+                    .map_or(true, |report| report.iter().any(|v| v[2] != 0))
+                {
+                    if backend == TextureBackend::Auto {
+                        drop(renderer);
+                        return Box::pin(Self::new_with_texture_backend(
+                            instance,
+                            surface,
+                            requested_format,
+                            width,
+                            height,
+                            mipmap_mode,
+                            TextureBackend::Separate,
+                        ))
+                        .await;
+                    }
+                    return Err("Array layer/mipmap startup probe failed".into());
+                }
+            }
+        }
         Ok(renderer)
     }
     pub fn uses_cpu_mips(&self) -> bool {
@@ -386,8 +505,7 @@ impl Renderer {
             usage: wgpu::BufferUsages::INDEX | wgpu::BufferUsages::COPY_DST,
             mapped_at_creation: false,
         });
-        self.index_ranges.clear();
-        self.index_next = 0;
+        self.index_atlas = index_atlas::IndexAtlas::new((bytes / 2) as u32);
     }
     pub fn resize(&mut self, w: u32, h: u32) {
         self.width = w.max(1);
@@ -437,44 +555,73 @@ impl Renderer {
         }
         self.clock += 1;
         // Preserve each f32 height exactly; only the invariant grid is shared.
-        let heights_texture = self.device.create_texture(&wgpu::TextureDescriptor {
-            label: Some("exact 129 terrain heights"),
-            size: wgpu::Extent3d {
-                width: 129,
-                height: 129,
-                depth_or_array_layers: 1,
-            },
-            mip_level_count: 1,
-            sample_count: 1,
-            dimension: wgpu::TextureDimension::D2,
-            format: wgpu::TextureFormat::R32Float,
-            usage: wgpu::TextureUsages::TEXTURE_BINDING | wgpu::TextureUsages::COPY_DST,
-            view_formats: &[],
-        });
+        let allocation = if let Some(pool) = &mut self.height_arrays {
+            Some(pool.allocate(&self.device, &self.height_layout, None)?)
+        } else {
+            None
+        };
+        let layer = allocation.as_ref().map_or(0, |slot| slot.layer);
+        let heights_texture = if let Some(slot) = &allocation {
+            slot.texture()
+        } else {
+            self.texture_creations += 1;
+            self.device.create_texture(&wgpu::TextureDescriptor {
+                label: Some("exact 129 terrain heights"),
+                size: wgpu::Extent3d {
+                    width: 129,
+                    height: 129,
+                    depth_or_array_layers: 1,
+                },
+                mip_level_count: 1,
+                sample_count: 1,
+                dimension: wgpu::TextureDimension::D2,
+                format: wgpu::TextureFormat::R32Float,
+                usage: wgpu::TextureUsages::TEXTURE_BINDING | wgpu::TextureUsages::COPY_DST,
+                view_formats: &[],
+            })
+        };
         self.queue.write_texture(
-            heights_texture.as_image_copy(),
+            wgpu::TexelCopyTextureInfo {
+                texture: &heights_texture,
+                mip_level: 0,
+                origin: wgpu::Origin3d {
+                    x: 0,
+                    y: 0,
+                    z: layer,
+                },
+                aspect: wgpu::TextureAspect::All,
+            },
             bytemuck::cast_slice(&heights),
             wgpu::TexelCopyBufferLayout {
                 offset: 0,
                 bytes_per_row: Some(129 * 4),
                 rows_per_image: Some(129),
             },
-            heights_texture.size(),
+            wgpu::Extent3d {
+                width: 129,
+                height: 129,
+                depth_or_array_layers: 1,
+            },
         );
-        let height_bind = self.device.create_bind_group(&wgpu::BindGroupDescriptor {
-            label: Some("terrain height field"),
-            layout: &self.height_layout,
-            entries: &[wgpu::BindGroupEntry {
-                binding: 0,
-                resource: wgpu::BindingResource::TextureView(
-                    &heights_texture.create_view(&Default::default()),
-                ),
-            }],
-        });
+        let height_bind = if let Some(slot) = &allocation {
+            slot.bind()
+        } else {
+            Arc::new(self.device.create_bind_group(&wgpu::BindGroupDescriptor {
+                label: Some("terrain height field"),
+                layout: &self.height_layout,
+                entries: &[wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: wgpu::BindingResource::TextureView(
+                        &heights_texture.create_view(&Default::default()),
+                    ),
+                }],
+            }))
+        };
         self.tiles.insert(
             id,
             Tile {
                 height_bind,
+                array: allocation,
                 _heights: heights_texture,
                 adaptive_profile: None,
                 adaptive_state: std::cell::Cell::new(adaptive::State::new()),
@@ -502,24 +649,44 @@ impl Renderer {
             return Ok(());
         }
         self.clock += 1;
-        let texture = self.device.create_texture(&wgpu::TextureDescriptor {
-            label: Some("actual imagery"),
-            size: wgpu::Extent3d {
-                width: 256,
-                height: 256,
-                depth_or_array_layers: 1,
-            },
-            mip_level_count: 9,
-            sample_count: 1,
-            dimension: wgpu::TextureDimension::D2,
-            format: wgpu::TextureFormat::Rgba8Unorm,
-            usage: wgpu::TextureUsages::TEXTURE_BINDING
-                | wgpu::TextureUsages::COPY_DST
-                | self.mipmaps.destination_usage(),
-            view_formats: &[],
-        });
+        let allocation = if let Some(pool) = &mut self.image_arrays {
+            Some(pool.allocate(&self.device, &self.texture_layout, Some(&self.sampler))?)
+        } else {
+            None
+        };
+        let layer = allocation.as_ref().map_or(0, |slot| slot.layer);
+        let texture = if let Some(slot) = &allocation {
+            slot.texture()
+        } else {
+            self.texture_creations += 1;
+            self.device.create_texture(&wgpu::TextureDescriptor {
+                label: Some("actual imagery"),
+                size: wgpu::Extent3d {
+                    width: 256,
+                    height: 256,
+                    depth_or_array_layers: 1,
+                },
+                mip_level_count: 9,
+                sample_count: 1,
+                dimension: wgpu::TextureDimension::D2,
+                format: wgpu::TextureFormat::Rgba8Unorm,
+                usage: wgpu::TextureUsages::TEXTURE_BINDING
+                    | wgpu::TextureUsages::COPY_DST
+                    | self.mipmaps.destination_usage(),
+                view_formats: &[],
+            })
+        };
         self.queue.write_texture(
-            texture.as_image_copy(),
+            wgpu::TexelCopyTextureInfo {
+                texture: &texture,
+                mip_level: 0,
+                origin: wgpu::Origin3d {
+                    x: 0,
+                    y: 0,
+                    z: layer,
+                },
+                aspect: wgpu::TextureAspect::All,
+            },
             rgba,
             wgpu::TexelCopyBufferLayout {
                 offset: 0,
@@ -533,26 +700,31 @@ impl Renderer {
             },
         );
         self.mipmaps
-            .generate(&self.device, &self.queue, &texture, rgba);
-        let view = texture.create_view(&Default::default());
-        let bind = self.device.create_bind_group(&wgpu::BindGroupDescriptor {
-            label: None,
-            layout: &self.texture_layout,
-            entries: &[
-                wgpu::BindGroupEntry {
-                    binding: 0,
-                    resource: wgpu::BindingResource::TextureView(&view),
-                },
-                wgpu::BindGroupEntry {
-                    binding: 1,
-                    resource: wgpu::BindingResource::Sampler(&self.sampler),
-                },
-            ],
-        });
+            .generate_layer(&self.device, &self.queue, &texture, rgba, layer);
+        let bind = if let Some(slot) = &allocation {
+            slot.bind()
+        } else {
+            let view = texture.create_view(&Default::default());
+            Arc::new(self.device.create_bind_group(&wgpu::BindGroupDescriptor {
+                label: None,
+                layout: &self.texture_layout,
+                entries: &[
+                    wgpu::BindGroupEntry {
+                        binding: 0,
+                        resource: wgpu::BindingResource::TextureView(&view),
+                    },
+                    wgpu::BindGroupEntry {
+                        binding: 1,
+                        resource: wgpu::BindingResource::Sampler(&self.sampler),
+                    },
+                ],
+            }))
+        };
         self.images.insert(
             id,
             ImageTile {
                 bind,
+                array: allocation,
                 _texture: texture,
                 used: self.clock,
             },
@@ -593,6 +765,12 @@ impl Renderer {
         }
         self.tiles.retain(|id, _| ground.contains(id));
         self.images.retain(|id, _| photos.contains(id));
+        if let Some(pool) = &mut self.image_arrays {
+            pool.trim_empty();
+        }
+        if let Some(pool) = &mut self.height_arrays {
+            pool.trim_empty();
+        }
         self.cover_dirty = true;
     }
     pub fn set_geometry_retention(&mut self, tiles: usize) {
@@ -613,6 +791,24 @@ impl Renderer {
     }
     pub fn resident_count(&self) -> usize {
         self.tiles.len().max(self.images.len())
+    }
+    pub fn array_stats(&self) -> [u64; 4] {
+        let pools = [self.image_arrays.as_ref(), self.height_arrays.as_ref()];
+        [
+            pools.iter().flatten().map(|p| p.creations).sum::<u64>() + self.texture_creations,
+            pools.iter().flatten().map(|p| p.reuses).sum(),
+            pools.iter().flatten().map(|p| p.bytes()).sum(),
+            pools.iter().flatten().map(|p| p.page_count() as u64).sum(),
+        ]
+    }
+    pub fn mipmap_stats(&self) -> MipmapStats {
+        self.mipmaps.stats()
+    }
+    pub fn set_mip_scratch_reuse(&self, reuse: bool) {
+        self.mipmaps.set_reuse(reuse)
+    }
+    pub fn index_cache_stats(&self) -> [u64; 5] {
+        self.index_atlas.stats()
     }
     pub fn skirt_edge_count(&self) -> u32 {
         0
@@ -1056,13 +1252,21 @@ impl Renderer {
                 (size / image_size) as f32,
                 ((b[0] - image[0]) / image_size) as f32,
                 ((b[1] - image[1]) / image_size) as f32,
+                self.images[&row.image]
+                    .array
+                    .as_ref()
+                    .map_or(0., |a| a.layer as f32),
+                self.tiles[&row.geometry]
+                    .array
+                    .as_ref()
+                    .map_or(0., |a| a.layer as f32),
             ]
         }));
         if data.len() > self.instance_capacity {
             self.instance_capacity = data.len().next_power_of_two();
             self.instances = self.device.create_buffer(&wgpu::BufferDescriptor {
                 label: Some("tile instances"),
-                size: (self.instance_capacity * 48) as u64,
+                size: (self.instance_capacity * 56) as u64,
                 usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
                 mapped_at_creation: false,
             });
@@ -1110,36 +1314,26 @@ impl Renderer {
             })
             .collect();
         let unique: HashSet<_> = rects.iter().copied().collect();
-        let missing: u32 = unique
-            .iter()
-            .filter(|key| !self.index_ranges.contains_key(key))
-            .map(|(r, m, s)| r.adaptive_index_count(*s, *m))
-            .sum();
-        let capacity = (self.indices.size() / 2) as u32;
-        if self.index_next + missing > capacity {
-            // Retire stale ranges, not geometry quality, when the bounded atlas fills.
-            self.index_ranges.clear();
-            self.index_next = 0;
-        }
+        self.index_atlas.begin_frame(&unique);
         let mut overflow = HashMap::new();
         for rect in &rects {
-            if !self.index_ranges.contains_key(rect) && !overflow.contains_key(rect) {
+            if self.index_atlas.get(rect).is_none() && !overflow.contains_key(rect) {
                 let ids: Vec<u16> = rect
                     .0
                     .adaptive_indices(rect.2, rect.1)
                     .into_iter()
                     .map(|i| i as u16)
                     .collect();
-                let start = self.index_next;
-                let end = start + ids.len() as u32;
-                if end <= capacity {
+                if let Some((start, _end)) =
+                    self.index_atlas.allocate(*rect, ids.len() as u32, &unique)
+                {
+                    // Queue writes execute with the next submission, after prior
+                    // submitted draws. No current-frame range can be evicted.
                     self.queue.write_buffer(
                         &self.indices,
                         start as u64 * 2,
                         bytemuck::cast_slice(&ids),
                     );
-                    self.index_ranges.insert(*rect, (start, end));
-                    self.index_next = end;
                 } else {
                     // A single frame may exceed the atlas: retain its exact indices.
                     // Buffers live through this submission and are bounded by visible cover.
@@ -1161,12 +1355,14 @@ impl Renderer {
         self.drawn_triangles = rects
             .iter()
             .map(|rect| {
-                self.index_ranges
+                self.index_atlas
                     .get(rect)
                     .map_or_else(|| (overflow[rect].size() / 2) as u32, |(a, b)| b - a)
                     / 3
             })
             .sum();
+        self.last_frame_draw_calls = 0;
+        self.last_frame_texture_binds = 0;
         let mut encoder = self.device.create_command_encoder(&Default::default());
         let depth = self.depth.create_view(&Default::default());
         {
@@ -1209,23 +1405,33 @@ impl Renderer {
             let mut i = 0;
             while i < rows.len() {
                 let row = rows[i];
-                if last_image != Some(row.image) {
-                    pass.set_bind_group(1, &self.images[&row.image].bind, &[]);
-                    last_image = Some(row.image);
+                let image_binding = Arc::as_ptr(&self.images[&row.image].bind);
+                let geometry_binding = Arc::as_ptr(&self.tiles[&row.geometry].height_bind);
+                if last_image != Some(image_binding) {
+                    pass.set_bind_group(1, self.images[&row.image].bind.as_ref(), &[]);
+                    last_image = Some(image_binding);
+                    self.last_frame_texture_binds += 1;
                 }
-                if last_geometry != Some(row.geometry) {
-                    pass.set_bind_group(2, &self.tiles[&row.geometry].height_bind, &[]);
-                    last_geometry = Some(row.geometry);
+                if last_geometry != Some(geometry_binding) {
+                    pass.set_bind_group(2, self.tiles[&row.geometry].height_bind.as_ref(), &[]);
+                    last_geometry = Some(geometry_binding);
+                    self.last_frame_texture_binds += 1;
                 }
                 let mut end_instance = i + 1;
                 while end_instance < rows.len()
-                    && rows[end_instance].geometry == row.geometry
-                    && rows[end_instance].image == row.image
+                    && Arc::ptr_eq(
+                        &self.tiles[&rows[end_instance].geometry].height_bind,
+                        &self.tiles[&row.geometry].height_bind,
+                    )
+                    && Arc::ptr_eq(
+                        &self.images[&rows[end_instance].image].bind,
+                        &self.images[&row.image].bind,
+                    )
                     && rects[end_instance] == rects[i]
                 {
                     end_instance += 1;
                 }
-                if let Some(&(start, end)) = self.index_ranges.get(&rects[i]) {
+                if let Some((start, end)) = self.index_atlas.get(&rects[i]) {
                     if !atlas_bound {
                         pass.set_index_buffer(self.indices.slice(..), wgpu::IndexFormat::Uint16);
                         atlas_bound = true;
@@ -1241,6 +1447,7 @@ impl Renderer {
                         i as u32..end_instance as u32,
                     );
                 }
+                self.last_frame_draw_calls += 1;
                 i = end_instance;
             }
             self.route_gpu.draw(&mut pass);

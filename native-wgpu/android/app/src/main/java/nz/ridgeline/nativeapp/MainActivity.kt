@@ -68,6 +68,8 @@ class MainActivity:Activity(){
     }
     override fun onResume(){super.onResume();if(::terrain.isInitialized)terrain.setActive(true);if(::loader.isInitialized)loader.setActive(true)}
     @Deprecated("Legacy Android back dispatch")
+    // API 33+ uses the OnBackInvokedDispatcher registered in onCreate above.
+    @android.annotation.SuppressLint("GestureBackNavigation")
     override fun onBackPressed(){if(!::planner.isInitialized||!planner.back())super.onBackPressed()}
     override fun onRequestPermissionsResult(request:Int,permissions:Array<out String>,grants:IntArray){super.onRequestPermissionsResult(request,permissions,grants);if(::location.isInitialized&&grants.any{it==android.content.pm.PackageManager.PERMISSION_GRANTED})location.permission(request)}
     override fun onActivityResult(request:Int,result:Int,data:android.content.Intent?){super.onActivityResult(request,result,data);if(::planner.isInitialized)planner.result(request,result,data);if(::offlineUi.isInitialized)offlineUi.result(request,result,data)}

@@ -1149,3 +1149,35 @@ Pixelpacking tests passallalphas+randomopaque+cancellation. Realinputhostpacking
 median.576->.305ms across60samples; p951.087->.715ms. No phoneFPSclaim.
 Source/evidence in research/COMPREHENSIVE-AUDIT-IMPLEMENTATION.md and
 validation/comprehensive-audit. Index/mipschanges arecurrentlyinprogress.
+
+
+## Comprehensive audit: GPU texture arrays and exact-work reductions
+
+Implemented lazy eight-layer GPU texture arrays for imagery/all nine mips and
+R32Float terrain, bounded generation-owned slots, shared bindings and compatible
+instanced draws. Automatic Vulkan arrays; automatic GLES pooled separate textures
+because host GLES arrays were slower. Offline / imagery > GPU textures allows
+explicit comparison and compatibility mode. Layer-aware GLES base staging fixes
+emulated-view mip corruption; startup layer/mip probes and safe fallback retained.
+Stable/coalescing index atlas prevents whole-cache resets. GLES mip scratch and
+bindings are reused. Bulk exact pixel packing is included. Full quality/no skirts/
+Capacitor/six original ZIPs remain. Optional expanded preparation remains off.
+
+Host fixture: 32 -> 4 image/height texture allocations, 16 -> 2 draws; all RGBA
+pixels identical. GLES median former139.671ms, pooled128.088ms, arrays148.593ms;
+Vulkan334.076/330.903/329.711ms, not a meaningful phone-speed claim. Index trace
+45 -> 31 pattern uploads. See research/COMPREHENSIVE-AUDIT-IMPLEMENTATION.md and
+validation/comprehensive-audit for raw data, warmup/memory costs and limitations.
+
+Requested 0–1000MiB automatic disk-cache slider added under Offline / imagery,
+sharing one allowance across HTTP/prepared terrain/completed imagery. Persists;
+changes apply after app restart, current active limit shown. Zero disables and
+clears these disposable disk caches on next launch. Saved regions, attached ZIPs
+and independent RAM/GPU working sets are separate. Default1000MiB, free-space cap
+retained. API33+ back callback already present; lint annotation documents legacy
+back override. No physical A20 run/performance acceptance is claimed.
+
+Validation: 26 core, 4 renderer and 1 CLI Rust tests pass; 58 JVM tests report
+zero failures. Vulkan/GLES smoke and five-trial three-mode pixel/recycle fixture
+pass. All three optimized JNI ABIs, assembly, lint, signature and alignment pass.
+Normal Base APK: 31,866,304 bytes; no large overview packs or session CA.

@@ -1,0 +1,90 @@
+{
+  "scope": "Linux host software GPU fixture; not Samsung A20 FPS, interaction acceptance or geographic parity",
+  "trialsPerMode": 5,
+  "input": "Genuine LINZ tile0 payloads from validation/pipeline-cache/inputs.tar.gz with small fixture-only layer tags and height offsets",
+  "timing": "Elapsed includes upload, render and GPU drain; API submission wall time is not pure CPU time. Startup probes and recycle checks excluded.",
+  "modes": {
+    "0": "Separate textures; former fresh GLES mip resources",
+    "1": "Separate textures; pooled GLES mip resources",
+    "2": "Eight-layer array pages; pooled GLES mip resources"
+  },
+  "results": {
+    "vulkan": {
+      "0": {
+        "elapsedUsIncludingGpuDrain": 334076,
+        "uploadSubmitCpuUs": 2487,
+        "renderSubmitCpuUs": 104,
+        "imageHeightTextureCreations": 32,
+        "mipTemporaryCreations": 0,
+        "mipBindCreations": 128,
+        "drawCalls": 16,
+        "textureBinds": 32,
+        "arrayAllocatedBytes": 0,
+        "mipScratchBytes": 0
+      },
+      "1": {
+        "elapsedUsIncludingGpuDrain": 330903,
+        "uploadSubmitCpuUs": 2459,
+        "renderSubmitCpuUs": 104,
+        "imageHeightTextureCreations": 32,
+        "mipTemporaryCreations": 0,
+        "mipBindCreations": 128,
+        "drawCalls": 16,
+        "textureBinds": 32,
+        "arrayAllocatedBytes": 0,
+        "mipScratchBytes": 0
+      },
+      "2": {
+        "elapsedUsIncludingGpuDrain": 329711,
+        "uploadSubmitCpuUs": 2891,
+        "renderSubmitCpuUs": 88,
+        "imageHeightTextureCreations": 4,
+        "mipTemporaryCreations": 0,
+        "mipBindCreations": 128,
+        "drawCalls": 2,
+        "textureBinds": 4,
+        "arrayAllocatedBytes": 6657408,
+        "mipScratchBytes": 0
+      }
+    },
+    "gles": {
+      "0": {
+        "elapsedUsIncludingGpuDrain": 139671,
+        "uploadSubmitCpuUs": 19759,
+        "renderSubmitCpuUs": 116671,
+        "imageHeightTextureCreations": 32,
+        "mipTemporaryCreations": 128,
+        "mipBindCreations": 128,
+        "drawCalls": 16,
+        "textureBinds": 32,
+        "arrayAllocatedBytes": 0,
+        "mipScratchBytes": 0
+      },
+      "1": {
+        "elapsedUsIncludingGpuDrain": 128088,
+        "uploadSubmitCpuUs": 12342,
+        "renderSubmitCpuUs": 107859,
+        "imageHeightTextureCreations": 32,
+        "mipTemporaryCreations": 0,
+        "mipBindCreations": 16,
+        "drawCalls": 16,
+        "textureBinds": 32,
+        "arrayAllocatedBytes": 0,
+        "mipScratchBytes": 87380
+      },
+      "2": {
+        "elapsedUsIncludingGpuDrain": 148593,
+        "uploadSubmitCpuUs": 13478,
+        "renderSubmitCpuUs": 129897,
+        "imageHeightTextureCreations": 4,
+        "mipTemporaryCreations": 0,
+        "mipBindCreations": 0,
+        "drawCalls": 2,
+        "textureBinds": 4,
+        "arrayAllocatedBytes": 6657408,
+        "mipScratchBytes": 349524
+      }
+    }
+  },
+  "pixelChecks": "All main, in-flight reuse and returned-view RGBA captures identical across modes within each API; 80 cache-churn uploads per mode per trial, no CPU fence before reuse. All 18 array layer/mip startup readbacks pass."
+}

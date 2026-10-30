@@ -27,14 +27,24 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     }
     private data class Source(val id:Id,val geometry:Boolean)
     // Automatic HTTP cache is disposable. Saved regions/packs are never evicted here.
-    val automaticCacheBytes=minOf(1_000_000_000L,(context.cacheDir.usableSpace/8).coerceAtLeast(4_194_304L))
+    private val preferences=context.getSharedPreferences("display",0)
+    val automaticCacheMiB get()=preferences.getInt("automaticCacheMiB",1000).coerceIn(0,1000)
+    fun automaticCacheMiB(value:Int){preferences.edit().putInt("automaticCacheMiB",value.coerceIn(0,1000)).apply()}
+    val automaticCacheBytes=AutomaticCacheBudget.bytes(automaticCacheMiB,context.cacheDir.usableSpace)
     private val preparedBytes=minOf(128L*1024*1024,automaticCacheBytes/8)
     private val compositionBytes=preparedBytes/2
     private val preparedWrites=ThreadPoolExecutor(1,1,0,TimeUnit.MILLISECONDS,ArrayBlockingQueue<Runnable>(8),ThreadFactory{work->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);work.run()},"RidgelinePreparedCache")},ThreadPoolExecutor.DiscardOldestPolicy())
     private val client = OkHttpClient.Builder()
-        .cache(Cache(File(context.cacheDir, "native-http-v1"), automaticCacheBytes-preparedBytes))
+        .cache(if(automaticCacheBytes>0)Cache(File(context.cacheDir, "native-http-v1"), automaticCacheBytes-preparedBytes)else null)
         .dispatcher(Dispatcher().apply{maxRequests=32;maxRequestsPerHost=16})
         .connectTimeout(12, TimeUnit.SECONDS).readTimeout(15, TimeUnit.SECONDS).build()
+    init {
+        if(automaticCacheBytes==0L)preparedWrites.execute {
+            // No HTTP cache is open and derived stores have a zero write limit.
+            for(name in listOf("native-http-v1","native-terrain-v3","native-compositions-v1"))
+                runCatching{File(context.cacheDir,name).deleteRecursively()}
+        }
+    }
     private val key = context.assets.open("map-defaults.json").use {
         JSONObject(it.readBytes().toString(Charsets.UTF_8)).getString("linzApiKey")
     }
@@ -50,8 +60,9 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private val regionContext=ThreadLocal<String>()
     @Volatile private var downloadLease:TileTransport.Consumer?=null
     private val downloadCancel=java.util.concurrent.atomic.AtomicBoolean(false)
-    private val preferences=context.getSharedPreferences("display",0)
     @Volatile var offlineOnly=preferences.getBoolean("offlineOnly",false);private set
+    val textureBackend get()=preferences.getInt("textureBackend",0)
+    fun textureBackend(mode:Int)=view.textureBackend(mode)
     fun offlineOnly(value:Boolean){offlineOnly=value;preferences.edit().putBoolean("offlineOnly",value).apply();for(task in jobs.values)task.cancel();clearWarm();synchronized(ready){ready.clear();readyBytes=0};synchronized(decoded){decoded.clear()};cameraChanged()}
     val overviews=OverviewAttachments(context)
     private val attachmentJobs=Executors.newSingleThreadExecutor()

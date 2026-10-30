@@ -75,6 +75,7 @@ fn recover_poisoned_state() {
 fn protect<T: Default>(f: impl FnOnce() -> T) -> T {
     std::panic::catch_unwind(std::panic::AssertUnwindSafe(f)).unwrap_or_default()
 }
+static ARRAY_MODE: AtomicU64 = AtomicU64::new(0);
 static PREFERRED_BACKEND: AtomicU64 = AtomicU64::new(0);
 fn state_for_backend(
     window: &NativeWindow,
@@ -96,13 +97,30 @@ fn state_for_backend(
         raw_window_handle: window.window_handle().map_err(|e| e.to_string())?.as_raw(),
     };
     let surface = unsafe { instance.create_surface_unsafe(target) }.map_err(|e| e.to_string())?;
-    let renderer = pollster::block_on(Renderer::new(
-        &instance,
-        Some(&surface),
-        None,
-        w.max(1) as u32,
-        h.max(1) as u32,
-    ))?;
+    let selected = match ARRAY_MODE.load(Ordering::Relaxed) {
+        1 => TextureBackend::Separate,
+        2 => TextureBackend::Arrays,
+        _ => TextureBackend::Auto,
+    };
+    let build = |backend| {
+        pollster::block_on(Renderer::new_with_texture_backend(
+            &instance,
+            Some(&surface),
+            None,
+            w.max(1) as u32,
+            h.max(1) as u32,
+            MipmapMode::Auto,
+            backend,
+        ))
+    };
+    let renderer = match build(selected) {
+        Ok(renderer) => renderer,
+        Err(_) if selected == TextureBackend::Arrays => {
+            log("Array texture startup unavailable; using compatibility textures");
+            build(TextureBackend::Separate)?
+        }
+        Err(error) => return Err(error),
+    };
     let config = wgpu::SurfaceConfiguration {
         usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
         format: renderer.format,
@@ -1033,4 +1051,13 @@ pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_gpuBacklog(
             })
             .unwrap_or(0)
     })
+}
+
+#[unsafe(no_mangle)]
+pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_textureBackend(
+    _env: *mut c_void,
+    _class: *mut c_void,
+    mode: i32,
+) {
+    ARRAY_MODE.store(mode.clamp(0, 2) as u64, Ordering::Relaxed);
 }

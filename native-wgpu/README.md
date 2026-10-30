@@ -8,6 +8,14 @@ optional GPU preparation (off by default). See [scope/evidence](validation/cache
 Historical skirt fixtures below describe earlier builds; cross-LOD cracks may
 be visible without skirts. No A20 FPS/interaction acceptance is claimed.
 
+The audit checkpoint adds bounded **GPU texture arrays**, shared bindings/batching,
+reusable GLES mip scratch, stable index suballocations and bulk pixel packing.
+**Offline / imagery → GPU textures** selects Automatic, Compatibility or Texture
+arrays. Automatic uses arrays on Vulkan and pooled separate textures on GLES:
+arrays reduced allocations/draws but were slower in the host GLES fixture.
+A **0–1000 MiB automatic disk-cache slider** applies after app restart; saved
+regions and attached ZIPs remain separate. See [measurements and limitations](research/COMPREHENSIVE-AUDIT-IMPLEMENTATION.md).
+
 Separate Kotlin/Android UI + Rust/wgpu app. Authoritative reference: Capacitor
 0.18.0 source `d880143418ac46ece98adff0b3b2fbaedf044d46`, latest
 `android-preview-download` checked at `39431dad230945919a7b7d9d0ef2e86db8492ead`.

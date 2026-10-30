@@ -218,6 +218,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         lastRecovery=now
         if(!live||!active)return
         if(handle!=0L)NativeBridge.destroy(handle)
+        NativeBridge.textureBackend(context.getSharedPreferences("display",0).getInt("textureBackend",0))
         handle=NativeBridge.create(holder.surface,width,height)
         residency=Residency(LongArray(0),LongArray(0));safetyPose=null;safetyValid=false;appliedRoutes=null;appliedDemand=null
         if(handle!=0L){
@@ -239,6 +240,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         live=true;val token=generation.incrementAndGet();val surface=holder.surface
         gpu.post {
             if(!live||generation.get()!=token)return@post
+            NativeBridge.textureBackend(context.getSharedPreferences("display",0).getInt("textureBackend",0))
             val created=NativeBridge.create(surface,width,height)
             if(!live||generation.get()!=token){if(created!=0L)NativeBridge.destroy(created);return@post}
             handle=created;safetyPose=null;safetyValid=false;appliedRoutes=null;appliedDemand=null;presentationFailures=0
@@ -257,6 +259,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     fun setActive(value:Boolean){
         if(!value){stopMotion();gestureEpoch++;gestureActive=false;val pose=cameraPose;cameraPreferences.edit().putLong("lon",pose.longitude.toBits()).putLong("lat",pose.latitude.toBits()).putLong("zoom",pose.zoom.toBits()).putFloat("bearing",pose.bearing).putFloat("pitch",pose.pitch).putFloat("elevation",pose.elevation).apply()}
         active=value;cancelFrames();if(value&&live)requestFrame()}
+    fun textureBackend(mode:Int){context.getSharedPreferences("display",0).edit().putInt("textureBackend",mode.coerceIn(0,2)).apply();gpu.post{lastRecovery=0L;recoverGpu()}}
     fun memoryPressure(){gpu.post{
         if(handle!=0L){NativeBridge.releaseUnused(handle);refreshResidency();safetyPose=null}
     }}

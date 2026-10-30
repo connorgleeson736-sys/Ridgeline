@@ -46,7 +46,19 @@ class OfflineUi(private val activity:Activity,root:FrameLayout,private val terra
         val list=LinearLayout(activity).apply{orientation=LinearLayout.VERTICAL}
         val status=TextView(activity)
         val dialog=AlertDialog.Builder(activity).setTitle("Offline maps").setView(ScrollView(activity).apply{addView(content)}).setNegativeButton("Close",null).create()
-        content.addView(TextView(activity).apply{text="Automatic cache: up to ${loader.automaticCacheBytes/1_000_000} MB, adjusted for free storage. Saved regions are kept separately.";textSize=12f})
+        val cacheLabel=TextView(activity).apply{textSize=12f}
+        val cacheSize=SeekBar(activity).apply{max=1000;progress=loader.automaticCacheMiB;contentDescription="Automatic map cache size in MiB"}
+        fun cacheText(){cacheLabel.text="Automatic cache: ${cacheSize.progress} MiB maximum · active limit ${loader.automaticCacheBytes/1_048_576} MiB. Adjusted for free storage. Changes apply after restarting the app; 0 disables automatic disk caching. Saved regions and attached ZIPs are separate."}
+        cacheText();content.addView(cacheLabel);content.addView(cacheSize)
+        cacheSize.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener{
+            override fun onProgressChanged(bar:SeekBar?,value:Int,user:Boolean){cacheText();if(user)loader.automaticCacheMiB(value)}
+            override fun onStartTrackingTouch(bar:SeekBar?){}
+            override fun onStopTrackingTouch(bar:SeekBar?){}
+        })
+        content.addView(button("GPU textures: "+arrayOf("Automatic","Compatibility","Texture arrays")[loader.textureBackend.coerceIn(0,2)]){
+            val choices=arrayOf("Automatic","Compatibility","Texture arrays")
+            AlertDialog.Builder(activity).setTitle("GPU textures").setSingleChoiceItems(choices,loader.textureBackend){picker,mode->loader.textureBackend(mode);picker.dismiss();dialog.dismiss();show()}.setNegativeButton("Cancel",null).show()
+        })
         content.addView(CheckBox(activity).apply{text="Prepare nearby terrain while idle";isChecked=loader.prepareAhead;setOnCheckedChangeListener{_,checked->loader.prepareAhead(checked)}})
         content.addView(CheckBox(activity).apply{text="Offline only";isChecked=loader.offlineOnly;setOnCheckedChangeListener{_,checked->loader.offlineOnly(checked)}})
         content.addView(button("Add imagery ZIPs"){dialog.dismiss();addImagery()})
