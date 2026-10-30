@@ -20,7 +20,10 @@ Three concrete failures were addressed:
    fallback chooses oldest non-owner entries first, or detail with a real resident
    ancestor. If no safe victim exists, preserve coverage debt instead of deleting
    the last source. This can temporarily exceed the configured soft count target;
-   existing bounded array pages and upload backpressure remain. RAM-slider limits
+   a separate 192-source hard ceiling per terrain/photo pool rejects unrelated
+   arrivals until capacity is available, on both texture backends. Related
+   replacements can use one transient slot and safely evict a covered source.
+   Bounded array pages and upload backpressure remain. RAM-slider limits
    are unchanged. This is not an unlimited retention or a zero-memory fallback.
 
 Regression evidence:

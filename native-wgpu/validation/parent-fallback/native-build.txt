@@ -1,9 +1,6 @@
-   Compiling ridgeline-core v0.1.0 (/workspace/Ridgeline/native-wgpu/core)
    Compiling ridgeline-renderer v0.1.0 (/workspace/Ridgeline/native-wgpu/renderer)
-    Finished `release` profile [optimized] target(s) in 5.81s
-   Compiling ridgeline-core v0.1.0 (/workspace/Ridgeline/native-wgpu/core)
+    Finished `release` profile [optimized] target(s) in 5.00s
    Compiling ridgeline-renderer v0.1.0 (/workspace/Ridgeline/native-wgpu/renderer)
-    Finished `release` profile [optimized] target(s) in 5.54s
-   Compiling ridgeline-core v0.1.0 (/workspace/Ridgeline/native-wgpu/core)
+    Finished `release` profile [optimized] target(s) in 4.70s
    Compiling ridgeline-renderer v0.1.0 (/workspace/Ridgeline/native-wgpu/renderer)
-    Finished `release` profile [optimized] target(s) in 5.55s
+    Finished `release` profile [optimized] target(s) in 4.87s

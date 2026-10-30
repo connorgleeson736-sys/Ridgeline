@@ -562,6 +562,17 @@ impl Renderer {
         if self.touch_geometry(id) {
             return Ok(());
         }
+        if self.tiles.len() >= 192 {
+            self.trim_geometry();
+            // A related tile makes safe replacement possible after upload. An
+            // unrelated arrival must wait for capacity rather than grow the
+            // compatibility backend indefinitely or discard sole coverage.
+            if self.tiles.len() >= 192
+                && !self.tiles.keys().any(|old| id.contains(*old) || old.contains(id))
+            {
+                return Err("Terrain residency full; waiting for fallback capacity".into());
+            }
+        }
         self.clock += 1;
         // Preserve each f32 height exactly; only the invariant grid is shared.
         let allocation = if let Some(pool) = &mut self.height_arrays {
@@ -657,6 +668,14 @@ impl Renderer {
         }
         if self.touch_image(id) {
             return Ok(());
+        }
+        if self.images.len() >= 192 {
+            self.trim_images();
+            if self.images.len() >= 192
+                && !self.images.keys().any(|old| id.contains(*old) || old.contains(id))
+            {
+                return Err("Imagery residency full; waiting for fallback capacity".into());
+            }
         }
         self.clock += 1;
         let allocation = if let Some(pool) = &mut self.image_arrays {

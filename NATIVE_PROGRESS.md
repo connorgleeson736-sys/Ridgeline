@@ -1259,3 +1259,8 @@ Regression: GPU complete parent/child frame stays byte-identical under fine-only
 new demand on Vulkan and GLES arrays; sibling holes no longer appear in that case.
 27core+4renderer+1CLI Rust,11focusedJVM+lint pass; all3optimizedABIs build.
 Evidence/scope in validation/parent-fallback; no A20 runtime or speedup claim.
+
+Physical residency remains bounded on both texture backends:192sources per terrain/
+photo pool. If all owners are protected at that hard ceiling, unrelated uploads
+wait for capacity; related replacements may use one transient slot and then evict
+a safely covered source. This bounds soft coverage debt on GLES as well as arrays.
