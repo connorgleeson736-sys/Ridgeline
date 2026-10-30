@@ -1238,3 +1238,24 @@ normal three-ABI Base signing and16KiB alignment pass.
 
 Seam-protected Base source`f104946`: 31,916,688bytes, SHA256
 `a1a21c2dfd36ec7bc35262f9f2d903235478b25502ab1a6d43c4b295a68e4f3d`; all3optimizedABIs, no largepacks/sessionCA.
+
+
+## Parent fallback gaps during zoom/pan
+
+Fixed ready-child ownership dropping its resident parent background while camera
+motion precedes next demand selection. Rendering now includes nearest cached
+ancestors without overlapping finer surfaces. Complete fine cover still removes
+all parent draws; coarse demand remains independent of stale cached detail.
+Loader restores nearest already-prepared RAM parents before fine preparation,
+including multi-level zoom jumps; terrain/photo independent. Upload queue admits
+ancestors outside exact requested IDs, prioritizes coverage, prunes unrelated work.
+Count eviction no longer selects newest non-explicit sources that still provide
+coverage: protects owners/backgrounds, oldest nonowners first, or detail with a
+real resident ancestor. Preserves coverage debt rather than deleting sole sources;
+soft count targets may be exceeded transiently, fixed array bounds/admission remain.
+No worker/network/detail increases; RAM/disk sliders, arrays, skirts/6ZIPs preserved.
+
+Regression: GPU complete parent/child frame stays byte-identical under fine-only
+new demand on Vulkan and GLES arrays; sibling holes no longer appear in that case.
+27core+4renderer+1CLI Rust,11focusedJVM+lint pass; all3optimizedABIs build.
+Evidence/scope in validation/parent-fallback; no A20 runtime or speedup claim.

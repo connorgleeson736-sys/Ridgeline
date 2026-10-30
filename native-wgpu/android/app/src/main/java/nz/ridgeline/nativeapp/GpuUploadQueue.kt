@@ -7,9 +7,10 @@ class GpuUploadQueue(private val capacity:Int) {
     data class Tile(val id:Id,val heights:ByteBuffer,val rgba:ByteBuffer,val kind:Kind=Kind.COMBINED){val bytes get()=heights.capacity()+rgba.capacity()}
     private val entries=LinkedHashMap<Pair<Id,Kind>,Tile>()
     private var warm:Pair<Set<Id>,Set<Id>> = emptySet<Id>() to emptySet()
-    private var demand:Pair<Set<Id>,Set<Id>>?=null
+    private var admitted:Pair<Set<Id>,Set<Id>>?=null
+    private var parents:Pair<Set<Id>,Set<Id>> = emptySet<Id>() to emptySet()
     private fun wanted(tile:Tile):Boolean {
-        val current=demand?:return true // Controlled fixtures need no viewport demand.
+        val current=admitted?:return true // Exact targets plus their useful ancestors.
         return when(tile.kind){
             Kind.GEOMETRY->tile.id in current.first||tile.id in warm.first
             Kind.IMAGE->tile.id in current.second||tile.id in warm.second
@@ -17,12 +18,16 @@ class GpuUploadQueue(private val capacity:Int) {
         }
     }
     private fun foreground(tile:Tile):Boolean{
-        val current=demand?:return true
+        val current=admitted?:return true
         return when(tile.kind){Kind.GEOMETRY->tile.id in current.first;Kind.IMAGE->tile.id in current.second;Kind.COMBINED->tile.id in current.first||tile.id in current.second}
     }
     /** Prune queued ownership only; resident fallback coverage remains intact. */
     @Synchronized fun updateDemand(geometry:Set<Id>,images:Set<Id>){
-        demand=geometry.toSet() to images.toSet()
+        fun ancestors(ids:Set<Id>):Set<Id> = buildSet {
+            for(target in ids){var id=target;while(id.z>0){id=Id(id.z-1,id.x/2,id.y/2);add(id)}}
+        }
+        parents=ancestors(geometry) to ancestors(images)
+        admitted=(geometry+parents.first) to (images+parents.second)
         entries.entries.removeAll{!wanted(it.value)}
     }
     @Synchronized fun updateWarm(geometry:Set<Id>,images:Set<Id>){warm=geometry.toSet() to images.toSet();entries.entries.removeAll{!wanted(it.value)}}
@@ -39,7 +44,11 @@ class GpuUploadQueue(private val capacity:Int) {
         val out=ArrayList<Tile>(count);var bytes=0
         while(out.size<count){val row=peek()?:break;if(bytes+row.bytes>byteBudget)break;out.add(row);bytes+=row.bytes;entries.remove(row.id to row.kind)};return out
     }
-    @Synchronized fun peek():Tile?=entries.values.firstOrNull{foreground(it)}?:entries.values.firstOrNull()
+    @Synchronized fun peek():Tile?=entries.values.firstOrNull{tile->when(tile.kind){
+        Kind.GEOMETRY->tile.id in parents.first
+        Kind.IMAGE->tile.id in parents.second
+        Kind.COMBINED->tile.id in parents.first||tile.id in parents.second
+    }}?:entries.values.firstOrNull{foreground(it)}?:entries.values.firstOrNull()
     @Synchronized fun isNotEmpty()=entries.isNotEmpty()
     @Synchronized fun clear()=entries.clear()
     companion object{val EMPTY:ByteBuffer=ByteBuffer.allocateDirect(0)}

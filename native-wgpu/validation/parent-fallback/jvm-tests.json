@@ -1,0 +1,20 @@
+[
+  {
+    "name": "nz.ridgeline.nativeapp.CachedFallbackTest",
+    "tests": "1",
+    "failures": "0",
+    "errors": "0"
+  },
+  {
+    "name": "nz.ridgeline.nativeapp.SourceDemandTest",
+    "tests": "4",
+    "failures": "0",
+    "errors": "0"
+  },
+  {
+    "name": "nz.ridgeline.nativeapp.GpuUploadQueueTest",
+    "tests": "6",
+    "failures": "0",
+    "errors": "0"
+  }
+]

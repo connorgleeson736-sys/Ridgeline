@@ -192,6 +192,27 @@ pub fn demanded_sources(available: &[TileId], ideal: &[TileId]) -> Vec<TileId> {
     out.sort_by_key(|id| (id.z, id.x, id.y));
     out
 }
+/// Keep the nearest resident ancestor as a backdrop even after an ideal tile
+/// arrives. A camera frame may precede the next demand plan during a drag;
+/// dropping this background would expose cached siblings as empty space.
+pub fn render_sources(available: &[TileId], ideal: &[TileId]) -> Vec<TileId> {
+    use std::collections::HashSet;
+    let exact: HashSet<_> = available.iter().copied().collect();
+    let mut selected: HashSet<_> = demanded_sources(available, ideal).into_iter().collect();
+    for target in ideal {
+        let mut parent = target.parent();
+        while let Some(id) = parent {
+            if exact.contains(&id) {
+                selected.insert(id);
+                break;
+            }
+            parent = id.parent();
+        }
+    }
+    let mut out: Vec<_> = selected.into_iter().collect();
+    out.sort_by_key(|id| (id.z, id.x, id.y));
+    out
+}
 #[cfg(test)]
 mod terrain_tests {
     use super::*;
@@ -318,5 +339,30 @@ mod cached_child_cover_tests {
         available.pop();
         let fallback = demanded_sources(&available, &[p]);
         assert_eq!(fallback, vec![p]);
+    }
+}
+
+#[cfg(test)]
+mod fallback_backdrop_tests {
+    use super::*;
+    #[test]
+    fn fine_arrival_keeps_cached_siblings_covered_before_the_next_pan_plan() {
+        let p = TileId {
+            z: 12,
+            x: 3983,
+            y: 2600,
+        };
+        let c = p.children()[0];
+        let owners = render_sources(&[p, c], &[c]);
+        let cover = resident_cover(&owners);
+        assert_eq!(cover.iter().filter(|r| r.source == p).count(), 3);
+        assert_eq!(cover.iter().filter(|r| r.source == c).count(), 1);
+        let mut available = vec![p];
+        available.extend(p.children());
+        let full = resident_cover(&render_sources(&available, &p.children()));
+        assert_eq!(full.len(), 4);
+        assert!(full.iter().all(|r| r.source != p));
+        // Zooming back out must not revive a lone stale fine child.
+        assert_eq!(render_sources(&[p, c], &[p]), vec![p]);
     }
 }

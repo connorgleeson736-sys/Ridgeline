@@ -839,6 +839,12 @@ impl Renderer {
             self.cover_dirty = true;
         }
     }
+    /// Controlled render clients may use all resident sources without a plan.
+    pub fn clear_demand(&mut self) {
+        if self.demand.take().is_some() {
+            self.cover_dirty = true;
+        }
+    }
     fn active_sources(&self, geometry: bool) -> Vec<TileId> {
         let available: Vec<_> = if geometry {
             self.tiles.keys().copied().collect()
@@ -858,7 +864,7 @@ impl Renderer {
                         .any(|other| id != other && id.contains(*other))
                 })
                 .collect();
-            ridgeline_core::demanded_sources(&available, &ideal)
+            ridgeline_core::render_sources(&available, &ideal)
         } else {
             available
         }
@@ -883,7 +889,12 @@ impl Renderer {
             // Protect a visible source if removing it would expose an uncovered
             // region. Fine tiles may fall back to an existing real ancestor;
             // a partial parent's unfilled siblings must never disappear.
-            let mut protected = HashSet::new();
+            let owners: HashSet<_> = if self.demand.is_some() {
+                self.active_sources(true).into_iter().collect()
+            } else {
+                HashSet::new()
+            };
+            let mut protected = owners.clone();
             if let Some(view) = self.last_view {
                 let (matrix, ppm) = camera_matrix(
                     view.width,
@@ -935,7 +946,7 @@ impl Renderer {
                     .tiles
                     .keys()
                     .any(|id| id.z > 12 && !protected.contains(id));
-            let victim = self
+            let Some(victim) = self
                 .tiles
                 .iter()
                 .filter(|(id, _)| !protected.contains(id) && !(reserve && id.z <= 12))
@@ -953,11 +964,32 @@ impl Renderer {
                 .or_else(|| {
                     self.tiles
                         .iter()
-                        .filter(|(id, _)| self.demand.as_ref().is_none_or(|(g, _)| !g.contains(id)))
-                        .max_by_key(|(_, tile)| tile.used)
+                        .filter(|(id, _)| !owners.contains(id))
+                        .min_by_key(|(_, tile)| tile.used)
                         .map(|(id, _)| *id)
                 })
-                .unwrap();
+                .or_else(|| {
+                    // Only sacrifice detail if a real resident ancestor can fill it.
+                    self.tiles
+                        .iter()
+                        .filter(|(id, _)| {
+                            let mut parent = id.parent();
+                            while let Some(p) = parent {
+                                if self.tiles.contains_key(&p) {
+                                    return true;
+                                }
+                                parent = p.parent();
+                            }
+                            false
+                        })
+                        .min_by_key(|(_, tile)| tile.used)
+                        .map(|(id, _)| *id)
+                })
+            else {
+                // Coverage debt is preferable to deleting the last source.
+                // Array pools and upload backpressure still bound admission.
+                break;
+            };
             if victim.z <= 12 {
                 coarse = coarse.saturating_sub(1);
             }
@@ -970,7 +1002,12 @@ impl Renderer {
     fn trim_images(&mut self) {
         let mut coarse = self.images.keys().filter(|id| id.z <= 12).count();
         while self.images.len() > self.budget {
-            let mut protected = HashSet::new();
+            let owners: HashSet<_> = if self.demand.is_some() {
+                self.active_sources(false).into_iter().collect()
+            } else {
+                HashSet::new()
+            };
+            let mut protected = owners.clone();
             if let Some(view) = self.last_view {
                 let (matrix, ppm) = camera_matrix(
                     view.width,
@@ -1027,7 +1064,7 @@ impl Renderer {
                     .images
                     .keys()
                     .any(|id| id.z > 12 && !protected.contains(id));
-            let victim = self
+            let Some(victim) = self
                 .images
                 .iter()
                 .filter(|(id, _)| !protected.contains(id) && !(reserve && id.z <= 12))
@@ -1045,11 +1082,32 @@ impl Renderer {
                 .or_else(|| {
                     self.images
                         .iter()
-                        .filter(|(id, _)| self.demand.as_ref().is_none_or(|(_, i)| !i.contains(id)))
-                        .max_by_key(|(_, tile)| tile.used)
+                        .filter(|(id, _)| !owners.contains(id))
+                        .min_by_key(|(_, tile)| tile.used)
                         .map(|(id, _)| *id)
                 })
-                .unwrap();
+                .or_else(|| {
+                    // Only sacrifice detail if a real resident ancestor can fill it.
+                    self.images
+                        .iter()
+                        .filter(|(id, _)| {
+                            let mut parent = id.parent();
+                            while let Some(p) = parent {
+                                if self.images.contains_key(&p) {
+                                    return true;
+                                }
+                                parent = p.parent();
+                            }
+                            false
+                        })
+                        .min_by_key(|(_, tile)| tile.used)
+                        .map(|(id, _)| *id)
+                })
+            else {
+                // Coverage debt is preferable to deleting the last source.
+                // Array pools and upload backpressure still bound admission.
+                break;
+            };
             if victim.z <= 12 {
                 coarse = coarse.saturating_sub(1);
             }

@@ -212,7 +212,11 @@ async fn run() {
         0.,
         1000.,
     );
-    assert_eq!(r.skirt_edge_count(), 8, "continuous shared parent/child boundaries omit internal skirts");
+    assert_eq!(
+        r.skirt_edge_count(),
+        8,
+        "continuous shared parent/child boundaries omit internal skirts"
+    );
     let bytes = read(&r, &output);
     let pixel = |x: usize, y: usize| &bytes[(y * 256 + x) * 4..][..4];
     assert_ne!(pixel(64, 64), &[36, 113, 74, 255]);
@@ -231,6 +235,25 @@ async fn run() {
         r.instance_uploads > counts.1,
         "refined source cover must update instances"
     );
+    // Demand can lag the moving camera. A ready fine tile must not suppress
+    // its cached parent while neighbouring detail is not in the new plan yet.
+    let fine = parent.children()[0];
+    r.set_demand(vec![fine], vec![fine]);
+    r.render(
+        &output.create_view(&Default::default()),
+        center,
+        12.,
+        0.,
+        0.,
+        1000.,
+    );
+    let backdrop = read(&r, &output);
+    assert_eq!(
+        backdrop, bytes,
+        "cached parent must keep every sibling pixel covered after fine arrival"
+    );
+    println!("Cached parent backdrop: fine-only demand preserves every pixel of the complete cached frame");
+    r.clear_demand();
     // Independent photographic detail must not duplicate/refine the terrain grid.
     let detailed = TileId {
         z: 12,
@@ -504,8 +527,9 @@ async fn run() {
         "recent requested terrain remains GPU resident across unrelated uploads"
     );
     seam.release_unused();
-    assert_eq!(seam.geometry_count(), 1);
-    assert_eq!(seam.image_count(), 1);
+    assert_eq!(seam.geometry_count(), 2, "keep requested terrain and its nearest parent backdrop");
+    assert_eq!(seam.image_count(), 2, "keep requested imagery and its nearest parent backdrop");
+    assert!(seam.touch_geometry(parent) && seam.touch_image(parent));
     assert!(
         seam.touch_geometry(high),
         "memory pressure preserves actual demanded terrain"

@@ -21,6 +21,12 @@ slider (0–1000 MiB)** applies immediately across encoded, decoded terrain and
 prepared tile payloads. Zero disables their retention. Working memory and GPU
 resources remain separate; high settings can exhaust phone memory. See [measurements and limitations](research/COMPREHENSIVE-AUDIT-IMPLEMENTATION.md).
 
+Parent fallback now keeps a cached ancestor behind ready fine tiles during camera
+movement, restores prepared RAM ancestors across zoom jumps, and admits/prioritizes
+those uploads. Cache eviction protects useful fallback ownership.
+[Regression scope](validation/parent-fallback/) includes pixel-identical full-frame
+coverage under fine-only demand on Vulkan/GLES arrays.
+
 Separate Kotlin/Android UI + Rust/wgpu app. Authoritative reference: Capacitor
 0.18.0 source `d880143418ac46ece98adff0b3b2fbaedf044d46`, latest
 `android-preview-download` checked at `39431dad230945919a7b7d9d0ef2e86db8492ead`.

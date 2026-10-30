@@ -210,8 +210,19 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         }
         val ranked=plan.ranked
         wanted = ranked.keys.toSet()
+        // Restore already prepared parents before requesting more detailed work.
+        // A zoom jump can skip several levels; the exact new plan need not name
+        // the parent that was visible moments ago. Geometry/photos are independent.
+        val cachedParents=LinkedHashMap<Source,ByteBuffer>()
+        for(source in wanted){
+            if(view.hasResidentCoverage(source.id.gpu(),source.geometry))continue
+            val parent=synchronized(ready){CachedFallback.nearest(source.id.gpu()){id->ready[Source(Id(id.z,id.x,id.y),source.geometry)]}}
+            if(parent!=null){val id=parent.first;val owner=Source(Id(id.z,id.x,id.y),source.geometry)
+                if(!resident(owner))cachedParents[owner]=parent.second}
+        }
         view.updateUploadDemand(wanted.filter{it.geometry}.map{it.id.gpu()}.toSet(),
             wanted.filter{!it.geometry}.map{it.id.gpu()}.toSet())
+        for((parent,data)in cachedParents)upload(parent,data)
         failures.keys.removeAll{it !in wanted}
         if(view.gestureInProgress&&!lastGesture){predictionCount=0;cancelPredictions()}
         lastGesture=view.gestureInProgress
