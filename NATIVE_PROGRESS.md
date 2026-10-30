@@ -1078,3 +1078,23 @@ Full imagery/heights/filters/mips, Add imagery, original6ZIPs andCapacitor intac
 Latest normal Base APK from 0e2d7ee: 31919402 bytes, SHA256
 474ed2be9fa8157d45132a0b3ff851b577504594b26725137e92f3975f687c55. All3optimizedABIs/signature/assembly pass; no packs orsessionCA.
 Measurement scope and reproducible original-data fixture in validation/pipeline-cache.
+
+## Published0.18cache/pipeline comparison audit
+
+Refreshed android-preview-download39431da andresolved d880143 usinglatestREADME,
+validation/checksum. FullAPKhashmatches. Readexactsource andgeneratedAPKmodules;
+app-onlyoptimise-web transforms matter. Detailed gaps/recommendations andasset
+provenance in research/CACHE-018-COMPARISON.md andCACHE-018-ASSETS.json.
+
+Highestpriority: local/prepared/disk hits mustnotqueuebehindtwo blockingHTTP
+workers; metadatafreshness shouldavoidbodyfetch/hash on everypreparedhit;
+subscriber-awaretransfercancel/promotion plusboundedquick-returngrace; restore
+residentcoverage/sharperchildren/coarsereserve beforemorefallbackrequests;
+boundedencodedRAM/compositionreuse; epoch-invalidatedsaveddatamissmemo;
+smallpressure-awareprediction; exactmembership/planindexreuse; per-tilephone
+traces.0.18alreadyimplements manyofthese. Nativecurrentlyhaspartialdedup,
+parentfallback,residency andcostadmission, notfull0.18cachearchitecture.
+
+Do notcopyremovedSHAdecoded-imagepool, duplicateWebViewelevationdiskcache,
+bridge/RTT-specificwrappers oroldmemoryvalues. OptionalexpandedGPUpreparation
+wasoffbydefault. No production code/APKchanged; no newperformanceclaim.

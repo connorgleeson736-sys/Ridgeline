@@ -1,0 +1,59 @@
+{
+  "referenceBranchCommit": "39431dad230945919a7b7d9d0ef2e86db8492ead",
+  "sourceCommit": "d880143418ac46ece98adff0b3b2fbaedf044d46",
+  "referenceApk": "Ridgeline-3D-0.18.0-Performance-Full.apk",
+  "apkSha256": "b4d286f5d6835447237eecaa15d5ee9a8bdf2870d56133c699f0b9ec3a173ffd",
+  "nativeCheckpoint": "06eed8b",
+  "generatedModules": [
+    {
+      "file": "maplibre-direct-sampling.js",
+      "bytes": 12880,
+      "sha256": "8bf7c4aae62c2cae8e7d9746927ddb7dfee70bd8ac6417adf39ebef7e74db197"
+    },
+    {
+      "file": "native-residency.js",
+      "bytes": 40591,
+      "sha256": "7301021e8c3c4d678bd1653fb20131e183734f6070bfd8111f677618b0f13d89"
+    },
+    {
+      "file": "prepare-ahead.js",
+      "bytes": 21073,
+      "sha256": "b54180440f4449f27c3f8113cc183c44dac2ea7b1807efb1aa7722c079b4b958"
+    },
+    {
+      "file": "raster-residency.js",
+      "bytes": 10154,
+      "sha256": "64466829083241422e919bc2944491f58a8425503e9103baeba4468b17353e9a"
+    },
+    {
+      "file": "regional-imagery-worker.js",
+      "bytes": 1614,
+      "sha256": "fa0f7c0d3d253e66be1839e858b9ff0454535db46a2448ea027c0e78e054fac2"
+    },
+    {
+      "file": "response-cache.js",
+      "bytes": 6975,
+      "sha256": "31e8cd36b4ab48ca2a98513576c5dd0d258dd510af0606b8687c08a2f3e4840d"
+    },
+    {
+      "file": "terrain-composition.js",
+      "bytes": 7008,
+      "sha256": "4e1114bb8f36c53187f65db514caba5acd341cc8659bca3164e46ecd085ecd09"
+    },
+    {
+      "file": "terrain-streaming.js",
+      "bytes": 3650,
+      "sha256": "4b05235ef554cde7ad57e1267eb50ac0abd28e8fe4d8d64d832c86c93e1329ba"
+    },
+    {
+      "file": "tile-cache.js",
+      "bytes": 10856,
+      "sha256": "683b47bf10d3217b65827f99f482bf8d832dab2f82d338405be74f0abefae463"
+    },
+    {
+      "file": "tile-trace.js",
+      "bytes": 3249,
+      "sha256": "10d5c3ac024591733dbae788ab41daae95d5b66adeb3c82fbb88e7ff20c1afc1"
+    }
+  ]
+}
