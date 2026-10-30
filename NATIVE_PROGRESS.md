@@ -1264,3 +1264,6 @@ Physical residency remains bounded on both texture backends:192sources per terra
 photo pool. If all owners are protected at that hard ceiling, unrelated uploads
 wait for capacity; related replacements may use one transient slot and then evict
 a safely covered source. This bounds soft coverage debt on GLES as well as arrays.
+
+Parent-fallback Base source`1fd7000`: 31,930,328bytes, SHA256
+`d46046b0bb5271c49cf46e7390abe0da2f830186c4082a260c7f180f74865431`; all3optimizedABIs, no largepacks/sessionCA.

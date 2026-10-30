@@ -1,0 +1,35 @@
+{
+  "sourceCheckpoint": "1fd7000d8e5f56b1cce668bb66be43e5ac354de8",
+  "bytes": 31930328,
+  "sha256": "d46046b0bb5271c49cf46e7390abe0da2f830186c4082a260c7f180f74865431",
+  "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86_64"
+  ],
+  "largeOverviewPacks": 0,
+  "managedSessionCa": false,
+  "signatureVerified": true,
+  "alignment16KiBVerified": true,
+  "focusedJvmTests": 11,
+  "rustCoreRendererCliTests": [
+    27,
+    4,
+    1
+  ],
+  "fineOnlyDemandFullFramePixelsIdentical": {
+    "vulkan": true,
+    "glesArrays": true
+  },
+  "phoneTested": false,
+  "parentFallback": {
+    "residentBackdrop": "nearest available ancestor retained even after a fine target arrives",
+    "preparedRam": "nearest prepared ancestor restored without I/O/decode for missing GPU coverage",
+    "uploadAdmission": "ancestors of current targets admitted and prioritized; unrelated demand pruned",
+    "eviction": "owners protected; oldest nonowners or detail with resident ancestor evicted first",
+    "physicalSourceCeilingPerPool": 192,
+    "relatedReplacementTransientSlots": 1,
+    "softCountCoverageDebt": true,
+    "arbitraryHttpCacheHitsRestoredDirectly": false
+  }
+}

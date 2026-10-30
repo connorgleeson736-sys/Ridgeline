@@ -1,7 +1,15 @@
 # Native Android checkpoints — incomplete prototypes
 
 Latest smaller build: [Ridgeline-Native-Base.apk](Ridgeline-Native-Base.apk).
-Source checkpoint `f104946`; signed debug Base APK, 31.9MB, all three ABIs.
+Source checkpoint `1fd7000`; signed debug Base APK, 31.9MB, all three ABIs.
+
+**Parent fallback fix:** cached parents remain as background coverage after a fine
+tile arrives. Prepared RAM ancestors can return across multi-level zoom jumps,
+with ancestor uploads admitted and prioritized. Eviction protects useful owners.
+[Regression evidence](../validation/parent-fallback/) preserves the complete cached
+frame under fine-only demand on Vulkan/GLES arrays. RAM/disk sliders and selective
+skirts remain; no imagery packs/session CA included. A20 movement still needs
+phone verification.
 
 This audit build adds **GPU texture arrays**, compatible instanced draws,
 reusable GLES mip resources, stable index suballocation and bulk pixel packing.

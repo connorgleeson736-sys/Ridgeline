@@ -1,8 +1,8 @@
 {
-  "sourceCheckpoint": "f104946d1627a01ab3a8248ce58301bbfbb13395",
+  "sourceCheckpoint": "1fd7000d8e5f56b1cce668bb66be43e5ac354de8",
   "apk": "Ridgeline-Native-Base.apk",
-  "bytes": 31916688,
-  "sha256": "a1a21c2dfd36ec7bc35262f9f2d903235478b25502ab1a6d43c4b295a68e4f3d",
+  "bytes": 31930328,
+  "sha256": "d46046b0bb5271c49cf46e7390abe0da2f830186c4082a260c7f180f74865431",
   "largeOverviewPacks": 0,
   "coarseImageryFiles": 67,
   "abis": [
@@ -13,6 +13,7 @@
   "managedSessionCa": false,
   "addImagery": "Offline / imagery > Add imagery ZIPs; attach original files in place with persistent read access; up to six at once",
   "changes": [
+    "Keep nearest resident parent behind ready fine tiles during zoom/pan; restore prepared RAM ancestors across skipped zoom levels and admit/prioritize ancestor uploads; protect fallback owners with oldest-unused eviction and hard admission bounds",
     "Restore selective MapLibre-depth terrain skirts at missing/discontinuous/unproven joins; omit proven continuous edges and photo-only internal subdivisions; retain real neighbour DEM halos, parent fallback and full-resolution imagery filtering",
     "Live persisted 0-1000 MiB combined RAM tile-payload cache budget across encoded bodies, decoded DEM samples and prepared direct buffers; immediate trimming, conservative recommendation and high-budget warning",
     "Bounded lazy eight-layer imagery and R32Float height texture arrays with generation-owned slots, shared bindings and compatible instanced draws",
@@ -36,7 +37,7 @@
     "routeSourcesFullGeometry": true,
     "fullSourceHeightsRetained": true
   },
-  "validation": "26 core, 4 renderer and 1 CLI Rust tests; 7 focused DEM JVM tests pass. Vulkan/GLES mixed-LOD fixture closes 36092/36093 exposed background pixels; explicit GLES arrays also passes. Continuous terrain joins omit internal skirts; photo subdivisions keep only original perimeter. Original grading/coverage/mips/picking/overflow/settled transfer checks pass. All three optimized JNI ABIs, assembly/signature/16KiB alignment pass. No A20 execution or speed claim; no large packs/session CA.",
+  "validation": "27 core, 4 renderer and 1 CLI Rust tests; 11 focused cached-parent/upload/demand JVM tests and lint pass. Vulkan/GLES arrays: fine-only demand preserves every pixel of the complete parent-backed frame; existing cover/mips/UV/picking/skirts/bounded unrelated-upload checks pass. Final hard admission guards compiled in all three optimized JNI ABIs; APK assembly/signature/16KiB alignment pass. No A20 run or speed claim; no large packs/session CA.",
   "terrainSkirts": true,
   "prepareAhead": "Offline / imagery > Prepare nearby terrain while idle; default off",
   "textureBackend": {
@@ -87,5 +88,15 @@
     "imagery": "exact UV mapping, explicit ClampToEdge, all nine trilinear mip levels and anisotropy",
     "surfaceDetailReduced": false,
     "extraGlobalGridBytes": 133128
+  },
+  "parentFallback": {
+    "residentBackdrop": "nearest available ancestor retained even after a fine target arrives",
+    "preparedRam": "nearest prepared ancestor restored without I/O/decode for missing GPU coverage",
+    "uploadAdmission": "ancestors of current targets admitted and prioritized; unrelated demand pruned",
+    "eviction": "owners protected; oldest nonowners or detail with resident ancestor evicted first",
+    "physicalSourceCeilingPerPool": 192,
+    "relatedReplacementTransientSlots": 1,
+    "softCountCoverageDebt": true,
+    "arbitraryHttpCacheHitsRestoredDirectly": false
   }
 }
