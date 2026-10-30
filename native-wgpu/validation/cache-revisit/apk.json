@@ -1,0 +1,19 @@
+{
+  "sourceCheckpoint": "a7cb004fb9d57ba9c8a295f68cde37dcca5cfe25",
+  "bytes": 31716248,
+  "sha256": "c804a18f038bb8b704c014048a09efbfda8eca66fe74954d461f57c5e5ae610b",
+  "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86_64"
+  ],
+  "terrainSkirts": false,
+  "managedSessionCa": false,
+  "largeOverviewPacks": 0,
+  "signatureVerified": true,
+  "phoneTested": false,
+  "hostHttpDiskHitMs": 1.529095,
+  "blockedForegroundTransfers": 8,
+  "focusedJvmTests": 18,
+  "coreTests": 26
+}

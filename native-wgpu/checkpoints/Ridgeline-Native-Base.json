@@ -1,8 +1,8 @@
 {
-  "sourceCheckpoint": "0e2d7ee2db85e08be10de110a65ccaf0345e26d2",
+  "sourceCheckpoint": "a7cb004fb9d57ba9c8a295f68cde37dcca5cfe25",
   "apk": "Ridgeline-Native-Base.apk",
-  "bytes": 31919402,
-  "sha256": "474ed2be9fa8157d45132a0b3ff851b577504594b26725137e92f3975f687c55",
+  "bytes": 31716248,
+  "sha256": "c804a18f038bb8b704c014048a09efbfda8eca66fe74954d461f57c5e5ae610b",
   "largeOverviewPacks": 0,
   "coarseImageryFiles": 67,
   "abis": [
@@ -13,11 +13,13 @@
   "managedSessionCa": false,
   "addImagery": "Offline / imagery > Add imagery ZIPs; attach original files in place with persistent read access; up to six at once",
   "changes": [
-    "Lossless versioned prepared terrain disk cache, source dependency validation and bounded background writes within the existing adaptive automatic-cache budget",
-    "Coordinated terrain/imagery residency; warm photos borrow unused terrain allowance with active coverage protected",
-    "Demand checkpoints skip obsolete image composition/RGBA and terrain work without poisoning shared downloads/DEM futures",
-    "Measured per-kind upload costs and render CPU cost guide admission; GPU completion callbacks cap outstanding frame submissions at two",
-    "Preserves full source heights/imagery/mips/filtering, in-place Add imagery, adaptive terrain and prior camera/GPU recovery changes"
+    "Remove all terrain skirts, duplicate skirt vertices and CPU seam analysis; retain full original surface/boundary heights",
+    "Separate local/offline/HTTP-cache-only admission from async network and bounded resumable CPU preparation",
+    "Fresh encoded RAM cache with absolute expiry/source version metadata; no repeated original-body validation/hash for fresh prepared hits",
+    "Independent subscriber cancellation, actual last-reader HTTP cancellation, shared priority promotion and bounded 600ms quick-return grace",
+    "Adopt exact/sharper cached cover before redundant downloads; prefer complete sharper children and retain a bounded coarse reserve",
+    "Lossless completed boundary/crop RGBA cache and cached provider/native source-mapping plans",
+    "Tiny pressure/rate-limited predictions; optional expanded idle GPU preparation under Offline / imagery, default off"
   ],
   "adaptiveTerrain": {
     "newErrorPixels": 0.6,
@@ -31,5 +33,7 @@
     "routeSourcesFullGeometry": true,
     "fullSourceHeightsRetained": true
   },
-  "validation": "16 focused tests pass. Genuine-input host preparation median 12.485ms cold decode/mesh versus 1.138ms prepared hit; no gain over 1.116ms decoded-RAM mesh. Revisit uploads 4 to 0 (40 to 36 total). Pressure fixture peak submissions 12 to 2 Vulkan, 6 to 2 GLES, same final pixels. Light upload replay has no CPU gain; GLES pressure throughput is lower. Not Android/A20 FPS evidence. All three optimized JNI ABIs, assembly and signature pass."
+  "validation": "18 focused JVM checks plus 26 core tests pass. Actual OkHttp disk-cache hit returns in 1.529095ms while eight foreground HTTP responses remain blocked (host fixture, not A20). Vulkan/GLES fixtures pass zero-skirt and existing surface/imagery checks. All three optimized JNI ABIs, assembly and signature pass. No new emulator/phone execution; mismatched height/LOD edges may show cracks without skirts.",
+  "terrainSkirts": false,
+  "prepareAhead": "Offline / imagery > Prepare nearby terrain while idle; default off"
 }

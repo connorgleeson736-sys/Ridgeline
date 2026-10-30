@@ -1121,3 +1121,7 @@ lastreaderabort cancelsactualHTTP, oneconsumerabort doesnotpoisonothers.
 includingzero-skirtgeometry. All3optimizedABIs/assembly pass. Evidence andexact
 bounds in validation/cache-revisit. No A20/emulatorruntimeclaim. Original6ZIPs,
 Addimagery/fullsourcequality/Capacitorpreserved; automaticdiskbudget still1GBadaptive.
+
+Latest normal Base APK from a7cb004: 31716248bytes, SHA256
+c804a18f038bb8b704c014048a09efbfda8eca66fe74954d461f57c5e5ae610b. All3optimizedABIs/assembly/signature pass. No largepacks/sessionCA;
+Addimagery retained. Source/dataquality preserved, allskirtsremovedbyrequest.
