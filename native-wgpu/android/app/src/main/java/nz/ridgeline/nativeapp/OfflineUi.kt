@@ -48,10 +48,22 @@ class OfflineUi(private val activity:Activity,root:FrameLayout,private val terra
         val dialog=AlertDialog.Builder(activity).setTitle("Offline maps").setView(ScrollView(activity).apply{addView(content)}).setNegativeButton("Close",null).create()
         val cacheLabel=TextView(activity).apply{textSize=12f}
         val cacheSize=SeekBar(activity).apply{max=1000;progress=loader.automaticCacheMiB;contentDescription="Automatic map cache size in MiB"}
-        fun cacheText(){cacheLabel.text="Automatic cache: ${cacheSize.progress} MiB maximum · active limit ${loader.automaticCacheBytes/1_048_576} MiB. Adjusted for free storage. Changes apply after restarting the app; 0 disables automatic disk caching. Saved regions and attached ZIPs are separate."}
+        fun cacheText(){cacheLabel.text="Automatic disk cache: ${cacheSize.progress} MiB maximum · active limit ${loader.automaticCacheBytes/1_048_576} MiB. Adjusted for free storage. Changes apply after restarting the app; 0 disables automatic disk caching. Saved regions and attached ZIPs are separate."}
         cacheText();content.addView(cacheLabel);content.addView(cacheSize)
         cacheSize.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener{
             override fun onProgressChanged(bar:SeekBar?,value:Int,user:Boolean){cacheText();if(user)loader.automaticCacheMiB(value)}
+            override fun onStartTrackingTouch(bar:SeekBar?){}
+            override fun onStopTrackingTouch(bar:SeekBar?){}
+        })
+        val ramLabel=TextView(activity).apply{textSize=12f}
+        val ramSize=SeekBar(activity).apply{max=1000;progress=loader.ramCacheMiB;contentDescription="Combined RAM tile cache budget in MiB"}
+        fun ramText(){
+            ramLabel.text="Combined RAM tile cache: up to ${ramSize.progress} MiB · recommended ${loader.recommendedRamCacheMiB} MiB. Applies immediately; 0 disables retained tile caching. Temporary loading memory, renderer working memory and GPU resources are separate."+
+                if(ramSize.progress>loader.recommendedRamCacheMiB)"\nHigh RAM budgets can cause Android to close the app, especially on the Samsung A20."else ""
+        }
+        ramText();content.addView(ramLabel);content.addView(ramSize)
+        ramSize.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener{
+            override fun onProgressChanged(bar:SeekBar?,value:Int,user:Boolean){ramText();if(user)loader.ramCacheMiB(value)}
             override fun onStartTrackingTouch(bar:SeekBar?){}
             override fun onStopTrackingTouch(bar:SeekBar?){}
         })

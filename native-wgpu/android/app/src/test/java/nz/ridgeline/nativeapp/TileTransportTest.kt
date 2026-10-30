@@ -9,6 +9,24 @@ import java.nio.file.Files
 import okhttp3.*
 
 class TileTransportTest {
+ @Test fun loweringRamBudgetEvictsImmediatelyAndZeroStillDeliversLiveResponses(){
+    val backend=Controlled();val transport=TileTransport(backend,1024)
+    try{
+     val key=ResourceKey("https://example.invalid/resize",false)
+     val first=transport.consumer();val f=first.acquire(key)
+     waitUntil{backend.starts.get()==1};backend.complete(key,"original");assertEquals("original",String(f.get().bytes));first.close()
+     assertEquals(8L,transport.stats()["encodedBytes"])
+     transport.setRamLimit(4);assertEquals(0L,transport.stats()["encodedBytes"])
+     transport.setRamLimit(0)
+     val second=transport.consumer();val s=second.acquire(key)
+     waitUntil{backend.starts.get()==2};backend.complete(key,"fresh");assertEquals("fresh",String(s.get().bytes));second.close()
+     assertEquals(0L,transport.stats()["encodedBytes"])
+     transport.setRamLimit(1024)
+     val third=transport.consumer();val t=third.acquire(key)
+     waitUntil{backend.starts.get()==3};backend.complete(key,"back");t.get();third.close()
+     assertEquals(4L,transport.stats()["encodedBytes"])
+    }finally{transport.close()}
+ }
  private class Controlled:TileBackend{
     val pending=ConcurrentHashMap<ResourceKey,(Result<TileBody>)->Unit>();val starts=AtomicInteger();val stops=AtomicInteger();val cancelled=ConcurrentHashMap.newKeySet<ResourceKey>()
     override fun local(key:ResourceKey):TileBody?=null

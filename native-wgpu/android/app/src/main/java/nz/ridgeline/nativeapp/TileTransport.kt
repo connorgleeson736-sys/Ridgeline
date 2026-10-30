@@ -16,9 +16,14 @@ internal class ResourcePending(val ready:CompletableFuture<*>):RuntimeException(
 
 /** Local lookups have their own executor, independent of admitted network work.
  * CPU consumers suspend by continuation instead of occupying a decode worker. */
-internal class TileTransport(private val backend:TileBackend,private val ramLimit:Long,
+internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
     private val clock:()->Long=System::currentTimeMillis,private val graceMs:Long=600):AutoCloseable {
     private val lock=Any()
+    private var ramLimit=ramLimit.coerceAtLeast(0)
+    fun setRamLimit(limit:Long){synchronized(lock){
+        ramLimit=limit.coerceAtLeast(0)
+        while(bytes>ramLimit&&ram.isNotEmpty())bytes-=ram.remove(ram.keys.first())!!.bytes.size
+    }}
     private val local=Executors.newFixedThreadPool(2)
     private val timers=Executors.newSingleThreadScheduledExecutor()
     private val jobs=LinkedHashMap<ResourceKey,Job>()

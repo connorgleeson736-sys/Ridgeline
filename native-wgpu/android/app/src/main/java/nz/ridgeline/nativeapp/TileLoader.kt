@@ -73,14 +73,31 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     }}
     fun detachOverview(payload:String,done:()->Unit){attachmentJobs.execute{overviews.detach(payload);imageryChanged();view.post{if(!dead)done()}}}
     private val am = context.getSystemService(ActivityManager::class.java)
+    val recommendedRamCacheMiB=RamCacheBudget.recommended(am.memoryClass,am.isLowRamDevice)
+    val ramCacheMiB get()=preferences.getInt("ramCacheMiB",recommendedRamCacheMiB).coerceIn(0,1000)
+    @Volatile private var ramBudget=RamCacheBudget.split(ramCacheMiB)
+    fun ramCacheMiB(value:Int){
+        val mib=value.coerceIn(0,1000)
+        preferences.edit().putInt("ramCacheMiB",mib).apply()
+        ramBudget=RamCacheBudget.split(mib)
+        transport.setRamLimit(ramBudget.encoded)
+        synchronized(ready){trimReady()}
+        synchronized(decoded){trimDecoded()}
+    }
     private val imageLimit = if (am.isLowRamDevice) 32 else (am.memoryClass / 2).coerceIn(64, 128)
     private val geometryLimit = (imageLimit/2).coerceIn(16,96)
-    private val readyByteLimit = imageLimit * 256*256*4 + geometryLimit * (129*129*4+16)
     private var readyBytes = 0
-    private val demLimit = if (am.isLowRamDevice) 24 else (am.memoryClass / 2).coerceIn(48, 128)
+    private val demLimit get()=(ramBudget.decoded/(256*256*4)).toInt()
     private val ready = LinkedHashMap<Source, ByteBuffer>(16, .75f, true)
     private data class Decoded(val raster:Dem,val dependencies:List<PreparedTerrainCache.Dependency>)
     private val decoded = LinkedHashMap<Id, Decoded>(16, .75f, true)
+    // Call only while holding the corresponding map monitor. New limits are
+    // read under that lock so concurrent insertions cannot restore an old budget.
+    private fun trimReady(){while(readyBytes.toLong()>ramBudget.prepared&&ready.isNotEmpty()){
+        val first=ready.keys.firstOrNull{it !in wanted}?:ready.keys.first()
+        readyBytes-=ready.remove(first)!!.capacity()
+    }}
+    private fun trimDecoded(){while(decoded.size>demLimit)decoded.remove(decoded.keys.first())}
     private val taskContext=ThreadLocal<Task>()
     private val sourceRecords=ThreadLocal<MutableMap<String,SourceStamp>>()
     private val jobs = ConcurrentHashMap<Source, Task>()
@@ -142,7 +159,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
                 val data=if(source.geometry)loadGeometry(source.id)else loadImage(source.id)
                 checkPreparation();failures.remove(source)
                 synchronized(ready){ready.put(source,data)?.let{readyBytes-=it.capacity()};readyBytes+=data.capacity()
-                    while(readyBytes>readyByteLimit){val first=ready.keys.firstOrNull{it !in wanted}?:ready.keys.first();readyBytes-=ready.remove(first)!!.capacity()}}
+                    trimReady()}
                 if((source in wanted||source in warmWanted)&&!resident(source))upload(source,data)
             }catch(pending:ResourcePending){waiting=pending.ready
             }catch(_:PreparationAborted){
@@ -266,7 +283,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             warmWanted=extras;view.updateWarmDemand(extras.filter{it.geometry}.map{it.id.gpu()}.toSet(),extras.filter{!it.geometry}.map{it.id.gpu()}.toSet())
             for(source in extras){val readyData=synchronized(ready){ready[source]};if(readyData!=null)upload(source,readyData)else schedule(source,1000,true)}
     }
-    private val transport by lazy{TileTransport(HttpTileBackend(client,offline::read),if(context.getSystemService(ActivityManager::class.java).isLowRamDevice)8L*1024*1024 else 16L*1024*1024)}
+    private val transport by lazy{TileTransport(HttpTileBackend(client,offline::read),ramBudget.encoded)}
     private fun resourceKey(url:String)=ResourceKey(url,offlineOnly&&regionContext.get()==null)
     private fun awaitInputs(urls:List<String>){
         val consumer=taskContext.get()?.consumer?:return
@@ -325,7 +342,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         val stamp=body.stamp!!
         val dependency=PreparedTerrainCache.Dependency(id.gpu(),stamp.fingerprint,stamp.until,stamp.key)
         if(old!=null&&old.dependencies.firstOrNull()?.fingerprint==stamp.fingerprint&&old.dependencies.drop(1).all(::dependencyFresh)){
-            return old.copy(dependencies=listOf(dependency)+old.dependencies.drop(1)).also{synchronized(decoded){decoded[id]=it}}
+            return old.copy(dependencies=listOf(dependency)+old.dependencies.drop(1)).also{synchronized(decoded){decoded[id]=it;trimDecoded()}}
         }
         val pixels=if(body.status==404)null else demPixels(body.bytes)
         val dependencies=LinkedHashMap<GpuUploadQueue.Id,PreparedTerrainCache.Dependency>();dependencies[dependency.id]=dependency
@@ -335,7 +352,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
                 for(y in 0..255)for(x in 0..255)if(!pixels[y*256+x].isFinite())pixels[y*256+x]=sample(coarse,id.x*256.0+x,id.y*256.0+y,id.z)}
             Dem(id.gpu(),pixels)
         }
-        return Decoded(raster,dependencies.values.toList()).also{synchronized(decoded){decoded[id]=it;while(decoded.size>demLimit)decoded.remove(decoded.keys.first())}}
+        return Decoded(raster,dependencies.values.toList()).also{synchronized(decoded){decoded[id]=it;trimDecoded()}}
     }
     private fun loadGeometry(id: Id): ByteBuffer {
         checkPreparation()

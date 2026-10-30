@@ -1184,3 +1184,22 @@ Normal Base APK: 31,866,304 bytes; no large overview packs or session CA.
 
 Published Base source `033bec6`: 31,866,304 bytes, SHA256
 `e329eb1f39198424931b4a18e18e3617672d0d11a9a48ab17b3487c14f2b972c`. All three optimized ABIs; no large packs/session CA.
+
+
+## Combined RAM cache control
+
+Added Offline / imagery > Combined RAM tile cache slider, 0–1000 MiB in 1 MiB
+steps, separate from automatic disk cache. Persists and applies live; shrinking
+trims all three stores immediately. One retained payload allowance is partitioned
+25% fresh encoded tile bytes, 25% decoded DEM FloatArrays, 50% prepared terrain/
+RGBA direct buffers. Those partition limits sum exactly to the selected total;
+LRU eviction keeps each below its share. No large allocation occurs when raising
+the slider. Zero retains no payloads in those stores; in-flight/shared responses,
+mesh-building halo references and queued uploads remain necessary working memory.
+Metadata/object overhead, active renderer CPU working sets and GPU memory are
+separate; this is not an app-wide memory ceiling. No quality/concurrency changes.
+Defaults: 32 MiB on low-RAM devices; otherwise one quarter of Android memoryClass,
+clamped32–96 MiB. UI shows recommended value and warns above it, specifically
+including A20 risk. Memory-pressure handling still clears disposable payloads.
+Focused budget/transport tests and lint pass; all slider values, immediate encoded
+shrink/zero/live response delivery/re-enable are covered. Native libraries unchanged.

@@ -14,7 +14,10 @@ reusable GLES mip scratch, stable index suballocations and bulk pixel packing.
 arrays. Automatic uses arrays on Vulkan and pooled separate textures on GLES:
 arrays reduced allocations/draws but were slower in the host GLES fixture.
 A **0–1000 MiB automatic disk-cache slider** applies after app restart; saved
-regions and attached ZIPs remain separate. See [measurements and limitations](research/COMPREHENSIVE-AUDIT-IMPLEMENTATION.md).
+regions and attached ZIPs remain separate. A separate **combined RAM tile-cache
+slider (0–1000 MiB)** applies immediately across encoded, decoded terrain and
+prepared tile payloads. Zero disables their retention. Working memory and GPU
+resources remain separate; high settings can exhaust phone memory. See [measurements and limitations](research/COMPREHENSIVE-AUDIT-IMPLEMENTATION.md).
 
 Separate Kotlin/Android UI + Rust/wgpu app. Authoritative reference: Capacitor
 0.18.0 source `d880143418ac46ece98adff0b3b2fbaedf044d46`, latest
