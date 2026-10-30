@@ -4,9 +4,9 @@ struct Scene { matrix: mat4x4<f32>, grade: vec4<f32>, metrics: vec4<f32> };
 @group(1) @binding(1) var photo_sampler: sampler;
 @group(2) @binding(0) var heights: texture_2d<f32>;
 struct Out { @builtin(position) position: vec4<f32>, @location(0) uv: vec2<f32>, @location(1) @interpolate(flat) clip: vec4<f32>, @location(2) @interpolate(flat) image: vec4<f32> };
-@vertex fn vs(@location(0) vertex: vec2<f32>, @location(1) tile: vec4<f32>, @location(2) clip: vec4<f32>, @location(3) image: vec4<f32>) -> Out {
+@vertex fn vs(@builtin(vertex_index) vertex_index:u32, @location(0) vertex: vec2<f32>, @location(1) tile: vec4<f32>, @location(2) clip: vec4<f32>, @location(3) image: vec4<f32>) -> Out {
  var o:Out;
- let height=textureLoad(heights,vec2<i32>(round(vertex*128.)),0).r;
+ let height=textureLoad(heights,vec2<i32>(round(vertex*128.)),0).r - select(0.,scene.metrics.z,vertex_index>=16641u);
  o.position=scene.matrix*vec4<f32>(tile.x+vertex.x*tile.z,tile.y-vertex.y*tile.z,(height-scene.metrics.y)*scene.metrics.x,1.);
  o.uv=vertex.xy;o.clip=clip;o.image=image;return o;
 }

@@ -1208,3 +1208,30 @@ RAM-slider Base APK source `eef2ba7`: 31,866,304 bytes, SHA256
 `1fc293176f5180d4445e78a9ce4143af55bf93e7d6225dd6298b9877a20672c9`. All three optimized native libraries byte-identical to 033bec6;
 8 focused JVM checks, lint, assembly, signing and 16KiB alignment pass. No new
 GPU/phone run, large packs or session CA.
+
+
+## MapLibre-style seam protection restored by request
+
+User now requests all four seam protections, superseding earlier remove-all-skirts
+instruction. Restored selective lowered skirts using unchanged source UV/heights,
+MapLibre logical-zoom depth and uint16 shared-grid indices. Omits photography-only
+internal walls and entire proven continuous shared terrain joins; missing,
+discontinuous/off-grid/unknown joins retain skirts. Cached seam masks recompute
+on cover/height arrival changes, not each camera frame. Global extraUVgrid133128B,
+no per-tile duplicate heights. Current adaptive detail/index atlas/texture arrays
+and RAM/disk sliders retained.
+
+Neighbour DEM halo sampling was already present and remains exact; new bitwise
+checks cover all129shared east/south samples across DEM boundaries/overscaling.
+Parent fallback/sharper complete cover already present and retained. Explicit
+ClampToEdge addressing with original full-resolution UVs/all nine trilinear mips
+and anisotropy retained; no invented imagery or blending of source colour seams.
+
+Controlled Vulkan/GLES mixed-LOD fixture closes36092/36093background pixels.
+Continuous shared edges omit internal skirts; photo subdivisions keep only original
+terrain perimeter. Overflow/coverage/picking/settled-transfer checks pass. Rust
+26core+4renderer+1CLI and7focusedDEM JVM tests pass; all3optimizedABIs build.
+See validation/seam-protection. No A20 FPS/real-terrain acceptance claim.
+
+Forced GLES texture-array seam fixture also passes (36093background pixels repaired);
+normal three-ABI Base signing and16KiB alignment pass.

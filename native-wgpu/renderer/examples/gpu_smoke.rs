@@ -46,7 +46,7 @@ async fn run() {
         descriptor.backends = wgpu::Backends::GL;
     }
     let instance = wgpu::Instance::new(descriptor);
-    let mut r = Renderer::new_with_mipmap_mode(
+    let mut r = Renderer::new_with_texture_backend(
         &instance,
         None,
         Some(wgpu::TextureFormat::Rgba8Unorm),
@@ -58,6 +58,11 @@ async fn run() {
             ridgeline_renderer::MipmapMode::Render
         } else {
             ridgeline_renderer::MipmapMode::Auto
+        },
+        if std::env::args().any(|v| v == "--arrays") {
+            ridgeline_renderer::TextureBackend::Arrays
+        } else {
+            ridgeline_renderer::TextureBackend::Auto
         },
     )
     .await
@@ -162,7 +167,7 @@ async fn run() {
         "planar simplification must preserve every output pixel"
     );
     println!(
-        "Adaptive plane: {} surface triangles, full boundaries, zero skirts, identical pixels",
+        "Adaptive plane: {} surface triangles, full boundaries, selective skirts, identical pixels",
         r.drawn_surface_triangles
     );
     r.set_routes(vec![ridgeline_renderer::RoutePath {
@@ -207,7 +212,7 @@ async fn run() {
         0.,
         1000.,
     );
-    assert_eq!(r.skirt_edge_count(), 0, "all skirts removed");
+    assert_eq!(r.skirt_edge_count(), 8, "continuous shared parent/child boundaries omit internal skirts");
     let bytes = read(&r, &output);
     let pixel = |x: usize, y: usize| &bytes[(y * 256 + x) * 4..][..4];
     assert_ne!(pixel(64, 64), &[36, 113, 74, 255]);
@@ -270,8 +275,8 @@ async fn run() {
     );
     assert_eq!(
         r.drawn_triangles - r.drawn_surface_triangles,
-        0,
-        "imagery subdivision must not add skirt triangles"
+        512 * 2,
+        "imagery subdivision keeps only the original terrain perimeter skirts"
     );
     // A minified 1px black/white checker must sample the generated pyramid,
     // not uninitialized levels or shimmer between original individual pixels.
@@ -304,7 +309,7 @@ async fn run() {
     );
     // An intentionally discontinuous parent/child height fixture exposes a
     // vertical LOD gap. Skirts must close pixels, not merely increase indices.
-    let mut seam = Renderer::new_with_mipmap_mode(
+    let mut seam = Renderer::new_with_texture_backend(
         &instance,
         None,
         Some(wgpu::TextureFormat::Rgba8Unorm),
@@ -316,6 +321,11 @@ async fn run() {
             ridgeline_renderer::MipmapMode::Render
         } else {
             ridgeline_renderer::MipmapMode::Auto
+        },
+        if std::env::args().any(|v| v == "--arrays") {
+            ridgeline_renderer::TextureBackend::Arrays
+        } else {
+            ridgeline_renderer::TextureBackend::Auto
         },
     )
     .await
@@ -365,14 +375,12 @@ async fn run() {
         .zip(closed.chunks_exact(4))
         .filter(|(a, b)| sky(a) && !sky(b))
         .count();
-    println!(
-        "No-skirt discontinuity control: {repaired} pixels changed by old skirt-depth setting (expected zero)"
+    println!("Mixed-LOD discontinuity: skirts close {repaired} exposed background pixels");
+    assert!(
+        repaired > 1000,
+        "skirts must visibly close the discontinuous LOD gap"
     );
-    assert_eq!(
-        repaired, 0,
-        "logical zoom no longer adds or changes curtains"
-    );
-    assert_eq!(seam.drawn_triangles, seam.drawn_surface_triangles);
+    assert!(seam.drawn_triangles > seam.drawn_surface_triangles);
     let triangles = seam.drawn_triangles;
     seam.set_index_cache_budget(24); // Deliberately force exact overflow buffers.
     seam.render(
@@ -483,7 +491,7 @@ async fn run() {
     assert_eq!(safety[2], high.z as f32);
     assert_eq!(
         seam.terrain_gpu_payload_bytes(),
-        133128 + seam.geometry_count() as u64 * 66564,
+        266256 + seam.geometry_count() as u64 * 66564,
         "shared grid keeps every exact f32 height without per-tile duplicated vertices"
     );
     seam.set_geometry_retention(48);

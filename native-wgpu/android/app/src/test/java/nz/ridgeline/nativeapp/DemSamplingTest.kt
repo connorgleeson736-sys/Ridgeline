@@ -67,6 +67,25 @@ class DemSamplingTest {
    assertArrayEquals("$id parent=$fallback",bytes(old),bytes(actual))
   }
  }
+ @Test fun adjacentTerrainMeshesShareEveryEdgeSampleIncludingSourceBoundaries(){
+  fun mesh(z:Int,x:Int,y:Int):ByteBuffer{
+   val output=ByteBuffer.allocate(129*129*4).order(ByteOrder.LITTLE_ENDIAN)
+   DemSampling.terrainMesh(z,x,y,output){id->LegacyDem(id,FloatArray(65536){i->
+    val gx=id.x*256+i%256;val gy=id.y*256+i/256
+    // Different slopes and high-frequency detail across original DEM borders.
+    ((gx*13L+gy*37L)%19001-5000).toFloat()*.125f
+   })}
+   return output
+  }
+  for(id in listOf(LegacyId(12,3983,2600),LegacyId(12,3984,2600),
+       LegacyId(19,509801,332801),LegacyId(22,4078407,2662407))){
+   val a=mesh(id.z,id.x,id.y);val east=mesh(id.z,id.x+1,id.y);val south=mesh(id.z,id.x,id.y+1)
+   for(i in 0..128){
+    assertEquals("east $id sample $i",a.getFloat((i*129+128)*4).toRawBits(),east.getFloat(i*129*4).toRawBits())
+    assertEquals("south $id sample $i",a.getFloat((128*129+i)*4).toRawBits(),south.getFloat(i*4).toRawBits())
+   }
+  }
+ }
  @Test fun interiorOverscaledMeshNeedsOneOriginalDemInsteadOfNine(){
   val id=LegacyId(20,1019601,665601);val source=provider(false)
   var oldCalls=0;val before=LegacyDemMesh{oldCalls++;source(it)}.mesh(id)

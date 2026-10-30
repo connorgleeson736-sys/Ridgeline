@@ -12,6 +12,7 @@ mod index_atlas;
 mod mipmaps;
 mod residency;
 mod routes;
+mod seams;
 mod texture_arrays;
 pub use mipmaps::MipmapStats;
 pub use routes::RoutePath;
@@ -106,6 +107,8 @@ pub struct Renderer {
     pub logical_zoom: Option<f64>,
     cover: Vec<ridgeline_core::CoverRegion>,
     cover_dirty: bool,
+    seams_dirty: bool,
+    edge_masks: HashMap<TileId, u8>,
     cover_plans: cover_plans::CoverPlans,
     demand: Option<(Vec<TileId>, Vec<TileId>)>,
     instance_capacity: usize,
@@ -274,11 +277,12 @@ impl Renderer {
         });
         let texture_layout = pipeline.get_bind_group_layout(1);
         let height_layout = pipeline.get_bind_group_layout(2);
-        let vertices: Vec<Vertex> = (0..129 * 129)
+        let mut vertices: Vec<Vertex> = (0..129 * 129)
             .map(|i| Vertex {
                 position: [(i % 129) as f32 / 128., (i / 129) as f32 / 128.],
             })
             .collect();
+        vertices.extend_from_within(..); // Lowered boundary indices share the exact original UVs.
         let grid = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("shared full-detail terrain grid"),
             contents: bytemuck::cast_slice(&vertices),
@@ -294,6 +298,9 @@ impl Renderer {
             1
         };
         let sampler = device.create_sampler(&wgpu::SamplerDescriptor {
+            address_mode_u: wgpu::AddressMode::ClampToEdge,
+            address_mode_v: wgpu::AddressMode::ClampToEdge,
+            address_mode_w: wgpu::AddressMode::ClampToEdge,
             anisotropy_clamp: anisotropy,
             mag_filter: wgpu::FilterMode::Linear,
             min_filter: wgpu::FilterMode::Linear,
@@ -428,6 +435,8 @@ impl Renderer {
             logical_zoom: None,
             cover: Vec::new(),
             cover_dirty: true,
+            seams_dirty: true,
+            edge_masks: HashMap::new(),
             cover_plans: Default::default(),
             demand: None,
             instance_capacity: 256,
@@ -635,6 +644,7 @@ impl Renderer {
         );
         self.trim_geometry();
         self.trim_joint();
+        self.seams_dirty = true;
         if self.cover.iter().any(|row| row.source == id) {
             self.route_dirty = true;
         }
@@ -811,7 +821,7 @@ impl Renderer {
         self.index_atlas.stats()
     }
     pub fn skirt_edge_count(&self) -> u32 {
-        0
+        self.edge_masks.values().map(|mask| mask.count_ones()).sum()
     }
     pub fn terrain_gpu_payload_bytes(&self) -> u64 {
         self.grid.size() + self.tiles.len() as u64 * 129 * 129 * 4
@@ -857,6 +867,10 @@ impl Renderer {
         let geometry = self.active_sources(true);
         let images = self.active_sources(false);
         let cover = ridgeline_core::resident_cover(&geometry);
+        if self.cover != cover || self.seams_dirty {
+            self.edge_masks = seams::masks(&cover, &self.tiles);
+            self.seams_dirty = false;
+        }
         if self.cover != cover {
             self.route_dirty = true;
             self.cover = cover;
@@ -1195,7 +1209,12 @@ impl Renderer {
         let scene = Scene {
             matrix: matrix.to_cols_array(),
             grade: [0.058, 1., 0.25, 1. / 0.74],
-            metrics: [px_meter, elevation, 0.0, 0.],
+            metrics: [
+                px_meter,
+                elevation,
+                ridgeline_core::surface::skirt_length(self.logical_zoom.unwrap_or(zoom)) as f32,
+                0.,
+            ],
         };
         if self.last_scene != Some(scene) {
             self.queue
@@ -1307,7 +1326,12 @@ impl Renderer {
             .map(|row| {
                 (
                     ridgeline_core::surface::GridRect::for_region(row.geometry, row.region),
-                    0, // Skirts removed by explicit product decision.
+                    ridgeline_core::surface::skirt_edges(row.geometry_region, row.region)
+                        & self
+                            .edge_masks
+                            .get(&row.geometry_region)
+                            .copied()
+                            .unwrap_or(15),
                     ridgeline_core::surface::GridRect::for_region(row.geometry, row.region)
                         .adaptive_step(self.adaptive_levels[&row.geometry]),
                 )

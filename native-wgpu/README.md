@@ -1,12 +1,14 @@
 # Ridgeline native migration — in progress
 
-Current checkpoint: skirt-free terrain by explicit request; independent cache-hit
+Current checkpoint: selective MapLibre-style terrain skirts restored by request; independent cache-hit
 admission, shared cancellable transfers, freshness-aware encoded RAM, sharper
 resident cover, finished imagery/plan reuse and bounded predictive warming are
 implemented. **Offline / imagery → Prepare nearby terrain while idle** enables
 optional GPU preparation (off by default). See [scope/evidence](validation/cache-revisit/).
-Historical skirt fixtures below describe earlier builds; cross-LOD cracks may
-be visible without skirts. No A20 FPS/interaction acceptance is claimed.
+Selective skirts protect unproven terrain joins and omit proven continuous shared
+edges/photo subdivisions. Neighbour DEM halos, parent fallback and exact imagery
+filtering are retained. See [seam protection evidence](validation/seam-protection/).
+No A20 FPS/interaction acceptance is claimed.
 
 The audit checkpoint adds bounded **GPU texture arrays**, shared bindings/batching,
 reusable GLES mip scratch, stable index suballocations and bulk pixel packing.
