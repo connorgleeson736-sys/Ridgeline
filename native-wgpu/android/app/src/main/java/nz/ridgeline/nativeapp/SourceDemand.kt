@@ -1,7 +1,6 @@
 package nz.ridgeline.nativeapp
 
-/** Ideal detail owns the budget first; spare slots progressively load fallback.
- * Never collapse a visible leaf merely to fit its complete ancestor chain. */
+/** Keep the whole visible region covered while closest detail starts immediately. */
 internal object SourceDemand {
     private fun parent(id:GpuUploadQueue.Id)=GpuUploadQueue.Id(id.z-1,id.x/2,id.y/2)
     private fun contains(a:GpuUploadQueue.Id,b:GpuUploadQueue.Id)=a.z<=b.z&&
@@ -9,25 +8,24 @@ internal object SourceDemand {
     fun bounded(input:List<GpuUploadQueue.Id>,budget:Int):Map<GpuUploadQueue.Id,Int> {
         require(budget>=16)
         val leaves=input.distinct().toMutableList()
-        while(leaves.size>budget){
-            val leaf=leaves.lastOrNull{it.z>0}?:break
-            val p=parent(leaf);val slot=leaves.indexOfFirst{contains(p,it)}
-            leaves.removeAll{contains(p,it)};leaves.add(slot,p)
+        fun collapse(rows:MutableList<GpuUploadQueue.Id>){
+            var selected=-1
+            for(i in rows.indices)if(rows[i].z>0&&(selected<0||rows[i].z>=rows[selected].z))selected=i
+            if(selected<0)return
+            val p=parent(rows[selected]);val slot=rows.indexOfFirst{contains(p,it)}
+            rows.removeAll{contains(p,it)};rows.add(slot,p)
         }
+        while(leaves.size>budget)collapse(leaves)
         val spare=budget-leaves.size
-        val ancestors=LinkedHashSet<GpuUploadQueue.Id>()
-        for(leaf in leaves){var id=leaf;while(id.z>minOf(8,leaf.z)){id=parent(id);ancestors.add(id)}}
-        val available=ancestors.filter{it !in leaves}
-        val coarse=available.minOfOrNull{it.z}
-        // Broad coverage plus nearest real parents give useful progressive detail;
-        // filling the spare pool with every intermediate level strands it at z8.
-        val fallback=(available.filter{it.z==coarse}+available.sortedByDescending{it.z}).distinct().take(spare)
+        val fallback=leaves.filter{it.z>0}.map(::parent).distinct().filter{it !in leaves}.toMutableList()
+        while(fallback.size>spare&&spare>0)collapse(fallback)
+        if(spare==0)fallback.clear()
         val out=LinkedHashMap<GpuUploadQueue.Id,Int>()
-        val focusParent=leaves.firstOrNull()?.takeIf{it.z>0}?.let(::parent)
-        for(id in fallback)out[id]=when{ id.z==coarse->0;id==focusParent->2;else->40+id.z}
-        // Request the closest full-detail leaf immediately after coarse coverage,
-        // rather than waiting for every intermediate ancestor to download first.
-        for((index,id)in leaves.withIndex())out[id]=4+index
+        val focus=leaves.firstOrNull()
+        for((index,id)in fallback.withIndex())out[id]=if(focus!=null&&contains(id,focus))0 else 3+index
+        // Fine focus is not held up by the full background queue. Other parents
+        // then establish useful detail throughout the viewport before refinements.
+        for((index,id)in leaves.withIndex())out[id]=if(index==0)1 else 32+index
         return out
     }
 }

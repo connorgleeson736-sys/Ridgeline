@@ -1015,3 +1015,27 @@ All3optimizedJNIABIs, Kotlin/assembly/signature pass. NativeZIPidentitymanifest
 included; no largepacks orsessionCA. Scope in validation/attach-adaptive;
 phoneSAFpersistedaccess andphysicalFPSstillneedexecution. Do notclaimprototype
 featurecomplete or inferdeviceFPSfromtrianglecounts. OriginalZIPs/Capacitorintact.
+
+## Samsung A20 terrain stability and recovery
+
+User clarified two-finger tilt. Removed automatic height-follow animation;
+terrain pivot recentering retains physical eye/pitch, render-only rest clearance
+avoids repeated state drift, and exclusive pitch pivots around map centre like
+MapLibre. Gesture elevation keeps a baseline with temporary collision lift.
+Planner uses the actual presented pose. Full upstream max-zoom recenter search
+is not yet ported; physical interaction acceptance remains open.
+
+Bounded background parent coverage now precedes most fine leaves so terrain
+behind a peak is not held behind foreground refinement. Same source ceilings.
+Uploads bounded to1/gesture or2/idle frame and paused during failed presentation.
+Temporary timeout/occlusion retries no longer stop after8failures; lost surfaces
+recreate, repeated hard/device errors rebuild renderer and reupload cached data.
+No A20 root-cause reproduction or measured FPS claim.
+
+Remove skirts only on proven continuous adjoining edges; retain exposed/mismatched
+joins to prevent cracks. Masks update on cover/geometry changes; unused fallback
+uploads/evictions no longer always retessellate routes. Vulkan/GLES fixtures pass,
+including 16->8 skirt edges in flat fixture and retained discontinuity protection.
+CameraMath5 and SourceDemand4 focused tests pass; Android native target compiles.
+See research/TERRAIN-STABILITY-AND-RECOVERY.md and validation/terrain-stability.
+Original six ZIPs, full source quality, Add imagery and Capacitor app preserved.

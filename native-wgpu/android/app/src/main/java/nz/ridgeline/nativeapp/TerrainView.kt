@@ -31,6 +31,8 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     }.getOrElse{CameraPose()};private set
     @Volatile private var groundedPose:CameraPose?=null
     @Volatile private var presentedPose:CameraPose?=null
+    @Volatile private var presentedFrom:CameraPose?=null
+    val planningPose:CameraPose get()=if(presentedFrom==cameraPose)presentedPose?:cameraPose else cameraPose
     internal fun frameReady()=presentedPose==cameraPose
     internal fun groundedFrameReady()=groundedPose==cameraPose&&presentedPose==cameraPose
     val longitude get()=cameraPose.longitude
@@ -102,13 +104,17 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     private val choreographer by lazy{Choreographer.getInstance()}
     private val vsync=Choreographer.FrameCallback{drawFrame()}
     private val adaptiveWake=Runnable{requestFrame()}
+    private val retryWake=Runnable{requestFrame()}
+    private val clearanceBytes=ByteBuffer.allocateDirect(12).order(ByteOrder.LITTLE_ENDIAN)
     private fun drawFrame() {
         queued.set(false)
-        if(!live||!active||handle==0L)return
+        if(!live||!active)return
+        gpu.removeCallbacks(retryWake)
+        if(handle==0L){recoverGpu();return}
         // Bounded source count and input bytes per display frame (650KiB).
         val demand=demandPacket
         if(demand!=null&&demand!==appliedDemand&&NativeBridge.demand(handle,demand)){appliedDemand=demand;safetyPose=null}
-        val rows=uploads.take(4,650*1024);var accepted=false;var geometryChanged=false
+        val rows=if(presentationFailures>0)emptyList()else uploads.take(if(gestureActive)1 else 2,650*1024);var accepted=false;var geometryChanged=false
         for(tile in rows){val id=tile.id;val ok=when(tile.kind){
             GpuUploadQueue.Kind.COMBINED->NativeBridge.upload(handle,id.z,id.x,id.y,tile.heights,tile.rgba)
             GpuUploadQueue.Kind.GEOMETRY->NativeBridge.uploadGeometry(handle,id.z,id.x,id.y,tile.heights)
@@ -128,33 +134,77 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         val floor=if(safetyValid)safetyBytes.float else Float.NEGATIVE_INFINITY
         val ground=if(safetyValid)safetyBytes.float else Float.NaN
         val groundZoom=if(safetyValid)safetyBytes.float.toInt() else -1
-        val pose=if(floor.isFinite()&&floor>requested.elevation+.01f)requested.copy(elevation=floor)else requested
-        val mx=(requested.longitude+180)/360;val my=CameraMath.mercatorY(requested.latitude)
-        val targetZoom=uploadDemand?.first?.filter{val n=2.0.pow(it.z);kotlin.math.floor(mx*n).toInt()==it.x&&kotlin.math.floor(my*n).toInt()==it.y}?.maxOfOrNull{it.z}?:Int.MAX_VALUE
-        if(pose!=requested||ground.isFinite()&&groundZoom>=targetZoom)post{
-            if(cameraPose==requested&&live&&active){
-                if(pose!=requested){elevationAnimation?.cancel();cameraPose=pose;if(gestureActive)applyGesture()else onCamera()}
-                if(cameraPose==pose&&ground.isFinite()&&groundZoom>=targetZoom)centerHeight(max(ground,floor))
+        val lift=if(floor.isFinite())max(0.0,(floor-requested.elevation).toDouble())else 0.0
+        var pose=if(gestureActive){
+            val held=max(gestureHeldElevation,if(floor.isFinite())floor else gestureHeldElevation)
+            if(abs(held-requested.elevation)>.01f)requested.copy(elevation=held)else requested
+        }else CameraMath.clearTerrain(requested,height,pixelScale,lift)
+        if(!gestureActive&&pose!=requested){
+            for(pass in 0 until 2){
+                clearanceBytes.rewind()
+                if(!NativeBridge.cameraSafety(handle,width,height,pose.longitude,pose.latitude,pose.zoom+log2(pixelScale),pose.bearing,pose.pitch,pose.elevation,clearanceBytes))break
+                val nextFloor=clearanceBytes.float
+                if(!nextFloor.isFinite()||nextFloor<=pose.elevation+.01f)break
+                pose=CameraMath.clearTerrain(pose,height,pixelScale,(nextFloor-pose.elevation).toDouble())
             }
         }
+        // Refined terrain changes the pivot, not the physical eye. No per-frame
+        // height-follow animation, and no collision correction fed back at rest.
+        val shouldRecenter=ground.isFinite()&&groundZoom>=0&&!gestureActive&&(geometryChanged||recenterPending)
+        val corrected=pose
+        if(gestureActive&&corrected!=requested)post{if(cameraPose==requested&&live&&active){
+            cameraPose=corrected;applyGesture()
+        }}
         val shown=NativeBridge.render(handle,width,height,pose.longitude,pose.latitude,pose.zoom+ln(pixelScale)/ln(2.0),pose.zoom,pose.bearing,pose.pitch,pose.elevation)
-        if(shown>0){presentationFailures=0;presentedPose=pose
+        if(shown>0){presentationFailures=0
+            val previous=presentedPose;presentedPose=pose;presentedFrom=requested
+            val rendered=pose
+            if(previous!=pose&&pose!=requested)post{if(cameraPose==requested&&live&&active)onCamera()}
+            if(shouldRecenter){
+            recenterPending=false
+            val token=gestureEpoch
+            pick(width*.5,height*.5){point->if(point!=null&&token==gestureEpoch&&!gestureActive&&cameraPose==requested){
+                val recentered=CameraMath.recenter(rendered,height,pixelScale,point[2])
+                if(recentered!=null){cameraPose=recentered;groundedPose=recentered;changed()}
+                else if(abs(point[2]-rendered.elevation)<.001)groundedPose=requested
+            }}
+        }
             val count=NativeBridge.waypoints(handle,projectedBytes)
             projectedBytes.rewind();projected=FloatArray(count*3){projectedBytes.float}
         }else {
             presentationFailures++
-            if(presentationFailures<=8)requestFrame(minOf(250L,16L shl presentationFailures)) else post{onStatus("GPU presentation unavailable")}
+            // Stop feeding uploads while a busy GPU drains; transient failure
+            // must never permanently stop presentation after an arbitrary count.
+            if(shown==-6||(shown==-5&&presentationFailures>=3)||(shown==-4&&presentationFailures>=6)||shown==0&&presentationFailures>=6){
+                recoverGpu()
+            }else requestFrame(when(shown){-2->250L;-3->16L;else->minOf(250L,16L shl minOf(presentationFailures,4))})
         }
         gpu.removeCallbacks(adaptiveWake)
         if(shown>1)gpu.postDelayed(adaptiveWake,(shown-2).toLong())
-        if(uploads.isNotEmpty())requestFrame()
+        if(shown>0&&uploads.isNotEmpty())requestFrame()
+    }
+    private var lastRecovery=0L
+    private fun recoverGpu(){
+        val now=android.os.SystemClock.uptimeMillis()
+        if(now-lastRecovery<2000){requestFrame(250);return}
+        lastRecovery=now
+        if(!live||!active)return
+        if(handle!=0L)NativeBridge.destroy(handle)
+        handle=NativeBridge.create(holder.surface,width,height)
+        residency=Residency(LongArray(0),LongArray(0));safetyPose=null;safetyValid=false;appliedRoutes=null;appliedDemand=null
+        if(handle!=0L){
+            val am=context.getSystemService(android.app.ActivityManager::class.java)
+            NativeBridge.tileBudget(handle,if(am.isLowRamDevice)32 else(am.memoryClass/2).coerceIn(64,128))
+            presentationFailures=0;post{onStatus("");onData()};requestFrame()
+        }else{post{onStatus("GPU recovering…")};requestFrame(250)}
     }
     private fun requestFrame(delay:Long=0) {
+        if(delay>0){if(live&&active)gpu.post{gpu.removeCallbacks(retryWake);gpu.postDelayed(retryWake,delay)};return}
         if(live&&active&&queued.compareAndSet(false,true))gpu.post {
             if(live&&active)choreographer.postFrameCallbackDelayed(vsync,delay)else queued.set(false)
         }
     }
-    private fun cancelFrames(){queued.set(false);gpu.post{gpu.removeCallbacks(adaptiveWake);choreographer.removeFrameCallback(vsync)}}
+    private fun cancelFrames(){queued.set(false);gpu.post{gpu.removeCallbacks(adaptiveWake);gpu.removeCallbacks(retryWake);choreographer.removeFrameCallback(vsync)}}
     private fun changed(){requestFrame();onCamera()}
     init{holder.addCallback(this)}
     override fun surfaceCreated(holder:SurfaceHolder) {
@@ -173,18 +223,18 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     override fun surfaceDestroyed(holder:SurfaceHolder) {
         live=false;presentedPose=null;generation.incrementAndGet();residency=Residency(LongArray(0),LongArray(0));queued.set(false)
         val done=CountDownLatch(1)
-        gpu.post{gpu.removeCallbacks(adaptiveWake);choreographer.removeFrameCallback(vsync);if(handle!=0L)NativeBridge.destroy(handle);handle=0L;done.countDown()}
+        gpu.post{gpu.removeCallbacks(adaptiveWake);gpu.removeCallbacks(retryWake);choreographer.removeFrameCallback(vsync);if(handle!=0L)NativeBridge.destroy(handle);handle=0L;done.countDown()}
         done.await(5,TimeUnit.SECONDS)
     }
     fun setActive(value:Boolean){
-        if(!value){stopMotion();elevationAnimation?.cancel();gestureEpoch++;gestureActive=false;val pose=cameraPose;cameraPreferences.edit().putLong("lon",pose.longitude.toBits()).putLong("lat",pose.latitude.toBits()).putLong("zoom",pose.zoom.toBits()).putFloat("bearing",pose.bearing).putFloat("pitch",pose.pitch).putFloat("elevation",pose.elevation).apply()}
+        if(!value){stopMotion();gestureEpoch++;gestureActive=false;val pose=cameraPose;cameraPreferences.edit().putLong("lon",pose.longitude.toBits()).putLong("lat",pose.latitude.toBits()).putLong("zoom",pose.zoom.toBits()).putFloat("bearing",pose.bearing).putFloat("pitch",pose.pitch).putFloat("elevation",pose.elevation).apply()}
         active=value;cancelFrames();if(value&&live)requestFrame()}
     fun memoryPressure(){gpu.post{
         if(handle!=0L){NativeBridge.releaseUnused(handle);refreshResidency();safetyPose=null}
     }}
     fun close() {
-        stopMotion();elevationAnimation?.cancel();active=false;live=false;generation.incrementAndGet();uploads.clear();queued.set(false)
-        gpu.post{gpu.removeCallbacks(adaptiveWake);choreographer.removeFrameCallback(vsync);if(handle!=0L)NativeBridge.destroy(handle);handle=0;thread.quitSafely()}
+        stopMotion();active=false;live=false;generation.incrementAndGet();uploads.clear();queued.set(false)
+        gpu.post{gpu.removeCallbacks(adaptiveWake);gpu.removeCallbacks(retryWake);choreographer.removeFrameCallback(vsync);if(handle!=0L)NativeBridge.destroy(handle);handle=0;thread.quitSafely()}
     }
     fun updateUploadDemand(geometry:Set<GpuUploadQueue.Id>,images:Set<GpuUploadQueue.Id>){
         val next=geometry to images
@@ -211,24 +261,11 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             post{callback(point)}
         }
     }
-    private var gestureActive=false
-    private var pendingGround:Float?=null
-    private var elevationAnimation:android.animation.ValueAnimator?=null
-    private var elevationTarget:Float?=null
-    fun centerHeight(value:Float){
-        if(gestureActive){pendingGround=value;return}
-        if(!value.isFinite()||elevationAnimation?.isRunning==true&&elevationTarget==value)return
-        val next=cameraPose.copy(elevation=value);groundedPose=next
-        if(next==cameraPose)return
-        elevationAnimation?.cancel()
-        val start=cameraPose.elevation;elevationTarget=value
-        elevationAnimation=android.animation.ValueAnimator.ofFloat(start,value).apply{
-            duration=350
-            addUpdateListener { cameraPose=cameraPose.copy(elevation=it.animatedValue as Float);requestFrame() }
-            addListener(object:android.animation.AnimatorListenerAdapter(){override fun onAnimationEnd(animation:android.animation.Animator){groundedPose=cameraPose;onCamera()}})
-            start()
-        }
-    }
+    @Volatile private var gestureActive=false
+    @Volatile private var gestureHeldElevation=3724f
+    @Volatile private var recenterPending=true
+    // Used by controlled fixtures and explicit initialization, never terrain-follow.
+    fun centerHeight(value:Float){if(value.isFinite()&&!gestureActive){cameraPose=cameraPose.copy(elevation=value);groundedPose=cameraPose;changed()}}
     fun zoomBy(delta:Double){
         if(delta.isFinite())easeControls((zoom+delta).coerceIn(4.0,19.0),bearing,width*.5,height*.5)
     }
@@ -277,11 +314,14 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         }
     }
     private var multiTouch=false
-    private fun beginGesture(x:Double,y:Double,time:Long=android.os.SystemClock.uptimeMillis()){
-        stopMotion();elevationAnimation?.cancel();pendingGround=null;gestureActive=true
+    private var tilting=false
+    private fun beginGesture(x:Double,y:Double,time:Long=android.os.SystemClock.uptimeMillis(),keepHold:Boolean=false){
+        stopMotion();gestureActive=true
+        if(presentedFrom==cameraPose)presentedPose?.let{cameraPose=it}
         finishGesturePending=false
         val token=++gestureEpoch;touchX=x;touchY=y;touchZoom=zoom;touchBearing=bearing;touchPitch=pitch
         val pose=cameraPose
+        if(!keepHold)gestureHeldElevation=pose.elevation
         gestureAnchor=CameraMath.anchor(pose,width,height,pixelScale,x,y)
         anchorPending=true
         recordMotion(time)
@@ -316,8 +356,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         val coast=pendingCoast;pendingCoast=null
         if(coast!=null){startCoast(coast);return}
         gestureActive=false;gestureEpoch++;anchorPending=false;gestureAnchor=null
-        pendingGround?.let{centerHeight(it)};pendingGround=null
-        onCamera()
+        recenterPending=true;requestFrame();onCamera()
     }
     private var draggingWaypoint=false
     private var dragEpoch=0L
@@ -360,13 +399,21 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         when(event.actionMasked){
             MotionEvent.ACTION_DOWN->{parent?.requestDisallowInterceptTouchEvent(true);multiTouch=false;beginGesture(event.x.toDouble(),event.y.toDouble(),event.eventTime)}
             MotionEvent.ACTION_POINTER_DOWN->{
-                multiTouch=true
-                val f=focusOf(event);beginGesture(f.first,f.second,event.eventTime)
+                multiTouch=true;tilting=false
+                val f=focusOf(event);beginGesture(f.first,f.second,event.eventTime,true)
                 twoFingers.start(event.getX(0)/pixelScale,event.getY(0)/pixelScale,event.getX(1)/pixelScale,event.getY(1)/pixelScale)
             }
             MotionEvent.ACTION_MOVE->if(event.pointerCount==2){
                 val f=focusOf(event)
                 val delta=twoFingers.move(event.getX(0)/pixelScale,event.getY(0)/pixelScale,event.getX(1)/pixelScale,event.getY(1)/pixelScale,event.eventTime)
+                if(delta.tilting&&!tilting){
+                    // MapLibre touchPitch excludes pan/zoom/rotate and pivots about
+                    // the map centre, not the arbitrary finger centroid.
+                    tilting=true;gestureEpoch++;anchorPending=false;motion.clear()
+                    touchX=width*.5;touchY=height*.5
+                    gestureAnchor=CameraMath.Anchor((longitude+180)/360,CameraMath.mercatorY(latitude),centerElevation.toDouble())
+                    recordMotion(event.eventTime)
+                }
                 touchZoom=(touchZoom+delta.zoom).coerceIn(4.0,19.0)
                 touchBearing+=delta.bearing.toFloat();touchPitch=(touchPitch+delta.pitch.toFloat()).coerceIn(0f,85f)
                 if(!delta.tilting){touchX=f.first;touchY=f.second}
@@ -375,7 +422,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             MotionEvent.ACTION_POINTER_UP->{
                 val coast=motion.finish(event.eventTime)
                 val continuation=if(event.pointerCount==2&&coast!=null)gestureAnchor?.let{MultiRelease(event.eventTime,coast,it,touchX,touchY,touchZoom,touchBearing,touchPitch)}else null
-                val f=focusOf(event,event.actionIndex);multiTouch=event.pointerCount-1>1;beginGesture(f.first,f.second,event.eventTime)
+                val f=focusOf(event,event.actionIndex);multiTouch=event.pointerCount-1>1;beginGesture(f.first,f.second,event.eventTime,true)
                 multiRelease=continuation
             }
         }

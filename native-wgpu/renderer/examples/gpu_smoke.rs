@@ -207,6 +207,11 @@ async fn run() {
         0.,
         1000.,
     );
+    assert_eq!(
+        r.skirt_edge_count(),
+        8,
+        "continuous joins omit internal skirts; exposed outer edges remain"
+    );
     let bytes = read(&r, &output);
     let pixel = |x: usize, y: usize| &bytes[(y * 256 + x) * 4..][..4];
     assert_ne!(pixel(64, 64), &[36, 113, 74, 255]);

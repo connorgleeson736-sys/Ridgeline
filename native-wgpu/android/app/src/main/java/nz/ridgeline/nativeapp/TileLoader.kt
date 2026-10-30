@@ -135,7 +135,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private fun loadView() {
         if (dead||!active||view.width==0||view.height==0) return
         val key=DemandPlanKey((view.width/view.pixelScale).roundToInt().coerceAtLeast(1),
-            (view.height/view.pixelScale).roundToInt().coerceAtLeast(1),view.cameraPose)
+            (view.height/view.pixelScale).roundToInt().coerceAtLeast(1),view.planningPose)
         val plan=plans.get(key) {
           val next=LinkedHashMap<Source,Int>()
           for(geometry in listOf(true,false)) {

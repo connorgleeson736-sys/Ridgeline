@@ -8,6 +8,7 @@ mod camera_safety;
 mod diagnostics;
 mod mipmaps;
 mod routes;
+mod seams;
 pub use routes::RoutePath;
 pub mod selection;
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -85,6 +86,8 @@ pub struct Renderer {
     pub logical_zoom: Option<f64>,
     cover: Vec<ridgeline_core::CoverRegion>,
     cover_dirty: bool,
+    seams_dirty: bool,
+    edge_masks: HashMap<TileId, u8>,
     demand: Option<(Vec<TileId>, Vec<TileId>)>,
     instance_capacity: usize,
     budget: usize,
@@ -332,6 +335,8 @@ impl Renderer {
             logical_zoom: None,
             cover: Vec::new(),
             cover_dirty: true,
+            seams_dirty: true,
+            edge_masks: HashMap::new(),
             demand: None,
             instance_capacity: 256,
             budget: 96,
@@ -480,7 +485,10 @@ impl Renderer {
             },
         );
         self.trim_geometry();
-        self.route_dirty = true;
+        self.seams_dirty = true;
+        if self.cover.iter().any(|row| row.source == id) {
+            self.route_dirty = true;
+        }
         self.cover_dirty = true;
         Ok(())
     }
@@ -591,6 +599,9 @@ impl Renderer {
     pub fn resident_count(&self) -> usize {
         self.tiles.len().max(self.images.len())
     }
+    pub fn skirt_edge_count(&self) -> u32 {
+        self.edge_masks.values().map(|mask| mask.count_ones()).sum()
+    }
     pub fn terrain_gpu_payload_bytes(&self) -> u64 {
         self.grid.size() + self.tiles.len() as u64 * 129 * 129 * 4
     }
@@ -635,6 +646,10 @@ impl Renderer {
         let geometry = self.active_sources(true);
         let images = self.active_sources(false);
         let cover = ridgeline_core::resident_cover(&geometry);
+        if self.cover != cover || self.seams_dirty {
+            self.edge_masks = seams::masks(&cover, &self.tiles);
+            self.seams_dirty = false;
+        }
         if self.cover != cover {
             self.route_dirty = true;
             self.cover = cover;
@@ -717,7 +732,10 @@ impl Renderer {
                 })
                 .unwrap();
             self.tiles.remove(&victim);
-            self.route_dirty = true;
+            self.seams_dirty = true;
+            if self.exact_route_sources.contains(&victim) {
+                self.route_dirty = true;
+            }
         }
     }
     fn trim_images(&mut self) {
@@ -1062,7 +1080,12 @@ impl Renderer {
             .map(|row| {
                 (
                     ridgeline_core::surface::GridRect::for_region(row.geometry, row.region),
-                    ridgeline_core::surface::skirt_edges(row.geometry_region, row.region),
+                    ridgeline_core::surface::skirt_edges(row.geometry_region, row.region)
+                        & self
+                            .edge_masks
+                            .get(&row.geometry_region)
+                            .copied()
+                            .unwrap_or(15),
                     ridgeline_core::surface::GridRect::for_region(row.geometry, row.region)
                         .adaptive_step(self.adaptive_levels[&row.geometry]),
                 )

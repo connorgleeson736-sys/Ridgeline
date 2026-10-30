@@ -49,7 +49,9 @@ fn configure_surface(
     }
 }
 struct AndroidState {
-    surface: wgpu::Surface<'static>,
+    surface: Option<wgpu::Surface<'static>>,
+    instance: wgpu::Instance,
+    device_lost: std::sync::Arc<std::sync::atomic::AtomicBool>,
     renderer: Renderer,
     config: wgpu::SurfaceConfiguration,
     _window: NativeWindow,
@@ -58,6 +60,17 @@ static STATES: OnceLock<Mutex<HashMap<u64, AndroidState>>> = OnceLock::new();
 static NEXT: AtomicU64 = AtomicU64::new(1);
 fn states() -> &'static Mutex<HashMap<u64, AndroidState>> {
     STATES.get_or_init(|| Mutex::new(HashMap::new()))
+}
+fn recover_poisoned_state() {
+    if !states().is_poisoned() {
+        return;
+    }
+    if let Err(poisoned) = states().lock() {
+        let mut guard = poisoned.into_inner();
+        guard.clear();
+        states().clear_poison();
+        log("Discarded interrupted GPU state; native renderer can be recreated");
+    }
 }
 fn protect<T: Default>(f: impl FnOnce() -> T) -> T {
     std::panic::catch_unwind(std::panic::AssertUnwindSafe(f)).unwrap_or_default()
@@ -102,12 +115,38 @@ fn state_for_backend(
         present_mode: wgpu::PresentMode::AutoVsync,
     };
     configure_surface(&surface, &renderer, &config)?;
+    let device_lost = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
+    let flag = device_lost.clone();
+    renderer
+        .device
+        .set_device_lost_callback(move |reason, _message| {
+            log(&format!("GPU device lost: {reason:?}"));
+            flag.store(true, Ordering::Release);
+        });
     Ok(AndroidState {
-        surface,
+        surface: Some(surface),
+        instance,
+        device_lost,
         renderer,
         config,
         _window: window.clone(),
     })
+}
+fn restore_surface(state: &mut AndroidState) -> Result<(), String> {
+    state.surface.take();
+    let target = wgpu::SurfaceTargetUnsafe::RawHandle {
+        raw_display_handle: Some(raw_window_handle::AndroidDisplayHandle::new().into()),
+        raw_window_handle: state
+            ._window
+            .window_handle()
+            .map_err(|e| e.to_string())?
+            .as_raw(),
+    };
+    let surface =
+        unsafe { state.instance.create_surface_unsafe(target) }.map_err(|e| e.to_string())?;
+    configure_surface(&surface, &state.renderer, &state.config)?;
+    state.surface = Some(surface);
+    Ok(())
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_create(
@@ -118,6 +157,7 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_create(
     h: i32,
 ) -> i64 {
     protect(|| {
+        recover_poisoned_state();
         let result = (|| -> Result<i64, String> {
             let window = unsafe { NativeWindow::from_surface(env.cast(), surface.cast()) }
                 .ok_or("No native window")?;
@@ -192,12 +232,19 @@ pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_render(
     elevation: f32,
 ) -> i32 {
     protect(|| {
+        recover_poisoned_state();
         let Ok(mut states) = states().lock() else {
             return 0;
         };
         let Some(s) = states.get_mut(&(handle as u64)) else {
             return 0;
         };
+        if s.device_lost.load(Ordering::Acquire) {
+            return -6;
+        }
+        if s.surface.is_none() && restore_surface(s).is_err() {
+            return -4;
+        }
         if w < 1 || h < 1 {
             return 0;
         }
@@ -205,22 +252,35 @@ pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_render(
             s.config.width = w as u32;
             s.config.height = h as u32;
             s.renderer.resize(w as u32, h as u32);
-            if let Err(error) = configure_surface(&s.surface, &s.renderer, &s.config) {
+            if let Err(error) =
+                configure_surface(s.surface.as_ref().unwrap(), &s.renderer, &s.config)
+            {
                 log(&format!("Surface configuration failed: {error}"));
                 return 0;
             }
         }
-        let frame = match s.surface.get_current_texture() {
-            wgpu::CurrentSurfaceTexture::Success(t)
-            | wgpu::CurrentSurfaceTexture::Suboptimal(t) => t,
-            wgpu::CurrentSurfaceTexture::Outdated | wgpu::CurrentSurfaceTexture::Lost => {
-                if let Err(error) = configure_surface(&s.surface, &s.renderer, &s.config) {
-                    log(&format!("Surface configuration failed: {error}"));
-                    return 0;
+        let acquired = s.surface.as_ref().unwrap().get_current_texture();
+        let frame = match acquired {
+            wgpu::CurrentSurfaceTexture::Success(frame)
+            | wgpu::CurrentSurfaceTexture::Suboptimal(frame) => frame,
+            wgpu::CurrentSurfaceTexture::Timeout => return -1,
+            wgpu::CurrentSurfaceTexture::Occluded => return -2,
+            wgpu::CurrentSurfaceTexture::Outdated => {
+                if let Err(error) =
+                    configure_surface(s.surface.as_ref().unwrap(), &s.renderer, &s.config)
+                {
+                    log(&format!("Surface reconfigure failed: {error}"));
+                    return -4;
                 }
-                return 0;
+                return -3;
             }
-            _ => return 0,
+            wgpu::CurrentSurfaceTexture::Lost => {
+                if let Err(error) = restore_surface(s) {
+                    log(&format!("Surface recreation failed: {error}"));
+                }
+                return -4;
+            }
+            wgpu::CurrentSurfaceTexture::Validation => return -5,
         };
         s.renderer.logical_zoom = Some(logical_zoom);
         s.renderer.render(

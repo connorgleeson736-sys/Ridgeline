@@ -25,4 +25,19 @@ class CameraMathTest {
    assertEquals(anchor.mx,projected.mx,1e-11);assertEquals(anchor.my,projected.my,1e-11)
   }
  }
+ @Test fun changingGroundPivotRetainsPhysicalEyeAndPitch(){
+  for(pitch in listOf(0f,45f,58f,80f)){
+   val pose=CameraPose(zoom=15.0,pitch=pitch,elevation=3000f)
+   val before=CameraMath.eye(pose,1280,2.0)
+   val afterPose=CameraMath.recenter(pose,1280,2.0,2900.0)!!
+   val after=CameraMath.eye(afterPose,1280,2.0)
+   assertEquals(before.mx,after.mx,1e-10);assertEquals(before.my,after.my,1e-10)
+   assertEquals(before.altitude,after.altitude,.001);assertEquals(pose.pitch,afterPose.pitch,0f)
+  }
+ }
+ @Test fun tiltAboutMapCenterDoesNotPanWithFingerCentroid(){
+  val pose=CameraPose();val anchor=CameraMath.anchor(pose,320,640,1.0,160.0,320.0)!!
+  val tilted=CameraMath.anchored(pose.copy(pitch=70f),anchor,320,640,1.0,160.0,320.0)!!
+  assertEquals(pose.longitude,tilted.longitude,1e-10);assertEquals(pose.latitude,tilted.latitude,1e-10)
+ }
 }
