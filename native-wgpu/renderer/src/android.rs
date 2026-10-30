@@ -190,7 +190,7 @@ pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_render(
     bearing: f32,
     pitch: f32,
     elevation: f32,
-) -> u8 {
+) -> i32 {
     protect(|| {
         let Ok(mut states) = states().lock() else {
             return 0;
@@ -232,7 +232,9 @@ pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_render(
             elevation,
         );
         s.renderer.queue.present(frame);
-        1
+        s.renderer
+            .next_adaptive_frame()
+            .map_or(1, |delay| 2 + delay.min(10000) as i32)
     })
 }
 #[unsafe(no_mangle)]
@@ -303,6 +305,8 @@ pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_tileBudget(
         if let Ok(mut states) = states().lock() {
             if let Some(s) = states.get_mut(&(handle as u64)) {
                 s.renderer.set_tile_budget(tiles.max(0) as usize);
+                s.renderer
+                    .set_geometry_retention((tiles.max(0) as usize / 2) * 3);
             }
         }
     });
@@ -489,7 +493,8 @@ unsafe fn upload_source(
             } else {
                 256 * 256 * 4
             };
-            if env.get_direct_buffer_capacity(&data)? != size {
+            let capacity = env.get_direct_buffer_capacity(&data)?;
+            if capacity != size && (!geometry || capacity != size + 16) {
                 return Ok(0);
             }
             let Ok(mut states) = states().lock() else {
@@ -510,14 +515,25 @@ unsafe fn upload_source(
             } {
                 return Ok(1);
             }
-            let bytes =
-                unsafe { std::slice::from_raw_parts(env.get_direct_buffer_address(&data)?, size) };
+            let bytes = unsafe {
+                std::slice::from_raw_parts(env.get_direct_buffer_address(&data)?, capacity)
+            };
             Ok(if geometry {
-                let heights: Vec<f32> = bytes
+                let heights: Vec<f32> = bytes[..size]
                     .chunks_exact(4)
                     .map(|b| f32::from_le_bytes(b.try_into().unwrap()))
                     .collect();
-                state.renderer.upload_geometry(id, &heights)
+                let result = state.renderer.upload_geometry_owned(id, heights);
+                if result.is_ok() && capacity == size + 16 {
+                    state.renderer.set_geometry_profile(
+                        id,
+                        [
+                            f64::from_le_bytes(bytes[size..size + 8].try_into().unwrap()),
+                            f64::from_le_bytes(bytes[size + 8..size + 16].try_into().unwrap()),
+                        ],
+                    );
+                }
+                result
             } else {
                 state.renderer.upload_image(id, bytes)
             }
@@ -882,4 +898,56 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_cameraSaf
         jni::Outcome::Ok(result) => result,
         _ => 0,
     }
+}
+
+/// Background source-worker metadata; never analyze terrain in the frame loop.
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_terrainProfile(
+    env: *mut jni::sys::JNIEnv,
+    _class: jni::sys::jclass,
+    data: jni::sys::jobject,
+) -> u8 {
+    let mut env = unsafe { jni::EnvUnowned::from_raw(env) };
+    match env
+        .with_env(|env| -> Result<u8, jni::errors::Error> {
+            let data = unsafe { jni::objects::JByteBuffer::from_raw(env, data) };
+            let size = 129 * 129 * 4;
+            if env.get_direct_buffer_capacity(&data)? != size + 16 {
+                return Ok(0);
+            }
+            let bytes = unsafe {
+                std::slice::from_raw_parts_mut(env.get_direct_buffer_address(&data)?, size + 16)
+            };
+            let heights: Vec<_> = bytes[..size]
+                .chunks_exact(4)
+                .map(|b| f32::from_le_bytes(b.try_into().unwrap()))
+                .collect();
+            let Some(errors) = ridgeline_core::adaptive::profile(&heights) else {
+                return Ok(0);
+            };
+            for (slot, error) in bytes[size..].chunks_exact_mut(8).zip(errors) {
+                slot.copy_from_slice(&error.to_le_bytes());
+            }
+            Ok(1)
+        })
+        .into_outcome()
+    {
+        jni::Outcome::Ok(result) => result,
+        _ => 0,
+    }
+}
+
+#[unsafe(no_mangle)]
+pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_releaseUnused(
+    _env: *mut c_void,
+    _class: *mut c_void,
+    handle: i64,
+) {
+    protect(|| {
+        if let Ok(mut states) = states().lock() {
+            if let Some(state) = states.get_mut(&(handle as u64)) {
+                state.renderer.release_unused();
+            }
+        }
+    });
 }

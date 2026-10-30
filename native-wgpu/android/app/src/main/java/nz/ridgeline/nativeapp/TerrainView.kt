@@ -101,6 +101,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     // Created and used exclusively on the GPU HandlerThread's Looper.
     private val choreographer by lazy{Choreographer.getInstance()}
     private val vsync=Choreographer.FrameCallback{drawFrame()}
+    private val adaptiveWake=Runnable{requestFrame()}
     private fun drawFrame() {
         queued.set(false)
         if(!live||!active||handle==0L)return
@@ -137,13 +138,15 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             }
         }
         val shown=NativeBridge.render(handle,width,height,pose.longitude,pose.latitude,pose.zoom+ln(pixelScale)/ln(2.0),pose.zoom,pose.bearing,pose.pitch,pose.elevation)
-        if(shown){presentationFailures=0;presentedPose=pose
+        if(shown>0){presentationFailures=0;presentedPose=pose
             val count=NativeBridge.waypoints(handle,projectedBytes)
             projectedBytes.rewind();projected=FloatArray(count*3){projectedBytes.float}
         }else {
             presentationFailures++
             if(presentationFailures<=8)requestFrame(minOf(250L,16L shl presentationFailures)) else post{onStatus("GPU presentation unavailable")}
         }
+        gpu.removeCallbacks(adaptiveWake)
+        if(shown>1)gpu.postDelayed(adaptiveWake,(shown-2).toLong())
         if(uploads.isNotEmpty())requestFrame()
     }
     private fun requestFrame(delay:Long=0) {
@@ -151,7 +154,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             if(live&&active)choreographer.postFrameCallbackDelayed(vsync,delay)else queued.set(false)
         }
     }
-    private fun cancelFrames(){queued.set(false);gpu.post{choreographer.removeFrameCallback(vsync)}}
+    private fun cancelFrames(){queued.set(false);gpu.post{gpu.removeCallbacks(adaptiveWake);choreographer.removeFrameCallback(vsync)}}
     private fun changed(){requestFrame();onCamera()}
     init{holder.addCallback(this)}
     override fun surfaceCreated(holder:SurfaceHolder) {
@@ -170,15 +173,18 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     override fun surfaceDestroyed(holder:SurfaceHolder) {
         live=false;presentedPose=null;generation.incrementAndGet();residency=Residency(LongArray(0),LongArray(0));queued.set(false)
         val done=CountDownLatch(1)
-        gpu.post{choreographer.removeFrameCallback(vsync);if(handle!=0L)NativeBridge.destroy(handle);handle=0L;done.countDown()}
+        gpu.post{gpu.removeCallbacks(adaptiveWake);choreographer.removeFrameCallback(vsync);if(handle!=0L)NativeBridge.destroy(handle);handle=0L;done.countDown()}
         done.await(5,TimeUnit.SECONDS)
     }
     fun setActive(value:Boolean){
         if(!value){stopMotion();elevationAnimation?.cancel();gestureEpoch++;gestureActive=false;val pose=cameraPose;cameraPreferences.edit().putLong("lon",pose.longitude.toBits()).putLong("lat",pose.latitude.toBits()).putLong("zoom",pose.zoom.toBits()).putFloat("bearing",pose.bearing).putFloat("pitch",pose.pitch).putFloat("elevation",pose.elevation).apply()}
         active=value;cancelFrames();if(value&&live)requestFrame()}
+    fun memoryPressure(){gpu.post{
+        if(handle!=0L){NativeBridge.releaseUnused(handle);refreshResidency();safetyPose=null}
+    }}
     fun close() {
         stopMotion();elevationAnimation?.cancel();active=false;live=false;generation.incrementAndGet();uploads.clear();queued.set(false)
-        gpu.post{choreographer.removeFrameCallback(vsync);if(handle!=0L)NativeBridge.destroy(handle);handle=0;thread.quitSafely()}
+        gpu.post{gpu.removeCallbacks(adaptiveWake);choreographer.removeFrameCallback(vsync);if(handle!=0L)NativeBridge.destroy(handle);handle=0;thread.quitSafely()}
     }
     fun updateUploadDemand(geometry:Set<GpuUploadQueue.Id>,images:Set<GpuUploadQueue.Id>){
         val next=geometry to images

@@ -79,6 +79,10 @@ impl GridRect {
     pub fn indices_with_skirt_edges(self, mask: u8) -> Vec<u32> {
         let mut ids = self.indices();
         ids.reserve(self.index_count(mask) as usize - ids.len());
+        self.append_skirts(&mut ids, mask);
+        ids
+    }
+    pub(crate) fn append_skirts(self, ids: &mut Vec<u32>, mask: u8) {
         let mut edge = |a: u32, b: u32| {
             let lower_a = a + 129 * 129;
             let lower_b = b + 129 * 129;
@@ -112,7 +116,6 @@ impl GridRect {
                 );
             }
         }
-        ids
     }
     pub fn indices(self) -> Vec<u32> {
         let mut ids =

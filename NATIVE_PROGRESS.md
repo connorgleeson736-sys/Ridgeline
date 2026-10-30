@@ -972,3 +972,28 @@ releasesaccess/handleswithoutdeletingphonefiles. Coarse67bundledimages andorigin
 sixpacks preserved. Assetpackaging includesoriginalarchiveidentitymanifest and
 ignoresgeneratedlicense/manifestassets. Kotlincompilepasses; nativefilepicker/
 persistedURIexecution stillneedsAndroidruntimeacceptance. Nextbuildmustincludethis.
+
+## Adaptive terrain, GPU residency and submission reuse
+
+Read exact0.18adaptive source, MARTINI RTINcode andCDLODpaper/sourceoverview.
+Chose0.18bounded32/64/128indexpolicy onexisting sharedgrid: .6drawing-buffer-pixel
+entry/.9retention,10/13pixelcellbounds,350msstablecoarsening,immediaterefinement.
+Originalf32heights, fineboundaryvertices andskirts retained; invalid/unknown/near-
+plane metadata keepsfull128. Sourceworkercomputesresidualbounds once; readybuffers
+carry16bytesofmetadata. No perframeanalysis ornewDEMfetch. Indexvariants sharethe
+existing boundedatlas; oneidlewakeallowscoarsening without blockingimmediateinput.
+Route-bearing sourceskeepfull128for exactdepthwiththenativeroute/markerpass.
+
+AndroidGPUterrainretentionis3xprevioussourcecount, capped192, usinglessrawgeometry
+payloadthantheoldduplicatedvertexlayout. Warmrevisitsreuseheighttextures,CPUfields
+andadaptive metadata. Memory-pressurecallbacksreleaseoff-demand caches, preserve
+activecoverage anddo notdiscardcachemerelybecauseUIhidden. Sharedgrid/instance
+buffersbindonce/pass; texturebindingsskipduplicates, compatibleadjacentpatches
+batch; perframevisible/instance/adaptivescratchstorage reused. Nativegeometryupload
+movesitsheightvectorintotheretainedfieldinstead ofcloning it.
+
+Twofocusedcorechecks pass. GPUplanefixture32768->8952surfacetriangleswithidentical
+pixels; routegeometryrestoresfull128. VulkanandGLES executechangedterrainpath;
+cachepressurefixturekeepsdemandedterrain. No phoneFPSclaim. In-placeattachment
+pickercompiles andall6originalZIPheadersmatchnativeoffsetreader. NextnormalBase
+APKmustincludeAddimagery plus thesechanges; archivesremainexternal/user-owned.

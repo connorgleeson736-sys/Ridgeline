@@ -149,6 +149,7 @@ impl crate::Renderer {
         None
     }
     pub(crate) fn rebuild_routes(&mut self) {
+        self.exact_route_sources.clear();
         self.route_anchor = self
             .route_paths
             .iter()
@@ -202,6 +203,9 @@ impl crate::Renderer {
                         convert(segment[1]),
                         clip,
                     );
+                    if !values.is_empty() {
+                        self.exact_route_sources.insert(row.source);
+                    }
                     for pair in values.windows(2) {
                         let world =
                             |p: [f64; 3]| [bounds[0] + p[0] * span, bounds[1] + p[1] * span, p[2]];
@@ -214,6 +218,12 @@ impl crate::Renderer {
                     let point = self.terrain_height(p).map(|h| [p[0], p[1], h]);
                     self.route_waypoints.push(point);
                     if let Some(p) = point {
+                        for row in &self.cover {
+                            let b = row.region.bounds();
+                            if p[0] >= b[0] && p[0] <= b[2] && p[1] >= b[1] && p[1] <= b[3] {
+                                self.exact_route_sources.insert(row.source);
+                            }
+                        }
                         quad(
                             p,
                             p,

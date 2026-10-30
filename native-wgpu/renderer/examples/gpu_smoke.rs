@@ -128,6 +128,65 @@ async fn run() {
     let point = r.pick_at(128., 128.).expect("native terrain ray hit");
     assert!((point[0] - (center[0] * 360. - 180.)).abs() < 1e-6);
     assert!((point[2] - 1000.).abs() < 1e-6);
+    // Metadata comes from source workers in production. A plane must simplify
+    // without changing a pixel, while preserving the source buffer and skirts.
+    r.set_geometry_profile(parent, ridgeline_core::adaptive::profile(&heights).unwrap());
+    r.render(
+        &output.create_view(&Default::default()),
+        center,
+        12.,
+        0.,
+        0.,
+        1000.,
+    );
+    assert!(
+        r.next_adaptive_frame().is_some(),
+        "coarsening waits for stable eligibility"
+    );
+    std::thread::sleep(std::time::Duration::from_millis(360));
+    r.render(
+        &output.create_view(&Default::default()),
+        center,
+        12.,
+        0.,
+        0.,
+        1000.,
+    );
+    assert!(
+        r.drawn_surface_triangles < 32768,
+        "eligible plane reduces GPU triangle work"
+    );
+    assert_eq!(
+        read(&r, &output),
+        bytes,
+        "planar simplification must preserve every output pixel"
+    );
+    println!(
+        "Adaptive plane: {} surface triangles, full boundaries/skirts, identical pixels",
+        r.drawn_surface_triangles
+    );
+    r.set_routes(vec![ridgeline_renderer::RoutePath {
+        points: vec![
+            [center[0] - (bounds[2] - bounds[0]) * 0.1, center[1]],
+            [center[0] + (bounds[2] - bounds[0]) * 0.1, center[1]],
+        ],
+        color: [1., 0.2, 0.1, 1.],
+        selected: Some(0),
+    }]);
+    r.render(
+        &output.create_view(&Default::default()),
+        center,
+        12.,
+        0.,
+        0.,
+        1000.,
+    );
+    assert_eq!(
+        r.drawn_surface_triangles, 32768,
+        "route-bearing terrain retains full geometry for exact depth/occlusion"
+    );
+    r.set_routes(Vec::new());
+    r.set_geometry_profile(parent, [1e12, 1e12]); // Force full detail for the existing ownership fixtures.
     // One detailed child must replace precisely its quadrant, leaving the other
     // three supplied by the parent. Render order is irrelevant to ownership.
     r.upload(
@@ -422,6 +481,22 @@ async fn run() {
         seam.terrain_gpu_payload_bytes(),
         266256 + seam.geometry_count() as u64 * 66564,
         "shared grid keeps every exact f32 height without per-tile duplicated vertices"
+    );
+    seam.set_geometry_retention(48);
+    for x in 10..14 {
+        seam.upload_geometry(TileId { z: 12, x, y: 2500 }, &heights)
+            .unwrap();
+    }
+    assert!(
+        seam.touch_geometry(high),
+        "recent requested terrain remains GPU resident across unrelated uploads"
+    );
+    seam.release_unused();
+    assert_eq!(seam.geometry_count(), 1);
+    assert_eq!(seam.image_count(), 1);
+    assert!(
+        seam.touch_geometry(high),
+        "memory pressure preserves actual demanded terrain"
     );
     // The hard budget holds during a burst of unrelated new uploads.
     r.set_tile_budget(24);

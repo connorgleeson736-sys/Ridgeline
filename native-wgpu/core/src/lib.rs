@@ -273,3 +273,5 @@ mod demand_tests {
         assert!(!demanded_sources(&available, &desired).contains(&p));
     }
 }
+
+pub mod adaptive;

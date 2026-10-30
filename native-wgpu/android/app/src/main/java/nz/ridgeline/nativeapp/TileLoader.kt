@@ -55,7 +55,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private val am = context.getSystemService(ActivityManager::class.java)
     private val imageLimit = if (am.isLowRamDevice) 32 else (am.memoryClass / 2).coerceIn(64, 128)
     private val geometryLimit = (imageLimit/2).coerceIn(16,96)
-    private val readyByteLimit = imageLimit * 256*256*4 + geometryLimit * 129*129*4
+    private val readyByteLimit = imageLimit * 256*256*4 + geometryLimit * (129*129*4+16)
     private var readyBytes = 0
     private val demLimit = if (am.isLowRamDevice) 24 else (am.memoryClass / 2).coerceIn(48, 128)
     private val ready = LinkedHashMap<Source, ByteBuffer>(16, .75f, true)
@@ -240,8 +240,10 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         finally { demJobs.remove(id, future) }
     }
     private fun loadGeometry(id: Id): ByteBuffer {
-        val heights=ByteBuffer.allocateDirect(129*129*4).order(ByteOrder.LITTLE_ENDIAN)
+        val heights=ByteBuffer.allocateDirect(129*129*4+16).order(ByteOrder.LITTLE_ENDIAN)
         DemSampling.terrainMesh(id.z,id.x,id.y,heights){raw(Id(it.z,it.x,it.y))}
+        heights.putDouble(129*129*4,Double.NaN);heights.putDouble(129*129*4+8,Double.NaN)
+        NativeBridge.terrainProfile(heights)
         return heights
     }
     private fun loadImage(id:Id):ByteBuffer {
@@ -312,6 +314,10 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             }
             view.post{if(!dead&&revision==profileRevision.get())callback(result)}
         },350,TimeUnit.MILLISECONDS)
+    }
+    fun memoryPressure(){
+        synchronized(ready){val it=ready.entries.iterator();while(it.hasNext()){val row=it.next();if(row.key !in wanted){readyBytes-=row.value.capacity();it.remove()}}}
+        synchronized(decoded){while(decoded.size>minOf(16,demLimit))decoded.remove(decoded.keys.first())}
     }
     fun setActive(value:Boolean){active=value;if(value)cameraChanged()}
     fun close() {

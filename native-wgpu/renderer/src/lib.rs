@@ -3,6 +3,7 @@ use glam::{Mat4, Vec3};
 pub use ridgeline_core::{TileId, mercator, terrain_rgb};
 use std::collections::{HashMap, HashSet};
 use wgpu::util::DeviceExt;
+mod adaptive;
 mod camera_safety;
 mod diagnostics;
 mod mipmaps;
@@ -32,6 +33,8 @@ struct Tile {
     _heights: wgpu::Texture,
     used: u64,
     field: ridgeline_core::heightfield::Heightfield,
+    adaptive_profile: Option<[f64; 2]>,
+    adaptive_state: std::cell::Cell<adaptive::State>,
 }
 struct ImageTile {
     bind: wgpu::BindGroup,
@@ -59,7 +62,7 @@ pub struct Renderer {
     tiles: HashMap<TileId, Tile>,
     images: HashMap<TileId, ImageTile>,
     draws: Vec<ridgeline_core::surface::SurfacePatch>,
-    index_ranges: HashMap<(ridgeline_core::surface::GridRect, u8), (u32, u32)>,
+    index_ranges: HashMap<(ridgeline_core::surface::GridRect, u8, u8), (u32, u32)>,
     index_next: u32,
     geometry_budget: usize,
     depth: wgpu::Texture,
@@ -68,6 +71,11 @@ pub struct Renderer {
     route_gpu: routes::RouteGpu,
     route_paths: Vec<RoutePath>,
     route_dirty: bool,
+    exact_route_sources: HashSet<TileId>,
+    next_adaptive_frame: Option<u64>,
+    adaptive_levels: HashMap<TileId, u8>,
+    instance_scratch: Vec<[f32; 12]>,
+    visible_scratch: Vec<ridgeline_core::surface::SurfacePatch>,
     route_anchor: [f64; 2],
     route_waypoints: Vec<Option<[f64; 3]>>,
     pub frames: u64,
@@ -266,6 +274,7 @@ impl Renderer {
                     y1: 128,
                 },
                 15,
+                1,
             ),
             (0, idx.len() as u32),
         );
@@ -307,6 +316,11 @@ impl Renderer {
             route_gpu,
             route_paths: vec![],
             route_dirty: true,
+            exact_route_sources: HashSet::new(),
+            next_adaptive_frame: None,
+            adaptive_levels: HashMap::new(),
+            instance_scratch: Vec::new(),
+            visible_scratch: Vec::new(),
             route_anchor: [0.5, 0.5],
             route_waypoints: vec![],
             frames: 0,
@@ -402,6 +416,9 @@ impl Renderer {
         self.upload_image(id, rgba)
     }
     pub fn upload_geometry(&mut self, id: TileId, heights: &[f32]) -> Result<(), String> {
+        self.upload_geometry_owned(id, heights.to_vec())
+    }
+    pub fn upload_geometry_owned(&mut self, id: TileId, heights: Vec<f32>) -> Result<(), String> {
         if heights.len() != 129 * 129 || heights.iter().any(|h| !h.is_finite()) {
             return Err("Invalid geometry payload".into());
         }
@@ -426,7 +443,7 @@ impl Renderer {
         });
         self.queue.write_texture(
             heights_texture.as_image_copy(),
-            bytemuck::cast_slice(heights),
+            bytemuck::cast_slice(&heights),
             wgpu::TexelCopyBufferLayout {
                 offset: 0,
                 bytes_per_row: Some(129 * 4),
@@ -449,10 +466,12 @@ impl Renderer {
             Tile {
                 height_bind,
                 _heights: heights_texture,
+                adaptive_profile: None,
+                adaptive_state: std::cell::Cell::new(adaptive::State::new()),
                 used: self.clock,
                 field: ridgeline_core::heightfield::Heightfield::new(
                     128,
-                    heights.to_vec().into_boxed_slice(),
+                    heights.into_boxed_slice(),
                 )
                 .map_err(str::to_owned)?,
             },
@@ -535,6 +554,35 @@ impl Renderer {
         self.geometry_budget = (self.budget / 2).clamp(16, 96);
         self.trim_geometry();
         self.trim_images();
+        self.cover_dirty = true;
+    }
+    /// Shared height textures make retaining three times the previous terrain
+    /// source count cheaper than the old duplicated-vertex representation.
+    pub fn set_geometry_profile(&mut self, id: TileId, errors: [f64; 2]) {
+        if errors.iter().all(|x| x.is_finite() && *x >= 0.) {
+            if let Some(tile) = self.tiles.get_mut(&id) {
+                tile.adaptive_profile = Some(errors);
+            }
+        }
+    }
+    pub fn next_adaptive_frame(&self) -> Option<u64> {
+        self.next_adaptive_frame
+    }
+    /// Memory pressure releases only cache entries outside current demand/cover.
+    pub fn release_unused(&mut self) {
+        let mut ground: HashSet<_> = self.active_sources(true).into_iter().collect();
+        let mut photos: HashSet<_> = self.active_sources(false).into_iter().collect();
+        if let Some((g, i)) = &self.demand {
+            ground.extend(g.iter().copied());
+            photos.extend(i.iter().copied());
+        }
+        self.tiles.retain(|id, _| ground.contains(id));
+        self.images.retain(|id, _| photos.contains(id));
+        self.cover_dirty = true;
+    }
+    pub fn set_geometry_retention(&mut self, tiles: usize) {
+        self.geometry_budget = tiles.clamp(16, 192);
+        self.trim_geometry();
         self.cover_dirty = true;
     }
     pub fn resident_count(&self) -> usize {
@@ -927,48 +975,45 @@ impl Renderer {
             pitch,
             elevation,
         });
-        let rows: Vec<_> = self
-            .draws
-            .iter()
-            .filter(|row| {
-                Self::visible(
-                    &ridgeline_core::CoverRegion {
-                        source: row.geometry,
-                        region: row.region,
-                    },
-                    &self.tiles[&row.geometry],
-                    matrix,
-                    center,
-                    world,
-                    px_meter,
-                    elevation,
-                )
-            })
-            .collect();
-        let data: Vec<[f32; 12]> = rows
-            .iter()
-            .map(|row| {
-                let b = row.geometry.bounds();
-                let region = row.region.bounds();
-                let size = b[2] - b[0];
-                let image = row.image.bounds();
-                let image_size = image[2] - image[0];
-                [
-                    ((b[0] - center[0]) * world) as f32,
-                    ((center[1] - b[1]) * world) as f32,
-                    (size * world) as f32,
-                    0.,
-                    ((region[0] - b[0]) / size) as f32,
-                    ((region[1] - b[1]) / size) as f32,
-                    ((region[2] - b[0]) / size) as f32,
-                    ((region[3] - b[1]) / size) as f32,
-                    (size / image_size) as f32,
-                    (size / image_size) as f32,
-                    ((b[0] - image[0]) / image_size) as f32,
-                    ((b[1] - image[1]) / image_size) as f32,
-                ]
-            })
-            .collect();
+        let mut rows = std::mem::take(&mut self.visible_scratch);
+        rows.clear();
+        rows.extend(self.draws.iter().copied().filter(|row| {
+            Self::visible(
+                &ridgeline_core::CoverRegion {
+                    source: row.geometry,
+                    region: row.region,
+                },
+                &self.tiles[&row.geometry],
+                matrix,
+                center,
+                world,
+                px_meter,
+                elevation,
+            )
+        }));
+        let mut data = std::mem::take(&mut self.instance_scratch);
+        data.clear();
+        data.extend(rows.iter().map(|row| {
+            let b = row.geometry.bounds();
+            let region = row.region.bounds();
+            let size = b[2] - b[0];
+            let image = row.image.bounds();
+            let image_size = image[2] - image[0];
+            [
+                ((b[0] - center[0]) * world) as f32,
+                ((center[1] - b[1]) * world) as f32,
+                (size * world) as f32,
+                0.,
+                ((region[0] - b[0]) / size) as f32,
+                ((region[1] - b[1]) / size) as f32,
+                ((region[2] - b[0]) / size) as f32,
+                ((region[3] - b[1]) / size) as f32,
+                (size / image_size) as f32,
+                (size / image_size) as f32,
+                ((b[0] - image[0]) / image_size) as f32,
+                ((b[1] - image[1]) / image_size) as f32,
+            ]
+        }));
         if data.len() > self.instance_capacity {
             self.instance_capacity = data.len().next_power_of_two();
             self.instances = self.device.create_buffer(&wgpu::BufferDescriptor {
@@ -984,7 +1029,30 @@ impl Renderer {
                     .write_buffer(&self.instances, 0, bytemuck::cast_slice(&data));
                 self.instance_uploads += 1;
             }
-            self.last_instances = data;
+            std::mem::swap(&mut self.last_instances, &mut data);
+        }
+        self.instance_scratch = data;
+        let now = std::time::Instant::now();
+        self.adaptive_levels.clear();
+        self.next_adaptive_frame = None;
+        for id in rows.iter().map(|r| r.geometry) {
+            if self.adaptive_levels.contains_key(&id) {
+                continue;
+            }
+            let (step, wake) = adaptive::choose(
+                &self.tiles[&id],
+                id,
+                matrix,
+                &route_view,
+                px_meter,
+                now,
+                self.exact_route_sources.contains(&id),
+            );
+            self.adaptive_levels.insert(id, step);
+            if let Some(delay) = wake {
+                self.next_adaptive_frame =
+                    Some(self.next_adaptive_frame.map_or(delay, |old| old.min(delay)));
+            }
         }
         let rects: Vec<_> = rows
             .iter()
@@ -992,6 +1060,8 @@ impl Renderer {
                 (
                     ridgeline_core::surface::GridRect::for_region(row.geometry, row.region),
                     ridgeline_core::surface::skirt_edges(row.geometry_region, row.region),
+                    ridgeline_core::surface::GridRect::for_region(row.geometry, row.region)
+                        .adaptive_step(self.adaptive_levels[&row.geometry]),
                 )
             })
             .collect();
@@ -999,7 +1069,7 @@ impl Renderer {
         let missing: u32 = unique
             .iter()
             .filter(|key| !self.index_ranges.contains_key(key))
-            .map(|(r, m)| r.index_count(*m))
+            .map(|(r, m, s)| r.adaptive_index_count(*s, *m))
             .sum();
         let capacity = (self.indices.size() / 4) as u32;
         if self.index_next + missing > capacity {
@@ -1010,7 +1080,7 @@ impl Renderer {
         let mut overflow = HashMap::new();
         for rect in &rects {
             if !self.index_ranges.contains_key(rect) && !overflow.contains_key(rect) {
-                let ids = rect.0.indices_with_skirt_edges(rect.1);
+                let ids = rect.0.adaptive_indices(rect.2, rect.1);
                 let start = self.index_next;
                 let end = start + ids.len() as u32;
                 if end <= capacity {
@@ -1037,7 +1107,7 @@ impl Renderer {
         }
         self.drawn_surface_triangles = rects
             .iter()
-            .map(|(r, _)| (r.x1 - r.x0) as u32 * (r.y1 - r.y0) as u32 * 2)
+            .map(|(r, _, s)| r.adaptive_surface_triangles(*s))
             .sum();
         self.drawn_triangles = rects
             .iter()
@@ -1083,27 +1153,46 @@ impl Renderer {
             pass.set_bind_group(0, &self.scene_bind, &[]);
             pass.set_index_buffer(self.indices.slice(..), wgpu::IndexFormat::Uint32);
             let mut atlas_bound = true;
-            for (i, row) in rows.iter().enumerate() {
-                let tile = &self.tiles[&row.geometry];
-                pass.set_bind_group(1, &self.images[&row.image].bind, &[]);
-                pass.set_vertex_buffer(0, self.grid.slice(..));
-                pass.set_bind_group(2, &tile.height_bind, &[]);
-                pass.set_vertex_buffer(
-                    1,
-                    self.instances.slice((i * 48) as u64..((i + 1) * 48) as u64),
-                );
+            pass.set_vertex_buffer(0, self.grid.slice(..));
+            pass.set_vertex_buffer(1, self.instances.slice(..));
+            let mut last_geometry = None;
+            let mut last_image = None;
+            let mut i = 0;
+            while i < rows.len() {
+                let row = rows[i];
+                if last_image != Some(row.image) {
+                    pass.set_bind_group(1, &self.images[&row.image].bind, &[]);
+                    last_image = Some(row.image);
+                }
+                if last_geometry != Some(row.geometry) {
+                    pass.set_bind_group(2, &self.tiles[&row.geometry].height_bind, &[]);
+                    last_geometry = Some(row.geometry);
+                }
+                let mut end_instance = i + 1;
+                while end_instance < rows.len()
+                    && rows[end_instance].geometry == row.geometry
+                    && rows[end_instance].image == row.image
+                    && rects[end_instance] == rects[i]
+                {
+                    end_instance += 1;
+                }
                 if let Some(&(start, end)) = self.index_ranges.get(&rects[i]) {
                     if !atlas_bound {
                         pass.set_index_buffer(self.indices.slice(..), wgpu::IndexFormat::Uint32);
                         atlas_bound = true;
                     }
-                    pass.draw_indexed(start..end, 0, 0..1);
+                    pass.draw_indexed(start..end, 0, i as u32..end_instance as u32);
                 } else {
                     let buffer = &overflow[&rects[i]];
                     pass.set_index_buffer(buffer.slice(..), wgpu::IndexFormat::Uint32);
                     atlas_bound = false;
-                    pass.draw_indexed(0..(buffer.size() / 4) as u32, 0, 0..1);
+                    pass.draw_indexed(
+                        0..(buffer.size() / 4) as u32,
+                        0,
+                        i as u32..end_instance as u32,
+                    );
                 }
+                i = end_instance;
             }
             self.route_gpu.draw(&mut pass);
         }
@@ -1118,6 +1207,7 @@ impl Renderer {
                 image.used = self.clock;
             }
         }
+        self.visible_scratch = rows;
         self.frames += 1;
     }
 }
