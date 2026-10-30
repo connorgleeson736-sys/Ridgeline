@@ -1,8 +1,8 @@
 {
-  "sourceCheckpoint": "40d278887128b50a6c8bb8209683ed4580b6068f",
+  "sourceCheckpoint": "22858d0c64c7273c8cf69479d1ea8df61cc335bf",
   "apk": "Ridgeline-Native-Base.apk",
-  "bytes": 31559809,
-  "sha256": "301488d08668ea2375263598ce44fb95678e74f4e64e135c9c912bc545208d67",
+  "bytes": 31614320,
+  "sha256": "0c96a6896546e6b5c588fa8f5bef361ac7a649b2ad48af009d5f2a0d17e3cac4",
   "largeOverviewPacks": 0,
   "coarseImageryFiles": 67,
   "abis": [
@@ -11,18 +11,26 @@
     "x86_64"
   ],
   "managedSessionCa": false,
-  "choices": {
-    "cameraReference": "Ridgeline0.18 / MapLibreGLJS6.14",
-    "automaticCacheMaximumBytes": 1000000000,
-    "automaticCacheAdaptation": "limited by free cache storage",
-    "imageryFadeMilliseconds": 0
-  },
+  "addImagery": "Offline / imagery > Add imagery ZIPs; attach original files in place with persistent read access; up to six at once",
   "changes": [
-    "Reference release momentum and two-finger gesture signs/activation",
-    "Smooth anchored zoom/doubletap/north controls",
-    "Exact shared terrain grid and per-tile R32Float heights",
-    "Eye/near-plane terrain clearance, actual rendered centre grounding",
-    "Deduplicated source body requests, active-use cache recency and background selection pause"
+    "Validated in-place original overview ZIP attachments and direct byte-range reads",
+    "Reference-bounded adaptive terrain interiors with exact boundaries and skirts",
+    "Three-times recent terrain source retention, capped 192, with memory-pressure cleanup",
+    "Shared grid/instance binding, redundant texture-binding removal and compatible instanced draws",
+    "Reused frame scratch storage and moved source-height ownership",
+    "16-bit terrain indices halve index storage/fetch bytes without changing topology"
   ],
-  "validation": "Three focused gesture tests pass; Kotlin compilation and all three optimized JNI ABIs/build pass. Vulkan/GLES shared-grid checks and dedicated CPU terrain-clearance/payload checks pass. Signature and normal Base payload verified. No new Android runtime/phone performance or complete MapLibre-equivalence claim."
+  "adaptiveTerrain": {
+    "newErrorPixels": 0.6,
+    "retainedErrorPixels": 0.9,
+    "stableCoarseningMs": 350,
+    "surfaceLevels": [
+      32,
+      64,
+      128
+    ],
+    "routeSourcesFullGeometry": true,
+    "fullSourceHeightsRetained": true
+  },
+  "validation": "Two focused adaptive invariants pass. Vulkan/GLES fixtures pass; plane uses 8952 instead of 32768 surface triangles with identical pixels; route sources keep full geometry; warm residency and memory pressure assertions pass. All six original ZIP headers match native reader layout. Kotlin/all three optimized JNI ABIs/assembly/signature pass. Android document-picker persistence and phone performance remain unverified."
 }

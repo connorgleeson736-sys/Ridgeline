@@ -249,3 +249,17 @@ See [reference code, decisions and remaining differences](research/MAPLIBRE-614-
 This is an implementation checkpoint, not a phone-performance or full-MapLibre
 acceptance claim. Full source imagery/mesh detail, six original ZIPs and Capacitor
 remain preserved; normal downloadable APK stays the smaller Base variant.
+
+
+## Attach existing overview imagery and adaptive terrain
+
+Open **Offline / imagery → Add imagery ZIPs** and select the original overview ZIPs
+already on your phone. Multiple selection supports all six; files remain in place
+with persisted read permission and are validated against original archive hashes.
+No extraction or duplicate pack storage. Detach never deletes the original ZIP.
+Imagery packs do not contain terrain; use network or a saved region for elevation.
+
+The renderer now carries0.18's bounded adaptive interior meshes, retains more
+recent terrain on the GPU, handles actual memory pressure, reuses frame storage
+and bindings, and uses16bit indices. See
+[research, bounds and limitations](research/ADAPTIVE-TERRAIN-AND-RESIDENCY.md).

@@ -1006,3 +1006,12 @@ imagefiltering,mips,sourceceilings ororiginalZIPdatareduced. Sourcevectorownersh
 andbinding/scratchreuse are exactworkremoval; adaptivity remains the separately
 bounded0.18visualpolicy withroutegeometryprotected. Attachmentreaderdetach race
 nowrejectsstalepackhandles. Proceeding tobuildnormalBasewithAddimagery included.
+
+LatestnormalBaseAPKfrom22858d0includes Addimagery/in-placeZIPattachments plusadaptive,
+warmterraincache, pressurehandling, submission/scratchreuse and16bitindices.
+Size31614320bytes,SHA256
+0c96a6896546e6b5c588fa8f5bef361ac7a649b2ad48af009d5f2a0d17e3cac4.
+All3optimizedJNIABIs, Kotlin/assembly/signature pass. NativeZIPidentitymanifest
+included; no largepacks orsessionCA. Scope in validation/attach-adaptive;
+phoneSAFpersistedaccess andphysicalFPSstillneedexecution. Do notclaimprototype
+featurecomplete or inferdeviceFPSfromtrianglecounts. OriginalZIPs/Capacitorintact.
