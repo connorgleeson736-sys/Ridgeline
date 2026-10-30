@@ -1,7 +1,7 @@
 # Native Android checkpoints — incomplete prototypes
 
 Latest smaller build: [Ridgeline-Native-Base.apk](Ridgeline-Native-Base.apk).
-Source checkpoint `22858d0`; signed debug Base APK, 31.6MB, all three ABIs.
+Source checkpoint `c602395`; signed debug Base APK, 31.7MB, all three ABIs.
 
 **Add your existing imagery:** open **Offline / imagery → Add imagery ZIPs**, then
 select the original Ridgeline overview ZIPs already on your phone (up to six at
@@ -9,16 +9,18 @@ once). Files attach in place: no extraction, copying or modification. Keep them
 at the selected location. Detach removes app access without deleting your files.
 The overview packs contain imagery; terrain needs network or a saved region.
 
-Also includes bounded adaptive terrain interiors, a larger warm terrain GPU cache,
-memory-pressure cleanup, fewer repeated bindings, reused frame storage and16bit
-terrain indices. Original source heights, full boundary/skirt samples, imagery
-resolution/filtering and previous MapLibre-style camera work are preserved.
+This checkpoint replaces automatic terrain height-follow with eye-preserving pivot
+updates, centres exclusive two-finger tilt, prioritizes background coverage and
+recovers temporary/lost GPU presentation. Uploads pause during presentation trouble.
+Skirts are removed at proven continuous joins and retained where they prevent cracks.
+Full source resolution, adaptive interiors and warm GPU caches remain available.
 
-The APK excludes all six large packs and session CA; retains67coarse images and
-full-resolution online sources. Focused GPU/core checks, optimized three-ABI build
-and signature pass. Native document-provider persistence and phone FPS remain
-unverified. [Evidence](../validation/attach-adaptive/) ·
-[implementation/research](../research/ADAPTIVE-TERRAIN-AND-RESIDENCY.md).
+The APK excludes all six large packs and session CA; retains 67 coarse images and
+full-resolution online sources. Nine focused tests, Vulkan/GLES fixtures, all
+three optimized JNI ABIs, assembly and signing pass. No new phone/emulator run;
+Samsung A20 feel, stability, recovery and performance remain unverified.
+[Evidence](../validation/terrain-stability/) ·
+[implementation/research](../research/TERRAIN-STABILITY-AND-RECOVERY.md).
 
 Earlier Base: [Ridgeline-Native-Base-a585548.apk](Ridgeline-Native-Base-a585548.apk).
 

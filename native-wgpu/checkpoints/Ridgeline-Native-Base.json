@@ -1,8 +1,8 @@
 {
-  "sourceCheckpoint": "22858d0c64c7273c8cf69479d1ea8df61cc335bf",
+  "sourceCheckpoint": "c602395d7f2061a24a2e30a2751f4e8e29881484",
   "apk": "Ridgeline-Native-Base.apk",
-  "bytes": 31614320,
-  "sha256": "0c96a6896546e6b5c588fa8f5bef361ac7a649b2ad48af009d5f2a0d17e3cac4",
+  "bytes": 31684240,
+  "sha256": "18e11cf44922da81a4dfa4b5aafff6bbb4af91e6113ff1f1bc7439e785d9dea1",
   "largeOverviewPacks": 0,
   "coarseImageryFiles": 67,
   "abis": [
@@ -13,12 +13,13 @@
   "managedSessionCa": false,
   "addImagery": "Offline / imagery > Add imagery ZIPs; attach original files in place with persistent read access; up to six at once",
   "changes": [
-    "Validated in-place original overview ZIP attachments and direct byte-range reads",
-    "Reference-bounded adaptive terrain interiors with exact boundaries and skirts",
-    "Three-times recent terrain source retention, capped 192, with memory-pressure cleanup",
-    "Shared grid/instance binding, redundant texture-binding removal and compatible instanced draws",
-    "Reused frame scratch storage and moved source-height ownership",
-    "16-bit terrain indices halve index storage/fetch bytes without changing topology"
+    "Eye-preserving terrain pivot recentering replaces automatic height-follow animation",
+    "Exclusive two-finger tilt pivots around map centre; planner follows presented camera",
+    "Prioritize useful parent coverage across background before remaining fine leaves",
+    "Bound uploads and pause them during presentation failure; retry temporary errors and recreate lost surfaces/devices",
+    "Omit skirts only on proven continuous joins; retain gap and mismatch protection",
+    "Avoid retessellating routes for unused fallback geometry",
+    "Retains in-place Add imagery, adaptive terrain, warm GPU caches, full source heights and imagery resolution"
   ],
   "adaptiveTerrain": {
     "newErrorPixels": 0.6,
@@ -32,5 +33,5 @@
     "routeSourcesFullGeometry": true,
     "fullSourceHeightsRetained": true
   },
-  "validation": "Two focused adaptive invariants pass. Vulkan/GLES fixtures pass; plane uses 8952 instead of 32768 surface triangles with identical pixels; route sources keep full geometry; warm residency and memory pressure assertions pass. All six original ZIP headers match native reader layout. Kotlin/all three optimized JNI ABIs/assembly/signature pass. Android document-picker persistence and phone performance remain unverified."
+  "validation": "Nine focused Kotlin tests and Vulkan/GLES terrain fixtures pass; all three optimized JNI ABIs, APK assembly and signing pass. No new phone/emulator run. A20 tilt, peak stability, loading latency and GPU recovery require on-device acceptance; full MapLibre equivalence is not claimed."
 }

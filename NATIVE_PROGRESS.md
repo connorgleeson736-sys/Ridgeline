@@ -1039,3 +1039,7 @@ including 16->8 skirt edges in flat fixture and retained discontinuity protectio
 CameraMath5 and SourceDemand4 focused tests pass; Android native target compiles.
 See research/TERRAIN-STABILITY-AND-RECOVERY.md and validation/terrain-stability.
 Original six ZIPs, full source quality, Add imagery and Capacitor app preserved.
+
+Latest normal Base APK from c602395: 31684240 bytes, SHA256
+18e11cf44922da81a4dfa4b5aafff6bbb4af91e6113ff1f1bc7439e785d9dea1. All three optimized JNI ABIs, assembly and signature pass.
+No packs/session CA; Add imagery retained. A20 runtime acceptance remains open.
