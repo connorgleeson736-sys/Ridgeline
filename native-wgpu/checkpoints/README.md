@@ -1,7 +1,7 @@
 # Native Android checkpoints — incomplete prototypes
 
 Latest smaller build: [Ridgeline-Native-Base.apk](Ridgeline-Native-Base.apk).
-Source checkpoint `eef2ba7`; signed debug Base APK, 31.9MB, all three ABIs.
+Source checkpoint `f104946`; signed debug Base APK, 31.9MB, all three ABIs.
 
 This audit build adds **GPU texture arrays**, compatible instanced draws,
 reusable GLES mip resources, stable index suballocation and bulk pixel packing.
@@ -28,8 +28,15 @@ once). Files attach in place: no extraction, copying or modification. Keep them
 at the selected location. Detach removes app access without deleting your files.
 The overview packs contain imagery; terrain needs network or a saved region.
 
-This checkpoint removes **all terrain skirts** as requested and adapts all six
-cache/revisit behaviors from the published 0.18 reference: independent local-cache
+This checkpoint restores **selective terrain skirts** by request, omitting proven
+continuous terrain joins and photo-only internal subdivisions. Real neighbour DEM
+halos, fallback coverage and full imagery filtering remain.
+[Seam protection checks](../validation/seam-protection/) close about 36,000 exposed
+background pixels in a controlled mixed-LOD fixture on Vulkan/GLES, including GLES
+texture arrays. All three optimized ABIs, signing and alignment pass. No phone
+performance or visual acceptance claim.
+
+It retains all six cache/revisit behaviors from the published 0.18 reference: independent local-cache
 admission, freshness-aware encoded RAM, shared cancellable/promotable transfers,
 quick-return grace, cached sharper/ancestor coverage and coarse reserve, completed
 imagery/plan reuse, and tightly bounded predictions.
@@ -38,7 +45,8 @@ Optional **Offline / imagery → Prepare nearby terrain while idle** prepares a
 small expanded GPU batch; it is off by default. Add imagery still attaches the
 original ZIPs in place. No large packs or session CA; 67 coarse images included.
 Full source resolution, heights, mips/filtering and adaptive error bounds remain.
-Without skirts, mismatched/missing terrain edges can expose cracks.
+Skirts hide geometric gaps within their depth; missing source coverage or colour
+differences baked into imagery still require real provider data.
 
 18 focused JVM checks and 26 core tests pass; Vulkan/GLES and all three optimized
 JNI ABIs/assembly/signature pass. A real host HTTP fixture returns a disk-cached

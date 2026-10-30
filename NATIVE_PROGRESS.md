@@ -1235,3 +1235,6 @@ See validation/seam-protection. No A20 FPS/real-terrain acceptance claim.
 
 Forced GLES texture-array seam fixture also passes (36093background pixels repaired);
 normal three-ABI Base signing and16KiB alignment pass.
+
+Seam-protected Base source`f104946`: 31,916,688bytes, SHA256
+`a1a21c2dfd36ec7bc35262f9f2d903235478b25502ab1a6d43c4b295a68e4f3d`; all3optimizedABIs, no largepacks/sessionCA.

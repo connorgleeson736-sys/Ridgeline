@@ -1,8 +1,8 @@
 {
-  "sourceCheckpoint": "eef2ba7b594782174d2e05cb2dc15430582b3b09",
+  "sourceCheckpoint": "f104946d1627a01ab3a8248ce58301bbfbb13395",
   "apk": "Ridgeline-Native-Base.apk",
-  "bytes": 31866304,
-  "sha256": "1fc293176f5180d4445e78a9ce4143af55bf93e7d6225dd6298b9877a20672c9",
+  "bytes": 31916688,
+  "sha256": "a1a21c2dfd36ec7bc35262f9f2d903235478b25502ab1a6d43c4b295a68e4f3d",
   "largeOverviewPacks": 0,
   "coarseImageryFiles": 67,
   "abis": [
@@ -13,6 +13,7 @@
   "managedSessionCa": false,
   "addImagery": "Offline / imagery > Add imagery ZIPs; attach original files in place with persistent read access; up to six at once",
   "changes": [
+    "Restore selective MapLibre-depth terrain skirts at missing/discontinuous/unproven joins; omit proven continuous edges and photo-only internal subdivisions; retain real neighbour DEM halos, parent fallback and full-resolution imagery filtering",
     "Live persisted 0-1000 MiB combined RAM tile-payload cache budget across encoded bodies, decoded DEM samples and prepared direct buffers; immediate trimming, conservative recommendation and high-budget warning",
     "Bounded lazy eight-layer imagery and R32Float height texture arrays with generation-owned slots, shared bindings and compatible instanced draws",
     "Automatic Vulkan arrays; automatic GLES pooled separate textures based on measured host GLES regression; Offline / imagery > GPU textures allows explicit selection",
@@ -21,7 +22,7 @@
     "Bulk owned-array ARGB to RGBA packing preserves exact integer premultiplication and cancellation",
     "Offline / imagery automatic disk-cache slider, 0\u20131000 MiB; one allowance for HTTP, prepared terrain and finished imagery, adaptive free-storage cap",
     "Cache size changes apply after app restart; zero disables and clears automatic disk caches on next launch; saved regions and attached ZIPs separate",
-    "Previous cache-revisit behaviors, Add imagery in-place attachment, full source quality and no-skirt terrain retained"
+    "Previous cache-revisit behaviors, Add imagery in-place attachment, full source quality retained"
   ],
   "adaptiveTerrain": {
     "newErrorPixels": 0.6,
@@ -35,8 +36,8 @@
     "routeSourcesFullGeometry": true,
     "fullSourceHeightsRetained": true
   },
-  "validation": "8 focused RAM-budget/transport tests and Android lint/assembly/signature/16KiB alignment pass. All three optimized native libraries are byte-identical to source 033bec6 (previous Vulkan/GLES correctness evidence retained). No phone run or new GPU benchmark; no large packs/session CA.",
-  "terrainSkirts": false,
+  "validation": "26 core, 4 renderer and 1 CLI Rust tests; 7 focused DEM JVM tests pass. Vulkan/GLES mixed-LOD fixture closes 36092/36093 exposed background pixels; explicit GLES arrays also passes. Continuous terrain joins omit internal skirts; photo subdivisions keep only original perimeter. Original grading/coverage/mips/picking/overflow/settled transfer checks pass. All three optimized JNI ABIs, assembly/signature/16KiB alignment pass. No A20 execution or speed claim; no large packs/session CA.",
+  "terrainSkirts": true,
   "prepareAhead": "Offline / imagery > Prepare nearby terrain while idle; default off",
   "textureBackend": {
     "automaticVulkan": "arrays",
@@ -77,5 +78,14 @@
       "GPU resources"
     ],
     "highBudgetWarning": true
+  },
+  "seamProtection": {
+    "terrainSkirts": "selective, cached continuity proof",
+    "depth": "MapLibre mean Earth circumference / 2^logicalZoom / 5",
+    "neighbourDem": "actual shared halo samples at pixel centres, immutable full source heights",
+    "missingTiles": "resident parent and complete finer child coverage",
+    "imagery": "exact UV mapping, explicit ClampToEdge, all nine trilinear mip levels and anisotropy",
+    "surfaceDetailReduced": false,
+    "extraGlobalGridBytes": 133128
   }
 }
