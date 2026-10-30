@@ -15,7 +15,7 @@ object NativeBridge {
  @JvmStatic external fun routes(handle:Long,input:ByteBuffer):Boolean
  @JvmStatic external fun waypoints(handle:Long,output:ByteBuffer):Int
  @JvmStatic external fun stats(output:ByteBuffer):Int
- @JvmStatic external fun plan(width:Int,height:Int,longitude:Double,latitude:Double,zoom:Double,bearing:Float,pitch:Float,elevation:Float,budget:Int,target:Double,maxZoom:Int,output:ByteBuffer):Int
+ @JvmStatic external fun plan(width:Int,height:Int,longitude:Double,latitude:Double,zoom:Double,bearing:Float,pitch:Float,elevation:Float,budget:Int,target:Double,maxZoom:Int,margin:Double,output:ByteBuffer):Int
  @JvmStatic external fun releaseUnused(handle:Long)
  @JvmStatic external fun gpuBacklog(handle:Long):Int
  @JvmStatic external fun tileBudget(handle:Long,tiles:Int)

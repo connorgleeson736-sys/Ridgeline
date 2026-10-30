@@ -33,4 +33,17 @@ class PreparedTerrainCacheTest {
             assertTrue(cache.sizeBytes()<=one*2+100);assertNull(cache.get(b){true});assertNotNull(cache.get(id){true})
         }finally{dir.deleteRecursively()}
     }
+    @Test fun completedRgbaCompositionRestoresEveryChannelWithoutRecomposition(){
+        val dir=Files.createTempDirectory("composition-cache").toFile()
+        try{
+            val store=PreparedTerrainCache(dir,2L*1024*1024,"gap-plan-v1",256*256*4)
+            val rgba=ByteBuffer.allocateDirect(256*256*4);repeat(rgba.capacity()){rgba.put((it*37+it/257).toByte())};rgba.rewind()
+            val stamp=PreparedTerrainCache.Dependency(id,"exact-input",2000,"provider-key")
+            store.put(id,rgba,listOf(stamp));var now=1000L
+            val hit=store.get(id){it.until>now}!!
+            for(index in 0 until rgba.capacity())assertEquals(rgba.get(index),hit.get(index))
+            now=2001;assertNull(store.get(id){it.until>now})
+            assertNull(PreparedTerrainCache(dir,2L*1024*1024,"gap-plan-v2",256*256*4).get(id){true})
+        }finally{dir.deleteRecursively()}
+    }
 }

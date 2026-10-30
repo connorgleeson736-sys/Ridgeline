@@ -1,5 +1,13 @@
 # Ridgeline native migration — in progress
 
+Current checkpoint: skirt-free terrain by explicit request; independent cache-hit
+admission, shared cancellable transfers, freshness-aware encoded RAM, sharper
+resident cover, finished imagery/plan reuse and bounded predictive warming are
+implemented. **Offline / imagery → Prepare nearby terrain while idle** enables
+optional GPU preparation (off by default). See [scope/evidence](validation/cache-revisit/).
+Historical skirt fixtures below describe earlier builds; cross-LOD cracks may
+be visible without skirts. No A20 FPS/interaction acceptance is claimed.
+
 Separate Kotlin/Android UI + Rust/wgpu app. Authoritative reference: Capacitor
 0.18.0 source `d880143418ac46ece98adff0b3b2fbaedf044d46`, latest
 `android-preview-download` checked at `39431dad230945919a7b7d9d0ef2e86db8492ead`.

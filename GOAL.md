@@ -17,6 +17,11 @@ work. User chose1GBadaptiveautomaticcache andimmediateimageryreplacement(nofades
 Askexecutivequestions forvisiblebehavior/resourcepolicy; routineimplementation is
 autonomous. Preferfocusedchanged-pathchecks andinstallableAPKcheckpoints.
 
+User explicitly requested removal of all terrain skirts and full adaptation of
+six0.18cache behaviors. Current native renderer is skirt-free: shared boundaries
+and height samples remain, but mismatched/missing edges may expose cracks. This
+supersedes earlier skirt-preservation notes; do not hide gaps with fabricated data.
+
 ## Authoritative reference
 
 Capacitor 0.18.0 source d880143418ac46ece98adff0b3b2fbaedf044d46;

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="nz.ridgeline.nativeapp.TileTransportTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-30T04:01:02.239Z" hostname="5085ef76c66b" time="0.427">
+  <properties/>
+  <testcase name="freshRamReusePreservesDeadlineAndVersion" classname="nz.ridgeline.nativeapp.TileTransportTest" time="0.023"/>
+  <testcase name="actualHttpDiskHitFinishesWhileAllForegroundNetworkSlotsAreBlocked" classname="nz.ridgeline.nativeapp.TileTransportTest" time="0.217"/>
+  <testcase name="absoluteHttpExpiryDoesNotRestartOnDiskRead" classname="nz.ridgeline.nativeapp.TileTransportTest" time="0.0"/>
+  <testcase name="lastConsumerCancellationAndQuickReturnDoNotPoisonSharedWork" classname="nz.ridgeline.nativeapp.TileTransportTest" time="0.184"/>
+  <testcase name="foregroundJoinPromotesQueuedBackgroundTransfer" classname="nz.ridgeline.nativeapp.TileTransportTest" time="0.003"/>
+  <system-out><![CDATA[ACTUAL_HTTP_CACHE: cached return 1.529095ms while 8 network transfers remain gated; identical bytes
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

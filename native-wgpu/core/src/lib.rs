@@ -148,10 +148,34 @@ pub fn resident_cover(available: &[TileId]) -> Vec<CoverRegion> {
 pub fn demanded_sources(available: &[TileId], ideal: &[TileId]) -> Vec<TileId> {
     use std::collections::HashSet;
     let exact: HashSet<_> = available.iter().copied().collect();
+    fn sharper(target: TileId, rows: &[TileId], exact: &HashSet<TileId>) -> Option<Vec<TileId>> {
+        let descendants: Vec<_> = rows
+            .iter()
+            .copied()
+            .filter(|id| target.contains(*id) && id.z > target.z)
+            .collect();
+        if !descendants.is_empty() && target.z < 22 {
+            let mut cover = Vec::new();
+            let mut full = true;
+            for child in target.children() {
+                match sharper(child, &descendants, exact) {
+                    Some(parts) => cover.extend(parts),
+                    None => {
+                        full = false;
+                        break;
+                    }
+                }
+            }
+            if full {
+                return Some(cover);
+            }
+        }
+        exact.contains(&target).then(|| vec![target])
+    }
     let mut selected = HashSet::new();
     for target in ideal {
-        if exact.contains(target) {
-            selected.insert(*target);
+        if let Some(ready) = sharper(*target, available, &exact) {
+            selected.extend(ready);
             continue;
         }
         selected.extend(available.iter().copied().filter(|id| target.contains(*id)));
@@ -275,3 +299,24 @@ mod demand_tests {
 }
 
 pub mod adaptive;
+
+#[cfg(test)]
+mod cached_child_cover_tests {
+    use super::*;
+    #[test]
+    fn complete_sharper_children_win_over_an_available_parent() {
+        let p = TileId {
+            z: 12,
+            x: 3982,
+            y: 2600,
+        };
+        let mut available = vec![p];
+        available.extend(p.children());
+        let selected = demanded_sources(&available, &[p]);
+        assert_eq!(selected.len(), 4);
+        assert!(!selected.contains(&p));
+        available.pop();
+        let fallback = demanded_sources(&available, &[p]);
+        assert_eq!(fallback, vec![p]);
+    }
+}

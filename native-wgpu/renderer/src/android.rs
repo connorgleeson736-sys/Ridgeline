@@ -385,6 +385,7 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_plan(
     budget: i32,
     target: f64,
     max_zoom: i32,
+    margin: f64,
     output: jni::sys::jobject,
 ) -> i32 {
     let mut env = unsafe { jni::EnvUnowned::from_raw(env) };
@@ -407,10 +408,10 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_plan(
             }
             let output = unsafe { jni::objects::JByteBuffer::from_raw(env, output) };
             let capacity = env.get_direct_buffer_capacity(&output)?;
-            if !target.is_finite() {
+            if !target.is_finite() || !margin.is_finite() {
                 return Ok(0);
             }
-            let ids = crate::selection::plan_with_target(
+            let ids = crate::selection::plan_with_margin(
                 &crate::selection::View {
                     width: w as u32,
                     height: h as u32,
@@ -423,6 +424,7 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_plan(
                 budget.max(16) as usize,
                 target,
                 max_zoom.clamp(4, 22) as u8,
+                margin,
             );
             if capacity < ids.len() * 12 {
                 return Ok(0);

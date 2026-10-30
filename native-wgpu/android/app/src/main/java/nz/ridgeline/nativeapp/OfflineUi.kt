@@ -47,6 +47,7 @@ class OfflineUi(private val activity:Activity,root:FrameLayout,private val terra
         val status=TextView(activity)
         val dialog=AlertDialog.Builder(activity).setTitle("Offline maps").setView(ScrollView(activity).apply{addView(content)}).setNegativeButton("Close",null).create()
         content.addView(TextView(activity).apply{text="Automatic cache: up to ${loader.automaticCacheBytes/1_000_000} MB, adjusted for free storage. Saved regions are kept separately.";textSize=12f})
+        content.addView(CheckBox(activity).apply{text="Prepare nearby terrain while idle";isChecked=loader.prepareAhead;setOnCheckedChangeListener{_,checked->loader.prepareAhead(checked)}})
         content.addView(CheckBox(activity).apply{text="Offline only";isChecked=loader.offlineOnly;setOnCheckedChangeListener{_,checked->loader.offlineOnly(checked)}})
         content.addView(button("Add imagery ZIPs"){dialog.dismiss();addImagery()})
         content.addView(TextView(activity).apply{text="Overview imagery: ${loader.overviews.list().size}/6 packs attached. Keep the ZIPs at their selected location. Overviews contain imagery; terrain needs a connection or a saved region.";textSize=12f})

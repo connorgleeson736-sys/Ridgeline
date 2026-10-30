@@ -33,6 +33,13 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     @Volatile private var presentedPose:CameraPose?=null
     @Volatile private var presentedFrom:CameraPose?=null
     val planningPose:CameraPose get()=if(presentedFrom==cameraPose)presentedPose?:cameraPose else cameraPose
+    val gestureInProgress get()=gestureActive
+    @Volatile private var lastBacklog=0
+    val canPrepareAhead get()=live&&active&&!gestureActive&&lastBacklog==0&&!uploads.isNotEmpty()
+    fun updateWarmDemand(geometry:Set<GpuUploadQueue.Id>,images:Set<GpuUploadQueue.Id>){uploads.updateWarm(geometry,images)}
+    fun hasResidentCoverage(id:GpuUploadQueue.Id,geometry:Boolean,sharp:Boolean=false):Boolean {
+        return ResidentCoverage.complete(id,if(geometry)residency.geometryIds else residency.imageIds,!sharp)
+    }
     internal fun frameReady()=presentedPose==cameraPose
     internal fun groundedFrameReady()=groundedPose==cameraPose&&presentedPose==cameraPose
     val longitude get()=cameraPose.longitude
@@ -80,10 +87,13 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     var onData:()->Unit={}
     var onStatus:(String)->Unit={}
     private val uploads=GpuUploadQueue(192)
-    private data class Residency(val geometry:LongArray,val images:LongArray)
+    private data class Residency(val geometry:LongArray,val images:LongArray){
+        private fun ids(rows:LongArray)=rows.map{GpuUploadQueue.Id((it ushr 44).toInt(),((it ushr 22)and 0x3fffff).toInt(),(it and 0x3fffff).toInt())}.toSet()
+        val geometryIds=ids(geometry);val imageIds=ids(images)
+    }
     @Volatile private var residency=Residency(LongArray(0),LongArray(0))
     private val residencyBytes=ByteBuffer.allocateDirect(4096).order(ByteOrder.LITTLE_ENDIAN)
-    fun isResident(id:GpuUploadQueue.Id,geometry:Boolean)=if(geometry)residency.geometry.contains(id.packed)else residency.images.contains(id.packed)
+    fun isResident(id:GpuUploadQueue.Id,geometry:Boolean)=if(geometry)id in residency.geometryIds else id in residency.imageIds
     internal fun residentSourceCounts()=residency.let{it.geometry.size to it.images.size}
     private fun refreshResidency(){
         val token=generation.get();residencyBytes.rewind()
@@ -114,7 +124,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         if(handle==0L){recoverGpu();return}
         // Nonblocking completion polling measures real outstanding submissions.
         // Keep the newest camera; do not queue more old frames behind a busy GPU.
-        val backlog=NativeBridge.gpuBacklog(handle)
+        val backlog=NativeBridge.gpuBacklog(handle);lastBacklog=backlog
         if(backlog>=2){requestFrame();return}
         val demand=demandPacket
         if(demand!=null&&demand!==appliedDemand&&NativeBridge.demand(handle,demand)){appliedDemand=demand;safetyPose=null}

@@ -48,6 +48,15 @@ pub fn plan(view: &View, budget: usize) -> Vec<TileId> {
     plan_with_target(view, budget, 256., 19)
 }
 pub fn plan_with_target(view: &View, budget: usize, target: f64, max_zoom: u8) -> Vec<TileId> {
+    plan_with_margin(view, budget, target, max_zoom, 1.0)
+}
+pub fn plan_with_margin(
+    view: &View,
+    budget: usize,
+    target: f64,
+    max_zoom: u8,
+    margin: f64,
+) -> Vec<TileId> {
     let target = target.clamp(32., 1024.);
     let max_zoom = max_zoom.clamp(4, 22);
     let (matrix, ppm) = camera_matrix(
@@ -59,6 +68,8 @@ pub fn plan_with_target(view: &View, budget: usize, target: f64, max_zoom: u8) -
         view.pitch,
         view.elevation,
     );
+    let margin = margin.clamp(1.0, 1.5) as f32;
+    let matrix = Mat4::from_scale(glam::Vec3::new(1.0 / margin, 1.0 / margin, 1.0)) * matrix;
     let world = 512. * 2f64.powf(view.zoom);
     let distance_to_center = view.height as f64 * 1.5;
     let pitch = (view.pitch as f64).to_radians();

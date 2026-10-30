@@ -162,7 +162,7 @@ async fn run() {
         "planar simplification must preserve every output pixel"
     );
     println!(
-        "Adaptive plane: {} surface triangles, full boundaries/skirts, identical pixels",
+        "Adaptive plane: {} surface triangles, full boundaries, zero skirts, identical pixels",
         r.drawn_surface_triangles
     );
     r.set_routes(vec![ridgeline_renderer::RoutePath {
@@ -207,11 +207,7 @@ async fn run() {
         0.,
         1000.,
     );
-    assert_eq!(
-        r.skirt_edge_count(),
-        8,
-        "continuous joins omit internal skirts; exposed outer edges remain"
-    );
+    assert_eq!(r.skirt_edge_count(), 0, "all skirts removed");
     let bytes = read(&r, &output);
     let pixel = |x: usize, y: usize| &bytes[(y * 256 + x) * 4..][..4];
     assert_ne!(pixel(64, 64), &[36, 113, 74, 255]);
@@ -274,8 +270,8 @@ async fn run() {
     );
     assert_eq!(
         r.drawn_triangles - r.drawn_surface_triangles,
-        1024,
-        "four full-resolution child photos share only the original geometry boundary skirts"
+        0,
+        "imagery subdivision must not add skirt triangles"
     );
     // A minified 1px black/white checker must sample the generated pyramid,
     // not uninitialized levels or shimmer between original individual pixels.
@@ -369,11 +365,14 @@ async fn run() {
         .zip(closed.chunks_exact(4))
         .filter(|(a, b)| sky(a) && !sky(b))
         .count();
-    println!("Skirt discontinuity fixture repaired {repaired} exposed background pixels");
-    assert!(
-        repaired > 100,
-        "skirts must visibly close a parent/fine boundary gap"
+    println!(
+        "No-skirt discontinuity control: {repaired} pixels changed by old skirt-depth setting (expected zero)"
     );
+    assert_eq!(
+        repaired, 0,
+        "logical zoom no longer adds or changes curtains"
+    );
+    assert_eq!(seam.drawn_triangles, seam.drawn_surface_triangles);
     let triangles = seam.drawn_triangles;
     seam.set_index_cache_budget(24); // Deliberately force exact overflow buffers.
     seam.render(
@@ -484,7 +483,7 @@ async fn run() {
     assert_eq!(safety[2], high.z as f32);
     assert_eq!(
         seam.terrain_gpu_payload_bytes(),
-        266256 + seam.geometry_count() as u64 * 66564,
+        133128 + seam.geometry_count() as u64 * 66564,
         "shared grid keeps every exact f32 height without per-tile duplicated vertices"
     );
     seam.set_geometry_retention(48);

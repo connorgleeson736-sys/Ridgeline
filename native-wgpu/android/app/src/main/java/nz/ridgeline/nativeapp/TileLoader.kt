@@ -29,35 +29,38 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     // Automatic HTTP cache is disposable. Saved regions/packs are never evicted here.
     val automaticCacheBytes=minOf(1_000_000_000L,(context.cacheDir.usableSpace/8).coerceAtLeast(4_194_304L))
     private val preparedBytes=minOf(128L*1024*1024,automaticCacheBytes/8)
+    private val compositionBytes=preparedBytes/2
     private val preparedWrites=ThreadPoolExecutor(1,1,0,TimeUnit.MILLISECONDS,ArrayBlockingQueue<Runnable>(8),ThreadFactory{work->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);work.run()},"RidgelinePreparedCache")},ThreadPoolExecutor.DiscardOldestPolicy())
     private val client = OkHttpClient.Builder()
         .cache(Cache(File(context.cacheDir, "native-http-v1"), automaticCacheBytes-preparedBytes))
+        .dispatcher(Dispatcher().apply{maxRequests=32;maxRequestsPerHost=16})
         .connectTimeout(12, TimeUnit.SECONDS).readTimeout(15, TimeUnit.SECONDS).build()
     private val key = context.assets.open("map-defaults.json").use {
         JSONObject(it.readBytes().toString(Charsets.UTF_8)).getString("linzApiKey")
     }
-    private val prepared by lazy{PreparedTerrainCache(File(context.cacheDir,"native-terrain-v2"),preparedBytes,"terrain-source-delta1-dem18-grid128-profile-v1:$key")}
+    private val prepared by lazy{PreparedTerrainCache(File(context.cacheDir,"native-terrain-v3"),preparedBytes-compositionBytes,"terrain-source-delta1-dem18-grid128-profile-v2:$key")}
     private val preparation=PreparationControl()
     private fun checkPreparation()=preparation.checkpoint()
-    private val geometryDependencies=ThreadLocal<MutableMap<GpuUploadQueue.Id,String>>()
+    private val geometryDependencies=ThreadLocal<MutableMap<GpuUploadQueue.Id,PreparedTerrainCache.Dependency>>()
     private fun linz(kind: String, id: Id, ext: String): String =
         "https://basemaps.linz.govt.nz/v1/tiles/$kind/WebMercatorQuad/${id.z}/${id.x}/${id.y}.$ext?" +
             (if (kind == "elevation") "pipeline=terrain-rgb&" else "") + "api=$key"
     private val offline=OfflineStore(context)
     private val downloadJobs=Executors.newSingleThreadExecutor()
     private val regionContext=ThreadLocal<String>()
+    @Volatile private var downloadLease:TileTransport.Consumer?=null
     private val downloadCancel=java.util.concurrent.atomic.AtomicBoolean(false)
     private val preferences=context.getSharedPreferences("display",0)
     @Volatile var offlineOnly=preferences.getBoolean("offlineOnly",false);private set
-    fun offlineOnly(value:Boolean){offlineOnly=value;preferences.edit().putBoolean("offlineOnly",value).apply();cameraChanged()}
+    fun offlineOnly(value:Boolean){offlineOnly=value;preferences.edit().putBoolean("offlineOnly",value).apply();for(task in jobs.values)task.cancel();clearWarm();synchronized(ready){ready.clear();readyBytes=0};synchronized(decoded){decoded.clear()};cameraChanged()}
     val overviews=OverviewAttachments(context)
     private val attachmentJobs=Executors.newSingleThreadExecutor()
     private val imagery = NativeImagery(context, ::fetch, {z,x,y->linz("aerial",Id(z,x,y),"webp")},overviews,::checkPreparation)
     fun attachOverview(uri:android.net.Uri,done:(String?)->Unit){attachmentJobs.execute{
-        val error=try{overviews.attach(uri);failures.clear();cameraChanged();null}catch(e:Exception){e.message?:"Could not attach imagery ZIP."}
+        val error=try{overviews.attach(uri);imageryChanged();null}catch(e:Exception){e.message?:"Could not attach imagery ZIP."}
         view.post{if(!dead)done(error)}
     }}
-    fun detachOverview(payload:String,done:()->Unit){attachmentJobs.execute{overviews.detach(payload);view.post{if(!dead)done()}}}
+    fun detachOverview(payload:String,done:()->Unit){attachmentJobs.execute{overviews.detach(payload);imageryChanged();view.post{if(!dead)done()}}}
     private val am = context.getSystemService(ActivityManager::class.java)
     private val imageLimit = if (am.isLowRamDevice) 32 else (am.memoryClass / 2).coerceIn(64, 128)
     private val geometryLimit = (imageLimit/2).coerceIn(16,96)
@@ -67,7 +70,8 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private val ready = LinkedHashMap<Source, ByteBuffer>(16, .75f, true)
     private data class Decoded(val raster:Dem,val dependencies:List<PreparedTerrainCache.Dependency>)
     private val decoded = LinkedHashMap<Id, Decoded>(16, .75f, true)
-    private val demJobs = ConcurrentHashMap<Id, CompletableFuture<Decoded>>()
+    private val taskContext=ThreadLocal<Task>()
+    private val sourceRecords=ThreadLocal<MutableMap<String,SourceStamp>>()
     private val jobs = ConcurrentHashMap<Source, Task>()
     private val sequence = AtomicLong()
     private data class Plan(val ranked:Map<Source,Int>)
@@ -78,6 +82,20 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     @Volatile private var wanted = emptySet<Source>()
     private var timer: ScheduledFuture<*>? = null
     private val scheduler = Executors.newSingleThreadScheduledExecutor()
+    @Volatile private var warmWanted=emptySet<Source>()
+    @Volatile var prepareAhead=preferences.getBoolean("prepareAhead",false);private set
+    fun prepareAhead(value:Boolean){prepareAhead=value;preferences.edit().putBoolean("prepareAhead",value).apply();clearWarm();cameraChanged()}
+    private var previousPose:CameraPose?=null
+    private var viewRevision=0L
+    private var preparedRevision=-1L
+    private var idleWake:ScheduledFuture<*>?=null
+    private val predictions=LinkedHashMap<ResourceKey,TileTransport.Consumer>()
+    private var predictionAt=0L
+    private val predictionRecent=java.util.ArrayDeque<Long>()
+    private var predictionCount=0
+    private var lastGesture=false
+    private var compositionStore:PreparedTerrainCache?=null
+    private fun imageStore():PreparedTerrainCache=synchronized(this){compositionStore?:PreparedTerrainCache(File(context.cacheDir,"native-compositions-v1"),compositionBytes,"rgba-premultiplied-gap-v1:$key:"+preferences.getLong("imageryGeneration",0),256*256*4).also{compositionStore=it}}
     // DEM halo work cannot occupy every imagery worker. Four bounded requests,
     // shared DEM futures, and no per-halo executor multiplication.
     private val geometryWorkers = ThreadPoolExecutor(2,2,0,TimeUnit.MILLISECONDS,PriorityBlockingQueue<Runnable>())
@@ -91,43 +109,44 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         else view.uploadImage(id.z,id.x,id.y,data)
     }
     private fun resident(source:Source)=view.isResident(source.id.gpu(),source.geometry)
-    private inner class Task(val source: Source, val priority: Int): Runnable, Comparable<Task> {
-        private val order = sequence.getAndIncrement()
-        override fun compareTo(other: Task) = compareValuesBy(this, other, { it.priority }, { it.order })
-        override fun run() {
-            var aborted=false
-            try {
-                if (dead || source !in wanted || resident(source)) return
-                preparation.enter{!dead&&active&&source in wanted}
-                val data = if(source.geometry)loadGeometry(source.id)else loadImage(source.id)
-                checkPreparation()
-                failures.remove(source)
-                if (!dead) {
-                    synchronized(ready) {
-                        ready.put(source,data)?.let{readyBytes-=it.capacity()}
-                        readyBytes+=data.capacity()
-                        while(readyBytes>readyByteLimit){
-                            val first=ready.keys.firstOrNull{it !in wanted}?:ready.keys.first()
-                            readyBytes-=ready.remove(first)!!.capacity()
-                        }
-                    }
-                    if (source in wanted&&!resident(source)) upload(source,data)
+    private inner class Task(val source:Source,@Volatile var priority:Int,@Volatile var speculative:Boolean=false):Runnable,Comparable<Task>{
+        private val order=sequence.getAndIncrement()
+        private val queued=java.util.concurrent.atomic.AtomicBoolean(false)
+        private val finished=java.util.concurrent.atomic.AtomicBoolean(false)
+        val consumer=transport.consumer(priority,speculative)
+        val records=LinkedHashMap<String,SourceStamp>()
+        @Volatile var started=false;private set
+        @Volatile private var parkedUntil=0L
+        fun eligible()=!dead&&active&&!finished.get()&&(source in wanted||source in warmWanted&&prepareAhead||parkedUntil>System.currentTimeMillis())
+        override fun compareTo(other:Task)=compareValuesBy(this,other,{it.priority+(if(it.speculative)10000 else 0)},{it.order})
+        fun enqueue(){if(!finished.get()&&!dead&&queued.compareAndSet(false,true))try{workers(source).execute(this)}catch(_:RejectedExecutionException){queued.set(false);cancel()}}
+        fun promote(rank:Int){priority=rank;speculative=false;parkedUntil=0;consumer.promote(rank);if(workers(source).remove(this)){queued.set(false);enqueue()}}
+        fun park(){if(parkedUntil!=0L)return;parkedUntil=System.currentTimeMillis()+600;scheduler.schedule({if(source !in wanted)cancel()},600,TimeUnit.MILLISECONDS)}
+        fun cancel(){if(finished.compareAndSet(false,true)){workers(source).remove(this);jobs.remove(source,this);consumer.release(true)}}
+        override fun run(){
+            queued.set(false);if(!eligible()){cancel();return}
+            var waiting:CompletableFuture<*>?=null
+            try{
+                started=true;preparation.enter{eligible()};taskContext.set(this);sourceRecords.set(records)
+                val data=if(source.geometry)loadGeometry(source.id)else loadImage(source.id)
+                checkPreparation();failures.remove(source)
+                synchronized(ready){ready.put(source,data)?.let{readyBytes-=it.capacity()};readyBytes+=data.capacity()
+                    while(readyBytes>readyByteLimit){val first=ready.keys.firstOrNull{it !in wanted}?:ready.keys.first();readyBytes-=ready.remove(first)!!.capacity()}}
+                if((source in wanted||source in warmWanted)&&!resident(source))upload(source,data)
+            }catch(pending:ResourcePending){waiting=pending.ready
+            }catch(_:PreparationAborted){
+            }catch(e:Exception){
+                if(eligible()&&source in wanted){
+                    val attempt=(failures[source]?.attempts?:0)+1;val delay=when(attempt){1->1000L;2->4000L;else->15000L}
+                    failures[source]=Failure(attempt,android.os.SystemClock.elapsedRealtime()+delay)
+                    if(!offlineOnly&&attempt<=3)runCatching{scheduler.schedule({cameraChanged()},delay,TimeUnit.MILLISECONDS)}
+                    view.post{view.onStatus("Terrain load failed: "+if(e is TileHttpException)"provider HTTP ${e.code}" else "source unavailable")}
                 }
-            } catch (_:PreparationAborted) {
-                aborted=true
-                // Demand changed after I/O. No failure/backoff for intentionally skipped work.
-            } catch (e: Exception) {
-                val attempt=(failures[source]?.attempts?:0)+1
-                val delay=when(attempt){1->1000L;2->4000L;else->15000L}
-                failures[source]=Failure(attempt,android.os.SystemClock.elapsedRealtime()+delay)
-                if(!dead&&!offlineOnly&&source in wanted&&attempt<=3)runCatching{scheduler.schedule({cameraChanged()},delay,TimeUnit.MILLISECONDS)}
-                if (!dead && context.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE != 0)
-                    android.util.Log.w("RidgelineSource","Load failed: ${e.javaClass.simpleName}; cause=${e.cause?.javaClass?.simpleName}")
-                if (!dead && source in wanted) view.post { view.onStatus("Terrain load failed: " +
-                    (if (e is TileHttpException) "provider HTTP ${e.code}" else "source unavailable")) }
-            } finally {
-                preparation.leave();geometryDependencies.remove();jobs.remove(source, this)
-                if(aborted&&!dead&&active&&source in wanted&&!resident(source))cameraChanged()
+            }finally{
+                preparation.leave();geometryDependencies.remove();sourceRecords.remove();taskContext.remove()
+                if(waiting!=null&&!finished.get())waiting.whenComplete{_,_->enqueue()} else{
+                    cancel();if(!dead&&active&&source in wanted&&!resident(source))cameraChanged()
+                }
             }
         }
     }
@@ -145,7 +164,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         val budget=maxOf(16,(if(geometry)geometryLimit else imageLimit)*3/4)
         val count=NativeBridge.plan(key.width,key.height,pose.longitude,pose.latitude,
             pose.zoom,pose.bearing,pose.pitch,pose.elevation,budget,
-            if(geometry)431.0 else 256.0/2.0.pow(.25),if(geometry)22 else 19,output)
+            if(geometry)431.0 else 256.0/2.0.pow(.25),if(geometry)22 else 19,1.0,output)
         return List(count){Id(output.int,output.int,output.int)}
     }
     private fun loadView() {
@@ -166,56 +185,102 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         view.updateUploadDemand(wanted.filter{it.geometry}.map{it.id.gpu()}.toSet(),
             wanted.filter{!it.geometry}.map{it.id.gpu()}.toSet())
         failures.keys.removeAll{it !in wanted}
-        // Queued tasks must inherit the latest screen priority after a pan.
-        for ((source, task) in jobs) if ((source !in wanted||ranked[source]!=task.priority) && workers(source).remove(task)) jobs.remove(source, task)
-        for ((source, priority) in ranked) {
+        if(view.gestureInProgress&&!lastGesture){predictionCount=0;cancelPredictions()}
+        lastGesture=view.gestureInProgress
+        transport.movement(view.gestureInProgress)
+        val returning=jobs.values.filter{it.source !in wanted&&!it.speculative&&it.started}.sortedBy{it.priority}.take(8).toSet()
+        for(task in jobs.values){if(task.source in wanted)task.promote(ranked[task.source]?:0)else if(task.source in warmWanted&&prepareAhead&&!view.gestureInProgress){}else if(task !in returning)task.cancel()else task.park()}
+        for((source,priority)in ranked){
             if(resident(source))continue
-            val old = synchronized(ready) { ready[source] }
-            if (old != null) { upload(source,old); continue }
-            val failure=failures[source]
-            if(failure!=null&&android.os.SystemClock.elapsedRealtime()<failure.retryAt)continue
-            val task = Task(source, priority)
-            if (jobs.putIfAbsent(source, task) == null && !dead) {
-                try{workers(source).execute(task)}catch(_:RejectedExecutionException){jobs.remove(source,task)}
-            }
+            val fallback=ranked.keys.any{it.geometry==source.geometry&&it.id!=source.id&&source.id.gpu().contains(it.id.gpu())}
+            if(view.hasResidentCoverage(source.id.gpu(),source.geometry,!fallback))continue
+            val old=synchronized(ready){ready[source]};if(old!=null){upload(source,old);continue}
+            val failure=failures[source];if(failure!=null&&android.os.SystemClock.elapsedRealtime()<failure.retryAt)continue
+            schedule(source,priority,false)
+        }
+        val prior=previousPose
+        if(prior!=key.pose){viewRevision++;clearWarm(false);predict(prior,key);previousPose=key.pose}
+        scheduleIdle(key,viewRevision)
+    }
+    private fun schedule(source:Source,priority:Int,speculative:Boolean){
+        val task=Task(source,priority,speculative)
+        if(jobs.putIfAbsent(source,task)==null)task.enqueue()else task.cancel()
+    }
+    @Synchronized private fun cancelPredictions(){for(consumer in predictions.values)consumer.release(true);predictions.clear()}
+    @Synchronized private fun clearWarm(cancelPredictions:Boolean=true){
+        idleWake?.cancel(false);idleWake=null;warmWanted=emptySet();view.updateWarmDemand(emptySet(),emptySet())
+        for(task in jobs.values)if(task.speculative)task.cancel()
+        if(cancelPredictions)cancelPredictions()
+    }
+    private fun predict(prior:CameraPose?,key:DemandPlanKey){
+        val now=System.currentTimeMillis();if(prior==null||offlineOnly||now-predictionAt<250)return
+        if(jobs.values.count{!it.speculative}>3||!view.canPrepareAhead&& !view.gestureInProgress){cancelPredictions();return}
+        while(predictionRecent.isNotEmpty()&&now-predictionRecent.first>60000)predictionRecent.removeFirst()
+        if(predictionRecent.size>=60||predictionCount>=24)return
+        predictionAt=now
+        val pose=key.pose;val dx=(pose.longitude-prior.longitude).coerceIn(-.01,.01);val dy=(pose.latitude-prior.latitude).coerceIn(-.01,.01)
+        val turn=((pose.bearing-prior.bearing+540)%360-180).coerceIn(-15f,15f)
+        if(kotlin.math.abs(dx)+kotlin.math.abs(dy)<1e-8&&kotlin.math.abs(turn)<1&&kotlin.math.abs(pose.zoom-prior.zoom)<.015)return
+        val future=pose.copy(longitude=(pose.longitude+dx).coerceIn(165.0,180.0),latitude=(pose.latitude+dy).coerceIn(-49.0,-33.0),bearing=pose.bearing+turn,zoom=(pose.zoom+(pose.zoom-prior.zoom).coerceIn(-.5,.5)).coerceIn(4.0,19.0))
+        val candidates=if(pose.zoom<prior.zoom-.015){
+            val leaf=sourcePlan(false,key).firstOrNull();if(leaf==null)emptyList()else generateSequence(leaf.parent()){if(it.z>5)it.parent()else null}.take(2).toList()
+        }else sourcePlan(false,key.copy(pose=future)).filter{Source(it,false) !in wanted}.take(3)
+        val urls=candidates.filter{it.z in 0..19}.flatMap{imagery.inputs(it.z,it.x,it.y)}.distinct().take(3)
+        for(url in urls){if(predictionRecent.size>=60||predictionCount>=24)break
+            val resource=resourceKey(url);if(transport.contains(resource)||synchronized(this){resource in predictions})continue
+            val consumer=transport.consumer(1000,true);synchronized(this){predictions[resource]=consumer};predictionCount++;predictionRecent.addLast(now)
+            consumer.acquire(resource).whenComplete{_,_->consumer.close();synchronized(this){predictions.remove(resource,consumer)}}
         }
     }
-    private data class FetchKey(val url:String,val offline:Boolean)
-    private val bodyJobs=ConcurrentHashMap<FetchKey,CompletableFuture<ByteArray>>()
+    private fun scheduleIdle(key:DemandPlanKey,revision:Long){
+        if(!prepareAhead||offlineOnly||preparedRevision==revision||idleWake!=null||!view.canPrepareAhead||jobs.values.any{!it.speculative}||wanted.any{!resident(it)&&!view.hasResidentCoverage(it.id.gpu(),it.geometry)})return
+        idleWake=scheduler.schedule({
+            idleWake=null
+            if(!prepareAhead||revision!=viewRevision||dead||!active||!view.canPrepareAhead||wanted.any{!resident(it)&&!view.hasResidentCoverage(it.id.gpu(),it.geometry)})return@schedule
+            preparedRevision=revision
+            val extras=LinkedHashSet<Source>()
+            for(geometry in listOf(true,false)){
+                planBuffer.rewind();val pose=key.pose
+                val count=NativeBridge.plan(key.width,key.height,pose.longitude,pose.latitude,pose.zoom,pose.bearing,pose.pitch,pose.elevation,
+                    if(geometry)geometryLimit else imageLimit,if(geometry)431.0 else 256.0/2.0.pow(.25),if(geometry)22 else 19,1.3,planBuffer)
+                val rows=List(count){Id(planBuffer.int,planBuffer.int,planBuffer.int)}
+                extras.addAll(rows.map{Source(it,geometry)}.filter{it !in wanted&&!resident(it)}.take(2))
+            }
+            // One small idle batch; speculative upload ownership never enters draw demand.
+            warmWanted=extras;view.updateWarmDemand(extras.filter{it.geometry}.map{it.id.gpu()}.toSet(),extras.filter{!it.geometry}.map{it.id.gpu()}.toSet())
+            for(source in extras){val readyData=synchronized(ready){ready[source]};if(readyData!=null)upload(source,readyData)else schedule(source,1000,true)}
+        },650,TimeUnit.MILLISECONDS)
+    }
+    private val transport by lazy{TileTransport(HttpTileBackend(client,offline::read),if(context.getSystemService(ActivityManager::class.java).isLowRamDevice)8L*1024*1024 else 16L*1024*1024)}
+    private fun resourceKey(url:String)=ResourceKey(url,offlineOnly&&regionContext.get()==null)
+    private fun awaitInputs(urls:List<String>){
+        val consumer=taskContext.get()?.consumer?:return
+        val futures=urls.distinct().map{consumer.acquire(resourceKey(it))}
+        if(futures.any{!it.isDone})throw ResourcePending(CompletableFuture.allOf(*futures.toTypedArray()))
+    }
+    private fun fetchRecord(url:String):TileBody{
+        check(!dead);val current=taskContext.get();val owned=current?.consumer?:transport.consumer(if(regionContext.get()!=null)1000 else 16,regionContext.get()!=null)
+        val downloading=current==null&&regionContext.get()!=null
+        if(downloading){downloadLease=owned;if(downloadCancel.get()){owned.release(true);throw PreparationAborted()}}
+        try{
+            val future=owned.acquire(resourceKey(url))
+            if(current!=null&&!future.isDone)throw ResourcePending(future)
+            val body=try{future.get()}catch(e:ExecutionException){throw(e.cause as? Exception?:IOException("Shared tile request failed"))}
+            body.stamp?.let{sourceRecords.get()?.set(it.key,it)}
+            return body
+        }finally{if(current==null)owned.close();if(downloading&&downloadLease===owned)downloadLease=null}
+    }
     private fun fetch(url:String):ByteArray{
-        check(!dead)
-        val key=FetchKey(url,offlineOnly&&regionContext.get()==null)
-        val future=CompletableFuture<ByteArray>();val existing=bodyJobs.putIfAbsent(key,future)
-        val bytes=if(existing!=null){
-            try{existing.get()}catch(e:ExecutionException){throw(e.cause as? Exception?:IOException("Shared tile request failed"))}
-        }else try{
-            fetchBody(url,key.offline).also{future.complete(it)}
-        }catch(e:Exception){future.completeExceptionally(e);throw e}
-        finally{bodyJobs.remove(key,future)}
-        regionContext.get()?.let{offline.keep(it,url,bytes)}
-        return bytes
+        val body=fetchRecord(url);if(body.status !in 200..299)throw TileHttpException(body.status)
+        regionContext.get()?.let{offline.keep(it,url,body.bytes)};return body.bytes
     }
-    private fun fetchBody(url: String,cacheOnly:Boolean): ByteArray {
-        check(!dead)
-        offline.read(url)?.let{return it}
-        val request = Request.Builder().url(url).header("User-Agent", "Ridgeline-Native/0.1.0").apply{
-            if(cacheOnly)cacheControl(CacheControl.FORCE_CACHE)
-        }.build()
-        client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) throw TileHttpException(response.code)
-            val body = response.body ?: throw IOException("Empty tile")
-            // Bound the stream itself, including chunked responses, before allocation grows.
-            require(body.contentLength() <= 8 * 1024 * 1024)
-            val source = body.source()
-            val sink = okio.Buffer()
-            while (true) {
-                val remaining = 8L * 1024 * 1024 + 1 - sink.size
-                check(remaining > 0) { "Oversized tile" }
-                if (source.read(sink, minOf(8192L, remaining)) == -1L) break
-            }
-            require(sink.size <= 8 * 1024 * 1024)
-            return sink.readByteArray()
-        }
+    private fun dependencyFresh(dep:PreparedTerrainCache.Dependency)=transport.fresh(SourceStamp(dep.resourceKey,dep.fingerprint,dep.until))
+    private fun imageryChanged(){
+        for(task in jobs.values)if(!task.source.geometry)task.cancel()
+        clearWarm()
+        synchronized(this){preferences.edit().putLong("imageryGeneration",preferences.getLong("imageryGeneration",0)+1).apply();compositionStore=null}
+        synchronized(ready){val iter=ready.entries.iterator();while(iter.hasNext()){val row=iter.next();if(!row.key.geometry){readyBytes-=row.value.capacity();iter.remove()}}}
+        transport.invalidate();failures.clear();cameraChanged()
     }
     private fun demPixels(data: ByteArray): FloatArray {
         val options = BitmapFactory.Options().apply {
@@ -233,67 +298,55 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private fun sample(record:Dem,gx:Double,gy:Double,z:Int)=DemSampling.sample(record,gx,gy,z)
     private fun raw(id:Id):Dem {
         val record=rawRecord(id)
-        geometryDependencies.get()?.let{dependencies->for(dep in record.dependencies)dependencies[dep.id]=dep.fingerprint}
+        geometryDependencies.get()?.let{dependencies->for(dep in record.dependencies)dependencies[dep.id]=dep}
         return record.raster
     }
-    private fun rawRecord(id: Id): Decoded {
-        synchronized(decoded) { decoded[id]?.let { return it } }
-        val future = CompletableFuture<Decoded>(); val existing = demJobs.putIfAbsent(id, future)
-        if (existing != null) return existing.get()
-        try {
-            var missing=false
-            val bytes=try{fetch(linz("elevation",id,"png"))}catch(e:TileHttpException){if(e.code==404&&id.z>0){missing=true;null}else throw e}
-            val dependency=PreparedTerrainCache.Dependency(id.gpu(),if(missing)"404" else PreparedTerrainCache.digest(bytes!!))
-            // Shared source work finishes before a per-view cancellation checkpoint;
-            // aborting its owner must never poison another consumer's DEM future.
-            val pixels=bytes?.let(::demPixels)
-            val dependencies=LinkedHashMap<GpuUploadQueue.Id,String>();dependencies[dependency.id]=dependency.fingerprint
-            fun parent():Dem{
-                val row=rawRecord(id.parent());for(dep in row.dependencies)dependencies[dep.id]=dep.fingerprint
-                return row.raster
-            }
-            val raster = if (pixels == null) parent() else {
-                if (pixels.any { !it.isFinite() }) {
-                    check(id.z > 0) { "Missing root elevation" }
-                    val coarse=parent()
-                    for (y in 0..255) for (x in 0..255) if (!pixels[y * 256 + x].isFinite())
-                        pixels[y * 256 + x] = sample(coarse, id.x * 256.0 + x, id.y * 256.0 + y, id.z)
-                }
-                Dem(id.gpu(), pixels)
-            }
-            val record=Decoded(raster,dependencies.map{PreparedTerrainCache.Dependency(it.key,it.value)})
-            synchronized(decoded) {
-                decoded[id] = record
-                while (decoded.size > demLimit) decoded.remove(decoded.keys.first())
-            }
-            future.complete(record); return record
-        } catch (e: Exception) { future.completeExceptionally(e); throw e }
-        finally { demJobs.remove(id, future) }
+    private fun rawRecord(id:Id):Decoded{
+        val old=synchronized(decoded){decoded[id]}
+        if(old!=null&&old.dependencies.all(::dependencyFresh))return old
+        val body=fetchRecord(linz("elevation",id,"png"))
+        if(body.status!=200&&body.status!=404)throw TileHttpException(body.status)
+        if(body.status==404&&id.z==0)throw TileHttpException(404)
+        val stamp=body.stamp!!
+        val dependency=PreparedTerrainCache.Dependency(id.gpu(),stamp.fingerprint,stamp.until,stamp.key)
+        if(old!=null&&old.dependencies.firstOrNull()?.fingerprint==stamp.fingerprint&&old.dependencies.drop(1).all(::dependencyFresh)){
+            return old.copy(dependencies=listOf(dependency)+old.dependencies.drop(1)).also{synchronized(decoded){decoded[id]=it}}
+        }
+        val pixels=if(body.status==404)null else demPixels(body.bytes)
+        val dependencies=LinkedHashMap<GpuUploadQueue.Id,PreparedTerrainCache.Dependency>();dependencies[dependency.id]=dependency
+        fun parent():Dem{val row=rawRecord(id.parent());for(dep in row.dependencies)dependencies[dep.id]=dep;return row.raster}
+        val raster=if(pixels==null)parent()else{
+            if(pixels.any{!it.isFinite()}){check(id.z>0);val coarse=parent()
+                for(y in 0..255)for(x in 0..255)if(!pixels[y*256+x].isFinite())pixels[y*256+x]=sample(coarse,id.x*256.0+x,id.y*256.0+y,id.z)}
+            Dem(id.gpu(),pixels)
+        }
+        return Decoded(raster,dependencies.values.toList()).also{synchronized(decoded){decoded[id]=it;while(decoded.size>demLimit)decoded.remove(decoded.keys.first())}}
     }
     private fun loadGeometry(id: Id): ByteBuffer {
         checkPreparation()
-        var changed=false
-        val cached=prepared.get(id.gpu()){dep->
+        val cached=prepared.getChecked(id.gpu()){dependencies->
             checkPreparation()
-            val source=Id(dep.id.z,dep.id.x,dep.id.y)
-            val fingerprint=try{PreparedTerrainCache.digest(fetch(linz("elevation",source,"png")))}catch(e:TileHttpException){if(e.code==404)"404"else throw e}
-            (fingerprint==dep.fingerprint).also{if(!it)changed=true}
+            val stale=dependencies.filter{!dependencyFresh(it)}
+            awaitInputs(stale.map{linz("elevation",Id(it.id.z,it.id.x,it.id.y),"png")})
+            dependencies.all{dep->if(dependencyFresh(dep))true else{val body=fetchRecord(linz("elevation",Id(dep.id.z,dep.id.x,dep.id.y),"png"));body.stamp?.fingerprint==dep.fingerprint&&body.until>System.currentTimeMillis()}}
         }
-        checkPreparation()
-        if(cached!=null)return cached
-        if(changed)synchronized(decoded){decoded.clear()}
-        val dependencies=LinkedHashMap<GpuUploadQueue.Id,String>();geometryDependencies.set(dependencies)
+        checkPreparation();if(cached!=null)return cached
+        awaitInputs(DemSampling.footprint(id.z,id.x,id.y,DemSampling.terrainSourceZoom(id.z)).map{linz("elevation",Id(it.z,it.x,it.y),"png")})
+        val dependencies=LinkedHashMap<GpuUploadQueue.Id,PreparedTerrainCache.Dependency>();geometryDependencies.set(dependencies)
         val heights=ByteBuffer.allocateDirect(129*129*4+16).order(ByteOrder.LITTLE_ENDIAN)
         DemSampling.terrainMesh(id.z,id.x,id.y,heights,::checkPreparation){checkPreparation();raw(Id(it.z,it.x,it.y)).also{checkPreparation()}}
         checkPreparation()
         heights.putDouble(129*129*4,Double.NaN);heights.putDouble(129*129*4+8,Double.NaN)
         NativeBridge.terrainProfile(heights)
         checkPreparation()
-        val provenance=dependencies.map{PreparedTerrainCache.Dependency(it.key,it.value)}
-        if(!preparedWrites.isShutdown)runCatching{preparedWrites.execute{prepared.put(id.gpu(),heights,provenance)}}
+        val provenance=dependencies.values.toList()
+        if(provenance.all{it.until>System.currentTimeMillis()}&&!preparedWrites.isShutdown)runCatching{preparedWrites.execute{prepared.put(id.gpu(),heights,provenance)}}
         return heights
     }
     private fun loadImage(id:Id):ByteBuffer {
+        val composed=imagery.composed(id.z,id.x,id.y)
+        if(composed)imageStore().get(id.gpu()){dependencyFresh(it)}?.let{return it}
+        awaitInputs(imagery.inputs(id.z,id.x,id.y))
         val image = imagery.load(id.z, id.x, id.y)
         checkPreparation()
         val rgba = ByteBuffer.allocateDirect(256 * 256 * 4)
@@ -305,7 +358,10 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             rgba.put(((Color.green(p) * a + 127) / 255).toByte())
             rgba.put(((Color.blue(p) * a + 127) / 255).toByte()); rgba.put(a.toByte())
         }
-        rgba.rewind(); return rgba
+        rgba.rewind()
+        if(composed){val provenance=sourceRecords.get()?.values?.map{PreparedTerrainCache.Dependency(id.gpu(),it.fingerprint,it.until,it.key)}?:emptyList()
+            if(provenance.all{it.until>System.currentTimeMillis()}&&!preparedWrites.isShutdown){val store=imageStore();runCatching{preparedWrites.execute{store.put(id.gpu(),rgba,provenance)}}}}
+        return rgba
     }
     data class Bounds(val west:Double,val south:Double,val east:Double,val north:Double)
     private fun regionTiles(bounds:Bounds,maxZoom:Int):List<Id>{
@@ -323,7 +379,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     fun regionEstimate(bounds:Bounds,maxZoom:Int)=regionTiles(bounds,maxZoom).size
     fun regions(callback:(List<OfflineStore.Region>)->Unit){downloadJobs.execute{val rows=offline.regions();view.post{if(!dead)callback(rows)}}}
     fun removeRegion(id:String,callback:()->Unit){downloadJobs.execute{offline.delete(id);view.post{if(!dead)callback()}}}
-    fun cancelDownload(){downloadCancel.set(true)}
+    fun cancelDownload(){downloadCancel.set(true);downloadLease?.release(true)}
     fun downloadRegion(name:String,bounds:Bounds,maxZoom:Int,progress:(String)->Unit,done:()->Unit){
         val tiles=regionTiles(bounds,maxZoom);downloadCancel.set(false)
         downloadJobs.execute{
@@ -366,12 +422,13 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     }
     fun memoryPressure(){
         synchronized(ready){val it=ready.entries.iterator();while(it.hasNext()){val row=it.next();if(row.key !in wanted){readyBytes-=row.value.capacity();it.remove()}}}
+        transport.memoryPressure();clearWarm()
         synchronized(decoded){while(decoded.size>minOf(16,demLimit))decoded.remove(decoded.keys.first())}
     }
-    fun setActive(value:Boolean){active=value;if(value)cameraChanged()}
+    fun setActive(value:Boolean){active=value;if(value)cameraChanged()else{for(task in jobs.values)task.cancel();clearWarm()}}
     fun close() {
-        dead = true;preparedWrites.shutdownNow();attachmentJobs.shutdown();downloadCancel.set(true);downloadJobs.shutdown(); profileRevision.incrementAndGet();profileJob?.cancel(true);profileJobs.shutdownNow();timer?.cancel(true); scheduler.shutdownNow(); geometryWorkers.shutdownNow();imageWorkers.shutdownNow()
+        dead = true;for(task in jobs.values)task.cancel();clearWarm();transport.close();preparedWrites.shutdownNow();attachmentJobs.shutdown();downloadCancel.set(true);downloadJobs.shutdown(); profileRevision.incrementAndGet();profileJob?.cancel(true);profileJobs.shutdownNow();timer?.cancel(true); scheduler.shutdownNow(); geometryWorkers.shutdownNow();imageWorkers.shutdownNow()
         client.dispatcher.cancelAll(); client.connectionPool.evictAll(); client.cache?.close(); client.dispatcher.executorService.shutdown(); synchronized(ready) { ready.clear(); readyBytes=0 }; synchronized(decoded) { decoded.clear() }
-        Thread({downloadJobs.awaitTermination(60,TimeUnit.SECONDS);profileJobs.awaitTermination(60,TimeUnit.SECONDS);geometryWorkers.awaitTermination(60,TimeUnit.SECONDS);imageWorkers.awaitTermination(60,TimeUnit.SECONDS);attachmentJobs.awaitTermination(60,TimeUnit.SECONDS);overviews.close();offline.close()},"ridgeline-offline-close").start()
+        Thread({downloadJobs.awaitTermination(60,TimeUnit.SECONDS);profileJobs.awaitTermination(60,TimeUnit.SECONDS);geometryWorkers.awaitTermination(60,TimeUnit.SECONDS);imageWorkers.awaitTermination(60,TimeUnit.SECONDS);attachmentJobs.awaitTermination(60,TimeUnit.SECONDS);transport.awaitClosed();overviews.close();offline.close()},"ridgeline-offline-close").start()
     }
 }

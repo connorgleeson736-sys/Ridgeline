@@ -1098,3 +1098,26 @@ parentfallback,residency andcostadmission, notfull0.18cachearchitecture.
 Do notcopyremovedSHAdecoded-imagepool, duplicateWebViewelevationdiskcache,
 bridge/RTT-specificwrappers oroldmemoryvalues. OptionalexpandedGPUpreparation
 wasoffbydefault. No production code/APKchanged; no newperformanceclaim.
+
+## Full six-row0.18cache adaptation and no skirts
+
+User explicitly requested removal of ALL skirts, overriding earlier retention
+requirements. Runtime nowhaszero skirt indices/duplicatevertices/lowering shader
+orCPUjoinanalysis. Sharedgrid266256->133128bytes; originalsurface/boundarysamples
+remain. Gaps atdiscontinuous/missingterrainmay bevisible; nofakefill.
+
+Sixrequestedbehaviorsimplemented: separate localcache-onlylookup lane andasync
+network withresumableCPUjobs; boundedfreshencodedRAM andabsoluteexpiry metadata;
+subscriber-ownedfutures/refcountcancel/promotion/600msquickreturngrace; exact/sharper
+residentcoveradoption andcoarsereserve; losslessfinishedRGBAcompositioncache plus
+provider/native mappingplanreuse; tinyrealprovider-input predictions withstrict
+rate/backpressurelimits andoptionalexpandedGPUidleprep(defaultoff, Offline/imagery).
+Preparedhits no longer fetch/hash original bodies while dependencyfreshness valid.
+Compression/diskI/O no longer holdsLRUreadlock. Map/profile/download sharing safe;
+lastreaderabort cancelsactualHTTP, oneconsumerabort doesnotpoisonothers.
+
+18focusedtests +26Rustcoretests pass. ActualOkHTTPdiskhit returns1.529095ms with
+8foregroundHTTPrequests stillblocked; RAMdisabledinfixture. Vulkan/GLES pass
+includingzero-skirtgeometry. All3optimizedABIs/assembly pass. Evidence andexact
+bounds in validation/cache-revisit. No A20/emulatorruntimeclaim. Original6ZIPs,
+Addimagery/fullsourcequality/Capacitorpreserved; automaticdiskbudget still1GBadaptive.

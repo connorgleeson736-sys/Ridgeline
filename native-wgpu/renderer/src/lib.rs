@@ -5,11 +5,11 @@ use std::collections::{HashMap, HashSet};
 use wgpu::util::DeviceExt;
 mod adaptive;
 mod camera_safety;
+mod cover_plans;
 mod diagnostics;
 mod mipmaps;
 mod residency;
 mod routes;
-mod seams;
 pub use routes::RoutePath;
 pub mod selection;
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -89,8 +89,7 @@ pub struct Renderer {
     pub logical_zoom: Option<f64>,
     cover: Vec<ridgeline_core::CoverRegion>,
     cover_dirty: bool,
-    seams_dirty: bool,
-    edge_masks: HashMap<TileId, u8>,
+    cover_plans: cover_plans::CoverPlans,
     demand: Option<(Vec<TileId>, Vec<TileId>)>,
     instance_capacity: usize,
     budget: usize,
@@ -220,12 +219,11 @@ impl Renderer {
         });
         let texture_layout = pipeline.get_bind_group_layout(1);
         let height_layout = pipeline.get_bind_group_layout(2);
-        let mut vertices: Vec<Vertex> = (0..129 * 129)
+        let vertices: Vec<Vertex> = (0..129 * 129)
             .map(|i| Vertex {
                 position: [(i % 129) as f32 / 128., (i / 129) as f32 / 128.],
             })
             .collect();
-        vertices.extend_from_within(..); // Same surface UVs and skirt UVs, shared by every tile.
         let grid = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("shared full-detail terrain grid"),
             contents: bytemuck::cast_slice(&vertices),
@@ -262,7 +260,7 @@ impl Renderer {
             x1: 128,
             y1: 128,
         }
-        .indices_with_skirts()
+        .indices()
         .into_iter()
         .map(|i| i as u16)
         .collect::<Vec<_>>();
@@ -282,7 +280,7 @@ impl Renderer {
                     x1: 128,
                     y1: 128,
                 },
-                15,
+                0,
                 1,
             ),
             (0, idx.len() as u32),
@@ -338,8 +336,7 @@ impl Renderer {
             logical_zoom: None,
             cover: Vec::new(),
             cover_dirty: true,
-            seams_dirty: true,
-            edge_masks: HashMap::new(),
+            cover_plans: Default::default(),
             demand: None,
             instance_capacity: 256,
             budget: 96,
@@ -491,7 +488,6 @@ impl Renderer {
         );
         self.trim_geometry();
         self.trim_joint();
-        self.seams_dirty = true;
         if self.cover.iter().any(|row| row.source == id) {
             self.route_dirty = true;
         }
@@ -619,7 +615,7 @@ impl Renderer {
         self.tiles.len().max(self.images.len())
     }
     pub fn skirt_edge_count(&self) -> u32 {
-        self.edge_masks.values().map(|mask| mask.count_ones()).sum()
+        0
     }
     pub fn terrain_gpu_payload_bytes(&self) -> u64 {
         self.grid.size() + self.tiles.len() as u64 * 129 * 129 * 4
@@ -665,17 +661,14 @@ impl Renderer {
         let geometry = self.active_sources(true);
         let images = self.active_sources(false);
         let cover = ridgeline_core::resident_cover(&geometry);
-        if self.cover != cover || self.seams_dirty {
-            self.edge_masks = seams::masks(&cover, &self.tiles);
-            self.seams_dirty = false;
-        }
         if self.cover != cover {
             self.route_dirty = true;
             self.cover = cover;
         }
-        self.draws = ridgeline_core::surface::surface_cover(&geometry, &images);
+        self.draws = self.cover_plans.get(&geometry, &images);
     }
     fn trim_geometry(&mut self) {
+        let mut coarse = self.tiles.keys().filter(|id| id.z <= 12).count();
         while self.tiles.len() > self.geometry_budget {
             // Protect a visible source if removing it would expose an uncovered
             // region. Fine tiles may fall back to an existing real ancestor;
@@ -727,10 +720,15 @@ impl Renderer {
                         .copied(),
                 );
             }
+            let reserve = coarse <= self.geometry_budget / 5
+                && self
+                    .tiles
+                    .keys()
+                    .any(|id| id.z > 12 && !protected.contains(id));
             let victim = self
                 .tiles
                 .iter()
-                .filter(|(id, _)| !protected.contains(id))
+                .filter(|(id, _)| !protected.contains(id) && !(reserve && id.z <= 12))
                 .max_by(|(a, ta), (b, tb)| {
                     let score = |id: &TileId, t: &Tile| {
                         let bounds = id.bounds();
@@ -750,14 +748,17 @@ impl Renderer {
                         .map(|(id, _)| *id)
                 })
                 .unwrap();
+            if victim.z <= 12 {
+                coarse = coarse.saturating_sub(1);
+            }
             self.tiles.remove(&victim);
-            self.seams_dirty = true;
             if self.exact_route_sources.contains(&victim) {
                 self.route_dirty = true;
             }
         }
     }
     fn trim_images(&mut self) {
+        let mut coarse = self.images.keys().filter(|id| id.z <= 12).count();
         while self.images.len() > self.budget {
             let mut protected = HashSet::new();
             if let Some(view) = self.last_view {
@@ -811,10 +812,15 @@ impl Renderer {
                         .copied(),
                 );
             }
+            let reserve = coarse <= self.budget / 5
+                && self
+                    .images
+                    .keys()
+                    .any(|id| id.z > 12 && !protected.contains(id));
             let victim = self
                 .images
                 .iter()
-                .filter(|(id, _)| !protected.contains(id))
+                .filter(|(id, _)| !protected.contains(id) && !(reserve && id.z <= 12))
                 .max_by(|(a, ta), (b, tb)| {
                     let score = |id: &TileId, used: u64| {
                         let q = id.bounds();
@@ -834,6 +840,9 @@ impl Renderer {
                         .map(|(id, _)| *id)
                 })
                 .unwrap();
+            if victim.z <= 12 {
+                coarse = coarse.saturating_sub(1);
+            }
             self.images.remove(&victim);
         }
     }
@@ -990,12 +999,7 @@ impl Renderer {
         let scene = Scene {
             matrix: matrix.to_cols_array(),
             grade: [0.058, 1., 0.25, 1. / 0.74],
-            metrics: [
-                px_meter,
-                elevation,
-                ridgeline_core::surface::skirt_length(self.logical_zoom.unwrap_or(zoom)) as f32,
-                0.,
-            ],
+            metrics: [px_meter, elevation, 0.0, 0.],
         };
         if self.last_scene != Some(scene) {
             self.queue
@@ -1099,12 +1103,7 @@ impl Renderer {
             .map(|row| {
                 (
                     ridgeline_core::surface::GridRect::for_region(row.geometry, row.region),
-                    ridgeline_core::surface::skirt_edges(row.geometry_region, row.region)
-                        & self
-                            .edge_masks
-                            .get(&row.geometry_region)
-                            .copied()
-                            .unwrap_or(15),
+                    0, // Skirts removed by explicit product decision.
                     ridgeline_core::surface::GridRect::for_region(row.geometry, row.region)
                         .adaptive_step(self.adaptive_levels[&row.geometry]),
                 )

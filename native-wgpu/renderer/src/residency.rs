@@ -40,27 +40,43 @@ impl Renderer {
             ground.extend(g);
             photos.extend(i);
         }
+        let mut coarse = self.tiles.keys().filter(|id| id.z <= 12).count() as u64 * HEIGHT_BYTES
+            + self.images.keys().filter(|id| id.z <= 12).count() as u64 * IMAGE_BYTES;
         while self.resident_payload_bytes() > limit {
+            let reserve = coarse <= limit / 5
+                && (self
+                    .tiles
+                    .keys()
+                    .any(|id| id.z > 12 && !ground.contains(id))
+                    || self
+                        .images
+                        .keys()
+                        .any(|id| id.z > 12 && !photos.contains(id)));
             // Photographs are more expensive to restore (decode/composite/mips).
             // Prefer releasing equally old prepared terrain over warm photographs.
             let g = self
                 .tiles
                 .iter()
-                .filter(|(id, _)| !ground.contains(id))
+                .filter(|(id, _)| !ground.contains(id) && !(reserve && id.z <= 12))
                 .max_by_key(|(_, t)| self.clock - t.used)
                 .map(|(id, t)| (*id, (self.clock - t.used) as f64));
             let i = self
                 .images
                 .iter()
-                .filter(|(id, _)| !photos.contains(id))
+                .filter(|(id, _)| !photos.contains(id) && !(reserve && id.z <= 12))
                 .max_by_key(|(_, t)| self.clock - t.used)
                 .map(|(id, t)| (*id, (self.clock - t.used) as f64 / 4.));
             match (g, i) {
                 (Some((id, age)), photo) if photo.is_none_or(|(_, p)| age >= p) => {
+                    if id.z <= 12 {
+                        coarse = coarse.saturating_sub(HEIGHT_BYTES);
+                    }
                     self.tiles.remove(&id);
-                    self.seams_dirty = true;
                 }
                 (_, Some((id, _))) => {
+                    if id.z <= 12 {
+                        coarse = coarse.saturating_sub(IMAGE_BYTES);
+                    }
                     self.images.remove(&id);
                 }
                 _ => break, // Explicit count caps still bound protected-coverage debt.

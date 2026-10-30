@@ -49,4 +49,12 @@ class GpuUploadQueueTest {
   assertTrue(q.offer(first.copy(rgba=ByteBuffer.allocate(16)))) // Replacement cannot be dropped.
   assertEquals(1,q.take(8).size)
  }
+ @Test fun speculationNeverDisplacesVisibleUploadsAndIsDroppedWhenCancelled(){
+  val q=GpuUploadQueue(2);val a=GpuUploadQueue.Id(12,1,1);val b=a.copy(x=2);val warm=a.copy(x=3)
+  val data=ByteBuffer.allocate(16)
+  fun tile(id:GpuUploadQueue.Id)=GpuUploadQueue.Tile(id,GpuUploadQueue.EMPTY,data,GpuUploadQueue.Kind.IMAGE)
+  q.updateDemand(emptySet(),setOf(a,b));q.updateWarm(emptySet(),setOf(warm));q.offer(tile(a));q.offer(tile(b))
+  assertFalse(q.offer(tile(warm)));assertEquals(a,q.take(1).single().id);assertTrue(q.offer(tile(warm)))
+  assertEquals(b,q.take(1).single().id);q.updateWarm(emptySet(),emptySet());assertFalse(q.isNotEmpty())
+ }
 }
