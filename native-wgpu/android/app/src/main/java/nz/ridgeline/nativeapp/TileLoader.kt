@@ -233,10 +233,15 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         }
     }
     private fun scheduleIdle(key:DemandPlanKey,revision:Long){
-        if(!prepareAhead||offlineOnly||preparedRevision==revision||idleWake!=null||!view.canPrepareAhead||jobs.values.any{!it.speculative}||wanted.any{!resident(it)&&!view.hasResidentCoverage(it.id.gpu(),it.geometry)})return
+        if(!prepareAhead||offlineOnly||preparedRevision==revision||idleWake!=null||view.gestureInProgress||jobs.values.any{!it.speculative}||wanted.any{!resident(it)&&!view.hasResidentCoverage(it.id.gpu(),it.geometry)})return
         idleWake=scheduler.schedule({
             idleWake=null
-            if(!prepareAhead||revision!=viewRevision||dead||!active||!view.canPrepareAhead||wanted.any{!resident(it)&&!view.hasResidentCoverage(it.id.gpu(),it.geometry)})return@schedule
+            // Poll completion on the GPU owner without drawing an otherwise idle frame.
+            view.checkPreparationRoom{room->if(room&&!dead)runCatching{scheduler.execute{prepareIdle(key,revision)}}}
+        },650,TimeUnit.MILLISECONDS)
+    }
+    private fun prepareIdle(key:DemandPlanKey,revision:Long){
+            if(!prepareAhead||revision!=viewRevision||preparedRevision==revision||dead||!active||!view.canPrepareAhead||jobs.values.any{!it.speculative}||wanted.any{!resident(it)&&!view.hasResidentCoverage(it.id.gpu(),it.geometry)})return
             preparedRevision=revision
             val extras=LinkedHashSet<Source>()
             for(geometry in listOf(true,false)){
@@ -249,7 +254,6 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             // One small idle batch; speculative upload ownership never enters draw demand.
             warmWanted=extras;view.updateWarmDemand(extras.filter{it.geometry}.map{it.id.gpu()}.toSet(),extras.filter{!it.geometry}.map{it.id.gpu()}.toSet())
             for(source in extras){val readyData=synchronized(ready){ready[source]};if(readyData!=null)upload(source,readyData)else schedule(source,1000,true)}
-        },650,TimeUnit.MILLISECONDS)
     }
     private val transport by lazy{TileTransport(HttpTileBackend(client,offline::read),if(context.getSystemService(ActivityManager::class.java).isLowRamDevice)8L*1024*1024 else 16L*1024*1024)}
     private fun resourceKey(url:String)=ResourceKey(url,offlineOnly&&regionContext.get()==null)

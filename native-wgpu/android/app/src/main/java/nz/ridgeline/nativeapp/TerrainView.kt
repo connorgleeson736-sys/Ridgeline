@@ -36,6 +36,9 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     val gestureInProgress get()=gestureActive
     @Volatile private var lastBacklog=0
     val canPrepareAhead get()=live&&active&&!gestureActive&&lastBacklog==0&&!uploads.isNotEmpty()
+    fun checkPreparationRoom(callback:(Boolean)->Unit){gpu.post{
+        if(live&&active&&handle!=0L&&!gestureActive&&presentationFailures==0){lastBacklog=NativeBridge.gpuBacklog(handle);callback(canPrepareAhead)}else callback(false)
+    }}
     fun updateWarmDemand(geometry:Set<GpuUploadQueue.Id>,images:Set<GpuUploadQueue.Id>){uploads.updateWarm(geometry,images)}
     fun hasResidentCoverage(id:GpuUploadQueue.Id,geometry:Boolean,sharp:Boolean=false):Boolean {
         return ResidentCoverage.complete(id,if(geometry)residency.geometryIds else residency.imageIds,!sharp)
