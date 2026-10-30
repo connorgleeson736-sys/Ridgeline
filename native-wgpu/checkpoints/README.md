@@ -1,7 +1,7 @@
 # Native Android checkpoints — incomplete prototypes
 
 Latest smaller build: [Ridgeline-Native-Base.apk](Ridgeline-Native-Base.apk).
-Source checkpoint `1fd7000`; signed debug Base APK, 31.9MB, all three ABIs.
+Source checkpoint `da2579c`; signed debug Base APK, 31.9MB, all three ABIs.
 
 **Parent fallback fix:** cached parents remain as background coverage after a fine
 tile arrives. Prepared RAM ancestors can return across multi-level zoom jumps,

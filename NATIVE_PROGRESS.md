@@ -1272,3 +1272,8 @@ Prepared-RAM background restoration also runs for ready GPU fine tiles: exact fi
 coverage cannot stand in for siblings of its parent. Only ideal leaves trigger
 restoration, avoiding recursive background requests for fallback entries. One
 bounded ancestor walk replaces repeated quadratic fallback classification.
+
+Final parent-fallback Base source`da2579c`: 31,930,328bytes, SHA256
+`c5c0b9654998a663d560bc644eb2f2666f175b09dd8ebabc4fe24d505c59c8aa`. Includes RAM-only parent restoration for ready GPU fine tiles;
+11targetedJVM checks/lint/assembly/signature/alignment pass. Native3ABIs unchanged
+from1fd7000. No largepacks/sessionCA.
