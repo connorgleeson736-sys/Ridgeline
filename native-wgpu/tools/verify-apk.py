@@ -13,6 +13,7 @@ import zipfile
 parser=argparse.ArgumentParser()
 parser.add_argument('apk',type=Path)
 parser.add_argument('--output',type=Path)
+parser.add_argument('--base',action='store_true',help='Verify the small APK without bundled large overview ZIPs')
 args=parser.parse_args()
 root=Path(__file__).resolve().parents[2]
 catalog=json.loads((root/'capacitor/overview-catalog.json').read_text())
@@ -26,8 +27,18 @@ with zipfile.ZipFile(args.apk) as apk:
         if name.endswith('.dex'):
             data=apk.read(name)
             assert b'Landroid/webkit/WebView;' not in data and b'Lcom/getcapacitor/' not in data, 'Web runtime dependency'
+    index=json.loads(apk.read('assets/overview-index.json'))
+    coarse={name for row in index['coarse'].values() for name in row.values()}
+    assert len(coarse)==67,'Expected all original coarse overview images'
+    for name in coarse:
+        data=apk.read('assets/'+name)
+        assert data[:4]==b'RIFF' and data[8:12]==b'WEBP'
+        assert struct.unpack_from('<I',data,4)[0]+8==len(data)
+    if args.base:
+        assert index['archives']=={}
+        assert not any(n.startswith('assets/overview-packs/') for n in names),'Unexpected large packs in Base APK'
     payloads=[];ranges=0
-    for entry in catalog['files']:
+    for entry in ([] if args.base else catalog['files']):
         digest=entry['sha256'];record=original_archives[digest];path='assets/overview-packs/'+record['name']
         info=apk.getinfo(path);assert info.compress_type==zipfile.ZIP_STORED,'ZIP assets must be uncompressed for ranges'
         original=apk.read(info)
@@ -56,10 +67,11 @@ with zipfile.ZipFile(args.apk) as apk:
     for lib in libs:
         binary=apk.read(lib);assert binary[:4]==b'\x7fELF'
         assert struct.unpack_from('<H',binary,18)[0]==abi_machines[lib.split('/')[1]]
-    assert len(payloads)==6
+    assert len(payloads)==(0 if args.base else 6)
     result={'scope':'Prototype packaging only, not feature/device/visual acceptance','apk':args.apk.name,
         'bytes':args.apk.stat().st_size,'sha256':hashlib.file_digest(args.apk.open('rb'),'sha256').hexdigest(),
         'nativeLibraries':libs,'webRuntimeAssets':0,'webViewOrCapacitorDexReferences':0,
+        'base':args.base,'coarseImageryFiles':len(coarse),
         'originalZipFiles':len(payloads),'overviewPayloadBytes':sum(row['bytes'] for row in payloads),'imageRanges':ranges,'packs':payloads}
     print(json.dumps(result,indent=2))
     if args.output: args.output.write_text(json.dumps(result,indent=2)+'\n')

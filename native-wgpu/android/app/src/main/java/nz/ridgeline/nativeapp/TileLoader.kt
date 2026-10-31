@@ -91,6 +91,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private val ready = LinkedHashMap<Source, ByteBuffer>(16, .75f, true)
     private data class Decoded(val raster:Dem,val dependencies:List<PreparedTerrainCache.Dependency>)
     private val decoded = LinkedHashMap<Id, Decoded>(16, .75f, true)
+    private val decoding=SharedDecode<Pair<Id,String>,FloatArray>()
     // Call only while holding the corresponding map monitor. New limits are
     // read under that lock so concurrent insertions cannot restore an old budget.
     private fun trimReady(){while(readyBytes.toLong()>ramBudget.prepared&&ready.isNotEmpty()){
@@ -109,6 +110,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     @Volatile private var active = true
     @Volatile private var wanted = emptySet<Source>()
     private var timer: ScheduledFuture<*>? = null
+    private val planCadence=PlanCadence()
     private val scheduler = Executors.newSingleThreadScheduledExecutor()
     @Volatile private var warmWanted=emptySet<Source>()
     @Volatile var prepareAhead=preferences.getBoolean("prepareAhead",false);private set
@@ -182,9 +184,9 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         // Throttle using the latest immutable camera; a continuous drag must not
         // indefinitely postpone source selection, as a cancel/reschedule debounce did.
         if(!dead&&active&&timer==null)timer=scheduler.schedule({
-            synchronized(this){timer=null}
+            synchronized(this){timer=null;planCadence.started(android.os.SystemClock.elapsedRealtime())}
             loadView()
-        },50,TimeUnit.MILLISECONDS)
+        },planCadence.delay(android.os.SystemClock.elapsedRealtime()),TimeUnit.MILLISECONDS)
     }
     private fun sourcePlan(geometry:Boolean,key:DemandPlanKey):List<Id> {
         val pose=key.pose
@@ -359,11 +361,16 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         if(old!=null&&old.dependencies.firstOrNull()?.fingerprint==stamp.fingerprint&&old.dependencies.drop(1).all(::dependencyFresh)){
             return old.copy(dependencies=listOf(dependency)+old.dependencies.drop(1)).also{synchronized(decoded){decoded[id]=it;trimDecoded()}}
         }
-        val pixels=if(body.status==404)null else demPixels(body.bytes)
+        // Fetch/freshness are consumer-owned. Only the immutable CPU PNG
+        // decode is shared; missing-pixel parent repair remains private.
+        val sharedPixels=if(body.status==404)null else decoding.get(id to stamp.fingerprint){demPixels(body.bytes)}
+        checkPreparation()
+        val missing=sharedPixels?.any{!it.isFinite()}==true
+        val pixels=if(missing)sharedPixels!!.copyOf()else sharedPixels
         val dependencies=LinkedHashMap<GpuUploadQueue.Id,PreparedTerrainCache.Dependency>();dependencies[dependency.id]=dependency
         fun parent():Dem{val row=rawRecord(id.parent());for(dep in row.dependencies)dependencies[dep.id]=dep;return row.raster}
         val raster=if(pixels==null)parent()else{
-            if(pixels.any{!it.isFinite()}){check(id.z>0);val coarse=parent()
+            if(missing){check(id.z>0);val coarse=parent()
                 for(y in 0..255)for(x in 0..255)if(!pixels[y*256+x].isFinite())pixels[y*256+x]=sample(coarse,id.x*256.0+x,id.y*256.0+y,id.z)}
             Dem(id.gpu(),pixels)
         }

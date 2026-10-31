@@ -57,22 +57,36 @@ object DemSampling {
         meshAtSourceZoom(z,x,y,terrainSourceZoom(z),output,load,check)
     private fun meshAtSourceZoom(z:Int,x:Int,y:Int,dz:Int,output:ByteBuffer,load:(GpuUploadQueue.Id)->Raster,check:()->Unit={}) {
         val factor=1 shl(z-dz);val n=1 shl dz
-        val halo=footprint(z,x,y,dz).associateWith(load)
-        fun height(gx:Int,gy:Int):Float {
-            val px=Math.floorMod(gx,n*256);val py=gy.coerceIn(0,n*256-1)
-            val record=halo.getValue(GpuUploadQueue.Id(dz,px/256,py/256))
+        // A mesh touches at most three source rows/columns. Resolve the
+        // immutable halo once; avoid 4*129² temporary IDs and hash lookups.
+        val ids=footprint(z,x,y,dz)
+        val columns=ids.map{it.x}.distinct().toIntArray()
+        val rows=ids.map{it.y}.distinct().toIntArray()
+        val halo=arrayOfNulls<Raster>(columns.size*rows.size)
+        for(id in ids)halo[rows.indexOf(id.y)*columns.size+columns.indexOf(id.x)]=load(id)
+        val pixelsX=IntArray(258);val slotsX=IntArray(258);val weightsX=DoubleArray(129)
+        for(i in 0..128){
+            val px=(x*256.0+i*2.0)/factor-.5;val ix=floor(px).toInt();weightsX[i]=px-ix
+            for(tap in 0..1){val gx=Math.floorMod(ix+tap,n*256);val at=i*2+tap
+                pixelsX[at]=gx;slotsX[at]=columns.indexOf(gx/256)}
+        }
+        fun height(px:Int,py:Int,slot:Int):Float {
+            val record=halo[slot]!!
             val exact=record.samples[(py%256)*256+px%256]
-            // Keep the old signed-zero behavior (neighbor *0 terms can affect its sign).
+            // Preserve fallback interpolation and signed zero bit for bit.
             return if(record.id.z==dz&&exact!=0f)exact
                 else sample(record,px.toDouble(),py.toDouble(),dz)
         }
-        for(j in 0..128){check();for(i in 0..128) {
-            val px=(x*256.0+i*2.0)/factor-.5;val py=(y*256.0+j*2.0)/factor-.5
-            val ix=floor(px).toInt();val iy=floor(py).toInt();val fx=px-ix;val fy=py-iy
-            val h=(height(ix,iy)*(1-fx)*(1-fy)+height(ix+1,iy)*fx*(1-fy)+
-                height(ix,iy+1)*(1-fx)*fy+height(ix+1,iy+1)*fx*fy).toFloat()
-            require(h.isFinite());output.putFloat(h)
-        }
+        for(j in 0..128){check()
+            val py=(y*256.0+j*2.0)/factor-.5;val iy=floor(py).toInt();val fy=py-iy
+            val py0=iy.coerceIn(0,n*256-1);val py1=(iy+1).coerceIn(0,n*256-1)
+            val row0=rows.indexOf(py0/256)*columns.size;val row1=rows.indexOf(py1/256)*columns.size
+            for(i in 0..128){
+                val a=i*2;val b=a+1;val fx=weightsX[i]
+                val h=(height(pixelsX[a],py0,row0+slotsX[a])*(1-fx)*(1-fy)+height(pixelsX[b],py0,row0+slotsX[b])*fx*(1-fy)+
+                    height(pixelsX[a],py1,row1+slotsX[a])*(1-fx)*fy+height(pixelsX[b],py1,row1+slotsX[b])*fx*fy).toFloat()
+                require(h.isFinite());output.putFloat(h)
+            }
         }
         output.rewind()
     }

@@ -1,5 +1,46 @@
 # Durable progress log
 
+## 2026-10-31 — checkpoint build requested
+
+User explicitly authorized further measured work and a new pushed checkpoint APK.
+Added exact-normalization-table CPU mip fallback: release host genuine-image
+chain0.427→0.332ms,22.3%lessCPU,allbytespreserved. Vulkan/GLES/array forced-CPU
+render checks pass; startup driver validation unchanged. Version code2/name
+0.1.1-performance-checkpoint, same package/signing identity, all3optimizedABIs,
+Base packaging/no session CA. Source and publication commits will be separate
+so the APK metadata can pin its complete source commit.
+
+
+## 2026-10-31 — continued loading breakthrough search
+
+Added leading-edge planning (idle starts immediately; moving remains 20Hz),
+header-first validation of derived cache entries, and source/fingerprint sharing
+of overlapping CPU DEM PNG decode. Final recorded host fixtures: first-demand
+scheduler + local read/decode/mesh64.396→14.070ms; rejected stale RGBA cache
+read1.811→0.0225ms (fresh hits unchanged); duplicate PNG decodes120→60 but
+pair latency improves only1.2%. Raw samples and exact limits are in the audit.
+No network/first-present/device speedup claim. Producer sharing is CPU-only;
+parent-hole repair remains private. No extra retained decoded cache.
+
+## 2026-10-31 — measured native skirt/loading performance pass
+
+User identified native-rust-wgpu as the intended branch and requested tangible
+per-change loading/performance measurements. Work starts from remote 3cc6f903.
+Removed the unrelated initial MapLibre working changes. Implemented dense DEM
+halo/axis reuse, ordered seam intersection sweep (each shared join tested once),
+array-binding/index-pattern grouping, and exact-mesh fragment entry point without
+discard. Rounded-out sub-cell photo regions retain clipping. Heights, detail,
+photographs and skirt depth are preserved; no A20 or APK speedup is claimed.
+
+Final recorded host run: decoded-memory mesh 1.600→0.583ms; local genuine PNG files + decode
++ mesh 13.579→13.009ms; controlled 512-edge matching 4.550→0.593ms. Array fixture
+draws16→12, binds22→4. Separate shader/batching/combined GPU ablations retain
+raw samples; timing is mixed, including batching-only regressions. Small shader
+boundary pixel changes are recorded explicitly. Source audit and reproducible
+benchmarks: native-wgpu/research/PERFORMANCE-AUDIT-2026-10-31.md and
+native-wgpu/validation/skirt-performance/. Android tests/lint, both ARM Rust
+compile-checks and Vulkan/GLES/array GPU regressions pass. No publication.
+
 ## 2026-10-29 — migration started
 
 User explicitly replaced the Capacitor optimisation task with a custom native

@@ -10,9 +10,7 @@ struct Out { @builtin(position) position: vec4<f32>, @location(0) uv: vec2<f32>,
  o.position=scene.matrix*vec4<f32>(tile.x+vertex.x*tile.z,tile.y-vertex.y*tile.z,(height-scene.metrics.y)*scene.metrics.x,1.);
  o.uv=vertex.xy;o.clip=clip;o.image=image;return o;
 }
-@fragment fn fs(i:Out)->@location(0) vec4<f32>{
- let dx=dpdx(i.uv)*i.image.xy;let dy=dpdy(i.uv)*i.image.xy;
- if(any(i.uv<i.clip.xy)||any(i.uv>i.clip.zw)){discard;}
+fn shade(i:Out,dx:vec2<f32>,dy:vec2<f32>)->vec4<f32>{
  var p=textureSampleGrad(photo,photo_sampler,clamp(i.uv*i.image.xy+i.image.zw,vec2<f32>(0.),vec2<f32>(1.)),dx,dy);
  if(p.a>0.){p=vec4<f32>(p.rgb/p.a,p.a);}
  let average=(p.r+p.g+p.b)/3.;
@@ -20,4 +18,16 @@ struct Out { @builtin(position) position: vec4<f32>, @location(0) uv: vec2<f32>,
  rgb=(rgb-vec3<f32>(.5))*scene.grade.w+vec3<f32>(.5);
  rgb=mix(vec3<f32>(scene.grade.x),vec3<f32>(scene.grade.y),rgb);
  return clamp(vec4<f32>(rgb*p.a,p.a),vec4<f32>(0.),vec4<f32>(1.));
+}
+
+// Fine photo subdivisions can be smaller than one terrain cell. Only those
+// rounded-out rectangles need fragment clipping; exact rectangles allow early
+// depth rejection without a discard instruction, including their skirt faces.
+@fragment fn fs(i:Out)->@location(0) vec4<f32>{
+ let dx=dpdx(i.uv)*i.image.xy;let dy=dpdy(i.uv)*i.image.xy;
+ if(any(i.uv<i.clip.xy)||any(i.uv>i.clip.zw)){discard;}
+ return shade(i,dx,dy);
+}
+@fragment fn fs_unclipped(i:Out)->@location(0) vec4<f32>{
+ return shade(i,dpdx(i.uv)*i.image.xy,dpdy(i.uv)*i.image.xy);
 }

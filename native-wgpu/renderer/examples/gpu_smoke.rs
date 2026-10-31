@@ -534,6 +534,25 @@ async fn run() {
         seam.touch_geometry(high),
         "memory pressure preserves actual demanded terrain"
     );
+    // Photos finer than one 128-grid cell must retain fragment clipping.
+    let mut tiny_renderer = Renderer::new(&instance, None, Some(wgpu::TextureFormat::Rgba8Unorm), 256, 256).await.unwrap();
+    let tiny = TileId { z: parent.z + 8, x: parent.x * 256 + 127, y: parent.y * 256 + 123 };
+    tiny_renderer.upload_geometry(parent, &heights).unwrap();
+    tiny_renderer.upload_image(tiny, &red).unwrap();
+    tiny_renderer.set_demand(vec![parent], vec![tiny]);
+    let b = tiny.bounds();
+    let tiny_output = tiny_renderer.device.create_texture(&wgpu::TextureDescriptor {
+        label: Some("sub-cell clip proof"), size: output.size(), mip_level_count: 1,
+        sample_count: 1, dimension: wgpu::TextureDimension::D2,
+        format: wgpu::TextureFormat::Rgba8Unorm,
+        usage: wgpu::TextureUsages::RENDER_ATTACHMENT | wgpu::TextureUsages::COPY_SRC,
+        view_formats: &[],
+    });
+    tiny_renderer.render(&tiny_output.create_view(&Default::default()), [(b[0]+b[2])*0.5,(b[1]+b[3])*0.5], tiny.z as f64 - 2., 0., 0., 1000.);
+    let clipped = read(&tiny_renderer,&tiny_output);
+    let colored = clipped.chunks_exact(4).filter(|p| !sky(p)).count();
+    assert!(colored > 1000 && colored < 30000, "sub-cell imagery must not spill across its rounded-out terrain cell: {colored}");
+    assert!(sky(&clipped[..4]) && sky(&clipped[clipped.len()-4..]));
     // The hard budget holds during a burst of unrelated new uploads.
     r.set_tile_budget(24);
     for x in 0..80 {

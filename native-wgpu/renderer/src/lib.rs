@@ -61,6 +61,7 @@ pub struct Renderer {
     pub queue: wgpu::Queue,
     pub format: wgpu::TextureFormat,
     pipeline: wgpu::RenderPipeline,
+    unclipped_pipeline: wgpu::RenderPipeline,
     scene: wgpu::Buffer,
     last_scene: Option<Scene>,
     last_instances: Vec<[f32; 14]>,
@@ -222,9 +223,10 @@ impl Renderer {
             }),
             usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
         });
-        let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+        let create_pipeline = |entry: &str, layout: Option<&wgpu::PipelineLayout>| {
+            device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("terrain"),
-            layout: None,
+            layout,
             vertex: wgpu::VertexState {
                 module: &shader,
                 entry_point: Some("vs"),
@@ -256,7 +258,7 @@ impl Renderer {
             multisample: Default::default(),
             fragment: Some(wgpu::FragmentState {
                 module: &shader,
-                entry_point: Some("fs"),
+                entry_point: Some(entry),
                 compilation_options: Default::default(),
                 targets: &[Some(wgpu::ColorTargetState {
                     format,
@@ -266,7 +268,63 @@ impl Renderer {
             }),
             multiview_mask: None,
             cache: None,
+        })
+        };
+        let scene_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+            label: Some("terrain scene"),
+            entries: &[wgpu::BindGroupLayoutEntry {
+                binding: 0,
+                visibility: wgpu::ShaderStages::VERTEX_FRAGMENT,
+                ty: wgpu::BindingType::Buffer {
+                    ty: wgpu::BufferBindingType::Uniform,
+                    has_dynamic_offset: false,
+                    min_binding_size: wgpu::BufferSize::new(std::mem::size_of::<Scene>() as u64),
+                },
+                count: None,
+            }],
         });
+        let texture_entry = |visibility, filterable| wgpu::BindGroupLayoutEntry {
+            binding: 0,
+            visibility,
+            count: None,
+            ty: wgpu::BindingType::Texture {
+                sample_type: wgpu::TextureSampleType::Float { filterable },
+                view_dimension: if arrays {
+                    wgpu::TextureViewDimension::D2Array
+                } else {
+                    wgpu::TextureViewDimension::D2
+                },
+                multisampled: false,
+            },
+        };
+        let photo_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+            label: Some("terrain photos"),
+            entries: &[
+                texture_entry(wgpu::ShaderStages::FRAGMENT, true),
+                wgpu::BindGroupLayoutEntry {
+                    binding: 1,
+                    visibility: wgpu::ShaderStages::FRAGMENT,
+                    ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Filtering),
+                    count: None,
+                },
+            ],
+        });
+        let height_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+            label: Some("terrain heights"),
+            entries: &[texture_entry(wgpu::ShaderStages::VERTEX, false)],
+        });
+        // Both programs use explicit compatible layouts, including array pages.
+        let shared_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+            label: Some("terrain shared layout"),
+            bind_group_layouts: &[
+                Some(&scene_layout),
+                Some(&photo_layout),
+                Some(&height_layout),
+            ],
+            immediate_size: 0,
+        });
+        let pipeline = create_pipeline("fs", Some(&shared_layout));
+        let unclipped_pipeline = create_pipeline("fs_unclipped", Some(&shared_layout));
         let scene_bind = device.create_bind_group(&wgpu::BindGroupDescriptor {
             label: None,
             layout: &pipeline.get_bind_group_layout(0),
@@ -388,6 +446,7 @@ impl Renderer {
             queue,
             format,
             pipeline,
+            unclipped_pipeline,
             scene,
             last_scene: None,
             last_instances: Vec::new(),
@@ -568,7 +627,10 @@ impl Renderer {
             // unrelated arrival must wait for capacity rather than grow the
             // compatibility backend indefinitely or discard sole coverage.
             if self.tiles.len() >= 192
-                && !self.tiles.keys().any(|old| id.contains(*old) || old.contains(id))
+                && !self
+                    .tiles
+                    .keys()
+                    .any(|old| id.contains(*old) || old.contains(id))
             {
                 return Err("Terrain residency full; waiting for fallback capacity".into());
             }
@@ -672,7 +734,10 @@ impl Renderer {
         if self.images.len() >= 192 {
             self.trim_images();
             if self.images.len() >= 192
-                && !self.images.keys().any(|old| id.contains(*old) || old.contains(id))
+                && !self
+                    .images
+                    .keys()
+                    .any(|old| id.contains(*old) || old.contains(id))
             {
                 return Err("Imagery residency full; waiting for fallback capacity".into());
             }
@@ -1327,6 +1392,52 @@ impl Renderer {
                 elevation,
             )
         }));
+        let now = std::time::Instant::now();
+        self.adaptive_levels.clear();
+        self.next_adaptive_frame = None;
+        for id in rows.iter().map(|r| r.geometry) {
+            if self.adaptive_levels.contains_key(&id) {
+                continue;
+            }
+            let (step, wake) = adaptive::choose(
+                &self.tiles[&id],
+                id,
+                matrix,
+                &route_view,
+                px_meter,
+                now,
+                self.exact_route_sources.contains(&id),
+            );
+            self.adaptive_levels.insert(id, step);
+            if let Some(delay) = wake {
+                self.next_adaptive_frame =
+                    Some(self.next_adaptive_frame.map_or(delay, |old| old.min(delay)));
+            }
+        }
+        // Group all compatible instances, rather than only accidental
+        // neighbours in quadtree order. Surface ownership remains disjoint.
+        if self.image_arrays.is_some() && self.height_arrays.is_some() {
+            rows.sort_by_cached_key(|row| {
+                let rect = ridgeline_core::surface::GridRect::for_region(row.geometry, row.region);
+                let mask = ridgeline_core::surface::skirt_edges(row.geometry_region, row.region)
+                    & self
+                        .edge_masks
+                        .get(&row.geometry_region)
+                        .copied()
+                        .unwrap_or(15);
+                (
+                    row.region.z - row.geometry.z > 7,
+                    Arc::as_ptr(&self.images[&row.image].bind) as usize,
+                    Arc::as_ptr(&self.tiles[&row.geometry].height_bind) as usize,
+                    rect.x0,
+                    rect.y0,
+                    rect.x1,
+                    rect.y1,
+                    mask,
+                    rect.adaptive_step(self.adaptive_levels[&row.geometry]),
+                )
+            });
+        }
         let mut data = std::mem::take(&mut self.instance_scratch);
         data.clear();
         data.extend(rows.iter().map(|row| {
@@ -1376,28 +1487,6 @@ impl Renderer {
             std::mem::swap(&mut self.last_instances, &mut data);
         }
         self.instance_scratch = data;
-        let now = std::time::Instant::now();
-        self.adaptive_levels.clear();
-        self.next_adaptive_frame = None;
-        for id in rows.iter().map(|r| r.geometry) {
-            if self.adaptive_levels.contains_key(&id) {
-                continue;
-            }
-            let (step, wake) = adaptive::choose(
-                &self.tiles[&id],
-                id,
-                matrix,
-                &route_view,
-                px_meter,
-                now,
-                self.exact_route_sources.contains(&id),
-            );
-            self.adaptive_levels.insert(id, step);
-            if let Some(delay) = wake {
-                self.next_adaptive_frame =
-                    Some(self.next_adaptive_frame.map_or(delay, |old| old.min(delay)));
-            }
-        }
         let rects: Vec<_> = rows
             .iter()
             .map(|row| {
@@ -1495,7 +1584,7 @@ impl Renderer {
                 occlusion_query_set: None,
                 multiview_mask: None,
             });
-            pass.set_pipeline(&self.pipeline);
+            let mut clipped_pipeline = None;
             pass.set_bind_group(0, &self.scene_bind, &[]);
             pass.set_index_buffer(self.indices.slice(..), wgpu::IndexFormat::Uint16);
             let mut atlas_bound = true;
@@ -1506,6 +1595,15 @@ impl Renderer {
             let mut i = 0;
             while i < rows.len() {
                 let row = rows[i];
+                let clipped = row.region.z - row.geometry.z > 7;
+                if clipped_pipeline != Some(clipped) {
+                    pass.set_pipeline(if clipped {
+                        &self.pipeline
+                    } else {
+                        &self.unclipped_pipeline
+                    });
+                    clipped_pipeline = Some(clipped);
+                }
                 let image_binding = Arc::as_ptr(&self.images[&row.image].bind);
                 let geometry_binding = Arc::as_ptr(&self.tiles[&row.geometry].height_bind);
                 if last_image != Some(image_binding) {
@@ -1520,6 +1618,7 @@ impl Renderer {
                 }
                 let mut end_instance = i + 1;
                 while end_instance < rows.len()
+                    && (rows[end_instance].region.z - rows[end_instance].geometry.z > 7) == clipped
                     && Arc::ptr_eq(
                         &self.tiles[&rows[end_instance].geometry].height_bind,
                         &self.tiles[&row.geometry].height_bind,

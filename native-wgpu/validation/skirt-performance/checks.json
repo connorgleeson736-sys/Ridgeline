@@ -1,0 +1,32 @@
+{
+  "baseline": "3cc6f903670d6796f04adc5201c112b067469172",
+  "android": {
+    "tests": 71,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 2
+  },
+  "androidLint": "passed",
+  "rustArmCompileCheck": [
+    "aarch64-linux-android",
+    "armv7-linux-androideabi"
+  ],
+  "rustTests": [
+    "test result: ok. 28 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.51s",
+    "test result: ok. 5 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.01s",
+    "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s",
+    "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+    "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+  ],
+  "gpu": {
+    "gpu-vulkan.txt": "passed",
+    "gpu-gles.txt": "passed",
+    "gpu-gles-arrays.txt": "passed"
+  },
+  "limits": "No physical A20, network-loading benchmark, isolated GPU timestamp, or installed/published APK validation.",
+  "gpuCpuMips": {
+    "gpu-vulkan-cpu-mips.txt": "passed",
+    "gpu-gles-cpu-mips.txt": "passed",
+    "gpu-gles-arrays-cpu-mips.txt": "passed"
+  }
+}

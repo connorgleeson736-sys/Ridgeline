@@ -1,4 +1,5 @@
 //! Pure, host-testable geographic and terrain primitives. No Android or browser runtime.
+pub mod mipmap;
 /// MapLibre altitude uses its mean Earth radius (6371008.8m), not EPSG:3857 radius.
 pub const ALTITUDE_CIRCUMFERENCE: f64 = 40030228.88407185;
 pub const EARTH_CIRCUMFERENCE: f64 = 40075016.68557849;

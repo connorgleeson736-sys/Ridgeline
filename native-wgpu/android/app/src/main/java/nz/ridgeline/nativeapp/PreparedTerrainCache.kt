@@ -28,18 +28,27 @@ internal class PreparedTerrainCache(private val directory:File,private val limit
     fun getChecked(id:GpuUploadQueue.Id,validate:(List<Dependency>)->Boolean):ByteBuffer? {
         val file=path(id)
         synchronized(this){if(entries[file]==null)return null}
-        val record=try{DataInputStream(GZIPInputStream(file.inputStream().buffered())).use{input->
+        val raw=try{file.inputStream().buffered()}
+            catch(_:Exception){synchronized(this){remove(file)};return null}
+        val input=try{DataInputStream(GZIPInputStream(raw))}
+            catch(_:Exception){runCatching{raw.close()};synchronized(this){remove(file)};return null}
+        try{
+            val dependencies=try{
                 require(input.readInt()==0x52475433)
                 val count=input.readInt();require(count in 0..128)
-                val dependencies=List(count){Dependency(GpuUploadQueue.Id(input.readInt(),input.readInt(),input.readInt()),input.readUTF(),input.readLong(),input.readUTF())}
+                List(count){Dependency(GpuUploadQueue.Id(input.readInt(),input.readInt(),input.readInt()),input.readUTF(),input.readLong(),input.readUTF())}
+            }catch(_:Exception){synchronized(this){remove(file)};return null}
+            // Validate outside I/O catches and the LRU lock. A suspended or
+            // cancelled reader must not invalidate an intact derived payload.
+            if(!validate(dependencies))return null
+            val payload=try{
                 val size=input.readInt();require(size==payloadBytes)
-                val payload=ByteArray(size);input.readFully(payload);require(input.read()==-1)
-                dependencies to payload
-            }}catch(_:Exception){synchronized(this){remove(file)};return null}
-        // Network/cache validation is intentionally outside the file lock.
-        if(!validate(record.first))return null
-        return ByteBuffer.allocateDirect(record.second.size).order(ByteOrder.LITTLE_ENDIAN).apply{put(record.second);rewind()}
+                ByteArray(size).also{input.readFully(it);require(input.read()==-1)}
+            }catch(_:Exception){synchronized(this){remove(file)};return null}
+            return ByteBuffer.allocateDirect(payload.size).order(ByteOrder.LITTLE_ENDIAN).apply{put(payload);rewind()}
+        }finally{runCatching{input.close()}}
     }
+
     fun put(id:GpuUploadQueue.Id,payload:ByteBuffer,dependencies:List<Dependency>){
         if(dependencies.size>128||limit<=0)return
         require(payload.capacity()==payloadBytes)

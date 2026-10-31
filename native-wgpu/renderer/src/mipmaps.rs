@@ -54,20 +54,7 @@ impl Mipmaps {
         for level in 1..texture.mip_level_count() {
             let next_width = (width / 2).max(1);
             let mut next = vec![0u8; next_width * next_width * 4];
-            for y in 0..next_width {
-                for x in 0..next_width {
-                    for c in 0..4 {
-                        let a = previous[(y * 2 * width + x * 2) * 4 + c] as f32 / 255.;
-                        let b = previous[(y * 2 * width + x * 2 + 1) * 4 + c] as f32 / 255.;
-                        let d = previous[((y * 2 + 1) * width + x * 2) * 4 + c] as f32 / 255.;
-                        let e = previous[((y * 2 + 1) * width + x * 2 + 1) * 4 + c] as f32 / 255.;
-                        next[(y * next_width + x) * 4 + c] = (((a + b + d + e) * 0.25) * 255.)
-                            .round_ties_even()
-                            .clamp(0., 255.)
-                            as u8;
-                    }
-                }
-            }
+            ridgeline_core::mipmap::downsample_rgba(&previous, width, &mut next);
             queue.write_texture(
                 wgpu::TexelCopyTextureInfo {
                     texture,

@@ -1,5 +1,13 @@
 # Ridgeline native migration — in progress
 
+31 October performance pass (checkpoint version 0.1.1): exact DEM halo/axis reuse, an ordered seam sweep,
+compatible array-instance grouping, an exact CPU mip fallback and a mesh-bounded fragment program are
+implemented. Additional fixes start idle demand immediately, reject stale derived entries
+before decompression, and share overlapping original DEM decodes. The host
+local-file DEM mesh fixture improves 4.2% in the final recorded run; this is not
+a phone or network-loading result. See the [audit, individual measurements,
+tradeoffs and follow-up candidates](research/PERFORMANCE-AUDIT-2026-10-31.md).
+
 Current checkpoint: selective MapLibre-style terrain skirts restored by request; independent cache-hit
 admission, shared cancellable transfers, freshness-aware encoded RAM, sharper
 resident cover, finished imagery/plan reuse and bounded predictive warming are
