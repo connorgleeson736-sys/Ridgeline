@@ -1,6 +1,13 @@
 # Ridgeline native migration — in progress
 
-Latest APK: **[0.1.3 Cold Loading Base](checkpoints/README.md)**, source `8ac2e3d`.
+Latest APK: **[0.1.4 Current View Base](checkpoints/README.md)**, source `db36617`.
+Canceled off-screen calls could retain underlying OkHttp slots after logical
+cancellation. The escape path now has an independent bounded Dispatcher, with
+retired-call routing and real underlying queue counts in Loading diagnostics.
+One focused real-HTTP regression passes: 253.3 → 2.0 ms in the controlled cache
+lock replay; no phone timing claim. See the [structural audit](research/RETIRED-HTTP-2026-11-01.md).
+
+Previous 0.1.3 Cold Loading Base, source `8ac2e3d`:
 Reserves existing foreground network capacity for imagery refinement, removes
 derived disk/shared-decode waits from CPU workers, adds local cold coverage and
 cache-free response persistence. **Offline / imagery → Loading diagnostics**

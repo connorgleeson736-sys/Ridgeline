@@ -1,5 +1,35 @@
 # Durable progress log
 
+## 2026-11-01 — actual off-screen HTTP ownership below the loader
+
+User requested a structural review of off-screen requests occupying slots.
+Found canceled calls remain in OkHttp's Dispatcher until their worker/callback
+exits, including uninterruptible cache-monitor waits. TileTransport freed logical
+permits correctly, but the cache-free client shared that underlying dispatcher.
+Current-view requests could therefore wait behind canceled off-screen work.
+
+Source db36617a595ef0058c43622864f2bb603a6223b7 isolates the cache-free queue
+(bounded14, existing12foreground+2background ceiling), routes new network work
+there when the ordinary dispatcher still has retired calls, and closes the owned
+dispatcher with transport. Connection pool/proxy/TLS and healthy normal cache
+path remain. Added real underlying/canceled running and queued counts to Loading
+diagnostics. Old blocked callbacks can still exist; they cannot occupy the
+isolated queue. No extra live source permits, source-selection/detail/Rust/route
+changes. Conservative frustum bounds reviewed; not tightened without actual DEM
+extrema, so some conservative off-screen candidates remain possible.
+
+One focused actual-OkHttp regression, four alternating trials: two canceled old
+calls confirmed blocked on real DiskLruCache monitor, holding two HTTP slots;
+current image253.320→1.952ms with250ms controlled lock hold. Current bytes match,
+no canceled request reaches server. No broad suite/lint or phone causality claim.
+Audit/evidence: research/RETIRED-HTTP-2026-11-01.md and
+validation/retired-http-2026-11-01/.
+
+Built0.1.4-current-view/code5 from that source,32,056,520bytes,
+SHA25679f0654dfff7c91944f5c84d879d61018191a37ad846db3cdd1f8b684c8ed2dd.
+Same Performance package/key, updates0.1.3 in place. All618assets and3optimized
+JNI libraries unchanged; APK signing/16KiB ZIP alignment verified. Build3seconds.
+
 ## 2026-11-01 — sharper-image network capacity; CPU storage/decode waits
 
 User clarified new areas first show coarse imagery, then stay blurry for 10+s.

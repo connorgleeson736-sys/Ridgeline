@@ -1,6 +1,29 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.3 Cold Loading Base APK — 32.1 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-Cold-Loading-0.1.3-Base.apk)**.
+Latest: **[Download 0.1.4 Current View Base APK — 32.1 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-Current-View-0.1.4-Base.apk)**.
+Source `db36617a595ef0058c43622864f2bb603a6223b7`, version code 5; same Performance
+package and signer for in-place updates from 0.1.2/0.1.3, preserving app data.
+
+Fixes a structural queue gap: canceled off-screen calls could still occupy
+OkHttp's Dispatcher even after the loader freed their permits. The cache-free
+escape client shared that queue. It now has an independent bounded dispatcher;
+new network admission uses it when retired calls still occupy the normal queue.
+Underlying running/queued and canceled-call counts are now visible in
+**Offline / imagery → Loading diagnostics**.
+
+One focused real-OkHttp regression, four alternating trials: current image
+253.3 → 2.0 ms while canceled calls remain blocked on a 250 ms cache-monitor hold.
+Same image bytes; canceled requests never reach the HTTP server. This reproduces
+the mechanism, not the user's particular phone stall. No full tests/lint or phone
+speedup claim. Package/signature/alignment checks pass; all assets and optimized
+native libraries remain byte-identical to 0.1.3.
+[Structural audit](../research/RETIRED-HTTP-2026-11-01.md) ·
+[Release record](../validation/retired-http-2026-11-01/release.json) ·
+[SHA-256](Ridgeline-Native-Current-View-0.1.4-Base.apk.sha256).
+
+## Previous 0.1.3 cold-loading checkpoint
+
+**[Download 0.1.3 Cold Loading Base APK — 32.1 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-Cold-Loading-0.1.3-Base.apk)**.
 Source `8ac2e3db62817161af54513cb89638ad3e693bfb`, version code 4.
 Installs over **Ridgeline Native Performance 0.1.2** with the same package and
 signer, preserving its settings, routes, attached ZIP permissions and cache.
