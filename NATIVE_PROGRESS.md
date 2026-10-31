@@ -1,5 +1,39 @@
 # Durable progress log
 
+## 2026-11-01 — sharper-image network capacity; CPU storage/decode waits
+
+User clarified new areas first show coarse imagery, then stay blurry for 10+s.
+Source `8ac2e3db62817161af54513cb89638ad3e693bfb`: publish pending image demand
+before source fan-out and reserve two existing foreground slots for images.
+Eight delayed terrain requests can otherwise block even top-priority image work.
+Controlled 250ms terrain / 5ms image replay: 255.914 → 5.457ms, six alternating
+trials, unchanged image bytes, maximum eight foreground transfers.
+
+Optional prepared/composition disk I/O now uses two independent readers with
+12ms miss deadline and 16-operation bound; CPU tasks suspend. Real cache lock
+held250ms fixture: foreground mesh251.516→13.775ms, identical bytes from genuine
+decoded LINZ DEMs, completing before unlock. Healthy hit0.853→1.465ms overhead.
+Shared PNG consumers yield CPU workers and keep bounded completed results across
+continuation; composition initialization no longer owns camera scheduler monitor.
+Cold first coverage may use original coarse assets plus genuine coarse terrain,
+within source budgets and preserving all fine targets. Secondary to blurry-image
+complaint. Cache-free HTTP winners persist asynchronously to a <=16MiB share of
+the existing disposable allowance; derived budgets reduced, total not increased.
+No route, Rust/shader, source resolution or sampling changes.
+
+Added Offline / imagery → Loading diagnostics (live HTTP/CPU/GPU queue snapshot,
+current request ages, cache/retry counts, Copy; no API keys/URLs). HTTP timing
+includes cache/connection/provider/body, not a Wi-Fi-only measurement.
+Seven focused checks pass; old isolated actual HTTP cache check passes (historical
+suite timeout not reproduced). No broad tests/lint or physical-phone claims.
+
+Built 0.1.3-cold-loading, code4, 32,056,524 bytes, same Performance package/key as
+0.1.2 for in-place update. SHA256
+7ef1d43793d7b858e82f442a112d5159deb23f21f1d3c8a617a94fde0e721059.
+All618assets and3optimized JNI libraries byte-identical to0.1.2. APK signing and
+16KiB ZIP alignment pass. Evidence: validation/pipeline-waits-2026-11-01;
+audit: research/COLD-REFINEMENT-2026-11-01.md.
+
 ## 2026-11-01 — loading checkpoint APK
 
 Built all loading improvements through `0b936a0` plus packaging source

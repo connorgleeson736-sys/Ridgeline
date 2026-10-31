@@ -1,6 +1,31 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.2 Loading Base APK — 32.0 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-Performance-2026-11-01-Base.apk)**.
+Latest: **[Download 0.1.3 Cold Loading Base APK — 32.1 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-Cold-Loading-0.1.3-Base.apk)**.
+Source `8ac2e3db62817161af54513cb89638ad3e693bfb`, version code 4.
+Installs over **Ridgeline Native Performance 0.1.2** with the same package and
+signer, preserving its settings, routes, attached ZIP permissions and cache.
+
+Visible imagery refinement now has two reserved slots within the existing
+foreground network limit, so terrain dependency fan-out cannot occupy every slot.
+Optional derived disk reads and shared PNG waits no longer block CPU workers.
+Adds original local coarse coverage for uncovered views, persistent cache-free
+HTTP winners, and **Offline / imagery → Loading diagnostics** with live queue and
+HTTP-stage timing snapshots plus Copy. Full imagery/terrain detail remains.
+
+Controlled host fixtures: sharpened image admission 255.9 → 5.5 ms with 250 ms
+terrain transfers; foreground prepared-cache stall 251.5 → 13.8 ms, same mesh
+bytes. These are independent injected workloads, not phone/Wi-Fi measurements.
+Healthy derived hits pay about 0.61 ms extra in the host fixture.
+[Investigation, tradeoffs and scope](../research/COLD-REFINEMENT-2026-11-01.md) ·
+[Exact release record](../validation/pipeline-waits-2026-11-01/release.json) ·
+[SHA-256](Ridgeline-Native-Cold-Loading-0.1.3-Base.apk.sha256).
+Seven focused checks passed; no broad suite/lint or device performance claim.
+Signing/alignment/package checks pass. All 618 assets and three optimized native
+libraries are byte-identical to 0.1.2; this pass changes Kotlin loading code/UI.
+
+## Previous 0.1.2 loading checkpoint
+
+**[Download 0.1.2 Loading Base APK — 32.0 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-Performance-2026-11-01-Base.apk)**.
 Source [`d831d2f`](https://github.com/connorgleeson736-sys/Ridgeline/commit/d831d2f3ddc9c301e0b2282fa58912d3940dd222), version code 3; optimized ARM64, ARMv7 and x86_64.
 
 Installs as **Ridgeline Native Performance**, package

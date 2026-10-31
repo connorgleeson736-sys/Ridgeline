@@ -1,6 +1,14 @@
 # Ridgeline native migration — in progress
 
-Latest APK: **[0.1.2 Loading Base](checkpoints/README.md)**, source `d831d2f`.
+Latest APK: **[0.1.3 Cold Loading Base](checkpoints/README.md)**, source `8ac2e3d`.
+Reserves existing foreground network capacity for imagery refinement, removes
+derived disk/shared-decode waits from CPU workers, adds local cold coverage and
+cache-free response persistence. **Offline / imagery → Loading diagnostics**
+shows current queue and HTTP-stage waits. See the
+[refinement investigation and controlled results](research/COLD-REFINEMENT-2026-11-01.md).
+Seven focused checks and package verification pass; no phone/Wi-Fi result claimed.
+
+Previous APK: 0.1.2 Loading Base, source `d831d2f`.
 Includes the foreground-priority and latency work below, with optimized ARM64,
 ARMv7 and x86_64 libraries. Uses a new key and separate application ID
 `nz.ridgeline.nativeapp.performance` to preserve the previously installed app.
