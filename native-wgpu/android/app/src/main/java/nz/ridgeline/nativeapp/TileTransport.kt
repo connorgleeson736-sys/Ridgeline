@@ -24,7 +24,8 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
         ramLimit=limit.coerceAtLeast(0)
         while(bytes>ramLimit&&ram.isNotEmpty())bytes-=ram.remove(ram.keys.first())!!.bytes.size
     }}
-    private val local=Executors.newFixedThreadPool(2)
+    private val local=ThreadPoolExecutor(2,2,0,TimeUnit.MILLISECONDS,PriorityBlockingQueue<Runnable>())
+    private var nextOrder:Long=0L
     private val timers=Executors.newSingleThreadScheduledExecutor()
     private val jobs=LinkedHashMap<ResourceKey,Job>()
     private val ram=LinkedHashMap<ResourceKey,TileBody>(16,.75f,true)
@@ -38,17 +39,55 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
     private inner class Job(val key:ResourceKey){
         val result=CompletableFuture<TileBody>();val users=LinkedHashSet<Consumer>()
         var phase=Phase.LOCAL;var stopped=false;var background=false;var cancel:(()->Unit)?=null
+        val order:Long=nextOrder++
+        @Volatile var localRank=Int.MAX_VALUE
+        var localWork:LocalWork?=null
         var expiry:ScheduledFuture<*>?=null
         fun speculative()=users.isNotEmpty()&&users.all{it.speculative}
         fun rank()=users.minOfOrNull{it.priority+(if(it.speculative)10000 else 0)}?:Int.MAX_VALUE
+    }
+    private inner class LocalWork(val job:Job):Runnable,Comparable<LocalWork>{
+        override fun compareTo(other:LocalWork):Int {val rank=job.localRank.compareTo(other.job.localRank);return if(rank!=0)rank else job.order.compareTo(other.job.order)}
+        override fun run(){try{
+            if(synchronized(lock){job.stopped})return
+            val body=backend.local(job.key)
+            if(body!=null){synchronized(lock){localHits++};finish(job,Result.success(body))}
+            else if(job.key.offline)finish(job,Result.failure(IOException("Offline tile unavailable")))
+            else{synchronized(lock){if(!job.stopped)job.phase=Phase.QUEUED};pump()}
+        }catch(e:Exception){finish(job,Result.failure(e))}}
+    }
+    // Caller owns lock. Queue comparators read only volatile scalar ranks, never
+    // acquire lock while the priority queue itself is locked.
+    private fun reprioritize(job:Job){
+        job.localRank=job.rank()
+        if(!closed&&!job.stopped&&job.phase==Phase.LOCAL)job.localWork?.let{work->if(local.remove(work))local.execute(work)}
+        if(job.phase==Phase.NETWORK){
+            val background=job.users.isEmpty()||job.speculative()
+            if(background!=job.background){backgroundActive+=if(background)1 else -1;job.background=background}
+        }
     }
     inner class Consumer internal constructor(internal var priority:Int,internal var speculative:Boolean):AutoCloseable {
         private val owned=LinkedHashMap<ResourceKey,Job>()
         private val immediate=LinkedHashMap<ResourceKey,CompletableFuture<TileBody>>()
         private var released=false
-        fun promote(priority:Int,speculative:Boolean=false){synchronized(lock){this.priority=priority;this.speculative=speculative
-            for(job in owned.values)if(job.phase==Phase.NETWORK&&job.background&&!job.speculative()){job.background=false;backgroundActive--}
+        fun promote(priority:Int,speculative:Boolean=false){synchronized(lock){
+            if(released||this.priority==priority&&this.speculative==speculative)return
+            this.priority=priority;this.speculative=speculative
+            for(job in owned.values)reprioritize(job)
         };pump()}
+        /** Preserve a returning request only if its whole dependency fan-out
+         * fits the two background slots. One DEM job can own several transfers. */
+        fun park():Boolean {
+            synchronized(lock){
+                if(released||closed)return false
+                val extra=owned.values.count{job->job.phase==Phase.NETWORK&&!job.background&&
+                    job.users.none{it!==this&&!it.speculative}}
+                if(backgroundActive+extra>2)return false
+                priority=1000;speculative=true
+                for(job in owned.values)reprioritize(job)
+            }
+            pump();return true
+        }
         fun acquire(key:ResourceKey):CompletableFuture<TileBody>{
             var start:Job?=null
             var forward:Pair<Job,CompletableFuture<TileBody>>?=null
@@ -63,31 +102,30 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
                 var job=jobs[key]
                 if(job==null){require(jobs.size<512){"Tile request guard reached"};job=Job(key);jobs[key]=job;start=job}else shares++
                 job.expiry?.cancel(false);job.expiry=null;job.users.add(this);owned[key]=job
-                if(job.phase==Phase.NETWORK&&job.background&&!job.speculative()){job.background=false;backgroundActive--}
+                reprioritize(job)
                 CompletableFuture<TileBody>().also{immediate[key]=it;forward=job to it}
             }
             forward?.let{(job,view)->job.result.whenComplete{body,error->if(error!=null)view.completeExceptionally(error)else view.complete(body)}}
-            start?.let{job->local.execute{try{
-                if(synchronized(lock){job.stopped})return@execute
-                val body=backend.local(job.key)
-                if(body!=null){synchronized(lock){localHits++};finish(job,Result.success(body))}
-                else if(job.key.offline)finish(job,Result.failure(IOException("Offline tile unavailable")))
-                else{synchronized(lock){if(!job.stopped)job.phase=Phase.QUEUED};pump()}
-            }catch(e:Exception){finish(job,Result.failure(e))}}}
-            pump();return future
+            start?.let{job->synchronized(lock){if(!job.stopped&&!closed){
+                val work=LocalWork(job);job.localWork=work;job.localRank=job.rank();local.execute(work)
+            }}}
+            if(forward!=null)pump();return future
         }
         override fun close()=release(false)
         fun release(force:Boolean){
             val cancelledViews=ArrayList<CompletableFuture<TileBody>>()
+            val abandoned=ArrayList<Job>()
             synchronized(lock){
                 if(released)return;released=true
                 val out=owned.values.toList();owned.clear();cancelledViews.addAll(immediate.values);immediate.clear()
-                for(job in out){job.users.remove(this)
+                for(job in out){job.users.remove(this);reprioritize(job)
                     if(job.users.isEmpty()&&job.phase!=Phase.DONE&&!job.stopped){
-                        job.expiry=timers.schedule({abandon(job)},if(speculative||force)0 else graceMs,TimeUnit.MILLISECONDS)
+                        if(speculative||force)abandoned+=job
+                        else job.expiry=timers.schedule({abandon(job)},graceMs,TimeUnit.MILLISECONDS)
                     }
                 }
             }
+            for(job in abandoned)abandon(job)
             // Cancel this reader immediately; other consumers keep the shared job.
             for(view in cancelledViews)view.completeExceptionally(PreparationAborted())
             pump()
@@ -95,11 +133,11 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
 
     }
     fun consumer(priority:Int=0,speculative:Boolean=false)=Consumer(priority,speculative)
-    fun movement(moving:Boolean){synchronized(lock){foregroundLimit=if(moving)8 else 12};pump()}
+    fun movement(moving:Boolean){synchronized(lock){val next=if(moving)8 else 12;if(next==foregroundLimit)return;foregroundLimit=next};pump()}
     private fun abandon(job:Job){
         val cancel=synchronized(lock){
             if(job.users.isNotEmpty()||job.phase==Phase.DONE||job.stopped)return
-            job.stopped=true;job.expiry=null;jobs.remove(job.key,job);cancellations++
+            job.stopped=true;job.expiry?.cancel(false);job.expiry=null;job.localWork?.let{local.remove(it)};jobs.remove(job.key,job);cancellations++
             if(job.phase==Phase.NETWORK){networkActive--;if(job.background)backgroundActive--}
             job.phase=Phase.DONE;job.cancel
         }
@@ -110,9 +148,16 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
         synchronized(lock){
             if(closed)return
             while(true){
-                val job=jobs.values.filter{it.phase==Phase.QUEUED&&!it.stopped&&it.users.isNotEmpty()}
-                    .filter{if(it.speculative())backgroundActive<2 else networkActive-backgroundActive<foregroundLimit}
-                    .minByOrNull{it.rank()}?:break
+                if(networkActive>=foregroundLimit+2)break
+                var best:Job?=null;var bestRank=Int.MAX_VALUE
+                // One scan, no temporary filtered lists per admitted transfer.
+                for(candidate in jobs.values){
+                    if(candidate.phase!=Phase.QUEUED||candidate.stopped||candidate.users.isEmpty())continue
+                    if(if(candidate.speculative())backgroundActive>=2 else networkActive-backgroundActive>=foregroundLimit)continue
+                    val rank=candidate.rank()
+                    if(best==null||rank<bestRank){best=candidate;bestRank=rank}
+                }
+                val job=best?:break
                 job.phase=Phase.NETWORK;job.background=job.speculative();networkActive++;if(job.background)backgroundActive++
                 networkStarts++;starts+=job
             }
@@ -124,6 +169,7 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
         }
     }
     private fun finish(job:Job,result:Result<TileBody>){
+        if(synchronized(lock){job.stopped||job.phase==Phase.DONE})return
         val stamped=result.map{body->
             val fingerprint=if(body.status==404)"404" else PreparedTerrainCache.digest(body.bytes)
             body.copy(stamp=SourceStamp(job.key.id,fingerprint,body.until))
@@ -135,7 +181,8 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
             stamped.getOrNull()?.let{body->
                 metadata[job.key.id]=body.stamp!!;while(metadata.size>4096)metadata.remove(metadata.keys.first())
                 prune()
-                if(body.until>clock()&&body.bytes.size<=ramLimit){
+                if(body.until>clock()&&body.bytes.size<=ramLimit&&
+                    (!job.speculative()||bytes+body.bytes.size<=ramLimit*9/10)){
                     ram.remove(job.key)?.let{bytes-=it.bytes.size};ram[job.key]=body;bytes+=body.bytes.size;nextExpiry=minOf(nextExpiry,body.until)
                     while(bytes>ramLimit&&ram.isNotEmpty())bytes-=ram.remove(ram.keys.first())!!.bytes.size
                 }
@@ -150,7 +197,7 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
     fun contains(key:ResourceKey)=synchronized(lock){prune();ram[key]?.until?.let{it>clock()}==true}
     fun memoryPressure(){synchronized(lock){ram.clear();bytes=0;nextExpiry=Long.MAX_VALUE}}
     fun invalidate(){synchronized(lock){ram.clear();bytes=0;nextExpiry=Long.MAX_VALUE;for((key,old)in metadata.toMap())metadata[key]=old.copy(fingerprint="invalidated",until=0)}}
-    fun stats():Map<String,Long> = synchronized(lock){prune();mapOf("encodedBytes" to bytes,"ramHits" to ramHits,"localHits" to localHits,"networkStarts" to networkStarts,"shared" to shares,"cancelled" to cancellations,"pending" to jobs.size.toLong())}
+    fun stats():Map<String,Long> = synchronized(lock){prune();mapOf("encodedBytes" to bytes,"ramHits" to ramHits,"localHits" to localHits,"networkStarts" to networkStarts,"shared" to shares,"cancelled" to cancellations,"pending" to jobs.size.toLong(),"networkActive" to networkActive.toLong(),"backgroundActive" to backgroundActive.toLong(),"localQueued" to local.queue.size.toLong())}
     fun awaitClosed(){local.awaitTermination(5,TimeUnit.SECONDS);timers.awaitTermination(5,TimeUnit.SECONDS)}
     override fun close(){
         val rows=synchronized(lock){if(closed)return;closed=true;val rows=jobs.values.toList();for(job in rows){job.stopped=true;job.expiry?.cancel(false)};jobs.clear();ram.clear();metadata.clear();bytes=0;rows}

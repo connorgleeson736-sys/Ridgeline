@@ -139,7 +139,11 @@ pub fn resident_cover(available: &[TileId]) -> Vec<CoverRegion> {
     for id in available {
         let mut node = *id;
         while let Some(parent) = node.parent() {
-            branches.insert(parent);
+            // A shared ancestor already has its complete path to the root.
+            // Neighbouring tiles must not rebuild that path for every source.
+            if !branches.insert(parent) {
+                break;
+            }
             node = parent;
         }
     }
@@ -177,73 +181,84 @@ pub fn resident_cover(available: &[TileId]) -> Vec<CoverRegion> {
 /// Ready ideal tiles win immediately. Missing ideals keep real loaded children
 /// and their nearest loaded ancestor until replacement is ready.
 pub fn demanded_sources(available: &[TileId], ideal: &[TileId]) -> Vec<TileId> {
+    source_owners(available, ideal, false)
+}
+/// Keep real cached ancestors behind detail until the next camera plan arrives.
+pub fn render_sources(available: &[TileId], ideal: &[TileId]) -> Vec<TileId> {
+    source_owners(available, ideal, true)
+}
+fn source_owners(available: &[TileId], ideal: &[TileId], backdrop: bool) -> Vec<TileId> {
+    if available.is_empty() || ideal.is_empty() {
+        return Vec::new();
+    }
     use std::collections::HashSet;
     let exact: HashSet<_> = available.iter().copied().collect();
-    fn sharper(target: TileId, rows: &[TileId], exact: &HashSet<TileId>) -> Option<Vec<TileId>> {
-        let descendants: Vec<_> = rows
-            .iter()
-            .copied()
-            .filter(|id| target.contains(*id) && id.z > target.z)
-            .collect();
-        if !descendants.is_empty() && target.z < 22 {
-            let mut cover = Vec::new();
-            let mut full = true;
-            for child in target.children() {
-                match sharper(child, &descendants, exact) {
-                    Some(parts) => cover.extend(parts),
-                    None => {
-                        full = false;
-                        break;
-                    }
-                }
+    // Fold complete child coverage upwards once. Previously every ideal target
+    // recursively allocated and filtered the available source list, even when
+    // a missing sibling made a full child cover impossible.
+    let mut full = exact.clone();
+    for &id in available {
+        let mut node = id;
+        while let Some(parent) = node.parent() {
+            if parent.z >= 22
+                || !parent.children().iter().all(|c| full.contains(c))
+                || !full.insert(parent)
+            {
+                break;
             }
-            if full {
-                return Some(cover);
-            }
+            node = parent;
         }
-        exact.contains(&target).then(|| vec![target])
+    }
+    fn sharper(id: TileId, full: &HashSet<TileId>, out: &mut HashSet<TileId>) {
+        if id.z < 22 && id.children().iter().all(|c| full.contains(c)) {
+            for child in id.children() {
+                sharper(child, full, out);
+            }
+        } else {
+            out.insert(id);
+        }
     }
     let mut selected = HashSet::new();
-    for target in ideal {
-        if let Some(ready) = sharper(*target, available, &exact) {
-            selected.extend(ready);
-            continue;
+    for &target in ideal {
+        let complete = full.contains(&target);
+        if complete {
+            sharper(target, &full, &mut selected);
+        } else {
+            selected.extend(available.iter().copied().filter(|id| target.contains(*id)));
         }
-        selected.extend(available.iter().copied().filter(|id| target.contains(*id)));
-        let mut ancestor = target.parent();
-        while let Some(id) = ancestor {
-            if exact.contains(&id) {
-                selected.insert(id);
-                break;
+        if backdrop || !complete {
+            let mut ancestor = target.parent();
+            while let Some(id) = ancestor {
+                if exact.contains(&id) {
+                    selected.insert(id);
+                    break;
+                }
+                ancestor = id.parent();
             }
-            ancestor = id.parent();
         }
     }
     let mut out: Vec<_> = selected.into_iter().collect();
     out.sort_by_key(|id| (id.z, id.x, id.y));
     out
 }
-/// Keep the nearest resident ancestor as a backdrop even after an ideal tile
-/// arrives. A camera frame may precede the next demand plan during a drag;
-/// dropping this background would expose cached siblings as empty space.
-pub fn render_sources(available: &[TileId], ideal: &[TileId]) -> Vec<TileId> {
-    use std::collections::HashSet;
-    let exact: HashSet<_> = available.iter().copied().collect();
-    let mut selected: HashSet<_> = demanded_sources(available, ideal).into_iter().collect();
-    for target in ideal {
-        let mut parent = target.parent();
-        while let Some(id) = parent {
-            if exact.contains(&id) {
-                selected.insert(id);
-                break;
-            }
-            parent = id.parent();
-        }
-    }
-    let mut out: Vec<_> = selected.into_iter().collect();
-    out.sort_by_key(|id| (id.z, id.x, id.y));
-    out
+/// Keep the finest disjoint requested leaves, preserving input order.
+/// Native request sets are small; the contiguous scan beats a hashed ancestor
+/// index here. The renderer caches this result once per demand membership.
+pub fn finest_sources(requested: &[TileId]) -> Vec<TileId> {
+    requested
+        .iter()
+        .copied()
+        .filter(|id| {
+            !requested
+                .iter()
+                .any(|other| id != other && id.contains(*other))
+        })
+        .collect()
 }
+#[cfg(test)]
+mod source_selection_reference;
+#[cfg(test)]
+mod source_selection_tests;
 #[cfg(test)]
 mod terrain_tests {
     use super::*;

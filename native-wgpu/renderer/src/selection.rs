@@ -160,14 +160,20 @@ fn plan_with_margin_using(
         }
         pending.extend(children.into_iter().flatten());
     }
+    // Match refinement priority at admission too. Distance to a tile's centre
+    // misranks a large tile covering the focus behind a small nearby tile.
     leaves.sort_by(|a, b| {
-        let rank = |c: &Candidate| {
+        let distance = |c: &Candidate| {
             let b = bounds(c.id);
-            let dx = (b[0] + b[2]) / 2. - view.center[0];
-            let dy = (b[1] + b[3]) / 2. - view.center[1];
+            let dx = (b[0] - view.center[0]).max(0.).max(view.center[0] - b[2]);
+            let dy = (b[1] - view.center[1]).max(0.).max(view.center[1] - b[3]);
             dx * dx + dy * dy
         };
-        rank(a).total_cmp(&rank(b))
+        b.focus
+            .cmp(&a.focus)
+            .then_with(|| distance(a).total_cmp(&distance(b)))
+            .then_with(|| b.score.total_cmp(&a.score))
+            .then_with(|| (a.id.z, a.id.x, a.id.y).cmp(&(b.id.z, b.id.x, b.id.y)))
     });
     leaves.into_iter().map(|c| c.id).collect()
 }

@@ -3,6 +3,28 @@ import java.nio.ByteBuffer
 import org.junit.Test
 import org.junit.Assert.*
 class GpuUploadQueueTest {
+ @Test fun liveRanksOverrideArrivalAndDistantParentOrdering(){
+  val queue=GpuUploadQueue(16)
+  val focus=GpuUploadQueue.Id(18,254000,166000);val close=focus.copy(x=focus.x+1)
+  val distant=focus.copy(x=focus.x+128);val parent=GpuUploadQueue.Id(17,distant.x/2,distant.y/2)
+  val data=ByteBuffer.allocate(4)
+  fun tile(id:GpuUploadQueue.Id)=GpuUploadQueue.Tile(id,GpuUploadQueue.EMPTY,data,GpuUploadQueue.Kind.IMAGE)
+  queue.updateRankedDemand(emptyMap(),linkedMapOf(parent to 10,focus to 1,close to 2,distant to 70))
+  for(id in listOf(parent,distant,close,focus))assertTrue(queue.offer(tile(id)))
+  assertEquals(listOf(focus,close,parent,distant),queue.take(16).map{it.id})
+  queue.offer(tile(focus));queue.offer(tile(close))
+  queue.updateRankedDemand(emptyMap(),linkedMapOf(focus to 2,close to 1))
+  assertEquals(close,queue.take(1).single().id)
+ }
+ @Test fun rankedQueuePressureProtectsCloseTiles(){
+  val q=GpuUploadQueue(2);val focus=GpuUploadQueue.Id(18,254000,166000)
+  val nearby=focus.copy(x=focus.x+1);val distant=focus.copy(x=focus.x+32);val urgent=focus.copy(x=focus.x+2)
+  val bytes=ByteBuffer.allocate(4)
+  fun tile(id:GpuUploadQueue.Id)=GpuUploadQueue.Tile(id,GpuUploadQueue.EMPTY,bytes,GpuUploadQueue.Kind.IMAGE)
+  q.updateRankedDemand(emptyMap(),mapOf(focus to 1,nearby to 2,distant to 70,urgent to 0))
+  assertTrue(q.offer(tile(focus)));assertTrue(q.offer(tile(nearby)));assertFalse(q.offer(tile(distant)))
+  assertTrue(q.offer(tile(urgent)));assertEquals(listOf(urgent,focus),q.take(2).map{it.id})
+ }
  @Test fun burstsCoalesceAndRemainBounded(){
   val q=GpuUploadQueue(4)
   val bytes=ByteBuffer.allocate(4)

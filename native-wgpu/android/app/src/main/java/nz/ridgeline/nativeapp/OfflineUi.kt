@@ -46,6 +46,19 @@ class OfflineUi(private val activity:Activity,root:FrameLayout,private val terra
         val list=LinearLayout(activity).apply{orientation=LinearLayout.VERTICAL}
         val status=TextView(activity)
         val dialog=AlertDialog.Builder(activity).setTitle("Offline maps").setView(ScrollView(activity).apply{addView(content)}).setNegativeButton("Close",null).create()
+        for(geometry in listOf(false,true)){
+            val name=if(geometry)"Terrain" else "Imagery"
+            val label=TextView(activity).apply{textSize=13f}
+            val slider=SeekBar(activity).apply{max=DetailPolicy.MAX;progress=if(geometry)loader.terrainDetail else loader.imageryDetail;contentDescription="$name detail"}
+            fun update(){label.text="$name detail: "+String.format(java.util.Locale.ROOT,"%.1f×",DetailPolicy.multiplier(slider.progress))}
+            update();content.addView(label);content.addView(slider)
+            slider.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener{
+                override fun onProgressChanged(bar:SeekBar?,value:Int,user:Boolean){update();if(user)loader.detail(geometry,value)}
+                override fun onStartTrackingTouch(bar:SeekBar?){}
+                override fun onStopTrackingTouch(bar:SeekBar?){}
+            })
+        }
+        content.addView(TextView(activity).apply{text="Higher detail loads finer tiles and uses more memory and data. Changes apply immediately.";textSize=12f})
         val cacheLabel=TextView(activity).apply{textSize=12f}
         val cacheSize=SeekBar(activity).apply{max=1000;progress=loader.automaticCacheMiB;contentDescription="Automatic map cache size in MiB"}
         fun cacheText(){cacheLabel.text="Automatic disk cache: ${cacheSize.progress} MiB maximum · active limit ${loader.automaticCacheBytes/1_048_576} MiB. Adjusted for free storage. Changes apply after restarting the app; 0 disables automatic disk caching. Saved regions and attached ZIPs are separate."}

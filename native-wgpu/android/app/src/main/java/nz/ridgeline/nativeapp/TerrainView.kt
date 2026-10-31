@@ -41,7 +41,8 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     }}
     fun updateWarmDemand(geometry:Set<GpuUploadQueue.Id>,images:Set<GpuUploadQueue.Id>){uploads.updateWarm(geometry,images)}
     fun hasResidentCoverage(id:GpuUploadQueue.Id,geometry:Boolean,sharp:Boolean=false):Boolean {
-        return ResidentCoverage.complete(id,if(geometry)residency.geometryIds else residency.imageIds,!sharp)
+        val current=residency
+        return (if(geometry)current.geometryCoverage else current.imageCoverage).complete(id,!sharp)
     }
     internal fun frameReady()=presentedPose==cameraPose
     internal fun groundedFrameReady()=groundedPose==cameraPose&&presentedPose==cameraPose
@@ -90,9 +91,19 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     var onData:()->Unit={}
     var onStatus:(String)->Unit={}
     private val uploads=GpuUploadQueue(192)
-    private data class Residency(val geometry:LongArray,val images:LongArray){
-        private fun ids(rows:LongArray)=rows.map{GpuUploadQueue.Id((it ushr 44).toInt(),((it ushr 22)and 0x3fffff).toInt(),(it and 0x3fffff).toInt())}.toSet()
-        val geometryIds=ids(geometry);val imageIds=ids(images)
+    private data class Residency(val geometry:LongArray,val images:LongArray,
+        val geometryIds:Set<GpuUploadQueue.Id> = ids(geometry),val imageIds:Set<GpuUploadQueue.Id> = ids(images),
+        val geometryCoverage:ResidentCoverage.Index = ResidentCoverage.Index(geometryIds),
+        val imageCoverage:ResidentCoverage.Index = ResidentCoverage.Index(imageIds)){
+        fun updated(ground:LongArray,photos:LongArray):Residency {
+            val sameGround=geometry.contentEquals(ground);val samePhotos=images.contentEquals(photos)
+            if(sameGround&&samePhotos)return this
+            val g=if(sameGround)geometryIds else ids(ground);val i=if(samePhotos)imageIds else ids(photos)
+            return Residency(ground,photos,g,i,if(sameGround)geometryCoverage else ResidentCoverage.Index(g),if(samePhotos)imageCoverage else ResidentCoverage.Index(i))
+        }
+        companion object {
+            private fun ids(rows:LongArray)=rows.map{GpuUploadQueue.Id((it ushr 44).toInt(),((it ushr 22)and 0x3fffff).toInt(),(it and 0x3fffff).toInt())}.toSet()
+        }
     }
     @Volatile private var residency=Residency(LongArray(0),LongArray(0))
     private val residencyBytes=ByteBuffer.allocateDirect(4096).order(ByteOrder.LITTLE_ENDIAN)
@@ -102,7 +113,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         val token=generation.get();residencyBytes.rewind()
         if(NativeBridge.residency(handle,residencyBytes)){
             val g=residencyBytes.int;val i=residencyBytes.int
-            val next=Residency(LongArray(g){residencyBytes.long},LongArray(i){residencyBytes.long})
+            val next=residency.updated(LongArray(g){residencyBytes.long},LongArray(i){residencyBytes.long})
             if(live&&generation.get()==token)residency=next
         }
     }
@@ -276,6 +287,11 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         buffer.putInt(geometry.size);buffer.putInt(images.size)
         for(id in geometry.toList()+images.toList()){buffer.putInt(id.z);buffer.putInt(id.x);buffer.putInt(id.y)}
         buffer.rewind();demandPacket=buffer;requestFrame()
+    }
+    fun updateRankedUploadDemand(geometry:Map<GpuUploadQueue.Id,Int>,images:Map<GpuUploadQueue.Id,Int>){
+        updateUploadDemand(geometry.keys,images.keys)
+        // Camera-only changes can reorder a plan without changing membership.
+        uploads.updateRankedDemand(geometry,images)
     }
     fun upload(z:Int,x:Int,y:Int,heights:ByteBuffer,rgba:ByteBuffer){if(uploads.offer(GpuUploadQueue.Tile(GpuUploadQueue.Id(z,x,y),heights,rgba)))requestFrame()}
     fun uploadGeometry(z:Int,x:Int,y:Int,data:ByteBuffer){if(uploads.offer(GpuUploadQueue.Tile(GpuUploadQueue.Id(z,x,y),data,GpuUploadQueue.EMPTY,GpuUploadQueue.Kind.GEOMETRY)))requestFrame()}

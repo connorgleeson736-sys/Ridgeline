@@ -1,6 +1,6 @@
 package nz.ridgeline.nativeapp
 
-data class DemandPlanKey(val width:Int,val height:Int,val pose:CameraPose)
+data class DemandPlanKey(val width:Int,val height:Int,val pose:CameraPose,val terrainDetail:Int=DetailPolicy.DEFAULT,val imageryDetail:Int=DetailPolicy.DEFAULT)
 
 /** One immutable plan, scoped to one loader/scheduler. Residency is deliberately not cached. */
 class DemandPlanCache<K:Any,V:Any> {

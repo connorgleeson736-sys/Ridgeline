@@ -1,5 +1,22 @@
 # Durable progress log
 
+## 2026-10-31 — visible tile priority and native loading pipeline
+
+Started from native93be86c; refreshed mainc0b3941 and preview39431da/Capacitor018.
+Implemented end-to-end foreground priority, four nearby refinements before distant
+fallbacks, ranked local reads/uploads and pressure eviction, dependency-aware
+obsolete parking, protected speculative bytes, fresh decoded DEM admission,
+reused readiness/ownership/ancestry and generation-safe seam proofs. Added the
+website's independent seven-position imagery and terrain detail controls with
+unchanged defaults. Rejected slower finest-leaf hashing. Source only, no new APK.
+Host cache queue70.171→2.289ms (controlled2msservice), source owners28.886→15.047us,
+resident partition142.069→117.720us, repeated seam proof2.950→0.060us; these are
+independent subsystem results, not phone or end-to-end speedups. 39Rust tests,
+34focusedJVMtests, allKotlin/API36typechecking and softwareVulkanGPU smoke pass.
+Details/reproduction: native-wgpu/research/VIEWPORT-LOADING-AUDIT-2026-10-31.md;
+rawsamples: native-wgpu/validation/viewport-priority-2026-10-31/.
+
+
 ## 2026-10-31 — final performance APK frozen for push
 
 Source150ad30e5db269a549769fb011667c31ec975178. Version0.1.1-performance-checkpoint,

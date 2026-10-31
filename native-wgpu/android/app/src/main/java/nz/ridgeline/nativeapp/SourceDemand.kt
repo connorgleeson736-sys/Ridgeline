@@ -22,10 +22,10 @@ internal object SourceDemand {
         if(spare==0)fallback.clear()
         val out=LinkedHashMap<GpuUploadQueue.Id,Int>()
         val focus=leaves.firstOrNull()
-        for((index,id)in fallback.withIndex())out[id]=if(focus!=null&&contains(id,focus))0 else 3+index
-        // Fine focus is not held up by the full background queue. Other parents
-        // then establish useful detail throughout the viewport before refinements.
-        for((index,id)in leaves.withIndex())out[id]=if(index==0)1 else 32+index
+        for((index,id)in fallback.withIndex())out[id]=if(focus!=null&&contains(id,focus))0 else 8+index
+        // A small focus neighbourhood starts before distant fallback work. One
+        // focus parent still establishes coverage first; far leaves follow parents.
+        for((index,id)in leaves.withIndex())out[id]=if(index<4)1+index else 64+index
         return out
     }
 }

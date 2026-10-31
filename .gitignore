@@ -11,3 +11,6 @@ source-cache/
 **/__pycache__/
 
 /.vinext/
+
+# Local investigation tools and benchmark scratch files.
+/work/

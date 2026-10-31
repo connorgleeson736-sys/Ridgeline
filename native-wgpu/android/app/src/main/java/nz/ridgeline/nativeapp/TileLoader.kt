@@ -28,6 +28,17 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private data class Source(val id:Id,val geometry:Boolean)
     // Automatic HTTP cache is disposable. Saved regions/packs are never evicted here.
     private val preferences=context.getSharedPreferences("display",0)
+    @Volatile private var detailSteps=preferences.getInt("terrainDetail",DetailPolicy.DEFAULT).coerceIn(0,DetailPolicy.MAX) to
+        preferences.getInt("imageryDetail",DetailPolicy.DEFAULT).coerceIn(0,DetailPolicy.MAX)
+    val terrainDetail get()=detailSteps.first
+    val imageryDetail get()=detailSteps.second
+    fun detail(geometry:Boolean,value:Int){
+        val step=value.coerceIn(0,DetailPolicy.MAX)
+        detailSteps=if(geometry)step to imageryDetail else terrainDetail to step
+        preferences.edit().putInt(if(geometry)"terrainDetail" else "imageryDetail",step).apply()
+        // Settings are part of the immutable plan key. Keep useful resident data.
+        runCatching{scheduler.execute{viewRevision++;preparedRevision=-1;clearWarm();cameraChanged()}}
+    }
     val automaticCacheMiB get()=preferences.getInt("automaticCacheMiB",1000).coerceIn(0,1000)
     fun automaticCacheMiB(value:Int){preferences.edit().putInt("automaticCacheMiB",value.coerceIn(0,1000)).apply()}
     val automaticCacheBytes=AutomaticCacheBudget.bytes(automaticCacheMiB,context.cacheDir.usableSpace)
@@ -148,10 +159,11 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         @Volatile var started=false;private set
         @Volatile private var parkedUntil=0L
         fun eligible()=!dead&&active&&!finished.get()&&(source in wanted||source in warmWanted&&prepareAhead||parkedUntil>System.currentTimeMillis())
-        override fun compareTo(other:Task)=compareValuesBy(this,other,{it.priority+(if(it.speculative)10000 else 0)},{it.order})
+        override fun compareTo(other:Task)=compareValuesBy(this,other,{it.priority+(if(it.speculative||it.parkedUntil!=0L)10000 else 0)},{it.order})
         fun enqueue(){if(!finished.get()&&!dead&&queued.compareAndSet(false,true))try{workers(source).execute(this)}catch(_:RejectedExecutionException){queued.set(false);cancel()}}
-        fun promote(rank:Int){priority=rank;speculative=false;parkedUntil=0;consumer.promote(rank);if(workers(source).remove(this)){queued.set(false);enqueue()}}
-        fun park(){if(parkedUntil!=0L)return;parkedUntil=System.currentTimeMillis()+600;scheduler.schedule({if(source !in wanted)cancel()},600,TimeUnit.MILLISECONDS)}
+        fun promote(rank:Int){if(priority==rank&&!speculative&&parkedUntil==0L)return;priority=rank;speculative=false;parkedUntil=0;consumer.promote(rank);if(workers(source).remove(this)){queued.set(false);enqueue()}}
+        fun park(){if(parkedUntil!=0L)return;if(!consumer.park()){cancel();return};parkedUntil=System.currentTimeMillis()+600;
+            if(workers(source).remove(this)){queued.set(false);enqueue()};scheduler.schedule({if(source !in wanted)cancel()},600,TimeUnit.MILLISECONDS)}
         fun cancel(){if(finished.compareAndSet(false,true)){workers(source).remove(this);jobs.remove(source,this);consumer.release(true)}}
         override fun run(){
             queued.set(false);if(!eligible()){cancel();return}
@@ -194,13 +206,13 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         val budget=maxOf(16,(if(geometry)geometryLimit else imageLimit)*3/4)
         val count=NativeBridge.plan(key.width,key.height,pose.longitude,pose.latitude,
             pose.zoom,pose.bearing,pose.pitch,pose.elevation,budget,
-            if(geometry)431.0 else 256.0/2.0.pow(.25),if(geometry)22 else 19,1.0,output)
+            DetailPolicy.target(geometry,if(geometry)key.terrainDetail else key.imageryDetail),if(geometry)22 else 19,1.0,output)
         return List(count){Id(output.int,output.int,output.int)}
     }
     private fun loadView() {
         if (dead||!active||view.width==0||view.height==0) return
         val key=DemandPlanKey((view.width/view.pixelScale).roundToInt().coerceAtLeast(1),
-            (view.height/view.pixelScale).roundToInt().coerceAtLeast(1),view.planningPose)
+            (view.height/view.pixelScale).roundToInt().coerceAtLeast(1),view.planningPose,terrainDetail,imageryDetail)
         val plan=plans.get(key) {
           val next=LinkedHashMap<Source,Int>()
           for(geometry in listOf(true,false)) {
@@ -211,6 +223,8 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
           Plan(next.toMap())
         }
         val ranked=plan.ranked
+        val prior=previousPose
+        if(prior!=key.pose){viewRevision++;clearWarm();previousPose=key.pose}
         wanted = ranked.keys.toSet()
         // Restore already prepared parents before requesting more detailed work.
         // A zoom jump can skip several levels; the exact new plan need not name
@@ -226,16 +240,16 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             if(parent!=null){val id=parent.first;val owner=Source(Id(id.z,id.x,id.y),source.geometry)
                 if(!resident(owner))cachedParents[owner]=parent.second}
         }
-        view.updateUploadDemand(wanted.filter{it.geometry}.map{it.id.gpu()}.toSet(),
-            wanted.filter{!it.geometry}.map{it.id.gpu()}.toSet())
+        view.updateRankedUploadDemand(ranked.filterKeys{it.geometry}.mapKeys{it.key.id.gpu()},
+            ranked.filterKeys{!it.geometry}.mapKeys{it.key.id.gpu()})
         for((parent,data)in cachedParents)upload(parent,data)
         failures.keys.removeAll{it !in wanted}
         if(view.gestureInProgress&&!lastGesture){predictionCount=0;cancelPredictions()}
         lastGesture=view.gestureInProgress
         transport.movement(view.gestureInProgress)
-        val returning=jobs.values.filter{it.source !in wanted&&!it.speculative&&it.started}.sortedBy{it.priority}.take(8).toSet()
+        val returning=jobs.values.filter{it.source !in wanted&&!it.speculative&&it.started}.sortedBy{it.priority}.take(2).toSet()
         for(task in jobs.values){if(task.source in wanted)task.promote(ranked[task.source]?:0)else if(task.source in warmWanted&&prepareAhead&&!view.gestureInProgress){}else if(task !in returning)task.cancel()else task.park()}
-        for((source,priority)in ranked){
+        for((source,priority)in ranked.entries.sortedBy{it.value}){
             if(resident(source))continue
             val fallback=source in fallbackSources
             if(view.hasResidentCoverage(source.id.gpu(),source.geometry,!fallback))continue
@@ -243,8 +257,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             val failure=failures[source];if(failure!=null&&android.os.SystemClock.elapsedRealtime()<failure.retryAt)continue
             schedule(source,priority,false)
         }
-        val prior=previousPose
-        if(prior!=key.pose){viewRevision++;clearWarm(false);predict(prior,key);previousPose=key.pose}
+        if(prior!=key.pose)predict(prior,key)
         scheduleIdle(key,viewRevision)
     }
     private fun schedule(source:Source,priority:Int,speculative:Boolean){
@@ -292,7 +305,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             for(geometry in listOf(true,false)){
                 planBuffer.rewind();val pose=key.pose
                 val count=NativeBridge.plan(key.width,key.height,pose.longitude,pose.latitude,pose.zoom,pose.bearing,pose.pitch,pose.elevation,
-                    if(geometry)geometryLimit else imageLimit,if(geometry)431.0 else 256.0/2.0.pow(.25),if(geometry)22 else 19,1.3,planBuffer)
+                    if(geometry)geometryLimit else imageLimit,DetailPolicy.target(geometry,if(geometry)key.terrainDetail else key.imageryDetail),if(geometry)22 else 19,1.3,planBuffer)
                 val rows=List(count){Id(planBuffer.int,planBuffer.int,planBuffer.int)}
                 extras.addAll(rows.map{Source(it,geometry)}.filter{it !in wanted&&!resident(it)}.take(2))
             }
@@ -385,7 +398,13 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             dependencies.all{dep->if(dependencyFresh(dep))true else{val body=fetchRecord(linz("elevation",Id(dep.id.z,dep.id.x,dep.id.y),"png"));body.stamp?.fingerprint==dep.fingerprint&&body.until>System.currentTimeMillis()}}
         }
         checkPreparation();if(cached!=null)return cached
-        awaitInputs(DemSampling.footprint(id.z,id.x,id.y,DemSampling.terrainSourceZoom(id.z)).map{linz("elevation",Id(it.z,it.x,it.y),"png")})
+        // A fresh decoded halo is already a complete input. Do not refetch its
+        // encoded body merely because the smaller encoded LRU has evicted it.
+        val missing=DemSampling.footprint(id.z,id.x,id.y,DemSampling.terrainSourceZoom(id.z)).filter{input->
+            val old=synchronized(decoded){decoded[Id(input.z,input.x,input.y)]}
+            old==null||!old.dependencies.all(::dependencyFresh)
+        }
+        awaitInputs(missing.map{linz("elevation",Id(it.z,it.x,it.y),"png")})
         val dependencies=LinkedHashMap<GpuUploadQueue.Id,PreparedTerrainCache.Dependency>();geometryDependencies.set(dependencies)
         val heights=ByteBuffer.allocateDirect(129*129*4+16).order(ByteOrder.LITTLE_ENDIAN)
         DemSampling.terrainMesh(id.z,id.x,id.y,heights,::checkPreparation){checkPreparation();raw(Id(it.z,it.x,it.y)).also{checkPreparation()}}

@@ -14,6 +14,52 @@ struct Edge {
     bit: u8,
     side: bool,
 }
+// Proofs never retain GPU resources. Immutable source generations, exact join
+// interval and axis are all part of the key; IDs alone would survive a reload.
+#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
+struct ProofKey {
+    sources: [(u8, u32, u32, u64); 2],
+    axis: u8,
+    line: u32,
+    lo: u32,
+    hi: u32,
+}
+impl ProofKey {
+    fn new(a: Edge, b: Edge, lo: u32, hi: u32, ga: u64, gb: u64) -> Self {
+        let mut sources = [
+            (a.source.z, a.source.x, a.source.y, ga),
+            (b.source.z, b.source.x, b.source.y, gb),
+        ];
+        sources.sort_unstable();
+        Self {
+            sources,
+            axis: a.axis,
+            line: a.line,
+            lo,
+            hi,
+        }
+    }
+}
+#[derive(Default)]
+pub(crate) struct Proofs {
+    rows: HashMap<ProofKey, bool>,
+}
+impl Proofs {
+    fn get(&mut self, key: ProofKey, test: impl FnOnce() -> bool) -> bool {
+        let result = *self.rows.entry(key).or_insert_with(test);
+        if self.rows.len() > 8192 {
+            self.rows.clear();
+        }
+        result
+    }
+    fn begin(&mut self) {
+        // Bound retained CPU metadata even through long journeys. Recomputing a
+        // proof affects work only; it cannot change which edges keep skirts.
+        if self.rows.len() > 8192 {
+            self.rows.clear();
+        }
+    }
+}
 fn continuous(a: Edge, b: Edge, lo: u32, hi: u32, tiles: &HashMap<TileId, Tile>) -> bool {
     if a.source == b.source {
         return true;
@@ -51,7 +97,12 @@ fn continuous(a: Edge, b: Edge, lo: u32, hi: u32, tiles: &HashMap<TileId, Tile>)
         p = (p + step).min(end);
     }
 }
-pub(crate) fn masks(cover: &[CoverRegion], tiles: &HashMap<TileId, Tile>) -> HashMap<TileId, u8> {
+pub(crate) fn masks(
+    cover: &[CoverRegion],
+    tiles: &HashMap<TileId, Tile>,
+    proofs: &mut Proofs,
+) -> HashMap<TileId, u8> {
+    proofs.begin();
     let mut lines: HashMap<(u8, u32), Vec<Edge>> = HashMap::new();
     let mut masks = HashMap::new();
     for row in cover {
@@ -82,7 +133,18 @@ pub(crate) fn masks(cover: &[CoverRegion], tiles: &HashMap<TileId, Tile>) -> Has
     }
     for edges in lines.values_mut() {
         join_line(edges, &mut masks, |a, b, lo, hi| {
-            continuous(a, b, lo, hi, tiles)
+            if a.source == b.source {
+                return true;
+            }
+            let key = ProofKey::new(
+                a,
+                b,
+                lo,
+                hi,
+                tiles[&a.source].generation,
+                tiles[&b.source].generation,
+            );
+            proofs.get(key, || continuous(a, b, lo, hi, tiles))
         });
     }
     masks
@@ -168,6 +230,69 @@ mod tests {
             }
         }
         masks
+    }
+    #[test]
+    fn continuity_proofs_require_identical_source_generations_and_join() {
+        let a = edge(1, 0, 16, false);
+        let b = edge(2, 0, 16, true);
+        let key = ProofKey::new(a, b, 0, 16, 7, 9);
+        let mut proofs = Proofs::default();
+        assert!(!proofs.get(key, || false));
+        assert!(!proofs.get(ProofKey::new(b, a, 0, 16, 9, 7), || panic!(
+            "retested immutable join"
+        )));
+        assert!(proofs.get(ProofKey::new(a, b, 0, 16, 8, 9), || true));
+        assert!(proofs.get(ProofKey::new(a, b, 1, 16, 7, 9), || true));
+        assert!(proofs.get(ProofKey { axis: 1, ..key }, || true));
+        assert!(proofs.get(ProofKey { line: 2, ..key }, || true));
+        for line in 0..9000 {
+            proofs.get(ProofKey { line, ..key }, || true);
+        }
+        assert!(proofs.rows.len() <= 8192);
+    }
+    #[test]
+    #[ignore = "explicit release host CPU benchmark"]
+    fn benchmark_reused_continuity() {
+        use ridgeline_core::heightfield::Heightfield;
+        let heights = |offset: f32| {
+            (0..129 * 129)
+                .map(|i| offset + (i % 129) as f32 * 0.25 + (i / 129) as f32 * 0.5)
+                .collect::<Vec<_>>()
+                .into_boxed_slice()
+        };
+        let left = Heightfield::new(128, heights(0.)).unwrap();
+        let right = Heightfield::new(128, heights(32.)).unwrap();
+        let test = || {
+            (0..=128).all(|y| left.sample(1., y as f64 / 128.) == right.sample(0., y as f64 / 128.))
+        };
+        let key = ProofKey::new(edge(1, 0, 16, false), edge(2, 0, 16, true), 0, 16, 7, 9);
+        let mut proofs = Proofs::default();
+        let mut rows: [Vec<u128>; 2] = std::array::from_fn(|_| Vec::new());
+        for trial in 0..100 {
+            for arm in if trial % 2 == 0 { [0, 1] } else { [1, 0] } {
+                let start = std::time::Instant::now();
+                for _ in 0..100 {
+                    std::hint::black_box(if arm == 0 {
+                        test()
+                    } else {
+                        proofs.get(key, test)
+                    });
+                }
+                if trial >= 20 {
+                    rows[arm].push(start.elapsed().as_nanos() / 100);
+                }
+            }
+        }
+        let mut sorted = rows.clone();
+        sorted.iter_mut().for_each(|r| r.sort_unstable());
+        let report = format!(
+            "{{\"scope\":\"Release host CPU, repeated continuity of an immutable 129-sample shared edge; no whole-frame, I/O or device claim\",\"beforeMedianNs\":{},\"afterMedianNs\":{},\"beforeNs\":{:?},\"afterNs\":{:?}}}",
+            sorted[0][40], sorted[1][40], rows[0], rows[1]
+        );
+        println!("{report}");
+        if let Ok(path) = std::env::var("RIDGELINE_CONTINUITY_OUTPUT") {
+            std::fs::write(path, report).unwrap();
+        }
     }
     #[test]
     fn sweep_matches_pairwise_with_mixed_lod_holes_and_discontinuities() {

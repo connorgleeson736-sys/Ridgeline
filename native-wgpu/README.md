@@ -1,5 +1,13 @@
 # Ridgeline native migration — in progress
 
+Foreground-loading pass: close tiles now retain priority through Rust selection,
+CPU/cache queues, transport and GPU upload pressure. Fresh decoded DEMs bypass
+redundant encoded requests; obsolete dependency fan-out is bounded; coverage and
+immutable seam proofs are reused. **Offline / imagery** now includes separate
+imagery/terrain detail sliders with the existing default quality. See the
+[audit, host measurements and limitations](research/VIEWPORT-LOADING-AUDIT-2026-10-31.md).
+This is a source checkpoint; the published APK below predates these changes.
+
 31 October performance pass (checkpoint version 0.1.1): exact DEM halo/axis reuse, an ordered seam sweep,
 compatible array-instance grouping, an exact CPU mip fallback and a mesh-bounded fragment program are
 implemented. Drawable cover construction now merge-joins geographically ordered regions

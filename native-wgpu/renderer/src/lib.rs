@@ -46,6 +46,7 @@ struct Tile {
     array: Option<texture_arrays::LayerLease>,
     _heights: wgpu::Texture,
     used: u64,
+    generation: u64,
     field: ridgeline_core::heightfield::Heightfield,
     adaptive_profile: Option<[f64; 2]>,
     adaptive_state: std::cell::Cell<adaptive::State>,
@@ -110,8 +111,10 @@ pub struct Renderer {
     cover_dirty: bool,
     seams_dirty: bool,
     edge_masks: HashMap<TileId, u8>,
+    seam_proofs: seams::Proofs,
     cover_plans: cover_plans::CoverPlans,
     demand: Option<(Vec<TileId>, Vec<TileId>)>,
+    ideal_demand: Option<(Vec<TileId>, Vec<TileId>)>,
     instance_capacity: usize,
     budget: usize,
     clock: u64,
@@ -496,8 +499,10 @@ impl Renderer {
             cover_dirty: true,
             seams_dirty: true,
             edge_masks: HashMap::new(),
+            seam_proofs: Default::default(),
             cover_plans: Default::default(),
             demand: None,
+            ideal_demand: None,
             instance_capacity: 256,
             budget: 96,
             residency_byte_budget: None,
@@ -708,6 +713,7 @@ impl Renderer {
                 adaptive_profile: None,
                 adaptive_state: std::cell::Cell::new(adaptive::State::new()),
                 used: self.clock,
+                generation: self.clock,
                 field: ridgeline_core::heightfield::Heightfield::new(
                     128,
                     heights.into_boxed_slice(),
@@ -916,9 +922,20 @@ impl Renderer {
     pub fn image_count(&self) -> usize {
         self.images.len()
     }
-    pub fn set_demand(&mut self, geometry: Vec<TileId>, images: Vec<TileId>) {
+    pub fn set_demand(&mut self, mut geometry: Vec<TileId>, mut images: Vec<TileId>) {
+        // Priorities can reorder an unchanged view. Geographic ownership depends
+        // only on membership, so that change must not rebuild covers/seams.
+        for ids in [&mut geometry, &mut images] {
+            ids.sort_unstable_by_key(|id| (id.z, id.x, id.y));
+            ids.dedup();
+        }
         let next = Some((geometry, images));
         if self.demand != next {
+            let (g, i) = next.as_ref().unwrap();
+            self.ideal_demand = Some((
+                ridgeline_core::finest_sources(g),
+                ridgeline_core::finest_sources(i),
+            ));
             self.demand = next;
             self.cover_dirty = true;
         }
@@ -926,6 +943,7 @@ impl Renderer {
     /// Controlled render clients may use all resident sources without a plan.
     pub fn clear_demand(&mut self) {
         if self.demand.take().is_some() {
+            self.ideal_demand = None;
             self.cover_dirty = true;
         }
     }
@@ -935,20 +953,8 @@ impl Renderer {
         } else {
             self.images.keys().copied().collect()
         };
-        if let Some((g, i)) = &self.demand {
-            let requested = if geometry { g } else { i };
-            // Demand contains fallback requests too. Only its finest disjoint leaves
-            // describe ideal ownership; ancestors remain cached, not forced owners.
-            let ideal: Vec<_> = requested
-                .iter()
-                .copied()
-                .filter(|id| {
-                    !requested
-                        .iter()
-                        .any(|other| id != other && id.contains(*other))
-                })
-                .collect();
-            ridgeline_core::render_sources(&available, &ideal)
+        if let Some((g, i)) = &self.ideal_demand {
+            ridgeline_core::render_sources(&available, if geometry { g } else { i })
         } else {
             available
         }
@@ -958,7 +964,7 @@ impl Renderer {
         let images = self.active_sources(false);
         let cover = ridgeline_core::resident_cover(&geometry);
         if self.cover != cover || self.seams_dirty {
-            self.edge_masks = seams::masks(&cover, &self.tiles);
+            self.edge_masks = seams::masks(&cover, &self.tiles, &mut self.seam_proofs);
             self.seams_dirty = false;
         }
         if self.cover != cover {
