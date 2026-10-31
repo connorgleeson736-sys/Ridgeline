@@ -1,5 +1,19 @@
 # Durable progress log
 
+## 2026-10-31 — geographic join breakthrough; final checkpoint rebuild
+
+User asked to keep searching for genuine breakthroughs while retaining the
+request to push a checkpoint APK. Found quadratic G×P scan in surface_cover;
+resident parent/fine sources can expand into thousands of cover regions. Exact
+Morton interval merge preserves every ordered patch and missing-photo skirt
+semantics. Release complete-cover host fixtures:0.237→0.087ms,2.124→0.302ms,
+9.398→0.705ms at17/65/161sources per pool (up to13.34×). This is source-arrival
+CPU work, not network/device FPS. Also kept exact power-of-two bounds
+(74.530→58.036us for both plans); removed slower support-plane experiment.
+Initial APK for a3021bc passed signing/alignment, but is intentionally replaced
+by a fresh3ABIbuild from the complete source checkpoint before publication.
+
+
 ## 2026-10-31 — checkpoint build requested
 
 User explicitly authorized further measured work and a new pushed checkpoint APK.

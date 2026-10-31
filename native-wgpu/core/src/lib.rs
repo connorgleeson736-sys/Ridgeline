@@ -31,18 +31,47 @@ impl TileId {
         })
     }
     pub fn bounds(self) -> [f64; 4] {
-        let n = 2f64.powi(self.z as i32);
+        // Every u8 zoom has an exactly representable inverse power of two.
+        // Construct it directly instead of exponentiation and four divisions.
+        let scale = f64::from_bits((1023 - self.z as u64) << 52);
         [
-            self.x as f64 / n,
-            self.y as f64 / n,
-            (self.x as f64 + 1.) / n,
-            (self.y as f64 + 1.) / n,
+            self.x as f64 * scale,
+            self.y as f64 * scale,
+            (self.x as f64 + 1.) * scale,
+            (self.y as f64 + 1.) * scale,
         ]
     }
 }
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn direct_bounds_are_bit_identical_for_all_zoom_values_and_coordinate_extremes() {
+        let mut random = 43u32;
+        for z in 0..=255 {
+            for i in 0..1024 {
+                random = random.wrapping_mul(1664525).wrapping_add(1013904223);
+                let x = if i == 0 {
+                    0
+                } else if i == 1 {
+                    u32::MAX
+                } else {
+                    random
+                };
+                random = random.wrapping_mul(1664525).wrapping_add(1013904223);
+                let y = random;
+                let n = 2f64.powi(z as i32);
+                let before = [
+                    x as f64 / n,
+                    y as f64 / n,
+                    (x as f64 + 1.) / n,
+                    (y as f64 + 1.) / n,
+                ];
+                let after = TileId { z, x, y }.bounds();
+                assert_eq!(before.map(f64::to_bits), after.map(f64::to_bits));
+            }
+        }
+    }
     #[test]
     fn encoding_is_height_not_channel_interpolation() {
         assert!((terrain_rgb([1, 173, 176]) - 1000.).abs() < 1e-8);
@@ -102,6 +131,7 @@ impl TileId {
 /// Exact non-overlapping partition of resident terrain. An available coarse
 /// tile fills siblings while sharper descendants replace only their footprint.
 /// Native geometry is never fabricated for uncovered regions.
+/// Output uses quadtree child (Morton) order; spatial joins rely on this order.
 pub fn resident_cover(available: &[TileId]) -> Vec<CoverRegion> {
     use std::collections::HashSet;
     let exact: HashSet<_> = available.iter().copied().collect();

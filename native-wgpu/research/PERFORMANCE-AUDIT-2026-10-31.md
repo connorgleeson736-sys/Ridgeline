@@ -174,3 +174,52 @@ build retains all 67 coarse imagery files and supports the original six attached
 ZIPs; it does not bundle those large packs or a managed-session CA. Final package
 hash, exact source commit, ABI/signature/alignment checks and test results are
 recorded separately with the published checkpoint.
+
+
+## Continued search: replace the quadratic drawable-cover join
+
+A further critical-path audit found `surface_cover` comparing every resident
+terrain region to every resident photographic region. A small source count can
+still expand into thousands of disjoint cover regions when distant parents fill
+siblings around scattered fine descendants. This made the cross-product costly
+on new-tile arrivals, even though the plan cache already avoids unchanged work.
+
+The implementation now merge-joins **exact integer Morton intervals** in the
+existing quadtree order. Disjoint regions are skipped once, overlapping ancestor
+photos remain available for subsequent terrain regions, and missing photographic
+coverage still keeps its original perimeter skirts. No spatial approximation,
+cache retention, texture budget or resolution policy is introduced. Ordered
+`SurfacePatch` values match the frozen nested-loop implementation, including
+sparse photos, mixed depths, fallback ownership, input reversal and the world root.
+
+Release host CPU, complete cover construction including both resident-cover
+builds, 60 alternating samples per case (`surface-join.json`):
+
+| Sources per pool | Terrain/photo regions | Former scan | Merge join | Speedup |
+| --- | --- | --- | --- | --- |
+| 17 | 304 / 328 | 0.237 ms | 0.087 ms | 2.72× |
+| 65 | 1,048 / 1,048 | 2.124 ms | 0.302 ms | 7.04× |
+| 161 | 2,356 / 2,185 | **9.398 ms** | **0.705 ms** | **13.34×** |
+
+This is a substantial reduction in the CPU work that prepares new drawable
+terrain/imagery patches. It is a synthetic fragmented-source workload, not a
+13× network-loading, frame-rate or A20 claim. Reproduce with the ignored release
+core test `benchmark_surface_join` and `RIDGELINE_SURFACE_JOIN_OUTPUT`. The
+unchanged source/plan cache still matters: no saving is expected for work that
+was already skipped on a stable frame.
+
+## Exact tile bounds; rejected culling experiment
+
+`TileId.bounds` now constructs the exact inverse power of two from IEEE-754 bits
+instead of repeated exponentiation and four divisions. All 256 zoom values and
+262,144 coordinate/extreme cases preserve all result bits. Across 1,200 complete
+ordered terrain/image plans the selected tiles are identical. The release
+changed-camera fixture measures **74.530 → 58.036 microseconds** for both plans,
+22.1% lower CPU time (`selection-paths.json`). This is a small absolute host
+saving, not a large loading claim.
+
+An experimental AABB support-plane culler also matched the correctness fixtures,
+but took 61.661 microseconds versus 58.677 for the bounds-only variant in its
+three-arm run. It was removed. `selection-frustum-rejected.json` records that
+experiment; only the simpler exact bounds calculation ships. Changing culling
+semantics or adding complexity was not justified by the timings.

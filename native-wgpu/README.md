@@ -2,7 +2,9 @@
 
 31 October performance pass (checkpoint version 0.1.1): exact DEM halo/axis reuse, an ordered seam sweep,
 compatible array-instance grouping, an exact CPU mip fallback and a mesh-bounded fragment program are
-implemented. Additional fixes start idle demand immediately, reject stale derived entries
+implemented. Drawable cover construction now merge-joins geographically ordered regions
+instead of testing the full terrain/imagery cross-product (up to 13.3× in the
+fragmented-source host fixture). Additional fixes start idle demand immediately, reject stale derived entries
 before decompression, and share overlapping original DEM decodes. The host
 local-file DEM mesh fixture improves 4.2% in the final recorded run; this is not
 a phone or network-loading result. See the [audit, individual measurements,

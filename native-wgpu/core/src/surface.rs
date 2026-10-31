@@ -12,15 +12,25 @@ pub fn surface_cover(geometry: &[TileId], images: &[TileId]) -> Vec<SurfacePatch
     let ground = resident_cover(geometry);
     let photos = resident_cover(images);
     let mut out = Vec::new();
+    // resident_cover emits disjoint regions in quadtree/Morton order. Their
+    // integer intervals allow a merge join, without testing every G×P pair.
+    let photo_spans: Vec<_> = photos.iter().map(|p| morton_span(p.region)).collect();
+    let mut cursor = 0;
     for g in &ground {
         let first = out.len();
-        for i in &photos {
+        let (start, end) = morton_span(g.region);
+        while cursor < photos.len() && photo_spans[cursor].1 <= start {
+            cursor += 1;
+        }
+        let mut next = cursor;
+        while next < photos.len() && photo_spans[next].0 < end {
+            let i = &photos[next];
             let region = if g.region.contains(i.region) {
                 i.region
             } else if i.region.contains(g.region) {
                 g.region
             } else {
-                continue;
+                unreachable!("disjoint quadtree intervals cannot overlap");
             };
             out.push(SurfacePatch {
                 geometry: g.source,
@@ -28,7 +38,13 @@ pub fn surface_cover(geometry: &[TileId], images: &[TileId]) -> Vec<SurfacePatch
                 image: i.source,
                 region,
             });
+            // An ancestor photo can also cover the following terrain region.
+            if photo_spans[next].1 > end {
+                break;
+            }
+            next += 1;
         }
+        cursor = next;
         // Omit photographic interior walls only for a complete image cover.
         // Missing imagery must retain the old exposed-boundary curtains.
         let area = |id: TileId| {
@@ -42,6 +58,22 @@ pub fn surface_cover(geometry: &[TileId], images: &[TileId]) -> Vec<SurfacePatch
         }
     }
     out
+}
+fn morton_span(id: TileId) -> (u128, u128) {
+    fn spread(value: u32) -> u64 {
+        let mut v = value as u64;
+        v = (v | v << 16) & 0x0000ffff0000ffff;
+        v = (v | v << 8) & 0x00ff00ff00ff00ff;
+        v = (v | v << 4) & 0x0f0f0f0f0f0f0f0f;
+        v = (v | v << 2) & 0x3333333333333333;
+        (v | v << 1) & 0x5555555555555555
+    }
+    // Native source zooms are at most22. u128 also handles the root's 2^64
+    // endpoint exactly and permits the full u32 coordinate domain through z32.
+    assert!(id.z <= 32);
+    let shift = 2 * (32 - id.z as u32);
+    let start = ((spread(id.x) | (spread(id.y) << 1)) as u128) << shift;
+    (start, start + (1u128 << shift))
 }
 #[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
 pub struct GridRect {
@@ -352,6 +384,137 @@ mod index_budget_tests {
                     r.indices_with_skirt_edges(mask).len()
                 );
             }
+        }
+    }
+}
+
+#[cfg(test)]
+mod join_tests {
+    use super::*;
+    fn reference_surface_cover(geometry: &[TileId], images: &[TileId]) -> Vec<SurfacePatch> {
+        let ground = resident_cover(geometry);
+        let photos = resident_cover(images);
+        let mut out = Vec::new();
+        for g in &ground {
+            let first = out.len();
+            for i in &photos {
+                let region = if g.region.contains(i.region) {
+                    i.region
+                } else if i.region.contains(g.region) {
+                    g.region
+                } else {
+                    continue;
+                };
+                out.push(SurfacePatch {
+                    geometry: g.source,
+                    geometry_region: g.region,
+                    image: i.source,
+                    region,
+                });
+            }
+            // Omit photographic interior walls only for a complete image cover.
+            // Missing imagery must retain the old exposed-boundary curtains.
+            let area = |id: TileId| {
+                let b = id.bounds();
+                (b[2] - b[0]) * (b[3] - b[1])
+            };
+            if out[first..].iter().map(|row| area(row.region)).sum::<f64>() != area(g.region) {
+                for row in &mut out[first..] {
+                    row.geometry_region = row.region;
+                }
+            }
+        }
+        out
+    }
+
+    fn sources(mut seed: u32, count: usize, parent: bool) -> Vec<TileId> {
+        let base = TileId {
+            z: 8,
+            x: 249,
+            y: 162,
+        };
+        let mut out = if parent { vec![base] } else { Vec::new() };
+        for _ in 0..count {
+            seed = seed.wrapping_mul(1664525).wrapping_add(1013904223);
+            let z = 12 + (seed % 10) as u8;
+            let scale = 1u32 << (z - 8);
+            seed = seed.wrapping_mul(1664525).wrapping_add(1013904223);
+            let x = base.x * scale + seed % scale;
+            seed = seed.wrapping_mul(1664525).wrapping_add(1013904223);
+            let y = base.y * scale + seed % scale;
+            out.push(TileId { z, x, y });
+        }
+        out
+    }
+    #[test]
+    fn merge_join_matches_every_patch_including_sparse_photos_and_fallbacks() {
+        for i in 0..160 {
+            let g = sources(31 + i, i as usize % 64, i % 2 == 0);
+            let mut p = sources(927 + i, i as usize % 96, i % 3 == 0);
+            if i % 5 == 0 {
+                for tile in &mut p {
+                    tile.x += 1;
+                }
+            }
+            let expected = reference_surface_cover(&g, &p);
+            let actual = surface_cover(&g, &p);
+            assert_eq!(expected, actual, "mixed cover {i}");
+            p.reverse();
+            assert_eq!(expected, surface_cover(&g, &p));
+        }
+        let root = TileId { z: 0, x: 0, y: 0 };
+        assert_eq!(morton_span(root), (0, 1u128 << 64));
+        for (i, child) in root.children().iter().enumerate() {
+            assert_eq!(
+                morton_span(*child),
+                ((i as u128) << 62, ((i + 1) as u128) << 62)
+            );
+        }
+    }
+    #[test]
+    #[ignore = "explicit release CPU surface-cover A/B"]
+    fn benchmark_surface_join() {
+        let mut reports = Vec::new();
+        for count in [16, 64, 160] {
+            let g = sources(43, count, true);
+            let p = sources(97, count, true);
+            assert_eq!(reference_surface_cover(&g, &p), surface_cover(&g, &p));
+            for _ in 0..10 {
+                std::hint::black_box(reference_surface_cover(&g, &p));
+                std::hint::black_box(surface_cover(&g, &p));
+            }
+            let (mut before, mut after) = (Vec::new(), Vec::new());
+            for i in 0..60 {
+                for fast in if i % 2 == 0 {
+                    [false, true]
+                } else {
+                    [true, false]
+                } {
+                    let start = std::time::Instant::now();
+                    std::hint::black_box(if fast {
+                        surface_cover(&g, &p)
+                    } else {
+                        reference_surface_cover(&g, &p)
+                    });
+                    if fast {
+                        after.push(start.elapsed().as_nanos());
+                    } else {
+                        before.push(start.elapsed().as_nanos());
+                    }
+                }
+            }
+            let (mut a, mut b) = (before.clone(), after.clone());
+            a.sort_unstable();
+            b.sort_unstable();
+            reports.push(format!("{{\"sourcesPerPool\":{},\"groundRegions\":{},\"photoRegions\":{},\"beforeMedianNs\":{},\"afterMedianNs\":{},\"beforeNs\":{:?},\"afterNs\":{:?}}}",count+1,resident_cover(&g).len(),resident_cover(&p).len(),a[30],b[30],before,after));
+        }
+        let report = format!(
+            "{{\"scope\":\"Release host CPU: complete drawable-cover construction, fragmented resident parent/fine terrain and photos, no HTTP/decode/GPU; identical ordered output\",\"cases\":[{}]}}",
+            reports.join(",")
+        );
+        println!("{report}");
+        if let Ok(path) = std::env::var("RIDGELINE_SURFACE_JOIN_OUTPUT") {
+            std::fs::write(path, report).unwrap();
         }
     }
 }

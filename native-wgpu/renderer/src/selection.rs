@@ -57,6 +57,16 @@ pub fn plan_with_margin(
     max_zoom: u8,
     margin: f64,
 ) -> Vec<TileId> {
+    plan_with_margin_using(view, budget, target, max_zoom, margin, TileId::bounds)
+}
+fn plan_with_margin_using(
+    view: &View,
+    budget: usize,
+    target: f64,
+    max_zoom: u8,
+    margin: f64,
+    bounds: impl Fn(TileId) -> [f64; 4],
+) -> Vec<TileId> {
     let target = target.clamp(32., 1024.);
     let max_zoom = max_zoom.clamp(4, 22);
     let (matrix, ppm) = camera_matrix(
@@ -88,7 +98,7 @@ pub fn plan_with_margin(
     let nz0 = crate::mercator(165., -33.);
     let nz1 = crate::mercator(180., -49.);
     let candidate = |id: TileId| -> Option<Candidate> {
-        let b = id.bounds();
+        let b = bounds(id);
         if b[2] < nz0[0] || b[0] > nz1[0] || b[3] < nz0[1] || b[1] > nz1[1] {
             return None;
         }
@@ -98,11 +108,9 @@ pub fn plan_with_margin(
         let y1 = ((view.center[1] - b[3]) * world) as f32;
         // Conservative NZ elevations, not a fabricated height field. Used only for
         // visibility until resident real DEM extrema are available.
-        if !visible_box(
-            matrix,
-            [x0, y1, (-100. - view.elevation) * ppm],
-            [x1, y0, (4000. - view.elevation) * ppm],
-        ) {
+        let lo = [x0, y1, (-100. - view.elevation) * ppm];
+        let hi = [x1, y0, (4000. - view.elevation) * ppm];
+        if !visible_box(matrix, lo, hi) {
             return None;
         }
         // MapLibre Native's distance mode measures distance to the tile bounds,
@@ -154,7 +162,7 @@ pub fn plan_with_margin(
     }
     leaves.sort_by(|a, b| {
         let rank = |c: &Candidate| {
-            let b = c.id.bounds();
+            let b = bounds(c.id);
             let dx = (b[0] + b[2]) / 2. - view.center[0];
             let dy = (b[1] + b[3]) / 2. - view.center[1];
             dx * dx + dy * dy
@@ -187,6 +195,69 @@ pub(crate) fn visible_box(matrix: Mat4, lo: [f32; 3], hi: [f32; 3]) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    fn old_bounds(id: TileId) -> [f64; 4] {
+        let n = 2f64.powi(id.z as i32);
+        [
+            id.x as f64 / n,
+            id.y as f64 / n,
+            (id.x as f64 + 1.) / n,
+            (id.y as f64 + 1.) / n,
+        ]
+    }
+    fn workload(i: usize) -> View {
+        View {
+            width: if i % 3 == 0 { 320 } else { 1080 },
+            height: if i % 3 == 0 { 640 } else { 1920 },
+            center: crate::mercator(170.14219572 + (i % 50) as f64 * 0.0001, -43.5955671),
+            zoom: [4., 8., 11.9, 16., 19., 22.][i % 6],
+            bearing: -180. + (i % 360) as f32,
+            pitch: [0., 45., 58., 75., 85.][i % 5],
+            elevation: if i % 2 == 0 { 0. } else { 3724. },
+        }
+    }
+    #[test]
+    fn optimized_selection_preserves_every_ordered_leaf() {
+        for i in 0..600 {
+            let view = workload(i);
+            for (budget, target, max) in [(48, 431., 22), (96, 256. / 2f64.powf(0.25), 19)] {
+                let old = plan_with_margin_using(&view, budget, target, max, 1., old_bounds);
+                let new = plan_with_margin(&view, budget, target, max, 1.);
+                assert_eq!(old, new, "ordered selection scene {i}");
+            }
+        }
+    }
+    #[test]
+    #[ignore = "explicit release CPU selection A/B"]
+    fn benchmark_selection_paths() {
+        let mut samples: [Vec<u128>; 2] = std::array::from_fn(|_| Vec::new());
+        for i in 0..660 {
+            let view = workload(i);
+            for arm in if i % 2 == 0 { [0, 1] } else { [1, 0] } {
+                let start = std::time::Instant::now();
+                for (budget, target, max) in [(48, 431., 22), (96, 256. / 2f64.powf(0.25), 19)] {
+                    std::hint::black_box(match arm {
+                        0 => plan_with_margin_using(&view, budget, target, max, 1., old_bounds),
+                        _ => plan_with_margin(&view, budget, target, max, 1.),
+                    });
+                }
+                if i >= 60 {
+                    samples[arm].push(start.elapsed().as_nanos());
+                }
+            }
+        }
+        let mut sorted = samples.clone();
+        for row in &mut sorted {
+            row.sort_unstable();
+        }
+        let report = format!(
+            "{{\"scope\":\"Release host CPU: exact tile bounds in both complete terrain and image plans per changed camera, 600 alternating scenes, no HTTP or decode\",\"beforeMedianNs\":{},\"afterMedianNs\":{},\"beforeNs\":{:?},\"afterNs\":{:?}}}",
+            sorted[0][300], sorted[1][300], samples[0], samples[1]
+        );
+        println!("{report}");
+        if let Ok(path) = std::env::var("RIDGELINE_SELECTION_BENCH_OUTPUT") {
+            std::fs::write(path, report).unwrap();
+        }
+    }
     #[test]
     fn close_zoom_keeps_maximum_source_detail_at_the_surface_focus() {
         let center = crate::mercator(170.14219572, -43.5955671);
