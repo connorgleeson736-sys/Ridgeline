@@ -14,6 +14,11 @@ pub struct View {
     pub pitch: f32,
     pub elevation: f32,
 }
+#[derive(Clone, Copy)]
+pub struct SurfaceFocus {
+    pub center: [f64; 2],
+    pub range: f64,
+}
 struct Candidate {
     id: TileId,
     score: f64,
@@ -59,6 +64,24 @@ pub fn plan_with_margin(
 ) -> Vec<TileId> {
     plan_with_margin_using(view, budget, target, max_zoom, margin, TileId::bounds)
 }
+pub fn plan_with_surface_focus(
+    view: &View,
+    budget: usize,
+    target: f64,
+    max_zoom: u8,
+    margin: f64,
+    focus: Option<SurfaceFocus>,
+) -> Vec<TileId> {
+    plan_using(
+        view,
+        budget,
+        target,
+        max_zoom,
+        margin,
+        TileId::bounds,
+        focus,
+    )
+}
 fn plan_with_margin_using(
     view: &View,
     budget: usize,
@@ -67,6 +90,24 @@ fn plan_with_margin_using(
     margin: f64,
     bounds: impl Fn(TileId) -> [f64; 4],
 ) -> Vec<TileId> {
+    plan_using(view, budget, target, max_zoom, margin, bounds, None)
+}
+fn plan_using(
+    view: &View,
+    budget: usize,
+    target: f64,
+    max_zoom: u8,
+    margin: f64,
+    bounds: impl Fn(TileId) -> [f64; 4],
+    focus: Option<SurfaceFocus>,
+) -> Vec<TileId> {
+    let focus = focus.filter(|f| {
+        f.center
+            .iter()
+            .all(|x| x.is_finite() && (0.0..=1.0).contains(x))
+            && f.range.is_finite()
+            && f.range > 1e-12
+    });
     let target = target.clamp(32., 1024.);
     let max_zoom = max_zoom.clamp(4, 22);
     let (matrix, ppm) = camera_matrix(
@@ -91,10 +132,13 @@ fn plan_with_margin_using(
     let vertical_distance = pitch.cos() * distance_to_center;
     // Like MapLibre Native's tileLodMinRadius, reserve fine cover around the
     // surface focus before spending the remaining budget at the horizon.
-    let focus_zoom = (view.zoom + (512. / target).log2())
+    let pivot_range = distance_to_center / world;
+    let surface_ratio = focus.map_or(1.0, |f| (pivot_range / f.range).max(1.0));
+    let focus_zoom = (view.zoom + (512. / target).log2() + surface_ratio.log2())
         .ceil()
         .clamp(4., max_zoom as f64);
     let focus_radius = 2f64.powf(-focus_zoom);
+    let primary = focus.map_or(view.center, |f| f.center);
     let nz0 = crate::mercator(165., -33.);
     let nz1 = crate::mercator(180., -49.);
     let candidate = |id: TileId| -> Option<Candidate> {
@@ -123,7 +167,7 @@ fn plan_with_margin_using(
         let cosine = vertical_distance / distance;
         let size = (b[2] - b[0]) * world;
         let score = size * distance_to_center / distance * (cosine / pitch.cos()).sqrt();
-        let focus = if b[0] <= view.center[0]
+        let pivot_focus = if b[0] <= view.center[0]
             && view.center[0] < b[2]
             && b[1] <= view.center[1]
             && view.center[1] < b[3]
@@ -138,7 +182,26 @@ fn plan_with_margin_using(
         } else {
             0
         };
-        Some(Candidate { id, score, focus })
+        let priority = if focus.is_some() {
+            if b[0] <= primary[0] && primary[0] < b[2] && b[1] <= primary[1] && primary[1] < b[3] {
+                4
+            } else if b[0] < primary[0] + focus_radius
+                && b[2] > primary[0] - focus_radius
+                && b[1] < primary[1] + focus_radius
+                && b[3] > primary[1] - focus_radius
+            {
+                3
+            } else {
+                pivot_focus
+            }
+        } else {
+            pivot_focus
+        };
+        Some(Candidate {
+            id,
+            score,
+            focus: priority,
+        })
     };
     let Some(root) = candidate(TileId { z: 0, x: 0, y: 0 }) else {
         return Vec::new();
@@ -148,7 +211,8 @@ fn plan_with_margin_using(
     let mut leaves = Vec::with_capacity(budget);
     pending.push(root);
     while let Some(next) = pending.pop() {
-        if next.id.z >= max_zoom || (next.score <= target && next.id.z >= 4) {
+        let surface_detail = focus.is_some() && next.focus >= 3 && (next.id.z as f64) < focus_zoom;
+        if next.id.z >= max_zoom || (next.score <= target && next.id.z >= 4 && !surface_detail) {
             leaves.push(next);
             continue;
         }
@@ -163,6 +227,21 @@ fn plan_with_margin_using(
     // Match refinement priority at admission too. Distance to a tile's centre
     // misranks a large tile covering the focus behind a small nearby tile.
     leaves.sort_by(|a, b| {
+        if let Some(f) = focus {
+            let priority = |c: &Candidate| {
+                let q = bounds(c.id);
+                let distance = |p: [f64; 2]| {
+                    ((q[0] - p[0]).max(0.).max(p[0] - q[2]))
+                        .hypot((q[1] - p[1]).max(0.).max(p[1] - q[3]))
+                };
+                (distance(f.center) / f.range).min(distance(view.center) / pivot_range + 0.15)
+            };
+            return priority(a)
+                .total_cmp(&priority(b))
+                .then_with(|| b.focus.cmp(&a.focus))
+                .then_with(|| b.score.total_cmp(&a.score))
+                .then_with(|| (a.id.z, a.id.x, a.id.y).cmp(&(b.id.z, b.id.x, b.id.y)));
+        }
         let distance = |c: &Candidate| {
             let b = bounds(c.id);
             let dx = (b[0] - view.center[0]).max(0.).max(view.center[0] - b[2]);
@@ -201,6 +280,43 @@ pub(crate) fn visible_box(matrix: Mat4, lo: [f32; 3], hi: [f32; 3]) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn surface_focus_missing_or_invalid_preserves_the_old_plan() {
+        for i in 0..24 {
+            let view=workload(i);
+            let expected=plan_with_margin(&view,72,215.,19,1.0);
+            for focus in [None,Some(SurfaceFocus{center:view.center,range:f64::NAN}),Some(SurfaceFocus{center:[f64::NAN,0.5],range:0.01})] {
+                assert_eq!(expected,plan_with_surface_focus(&view,72,215.,19,1.0,focus));
+            }
+        }
+    }
+    #[test]
+    fn surface_focus_prioritizes_the_first_actual_terrain_intersection() {
+        let view=View{width:320,height:640,center:crate::mercator(170.14219572,-43.5955671),zoom:12.,bearing:0.,pitch:70.,elevation:0.};
+        // Same CPU heightfield ray intersection used by Renderer::pick: a real
+        // 129x129 elevated surface lies between the eye and navigation pivot.
+        let (matrix,ppm)=camera_matrix(view.width,view.height,view.center,view.zoom,view.bearing,view.pitch,view.elevation);
+        let inverse=matrix.inverse();let a=inverse*Vec4::new(0.,0.,0.,1.);let b=inverse*Vec4::new(0.,0.,1.,1.);
+        let origin=a.truncate()/a.w;let direction=(b.truncate()/b.w-origin).normalize();
+        let id=TileId{z:8,x:248,y:162};let bounds=id.bounds();let span=bounds[2]-bounds[0];let world=512.*2f64.powf(view.zoom);
+        let field=ridgeline_core::heightfield::Heightfield::new(128,vec![3000.;129*129].into_boxed_slice()).unwrap();
+        let ray=ridgeline_core::heightfield::Ray{
+            origin:[(view.center[0]+origin.x as f64/world-bounds[0])/span,(view.center[1]-origin.y as f64/world-bounds[1])/span,origin.z as f64/ppm as f64],
+            direction:[direction.x as f64/world/span,-direction.y as f64/world/span,direction.z as f64/ppm as f64]};
+        let hit=field.intersect_region(ray,[0.,0.,1.,1.]).expect("visible elevated surface");
+        let point=[bounds[0]+hit.point[0]*span,bounds[1]+hit.point[1]*span];
+        let d=view.height as f64*1.5/world;let pitch=(view.pitch as f64).to_radians();
+        let range=((point[0]-view.center[0]).powi(2)+(point[1]-view.center[1]-pitch.sin()*d).powi(2)+(hit.point[2]*ppm as f64/world-pitch.cos()*d).powi(2)).sqrt();
+        let focus=SurfaceFocus{center:point,range};let target=TileId{z:22,x:(point[0]*(1u32<<22)as f64)as u32,y:(point[1]*(1u32<<22)as f64)as u32};
+        let before=plan_with_margin(&view,72,215.,19,1.);
+        let after=plan_with_surface_focus(&view,72,215.,19,1.,Some(focus));
+        assert!(after[0].contains(target),"first request must cover measured face");
+        let old=before.iter().position(|id|id.contains(target)).unwrap();
+        assert!(after[0].z>=before[old].z);
+        assert!(after.len()<=72);assert!(after.iter().all(|id|id.z<=19));
+        for (i,a) in after.iter().enumerate(){for b in &after[i+1..]{assert!(!a.contains(*b)&&!b.contains(*a));}}
+        println!("SURFACE_FOCUS: old face request rank={old}, level={}; new rank=0, level={}; before sources={}, after sources={}, real hit height={}",before[old].z,after[0].z,before.len(),after.len(),hit.point[2]);
+    }
     fn old_bounds(id: TileId) -> [f64; 4] {
         let n = 2f64.powi(id.z as i32);
         [

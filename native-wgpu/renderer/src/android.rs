@@ -406,6 +406,73 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_plan(
     margin: f64,
     output: jni::sys::jobject,
 ) -> i32 {
+    unsafe {
+        plan_into(
+            env, _class, w, h, lon, lat, zoom, bearing, pitch, elevation, budget, target, max_zoom,
+            margin, output, None,
+        )
+    }
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_planFocused(
+    env: *mut jni::sys::JNIEnv,
+    _class: jni::sys::jclass,
+    w: i32,
+    h: i32,
+    lon: f64,
+    lat: f64,
+    zoom: f64,
+    bearing: f32,
+    pitch: f32,
+    elevation: f32,
+    budget: i32,
+    target: f64,
+    max_zoom: i32,
+    margin: f64,
+    focus_lon: f64,
+    focus_lat: f64,
+    focus_range: f64,
+    output: jni::sys::jobject,
+) -> i32 {
+    let focus = if focus_lon.is_finite()
+        && focus_lat.is_finite()
+        && (-180.0..=180.0).contains(&focus_lon)
+        && (-85.0..=85.0).contains(&focus_lat)
+    {
+        Some(crate::selection::SurfaceFocus {
+            center: mercator(focus_lon, focus_lat),
+            range: focus_range,
+        })
+    } else {
+        None
+    };
+    unsafe {
+        plan_into(
+            env, _class, w, h, lon, lat, zoom, bearing, pitch, elevation, budget, target, max_zoom,
+            margin, output, focus,
+        )
+    }
+}
+
+unsafe fn plan_into(
+    env: *mut jni::sys::JNIEnv,
+    _class: jni::sys::jclass,
+    w: i32,
+    h: i32,
+    lon: f64,
+    lat: f64,
+    zoom: f64,
+    bearing: f32,
+    pitch: f32,
+    elevation: f32,
+    budget: i32,
+    target: f64,
+    max_zoom: i32,
+    margin: f64,
+    output: jni::sys::jobject,
+    focus: Option<crate::selection::SurfaceFocus>,
+) -> i32 {
     let mut env = unsafe { jni::EnvUnowned::from_raw(env) };
     match env
         .with_env(|env| -> Result<i32, jni::errors::Error> {
@@ -429,7 +496,7 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_plan(
             if !target.is_finite() || !margin.is_finite() {
                 return Ok(0);
             }
-            let ids = crate::selection::plan_with_margin(
+            let ids = crate::selection::plan_with_surface_focus(
                 &crate::selection::View {
                     width: w as u32,
                     height: h as u32,
@@ -443,6 +510,7 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_plan(
                 target,
                 max_zoom.clamp(4, 22) as u8,
                 margin,
+                focus,
             );
             if capacity < ids.len() * 12 {
                 return Ok(0);

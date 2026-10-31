@@ -132,6 +132,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     @Volatile var prepareAhead=preferences.getBoolean("prepareAhead",false);private set
     fun prepareAhead(value:Boolean){prepareAhead=value;preferences.edit().putBoolean("prepareAhead",value).apply();clearWarm();cameraChanged()}
     private var previousPose:CameraPose?=null
+    private var previousFocus:SurfaceFocus?=null
     private var viewRevision=0L
     private var preparedRevision=-1L
     private var idleWake:ScheduledFuture<*>?=null
@@ -223,15 +224,18 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         val pose=key.pose
         val output=planBuffer;output.rewind()
         val budget=maxOf(16,(if(geometry)geometryLimit else imageLimit)*3/4)
-        val count=NativeBridge.plan(key.width,key.height,pose.longitude,pose.latitude,
+        val focus=key.surfaceFocus
+        val count=NativeBridge.planFocused(key.width,key.height,pose.longitude,pose.latitude,
             pose.zoom,pose.bearing,pose.pitch,pose.elevation,budget,
-            DetailPolicy.target(geometry,if(geometry)key.terrainDetail else key.imageryDetail),if(geometry)22 else 19,1.0,output)
+            DetailPolicy.target(geometry,if(geometry)key.terrainDetail else key.imageryDetail),if(geometry)22 else 19,1.0,
+            focus?.longitude?:Double.NaN,focus?.latitude?:Double.NaN,focus?.range?:Double.NaN,output)
         return List(count){Id(output.int,output.int,output.int)}
     }
     private fun loadView() {
         if (dead||!active||view.width==0||view.height==0) return
+        val planningPose=view.planningPose
         val key=DemandPlanKey((view.width/view.pixelScale).roundToInt().coerceAtLeast(1),
-            (view.height/view.pixelScale).roundToInt().coerceAtLeast(1),view.planningPose,terrainDetail,imageryDetail)
+            (view.height/view.pixelScale).roundToInt().coerceAtLeast(1),planningPose,terrainDetail,imageryDetail,view.surfaceFocusFor(planningPose))
         val plan=plans.get(key) {
           val next=LinkedHashMap<Source,Int>()
           val imageIds=sourcePlan(false,key)
@@ -252,7 +256,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         // is reused. Only memory lookups, queue operations and async scheduling
         // belong here; predictive catalog/source work stays outside this scope.
         transport.batchDemand {
-            if(prior!=key.pose){viewRevision++;clearWarm();previousPose=key.pose}
+            if(prior!=key.pose||previousFocus!=key.surfaceFocus){viewRevision++;clearWarm();previousPose=key.pose;previousFocus=key.surfaceFocus}
             wanted = ranked.keys.toSet()
             transport.imageryDemand(wanted.any{!it.geometry&&!view.hasResidentCoverage(it.id.gpu(),false,true)})
             // Restore already prepared parents before requesting more detailed work.
@@ -319,7 +323,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         val future=pose.copy(longitude=(pose.longitude+dx).coerceIn(165.0,180.0),latitude=(pose.latitude+dy).coerceIn(-49.0,-33.0),bearing=pose.bearing+turn,zoom=(pose.zoom+(pose.zoom-prior.zoom).coerceIn(-.5,.5)).coerceIn(4.0,19.0))
         val candidates=if(pose.zoom<prior.zoom-.015){
             val leaf=sourcePlan(false,key).firstOrNull();if(leaf==null)emptyList()else generateSequence(leaf.parent()){if(it.z>5)it.parent()else null}.take(2).toList()
-        }else sourcePlan(false,key.copy(pose=future)).filter{Source(it,false) !in wanted}.take(3)
+        }else sourcePlan(false,key.copy(pose=future,surfaceFocus=null)).filter{Source(it,false) !in wanted}.take(3)
         val urls=candidates.filter{it.z in 0..19}.flatMap{imagery.inputs(it.z,it.x,it.y)}.distinct().take(3)
         for(url in urls){if(predictionRecent.size>=60||predictionCount>=24)break
             val resource=resourceKey(url);if(transport.contains(resource)||synchronized(this){resource in predictions})continue
