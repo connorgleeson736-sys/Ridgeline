@@ -11,13 +11,17 @@ internal interface TileBackend {
     /** Local storage only; a miss MUST NOT initiate HTTP. */
     fun local(key:ResourceKey):TileBody?
     fun network(key:ResourceKey,done:(Result<TileBody>)->Unit):()->Unit
+    /** Must not wait on the local cache being raced. Backends without a disk
+     * cache can share their ordinary asynchronous network implementation. */
+    fun uncachedNetwork(key:ResourceKey,done:(Result<TileBody>)->Unit):()->Unit=network(key,done)
 }
 internal class ResourcePending(val ready:CompletableFuture<*>):RuntimeException(null,null,false,false)
 
 /** Local lookups have their own executor, independent of admitted network work.
  * CPU consumers suspend by continuation instead of occupying a decode worker. */
 internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
-    private val clock:()->Long=System::currentTimeMillis,private val graceMs:Long=600):AutoCloseable {
+    private val clock:()->Long=System::currentTimeMillis,private val graceMs:Long=600,
+    private val localWaitMs:Long=40,private val localCooldownMs:Long=30000):AutoCloseable {
     private val lock=Any()
     private var ramLimit=ramLimit.coerceAtLeast(0)
     fun setRamLimit(limit:Long){synchronized(lock){
@@ -34,6 +38,9 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
     private fun prune(){val now=clock();if(now<nextExpiry)return;nextExpiry=Long.MAX_VALUE;val it=ram.entries.iterator();while(it.hasNext()){val row=it.next();if(row.value.until<=now){bytes-=row.value.bytes.size;it.remove()}else nextExpiry=minOf(nextExpiry,row.value.until)}}
     private var bytes=0L;private var networkActive=0;private var backgroundActive=0
     private var foregroundLimit=12;private var closed=false
+    private val localEpoch=System.nanoTime()
+    private fun localNow()=TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-localEpoch)
+    private var localCooldownUntil=0L;private var localTimeouts=0L;private var localErrors=0L;private var bypasses=0L
     private var ramHits=0L;private var localHits=0L;private var networkStarts=0L;private var shares=0L;private var cancellations=0L
     private enum class Phase { LOCAL,QUEUED,NETWORK,DONE }
     private inner class Job(val key:ResourceKey){
@@ -42,6 +49,9 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
         val order:Long=nextOrder++
         @Volatile var localRank=Int.MAX_VALUE
         var localWork:LocalWork?=null
+        var localFinished=false;var localHit=false;var bypassCache=false;var networkTried=false
+        var networkError:Throwable?=null
+        var localWake:ScheduledFuture<*>?=null
         var expiry:ScheduledFuture<*>?=null
         fun speculative()=users.isNotEmpty()&&users.all{it.speculative}
         fun rank()=users.minOfOrNull{it.priority+(if(it.speculative)10000 else 0)}?:Int.MAX_VALUE
@@ -49,12 +59,58 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
     private inner class LocalWork(val job:Job):Runnable,Comparable<LocalWork>{
         override fun compareTo(other:LocalWork):Int {val rank=job.localRank.compareTo(other.job.localRank);return if(rank!=0)rank else job.order.compareTo(other.job.order)}
         override fun run(){try{
-            if(synchronized(lock){job.stopped})return
-            val body=backend.local(job.key)
-            if(body!=null){synchronized(lock){localHits++};finish(job,Result.success(body))}
-            else if(job.key.offline)finish(job,Result.failure(IOException("Offline tile unavailable")))
-            else{synchronized(lock){if(!job.stopped)job.phase=Phase.QUEUED};pump()}
-        }catch(e:Exception){finish(job,Result.failure(e))}}
+            if(synchronized(lock){job.stopped||job.phase==Phase.DONE})return
+            localDone(job,Result.success(backend.local(job.key)))
+        }catch(e:Exception){localDone(job,Result.failure(e))}}
+    }
+    /** A foreground request gets a bounded disk-first opportunity. Online
+     * progress then uses an independent cache-free HTTP path, within the same
+     * network limits. Offline/speculative readers never start a hedge. */
+    private fun watchLocal(job:Job){
+        if(closed||job.stopped||job.phase!=Phase.LOCAL||job.key.offline||job.networkTried||
+            job.localWake!=null||job.users.none{!it.speculative})return
+        val delay=if(localNow()<localCooldownUntil)0 else localWaitMs
+        job.localWake=timers.schedule({
+            synchronized(lock){
+                job.localWake=null
+                if(closed||job.stopped||job.phase!=Phase.LOCAL||job.networkTried||job.users.none{!it.speculative})return@schedule
+                localTimeouts++;localCooldownUntil=localNow()+localCooldownMs
+                if(job.localWork==null)job.localFinished=true
+                job.bypassCache=true;job.phase=Phase.QUEUED
+            }
+            pump()
+        },delay.coerceAtLeast(0),TimeUnit.MILLISECONDS)
+    }
+    private fun localDone(job:Job,result:Result<TileBody?>){
+        var completed:Result<TileBody>?=null
+        synchronized(lock){
+            // Progress reopens the disk path even if this particular reader
+            // lost the race. A late body never replaces the selected response.
+            if(result.isSuccess)localCooldownUntil=0
+            if(job.stopped||job.phase==Phase.DONE)return
+            job.localFinished=true;job.localWake?.cancel(false);job.localWake=null
+            val body=result.getOrNull()
+            if(body!=null){job.localHit=true;localHits++;completed=Result.success(body)}
+            else if(job.key.offline)completed=Result.failure(result.exceptionOrNull()?:IOException("Offline tile unavailable"))
+            else if(job.networkError!=null)completed=Result.failure(job.networkError!!)
+            else if(job.phase==Phase.LOCAL){
+                if(result.isFailure){localErrors++;localCooldownUntil=localNow()+localCooldownMs;job.bypassCache=true}
+                job.phase=Phase.QUEUED
+            }
+        }
+        completed?.let{finish(job,it)}?:pump()
+    }
+    private fun networkDone(job:Job,result:Result<TileBody>){
+        val waitForLocal=synchronized(lock){
+            if(job.stopped||job.phase!=Phase.NETWORK)return
+            if(result.isFailure&&job.localHit)return
+            if(result.isFailure&&!job.localFinished){
+                // A failed hedge must not suppress a possible saved/disk hit.
+                networkActive--;if(job.background)backgroundActive--
+                job.phase=Phase.LOCAL;job.networkError=result.exceptionOrNull();true
+            }else false
+        }
+        if(waitForLocal)pump()else finish(job,result,true)
     }
     // Caller owns lock. Queue comparators read only volatile scalar ranks, never
     // acquire lock while the priority queue itself is locked.
@@ -65,6 +121,7 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
             val background=job.users.isEmpty()||job.speculative()
             if(background!=job.background){backgroundActive+=if(background)1 else -1;job.background=background}
         }
+        watchLocal(job)
     }
     inner class Consumer internal constructor(internal var priority:Int,internal var speculative:Boolean):AutoCloseable {
         private val owned=LinkedHashMap<ResourceKey,Job>()
@@ -106,8 +163,14 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
                 CompletableFuture<TileBody>().also{immediate[key]=it;forward=job to it}
             }
             forward?.let{(job,view)->job.result.whenComplete{body,error->if(error!=null)view.completeExceptionally(error)else view.complete(body)}}
-            start?.let{job->synchronized(lock){if(!job.stopped&&!closed){
-                val work=LocalWork(job);job.localWork=work;job.localRank=job.rank();local.execute(work)
+            start?.let{job->synchronized(lock){if(!job.stopped&&!closed&&job.phase==Phase.LOCAL&&!job.networkTried){
+                if(!job.key.offline&&!job.speculative()&&localNow()<localCooldownUntil){
+                    job.bypassCache=true;job.localFinished=true;job.phase=Phase.QUEUED
+                    job.localWake?.cancel(false);job.localWake=null
+                }else{
+                    val work=LocalWork(job);job.localWork=work;job.localRank=job.rank();local.execute(work)
+                    watchLocal(job)
+                }
             }}}
             if(forward!=null)pump();return future
         }
@@ -137,7 +200,7 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
     private fun abandon(job:Job){
         val cancel=synchronized(lock){
             if(job.users.isNotEmpty()||job.phase==Phase.DONE||job.stopped)return
-            job.stopped=true;job.expiry?.cancel(false);job.expiry=null;job.localWork?.let{local.remove(it)};jobs.remove(job.key,job);cancellations++
+            job.stopped=true;job.expiry?.cancel(false);job.expiry=null;job.localWake?.cancel(false);job.localWork?.let{local.remove(it)};jobs.remove(job.key,job);cancellations++
             if(job.phase==Phase.NETWORK){networkActive--;if(job.background)backgroundActive--}
             job.phase=Phase.DONE;job.cancel
         }
@@ -158,26 +221,32 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
                     if(best==null||rank<bestRank){best=candidate;bestRank=rank}
                 }
                 val job=best?:break
-                job.phase=Phase.NETWORK;job.background=job.speculative();networkActive++;if(job.background)backgroundActive++
+                job.phase=Phase.NETWORK;job.networkTried=true;job.background=job.speculative();networkActive++;if(job.background)backgroundActive++
                 networkStarts++;starts+=job
             }
         }
         for(job in starts){
-            if(synchronized(lock){job.stopped})continue
-            val cancel=try{backend.network(job.key){finish(job,it)}}catch(e:Exception){finish(job,Result.failure(e));continue}
-            val stopped=synchronized(lock){job.cancel=cancel;job.stopped};if(stopped)cancel()
+            if(synchronized(lock){job.stopped||job.phase!=Phase.NETWORK})continue
+            val cancel=try{
+                if(job.bypassCache){synchronized(lock){bypasses++};backend.uncachedNetwork(job.key){networkDone(job,it)}}
+                else backend.network(job.key){networkDone(job,it)}
+            }catch(e:Exception){networkDone(job,Result.failure(e));continue}
+            val obsolete=synchronized(lock){job.cancel=cancel;job.stopped||job.phase!=Phase.NETWORK};if(obsolete)cancel()
         }
     }
-    private fun finish(job:Job,result:Result<TileBody>){
+    private fun finish(job:Job,result:Result<TileBody>,fromNetwork:Boolean=false){
         if(synchronized(lock){job.stopped||job.phase==Phase.DONE})return
         val stamped=result.map{body->
             val fingerprint=if(body.status==404)"404" else PreparedTerrainCache.digest(body.bytes)
             body.copy(stamp=SourceStamp(job.key.id,fingerprint,body.until))
         }
+        var cancelNetwork:(()->Unit)?=null
         synchronized(lock){
             if(job.stopped||job.phase==Phase.DONE)return
+            if(!fromNetwork&&job.phase==Phase.NETWORK)cancelNetwork=job.cancel
             if(job.phase==Phase.NETWORK){networkActive--;if(job.background)backgroundActive--}
-            job.phase=Phase.DONE;job.expiry?.cancel(false);jobs.remove(job.key,job)
+            job.phase=Phase.DONE;job.expiry?.cancel(false);job.localWake?.cancel(false);
+            job.localWork?.let{local.remove(it)};jobs.remove(job.key,job)
             stamped.getOrNull()?.let{body->
                 metadata[job.key.id]=body.stamp!!;while(metadata.size>4096)metadata.remove(metadata.keys.first())
                 prune()
@@ -188,6 +257,7 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
                 }
             }
         }
+        cancelNetwork?.invoke()
         stamped.fold({job.result.complete(it)},{job.result.completeExceptionally(it)});pump()
     }
     fun fresh(stamp:SourceStamp):Boolean=synchronized(lock){
@@ -197,10 +267,10 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
     fun contains(key:ResourceKey)=synchronized(lock){prune();ram[key]?.until?.let{it>clock()}==true}
     fun memoryPressure(){synchronized(lock){ram.clear();bytes=0;nextExpiry=Long.MAX_VALUE}}
     fun invalidate(){synchronized(lock){ram.clear();bytes=0;nextExpiry=Long.MAX_VALUE;for((key,old)in metadata.toMap())metadata[key]=old.copy(fingerprint="invalidated",until=0)}}
-    fun stats():Map<String,Long> = synchronized(lock){prune();mapOf("encodedBytes" to bytes,"ramHits" to ramHits,"localHits" to localHits,"networkStarts" to networkStarts,"shared" to shares,"cancelled" to cancellations,"pending" to jobs.size.toLong(),"networkActive" to networkActive.toLong(),"backgroundActive" to backgroundActive.toLong(),"localQueued" to local.queue.size.toLong())}
+    fun stats():Map<String,Long> = synchronized(lock){prune();mapOf("encodedBytes" to bytes,"ramHits" to ramHits,"localHits" to localHits,"networkStarts" to networkStarts,"shared" to shares,"cancelled" to cancellations,"pending" to jobs.size.toLong(),"networkActive" to networkActive.toLong(),"backgroundActive" to backgroundActive.toLong(),"localQueued" to local.queue.size.toLong(),"localTimeouts" to localTimeouts,"localErrors" to localErrors,"uncachedStarts" to bypasses,"localCooldownMs" to (localCooldownUntil-localNow()).coerceAtLeast(0))}
     fun awaitClosed(){local.awaitTermination(5,TimeUnit.SECONDS);timers.awaitTermination(5,TimeUnit.SECONDS)}
     override fun close(){
-        val rows=synchronized(lock){if(closed)return;closed=true;val rows=jobs.values.toList();for(job in rows){job.stopped=true;job.expiry?.cancel(false)};jobs.clear();ram.clear();metadata.clear();bytes=0;rows}
+        val rows=synchronized(lock){if(closed)return;closed=true;val rows=jobs.values.toList();for(job in rows){job.stopped=true;job.expiry?.cancel(false);job.localWake?.cancel(false)};jobs.clear();ram.clear();metadata.clear();bytes=0;rows}
         for(job in rows){job.cancel?.invoke();job.result.completeExceptionally(PreparationAborted())}
         local.shutdownNow();timers.shutdownNow()
     }

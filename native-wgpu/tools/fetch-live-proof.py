@@ -7,6 +7,7 @@ from PIL import Image
 
 p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('output', type=pathlib.Path)
+p.add_argument('--parent-dem', action='store_true', help='Include the original parent DEM used by the incremental-loading replay')
 p.add_argument('--child-images', action='store_true', help='Fetch four full-resolution child photos for independent-LOD validation')
 a = p.parse_args()
 a.output.mkdir(parents=True, exist_ok=True)
@@ -40,6 +41,9 @@ for yy in range(y-1,y+2):
         rows = list(im.get_flattened_data()) if hasattr(im, "get_flattened_data") else list(im.getdata())
         assert all(v[3] == 255 for v in rows), 'nodata needs production parent fallback; do not fabricate heights'
         pixels[xx,yy] = [-10000 + (r*65536+g*256+b)*.1 for r,g,b,_ in rows]
+if a.parent_dem:
+    parent = fetch('elevation', x//2, (y-1)//2, z-1)
+    assert parent.getchannel('A').getextrema() == (255, 255), 'parent fixture requires measured opaque samples'
 def height(gx,gy):
     return pixels[gx//256,gy//256][(gy%256)*256+gx%256]
 def mesh(xx):
@@ -59,7 +63,7 @@ if a.child_images:
     for i in range(4):
         image=fetch('aerial',x*2+i%2,y*2+i//2,z+1)
         (a.output/f'child{i}.rgba').write_bytes(image.tobytes())
-report=dict(independentChildPhotos=a.child_images,provider='basemaps.linz.govt.nz',z=z,x=x,y=y,sharedEdgeSamples=129,
+report=dict(independentChildPhotos=a.child_images,incrementalParentDem=a.parent_dem,provider='basemaps.linz.govt.nz',z=z,x=x,y=y,sharedEdgeSamples=129,
             sharedEdgeMaxErrorMetres=0,minimumMetres=min(map(min,meshes)),maximumMetres=max(map(max,meshes)),
             imagerySize=[256,256],records=records,
             limitation='Host fixture preparation; Android loader execution, cross-LOD stitching and visual parity remain unverified.')

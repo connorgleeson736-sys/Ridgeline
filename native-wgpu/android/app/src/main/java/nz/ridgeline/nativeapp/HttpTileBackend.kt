@@ -12,8 +12,15 @@ internal class HttpTileBackend(private val client:OkHttpClient,private val offli
             return read(response,key.offline)
         }
     }
-    override fun network(key:ResourceKey,done:(Result<TileBody>)->Unit):()->Unit{
-        val call=client.newCall(Request.Builder().url(key.url).header("User-Agent","Ridgeline-Native/0.1.0").build())
+    // FORCE_NETWORK still runs CacheInterceptor.get() in OkHttp 4.12. A
+    // cache-free sibling is required to escape a blocked disk journal/lookup.
+    // Dispatcher, connection pool, proxy, TLS and cancellation ownership are shared.
+    private val direct by lazy{client.newBuilder().cache(null).build()}
+    override fun network(key:ResourceKey,done:(Result<TileBody>)->Unit)=network(client,key,done)
+    override fun uncachedNetwork(key:ResourceKey,done:(Result<TileBody>)->Unit)=network(direct,key,done)
+    private fun network(http:OkHttpClient,key:ResourceKey,done:(Result<TileBody>)->Unit):()->Unit{
+        check(!key.offline){"Offline network request rejected"}
+        val call=http.newCall(Request.Builder().url(key.url).header("User-Agent","Ridgeline-Native/0.1.0").build())
         call.enqueue(object:Callback{
             override fun onFailure(call:Call,e:IOException){done(Result.failure(e))}
             override fun onResponse(call:Call,response:Response){response.use{done(runCatching{read(it,false)})}}

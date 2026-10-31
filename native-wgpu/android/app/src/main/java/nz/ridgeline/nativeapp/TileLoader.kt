@@ -110,6 +110,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         readyBytes-=ready.remove(first)!!.capacity()
     }}
     private fun trimDecoded(){while(decoded.size>demLimit)decoded.remove(decoded.keys.first())}
+    @Volatile private var pipelinePauseUntil=0L
     private val taskContext=ThreadLocal<Task>()
     private val sourceRecords=ThreadLocal<MutableMap<String,SourceStamp>>()
     private val jobs = ConcurrentHashMap<Source, Task>()
@@ -156,15 +157,18 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         private val finished=java.util.concurrent.atomic.AtomicBoolean(false)
         val consumer=transport.consumer(priority,speculative)
         val records=LinkedHashMap<String,SourceStamp>()
+        val inputs=GeometryInputPipeline<Id,Decoded>(retain={pipelineEligible()})
+        fun pipelineEligible()=source.geometry&&!speculative&&priority<=2&&parkedUntil==0L&&!finished.get()&&
+            (pipelinePauseUntil==0L||System.nanoTime()-pipelinePauseUntil>=0)
         @Volatile var started=false;private set
         @Volatile private var parkedUntil=0L
         fun eligible()=!dead&&active&&!finished.get()&&(source in wanted||source in warmWanted&&prepareAhead||parkedUntil>System.currentTimeMillis())
         override fun compareTo(other:Task)=compareValuesBy(this,other,{it.priority+(if(it.speculative||it.parkedUntil!=0L)10000 else 0)},{it.order})
         fun enqueue(){if(!finished.get()&&!dead&&queued.compareAndSet(false,true))try{workers(source).execute(this)}catch(_:RejectedExecutionException){queued.set(false);cancel()}}
-        fun promote(rank:Int){if(priority==rank&&!speculative&&parkedUntil==0L)return;priority=rank;speculative=false;parkedUntil=0;consumer.promote(rank);if(workers(source).remove(this)){queued.set(false);enqueue()}}
-        fun park(){if(parkedUntil!=0L)return;if(!consumer.park()){cancel();return};parkedUntil=System.currentTimeMillis()+600;
+        fun promote(rank:Int){if(priority==rank&&!speculative&&parkedUntil==0L)return;priority=rank;speculative=false;parkedUntil=0;consumer.promote(rank);if(!pipelineEligible())inputs.clear();if(workers(source).remove(this)){queued.set(false);enqueue()}}
+        fun park(){if(parkedUntil!=0L)return;inputs.clear();if(!consumer.park()){cancel();return};parkedUntil=System.currentTimeMillis()+600;
             if(workers(source).remove(this)){queued.set(false);enqueue()};scheduler.schedule({if(source !in wanted)cancel()},600,TimeUnit.MILLISECONDS)}
-        fun cancel(){if(finished.compareAndSet(false,true)){workers(source).remove(this);jobs.remove(source,this);consumer.release(true)}}
+        fun cancel(){if(finished.compareAndSet(false,true)){workers(source).remove(this);jobs.remove(source,this);consumer.release(true);inputs.clear()}}
         override fun run(){
             queued.set(false);if(!eligible()){cancel();return}
             var waiting:CompletableFuture<*>?=null
@@ -186,6 +190,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
                 }
             }finally{
                 preparation.leave();geometryDependencies.remove();sourceRecords.remove();taskContext.remove()
+                if(finished.get())inputs.clear()
                 if(waiting!=null&&!finished.get())waiting.whenComplete{_,_->enqueue()} else{
                     cancel();if(!dead&&active&&source in wanted&&!resident(source))cameraChanged()
                 }
@@ -364,6 +369,12 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         return record.raster
     }
     private fun rawRecord(id:Id):Decoded{
+        val task=taskContext.get()
+        if(task?.pipelineEligible()==true)task.inputs.get(id)?.let{return it}
+        val record=loadRawRecord(id)
+        return if(task?.pipelineEligible()==true)task.inputs.remember(id,record)else record
+    }
+    private fun loadRawRecord(id:Id):Decoded{
         val old=synchronized(decoded){decoded[id]}
         if(old!=null&&old.dependencies.all(::dependencyFresh))return old
         val body=fetchRecord(linz("elevation",id,"png"))
@@ -398,13 +409,27 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             dependencies.all{dep->if(dependencyFresh(dep))true else{val body=fetchRecord(linz("elevation",Id(dep.id.z,dep.id.x,dep.id.y),"png"));body.stamp?.fingerprint==dep.fingerprint&&body.until>System.currentTimeMillis()}}
         }
         checkPreparation();if(cached!=null)return cached
-        // A fresh decoded halo is already a complete input. Do not refetch its
-        // encoded body merely because the smaller encoded LRU has evicted it.
-        val missing=DemSampling.footprint(id.z,id.x,id.y,DemSampling.terrainSourceZoom(id.z)).filter{input->
-            val old=synchronized(decoded){decoded[Id(input.z,input.x,input.y)]}
-            old==null||!old.dependencies.all(::dependencyFresh)
+        val footprint=DemSampling.footprint(id.z,id.x,id.y,DemSampling.terrainSourceZoom(id.z))
+        val task=taskContext.get()
+        if(task?.pipelineEligible()==true){
+            // Bound early decoding to the focus backdrop and first two sharp
+            // leaves. At most eight raster references per operation; cancellation
+            // releases them. Remaining jobs keep ordinary all-input admission.
+            task.inputs.prepare(footprint.map{Id(it.z,it.x,it.y)},request={input->
+                checkPreparation()
+                val old=synchronized(decoded){decoded[input]}
+                if(old!=null&&old.dependencies.all(::dependencyFresh)){
+                    task.inputs.remember(input,old);CompletableFuture.completedFuture(Unit)
+                }else task.consumer.acquire(resourceKey(linz("elevation",input,"png")))
+            },decode={input->checkPreparation();rawRecord(input)})
+        }else{
+            // Fresh decoded inputs need no encoded disk/network lookup.
+            val missing=footprint.filter{input->
+                val old=synchronized(decoded){decoded[Id(input.z,input.x,input.y)]}
+                old==null||!old.dependencies.all(::dependencyFresh)
+            }
+            awaitInputs(missing.map{linz("elevation",Id(it.z,it.x,it.y),"png")})
         }
-        awaitInputs(missing.map{linz("elevation",Id(it.z,it.x,it.y),"png")})
         val dependencies=LinkedHashMap<GpuUploadQueue.Id,PreparedTerrainCache.Dependency>();geometryDependencies.set(dependencies)
         val heights=ByteBuffer.allocateDirect(129*129*4+16).order(ByteOrder.LITTLE_ENDIAN)
         DemSampling.terrainMesh(id.z,id.x,id.y,heights,::checkPreparation){checkPreparation();raw(Id(it.z,it.x,it.y)).also{checkPreparation()}}
@@ -485,6 +510,8 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         },350,TimeUnit.MILLISECONDS)
     }
     fun memoryPressure(){
+        pipelinePauseUntil=System.nanoTime()+TimeUnit.SECONDS.toNanos(30)
+        for(task in jobs.values)task.inputs.clear()
         synchronized(ready){val it=ready.entries.iterator();while(it.hasNext()){val row=it.next();if(row.key !in wanted){readyBytes-=row.value.capacity();it.remove()}}}
         transport.memoryPressure();clearWarm()
         synchronized(decoded){while(decoded.size>minOf(16,demLimit))decoded.remove(decoded.keys.first())}

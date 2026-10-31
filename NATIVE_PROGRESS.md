@@ -1,5 +1,26 @@
 # Durable progress log
 
+## 2026-11-01 — remove cache and DEM loading barriers
+
+Continued from `49d74fc` on `native-renderer-performance`. Foreground online
+requests now get a 40 ms disk-first window and a cache-free sibling HTTP path;
+`FORCE_NETWORK` alone still enters OkHttp's disk cache. The first valid result
+owns the source. Failed hedges preserve local fallback, offline/speculative
+requests never hedge, and existing download limits/cancellation remain. Local
+progress reopens the path; otherwise a monotonic 30-second cooldown applies.
+
+Nearby DEM operations now decode ready bodies and discover parent dependencies
+immediately, keeping at most eight raster references per operation and three
+focus operations. Pins are released on completion/cancellation/parking and under
+memory pressure. Final host fixtures: actual 400 ms cache lock 404.369 → 43.377 ms;
+complete parent-dependent mesh 375.917 → 195.666 ms, identical 66,564 bytes and
+five requests. Healthy disk hits 0.536 → 0.610 ms with no extra HTTP. All 57
+focused JVM tests and Kotlin/API 36 type-checking pass. No Rust/shader/route
+changes, new APK or phone performance claim.
+
+Audit: `native-wgpu/research/LATENCY-BARRIERS-2026-11-01.md`; raw measurements,
+input provenance and validation in `native-wgpu/validation/latency-barriers-2026-11-01/`.
+
 ## 2026-10-31 — visible tile priority and native loading pipeline
 
 Started from native93be86c; refreshed mainc0b3941 and preview39431da/Capacitor018.
