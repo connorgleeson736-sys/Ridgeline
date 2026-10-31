@@ -35,6 +35,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     val planningPose:CameraPose get()=if(presentedFrom==cameraPose)presentedPose?:cameraPose else cameraPose
     val gestureInProgress get()=gestureActive
     @Volatile private var lastBacklog=0
+    internal fun loadingSnapshot()="GPU uploads waiting: ${uploads.size()} · outstanding submissions: $lastBacklog\nResident geometry/images: ${residency.geometry.size}/${residency.images.size}"
     val canPrepareAhead get()=live&&active&&!gestureActive&&lastBacklog==0&&!uploads.isNotEmpty()
     fun checkPreparationRoom(callback:(Boolean)->Unit){gpu.post{
         if(live&&active&&handle!=0L&&!gestureActive&&presentationFailures==0){lastBacklog=NativeBridge.gpuBacklog(handle);callback(canPrepareAhead)}else callback(false)

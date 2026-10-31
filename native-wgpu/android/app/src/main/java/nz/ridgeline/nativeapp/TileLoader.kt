@@ -43,8 +43,12 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     fun automaticCacheMiB(value:Int){preferences.edit().putInt("automaticCacheMiB",value.coerceIn(0,1000)).apply()}
     val automaticCacheBytes=AutomaticCacheBudget.bytes(automaticCacheMiB,context.cacheDir.usableSpace)
     private val preparedBytes=minOf(128L*1024*1024,automaticCacheBytes/8)
-    private val compositionBytes=preparedBytes/2
+    private val escapedBytes=minOf(16L*1024*1024,preparedBytes/4)
+    private val compositionBytes=(preparedBytes-escapedBytes)/2
+    private val escaped by lazy{HedgedBodyCache(File(context.cacheDir,"native-escaped-v1"),escapedBytes)}
+    private val escapedWrites=ThreadPoolExecutor(1,1,0,TimeUnit.MILLISECONDS,ArrayBlockingQueue<Runnable>(8),ThreadFactory{work->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);work.run()},"RidgelineSourceCache")},ThreadPoolExecutor.DiscardOldestPolicy())
     private val preparedWrites=ThreadPoolExecutor(1,1,0,TimeUnit.MILLISECONDS,ArrayBlockingQueue<Runnable>(8),ThreadFactory{work->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);work.run()},"RidgelinePreparedCache")},ThreadPoolExecutor.DiscardOldestPolicy())
+    private val derivedReads=DerivedReadGate()
     private val client = OkHttpClient.Builder()
         .cache(if(automaticCacheBytes>0)Cache(File(context.cacheDir, "native-http-v1"), automaticCacheBytes-preparedBytes)else null)
         .dispatcher(Dispatcher().apply{maxRequests=32;maxRequestsPerHost=16})
@@ -52,14 +56,14 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     init {
         if(automaticCacheBytes==0L)preparedWrites.execute {
             // No HTTP cache is open and derived stores have a zero write limit.
-            for(name in listOf("native-http-v1","native-terrain-v3","native-compositions-v1"))
+            for(name in listOf("native-http-v1","native-terrain-v3","native-compositions-v1","native-escaped-v1"))
                 runCatching{File(context.cacheDir,name).deleteRecursively()}
         }
     }
     private val key = context.assets.open("map-defaults.json").use {
         JSONObject(it.readBytes().toString(Charsets.UTF_8)).getString("linzApiKey")
     }
-    private val prepared by lazy{PreparedTerrainCache(File(context.cacheDir,"native-terrain-v3"),preparedBytes-compositionBytes,"terrain-source-delta1-dem18-grid128-profile-v2:$key")}
+    private val prepared by lazy{PreparedTerrainCache(File(context.cacheDir,"native-terrain-v3"),preparedBytes-escapedBytes-compositionBytes,"terrain-source-delta1-dem18-grid128-profile-v2:$key")}
     private val preparation=PreparationControl()
     private fun checkPreparation()=preparation.checkpoint()
     private val geometryDependencies=ThreadLocal<MutableMap<GpuUploadQueue.Id,PreparedTerrainCache.Dependency>>()
@@ -137,7 +141,8 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private var predictionCount=0
     private var lastGesture=false
     private var compositionStore:PreparedTerrainCache?=null
-    private fun imageStore():PreparedTerrainCache=synchronized(this){compositionStore?:PreparedTerrainCache(File(context.cacheDir,"native-compositions-v1"),compositionBytes,"rgba-premultiplied-gap-v1:$key:"+preferences.getLong("imageryGeneration",0),256*256*4).also{compositionStore=it}}
+    private val compositionLock=Any()
+    private fun imageStore():PreparedTerrainCache=synchronized(compositionLock){compositionStore?:PreparedTerrainCache(File(context.cacheDir,"native-compositions-v1"),compositionBytes,"rgba-premultiplied-gap-v1:$key:"+preferences.getLong("imageryGeneration",0),256*256*4).also{compositionStore=it}}
     // DEM halo work cannot occupy every imagery worker. Four bounded requests,
     // shared DEM futures, and no per-halo executor multiplication.
     private val geometryWorkers = ThreadPoolExecutor(2,2,0,TimeUnit.MILLISECONDS,PriorityBlockingQueue<Runnable>())
@@ -155,8 +160,17 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         private val order=sequence.getAndIncrement()
         private val queued=java.util.concurrent.atomic.AtomicBoolean(false)
         private val finished=java.util.concurrent.atomic.AtomicBoolean(false)
-        val consumer=transport.consumer(priority,speculative)
+        val consumer=transport.consumer(priority,speculative,imagery=!source.geometry)
         val records=LinkedHashMap<String,SourceStamp>()
+        val decodeWait=SharedDecode.Waiter<Pair<Id,String>,FloatArray>()
+        @Volatile private var derivedRead:CompletableFuture<ByteBuffer?>?=null
+        fun derived(read:()->ByteBuffer?):ByteBuffer? {
+            checkPreparation()
+            val result=derivedRead?:derivedReads.read(priority){if(eligible())read()else null}.also{derivedRead=it}
+            if(finished.get()){result.cancel(false);throw PreparationAborted()}
+            if(!result.isDone)throw ResourcePending(result)
+            return result.getNow(null).also{checkPreparation()}
+        }
         val inputs=GeometryInputPipeline<Id,Decoded>(retain={pipelineEligible()})
         fun pipelineEligible()=source.geometry&&!speculative&&priority<=2&&parkedUntil==0L&&!finished.get()&&
             (pipelinePauseUntil==0L||System.nanoTime()-pipelinePauseUntil>=0)
@@ -168,7 +182,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         fun promote(rank:Int){if(priority==rank&&!speculative&&parkedUntil==0L)return;priority=rank;speculative=false;parkedUntil=0;consumer.promote(rank);if(!pipelineEligible())inputs.clear();if(workers(source).remove(this)){queued.set(false);enqueue()}}
         fun park(){if(parkedUntil!=0L)return;inputs.clear();if(!consumer.park()){cancel();return};parkedUntil=System.currentTimeMillis()+600;
             if(workers(source).remove(this)){queued.set(false);enqueue()};scheduler.schedule({if(source !in wanted)cancel()},600,TimeUnit.MILLISECONDS)}
-        fun cancel(){if(finished.compareAndSet(false,true)){workers(source).remove(this);jobs.remove(source,this);consumer.release(true);inputs.clear()}}
+        fun cancel(){if(finished.compareAndSet(false,true)){workers(source).remove(this);jobs.remove(source,this);consumer.release(true);inputs.clear();decodeWait.clear();derivedRead?.cancel(false)}}
         override fun run(){
             queued.set(false);if(!eligible()){cancel();return}
             var waiting:CompletableFuture<*>?=null
@@ -190,7 +204,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
                 }
             }finally{
                 preparation.leave();geometryDependencies.remove();sourceRecords.remove();taskContext.remove()
-                if(finished.get())inputs.clear()
+                if(finished.get()){inputs.clear();decodeWait.clear()}
                 if(waiting!=null&&!finished.get())waiting.whenComplete{_,_->enqueue()} else{
                     cancel();if(!dead&&active&&source in wanted&&!resident(source))cameraChanged()
                 }
@@ -220,9 +234,14 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             (view.height/view.pixelScale).roundToInt().coerceAtLeast(1),view.planningPose,terrainDetail,imageryDetail)
         val plan=plans.get(key) {
           val next=LinkedHashMap<Source,Int>()
+          val imageIds=sourcePlan(false,key)
+          val focus=imageIds.firstOrNull()
+          val bootstrap=focus?.takeIf{!view.hasResidentCoverage(it.gpu(),false)}?.let{imagery.bootstrap(it.z,it.x,it.y)}
           for(geometry in listOf(true,false)) {
-            val ids=sourcePlan(geometry,key)
-            val demand=SourceDemand.bounded(ids.map{it.gpu()},if(geometry)geometryLimit else imageLimit)
+            val ids=if(geometry)sourcePlan(true,key)else imageIds
+            val limit=if(geometry)geometryLimit else imageLimit
+            val original=SourceDemand.bounded(ids.map{it.gpu()},limit)
+            val demand=if(bootstrap!=null&&(!geometry||!view.hasResidentCoverage(focus!!.gpu(),true)))SourceDemand.bootstrap(original,bootstrap,limit)else original
             for((id,priority)in demand)next[Source(Id(id.z,id.x,id.y),geometry)]=priority
           }
           Plan(next.toMap())
@@ -235,6 +254,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         transport.batchDemand {
             if(prior!=key.pose){viewRevision++;clearWarm();previousPose=key.pose}
             wanted = ranked.keys.toSet()
+            transport.imageryDemand(wanted.any{!it.geometry&&!view.hasResidentCoverage(it.id.gpu(),false,true)})
             // Restore already prepared parents before requesting more detailed work.
             // A zoom jump can skip several levels; the exact new plan need not name
             // the parent that was visible moments ago. Geometry/photos are independent.
@@ -303,7 +323,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         val urls=candidates.filter{it.z in 0..19}.flatMap{imagery.inputs(it.z,it.x,it.y)}.distinct().take(3)
         for(url in urls){if(predictionRecent.size>=60||predictionCount>=24)break
             val resource=resourceKey(url);if(transport.contains(resource)||synchronized(this){resource in predictions})continue
-            val consumer=transport.consumer(1000,true);synchronized(this){predictions[resource]=consumer};predictionCount++;predictionRecent.addLast(now)
+            val consumer=transport.consumer(1000,true,imagery=true);synchronized(this){predictions[resource]=consumer};predictionCount++;predictionRecent.addLast(now)
             consumer.acquire(resource).whenComplete{_,_->consumer.close();synchronized(this){predictions.remove(resource,consumer)}}
         }
     }
@@ -330,7 +350,23 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             warmWanted=extras;view.updateWarmDemand(extras.filter{it.geometry}.map{it.id.gpu()}.toSet(),extras.filter{!it.geometry}.map{it.id.gpu()}.toSet())
             for(source in extras){val readyData=synchronized(ready){ready[source]};if(readyData!=null)upload(source,readyData)else schedule(source,1000,true)}
     }
-    private val transport by lazy{TileTransport(HttpTileBackend(client,offline::read),ramBudget.encoded)}
+    private val transport by lazy{TileTransport(HttpTileBackend(client,
+        escapeRead={escaped.get(it)},
+        escapeWrite={resource,body->if(escapedBytes>0&&!escapedWrites.isShutdown)runCatching{escapedWrites.execute{escaped.put(resource,body)}}},
+        offlineRead=offline::read),ramBudget.encoded)}
+    fun loadingDiagnostics():String {
+        val counts=transport.stats();val times=transport.latencyStats()
+        return "Native loading snapshot\n"+
+            "HTTP active/queued: ${counts["networkActive"]}/${counts["networkQueued"]} · local reads queued: ${counts["localQueued"]}\n"+
+            "Oldest active HTTP: ${times["oldestActiveHttpMs"]} ms · waiting source: ${times["oldestWaitingMs"]} ms\n"+
+            "Last HTTP stage: ${times["lastHttpMs"]} ms · max this session: ${times["maxHttpMs"]} ms\n"+
+            "Last local/queue wait before HTTP: ${times["lastAdmissionMs"]} ms\n"+
+            "Geometry CPU active/queued: ${geometryWorkers.activeCount}/${geometryWorkers.queue.size}\n"+
+            "Imagery CPU active/queued: ${imageWorkers.activeCount}/${imageWorkers.queue.size}\n"+
+            "Tiles in progress: ${jobs.size} · retry backoffs: ${failures.size}\n"+
+            "RAM/disk hits: ${counts["ramHits"]}/${counts["localHits"]} · cache escape starts: ${counts["uncachedStarts"]}\n"+
+            view.loadingSnapshot()+"\nHTTP stage includes cache, connection, provider and body transfer; it does not isolate Wi-Fi latency."
+    }
     private fun resourceKey(url:String)=ResourceKey(url,offlineOnly&&regionContext.get()==null)
     private fun awaitInputs(urls:List<String>){
         val consumer=taskContext.get()?.consumer?:return
@@ -357,7 +393,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private fun imageryChanged(){
         for(task in jobs.values)if(!task.source.geometry)task.cancel()
         clearWarm()
-        synchronized(this){preferences.edit().putLong("imageryGeneration",preferences.getLong("imageryGeneration",0)+1).apply();compositionStore=null}
+        synchronized(compositionLock){preferences.edit().putLong("imageryGeneration",preferences.getLong("imageryGeneration",0)+1).apply();compositionStore=null}
         synchronized(ready){val iter=ready.entries.iterator();while(iter.hasNext()){val row=iter.next();if(!row.key.geometry){readyBytes-=row.value.capacity();iter.remove()}}}
         transport.invalidate();failures.clear();cameraChanged()
     }
@@ -399,7 +435,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         }
         // Fetch/freshness are consumer-owned. Only the immutable CPU PNG
         // decode is shared; missing-pixel parent repair remains private.
-        val sharedPixels=if(body.status==404)null else decoding.get(id to stamp.fingerprint){demPixels(body.bytes)}
+        val sharedPixels=if(body.status==404)null else decoding.get(id to stamp.fingerprint,taskContext.get()?.decodeWait){demPixels(body.bytes)}
         checkPreparation()
         val missing=sharedPixels?.any{!it.isFinite()}==true
         val pixels=if(missing)sharedPixels!!.copyOf()else sharedPixels
@@ -414,12 +450,11 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     }
     private fun loadGeometry(id: Id): ByteBuffer {
         checkPreparation()
-        val cached=prepared.getChecked(id.gpu()){dependencies->
-            checkPreparation()
-            val stale=dependencies.filter{!dependencyFresh(it)}
-            awaitInputs(stale.map{linz("elevation",Id(it.id.z,it.id.x,it.id.y),"png")})
-            dependencies.all{dep->if(dependencyFresh(dep))true else{val body=fetchRecord(linz("elevation",Id(dep.id.z,dep.id.x,dep.id.y),"png"));body.stamp?.fingerprint==dep.fingerprint&&body.until>System.currentTimeMillis()}}
-        }
+        // Derived files are optional. Do not let their index, read or gzip
+        // delay source admission or occupy the two geometry workers. Expired
+        // provenance takes the normal source path instead of awaiting sources
+        // from inside an open derived file.
+        val cached=taskContext.get()?.derived{prepared.get(id.gpu(),::dependencyFresh)}
         checkPreparation();if(cached!=null)return cached
         val footprint=DemSampling.footprint(id.z,id.x,id.y,DemSampling.terrainSourceZoom(id.z))
         val task=taskContext.get()
@@ -454,14 +489,20 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         return heights
     }
     private fun loadImage(id:Id):ByteBuffer {
+        val imageryGeneration=preferences.getLong("imageryGeneration",0)
         val composed=imagery.composed(id.z,id.x,id.y)
-        if(composed)imageStore().get(id.gpu()){dependencyFresh(it)}?.let{return it}
+        if(composed)taskContext.get()?.derived{imageStore().get(id.gpu(),::dependencyFresh)}?.let{return it}
         awaitInputs(imagery.inputs(id.z,id.x,id.y))
         val image = imagery.load(id.z, id.x, id.y)
         checkPreparation()
         val rgba=PixelPacking.rgbaOwned(image,::checkPreparation)
         if(composed){val provenance=sourceRecords.get()?.values?.map{PreparedTerrainCache.Dependency(id.gpu(),it.fingerprint,it.until,it.key)}?:emptyList()
-            if(provenance.all{it.until>System.currentTimeMillis()}&&!preparedWrites.isShutdown){val store=imageStore();runCatching{preparedWrites.execute{store.put(id.gpu(),rgba,provenance)}}}}
+            if(provenance.all{it.until>System.currentTimeMillis()}&&!preparedWrites.isShutdown)runCatching{preparedWrites.execute{
+                // Store initialization may still be running on a slow reader.
+                // Keep that wait on the cache executor, never a decode worker.
+                val store=synchronized(compositionLock){if(preferences.getLong("imageryGeneration",0)==imageryGeneration)imageStore()else null}
+                store?.put(id.gpu(),rgba,provenance)
+            }}}
         return rgba
     }
     data class Bounds(val west:Double,val south:Double,val east:Double,val north:Double)
@@ -523,13 +564,15 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     }
     fun memoryPressure(){
         pipelinePauseUntil=System.nanoTime()+TimeUnit.SECONDS.toNanos(30)
-        for(task in jobs.values)task.inputs.clear()
+        for(task in jobs.values){task.inputs.clear();task.decodeWait.clear()}
         synchronized(ready){val it=ready.entries.iterator();while(it.hasNext()){val row=it.next();if(row.key !in wanted){readyBytes-=row.value.capacity();it.remove()}}}
         transport.memoryPressure();clearWarm()
         synchronized(decoded){while(decoded.size>minOf(16,demLimit))decoded.remove(decoded.keys.first())}
     }
     fun setActive(value:Boolean){active=value;if(value)cameraChanged()else{transport.batchDemand{for(task in jobs.values)task.cancel();clearWarm()}}}
     fun close() {
+        escapedWrites.shutdown()
+        derivedReads.close()
         dead = true;transport.batchDemand{for(task in jobs.values)task.cancel();clearWarm();transport.close()};preparedWrites.shutdownNow();attachmentJobs.shutdown();downloadCancel.set(true);downloadJobs.shutdown(); profileRevision.incrementAndGet();profileJob?.cancel(true);profileJobs.shutdownNow();timer?.cancel(true); scheduler.shutdownNow(); geometryWorkers.shutdownNow();imageWorkers.shutdownNow()
         client.dispatcher.cancelAll(); client.connectionPool.evictAll(); client.cache?.close(); client.dispatcher.executorService.shutdown(); synchronized(ready) { ready.clear(); readyBytes=0 }; synchronized(decoded) { decoded.clear() }
         Thread({downloadJobs.awaitTermination(60,TimeUnit.SECONDS);profileJobs.awaitTermination(60,TimeUnit.SECONDS);geometryWorkers.awaitTermination(60,TimeUnit.SECONDS);imageWorkers.awaitTermination(60,TimeUnit.SECONDS);attachmentJobs.awaitTermination(60,TimeUnit.SECONDS);transport.awaitClosed();overviews.close();offline.close()},"ridgeline-offline-close").start()

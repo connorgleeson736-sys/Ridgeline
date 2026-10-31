@@ -32,6 +32,12 @@ class NativeImagery(
     private val metadata = ConcurrentHashMap<String, Meta>()
     private fun json(name: String) = context.assets.open(name).use { JSONObject(it.readBytes().toString(Charsets.UTF_8)) }
     private fun asset(name: String) = context.assets.open(name.removePrefix("/")).use { it.readBytes() }
+    /** Existing, original coarse asset covering the focus: no provider request
+     * is needed to establish imagery in a completely new region. */
+    internal fun bootstrap(z:Int,x:Int,y:Int):GpuUploadQueue.Id? {
+        val rows=catalog.getJSONObject("coarse")
+        return SourceDemand.coarseAsset(GpuUploadQueue.Id(z,x,y),rows::has)
+    }
     private fun bitmap(bytes: ByteArray): Bitmap {
         checkPreparation()
         val options = BitmapFactory.Options().apply { inScaled=false; inPreferredConfig=Bitmap.Config.ARGB_8888 }

@@ -86,6 +86,14 @@ class OfflineUi(private val activity:Activity,root:FrameLayout,private val terra
         })
         content.addView(CheckBox(activity).apply{text="Prepare nearby terrain while idle";isChecked=loader.prepareAhead;setOnCheckedChangeListener{_,checked->loader.prepareAhead(checked)}})
         content.addView(CheckBox(activity).apply{text="Offline only";isChecked=loader.offlineOnly;setOnCheckedChangeListener{_,checked->loader.offlineOnly(checked)}})
+        content.addView(button("Loading diagnostics"){
+            val snapshot=TextView(activity).apply{setPadding(dp(16),dp(12),dp(16),dp(12));setTextIsSelectable(true)}
+            val loading=AlertDialog.Builder(activity).setTitle("Loading diagnostics").setView(snapshot).setNegativeButton("Close",null).setNeutralButton("Copy"){_,_->
+                activity.getSystemService(android.content.ClipboardManager::class.java).setPrimaryClip(android.content.ClipData.newPlainText("Ridgeline loading",snapshot.text))
+            }.create()
+            fun refresh(){if(loading.isShowing){snapshot.text=loader.loadingDiagnostics();snapshot.postDelayed({refresh()},1000)}}
+            loading.show();refresh()
+        })
         content.addView(button("Add imagery ZIPs"){dialog.dismiss();addImagery()})
         content.addView(TextView(activity).apply{text="Overview imagery: ${loader.overviews.list().size}/6 packs attached. Keep the ZIPs at their selected location. Overviews contain imagery; terrain needs a connection or a saved region.";textSize=12f})
         for(pack in loader.overviews.list())content.addView(button("Detach ${pack.name}"){loader.detachOverview(pack.payload){dialog.dismiss();show()}})

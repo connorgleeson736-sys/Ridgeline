@@ -38,17 +38,20 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
     private fun prune(){val now=clock();if(now<nextExpiry)return;nextExpiry=Long.MAX_VALUE;val it=ram.entries.iterator();while(it.hasNext()){val row=it.next();if(row.value.until<=now){bytes-=row.value.bytes.size;it.remove()}else nextExpiry=minOf(nextExpiry,row.value.until)}}
     private var bytes=0L;private var networkActive=0;private var backgroundActive=0
     private var foregroundLimit=12;private var closed=false;private var demandBatch=0
+    private var imageryPending=false
     private val localEpoch=System.nanoTime()
     private fun localNow()=TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-localEpoch)
     private var localWatch:ScheduledFuture<*>?=null
     private var localWatchAt=Long.MAX_VALUE;private var localWatchEpoch=0L;private var localWatchRuns=0L
     private var localCooldownUntil=0L;private var localTimeouts=0L;private var localErrors=0L;private var bypasses=0L
     private var ramHits=0L;private var localHits=0L;private var networkStarts=0L;private var shares=0L;private var cancellations=0L
+    private var lastNetworkMs=0L;private var maxNetworkMs=0L;private var lastAdmissionMs=0L
     private enum class Phase { LOCAL,QUEUED,NETWORK,DONE }
     private inner class Job(val key:ResourceKey){
         val result=CompletableFuture<TileBody>();val users=LinkedHashSet<Consumer>()
         var phase=Phase.LOCAL;var stopped=false;var background=false;var cancel:(()->Unit)?=null
         val order:Long=nextOrder++
+        val createdNs=System.nanoTime();var networkNs=0L
         @Volatile var localRank=Int.MAX_VALUE
         var localWork:LocalWork?=null
         var localFinished=false;var localHit=false;var bypassCache=false;var networkTried=false
@@ -56,6 +59,7 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
         var localDeadline=Long.MAX_VALUE
         var expiry:ScheduledFuture<*>?=null
         fun speculative()=users.isNotEmpty()&&users.all{it.speculative}
+        fun imagery()=users.any{it.imagery&&!it.speculative}
         fun rank()=users.minOfOrNull{it.priority+(if(it.speculative)10000 else 0)}?:Int.MAX_VALUE
     }
     private inner class LocalWork(val job:Job):Runnable,Comparable<LocalWork>{
@@ -124,6 +128,7 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
     private fun networkDone(job:Job,result:Result<TileBody>){
         val waitForLocal=synchronized(lock){
             if(job.stopped||job.phase!=Phase.NETWORK)return
+            lastNetworkMs=TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-job.networkNs);maxNetworkMs=maxOf(maxNetworkMs,lastNetworkMs)
             if(result.isFailure&&job.localHit)return
             if(result.isFailure&&!job.localFinished){
                 // A failed hedge must not suppress a possible saved/disk hit.
@@ -144,7 +149,7 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
         }
         watchLocal(job)
     }
-    inner class Consumer internal constructor(internal var priority:Int,internal var speculative:Boolean):AutoCloseable {
+    inner class Consumer internal constructor(internal var priority:Int,internal var speculative:Boolean,internal val imagery:Boolean):AutoCloseable {
         private val owned=LinkedHashMap<ResourceKey,Job>()
         private val immediate=LinkedHashMap<ResourceKey,CompletableFuture<TileBody>>()
         private var released=false
@@ -216,7 +221,11 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
         }
 
     }
-    fun consumer(priority:Int=0,speculative:Boolean=false)=Consumer(priority,speculative)
+    fun consumer(priority:Int=0,speculative:Boolean=false,imagery:Boolean=false)=Consumer(priority,speculative,imagery)
+    /** Publish before CPU work can fan out DEM dependencies. Keep two existing
+     * foreground slots available for sharper images until visible demand is
+     * satisfied; no extra connections or cancellation of shared terrain work. */
+    fun imageryDemand(pending:Boolean){synchronized(lock){imageryPending=pending};pump()}
     fun movement(moving:Boolean){synchronized(lock){val next=if(moving)8 else 12;if(next==foregroundLimit)return;foregroundLimit=next};pump()}
     private fun abandon(job:Job){
         val cancel=synchronized(lock){
@@ -241,14 +250,18 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
             while(true){
                 if(networkActive>=foregroundLimit+2)break
                 var best:Job?=null;var bestRank=Int.MAX_VALUE
+                val reserve=imageryPending||jobs.values.any{it.phase!=Phase.DONE&&it.imagery()}
+                val nonImageActive=if(reserve)jobs.values.count{it.phase==Phase.NETWORK&&!it.background&&!it.imagery()}else 0
                 // One scan, no temporary filtered lists per admitted transfer.
                 for(candidate in jobs.values){
                     if(candidate.phase!=Phase.QUEUED||candidate.stopped||candidate.users.isEmpty())continue
                     if(if(candidate.speculative())backgroundActive>=2 else networkActive-backgroundActive>=foregroundLimit)continue
+                    if(reserve&&!candidate.speculative()&&!candidate.imagery()&&nonImageActive>=foregroundLimit-2)continue
                     val rank=candidate.rank()
                     if(best==null||rank<bestRank){best=candidate;bestRank=rank}
                 }
                 val job=best?:break
+                job.networkNs=System.nanoTime();lastAdmissionMs=TimeUnit.NANOSECONDS.toMillis(job.networkNs-job.createdNs)
                 job.phase=Phase.NETWORK;job.networkTried=true;job.background=job.speculative();networkActive++;if(job.background)backgroundActive++
                 networkStarts++;starts+=job
             }
@@ -296,6 +309,12 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
     fun memoryPressure(){synchronized(lock){ram.clear();bytes=0;nextExpiry=Long.MAX_VALUE}}
     fun invalidate(){synchronized(lock){ram.clear();bytes=0;nextExpiry=Long.MAX_VALUE;for((key,old)in metadata.toMap())metadata[key]=old.copy(fingerprint="invalidated",until=0)}}
     fun stats():Map<String,Long> = synchronized(lock){prune();mapOf("encodedBytes" to bytes,"ramHits" to ramHits,"localHits" to localHits,"networkStarts" to networkStarts,"shared" to shares,"cancelled" to cancellations,"pending" to jobs.size.toLong(),"networkActive" to networkActive.toLong(),"backgroundActive" to backgroundActive.toLong(),"localQueued" to local.queue.size.toLong(),"networkQueued" to jobs.values.count{it.phase==Phase.QUEUED}.toLong(),"localTimeouts" to localTimeouts,"localWatchRuns" to localWatchRuns,"localErrors" to localErrors,"uncachedStarts" to bypasses,"localCooldownMs" to (localCooldownUntil-localNow()).coerceAtLeast(0))}
+    fun latencyStats():Map<String,Long> = synchronized(lock){
+        val now=System.nanoTime()
+        mapOf("lastHttpMs" to lastNetworkMs,"maxHttpMs" to maxNetworkMs,"lastAdmissionMs" to lastAdmissionMs,
+            "oldestActiveHttpMs" to (jobs.values.filter{it.phase==Phase.NETWORK}.maxOfOrNull{TimeUnit.NANOSECONDS.toMillis(now-it.networkNs)}?:0L),
+            "oldestWaitingMs" to (jobs.values.filter{it.phase==Phase.QUEUED||it.phase==Phase.LOCAL}.maxOfOrNull{TimeUnit.NANOSECONDS.toMillis(now-it.createdNs)}?:0L))
+    }
     fun awaitClosed(){local.awaitTermination(5,TimeUnit.SECONDS);timers.awaitTermination(5,TimeUnit.SECONDS)}
     override fun close(){
         val rows=synchronized(lock){if(closed)return;closed=true;localWatchEpoch++;localWatch?.cancel(false);localWatch=null;val rows=jobs.values.toList();for(job in rows){job.stopped=true;job.expiry?.cancel(false)};jobs.clear();ram.clear();metadata.clear();bytes=0;rows}

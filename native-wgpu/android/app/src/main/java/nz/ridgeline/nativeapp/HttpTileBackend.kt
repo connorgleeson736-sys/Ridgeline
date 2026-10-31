@@ -3,9 +3,13 @@ import okhttp3.*
 import java.io.IOException
 
 /** The local path is explicitly cache-only. It never waits on a network permit. */
-internal class HttpTileBackend(private val client:OkHttpClient,private val offlineRead:(String)->ByteArray?):TileBackend {
+internal class HttpTileBackend(private val client:OkHttpClient,
+    private val escapeRead:(ResourceKey)->TileBody?={null},
+    private val escapeWrite:(ResourceKey,TileBody)->Unit={_,_->},
+    private val offlineRead:(String)->ByteArray?):TileBackend {
     override fun local(key:ResourceKey):TileBody?{
         offlineRead(key.url)?.let{return TileBody(it,200,Long.MAX_VALUE)}
+        escapeRead(key)?.let{return it}
         val policy=if(key.offline)CacheControl.FORCE_CACHE else CacheControl.Builder().onlyIfCached().build()
         client.newCall(Request.Builder().url(key.url).header("User-Agent","Ridgeline-Native/0.1.0").cacheControl(policy).build()).execute().use{response->
             if(response.code==504)return null
@@ -17,7 +21,12 @@ internal class HttpTileBackend(private val client:OkHttpClient,private val offli
     // Dispatcher, connection pool, proxy, TLS and cancellation ownership are shared.
     private val direct by lazy{client.newBuilder().cache(null).build()}
     override fun network(key:ResourceKey,done:(Result<TileBody>)->Unit)=network(client,key,done)
-    override fun uncachedNetwork(key:ResourceKey,done:(Result<TileBody>)->Unit)=network(direct,key,done)
+    override fun uncachedNetwork(key:ResourceKey,done:(Result<TileBody>)->Unit)=network(direct,key){result->
+        // Enqueue only: a cache-free winner must not re-enter a stuck journal
+        // before delivery, but should survive encoded-RAM eviction/restart.
+        result.getOrNull()?.let{body->runCatching{escapeWrite(key,body)}}
+        done(result)
+    }
     private fun network(http:OkHttpClient,key:ResourceKey,done:(Result<TileBody>)->Unit):()->Unit{
         check(!key.offline){"Offline network request rejected"}
         val call=http.newCall(Request.Builder().url(key.url).header("User-Agent","Ridgeline-Native/0.1.0").build())

@@ -82,6 +82,7 @@ class GpuUploadQueue(private val capacity:Int) {
     }}?:entries.values.firstOrNull{foreground(it)}?:entries.values.firstOrNull()
     }
     @Synchronized fun isNotEmpty()=entries.isNotEmpty()
+    @Synchronized fun size()=entries.size
     @Synchronized fun clear()=entries.clear()
     companion object{val EMPTY:ByteBuffer=ByteBuffer.allocateDirect(0)}
 }
