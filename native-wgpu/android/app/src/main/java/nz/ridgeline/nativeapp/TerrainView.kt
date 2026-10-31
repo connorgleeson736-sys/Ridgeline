@@ -36,7 +36,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     private val surfaceFocus=SurfaceFocusTracker()
     fun surfaceFocusFor(pose:CameraPose):SurfaceFocus?=surfaceFocus.current(pose,width,height,pixelScale,android.os.SystemClock.elapsedRealtime())
     private val focusBytes=ByteBuffer.allocateDirect(24).order(ByteOrder.LITTLE_ENDIAN)
-    private var focusTerrainDirty=false
+    private var focusCoverDirty=false
     val gestureInProgress get()=gestureActive
     @Volatile private var lastBacklog=0
     internal fun loadingSnapshot()="GPU uploads waiting: ${uploads.size()} · outstanding submissions: $lastBacklog\nResident geometry/images: ${residency.geometry.size}/${residency.images.size}\nDetail focus: "+if(surfaceFocusFor(planningPose)!=null)"measured visible terrain"else"map pivot (no current terrain hit)"
@@ -164,7 +164,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             count++;bytes+=tile.bytes;accepted=accepted||ok;geometryChanged=geometryChanged||(ok&&tile.kind!=GpuUploadQueue.Kind.IMAGE)
         }
         if(count>0)refreshResidency()
-        focusTerrainDirty=focusTerrainDirty||geometryChanged
+        focusCoverDirty=focusCoverDirty||accepted
         if(accepted)post{onStatus("");onData()}
         val packet=routePacket
         if(packet!=null&&packet!==appliedRoutes&&NativeBridge.routes(handle,packet))appliedRoutes=packet
@@ -207,16 +207,16 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             val rendered=pose
             if(previous!=pose&&pose!=requested)post{if(cameraPose==requested&&live&&active)onCamera()}
             val focusNow=android.os.SystemClock.elapsedRealtime()
-            val sampleFocus=surfaceFocus.needsSample(pose,width,height,pixelScale,focusNow,focusTerrainDirty,gestureActive)
+            val sampleFocus=surfaceFocus.needsSample(pose,width,height,pixelScale,focusNow,focusCoverDirty,gestureActive)
             var centerPoint:DoubleArray?=null
             gpu.removeCallbacks(focusWake)
             if(sampleFocus||shouldRecenter){
                 focusBytes.rewind()
                 centerPoint=if(NativeBridge.pick(handle,width*.5,height*.5,focusBytes))DoubleArray(3){focusBytes.double}else null
                 val changedFocus=surfaceFocus.update(pose,width,height,pixelScale,focusNow,centerPoint)
-                focusTerrainDirty=false
+                focusCoverDirty=false
                 if(changedFocus)post{if(cameraPose==requested&&live&&active)onCamera()}
-            }else if(surfaceFocus.pending(pose,width,height,pixelScale,focusTerrainDirty))gpu.postDelayed(focusWake,240)
+            }else if(surfaceFocus.pending(pose,width,height,pixelScale,focusCoverDirty))gpu.postDelayed(focusWake,240)
             if(shouldRecenter){
             recenterPending=false
             val token=gestureEpoch
@@ -271,7 +271,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         live=true;val token=generation.incrementAndGet();val surface=holder.surface
         gpu.post {
             if(!live||generation.get()!=token)return@post
-            surfaceFocus.clear();focusTerrainDirty=false
+            surfaceFocus.clear();focusCoverDirty=false
             NativeBridge.textureBackend(context.getSharedPreferences("display",0).getInt("textureBackend",0))
             val created=NativeBridge.create(surface,width,height)
             if(!live||generation.get()!=token){if(created!=0L)NativeBridge.destroy(created);return@post}

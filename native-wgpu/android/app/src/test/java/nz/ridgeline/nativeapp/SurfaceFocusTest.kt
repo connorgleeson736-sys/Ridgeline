@@ -33,6 +33,9 @@ class SurfaceFocusTest {
   assertNull(tracker.current(pose,640,320,1.0,1100))
   assertNotNull(tracker.current(pose,320,640,1.0,9999)) // unchanged camera needs no permanent sampling
   assertTrue(tracker.update(pose,320,640,1.0,1100,null));assertNull(tracker.current(pose,320,640,1.0,1100))
+  assertTrue(tracker.pending(pose,320,640,1.0,true)) // imagery can make existing terrain drawable
+  assertFalse(tracker.needsSample(pose,320,640,1.0,1200,true,false))
+  assertTrue(tracker.needsSample(pose,320,640,1.0,1340,true,false))
   tracker.update(pose,320,640,1.0,1200,doubleArrayOf(Double.NaN,0.0,0.0));assertNull(tracker.current(pose,320,640,1.0,1200))
   tracker.clear();assertTrue(tracker.needsSample(pose,320,640,1.0,1300,false,false))
  }

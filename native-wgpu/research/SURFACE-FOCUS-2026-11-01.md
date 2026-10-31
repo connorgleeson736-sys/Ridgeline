@@ -14,7 +14,9 @@ same result serves existing idle camera recentering, avoiding a duplicate pick.
 
 The focus is separate from the camera pose. During gestures sampling is bounded
 to 240 ms, with one deferred wake for unfinished changes and no permanent idle
-frame loop. Terrain arrivals/settled camera changes refresh it. Invalid/missing
+frame loop. Terrain arrivals/settled camera changes refresh it. Imagery arrivals
+also invalidate the sample: they can make existing terrain drawable after an
+earlier ray found no textured cover. Invalid/missing
 terrain clears it; unchanged views reuse the measured hit. A recent hit can
 survive small motion only while projecting inside the central 80% of the new
 viewport, and expires after 500 ms across changed cameras. Resize, surface loss

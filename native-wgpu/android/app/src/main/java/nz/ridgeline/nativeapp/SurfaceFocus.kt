@@ -10,14 +10,14 @@ internal class SurfaceFocusTracker {
     private data class Sample(val pose:CameraPose,val width:Int,val height:Int,val scale:Double,val at:Long,val focus:SurfaceFocus?)
     @Volatile private var sample:Sample?=null
     fun clear(){sample=null}
-    fun pending(pose:CameraPose,width:Int,height:Int,scale:Double,geometryChanged:Boolean):Boolean {
+    fun pending(pose:CameraPose,width:Int,height:Int,scale:Double,coverChanged:Boolean):Boolean {
         val old=sample?:return true
-        return geometryChanged||old.pose!=pose||old.width!=width||old.height!=height||old.scale!=scale
+        return coverChanged||old.pose!=pose||old.width!=width||old.height!=height||old.scale!=scale
     }
-    fun needsSample(pose:CameraPose,width:Int,height:Int,scale:Double,now:Long,geometryChanged:Boolean,gesturing:Boolean):Boolean {
+    fun needsSample(pose:CameraPose,width:Int,height:Int,scale:Double,now:Long,coverChanged:Boolean,gesturing:Boolean):Boolean {
         val old=sample?:return true
-        val changed=pending(pose,width,height,scale,geometryChanged)
-        return changed&&(!gesturing||now-old.at>=240)
+        val changed=pending(pose,width,height,scale,coverChanged)
+        return changed&&(now-old.at>=240||(!gesturing&&old.pose!=pose)||old.width!=width||old.height!=height||old.scale!=scale)
     }
     fun update(pose:CameraPose,width:Int,height:Int,scale:Double,now:Long,point:DoubleArray?):Boolean {
         val previous=current(pose,width,height,scale,now)
