@@ -350,14 +350,18 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             warmWanted=extras;view.updateWarmDemand(extras.filter{it.geometry}.map{it.id.gpu()}.toSet(),extras.filter{!it.geometry}.map{it.id.gpu()}.toSet())
             for(source in extras){val readyData=synchronized(ready){ready[source]};if(readyData!=null)upload(source,readyData)else schedule(source,1000,true)}
     }
-    private val transport by lazy{TileTransport(HttpTileBackend(client,
+    private val backend by lazy{HttpTileBackend(client,
         escapeRead={escaped.get(it)},
         escapeWrite={resource,body->if(escapedBytes>0&&!escapedWrites.isShutdown)runCatching{escapedWrites.execute{escaped.put(resource,body)}}},
-        offlineRead=offline::read),ramBudget.encoded)}
+        offlineRead=offline::read)}
+    private val transport by lazy{TileTransport(backend,ramBudget.encoded)}
     fun loadingDiagnostics():String {
         val counts=transport.stats();val times=transport.latencyStats()
+        val http=backend.stats()
         return "Native loading snapshot\n"+
             "HTTP active/queued: ${counts["networkActive"]}/${counts["networkQueued"]} · local reads queued: ${counts["localQueued"]}\n"+
+            "Underlying HTTP running/queued: ${http["httpRunning"]}/${http["httpQueued"]} · canceled but still occupying slots: ${http["retiredHttpRunning"]}/${http["retiredHttpQueued"]}\n"+
+            "Isolated escape HTTP running/queued: ${http["escapeRunning"]}/${http["escapeQueued"]}\n"+
             "Oldest active HTTP: ${times["oldestActiveHttpMs"]} ms · waiting source: ${times["oldestWaitingMs"]} ms\n"+
             "Last HTTP stage: ${times["lastHttpMs"]} ms · max this session: ${times["maxHttpMs"]} ms\n"+
             "Last local/queue wait before HTTP: ${times["lastAdmissionMs"]} ms\n"+

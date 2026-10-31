@@ -7,7 +7,8 @@ import java.util.concurrent.*
 internal data class SourceStamp(val key:String,val fingerprint:String,val until:Long)
 internal data class TileBody(val bytes:ByteArray,val status:Int,val until:Long,val stamp:SourceStamp?=null)
 internal data class ResourceKey(val url:String,val offline:Boolean){val id:String by lazy{PreparedTerrainCache.digest((if(offline)"offline:" else "online:").plus(url).toByteArray())}}
-internal interface TileBackend {
+internal interface TileBackend:AutoCloseable {
+    override fun close(){}
     /** Local storage only; a miss MUST NOT initiate HTTP. */
     fun local(key:ResourceKey):TileBody?
     fun network(key:ResourceKey,done:(Result<TileBody>)->Unit):()->Unit
@@ -320,5 +321,6 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
         val rows=synchronized(lock){if(closed)return;closed=true;localWatchEpoch++;localWatch?.cancel(false);localWatch=null;val rows=jobs.values.toList();for(job in rows){job.stopped=true;job.expiry?.cancel(false)};jobs.clear();ram.clear();metadata.clear();bytes=0;rows}
         for(job in rows){job.cancel?.invoke();job.result.completeExceptionally(PreparationAborted())}
         local.shutdownNow();timers.shutdownNow()
+        backend.close()
     }
 }

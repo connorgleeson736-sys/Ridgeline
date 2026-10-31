@@ -18,9 +18,29 @@ internal class HttpTileBackend(private val client:OkHttpClient,
     }
     // FORCE_NETWORK still runs CacheInterceptor.get() in OkHttp 4.12. A
     // cache-free sibling is required to escape a blocked disk journal/lookup.
-    // Dispatcher, connection pool, proxy, TLS and cancellation ownership are shared.
-    private val direct by lazy{client.newBuilder().cache(null).build()}
-    override fun network(key:ResourceKey,done:(Result<TileBody>)->Unit)=network(client,key,done)
+    // A canceled call is still a Dispatcher running/queued call until its
+    // callback exits. In particular, cancellation cannot interrupt a cache
+    // monitor acquisition. Sharing that dispatcher made the escape path wait
+    // behind canceled off-screen calls even after transport permits were free.
+    // Isolate this bounded queue; retain connection pool, proxy and TLS settings.
+    private val directClient=lazy{client.newBuilder().cache(null).dispatcher(Dispatcher().apply{
+        maxRequests=14;maxRequestsPerHost=14 // existing 12 foreground + 2 background maximum
+    }).build()}
+    private val direct by directClient
+    override fun network(key:ResourceKey,done:(Result<TileBody>)->Unit):()->Unit {
+        val retired=client.dispatcher.runningCalls().any{it.isCanceled()}||client.dispatcher.queuedCalls().any{it.isCanceled()}
+        return if(retired)uncachedNetwork(key,done)else network(client,key,done)
+    }
+    fun stats():Map<String,Long> {
+        val running=client.dispatcher.runningCalls();val queued=client.dispatcher.queuedCalls()
+        return mapOf("httpRunning" to running.size.toLong(),"httpQueued" to queued.size.toLong(),
+            "retiredHttpRunning" to running.count{it.isCanceled()}.toLong(),"retiredHttpQueued" to queued.count{it.isCanceled()}.toLong(),
+            "escapeRunning" to if(directClient.isInitialized())direct.dispatcher.runningCallsCount().toLong()else 0L,
+            "escapeQueued" to if(directClient.isInitialized())direct.dispatcher.queuedCallsCount().toLong()else 0L)
+    }
+    override fun close(){if(directClient.isInitialized()){
+        direct.dispatcher.cancelAll();direct.dispatcher.executorService.shutdown()
+    }}
     override fun uncachedNetwork(key:ResourceKey,done:(Result<TileBody>)->Unit)=network(direct,key){result->
         // Enqueue only: a cache-free winner must not re-enter a stuck journal
         // before delivery, but should survive encoded-RAM eviction/restart.
