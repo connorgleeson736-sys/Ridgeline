@@ -100,6 +100,13 @@ Debug signing uses the local Android debug keystore, so byte-identical signed
 APKs across machines require the same locally managed key. Never commit it.
 The checked-in LINZ client key is the existing authorized public application key.
 
+For a separately installed performance checkpoint, pass
+`-PridgelineSideBySide=true` to Gradle. This uses
+`nz.ridgeline.nativeapp.performance` and the label **Ridgeline Native Performance**.
+Set `RIDGELINE_SIGNING_KEYSTORE` to an external Android debug-format key to reuse
+its signer. The original native package remains the default. Keep signing keys
+and their private backups outside Git.
+
 For emulator ABI also install `x86_64-linux-android`, then set
 `RIDGELINE_ABIS=arm64-v8a,armeabi-v7a,x86_64`. `RIDGELINE_PROFILE=debug` makes an unoptimized
 native build for debugging. The final device artifact should use `release`.

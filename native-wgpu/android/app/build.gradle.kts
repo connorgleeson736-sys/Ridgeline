@@ -1,10 +1,17 @@
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
 plugins { id("com.android.application"); id("org.jetbrains.kotlin.android") }
+val sideBySide=providers.gradleProperty("ridgelineSideBySide").map(String::toBoolean).getOrElse(false)
 android {
  namespace="nz.ridgeline.nativeapp"
  compileSdk=36
- defaultConfig { applicationId="nz.ridgeline.nativeapp"; minSdk=26; targetSdk=36; versionCode=2; versionName="0.1.1-performance-checkpoint"; ndk {abiFilters+=providers.gradleProperty("ridgelineAbis").getOrElse("arm64-v8a").split(",")} }
+ defaultConfig { applicationId = if (sideBySide) "nz.ridgeline.nativeapp.performance" else "nz.ridgeline.nativeapp"
+  manifestPlaceholders["ridgelineAppLabel"] = if (sideBySide) "Ridgeline Native Performance" else "Ridgeline Native Prototype"
+  minSdk=26; targetSdk=36; versionCode=3; versionName="0.1.2-loading-checkpoint"; ndk {abiFilters+=providers.gradleProperty("ridgelineAbis").getOrElse("arm64-v8a").split(",")} }
+ // An optional external key makes signing reproducible without committing keys.
+ signingConfigs.getByName("debug") {
+  providers.environmentVariable("RIDGELINE_SIGNING_KEYSTORE").orNull?.let {storeFile=file(it)}
+ }
  ndkVersion="29.0.14206865"
  compileOptions {sourceCompatibility=JavaVersion.VERSION_21;targetCompatibility=JavaVersion.VERSION_21}
  packaging {jniLibs {useLegacyPackaging=false}}

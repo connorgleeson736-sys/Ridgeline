@@ -3,9 +3,9 @@
   <activity android:name=".ProofActivity" android:exported="true" android:label="Ridgeline controlled GPU fixture"/>
   <activity android:name=".GestureProofActivity" android:exported="false"/>
  </application>
- <instrumentation android:name=".ProofInstrumentation" android:targetPackage="nz.ridgeline.nativeapp" android:functionalTest="true"/>
- <instrumentation android:name=".LiveProofInstrumentation" android:targetPackage="nz.ridgeline.nativeapp" android:functionalTest="true"/>
- <instrumentation android:name=".MipmapProofInstrumentation" android:targetPackage="nz.ridgeline.nativeapp" android:functionalTest="true"/>
- <instrumentation android:name=".PlannerProofInstrumentation" android:targetPackage="nz.ridgeline.nativeapp" android:functionalTest="true"/>
- <instrumentation android:name=".GestureProofInstrumentation" android:targetPackage="nz.ridgeline.nativeapp" android:functionalTest="true"/>
+ <instrumentation android:name=".ProofInstrumentation" android:targetPackage="${applicationId}" android:functionalTest="true"/>
+ <instrumentation android:name=".LiveProofInstrumentation" android:targetPackage="${applicationId}" android:functionalTest="true"/>
+ <instrumentation android:name=".MipmapProofInstrumentation" android:targetPackage="${applicationId}" android:functionalTest="true"/>
+ <instrumentation android:name=".PlannerProofInstrumentation" android:targetPackage="${applicationId}" android:functionalTest="true"/>
+ <instrumentation android:name=".GestureProofInstrumentation" android:targetPackage="${applicationId}" android:functionalTest="true"/>
 </manifest>
