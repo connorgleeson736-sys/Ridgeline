@@ -3,9 +3,11 @@
 Latency follow-up: online foreground requests can escape a stalled disk lookup
 through a bounded, shared HTTP path; nearby DEM work now decodes early and starts
 missing-data parent requests before other inputs finish. Controlled host fixtures
-measure 404 → 43 ms under a 400 ms cache lock and 376 → 196 ms for a
+measure 404 → 43 ms under a 400 ms cache lock and 375 → 197 ms for a
 parent-dependent complete mesh, with identical mesh bytes and request counts. Healthy cache hits
 remain local. See [scope, tradeoffs and reproduction](research/LATENCY-BARRIERS-2026-11-01.md).
+Camera-generation batching also removes obsolete download admissions during
+cancellation; one deadline wake covers a 200-request stall fixture.
 This source update has not been packaged or measured on a phone.
 
 Foreground-loading pass: close tiles now retain priority through Rust selection,

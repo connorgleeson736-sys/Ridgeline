@@ -74,7 +74,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     @Volatile var offlineOnly=preferences.getBoolean("offlineOnly",false);private set
     val textureBackend get()=preferences.getInt("textureBackend",0)
     fun textureBackend(mode:Int)=view.textureBackend(mode)
-    fun offlineOnly(value:Boolean){offlineOnly=value;preferences.edit().putBoolean("offlineOnly",value).apply();for(task in jobs.values)task.cancel();clearWarm();synchronized(ready){ready.clear();readyBytes=0};synchronized(decoded){decoded.clear()};cameraChanged()}
+    fun offlineOnly(value:Boolean){offlineOnly=value;preferences.edit().putBoolean("offlineOnly",value).apply();transport.batchDemand{for(task in jobs.values)task.cancel();clearWarm()};synchronized(ready){ready.clear();readyBytes=0};synchronized(decoded){decoded.clear()};cameraChanged()}
     val overviews=OverviewAttachments(context)
     private val attachmentJobs=Executors.newSingleThreadExecutor()
     private val imagery = NativeImagery(context, ::fetch, {z,x,y->linz("aerial",Id(z,x,y),"webp")},overviews,::checkPreparation)
@@ -229,38 +229,43 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         }
         val ranked=plan.ranked
         val prior=previousPose
-        if(prior!=key.pose){viewRevision++;clearWarm();previousPose=key.pose}
-        wanted = ranked.keys.toSet()
-        // Restore already prepared parents before requesting more detailed work.
-        // A zoom jump can skip several levels; the exact new plan need not name
-        // the parent that was visible moments ago. Geometry/photos are independent.
-        val fallbackSources=HashSet<Source>()
-        for(source in wanted){var id=source.id;while(id.z>0){id=id.parent();val ancestor=Source(id,source.geometry);if(ancestor in wanted)fallbackSources.add(ancestor)}}
-        val cachedParents=LinkedHashMap<Source,ByteBuffer>()
-        for(source in wanted){
-            // A ready fine tile does not cover its parent's siblings. Restore
-            // backgrounds for ideal leaves, not recursively for fallback requests.
-            if(source in fallbackSources)continue
-            val parent=synchronized(ready){CachedFallback.nearest(source.id.gpu()){id->ready[Source(Id(id.z,id.x,id.y),source.geometry)]}}
-            if(parent!=null){val id=parent.first;val owner=Source(Id(id.z,id.x,id.y),source.geometry)
-                if(!resident(owner))cachedParents[owner]=parent.second}
-        }
-        view.updateRankedUploadDemand(ranked.filterKeys{it.geometry}.mapKeys{it.key.id.gpu()},
-            ranked.filterKeys{!it.geometry}.mapKeys{it.key.id.gpu()})
-        for((parent,data)in cachedParents)upload(parent,data)
-        failures.keys.removeAll{it !in wanted}
-        if(view.gestureInProgress&&!lastGesture){predictionCount=0;cancelPredictions()}
-        lastGesture=view.gestureInProgress
-        transport.movement(view.gestureInProgress)
-        val returning=jobs.values.filter{it.source !in wanted&&!it.speculative&&it.started}.sortedBy{it.priority}.take(2).toSet()
-        for(task in jobs.values){if(task.source in wanted)task.promote(ranked[task.source]?:0)else if(task.source in warmWanted&&prepareAhead&&!view.gestureInProgress){}else if(task !in returning)task.cancel()else task.park()}
-        for((source,priority)in ranked.entries.sortedBy{it.value}){
-            if(resident(source))continue
-            val fallback=source in fallbackSources
-            if(view.hasResidentCoverage(source.id.gpu(),source.geometry,!fallback))continue
-            val old=synchronized(ready){ready[source]};if(old!=null){upload(source,old);continue}
-            val failure=failures[source];if(failure!=null&&android.os.SystemClock.elapsedRealtime()<failure.retryAt)continue
-            schedule(source,priority,false)
+        // Publish the whole camera generation before any freed network slot
+        // is reused. Only memory lookups, queue operations and async scheduling
+        // belong here; predictive catalog/source work stays outside this scope.
+        transport.batchDemand {
+            if(prior!=key.pose){viewRevision++;clearWarm();previousPose=key.pose}
+            wanted = ranked.keys.toSet()
+            // Restore already prepared parents before requesting more detailed work.
+            // A zoom jump can skip several levels; the exact new plan need not name
+            // the parent that was visible moments ago. Geometry/photos are independent.
+            val fallbackSources=HashSet<Source>()
+            for(source in wanted){var id=source.id;while(id.z>0){id=id.parent();val ancestor=Source(id,source.geometry);if(ancestor in wanted)fallbackSources.add(ancestor)}}
+            val cachedParents=LinkedHashMap<Source,ByteBuffer>()
+            for(source in wanted){
+                // A ready fine tile does not cover its parent's siblings. Restore
+                // backgrounds for ideal leaves, not recursively for fallback requests.
+                if(source in fallbackSources)continue
+                val parent=synchronized(ready){CachedFallback.nearest(source.id.gpu()){id->ready[Source(Id(id.z,id.x,id.y),source.geometry)]}}
+                if(parent!=null){val id=parent.first;val owner=Source(Id(id.z,id.x,id.y),source.geometry)
+                    if(!resident(owner))cachedParents[owner]=parent.second}
+            }
+            view.updateRankedUploadDemand(ranked.filterKeys{it.geometry}.mapKeys{it.key.id.gpu()},
+                ranked.filterKeys{!it.geometry}.mapKeys{it.key.id.gpu()})
+            for((parent,data)in cachedParents)upload(parent,data)
+            failures.keys.removeAll{it !in wanted}
+            if(view.gestureInProgress&&!lastGesture){predictionCount=0;cancelPredictions()}
+            lastGesture=view.gestureInProgress
+            transport.movement(view.gestureInProgress)
+            val returning=jobs.values.filter{it.source !in wanted&&!it.speculative&&it.started}.sortedBy{it.priority}.take(2).toSet()
+            for(task in jobs.values){if(task.source in wanted)task.promote(ranked[task.source]?:0)else if(task.source in warmWanted&&prepareAhead&&!view.gestureInProgress){}else if(task !in returning)task.cancel()else task.park()}
+            for((source,priority)in ranked.entries.sortedBy{it.value}){
+                if(resident(source))continue
+                val fallback=source in fallbackSources
+                if(view.hasResidentCoverage(source.id.gpu(),source.geometry,!fallback))continue
+                val old=synchronized(ready){ready[source]};if(old!=null){upload(source,old);continue}
+                val failure=failures[source];if(failure!=null&&android.os.SystemClock.elapsedRealtime()<failure.retryAt)continue
+                schedule(source,priority,false)
+            }
         }
         if(prior!=key.pose)predict(prior,key)
         scheduleIdle(key,viewRevision)
@@ -269,11 +274,18 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         val task=Task(source,priority,speculative)
         if(jobs.putIfAbsent(source,task)==null)task.enqueue()else task.cancel()
     }
-    @Synchronized private fun cancelPredictions(){for(consumer in predictions.values)consumer.release(true);predictions.clear()}
+    @Synchronized private fun cancelPredictions(){
+        // Completing a canceled future runs its callback synchronously; remove
+        // ownership before callbacks can mutate the same prediction map.
+        val obsolete=predictions.values.toList();predictions.clear()
+        transport.batchDemand{for(consumer in obsolete)consumer.release(true)}
+    }
     @Synchronized private fun clearWarm(cancelPredictions:Boolean=true){
         idleWake?.cancel(false);idleWake=null;warmWanted=emptySet();view.updateWarmDemand(emptySet(),emptySet())
-        for(task in jobs.values)if(task.speculative)task.cancel()
-        if(cancelPredictions)cancelPredictions()
+        transport.batchDemand {
+            for(task in jobs.values)if(task.speculative)task.cancel()
+            if(cancelPredictions)cancelPredictions()
+        }
     }
     private fun predict(prior:CameraPose?,key:DemandPlanKey){
         val now=System.currentTimeMillis();if(prior==null||offlineOnly||now-predictionAt<250)return
@@ -516,9 +528,9 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         transport.memoryPressure();clearWarm()
         synchronized(decoded){while(decoded.size>minOf(16,demLimit))decoded.remove(decoded.keys.first())}
     }
-    fun setActive(value:Boolean){active=value;if(value)cameraChanged()else{for(task in jobs.values)task.cancel();clearWarm()}}
+    fun setActive(value:Boolean){active=value;if(value)cameraChanged()else{transport.batchDemand{for(task in jobs.values)task.cancel();clearWarm()}}}
     fun close() {
-        dead = true;for(task in jobs.values)task.cancel();clearWarm();transport.close();preparedWrites.shutdownNow();attachmentJobs.shutdown();downloadCancel.set(true);downloadJobs.shutdown(); profileRevision.incrementAndGet();profileJob?.cancel(true);profileJobs.shutdownNow();timer?.cancel(true); scheduler.shutdownNow(); geometryWorkers.shutdownNow();imageWorkers.shutdownNow()
+        dead = true;transport.batchDemand{for(task in jobs.values)task.cancel();clearWarm();transport.close()};preparedWrites.shutdownNow();attachmentJobs.shutdown();downloadCancel.set(true);downloadJobs.shutdown(); profileRevision.incrementAndGet();profileJob?.cancel(true);profileJobs.shutdownNow();timer?.cancel(true); scheduler.shutdownNow(); geometryWorkers.shutdownNow();imageWorkers.shutdownNow()
         client.dispatcher.cancelAll(); client.connectionPool.evictAll(); client.cache?.close(); client.dispatcher.executorService.shutdown(); synchronized(ready) { ready.clear(); readyBytes=0 }; synchronized(decoded) { decoded.clear() }
         Thread({downloadJobs.awaitTermination(60,TimeUnit.SECONDS);profileJobs.awaitTermination(60,TimeUnit.SECONDS);geometryWorkers.awaitTermination(60,TimeUnit.SECONDS);imageWorkers.awaitTermination(60,TimeUnit.SECONDS);attachmentJobs.awaitTermination(60,TimeUnit.SECONDS);transport.awaitClosed();overviews.close();offline.close()},"ridgeline-offline-close").start()
     }

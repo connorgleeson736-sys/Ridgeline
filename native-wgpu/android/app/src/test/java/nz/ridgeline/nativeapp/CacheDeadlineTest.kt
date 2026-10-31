@@ -45,6 +45,21 @@ class CacheDeadlineTest {
    assertEquals(201,requests.get());assertEquals(0L,transport.stats()["networkActive"]);assertEquals(0L,transport.stats()["pending"])
   }finally{release.countDown();transport.close();callers.shutdownNow()}
  }
+ @Test fun twoHundredStalledCacheReadsShareOneDeadlineWake(){
+  val release=CountDownLatch(1);val entered=CountDownLatch(2);val starts=AtomicInteger()
+  val transport=TileTransport(object:TileBackend{
+   override fun local(key:ResourceKey):TileBody?{entered.countDown();release.await(3,TimeUnit.SECONDS);return null}
+   override fun network(key:ResourceKey,done:(Result<TileBody>)->Unit):()->Unit{starts.incrementAndGet();return{}}
+  },0,localWaitMs=250)
+  try{
+   transport.movement(true)
+   val owners=(0..199).map{i->transport.consumer(1000,true).also{it.acquire(ResourceKey("batch$i",false))}}
+   assertTrue(entered.await(1,TimeUnit.SECONDS))
+   owners.forEachIndexed{i,c->c.promote(i)};waitUntil{starts.get()==8}
+   assertEquals(1L,transport.stats()["localWatchRuns"]);assertEquals(200L,transport.stats()["localTimeouts"])
+   owners.forEach{it.release(true)};assertEquals(0L,transport.stats()["networkActive"])
+  }finally{release.countDown();transport.close()}
+ }
  @Test fun offlineAndUnpromotedSpeculationNeverStartHedges(){
   val release=CountDownLatch(1);val starts=AtomicInteger()
   val transport=TileTransport(object:TileBackend{

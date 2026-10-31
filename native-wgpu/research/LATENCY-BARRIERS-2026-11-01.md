@@ -3,7 +3,7 @@
 Baseline: `49d74fc2d05e19ce26da65e0d93f78105c6c0da3`, the preceding foreground-priority
 checkpoint. The investigation continues on `native-renderer-performance`.
 
-This pass removes two serial waits in the Kotlin loading pipeline that feeds the
+This pass removes serial waits and obsolete-request churn in the Kotlin loading pipeline that feeds the
 Rust renderer. It changes when valid source work starts, while retaining the
 same imagery/terrain data, provider selection, geometry, mip levels and renderer.
 No route-planning code changes.
@@ -15,10 +15,16 @@ Final alternating host measurements and complete samples are in
 
 | Controlled workload | Before | After | Interpretation |
 | --- | ---: | ---: | --- |
-| Real OkHttp disk-cache monitor locked for 400 ms; genuine 114,118-byte LINZ PNG over loopback HTTP | 404.369 ms | **43.377 ms** | Acquire to validated body, 12 alternating trials. 89.3% less latency, 9.3× faster in this cache-stall fixture. The new request completes while the actual cache monitor remains locked. |
-| Four original DEM inputs; first source needs a real parent; 10/180 ms controlled source arrivals | 375.917 ms | **195.666 ms** | Complete 129×129 terrain mesh, 12 alternating trials. 48.0% less latency, 1.92× faster. Both paths make exactly five source requests and produce identical mesh bytes. |
-| Four original DEM inputs, no parent fallback | 198.579 ms | **186.256 ms** | Same 180 ms slowest input. Overlapping actual PNG decode hides approximately 12 ms of work. Both paths make four requests and produce identical mesh bytes. |
-| Healthy actual HTTP disk-cache hits, RAM retention disabled | 0.536 ms | 0.610 ms | 40 alternating samples after warmup. Approximately 0.074 ms extra admission overhead in this run; only the single cache-warming HTTP request occurred. This is a small cost, not an improvement claim. |
+| Real OkHttp disk-cache monitor locked for 400 ms; genuine 114,118-byte LINZ PNG over loopback HTTP | 404.218 ms | **43.248 ms** | Acquire to validated body, 12 alternating trials. 89.3% less latency, 9.3× faster in this cache-stall fixture. The new request completes while the actual cache monitor remains locked. |
+| Four original DEM inputs; first source needs a real parent; 10/180 ms controlled source arrivals | 375.235 ms | **197.203 ms** | Complete 129×129 terrain mesh, 12 alternating trials. 47.4% less latency, 1.90× faster. Both paths make exactly five source requests and produce identical mesh bytes. |
+| Four original DEM inputs, no parent fallback | 197.153 ms | **185.705 ms** | Same 180 ms slowest input. Overlapping actual PNG decode hides approximately 12 ms of work. Both paths make four requests and produce identical mesh bytes. |
+| Healthy actual HTTP disk-cache hits, RAM retention disabled | 0.581 ms | 0.614 ms | 40 alternating samples after warmup. Approximately 0.033 ms extra admission overhead in this run; only the single cache-warming HTTP request occurred. This is a small cost, not an improvement claim. |
+
+The camera-change cancellation replay also eliminates **64 unnecessary backend
+network admissions**: eight requests were already active and 64 were queued for
+an obsolete view. Unbatched cancellation admitted all 72 while canceling them;
+batched ownership changes admit only the original eight, then admit the new
+focus normally. These are admission counts, not measured TCP requests or latency.
 
 These gains are conditional and independent. They are not additive, a phone FPS
 measurement, or a claim that ordinary uncached HTTP latency falls by 9.3×.
@@ -99,16 +105,48 @@ Other visible and speculative jobs retain ordinary admission. Existing worker
 counts, network limits, original source stamps/deadlines, missing-pixel parent
 repair, shared CPU decode ownership and prepared-cache validation remain in use.
 
+## 3. Publish a camera generation before refilling network slots
+
+Each old consumer cancellation used to pump the network queue immediately. The
+first canceled transfer freed a slot for another old request; that request was
+then canceled later in the same loop. A rapid camera change could therefore
+admit the remainder of an obsolete queue while trying to remove it.
+
+`batchDemand` defers network admission until the entire ownership update is
+published. The view update includes prediction removal, cache-parent restoration,
+all promotions/cancellations and asynchronous scheduling of current demand.
+Camera planning and predictive catalog/source work stay outside this scope;
+it does not hold the transport monitor across changes or wait for source I/O.
+Nested updates and exceptions release the admission gate in `finally`.
+Offline-mode changes, pause/close and speculative cleanup use the same batching.
+
+The replay isolates this change by using the same production transport with
+batching enabled versus disabled: eight active requests plus 64 queued obsolete
+requests yield 72 versus eight backend admissions. The fresh focus is admitted
+successfully after either cleanup, without exceeding the existing moving limit.
+
+Deadline management also uses one on-demand, generation-checked wake instead of
+one scheduled callback per source. A focused test handles **200 stalled cache
+lookups with one wake**, while admitting only eight network requests. Idle work
+stops after the last pending check; there is no recurring idle loop or repaint.
+
+Prediction cancellation now detaches and clears its owner map before releasing
+consumers. Completing a canceled future can synchronously remove its prediction
+entry. Iterating the live map while doing this could throw a concurrent-modification
+exception and abort a view update. Detachment preserves safe callback ownership.
+This fix follows from the callback/collection path; no device occurrence is claimed.
+
 ## Verification
 
-- **57 focused Kotlin/JVM tests pass**, including both new fixtures and changed-path
+- **60 focused Kotlin/JVM tests pass**, including the latency/admission fixtures and changed-path
   regressions. All application and existing JVM test sources type-check with
   Kotlin 2.2.21, Java target 21 and Android API 36 classes.
 - Tests cover fast cached hits, fully blocked local workers, the actual OkHttp disk
   monitor, cooldown recovery, strict offline behavior, non-hedged speculation,
   foreground promotion, shared cancellation, the eight-slot moving limit, failed
   HTTP with a successful disk result, both winner orders, late-version rejection,
-  storage exceptions, incremental parent discovery, bounded/cleared operation
+  storage exceptions, coalesced deadlines, nested/exception-safe demand batches,
+  obsolete-admission suppression, incremental parent discovery, bounded/cleared operation
   memory, and full mesh equality with original DEM and parent pixels.
 - The frozen `BeforeDeadlineTransport.kt` is test-only source from `49d74fc`.
   The mesh replay uses identical transport/sampling code in both arms, changing
@@ -129,7 +167,8 @@ python native-wgpu/tools/fetch-live-proof.py --parent-dem /absolute/fixtures/liv
 RIDGELINE_PIPELINE_FIXTURE=/absolute/fixtures/live-proof \
 RIDGELINE_BENCH_OUTPUT=/absolute/writable/results \
   native-wgpu/android/gradlew -p native-wgpu/android :app:testDebugUnitTest \
-  --tests '*.CacheDeadlineTest' --tests '*.GeometryInputPipelineTest' \
+  --tests '*.DemandBatchTest' --tests '*.CacheDeadlineTest' \
+  --tests '*.GeometryInputPipelineTest' \
   --tests '*.TileTransportTest' --tests '*.PriorityPipelineTest' \
   --tests '*.GpuUploadQueueTest' --tests '*.SourceDemandTest' \
   --tests '*.SharedDecodeTest' --tests '*.DemSamplingTest' \

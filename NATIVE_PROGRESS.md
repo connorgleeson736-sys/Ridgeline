@@ -12,11 +12,17 @@ progress reopens the path; otherwise a monotonic 30-second cooldown applies.
 Nearby DEM operations now decode ready bodies and discover parent dependencies
 immediately, keeping at most eight raster references per operation and three
 focus operations. Pins are released on completion/cancellation/parking and under
-memory pressure. Final host fixtures: actual 400 ms cache lock 404.369 → 43.377 ms;
-complete parent-dependent mesh 375.917 → 195.666 ms, identical 66,564 bytes and
-five requests. Healthy disk hits 0.536 → 0.610 ms with no extra HTTP. All 57
+memory pressure. Final host fixtures: actual 400 ms cache lock 404.218 → 43.248 ms;
+complete parent-dependent mesh 375.235 → 197.203 ms, identical 66,564 bytes and
+five requests. Healthy disk hits 0.581 → 0.614 ms with no extra HTTP. All 60
 focused JVM tests and Kotlin/API 36 type-checking pass. No Rust/shader/route
 changes, new APK or phone performance claim.
+
+Continued review added atomic camera-demand publication and batched cancellation:
+a replay admits 8 rather than 72 backend operations when canceling eight active
+plus 64 obsolete queued sources. One on-demand deadline wake handles 200 stalled
+lookups. Prediction cancellation now clears ownership before callbacks can mutate
+its map, preventing an exception from aborting the view update.
 
 Audit: `native-wgpu/research/LATENCY-BARRIERS-2026-11-01.md`; raw measurements,
 input provenance and validation in `native-wgpu/validation/latency-barriers-2026-11-01/`.

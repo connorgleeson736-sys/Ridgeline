@@ -1,6 +1,6 @@
 {
   "baseline": "49d74fc2d05e19ce26da65e0d93f78105c6c0da3",
-  "testsPassed": 57,
+  "testsPassed": 60,
   "compiler": "Kotlin 2.2.21 / target 21 / Android API 36 classes",
   "productionAndTestKotlinTypeChecked": true,
   "actualOkHttpMonitorHeldMillis": 400,
@@ -15,12 +15,19 @@
   "rustKernelsAndGpuShadersChanged": false,
   "sourceSha256": {
     "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/HttpTileBackend.kt": "58fdecd1f08ac25bcd2368d95df1294eb8135902039765087035cce0a72e918c",
-    "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/TileLoader.kt": "58dc3c119aae2b8e2bb368606c4e17ebb4b0e669e45f4be3b244f6c5ffd74310",
-    "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/TileTransport.kt": "779facc39f1590d9f662db0f7cafcc018cc87d11b49238c2c1a849e8dfeb6920",
+    "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/TileLoader.kt": "94417eab56de9b7d7ca4aac59ba5f8ce84a97424a219e017b45a798530dc1700",
+    "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/TileTransport.kt": "7654deaaab082252c16bd57a249330a66f336ea6dcf1a25beac8345196d43df1",
     "native-wgpu/tools/fetch-live-proof.py": "0469e4fc6e2f631b36a9664e9fdc0f0dde2c256f9bcb2bb2ca1c5a2923e89484",
     "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/GeometryInputPipeline.kt": "51ba242911b754e2a27b2e72f0778b64bbea042cbfba95f8d5dbf70b38e3ef78",
     "native-wgpu/android/app/src/test/java/nz/ridgeline/nativeapp/BeforeDeadlineTransport.kt": "16f09646a7ad8dd2ca3599b218384aef59c17483d5cb5934b28f552c7fa8a537",
-    "native-wgpu/android/app/src/test/java/nz/ridgeline/nativeapp/CacheDeadlineTest.kt": "5773f61b8b37e4041b2e1aa62f654fc7a94b53722f5521721a92b5a057880892",
-    "native-wgpu/android/app/src/test/java/nz/ridgeline/nativeapp/GeometryInputPipelineTest.kt": "5187cad9f7eb4a82dd197c533d6c8268f0f036bf916e91ebd0ed606c2425f518"
+    "native-wgpu/android/app/src/test/java/nz/ridgeline/nativeapp/CacheDeadlineTest.kt": "7866d23a5a80f87a483188d69dd22f8a622af7f0f30f1e097ddf129e5612a357",
+    "native-wgpu/android/app/src/test/java/nz/ridgeline/nativeapp/GeometryInputPipelineTest.kt": "5187cad9f7eb4a82dd197c533d6c8268f0f036bf916e91ebd0ed606c2425f518",
+    "native-wgpu/android/app/src/test/java/nz/ridgeline/nativeapp/DemandBatchTest.kt": "b82181ee8f35fc72485f82bbe59b7a096d93337e96a0c47f2a420e0191662238"
+  },
+  "singleDeadlineWakeFor200StalledSourcesTestPassed": true,
+  "obsoleteNetworkAdmissions": {
+    "unbatched": 64,
+    "batched": 0,
+    "freshFocusAdmitted": true
   }
 }
