@@ -1,0 +1,62 @@
+{
+  "sourceCheckpoint": "150ad30e5db269a549769fb011667c31ec975178",
+  "apk": "Ridgeline-Native-Performance-2026-10-31-Base.apk",
+  "versionCode": 2,
+  "versionName": "0.1.1-performance-checkpoint",
+  "bytes": 32002808,
+  "sha256": "5c41854d52fc08b6c5496c455593d5969834201c2205bb18d494bf0414358043",
+  "signerCertificateSHA256": "9384feb22f692afc35cc8a19d5e95103e4fe47292cfc3c81082eca0dec8492f0",
+  "signerMatchesPreviousCheckpoint": true,
+  "nativeLibraries": {
+    "arm64-v8a": {
+      "sha256": "7afceaaf9dffd6195a2f396eea9f7b45685bea12a2ac2faa6fe6924ff3e4d645",
+      "bytes": 4574136,
+      "elfLoadAlignment": [
+        16384,
+        16384,
+        16384
+      ]
+    },
+    "armeabi-v7a": {
+      "sha256": "b1ff319a03bfc5e16ae12ee24c97b70ad21c960966795326b5742c15ac65318b",
+      "bytes": 3141880,
+      "elfLoadAlignment": [
+        4096,
+        4096,
+        4096
+      ]
+    },
+    "x86_64": {
+      "sha256": "d160c541d05ad53a2eabc4ab86f223b336d6799133e53f18a86b04cb61cdd2bf",
+      "bytes": 5189944,
+      "elfLoadAlignment": [
+        16384,
+        16384,
+        16384
+      ]
+    }
+  },
+  "zipAlignment16KiBVerified": true,
+  "coarseImagesIdenticalToPrevious": 67,
+  "overviewCatalogUnchanged": true,
+  "gapAtlasUnchanged": true,
+  "largePacksBundled": 0,
+  "managedSessionCA": false,
+  "androidUnitTests": {
+    "tests": 71,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 2
+  },
+  "rustTests": [
+    "test result: ok. 30 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 1.11s",
+    "test result: ok. 6 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 1.42s",
+    "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s",
+    "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+    "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+  ],
+  "androidLint": "passed",
+  "gpuModesPassed": 6,
+  "phoneTested": false,
+  "scope": "Optimized signed native Base prototype checkpoint; no A20 FPS, whole-app loading, or installed-device acceptance claim."
+}

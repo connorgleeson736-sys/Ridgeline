@@ -1,8 +1,8 @@
 {
-  "sourceCheckpoint": "da2579c08999168ba7e2edd65beb83c8abcb982a",
+  "sourceCheckpoint": "150ad30e5db269a549769fb011667c31ec975178",
   "apk": "Ridgeline-Native-Base.apk",
-  "bytes": 31930328,
-  "sha256": "c5c0b9654998a663d560bc644eb2f2666f175b09dd8ebabc4fe24d505c59c8aa",
+  "bytes": 32002808,
+  "sha256": "5c41854d52fc08b6c5496c455593d5969834201c2205bb18d494bf0414358043",
   "largeOverviewPacks": 0,
   "coarseImageryFiles": 67,
   "abis": [
@@ -13,17 +13,14 @@
   "managedSessionCa": false,
   "addImagery": "Offline / imagery > Add imagery ZIPs; attach original files in place with persistent read access; up to six at once",
   "changes": [
-    "Keep nearest resident parent behind ready fine tiles during zoom/pan; restore prepared RAM ancestors across skipped zoom levels and admit/prioritize ancestor uploads; protect fallback owners with oldest-unused eviction and hard admission bounds",
-    "Restore selective MapLibre-depth terrain skirts at missing/discontinuous/unproven joins; omit proven continuous edges and photo-only internal subdivisions; retain real neighbour DEM halos, parent fallback and full-resolution imagery filtering",
-    "Live persisted 0-1000 MiB combined RAM tile-payload cache budget across encoded bodies, decoded DEM samples and prepared direct buffers; immediate trimming, conservative recommendation and high-budget warning",
-    "Bounded lazy eight-layer imagery and R32Float height texture arrays with generation-owned slots, shared bindings and compatible instanced draws",
-    "Automatic Vulkan arrays; automatic GLES pooled separate textures based on measured host GLES regression; Offline / imagery > GPU textures allows explicit selection",
-    "Layer-aware full nine-level mip generation, reusable GLES scratch/bindings and startup layer/mip readback with exact fallback",
-    "Stable coalescing index atlas evicts only off-current-frame patterns instead of resetting the whole atlas",
-    "Bulk owned-array ARGB to RGBA packing preserves exact integer premultiplication and cancellation",
-    "Offline / imagery automatic disk-cache slider, 0\u20131000 MiB; one allowance for HTTP, prepared terrain and finished imagery, adaptive free-storage cap",
-    "Cache size changes apply after app restart; zero disables and clears automatic disk caches on next launch; saved regions and attached ZIPs separate",
-    "Previous cache-revisit behaviors, Add imagery in-place attachment, full source quality retained"
+    "Linear geographic merge instead of quadratic terrain/imagery cover scan",
+    "Immediate idle demand with unchanged 20Hz movement throttle",
+    "Header-first stale derived-cache rejection",
+    "Shared overlapping original DEM PNG decode",
+    "Dense halo and axis reuse for exact terrain meshes",
+    "Ordered shared-edge sweep and compatible array batching",
+    "Mesh-bounded fragment path with sub-cell photo clipping preserved",
+    "Exact CPU mip normalization and exact tile-bound computation"
   ],
   "adaptiveTerrain": {
     "newErrorPixels": 0.6,
@@ -37,7 +34,7 @@
     "routeSourcesFullGeometry": true,
     "fullSourceHeightsRetained": true
   },
-  "validation": "27 core, 4 renderer and 1 CLI Rust tests; 11 focused cached-parent/upload/demand JVM tests and lint pass. Vulkan/GLES arrays: fine-only demand preserves every pixel of the complete parent-backed frame; existing cover/mips/UV/picking/skirts/bounded unrelated-upload checks pass. Final hard admission guards compiled in all three optimized JNI ABIs; APK assembly/signature/16KiB alignment pass. No A20 run or speed claim; no large packs/session CA.",
+  "validation": "37 Rust tests; 69 Android tests passed, 2 skipped; lint passed. Six Vulkan/GLES automatic/CPU-mip/array GPU modes passed. All three optimized JNI ABIs are packaged; signature matches prior checkpoint, ZIP 16KiB and 64-bit ELF load alignment verified. Original 67 coarse images/catalog/gap atlas match. No A20 execution or whole-app speedup claim.",
   "terrainSkirts": true,
   "prepareAhead": "Offline / imagery > Prepare nearby terrain while idle; default off",
   "textureBackend": {
@@ -98,5 +95,61 @@
     "relatedReplacementTransientSlots": 1,
     "softCountCoverageDebt": true,
     "arbitraryHttpCacheHitsRestoredDirectly": false
-  }
+  },
+  "versionCode": 2,
+  "versionName": "0.1.1-performance-checkpoint",
+  "signerCertificateSHA256": "9384feb22f692afc35cc8a19d5e95103e4fe47292cfc3c81082eca0dec8492f0",
+  "signerMatchesPreviousCheckpoint": true,
+  "nativeLibraries": {
+    "arm64-v8a": {
+      "sha256": "7afceaaf9dffd6195a2f396eea9f7b45685bea12a2ac2faa6fe6924ff3e4d645",
+      "bytes": 4574136,
+      "elfLoadAlignment": [
+        16384,
+        16384,
+        16384
+      ]
+    },
+    "armeabi-v7a": {
+      "sha256": "b1ff319a03bfc5e16ae12ee24c97b70ad21c960966795326b5742c15ac65318b",
+      "bytes": 3141880,
+      "elfLoadAlignment": [
+        4096,
+        4096,
+        4096
+      ]
+    },
+    "x86_64": {
+      "sha256": "d160c541d05ad53a2eabc4ab86f223b336d6799133e53f18a86b04cb61cdd2bf",
+      "bytes": 5189944,
+      "elfLoadAlignment": [
+        16384,
+        16384,
+        16384
+      ]
+    }
+  },
+  "zipAlignment16KiBVerified": true,
+  "coarseImagesIdenticalToPrevious": 67,
+  "overviewCatalogUnchanged": true,
+  "gapAtlasUnchanged": true,
+  "largePacksBundled": 0,
+  "managedSessionCA": false,
+  "androidUnitTests": {
+    "tests": 71,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 2
+  },
+  "rustTests": [
+    "test result: ok. 30 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 1.11s",
+    "test result: ok. 6 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 1.42s",
+    "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s",
+    "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+    "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+  ],
+  "androidLint": "passed",
+  "gpuModesPassed": 6,
+  "phoneTested": false,
+  "scope": "Optimized signed native Base prototype checkpoint; no A20 FPS, whole-app loading, or installed-device acceptance claim."
 }

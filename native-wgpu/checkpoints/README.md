@@ -1,7 +1,32 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest smaller build: [Ridgeline-Native-Base.apk](Ridgeline-Native-Base.apk).
-Source checkpoint `da2579c`; signed debug Base APK, 31.9MB, all three ABIs.
+Latest performance checkpoint: **[Download 0.1.1 Base APK — 32.0 MB](Ridgeline-Native-Performance-2026-10-31-Base.apk)**.
+The [latest Base alias](Ridgeline-Native-Base.apk) contains the same bytes.
+Source checkpoint [`150ad30`](https://github.com/connorgleeson736-sys/Ridgeline/commit/150ad30e5db269a549769fb011667c31ec975178), version code 2, signed debug APK with optimized ARM64, ARMv7 and x86_64.
+
+Install over the previous native prototype without uninstalling: package identity
+and signing certificate match, preserving app-private routes, caches and attached
+imagery permissions. The existing Capacitor app remains separate.
+
+This checkpoint replaces the quadratic terrain/imagery cover scan with an exact
+geographic merge: **9.398 → 0.705 ms** in the fragmented-source host fixture,
+with an identical ordered patch list. It also starts idle demand immediately,
+rejects stale derived entries before decompression, shares overlapping DEM PNG
+decodes, reuses exact halo/axis calculations, improves skirt submission work,
+and accelerates exact CPU mipmaps and tile bounds. No detail or source imagery
+resolution is reduced. The more complex culling experiment was rejected.
+
+[Individual measurements and limits](../research/PERFORMANCE-AUDIT-2026-10-31.md) ·
+[APK verification](../validation/performance-checkpoint-2026-10-31/apk.json) ·
+[SHA-256](Ridgeline-Native-Performance-2026-10-31-Base.apk.sha256)
+
+Validation: 37 Rust tests, 69 Android unit tests (2 skipped), lint, six Vulkan/GLES
+GPU modes, all three optimized ABIs, matching signer and ZIP/64-bit ELF alignment.
+All 67 coarse images, overview catalog and gap atlas match the prior checkpoint.
+No large packs or session CA are bundled. **No A20 speedup or device acceptance
+is claimed.** Raw subsystem timings cannot be combined into an app-wide speedup.
+
+Previous native Base: [source/checkpoint da2579c](https://github.com/connorgleeson736-sys/Ridgeline/tree/3cc6f903670d6796f04adc5201c112b067469172/native-wgpu/checkpoints).
 
 **Parent fallback fix:** cached parents remain as background coverage after a fine
 tile arrives. Prepared RAM ancestors can return across multi-level zoom jumps,
@@ -56,7 +81,7 @@ Full source resolution, heights, mips/filtering and adaptive error bounds remain
 Skirts hide geometric gaps within their depth; missing source coverage or colour
 differences baked into imagery still require real provider data.
 
-18 focused JVM checks and 26 core tests pass; Vulkan/GLES and all three optimized
+Earlier cache-revisit evidence: 18 focused JVM checks and 26 core tests passed; Vulkan/GLES and all three optimized
 JNI ABIs/assembly/signature pass. A real host HTTP fixture returns a disk-cached
 tile in 1.53ms while eight foreground transfers are blocked. This is not A20
 performance or interaction acceptance. [Scope and evidence](../validation/cache-revisit/).

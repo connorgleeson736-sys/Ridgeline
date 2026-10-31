@@ -1,5 +1,18 @@
 # Durable progress log
 
+## 2026-10-31 — final performance APK frozen for push
+
+Source150ad30e5db269a549769fb011667c31ec975178. Version0.1.1-performance-checkpoint,
+versionCode2,32,002,808bytes; SHA256
+5c41854d52fc08b6c5496c455593d5969834201c2205bb18d494bf0414358043.
+DatedPerformance-2026-10-31-Base APK plus latest Base alias. Optimized3ABIs,
+oldsignermatched(9384feb2...),ZIP16KiB/64bitELF16KiB verified;ARMv7ELF4KiB.
+37Rust and69Androidtests pass(2skipped),lint,sixGPUmodes pass. All67coarse
+images/catalog/gap bytes unchanged; no largepacks/sessionCA. Evidence in
+validation/performance-checkpoint-2026-10-31. User authorized pushing source
+and the new checkpoint to native-rust-wgpu; no physical A20 speedup claimed.
+
+
 ## 2026-10-31 — geographic join breakthrough; final checkpoint rebuild
 
 User asked to keep searching for genuine breakthroughs while retaining the
