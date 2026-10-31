@@ -1,6 +1,28 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.4 Current View Base APK — 32.1 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-Current-View-0.1.4-Base.apk)**.
+Latest: **[Download 0.1.5 Surface Focus Base APK — 32.1 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-Surface-Focus-0.1.5-Base.apk)**.
+Source `b0d76de4d551ee5ae68a18ce02e9bc210196ca84`, version code 6. Same Native
+Performance package and signing key; installs over 0.1.2–0.1.4 preserving data.
+
+Terrain and imagery detail now prioritize the actual terrain under the centre
+screen ray, keeping the map pivot as a secondary focus. Uses the existing CPU
+terrain picker, with no GPU readback or extra source requests for picking.
+Missing/stale/off-screen hits fall back to the old policy. Detail defaults,
+source ceilings and source budgets remain. Loading diagnostics shows whether
+the measured terrain focus is active. All three optimized native ABIs rebuilt.
+
+Focused elevated-surface fixture: face request rank 33 → 0 and source zoom
+15 → 16, with the same 72-source budget. This is selection behavior, not a
+phone latency result or a claim that the ten-second stall is solved.
+Two Rust and two Kotlin checks pass; no broad tests/lint. Package signature,
+ZIP/ELF alignment and focused JNI exports verified; all 618 assets unchanged.
+[Implementation/scope](../research/SURFACE-FOCUS-2026-11-01.md) ·
+[Exact release record](../validation/surface-focus-2026-11-01/release.json) ·
+[SHA-256](Ridgeline-Native-Surface-Focus-0.1.5-Base.apk.sha256).
+
+## Previous 0.1.4 current-view checkpoint
+
+**[Download 0.1.4 Current View Base APK — 32.1 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-Current-View-0.1.4-Base.apk)**.
 Source `db36617a595ef0058c43622864f2bb603a6223b7`, version code 5; same Performance
 package and signer for in-place updates from 0.1.2/0.1.3, preserving app data.
 

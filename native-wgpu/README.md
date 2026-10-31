@@ -1,6 +1,14 @@
 # Ridgeline native migration — in progress
 
-Latest APK: **[0.1.4 Current View Base](checkpoints/README.md)**, source `db36617`.
+Latest APK: **[0.1.5 Surface Focus Base](checkpoints/README.md)**, source `b0d76de`.
+Both source plans now prioritize the actual centre-ray terrain intersection,
+separately from the navigation pivot. CPU picking is reused; unavailable or
+stale hits preserve the old policy. In the focused fixture the visible face
+moves from request rank33 to0 with the same72-source budget. All3optimized ABIs
+rebuilt;2Rust/2Kotlin checks and packaging verification pass. No phone latency
+claim. [Implementation and scope](research/SURFACE-FOCUS-2026-11-01.md).
+
+Previous 0.1.4 Current View Base, source `db36617`:
 Canceled off-screen calls could retain underlying OkHttp slots after logical
 cancellation. The escape path now has an independent bounded Dispatcher, with
 retired-call routing and real underlying queue counts in Loading diagnostics.

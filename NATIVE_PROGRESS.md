@@ -1,5 +1,35 @@
 # Durable progress log
 
+## 2026-11-01 — measured visible-surface detail focus
+
+User explicitly selected implementing MapLibre-style focus on the terrain face
+under the centre ray. Implemented independent measured SurfaceFocus via existing
+CPU terrain picker after a successful frame; no GPU readback or extra downloads.
+Reuses the centre hit for existing idle camera recentering. Bounded240ms gesture
+sampling, deferred cover-dirty wake, stable-hit bands and stale/off-screen/resize/
+GPU-loss rejection. Imagery arrivals also dirty focus because they can make
+previously untextured terrain drawable. Missing hits preserve previous policy.
+
+DemandPlanKey includes focus; a new planFocused JNI feeds both geometry and
+imagery Rust plans. Existing plan JNI retained. Refine the measured face first,
+account for nearer hit range, retain pivot as secondary, order source admission
+by normalized surface/pivot distance. Source defaults/ceilings/budgets and pixels
+unchanged; no elevation-bound or route changes. Future prediction clears current
+measured focus, and focus changes invalidate old idle preparation.
+
+TwoRust and twoKotlin targeted checks pass; no broad suite/lint. Actual CPU
+heightfield-ray fixture with synthetic3000m surface: oldface rank33/zoom15 to
+rank0/zoom16,72sources both. Exact previous ordered selection preserved for
+missing/invalid focus over24views. No phone latency/stall-resolution claim.
+Audit/evidence: research/SURFACE-FOCUS-2026-11-01.md and
+validation/surface-focus-2026-11-01/.
+
+Source b0d76de4d551ee5ae68a18ce02e9bc210196ca84. APK0.1.5-surface-focus/code6,
+32,056,100bytes;SHA2568530a2bb0f871226621be3db06c55b49cac966174081723ba10e7f4dbdf82122.
+All3optimized JNI ABIs rebuilt with new export. SamePerformance package/key for
+in-place update. Signature/ZIP16KiB and64-bitELF16KiB verified;ARMv7ELF4KiB.
+All618assets unchanged. Loading diagnostics displays focus versus pivot fallback.
+
 ## 2026-11-01 — actual off-screen HTTP ownership below the loader
 
 User requested a structural review of off-screen requests occupying slots.
