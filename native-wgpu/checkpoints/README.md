@@ -1,6 +1,34 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest performance checkpoint: **[Download 0.1.1 Base APK — 32.0 MB](Ridgeline-Native-Performance-2026-10-31-Base.apk)**.
+Latest: **[Download 0.1.2 Loading Base APK — 32.0 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-Performance-2026-11-01-Base.apk)**.
+Source [`d831d2f`](https://github.com/connorgleeson736-sys/Ridgeline/commit/d831d2f3ddc9c301e0b2282fa58912d3940dd222), version code 3; optimized ARM64, ARMv7 and x86_64.
+
+Installs as **Ridgeline Native Performance**, package
+`nz.ridgeline.nativeapp.performance`. A new signing key was created at the user's
+request because the previous key was unavailable. This is a separate installation;
+the old native app and its private data remain in place. Its caches, saved routes
+and imagery attachments are not automatically transferred. The new key and restore
+instructions are backed up privately in the user's Google Drive, outside Git.
+
+Includes foreground tile priority throughout selection, cache/network/CPU/GPU
+admission, independent imagery and terrain detail sliders, decoded DEM reuse,
+coverage/seam reuse, bounded bypass of stalled disk-cache reads, early DEM parent
+loading and atomic camera-demand cancellation. Existing detail defaults remain.
+See the [viewport audit](../research/VIEWPORT-LOADING-AUDIT-2026-10-31.md) and
+[latency measurements](../research/LATENCY-BARRIERS-2026-11-01.md).
+
+[Build/package record](../validation/loading-checkpoint-2026-11-01/release.json) ·
+[Validation scope](../validation/loading-checkpoint-2026-11-01/README.md) ·
+[SHA-256](Ridgeline-Native-Performance-2026-11-01-Base.apk.sha256).
+APK signature, ZIP/ELF alignment and all 618 original asset files verified;
+67 coarse images, no large packs or session CA. No phone benchmark is claimed.
+Before the user stopped further testing, one Android HTTP-cache fixture timed
+out (99 tests, 1 failure, 5 skipped); it remains unresolved. Final assembly
+succeeded without test or lint tasks.
+
+## Previous native checkpoint used as the baseline
+
+**[0.1.1 Base APK — 32.0 MB](Ridgeline-Native-Performance-2026-10-31-Base.apk)**.
 The [latest Base alias](Ridgeline-Native-Base.apk) contains the same bytes.
 Source checkpoint [`150ad30`](https://github.com/connorgleeson736-sys/Ridgeline/commit/150ad30e5db269a549769fb011667c31ec975178), version code 2, signed debug APK with optimized ARM64, ARMv7 and x86_64.
 

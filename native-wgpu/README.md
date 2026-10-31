@@ -1,5 +1,12 @@
 # Ridgeline native migration — in progress
 
+Latest APK: **[0.1.2 Loading Base](checkpoints/README.md)**, source `d831d2f`.
+Includes the foreground-priority and latency work below, with optimized ARM64,
+ARMv7 and x86_64 libraries. Uses a new key and separate application ID
+`nz.ridgeline.nativeapp.performance` to preserve the previously installed app.
+Build/package verification passed; one earlier Android HTTP fixture timed out,
+and further tests/lint were stopped at the user's request. No phone result claimed.
+
 Latency follow-up: online foreground requests can escape a stalled disk lookup
 through a bounded, shared HTTP path; nearby DEM work now decodes early and starts
 missing-data parent requests before other inputs finish. Controlled host fixtures
@@ -8,7 +15,7 @@ parent-dependent complete mesh, with identical mesh bytes and request counts. He
 remain local. See [scope, tradeoffs and reproduction](research/LATENCY-BARRIERS-2026-11-01.md).
 Camera-generation batching also removes obsolete download admissions during
 cancellation; one deadline wake covers a 200-request stall fixture.
-This source update has not been packaged or measured on a phone.
+Included in 0.1.2; not measured on a phone.
 
 Foreground-loading pass: close tiles now retain priority through Rust selection,
 CPU/cache queues, transport and GPU upload pressure. Fresh decoded DEMs bypass
@@ -16,7 +23,7 @@ redundant encoded requests; obsolete dependency fan-out is bounded; coverage and
 immutable seam proofs are reused. **Offline / imagery** now includes separate
 imagery/terrain detail sliders with the existing default quality. See the
 [audit, host measurements and limitations](research/VIEWPORT-LOADING-AUDIT-2026-10-31.md).
-This is a source checkpoint; the published APK below predates these changes.
+Included in the 0.1.2 APK linked above.
 
 31 October performance pass (checkpoint version 0.1.1): exact DEM halo/axis reuse, an ordered seam sweep,
 compatible array-instance grouping, an exact CPU mip fallback and a mesh-bounded fragment program are

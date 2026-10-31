@@ -1,5 +1,30 @@
 # Durable progress log
 
+## 2026-11-01 — loading checkpoint APK
+
+Built all loading improvements through `0b936a0` plus packaging source
+`d831d2f3ddc9c301e0b2282fa58912d3940dd222`. Version 0.1.2-loading-checkpoint,
+code 3, 32,040,144 bytes; SHA-256
+`8dcee8432de6d61fb2f6a11303b95edbfea91698104f8e26c26623d9dd56f24c`.
+Dated APK: `native-wgpu/checkpoints/Ridgeline-Native-Performance-2026-11-01-Base.apk`.
+All three ABIs are optimized. APK v2 signature, ZIP16KiB and 64-bit ELF16KiB
+alignment verified; ARMv7 ELF4KiB. All 618 assets match the previous Base exactly.
+No large packs or session CA. Previous native baseline was 0.1.1 from source
+`150ad30e5db269a549769fb011667c31ec975178`, dated 2026-10-31.
+
+Original key absent; user requested a new key and private Google Drive backup.
+Created a separate `nz.ridgeline.nativeapp.performance` app, labelled Ridgeline
+Native Performance, preserving the old installed app/data. Key plus restore
+instructions uploaded to an owner-only private Drive folder; never committed.
+New signer SHA-256 `03ef64214daee8c59cad6571ce5036579237d553c040837ce996f80efa898ae7`.
+
+User instructed stopping tests and pushing. Earlier host Rust run: 39 passed,
+6 ignored. Android run: 99 tests, 1 failure, 5 skipped; unresolved timeout in
+`TileTransportTest.actualHttpDiskHitFinishesWhileAllForegroundNetworkSlotsAreBlocked`.
+Stopped further tests/lint. Final `assembleDebug` succeeded in 19 seconds with
+no test/lint tasks. No device installation or phone performance claim.
+Evidence: `native-wgpu/validation/loading-checkpoint-2026-11-01/`.
+
 ## 2026-11-01 — remove cache and DEM loading barriers
 
 Continued from `49d74fc` on `native-renderer-performance`. Foreground online
