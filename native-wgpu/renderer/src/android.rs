@@ -1182,3 +1182,70 @@ pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_textureBackend(
 ) {
     ARRAY_MODE.store(mode.clamp(0, 2) as u64, Ordering::Relaxed);
 }
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_configure(env:*mut jni::sys::JNIEnv,_class:jni::sys::jclass,handle:i64,input:jni::sys::jobject)->u8{
+    let mut env=unsafe{jni::EnvUnowned::from_raw(env)};
+    match env.with_env(|env|->Result<u8,jni::errors::Error>{
+        let buffer=unsafe{jni::objects::JByteBuffer::from_raw(env,input)};
+        if env.get_direct_buffer_capacity(&buffer)?!=20{return Ok(0)}
+        let bytes=unsafe{std::slice::from_raw_parts(env.get_direct_buffer_address(&buffer)?,20)};
+        let Some(style)=crate::MapStyle::from_packet(bytes)else{return Ok(0)};
+        let Ok(mut all)=states().lock()else{return Ok(0)};let Some(state)=all.get_mut(&(handle as u64))else{return Ok(0)};
+        state.renderer.set_map_style(style);Ok(1)
+    }).into_outcome(){jni::Outcome::Ok(v)=>v,_=>0}
+}
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_clearImages(_env:*mut jni::sys::JNIEnv,_class:jni::sys::jclass,handle:i64){
+    if let Ok(mut all)=states().lock(){if let Some(state)=all.get_mut(&(handle as u64)){state.renderer.clear_images();}}
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_cartography(env:*mut jni::sys::JNIEnv,_class:jni::sys::jclass,handle:i64,input:jni::sys::jobject)->u8{
+ let mut env=unsafe{jni::EnvUnowned::from_raw(env)};
+ match env.with_env(|env|->Result<u8,jni::errors::Error>{
+  let buffer=unsafe{jni::objects::JByteBuffer::from_raw(env,input)};let size=env.get_direct_buffer_capacity(&buffer)?;
+  if !(4..=10_000_000).contains(&size){return Ok(0)}let bytes=unsafe{std::slice::from_raw_parts(env.get_direct_buffer_address(&buffer)?,size)};
+  let count=u32::from_le_bytes(bytes[..4].try_into().unwrap())as usize;if count>32768{return Ok(0)}let mut at=4;let mut total=0;let mut paths=Vec::with_capacity(count);
+  for _ in 0..count{
+   if at+20>size{return Ok(0)}let n=u32::from_le_bytes(bytes[at..at+4].try_into().unwrap())as usize;let color=u32::from_le_bytes(bytes[at+4..at+8].try_into().unwrap());
+   let f=|offset|f32::from_le_bytes(bytes[offset..offset+4].try_into().unwrap());let width=f(at+8);let dash=[f(at+12),f(at+16)];at+=20;total+=n;
+   if n>262144||total>500000||at+n*16>size||!width.is_finite()||width<=0.||width>20.||dash.iter().any(|v|!v.is_finite()||*v<0.||*v>100.){return Ok(0)}
+   let mut points=Vec::with_capacity(n);for row in bytes[at..at+n*16].chunks_exact(16){let x=f64::from_le_bytes(row[..8].try_into().unwrap());let y=f64::from_le_bytes(row[8..].try_into().unwrap());if !x.is_finite()||!y.is_finite()||!(0. ..=1.).contains(&x)||!(0. ..=1.).contains(&y){return Ok(0)}points.push([x,y]);}at+=n*16;
+   paths.push(crate::CartographicPath{points,color:[((color>>16)&255)as f32/255.,((color>>8)&255)as f32/255.,(color&255)as f32/255.,((color>>24)&255)as f32/255.],width,dash});
+  }
+  if at!=size{return Ok(0)}let Ok(mut all)=states().lock()else{return Ok(0)};let Some(state)=all.get_mut(&(handle as u64))else{return Ok(0)};state.renderer.set_cartography(paths);Ok(1)
+ }).into_outcome(){jni::Outcome::Ok(v)=>v,_=>0}
+}
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_project(env:*mut jni::sys::JNIEnv,_class:jni::sys::jclass,handle:i64,input:jni::sys::jobject,output:jni::sys::jobject)->i32{
+ let mut env=unsafe{jni::EnvUnowned::from_raw(env)};
+ match env.with_env(|env|->Result<i32,jni::errors::Error>{
+  let input=unsafe{jni::objects::JByteBuffer::from_raw(env,input)};let output=unsafe{jni::objects::JByteBuffer::from_raw(env,output)};let size=env.get_direct_buffer_capacity(&input)?;
+  if size%16!=0||size>512*16||env.get_direct_buffer_capacity(&output)?<size/16*12{return Ok(0)}
+  let bytes=unsafe{std::slice::from_raw_parts(env.get_direct_buffer_address(&input)?,size)};let points:Vec<_>=bytes.chunks_exact(16).map(|r|[f64::from_le_bytes(r[..8].try_into().unwrap()),f64::from_le_bytes(r[8..].try_into().unwrap())]).collect();
+  if points.iter().flatten().any(|v|!v.is_finite()||!(0. ..=1.).contains(v)){return Ok(0)}
+  let Ok(all)=states().lock()else{return Ok(0)};let Some(state)=all.get(&(handle as u64))else{return Ok(0)};let projected=state.renderer.project_points(&points);
+  let out=unsafe{std::slice::from_raw_parts_mut(env.get_direct_buffer_address(&output)?,projected.len()*12)};for(slot,value)in out.chunks_exact_mut(4).zip(projected.iter().flatten()){slot.copy_from_slice(&value.to_le_bytes());}Ok(projected.len()as i32)
+ }).into_outcome(){jni::Outcome::Ok(v)=>v,_=>0}
+}
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_labelAtlas(env:*mut jni::sys::JNIEnv,_class:jni::sys::jclass,handle:i64,width:i32,height:i32,rgba:jni::sys::jobject,metadata:jni::sys::jobject)->u8{
+ let mut env=unsafe{jni::EnvUnowned::from_raw(env)};
+ match env.with_env(|env|->Result<u8,jni::errors::Error>{
+  if !(1..=2048).contains(&width)||!(1..=2048).contains(&height){return Ok(0)}let rgba=unsafe{jni::objects::JByteBuffer::from_raw(env,rgba)};let metadata=unsafe{jni::objects::JByteBuffer::from_raw(env,metadata)};
+  let size=env.get_direct_buffer_capacity(&metadata)?;if !(4..=4+512*40).contains(&size)||env.get_direct_buffer_capacity(&rgba)?!=(width*height*4)as usize{return Ok(0)}
+  let bytes=unsafe{std::slice::from_raw_parts(env.get_direct_buffer_address(&metadata)?,size)};let count=u32::from_le_bytes(bytes[..4].try_into().unwrap())as usize;if count>512||size!=4+count*40{return Ok(0)}let mut sprites=Vec::with_capacity(count);
+  for row in bytes[4..].chunks_exact(40){let point=[f64::from_le_bytes(row[..8].try_into().unwrap()),f64::from_le_bytes(row[8..16].try_into().unwrap())];let f=|i|f32::from_le_bytes(row[i..i+4].try_into().unwrap());let uv=[f(16),f(20),f(24),f(28)];let size=[f(32),f(36)];if point.iter().any(|v|!v.is_finite()||!(0. ..=1.).contains(v))||uv.iter().any(|v|!v.is_finite()||!(0. ..=1.).contains(v))||size.iter().any(|v|!v.is_finite()||*v<=0.||*v>512.){return Ok(0)}sprites.push(crate::LabelSprite{point,uv,size});}
+  let pixels=unsafe{std::slice::from_raw_parts(env.get_direct_buffer_address(&rgba)?,(width*height*4)as usize)};let Ok(mut all)=states().lock()else{return Ok(0)};let Some(state)=all.get_mut(&(handle as u64))else{return Ok(0)};state.renderer.set_label_atlas(width as u32,height as u32,pixels,sprites);Ok(1)
+ }).into_outcome(){jni::Outcome::Ok(v)=>v,_=>0}
+}
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_placeLabels(env:*mut jni::sys::JNIEnv,_class:jni::sys::jclass,handle:i64,input:jni::sys::jobject)->u8{
+ let mut env=unsafe{jni::EnvUnowned::from_raw(env)};
+ match env.with_env(|env|->Result<u8,jni::errors::Error>{
+  let buffer=unsafe{jni::objects::JByteBuffer::from_raw(env,input)};let size=env.get_direct_buffer_capacity(&buffer)?;if !(4..=4+512*12).contains(&size){return Ok(0)}let bytes=unsafe{std::slice::from_raw_parts(env.get_direct_buffer_address(&buffer)?,size)};let count=u32::from_le_bytes(bytes[..4].try_into().unwrap())as usize;if count>512||size!=4+count*12{return Ok(0)}let mut selection=Vec::with_capacity(count);
+  for row in bytes[4..].chunks_exact(12){let index=u32::from_le_bytes(row[..4].try_into().unwrap())as usize;let offset=[f32::from_le_bytes(row[4..8].try_into().unwrap()),f32::from_le_bytes(row[8..].try_into().unwrap())];if index>=512||offset.iter().any(|v|!v.is_finite()||v.abs()>512.){return Ok(0)}selection.push((index,offset));}
+  let Ok(mut all)=states().lock()else{return Ok(0)};let Some(state)=all.get_mut(&(handle as u64))else{return Ok(0)};state.renderer.select_labels(selection);Ok(1)
+ }).into_outcome(){jni::Outcome::Ok(v)=>v,_=>0}
+}

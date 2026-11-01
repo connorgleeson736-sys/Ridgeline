@@ -25,7 +25,7 @@ class RouteControllerTest {
  private class Fixture(val storage:Memory=Memory()):AutoCloseable {
   val queue=LinkedBlockingQueue<Runnable>();val io=Executors.newSingleThreadScheduledExecutor()
   val controller=RouteController(storage,Executor{queue.add(it)},io)
-  init{until{controller.state.loaded}}
+  init{until{controller.state.loaded};controller.newRoute();until{controller.state.drawing}}
   fun until(test:()->Boolean){val end=System.nanoTime()+TimeUnit.SECONDS.toNanos(5);while(!test()){check(System.nanoTime()<end){"Timed out: ${controller.state}"};queue.poll(20,TimeUnit.MILLISECONDS)?.run()}}
   fun saved(){until{controller.state.saveState==RouteController.SaveState.SAVED}}
   override fun close(){storage.release?.countDown();controller.close();io.shutdownNow()}
@@ -58,4 +58,15 @@ class RouteControllerTest {
    f.controller.delete("old-0");f.saved();assertEquals(50,storage.summaries().size);assertEquals(listOf(a),storage.load(key)!!.points)
   }
  }
+ @Test fun savedRouteStaysReadOnlyUntilEditAndAnUnmovedTapDoesNotSave(){Fixture().use{f->
+  f.controller.append(a);f.controller.append(b);f.saved();val original=f.controller.state.points;val writes=f.storage.calls.get()
+  f.controller.drawing(false)
+  assertEquals(RouteEditor.Result.NO_CHANGE,f.controller.append(Coordinate(170.1,-43.1)))
+  assertEquals(RouteEditor.Result.NO_CHANGE,f.controller.insert(0,Coordinate(170.005,-43.005)))
+  assertFalse(f.controller.beginDrag(0));f.controller.deleteSelected();assertEquals(original,f.controller.state.points)
+  f.controller.drawing(true);assertTrue(f.controller.beginDrag(0));f.controller.finishDrag()
+  assertFalse(f.controller.state.dragging);assertEquals(writes,f.storage.calls.get());assertEquals(original,f.controller.state.points)
+  f.controller.drawing(false);val id=f.controller.state.id!!;f.controller.closeAll();f.until{f.controller.state.id==null};assertTrue(f.controller.state.opened.isEmpty());assertNotNull(f.storage.load(id))
+ }}
+
 }

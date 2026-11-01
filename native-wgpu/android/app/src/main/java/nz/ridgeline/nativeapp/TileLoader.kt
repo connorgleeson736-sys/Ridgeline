@@ -21,6 +21,7 @@ internal class TileHttpException(val code:Int):IOException("Provider HTTP $code"
 
 /** Native-source prototype; viewport/LOD parity and performance acceptance remain open. */
 class TileLoader(private val context: Context, private val view: TerrainView) {
+    internal val mapSettings=MapSettings(context)
     private data class Id(val z: Int, val x: Int, val y: Int) {
         fun parent() = Id(z - 1, x / 2, y / 2)
         fun gpu() = GpuUploadQueue.Id(z,x,y)
@@ -99,7 +100,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     fun offlineOnly(value:Boolean){offlineOnly=value;preferences.edit().putBoolean("offlineOnly",value).apply();transport.batchDemand{for(task in jobs.values)task.cancel();clearWarm()};synchronized(ready){ready.clear();readyBytes=0};synchronized(decoded){decoded.clear()};cameraChanged()}
     val overviews=OverviewAttachments(context)
     private val attachmentJobs=Executors.newSingleThreadExecutor()
-    private val imagery = NativeImagery(context, ::fetch, {z,x,y->linz("aerial",Id(z,x,y),"webp")},overviews,::checkPreparation,::localImage)
+    private val imagery = NativeImagery(context, ::fetch, {z,x,y->linz("aerial",Id(z,x,y),"webp")},overviews,::checkPreparation,::localImage,{mapSettings.state})
     private val imageryReady=CompletableFuture.runAsync({imagery.initialize()},attachmentJobs)
     fun attachOverview(uri:android.net.Uri,done:(String?)->Unit){attachmentJobs.execute{
         val error=try{overviews.attach(uri);imageryChanged();null}catch(e:Exception){e.message?:"Could not attach imagery ZIP."}
@@ -217,9 +218,11 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
                 started=true;preparation.enter{eligible()};taskContext.set(this);sourceRecords.set(records)
                 val data=try{val loaded=if(source.geometry)loadGeometry(source.id)else loadImage(source.id);checkPreparation();loaded}catch(ready:PreparedAvailable){ready.data}
                 preparation.checkpoint();failures.remove(source)
-                synchronized(ready){ready.put(source,data)?.let{readyBytes-=it.capacity()};readyBytes+=data.capacity()
-                    trimReady()}
-                if((source in wanted||source in warmWanted)&&!resident(source))upload(source,data)
+                synchronized(ready){
+                    if(!eligible()||!source.geometry&&imageryGeneration!=preferences.getLong("imageryGeneration",0))throw PreparationAborted()
+                    ready.put(source,data)?.let{readyBytes-=it.capacity()};readyBytes+=data.capacity();trimReady()
+                    if((source in wanted||source in warmWanted)&&!resident(source))upload(source,data)
+                }
             }catch(pending:ResourcePending){waiting=pending.ready
             }catch(_:PreparationAborted){
             }catch(e:Exception){
@@ -253,7 +256,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         val focus=key.surfaceFocus
         val count=NativeBridge.planFocused(key.width,key.height,pose.longitude,pose.latitude,
             pose.zoom,pose.bearing,pose.pitch,pose.elevation,budget,
-            DetailPolicy.target(geometry,if(geometry)key.terrainDetail else key.imageryDetail),if(geometry)22 else 19,1.0,
+            DetailPolicy.target(geometry,if(geometry)key.terrainDetail else key.imageryDetail)*(if(!geometry&&mapSettings.state.base==MapSettings.Base.TOPO).5 else 1.0),if(geometry)22 else if(mapSettings.state.base!=MapSettings.Base.LINZ)18 else 19,1.0,
             focus?.longitude?:Double.NaN,focus?.latitude?:Double.NaN,focus?.range?:Double.NaN,output)
         return List(count){Id(output.int,output.int,output.int)}
     }
@@ -267,7 +270,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
           val next=LinkedHashMap<Source,Int>()
           val imageIds=sourcePlan(false,key)
           val focus=imageIds.firstOrNull()
-          val bootstrap=focus?.takeIf{!view.hasResidentCoverage(it.gpu(),false)}?.let{imagery.bootstrap(it.z,it.x,it.y)}
+          val bootstrap=focus?.takeIf{mapSettings.state.base==MapSettings.Base.LINZ&&!view.hasResidentCoverage(it.gpu(),false)}?.let{imagery.bootstrap(it.z,it.x,it.y)}
           for(geometry in listOf(true,false)) {
             val ids=if(geometry)sourcePlan(true,key)else imageIds
             val limit=if(geometry)geometryLimit else imageLimit
@@ -387,6 +390,14 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         cacheThreadFactory=ThreadFactory{work->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);work.run()},"RidgelineHttpCache")},
         metrics=httpMetrics,offlineRead=offline::read)}
     private val transport by lazy{TileTransport(backend,ramBudget.encoded,initialLimits=downloadLimits)}
+    internal fun layerConsumer()=transport.consumer(800,true)
+    internal fun layerBody(consumer:TileTransport.Consumer,url:String)=consumer.acquire(ResourceKey(url,offlineOnly))
+    internal fun vectorUrl(z:Int,x:Int,y:Int)="https://basemaps.linz.govt.nz/v1/tiles/topographic-v2/3857/$z/$x/$y.pbf?api=$key"
+    internal fun changeMapStyle(before:MapSettings.State,after:MapSettings.State){
+        if(before.base!=after.base||before.natural!=after.natural)runCatching{scheduler.execute{plans.clear();imageryChanged();view.clearImages()}}
+        view.configure(after)
+    }
+    internal var externalDiagnostics:()->String={""}
     fun loadingDiagnostics():String {
         val counts=transport.stats();val times=transport.latencyStats()
         val http=backend.stats()
@@ -407,7 +418,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             "Tiles in progress: ${jobs.size} · retry backoffs: ${failures.size}\n"+
             "Late prepared-cache wins: ${latePreparedWins.get()}\n"+
             "RAM/disk hits: ${counts["ramHits"]}/${counts["localHits"]} · cache escape starts: ${counts["uncachedStarts"]}\n"+
-            httpMetrics.snapshot()+"\n"+view.loadingSnapshot()+"\nHTTP spans may overlap during route retries. Wire reads are before cache/decompression; processing includes cache and body handling. Body rate excludes headers/TLS/other apps."
+            httpMetrics.snapshot()+"\n"+externalDiagnostics()+"\n"+view.loadingSnapshot()+"\nHTTP spans may overlap during route retries. Wire reads are before cache/decompression; processing includes cache and body handling. Body rate excludes headers/TLS/other apps."
     }
     private fun resourceKey(url:String)=ResourceKey(url,offlineOnly&&regionContext.get()==null)
     private fun awaitInputs(urls:List<String>,local:List<NativeImagery.LocalInput> = emptyList()){
@@ -607,6 +618,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private val profileJobs=Executors.newSingleThreadScheduledExecutor()
     private var profileJob:Future<*>?=null
     private val profileRevision=AtomicLong()
+    fun cancelProfile(){profileRevision.incrementAndGet();profileJob?.cancel(true)}
     fun profile(points:List<Coordinate>,callback:(List<NativeGeo.ProfilePoint>)->Unit){
         val revision=profileRevision.incrementAndGet();profileJob?.cancel(true)
         val samples=NativeGeo.samples(points)

@@ -1,5 +1,15 @@
 # Durable progress log
 
+## 2026-11-01 — Capacitor UI/layers/route migration in progress
+
+Latest user explicitly requests the Capacitor UI, all route features and every
+map layer, and specifically asks to modify the existing route editor directly.
+Reference refreshed/pinned at0.18.0 d880143; keep native renderer/0.1.8 HTTP fixes.
+Source work is in progress, not a delivered0.1.9 APK. Eight focused JVM checks
+pass; Kotlin compile and host Rust check pass. Actual GPU/JNI/packaging checks
+are still pending. Working inventory, measured disabled-layer decode savings and
+remaining work: native-wgpu/research/UI-LAYERS-MIGRATION-2026-11-01.md.
+
 ## 2026-11-01 — HTTP-specific latency improvements, APK 0.1.8
 
 Investigated HTTP intervals sometimes exceeding five seconds. Found synchronous

@@ -17,6 +17,12 @@ object NativeBridge {
  @JvmStatic external fun mipmapProof(handle:Long,output:ByteBuffer):Boolean
  @JvmStatic external fun routes(handle:Long,input:ByteBuffer):Boolean
  @JvmStatic external fun waypoints(handle:Long,output:ByteBuffer):Int
+ @JvmStatic external fun cartography(handle:Long,input:ByteBuffer):Boolean
+ @JvmStatic external fun project(handle:Long,input:ByteBuffer,output:ByteBuffer):Int
+ @JvmStatic external fun labelAtlas(handle:Long,width:Int,height:Int,rgba:ByteBuffer,metadata:ByteBuffer):Boolean
+ @JvmStatic external fun placeLabels(handle:Long,input:ByteBuffer):Boolean
+ @JvmStatic external fun configure(handle:Long,input:ByteBuffer):Boolean
+ @JvmStatic external fun clearImages(handle:Long)
  @JvmStatic external fun stats(output:ByteBuffer):Int
  @JvmStatic external fun plan(width:Int,height:Int,longitude:Double,latitude:Double,zoom:Double,bearing:Float,pitch:Float,elevation:Float,budget:Int,target:Double,maxZoom:Int,margin:Double,output:ByteBuffer):Int
  @JvmStatic external fun planFocused(width:Int,height:Int,longitude:Double,latitude:Double,zoom:Double,bearing:Float,pitch:Float,elevation:Float,budget:Int,target:Double,maxZoom:Int,margin:Double,focusLongitude:Double,focusLatitude:Double,focusRange:Double,output:ByteBuffer):Int

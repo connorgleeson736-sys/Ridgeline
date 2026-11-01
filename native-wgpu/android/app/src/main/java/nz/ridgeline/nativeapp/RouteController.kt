@@ -44,20 +44,20 @@ class RouteController(
     private fun editable()=loaded&&!busy&&!closed
     private fun edited(){revision++;saveRevision++;dirty=true;error=null;emit(Change.GEOMETRY);save(0)}
     fun append(point:Coordinate):RouteEditor.Result {
-        if(!editable()||editor.isDragging)return RouteEditor.Result.NO_CHANGE
+        if(!editable()||!drawing||editor.isDragging)return RouteEditor.Result.NO_CHANGE
         val result=editor.append(point);if(result==RouteEditor.Result.CHANGED)edited();return result
     }
     fun insert(index:Int,point:Coordinate):RouteEditor.Result {
-        if(!editable())return RouteEditor.Result.NO_CHANGE
+        if(!editable()||!drawing)return RouteEditor.Result.NO_CHANGE
         val result=editor.insertAfter(index,point);if(result==RouteEditor.Result.CHANGED){drawing=true;edited()};return result
     }
-    fun select(index:Int){if(editable()&&editor.select(index)){drawing=true;emit(Change.SELECTION)}}
-    fun deleteSelected(){if(editable()&&editor.deleteSelected())edited()}
+    fun select(index:Int){if(editable()&&drawing&&editor.select(index))emit(Change.SELECTION)}
+    fun deleteSelected(){if(editable()&&drawing&&editor.deleteSelected())edited()}
     fun undo(){if(editable()&&editor.undo())edited()}
-    fun beginDrag(index:Int):Boolean {if(!editable())return false;val started=editor.beginDrag(index);if(started){drawing=true;emit(Change.SELECTION)};return started}
+    fun beginDrag(index:Int):Boolean {if(!editable()||!drawing)return false;val started=editor.beginDrag(index);if(started)emit(Change.SELECTION);return started}
     fun previewDrag(point:Coordinate){if(editable()&&editor.previewDrag(point))emit(Change.PREVIEW)}
-    fun finishDrag(){if(editable()&&editor.commitDrag())edited()}
-    fun cancelDrag(){if(editor.cancelDrag())emit(Change.PREVIEW)}
+    fun finishDrag(){if(!editable())return;val was=editor.isDragging;if(editor.commitDrag())edited()else if(was)emit(Change.VIEW)}
+    fun cancelDrag(){val was=editor.isDragging;if(editor.cancelDrag())emit(Change.PREVIEW)else if(was)emit(Change.VIEW)}
     fun drawing(value:Boolean){if(!editable())return;finishDrag();drawing=value;emit(Change.VIEW)}
     fun name(value:String){if(!editable()||name==value.take(80))return;name=value.take(80);saveRevision++;dirty=true;error=null;emit(Change.VIEW);save(400)}
     private fun save(delay:Long,after:(()->Unit)?=null) {
@@ -99,6 +99,7 @@ class RouteController(
     }}
     fun showOther(key:String){if(editable()){opened.add(key);emit(Change.LIST)}}
     fun closeOther(key:String){if(key==id)unload()else if(editable()){opened.remove(key);emit(Change.LIST)}}
+    fun closeAll(){navigate{reset(emptyList(),name,null,false);opened.clear();emit(Change.GEOMETRY)}}
     /** Load passive routes only when requested, preserving the metadata-only list path. */
     fun loadOther(key:String,callback:(SavedRoute?)->Unit){if(closed)return;io.execute{val route=runCatching{storage.load(key)}.getOrNull();post{callback(route)}}}
     fun import(route:GpxCodec.Imported){navigate{reset(route.points,route.name,null,false);dirty=true;emit(Change.OPENED);save(0)}}

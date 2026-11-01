@@ -25,6 +25,7 @@ pub(crate) fn choose(
     ppm: f32,
     now: Instant,
     exact: bool,
+    relief:f32,
 ) -> (u8, Option<u64>) {
     let old = tile.adaptive_state.get();
     let metrics = if exact {
@@ -47,7 +48,7 @@ pub(crate) fn choose(
                             * Vec4::new(
                                 ((x - view.center[0]) * world) as f32,
                                 ((view.center[1] - y) * world) as f32,
-                                (h - view.elevation) * ppm,
+                                (h*relief - view.elevation) * ppm,
                                 1.,
                             );
                         if !clip.is_finite() || clip.w <= view.height as f32 / 50. || clip.z < 0. {
@@ -78,7 +79,7 @@ pub(crate) fn choose(
             }
             Some((
                 errors,
-                nx.hypot(ny) / (min_w * min_w) * ppm as f64,
+                nx.hypot(ny) / (min_w * min_w) * ppm as f64*relief as f64,
                 (x1 - x0).max(y1 - y0),
             ))
         })

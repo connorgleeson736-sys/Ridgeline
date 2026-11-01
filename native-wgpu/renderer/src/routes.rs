@@ -1,4 +1,3 @@
-use wgpu::util::DeviceExt;
 #[derive(Clone, PartialEq)]
 pub struct RoutePath {
     pub points: Vec<[f64; 2]>,
@@ -12,6 +11,7 @@ pub(crate) struct Vertex {
     pub end: [f32; 3],
     pub corner: [f32; 3],
     pub color: [f32; 4],
+    pub style:[f32;3],
 }
 #[repr(C)]
 #[derive(Clone, Copy, PartialEq, bytemuck::Pod, bytemuck::Zeroable)]
@@ -37,7 +37,7 @@ impl RouteGpu {
         });
         let pipeline=device.create_render_pipeline(&wgpu::RenderPipelineDescriptor{
    label:Some("depth-tested native route and waypoint overlay"),layout:None,
-   vertex:wgpu::VertexState{module:&shader,entry_point:Some("vs"),buffers:&[Some(wgpu::VertexBufferLayout{array_stride:52,step_mode:wgpu::VertexStepMode::Vertex,attributes:&wgpu::vertex_attr_array![0=>Float32x3,1=>Float32x3,2=>Float32x3,3=>Float32x4]})],compilation_options:Default::default()},
+   vertex:wgpu::VertexState{module:&shader,entry_point:Some("vs"),buffers:&[Some(wgpu::VertexBufferLayout{array_stride:64,step_mode:wgpu::VertexStepMode::Vertex,attributes:&wgpu::vertex_attr_array![0=>Float32x3,1=>Float32x3,2=>Float32x3,3=>Float32x4,4=>Float32x3]})],compilation_options:Default::default()},
    fragment:Some(wgpu::FragmentState{module:&shader,entry_point:Some("fs"),targets:&[Some(wgpu::ColorTargetState{format,blend:Some(wgpu::BlendState::PREMULTIPLIED_ALPHA_BLENDING),write_mask:wgpu::ColorWrites::ALL})],compilation_options:Default::default()}),
    primitive:Default::default(),depth_stencil:Some(wgpu::DepthStencilState{format:wgpu::TextureFormat::Depth32Float,depth_write_enabled:Some(false),depth_compare:Some(wgpu::CompareFunction::LessEqual),stencil:Default::default(),bias:wgpu::DepthBiasState{constant:-4,slope_scale:-1.,clamp:0.}}),multisample:Default::default(),multiview_mask:None,cache:None});
         let uniform = device.create_buffer(&wgpu::BufferDescriptor {
@@ -56,8 +56,8 @@ impl RouteGpu {
         });
         let vertices = device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("empty routes"),
-            size: 52,
-            usage: wgpu::BufferUsages::VERTEX,
+            size: 64,
+            usage: wgpu::BufferUsages::VERTEX|wgpu::BufferUsages::COPY_DST,
             mapped_at_creation: false,
         });
         Self {
@@ -70,17 +70,22 @@ impl RouteGpu {
             last: None,
         }
     }
-    pub fn upload(&mut self, device: &wgpu::Device, vertices: &[Vertex]) {
+    pub fn fork(&self,device:&wgpu::Device)->Self{
+        let uniform=device.create_buffer(&wgpu::BufferDescriptor{label:Some("overlay camera"),size:96,usage:wgpu::BufferUsages::UNIFORM|wgpu::BufferUsages::COPY_DST,mapped_at_creation:false});
+        let bind=device.create_bind_group(&wgpu::BindGroupDescriptor{label:None,layout:&self.pipeline.get_bind_group_layout(0),entries:&[wgpu::BindGroupEntry{binding:0,resource:uniform.as_entire_binding()}]});
+        let vertices=device.create_buffer(&wgpu::BufferDescriptor{label:Some("empty overlay batch"),size:64,usage:wgpu::BufferUsages::VERTEX|wgpu::BufferUsages::COPY_DST,mapped_at_creation:false});
+        Self{uploads:0,pipeline:self.pipeline.clone(),uniform,bind,vertices,count:0,last:None}
+    }
+    pub fn upload(&mut self, device: &wgpu::Device,queue:&wgpu::Queue, vertices: &[Vertex]) {
         self.uploads += 1;
         self.count = vertices.len() as u32;
         if !vertices.is_empty() {
-            self.vertices = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-                label: Some("cached draped routes"),
-                contents: bytemuck::cast_slice(vertices),
-                usage: wgpu::BufferUsages::VERTEX,
-            });
+            let bytes=bytemuck::cast_slice(vertices);
+            if self.vertices.size()<bytes.len() as u64 {self.vertices=device.create_buffer(&wgpu::BufferDescriptor{label:Some("cached draped overlay capacity"),size:(bytes.len() as u64).next_power_of_two(),usage:wgpu::BufferUsages::VERTEX|wgpu::BufferUsages::COPY_DST,mapped_at_creation:false});}
+            queue.write_buffer(&self.vertices,0,bytes);
         }
     }
+
     pub fn camera(
         &mut self,
         queue: &wgpu::Queue,
@@ -164,7 +169,7 @@ impl crate::Renderer {
             [
                 (p[0] - anchor[0]) as f32,
                 (p[1] - anchor[1]) as f32,
-                p[2] as f32,
+                (p[2]*self.map_style.relief as f64) as f32,
             ]
         };
         let mut quad = |a: [f64; 3], b: [f64; 3], radius: f32, color: [f32; 4]| {
@@ -181,6 +186,7 @@ impl crate::Renderer {
                     end: local(b),
                     corner: [t, side, radius],
                     color,
+                    style:[0.;3],
                 });
             }
         };
@@ -209,7 +215,8 @@ impl crate::Renderer {
                     for pair in values.windows(2) {
                         let world =
                             |p: [f64; 3]| [bounds[0] + p[0] * span, bounds[1] + p[1] * span, p[2]];
-                        quad(world(pair[0]), world(pair[1]), 0., path.color);
+                        if index==0 {quad(world(pair[0]),world(pair[1]),-3.,[1.,1.,1.,0.85]);}
+                        quad(world(pair[0]), world(pair[1]), -1.5, path.color);
                     }
                 }
             }
@@ -227,18 +234,19 @@ impl crate::Renderer {
                         quad(
                             p,
                             p,
-                            if path.selected == Some(i) { 9. } else { 5. },
+                            if path.selected == Some(i) { 8.5 } else { 5. },
                             if path.selected == Some(i) {
-                                [1., 0.62, 0.12, 1.]
+                                [216./255.,117./255.,73./255.,1.]
                             } else {
-                                path.color
+                                [216./255.,117./255.,73./255.,1.]
                             },
                         );
+                        quad(p,p,if path.selected==Some(i){6.5}else{4.},if path.selected==Some(i){[216./255.,117./255.,73./255.,1.]}else{[250./255.,250./255.,245./255.,1.]});
                     }
                 }
             }
         }
-        self.route_gpu.upload(&self.device, &vertices);
+        self.route_gpu.upload(&self.device,&self.queue, &vertices);
         self.route_dirty = false;
     }
     pub fn project_waypoints(&self) -> Vec<[f32; 3]> {
@@ -262,7 +270,7 @@ impl crate::Renderer {
                     let c = m * glam::Vec4::new(
                         ((p[0] - view.center[0]) * world) as f32,
                         ((view.center[1] - p[1]) * world) as f32,
-                        (p[2] as f32 + 1. - view.elevation) * ppm,
+                        (p[2] as f32*self.map_style.relief + 1. - view.elevation) * ppm,
                         1.,
                     );
                     if c.w > 0. && c.z >= 0. {

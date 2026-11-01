@@ -111,6 +111,7 @@ class GpuUploadQueue(private val capacity:Int) {
     }
     @Synchronized fun isNotEmpty()=entries.isNotEmpty()
     @Synchronized fun size()=entries.size
+    @Synchronized fun clearImages(){entries.entries.removeAll{it.value.kind!=Kind.GEOMETRY};retries.keys.removeAll{it.second!=Kind.GEOMETRY}}
     @Synchronized fun clear(){entries.clear();retries.clear()}
     companion object{
         const val ACCEPTED=1;const val RETRY=0;const val INVALID=-1;const val DEVICE_UNAVAILABLE=-2

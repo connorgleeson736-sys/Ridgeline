@@ -60,11 +60,26 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     val pixelScale:Double get()=resources.displayMetrics.density.toDouble()
     val renderZoom:Double get()=zoom+ln(pixelScale)/ln(2.0)
     var onMapTap:((Double,Double,Int)->Unit)?=null
+    var routeEditing=false
     var onWaypointDragStart:((Int)->Boolean)?=null
     var onWaypointDrag:((Coordinate)->Unit)?=null
     var onWaypointDragEnd:((Boolean)->Unit)?=null
     @Volatile private var routePacket:ByteBuffer?=null
     private var appliedRoutes:ByteBuffer?=null
+    @Volatile private var stylePacket:ByteBuffer?=null
+    private var appliedStyle:ByteBuffer?=null
+    @Volatile private var layerBatch:NativeLayerBatch?=null
+    private var appliedLayers:NativeLayerBatch?=null
+    @Volatile private var labelPlacement:Pair<NativeLabelAtlas,ByteBuffer>?=null
+    private var appliedPlacement:Pair<NativeLabelAtlas,ByteBuffer>?=null
+    private val labelProjection=ByteBuffer.allocateDirect(512*12).order(ByteOrder.LITTLE_ENDIAN)
+    private var labelPose:CameraPose?=null;private var labelSize=0L;private var labelTime=0L
+    internal var onLayerProjection:(NativeLabelAtlas,FloatArray)->Unit={_,_->}
+    internal fun mapLayers(batch:NativeLayerBatch){layerBatch=batch;requestFrame()}
+    internal fun placeMapLabels(atlas:NativeLabelAtlas,buffer:ByteBuffer){if(labelPlacement?.let{it.first===atlas&&it.second==buffer}==true)return;labelPlacement=atlas to buffer;requestFrame()}
+
+    internal fun configure(value:MapSettings.State){stylePacket=ByteBuffer.allocateDirect(20).order(ByteOrder.LITTLE_ENDIAN).apply{putInt(value.base.ordinal);putInt(if(value.natural)1 else 0);putInt(if(value.hillshade)1 else 0);putFloat(value.relief);putInt(value.sky);rewind()};requestFrame()}
+    internal fun clearImages(){uploads.clearImages();gpu.post{if(handle!=0L){NativeBridge.clearImages(handle);refreshResidency()};post{onData()};requestFrame()}}
     @Volatile private var demandPacket:ByteBuffer?=null
     private var appliedDemand:ByteBuffer?=null
     private var uploadDemand:Pair<Set<GpuUploadQueue.Id>,Set<GpuUploadQueue.Id>>?=null
@@ -150,6 +165,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         if(!live||!active)return
         gpu.removeCallbacks(retryWake)
         if(handle==0L){recoverGpu();return}
+        stylePacket?.let{if(it!==appliedStyle&&NativeBridge.configure(handle,it)){appliedStyle=it;safetyPose=null;labelPose=null}}
         // Nonblocking completion polling measures real outstanding submissions.
         // Keep the newest camera; do not queue more old frames behind a busy GPU.
         val backlog=NativeBridge.gpuBacklog(handle);lastBacklog=backlog
@@ -179,6 +195,13 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         if(count>0)refreshResidency()
         focusCoverDirty=focusCoverDirty||accepted
         if(accepted)post{onStatus("");onData()}
+        val layers=layerBatch
+        if(layers!=null&&layers!==appliedLayers){
+            val changedAtlas=layers.atlas!==appliedLayers?.atlas
+            if(NativeBridge.cartography(handle,layers.lines)&&(!changedAtlas||NativeBridge.labelAtlas(handle,layers.atlas.width,layers.atlas.height,layers.atlas.rgba,layers.atlas.metadata))){appliedLayers=layers;if(changedAtlas){labelPose=null;appliedPlacement=null}}
+        }
+        val placement=labelPlacement
+        if(placement!=null&&placement!==appliedPlacement&&placement.first===appliedLayers?.atlas&&NativeBridge.placeLabels(handle,placement.second))appliedPlacement=placement
         val packet=routePacket
         if(packet!=null&&packet!==appliedRoutes&&NativeBridge.routes(handle,packet))appliedRoutes=packet
         val requested=cameraPose // One immutable snapshot, no mixed camera revisions.
@@ -242,6 +265,14 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         }
             val count=NativeBridge.waypoints(handle,projectedBytes)
             projectedBytes.rewind();projected=FloatArray(count*3){projectedBytes.float}
+            if(geometryChanged)labelPose=null
+            val atlas=appliedLayers?.atlas;val now=android.os.SystemClock.uptimeMillis()
+            if(atlas!=null&&atlas.labels.isNotEmpty()&&(labelPose!=pose||labelSize!=size)&&now-labelTime>=33){
+                val n=NativeBridge.project(handle,atlas.points,labelProjection);labelProjection.rewind();val positions=FloatArray(n*3){labelProjection.float}
+                labelPose=pose;labelSize=size;labelTime=now
+                post{if(live&&layerBatch?.atlas===atlas)onLayerProjection(atlas,positions)}
+            }
+
         }else {
             presentationFailures++
             // Stop feeding uploads while a busy GPU drains; transient failure
@@ -289,7 +320,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             NativeBridge.textureBackend(context.getSharedPreferences("display",0).getInt("textureBackend",0))
             val created=NativeBridge.create(surface,width,height)
             if(!live||generation.get()!=token){if(created!=0L)NativeBridge.destroy(created);return@post}
-            handle=created;safetyPose=null;safetyValid=false;appliedRoutes=null;appliedDemand=null;presentationFailures=0
+            handle=created;safetyPose=null;safetyValid=false;appliedRoutes=null;appliedDemand=null;appliedStyle=null;appliedLayers=null;appliedPlacement=null;labelPose=null;presentationFailures=0
             if(handle!=0L){val am=context.getSystemService(android.app.ActivityManager::class.java);NativeBridge.tileBudget(handle,if(am.isLowRamDevice)32 else (am.memoryClass/2).coerceIn(64,128))}
             post{onStatus(if(created==0L)"Native GPU initialization failed"else "Loading terrain and imagery…")};requestFrame()
         }
@@ -352,6 +383,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     fun zoomBy(delta:Double){
         if(delta.isFinite())easeControls((zoom+delta).coerceIn(4.0,19.0),bearing,width*.5,height*.5)
     }
+    fun toggleDimension(){cameraPose=cameraPose.copy(pitch=if(pitch>1f)0f else 58f);changed()}
     fun northUp(){
         val difference=(((bearing+180f)%360f+360f)%360f)-180f
         if(abs(difference)>.001f)easeControls(zoom,bearing-difference,width*.5,height*.5)
@@ -442,6 +474,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         recenterPending=true;requestFrame();onCamera()
     }
     private var draggingWaypoint=false
+    private var dragStartX=0.0;private var dragStartY=0.0;private var dragMoved=false
     private var dragEpoch=0L
     private var dragBusy=false
     private var dragTarget:Triple<Double,Double,Boolean>?=null
@@ -461,9 +494,10 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     }
     private val gestures=GestureDetector(context,object:GestureDetector.SimpleOnGestureListener(){
         override fun onDown(e:MotionEvent)=true
-        override fun onSingleTapConfirmed(e:MotionEvent):Boolean {onMapTap?.invoke(e.x.toDouble(),e.y.toDouble(),nearestWaypoint(e.x.toDouble(),e.y.toDouble()));return true}
-        override fun onLongPress(e:MotionEvent){val index=nearestWaypoint(e.x.toDouble(),e.y.toDouble());if(index>=0&&onWaypointDragStart?.invoke(index)==true){dragEpoch++;draggingWaypoint=true;performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)}}
-        override fun onDoubleTap(e:MotionEvent):Boolean{easeControls((zoom+1).coerceIn(4.0,19.0),bearing,e.x.toDouble(),e.y.toDouble());return true}
+        override fun onSingleTapUp(e:MotionEvent):Boolean {if(routeEditing)onMapTap?.invoke(e.x.toDouble(),e.y.toDouble(),nearestWaypoint(e.x.toDouble(),e.y.toDouble()));return true}
+        override fun onSingleTapConfirmed(e:MotionEvent):Boolean {if(!routeEditing)onMapTap?.invoke(e.x.toDouble(),e.y.toDouble(),nearestWaypoint(e.x.toDouble(),e.y.toDouble()));return true}
+        override fun onDoubleTap(e:MotionEvent):Boolean{if(!routeEditing)easeControls((zoom+1).coerceIn(4.0,19.0),bearing,e.x.toDouble(),e.y.toDouble());return true}
+        override fun onDoubleTapEvent(e:MotionEvent):Boolean {if(routeEditing&&e.actionMasked==MotionEvent.ACTION_UP)onMapTap?.invoke(e.x.toDouble(),e.y.toDouble(),nearestWaypoint(e.x.toDouble(),e.y.toDouble()));return true}
         override fun onScroll(a:MotionEvent?,b:MotionEvent,dx:Float,dy:Float):Boolean {
             if(b.pointerCount==1&&!multiTouch){multiRelease=null;touchX=b.x.toDouble();touchY=b.y.toDouble();applyGesture();recordMotion(b.eventTime)}
             return true
@@ -475,9 +509,21 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         return x/count to y/count
     }
     override fun onTouchEvent(event:MotionEvent):Boolean {
+        if(event.actionMasked==MotionEvent.ACTION_DOWN&&routeEditing){
+            val index=nearestWaypoint(event.x.toDouble(),event.y.toDouble())
+            if(index>=0&&onWaypointDragStart?.invoke(index)==true){
+                stopMotion();parent?.requestDisallowInterceptTouchEvent(true);dragEpoch++;dragTarget=null;draggingWaypoint=true;dragMoved=false;dragStartX=event.x.toDouble();dragStartY=event.y.toDouble()
+                return true
+            }
+        }
         if(draggingWaypoint){
             if(event.actionMasked==MotionEvent.ACTION_CANCEL||event.pointerCount>1){dragEpoch++;draggingWaypoint=false;dragTarget=null;onWaypointDragEnd?.invoke(false)}
-            else {if(event.actionMasked==MotionEvent.ACTION_MOVE||event.actionMasked==MotionEvent.ACTION_UP)dragPick(event.x.toDouble(),event.y.toDouble(),event.actionMasked==MotionEvent.ACTION_UP);if(event.actionMasked==MotionEvent.ACTION_UP)endGesture();return true}
+            else {
+                dragMoved=dragMoved||hypot(event.x-dragStartX,event.y-dragStartY)>=3*pixelScale
+                if(event.actionMasked==MotionEvent.ACTION_UP&&!dragMoved){dragEpoch++;draggingWaypoint=false;onWaypointDragEnd?.invoke(true)}
+                else if(dragMoved&&(event.actionMasked==MotionEvent.ACTION_MOVE||event.actionMasked==MotionEvent.ACTION_UP))dragPick(event.x.toDouble(),event.y.toDouble(),event.actionMasked==MotionEvent.ACTION_UP)
+                return true
+            }
         }
         when(event.actionMasked){
             MotionEvent.ACTION_DOWN->{parent?.requestDisallowInterceptTouchEvent(true);multiTouch=false;beginGesture(event.x.toDouble(),event.y.toDouble(),event.eventTime)}

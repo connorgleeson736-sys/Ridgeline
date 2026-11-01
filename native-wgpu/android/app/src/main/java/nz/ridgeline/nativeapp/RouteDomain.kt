@@ -13,6 +13,24 @@ data class Coordinate(val longitude:Double,val latitude:Double) {
 object NativeGeo {
     data class ProfilePoint(val point:Coordinate,val distance:Double,val height:Double?=null)
     data class Totals(val ascent:Double,val descent:Double,val high:Double?,val complete:Boolean)
+    data class Section(val start:Double,val end:Double,val distance:Double,val ascent:Double,val descent:Double,val complete:Boolean)
+    fun profileAt(samples:List<ProfilePoint>,distance:Double):ProfilePoint?{
+        if(samples.isEmpty()||!distance.isFinite())return null
+        val d=distance.coerceIn(samples.first().distance,samples.last().distance);var lo=0;var hi=samples.lastIndex
+        while(lo<hi){val mid=(lo+hi) ushr 1;if(samples[mid].distance<d)lo=mid+1 else hi=mid}
+        val b=samples[lo];if(lo==0||b.distance==d)return b
+        val a=samples[lo-1];val t=(d-a.distance)/(b.distance-a.distance)
+        return ProfilePoint(Coordinate(a.point.longitude+(b.point.longitude-a.point.longitude)*t,a.point.latitude+(b.point.latitude-a.point.latitude)*t),d,if(a.height!=null&&b.height!=null)a.height+(b.height-a.height)*t else null)
+    }
+    /** Same endpoint interpolation and missing-gap accounting as the Capacitor chart. */
+    fun section(samples:List<ProfilePoint>,a:Double,b:Double):Section?{
+        if(samples.isEmpty()||!a.isFinite()||!b.isFinite())return null
+        val start=max(samples.first().distance,min(a,b));val end=min(samples.last().distance,max(a,b));if(end<=start)return null
+        val values=listOf(profileAt(samples,start)!!)+samples.filter{it.distance>start&&it.distance<end}+profileAt(samples,end)!!
+        var ascent=0.0;var descent=0.0;var complete=true
+        for(i in 1 until values.size){val l=values[i-1].height;val r=values[i].height;if(l==null||r==null){complete=false;continue};val delta=r-l;if(delta>0)ascent+=delta else descent-=delta}
+        return Section(start,end,end-start,ascent,descent,complete)
+    }
     fun distance(a:Coordinate,b:Coordinate):Double {
         val p=Math.toRadians(b.latitude-a.latitude);val q=Math.toRadians(b.longitude-a.longitude)
         val h=sin(p/2).pow(2)+cos(Math.toRadians(a.latitude))*cos(Math.toRadians(b.latitude))*sin(q/2).pow(2)

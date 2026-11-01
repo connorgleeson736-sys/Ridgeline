@@ -6,6 +6,7 @@ data class DemandPlanKey(val width:Int,val height:Int,val pose:CameraPose,val te
 class DemandPlanCache<K:Any,V:Any> {
     private var key:K?=null
     private var value:V?=null
+    fun clear(){key=null;value=null}
     fun get(input:K,build:()->V):V {
         if(key==input)return value!!
         val next=build() // A failed build must never publish the new key with stale data.

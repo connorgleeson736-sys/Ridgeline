@@ -17,13 +17,14 @@ import kotlin.math.floor
 import kotlin.math.pow
 
 /** Data-only port of the reference source chain. No JavaScript at runtime. */
-class NativeImagery(
+internal class NativeImagery(
     private val context: Context,
     private val fetch: (String) -> ByteArray,
     private val linz: (Int, Int, Int) -> String,
     private val attachments:OverviewAttachments?=null,
     private val checkPreparation:()->Unit={},
     private val readLocal:(String,()->ByteArray?)->ByteArray?={_,read->read()},
+    private val settings:()->MapSettings.State={MapSettings.State()},
 ) {
     private class FineTransportFailure(cause:java.io.IOException):java.io.IOException(cause)
     private val catalog by lazy { json("overview-index.json") }
@@ -53,9 +54,10 @@ class NativeImagery(
     private fun pixels(bitmap:Bitmap):IntArray {checkPreparation();return IntArray(65536).also { bitmap.getPixels(it,0,256,0,0,256,256) }}
     internal fun saved(z:Int,x:Int,y:Int):ByteArray? {
         val key="$z/$x/$y"
-        catalog.getJSONObject("coarse").optJSONObject(key)?.let { return asset(it.getString("natural")) }
+        val variant=if(settings().natural)"natural"else"raw"
+        catalog.getJSONObject("coarse").optJSONObject(key)?.let { return asset(it.getString(variant)) }
         val entry=catalog.getJSONObject("tiles").optJSONObject(key) ?: return null
-        val row=entry.optJSONObject("natural") ?: entry
+        val row=entry.optJSONObject(variant) ?: entry
         val file=row.getString("file"); val offset=row.getLong("offset"); val length=row.getInt("bytes")
         require(file.matches(payloadPattern) && offset>=0 && length in 20..1048576)
         attachments?.read(file,offset,length)?.let{return it}
@@ -102,7 +104,7 @@ class NativeImagery(
         }
         return Plan(factor,coarse,entry,mode).also{synchronized(plans){plans[key]=it;while(plans.size>512)plans.remove(plans.keys.first())}}
     }
-    fun composed(z:Int,x:Int,y:Int):Boolean=plan(z,x,y).let{it.mode=="boundary"||(z>18&&it.mode!="linz")}
+    fun composed(z:Int,x:Int,y:Int):Boolean=settings().base==MapSettings.Base.LINZ&&plan(z,x,y).let{it.mode=="boundary"||(z>18&&it.mode!="linz")}
     private val bundled=ConcurrentHashMap<String,Boolean>()
     private fun hasSaved(z:Int,x:Int,y:Int):Boolean{
         if(z>12)return false
@@ -116,12 +118,14 @@ class NativeImagery(
     /** Discover all independent dependencies before suspending a CPU task. */
     internal data class LocalInput(val key:String,val read:()->ByteArray?)
     internal fun localInputs(z:Int,x:Int,y:Int):List<LocalInput>{
+        if(settings().base!=MapSettings.Base.LINZ)return emptyList()
         val p=plan(z,x,y);val inputs=ArrayList<LocalInput>(2)
         if((p.mode=="linz"||p.mode=="boundary")&&hasSaved(z,x,y))inputs+=LocalInput("saved:$z/$x/$y"){saved(z,x,y)}
         p.coarse?.let{val name=it.getString("url");inputs+=LocalInput("asset:$name"){assetBytes(name)}}
         return inputs
     }
     fun inputs(z:Int,x:Int,y:Int):List<String>{
+        alternate(z,x,y)?.let{return listOf(it)}
         val p=plan(z,x,y);val urls=ArrayList<String>()
         if(p.mode=="linz"||p.mode=="boundary")if(!hasSaved(z,x,y))urls+=linz(z,x,y)
         if(p.mode!="linz"&&p.coarse==null){val ez=minOf(z,18);val f=1 shl(z-ez)
@@ -140,6 +144,7 @@ class NativeImagery(
     fun load(z:Int,x:Int,y:Int):IntArray {
         require(z in 0..19 && x in 0 until (1 shl z) && y in 0 until (1 shl z))
         checkPreparation()
+        alternate(z,x,y)?.let{url->return bitmap(fetch(url)).using{source->if(z<=18)pixels(source)else crop(source,x,y,1 shl(z-18)).using(::pixels)}}
         val selected=plan(z,x,y);val factor=selected.factor;val coarse=selected.coarse;val entry=selected.entry;val mode=selected.mode
         if(mode=="linz") return base(z,x,y).using(::pixels)
         val ez=minOf(z,18); val f=1 shl(z-ez)
@@ -170,6 +175,11 @@ class NativeImagery(
                 }
             }
         }
+    }
+    private fun alternate(z:Int,x:Int,y:Int):String?{
+        val mode=settings().base;if(mode==MapSettings.Base.LINZ)return null
+        val ez=minOf(z,18);val factor=1 shl(z-ez)
+        return if(mode==MapSettings.Base.TOPO)linz(ez,x/factor,y/factor).replace("/aerial/","/topo-raster/")else"https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/$ez/${y/factor}/${x/factor}"
     }
     private fun vetoFine(mask:BooleanArray,fine:JSONArray,z:Int,x:Int,y:Int) {
         Bitmap.createBitmap(256,256,Bitmap.Config.ARGB_8888).using { survey ->

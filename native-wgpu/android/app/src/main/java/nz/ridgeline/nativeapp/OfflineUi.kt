@@ -5,7 +5,7 @@ import android.view.Gravity
 import android.widget.*
 import kotlin.math.*
 
-class OfflineUi(private val activity:Activity,root:FrameLayout,private val terrain:TerrainView,private val loader:TileLoader){
+class OfflineUi(private val activity:Activity,root:FrameLayout,private val terrain:TerrainView,private val loader:TileLoader,attachLauncher:Boolean=true){
     private var downloading=false
     private var attaching=false
     private val attachRequest=4301
@@ -40,8 +40,8 @@ class OfflineUi(private val activity:Activity,root:FrameLayout,private val terra
     }
     private fun dp(value:Int)=(value*activity.resources.displayMetrics.density+.5f).toInt()
     private fun button(label:String,action:()->Unit)=Button(activity).apply{text=label;textSize=12f;setOnClickListener{action()}}
-    init{root.addView(button("Offline / imagery"){show()},FrameLayout.LayoutParams(-2,dp(48),Gravity.TOP or Gravity.START).apply{leftMargin=dp(12);topMargin=dp(114)})}
-    private fun show(){
+    init{if(attachLauncher)root.addView(button("Offline / imagery"){show()},FrameLayout.LayoutParams(-2,dp(48),Gravity.TOP or Gravity.START).apply{leftMargin=dp(12);topMargin=dp(114)})}
+    fun show(){
         val content=LinearLayout(activity).apply{orientation=LinearLayout.VERTICAL;setPadding(dp(12),dp(8),dp(12),dp(8))}
         val list=LinearLayout(activity).apply{orientation=LinearLayout.VERTICAL}
         val status=TextView(activity)

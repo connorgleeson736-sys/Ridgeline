@@ -14,9 +14,9 @@ import android.widget.*
 class LocationUi(private val activity:Activity,root:FrameLayout,private val terrain:TerrainView):LocationListener{
     private val manager=activity.getSystemService(LocationManager::class.java)
     private val main=Handler(Looper.getMainLooper());private var waiting=false
-    private val button=Button(activity).apply{text="Locate";textSize=12f;contentDescription="Center map on current location";setOnClickListener{if(waiting)stop()else locate()}}
+    val button=NativeUi.button(activity,"◎"){if(waiting)stop()else locate()}.apply{textSize=22f;contentDescription="Center map on current location"}
     private val timeout=Runnable{stop();Toast.makeText(activity,"No location fix yet. Check location services and try again.",Toast.LENGTH_LONG).show()}
-    init{val scale=activity.resources.displayMetrics.density;root.addView(button,FrameLayout.LayoutParams(-2,(48*scale).toInt(),Gravity.TOP or Gravity.START).apply{leftMargin=(12*scale).toInt();topMargin=(166*scale).toInt()})}
+    init{val scale=activity.resources.displayMetrics.density;root.addView(button,FrameLayout.LayoutParams((44*scale).toInt(),(44*scale).toInt(),Gravity.TOP or Gravity.END).apply{marginEnd=(10*scale).toInt();topMargin=(230*scale).toInt()})}
     private fun locate(){
         if(activity.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED){activity.requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION),4201);return}
         try{
@@ -25,7 +25,7 @@ class LocationUi(private val activity:Activity,root:FrameLayout,private val terr
             if(providers.isEmpty()){Toast.makeText(activity,"Enable location services to locate yourself.",Toast.LENGTH_LONG).show();return}
             val recent=providers.mapNotNull{manager.getLastKnownLocation(it)}.filter{System.currentTimeMillis()-it.time<60000&&it.accuracy<100}.minByOrNull{it.accuracy}
             if(recent!=null){onLocationChanged(recent);return}
-            waiting=true;button.text="Cancel GPS"
+            waiting=true;button.text="×"
             for(provider in providers)manager.requestLocationUpdates(provider,1000,0f,this,Looper.getMainLooper())
             main.postDelayed(timeout,30000)
         }catch(_:SecurityException){stop();Toast.makeText(activity,"Location permission is needed.",Toast.LENGTH_LONG).show()}
@@ -39,5 +39,5 @@ class LocationUi(private val activity:Activity,root:FrameLayout,private val terr
     override fun onProviderDisabled(provider:String){}
     override fun onProviderEnabled(provider:String){}
     override fun onStatusChanged(provider:String?,status:Int,extras:Bundle?){}
-    fun stop(){waiting=false;button.text="Locate";main.removeCallbacks(timeout);runCatching{manager.removeUpdates(this)}}
+    fun stop(){waiting=false;button.text="◎";main.removeCallbacks(timeout);runCatching{manager.removeUpdates(this)}}
 }
