@@ -28,9 +28,12 @@ final class OkHttpCacheAccess {
     static boolean write(Cache cache, Response response, byte[] body) throws IOException {
         CacheRequest entry = cache.put$okhttp(response);
         if (entry == null) return false;
-        try (BufferedSink sink = Okio.buffer(entry.body())) {
+        BufferedSink sink = Okio.buffer(entry.body());
+        try {
             sink.write(body);
-        } catch (IOException | RuntimeException error) {
+            sink.close();
+        } catch (IOException | RuntimeException | Error error) {
+            // Closing a partial buffered body could commit it. Abort instead.
             entry.abort();
             throw error;
         }

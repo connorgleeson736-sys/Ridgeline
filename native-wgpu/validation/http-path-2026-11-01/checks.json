@@ -19,7 +19,8 @@
     "retired canceled-call queue isolation",
     "50 real simultaneous HTTP downloads on both existing paths",
     "phase probe identifies non-wire cache wait; cache hits do not count as wire bytes; diagnostics omit query credentials",
-    "pending handoff uses SDK freshness; offline max-stale cannot override must-revalidate/no-cache/no-store"
+    "pending handoff uses SDK freshness; offline max-stale cannot override must-revalidate/no-cache/no-store",
+    "chunked gzip response persists dechunked/decompressed with consistent stored headers; invalid partial write is aborted"
   ],
   "cache": {
     "sameOriginalAutomaticHttpCacheBudget": true,

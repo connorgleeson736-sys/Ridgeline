@@ -41,7 +41,7 @@ internal class HttpCachePublisher(private val cache:Cache?,private val byteLimit
         // BridgeInterceptor may already have decompressed the body. Keep headers
         // consistent with the exact bytes stored, with original timing/ETag/Vary.
         val empty=ByteArray(0).toResponseBody(response.body.contentType())
-        val builder=response.newBuilder().header("Content-Length",body.bytes.size.toString()).body(empty)
+        val builder=response.newBuilder().removeHeader("Transfer-Encoding").header("Content-Length",body.bytes.size.toString()).body(empty)
         if(!encoded)builder.removeHeader("Content-Encoding")
         if(response.networkResponse==null)builder.networkResponse(response.newBuilder().body(empty).build())
         val row=Pending(key,builder.build(),body)

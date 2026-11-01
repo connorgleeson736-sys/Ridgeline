@@ -19,7 +19,8 @@ class HttpPathTest {
    val reader=c.getInputStream().bufferedReader();val request=reader.readLine()?:return@use
    val headers=HashMap<String,String>();while(true){val line=reader.readLine()?:break;if(line.isEmpty())break;val colon=line.indexOf(':');if(colon>0)headers[line.substring(0,colon).lowercase()]=line.substring(colon+1).trim()}
    requests.incrementAndGet();val (rows,body)=reply(request.split(' ')[1],headers)
-   c.getOutputStream().apply{write((rows+listOf("Content-Length: ${body.size}","Connection: close","","")).joinToString("\r\n").toByteArray());write(body);flush()}
+   val length=if(rows.any{it.startsWith("Transfer-Encoding:",true)})emptyList()else listOf("Content-Length: ${body.size}")
+   c.getOutputStream().apply{write((rows+length+listOf("Connection: close","","")).joinToString("\r\n").toByteArray());write(body);flush()}
   }catch(_:IOException){}}}}}catch(_:SocketException){}}}
   fun url(path:String)="http://127.0.0.1:$port$path"
   override fun close(){socket.close();workers.shutdownNow()}
@@ -114,10 +115,12 @@ class HttpPathTest {
  @Test fun fullCachePreservesFreshnessGzipVaryConditionalValidationAndRedirects(){
   val payload="original bytes after transparent gzip".toByteArray()
   val gzip=ByteArrayOutputStream().also{out->java.util.zip.GZIPOutputStream(out).use{it.write(payload)}}.toByteArray()
+  val chunked=(gzip.size.toString(16)+"\r\n").toByteArray()+gzip+"\r\n0\r\n\r\n".toByteArray()
   val validated=AtomicInteger()
   Server{path,headers->when(path){
    "/redirect"->listOf("HTTP/1.1 301 Moved Permanently","Location: /fresh","Cache-Control: public, max-age=3600") to "redirect body".toByteArray()
    "/fresh"->listOf("HTTP/1.1 200 OK","Cache-Control: public, max-age=3600","Vary: Accept-Encoding, User-Agent","Content-Encoding: gzip","ETag: \"original\"") to gzip
+   "/chunked"->listOf("HTTP/1.1 200 OK","Cache-Control: public, max-age=3600","Content-Encoding: gzip","Transfer-Encoding: chunked") to chunked
    "/validate"->if(headers["if-none-match"]=="\"original\""){validated.incrementAndGet();listOf("HTTP/1.1 304 Not Modified","Cache-Control: public, max-age=3600","ETag: \"original\"") to ByteArray(0)}else listOf("HTTP/1.1 200 OK","Cache-Control: no-cache","ETag: \"original\"") to payload
    "/vary-star"->listOf("HTTP/1.1 200 OK","Cache-Control: public, max-age=3600","Vary: *") to payload
    else->listOf("HTTP/1.1 200 OK","Cache-Control: no-store") to payload
@@ -137,11 +140,13 @@ class HttpPathTest {
     assertArrayEquals(payload,network(redirect).bytes);backend.awaitCacheWrites()
     assertArrayEquals(payload,network(noStore).bytes);backend.awaitCacheWrites();assertNull(backend.local(noStore))
     val varyStar=ResourceKey(server.url("/vary-star"),false);assertArrayEquals(payload,network(varyStar).bytes);assertNull(backend.local(varyStar))
+    val chunk=ResourceKey(server.url("/chunked"),false);assertArrayEquals(payload,network(chunk).bytes);backend.awaitCacheWrites()
     val before=server.requests.get();close(client,backend)
     client=OkHttpClient.Builder().proxy(Proxy.NO_PROXY).cache(Cache(dir,4_194_304)).build();backend=HttpTileBackend(client){null}
     assertArrayEquals(payload,backend.local(fresh)!!.bytes)
     assertArrayEquals(payload,backend.local(conditional)!!.bytes)
     assertArrayEquals(payload,backend.local(redirect)!!.bytes)
+    assertArrayEquals(payload,backend.local(chunk)!!.bytes)
     assertEquals("Persistent cache hits/redirects must not perform HTTP",before,server.requests.get())
     assertTrue("Original automatic disk budget is retained",client.cache!!.maxSize()==4_194_304L)
    }finally{close(client,backend);dir.deleteRecursively()}

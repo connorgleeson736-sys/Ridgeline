@@ -83,7 +83,7 @@ must compile this adapter and repeat the cache/migration fixtures.
 A fixture was produced by the actual OkHttp **4.12.0** jar, including Vary headers
 and its journal/metadata/body files. The new client reads that fixture without
 network access. Both versions use cache format version 201105. No automatic
-cache deletion/migration was added. Real HTTP checks cover gzip, Vary, no-cache,
+cache deletion/migration was added. Real HTTP checks cover gzip, chunked gzip, Vary, no-cache,
 ETag/304 freshness renewal, no-store, Vary:*, redirects, restart and pending-body
 must-revalidate rules. These are host checks, not Android storage benchmarks.
 
