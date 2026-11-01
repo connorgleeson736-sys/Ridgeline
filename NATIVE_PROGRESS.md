@@ -1,5 +1,60 @@
 # Durable progress log
 
+## 2026-11-01 — eight pipeline/latency improvements, APK 0.1.7
+
+User asked for continuing broad performance work, then prioritized improvements
+that can avoid more than200ms. Implemented shared prioritized original-file I/O
+independent of CPU decoding; async metadata initialization; bounded two-tile
+offline prefetch reusing source leases even with zeroRAM; acknowledged/retryable
+GPU admission; Vulkan merged mip/frame submissions; real read-handle publication
+to bypass SQLiteOpenHelper's inherited monitor; independent region-list queries;
+and asynchronous HTTP disk-cache close during teardown. Capacity releases wake
+GPU retries instead of waiting up to512ms on a stale deadline.
+
+Follow-up added revalidated late prepared-cache adoption while waiting on sources
+or at CPU checkpoints. Keeps12msheadstart,2readers/16pending cap and legacy API;
+rechecks current provenance/expiry/imageryGeneration/eligibility, rejects stale
+hits, preserves shared consumers, and never publishes an obsolete late result.
+
+First source3681a4a, late-cache b2e102d, final app source
+36f94778587447c5519623bea318f2d0e0b5e072. All Rust production trees remain identical
+between first and final source. ARM64/ARMv7/x86_64 rebuilt release/stripped with
+new typed-admission JNI exports; legacy exports and surface focus preserved.
+ThirdABIbuild hit disk limit after Cargo target cleanup retained large dependency
+files; explicit completed-target cargo cleans freed space and x86_64 then built.
+Final APK repackaged from a fresh packaging directory to omit incremental unused
+bodies; no repeated full tests/lint.
+
+Eleven distinct targeted JVM checks pass; ack test extended/rerun for capacity
+wakes. Actual lossless cache/injected350ms source fixture363.223→41.986ms,
+321.237ms saved. Helper-style250mswriter hold250.218→0.000431ms with production
+PublishedReadHandle. Original-I/O ready CPU queue250.345→0.120ms. Offline fixture
+about2x faster with same12requests/bytes,2background cap,0retainedRAM. Host only.
+
+GPU A/B/C: existing5submits, split2submits, merged1submit for4images+frame.
+Three alternating warmed trials on Vulkan arrays, Vulkan separate and GLES
+separate; identical frame pixels, all9checker mips and2-layer mip probe pass.
+Vulkan merged CPU submission improves strongly in software fixtures; GPU-drain
+results differ by layout. GLES measurements varied/regressed in an earlier round,
+so Android enables batching only on Vulkan. No phone/FPS claim or quality cut.
+
+Pinned AOSP Android16 source confirms SQLiteOpenHelper.getReadableDatabase locks
+on the same helper. Read-only handles are not cached; writers publish writable
+handles, initialization uses CAS, committed resource availability cannot be
+replaced by an older empty snapshot. Durable transactions and ownership remain.
+
+APK Ridgeline-Native-Latency-0.1.7-Base.apk, code8,32,092,956bytes,
+SHA2569432908850999d937293a6efc85c5b40ef7aedfa10683f67d3cf2ae111330dbb.
+Same Performance package/key, in-place update from0.1.2–0.1.6. Signature,
+ZIP16KiB/ELF alignment, new JNI exports and all618unchanged assets verified.
+No sessionCA/WebView/bigpacks. Report and exact validation:
+native-wgpu/research/ASYNCHRONOUS-PIPELINE-2026-11-01.md and
+native-wgpu/validation/asynchronous-pipeline-2026-11-01/release.json.
+
+Next major candidates remain correlated tile-to-present tracing, conservative
+measured terrain bounds, in-flight allocation accounting, classified retries,
+and device-proven pipeline caching/pacing. Route planning untouched.
+
 ## 2026-11-01 — persistent live download-job sliders and APK 0.1.6
 
 Added moving, stationary and background download sliders, each 1–50, under

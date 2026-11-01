@@ -1,7 +1,8 @@
 # Native performance implementation — 0.1.7
 
 **1 November 2026, Australia/Melbourne.** First implementation checkpoint: `3681a4ac86d955837c893ef42285b2ec9c0f3c32`.
-Final application source is pinned in the accompanying release record. Builds on
+Final application source: `36f94778587447c5519623bea318f2d0e0b5e072`
+(also pinned in the accompanying release record). Builds on
 native 0.1.6 and retains
 the requested 0.1.1 checkpoint ancestry. Reference refreshed from
 `android-preview-download`: Capacitor Performance 0.18.0, source

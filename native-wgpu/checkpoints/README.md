@@ -1,6 +1,34 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.6 Download Controls Base APK — 32.1 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-Download-Controls-0.1.6-Base.apk)**.
+Latest: **[Download 0.1.7 Latency Base APK — 32.1 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-Latency-0.1.7-Base.apk)**.
+Source `36f94778587447c5519623bea318f2d0e0b5e072`, version code 8. Same Native
+Performance package and signer; installs over 0.1.2–0.1.6 preserving data.
+
+Eight changes across original local I/O, late prepared-cache adoption, offline
+prefetch, saved-reader locks, saved-region query scheduling, GPU admission,
+Vulkan mip/frame batching and asynchronous HTTP-cache teardown. The 1–50 job
+controls remain. All three optimized native ABIs rebuilt; original detail,
+filters and all 618 assets preserved.
+
+Controlled host fixtures: late prepared cache **363.223 → 41.986 ms**;
+a 250 ms writer-monitor hold **250.218 → 0.000431 ms** for an established reader;
+ready-image CPU queue behind held local reads **250.345 → 0.120 ms**. Offline
+lookahead roughly halves the injected source-pipeline workload with identical
+requests/bytes and zero retained RAM. These are conditional subsystem results,
+not phone latency/FPS claims. Vulkan batching reduces four-image frame submissions
+from five to one; GLES retains its previous path after mixed host timing results.
+
+Eleven targeted JVM checks pass; three graphics configurations compare three
+submission modes with identical frame pixels and nine-level mip probes. No full
+suite/lint or physical-device benchmark. Signature, package/version, ZIP/ELF
+alignment, new JNI exports and unchanged original assets verified.
+[Full report, measurements and next candidates](../research/ASYNCHRONOUS-PIPELINE-2026-11-01.md) ·
+[Exact release record](../validation/asynchronous-pipeline-2026-11-01/release.json) ·
+[SHA-256](Ridgeline-Native-Latency-0.1.7-Base.apk.sha256).
+
+## Previous 0.1.6 download-controls checkpoint
+
+**[Download 0.1.6 Download Controls Base APK — 32.1 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-Download-Controls-0.1.6-Base.apk)**.
 Source `f6f5ea0682945d3e42fc73f392b298e57ea2c37d`, version code 7. Same Native
 Performance package and signer; installs over 0.1.2–0.1.5 preserving data.
 

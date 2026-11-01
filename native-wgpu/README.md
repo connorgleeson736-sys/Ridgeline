@@ -5,7 +5,21 @@
 the audited APK was 0.1.5. Main next candidates are raw local-I/O isolation,
 GPU upload acknowledgement, classified recovery and per-tile critical-path tracing.
 
-Latest APK: **[0.1.6 Download Controls Base](checkpoints/README.md)**, source `f6f5ea0`.
+Latest APK: **[0.1.7 Latency Base](checkpoints/README.md)**, source `36f9477`.
+Original file I/O yields before CPU decoding; revalidated late prepared-cache hits
+can beat source rebuilding; saved WAL readers bypass both application and inherited
+helper locks. Offline source lookahead and independent region queries remove
+serialization. Uploads retain ownership until typed JNI acknowledgement; actual
+capacity releases wake retries. Vulkan mip/frame commands share a submission;
+GLES keeps the prior path. HTTP disk-cache close runs in the cleanup thread.
+
+Controlled host cases avoid 321 ms of fallback wait and 250 ms of writer-monitor
+wait. These are not phone results. Eleven focused JVM checks and three graphics
+configurations pass; original pixels/mips/assets preserved. All3optimized ABIs
+rebuilt; signed in-place update over0.1.6. No full suite/lint.
+[Implementation, measurements, tradeoffs and remaining work](research/ASYNCHRONOUS-PIPELINE-2026-11-01.md).
+
+Previous 0.1.6 Download Controls Base, source `f6f5ea0`:
 **Offline / imagery → Download jobs** includes saved 1–50 sliders for moving,
 stationary and additional background transfers (defaults 8/12/2). Changes apply
 immediately, with a reset button; existing downloads finish when reducing limits.
