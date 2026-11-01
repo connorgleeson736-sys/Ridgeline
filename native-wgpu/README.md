@@ -2,10 +2,19 @@
 
 [Application-wide performance audit, 1 November 2026](research/FULL-APP-PERFORMANCE-AUDIT-2026-11-01.md):
 23 ranked findings, pinned code evidence and current research. Report only;
-the latest APK remains 0.1.5. Main next candidates are raw local-I/O isolation,
+the audited APK was 0.1.5. Main next candidates are raw local-I/O isolation,
 GPU upload acknowledgement, classified recovery and per-tile critical-path tracing.
 
-Latest APK: **[0.1.5 Surface Focus Base](checkpoints/README.md)**, source `b0d76de`.
+Latest APK: **[0.1.6 Download Controls Base](checkpoints/README.md)**, source `f6f5ea0`.
+**Offline / imagery → Download jobs** includes saved 1–50 sliders for moving,
+stationary and additional background transfers (defaults 8/12/2). Changes apply
+immediately, with a reset button; existing downloads finish when reducing limits.
+Both HTTP paths support the selected range. Two focused checks pass, including
+50 simultaneous real HTTP transfers per path. APK signature/alignment verified;
+all 618 assets and three optimized native libraries are byte-identical to 0.1.5.
+[Scope and validation](research/DOWNLOAD-CONTROLS-2026-11-01.md). No phone benchmark.
+
+Previous 0.1.5 Surface Focus Base, source `b0d76de`:
 Both source plans now prioritize the actual centre-ray terrain intersection,
 separately from the navigation pivot. CPU picking is reused; unavailable or
 stale hits preserve the old policy. In the focused fixture the visible face

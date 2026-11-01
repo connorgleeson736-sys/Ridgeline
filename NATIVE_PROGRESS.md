@@ -1,5 +1,29 @@
 # Durable progress log
 
+## 2026-11-01 — persistent live download-job sliders and APK 0.1.6
+
+Added moving, stationary and background download sliders, each 1–50, under
+Offline / imagery. Defaults remain 8/12/2; reset restores them. Preferences
+persist and apply immediately. Lowering caps drains admitted work normally.
+Transport remains the admission controller; ordinary and isolated HTTP queues
+accommodate up to 50 foreground + 50 background transfers. Imagery reservation
+scales down at small limits so one-slot terrain progress remains possible.
+
+Two focused JVM checks pass: live admission/movement/growth/shrink/background/
+one-slot terrain/clamping, plus 50 simultaneous actual HTTP transfers on each
+HTTP path and queued request 51. Fixed an ordering assumption in the fixture:
+the two independent local readers may finish in either order. No full suite,
+lint or phone benchmark. Preserved the renderer and all prior improvements.
+
+Source f6f5ea0682945d3e42fc73f392b298e57ea2c37d. APK 0.1.6-download-controls,
+code7, 32,056,100bytes; SHA256
+ed429e5d4ebdef8bba39382bada421b4f4ed84f415fdcf9330488ee9a0ce093e.
+Same Performance package/key, in-place update from0.1.2–0.1.5. Signature/version/
+ZIP16KiB alignment verified; all618assets and all3optimized native libraries
+byte-identical to0.1.5. Research and release record:
+native-wgpu/research/DOWNLOAD-CONTROLS-2026-11-01.md and
+native-wgpu/validation/download-controls-2026-11-01/release.json.
+
 ## 2026-11-01 — application-wide performance audit delivered
 
 Surface-focus 0.1.5 implementation/APK already complete at publication8c06ca6,

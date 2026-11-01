@@ -1,6 +1,27 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.5 Surface Focus Base APK — 32.1 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-Surface-Focus-0.1.5-Base.apk)**.
+Latest: **[Download 0.1.6 Download Controls Base APK — 32.1 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-Download-Controls-0.1.6-Base.apk)**.
+Source `f6f5ea0682945d3e42fc73f392b298e57ea2c37d`, version code 7. Same Native
+Performance package and signer; installs over 0.1.2–0.1.5 preserving data.
+
+**Offline / imagery → Download jobs** now has three saved sliders, each 1–50:
+While moving (default 8), While stationary (default 12), and Background (default 2).
+Changes apply immediately; lowering a cap lets current transfers finish. Reset
+restores the defaults. Background jobs are additional to foreground jobs.
+Both HTTP paths accommodate the full selectable range; the transport still
+controls actual admission. One-slot settings allow terrain to progress.
+
+Two focused checks pass, including 50 simultaneous real HTTP transfers on both
+ordinary and isolated cache-free paths. No full suite or lint. Signature,
+version/package and ZIP alignment verified; all 618 assets and three optimized
+native libraries match 0.1.5 byte-for-byte. No phone speed measurement.
+[Implementation/scope](../research/DOWNLOAD-CONTROLS-2026-11-01.md) ·
+[Exact release record](../validation/download-controls-2026-11-01/release.json) ·
+[SHA-256](Ridgeline-Native-Download-Controls-0.1.6-Base.apk.sha256).
+
+## Previous 0.1.5 surface-focus checkpoint
+
+**[Download 0.1.5 Surface Focus Base APK — 32.1 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-Surface-Focus-0.1.5-Base.apk)**.
 Source `b0d76de4d551ee5ae68a18ce02e9bc210196ca84`, version code 6. Same Native
 Performance package and signing key; installs over 0.1.2–0.1.4 preserving data.
 
