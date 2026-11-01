@@ -55,7 +55,7 @@ internal class HttpMetrics {
     private fun traffic(bytes:Long){val epoch=System.nanoTime()/250_000_000;val index=(epoch%20).toInt();synchronized(meter){if(epochs[index]!=epoch){epochs[index]=epoch;bucket[index]=0};bucket[index]+=bytes}}
     fun listener(call:Call):EventListener {
         if(call.request().cacheControl.onlyIfCached)return EventListener.NONE
-        val trace=Trace(call.request().url.host,if("/elevation/" in call.request().url.encodedPath)"terrain"else"imagery")
+        val trace=Trace(call.request().url.host,when{ "/elevation/" in call.request().url.encodedPath->"terrain";"/topographic-v2/" in call.request().url.encodedPath->"topography";"/topo-raster/" in call.request().url.encodedPath->"topo";else->"imagery"})
         active[call]=trace
         return object:EventListener(){
             override fun dnsStart(call:Call,domainName:String){trace.begin();trace.probe=null;trace.dnsStart.set(System.nanoTime())}

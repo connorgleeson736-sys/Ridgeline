@@ -6,6 +6,9 @@ impl Renderer {
     /// [minimum safe center elevation, drawn center height, center geometry zoom].
     /// Missing terrain stays unknown rather than becoming an invented zero plane.
     pub fn camera_safety(&mut self, view: &View) -> [f32; 3] {
+        if !self.map_style.three_d {
+            return [f32::NEG_INFINITY, 0., -1.];
+        }
         if self.cover_dirty {
             self.rebuild_cover();
             self.cover_dirty = false;
@@ -28,7 +31,9 @@ impl Renderer {
                 view.center[1] - point.y as f64 / world,
             ];
             if let Some(height) = self.terrain_height(coordinate) {
-                floor = floor.max(height*self.map_style.relief as f64 - point.z as f64 / ppm as f64 + 0.05);
+                floor = floor.max(
+                    height * self.map_style.relief as f64 - point.z as f64 / ppm as f64 + 0.05,
+                );
             }
         };
         let b = view.bearing.to_radians();
@@ -43,7 +48,7 @@ impl Renderer {
         }
         let ground = self
             .terrain_height(view.center)
-            .map(|h| h as f32*self.map_style.relief)
+            .map(|h| h as f32 * self.map_style.relief)
             .unwrap_or(f32::NAN);
         let z = self
             .cover

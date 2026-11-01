@@ -28,3 +28,9 @@ console.log(JSON.stringify({full,packCount:full?catalog.files.length:0,coarseIma
 // Retain the notice for algorithms adapted from the reference MapLibre engine.
 fs.mkdirSync(path.join(out,'licenses'),{recursive:true});
 fs.copyFileSync(path.join(root,'native-wgpu/licenses/maplibre-gl-js.txt'),path.join(out,'licenses/maplibre-gl-js.txt'));
+
+// Data-only Capacitor layer policy and exact original source boundary. No JS engine in APK.
+const layerContext=load('topographic-overlays.js');
+fs.writeFileSync(path.join(out,'topography-style.json'),JSON.stringify(layerContext.RidgeTopography.layers()));
+const boundaryMeta=load('imagery-boundary-data.js').RidgeImageryBoundaryData;
+fs.copyFileSync(path.join(root,'public',boundaryMeta.url.replace(/^\//,'')),path.join(out,'imagery-boundary.geojson'));

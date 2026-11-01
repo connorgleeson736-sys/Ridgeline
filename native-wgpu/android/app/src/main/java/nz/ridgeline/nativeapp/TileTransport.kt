@@ -78,7 +78,7 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
      * progress then uses an independent cache-free HTTP path, within the same
      * network limits. Offline/speculative readers never start a hedge. */
     private fun watchable(job:Job)=!job.stopped&&job.phase==Phase.LOCAL&&!job.key.offline&&
-        !job.networkTried&&!job.localFinished&&job.localWork!=null&&job.users.any{!it.speculative}
+        !job.networkTried&&!job.localFinished&&job.localWork!=null&&job.users.any{!it.speculative||it.cacheDeadline}
     private fun scheduleLocalWatch(at:Long){
         if(localWatch!=null&&localWatchAt<=at)return
         localWatch?.cancel(false);localWatchAt=at
@@ -154,7 +154,7 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
         }
         watchLocal(job)
     }
-    inner class Consumer internal constructor(internal var priority:Int,internal var speculative:Boolean,internal val imagery:Boolean):AutoCloseable {
+    inner class Consumer internal constructor(internal var priority:Int,internal var speculative:Boolean,internal val imagery:Boolean,internal val cacheDeadline:Boolean):AutoCloseable {
         private val owned=LinkedHashMap<ResourceKey,Job>()
         private val immediate=LinkedHashMap<ResourceKey,CompletableFuture<TileBody>>()
         private var released=false
@@ -195,7 +195,7 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
             }
             forward?.let{(job,view)->job.result.whenComplete{body,error->if(error!=null)view.completeExceptionally(error)else view.complete(body)}}
             start?.let{job->synchronized(lock){if(!job.stopped&&!closed&&job.phase==Phase.LOCAL&&!job.networkTried){
-                if(!job.key.offline&&!job.speculative()&&localNow()<localCooldownUntil){
+                if(!job.key.offline&&job.users.any{!it.speculative||it.cacheDeadline}&&localNow()<localCooldownUntil){
                     job.bypassCache=true;job.localFinished=true;job.phase=Phase.QUEUED
                     job.localDeadline=Long.MAX_VALUE
                 }else{
@@ -226,7 +226,7 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
         }
 
     }
-    fun consumer(priority:Int=0,speculative:Boolean=false,imagery:Boolean=false)=Consumer(priority,speculative,imagery)
+    fun consumer(priority:Int=0,speculative:Boolean=false,imagery:Boolean=false,cacheDeadline:Boolean=false)=Consumer(priority,speculative,imagery,cacheDeadline)
     /** Publish before CPU work can fan out DEM dependencies. Keep two existing
      * foreground slots (when the limit permits) available for sharper images until visible demand is
      * satisfied; no extra connections or cancellation of shared terrain work. */

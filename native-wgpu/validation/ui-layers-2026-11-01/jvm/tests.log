@@ -22,13 +22,16 @@
 > Task :app:javaPreCompileDebugUnitTest UP-TO-DATE
 > Task :app:compileDebugKotlin
 > Task :app:compileDebugJavaWithJavac UP-TO-DATE
+> Task :app:bundleDebugClassesToCompileJar
 > Task :app:bundleDebugClassesToRuntimeJar
 > Task :app:processDebugJavaRes UP-TO-DATE
-> Task :app:bundleDebugClassesToCompileJar
+
 > Task :app:compileDebugUnitTestKotlin
+w: file:///workspace/Ridgeline/native-wgpu/android/app/src/test/java/nz/ridgeline/nativeapp/CacheDeadlineTest.kt:184:36 Java type mismatch: inferred type is 'Any?', but 'Any' was expected.
+
 > Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
 > Task :app:processDebugUnitTestJavaRes UP-TO-DATE
 > Task :app:testDebugUnitTest
 
-BUILD SUCCESSFUL in 3s
+BUILD SUCCESSFUL in 25s
 26 actionable tasks: 5 executed, 21 up-to-date

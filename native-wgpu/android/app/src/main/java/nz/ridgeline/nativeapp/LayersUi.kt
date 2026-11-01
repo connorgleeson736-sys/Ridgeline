@@ -53,7 +53,7 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
         val state=settings.state
         check(parent,"LINZ peak labels",state.peaks){v->settings.change{it.copy(peaks=v)}}
         check(parent,"Natural imagery colour",state.natural){v->settings.change{it.copy(natural=v)}}
-        check(parent,"Soft terrain shading",state.hillshade){v->settings.change{it.copy(hillshade=v)}}
+        check(parent,"Soft terrain shading · aerial backgrounds",state.hillshade){v->settings.change{it.copy(hillshade=v)}}
         parent.addView(NativeUi.text(activity,"Sky colour"))
         val names=arrayOf("Mist","Alpine blue","Clear blue","Warm haze","Slate","Night","Custom colour")
         val colors=intArrayOf(0xffbdcbd0.toInt(),0xffadc9db.toInt(),0xff88c6fc.toInt(),0xffe8d9c4.toInt(),0xff697b89.toInt(),0xff17242f.toInt())
@@ -61,7 +61,7 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
             AlertDialog.Builder(activity).setTitle("Sky colour").setItems(names){_,i->if(i<colors.size){settings.change{it.copy(sky=colors[i])};render()}else{val input=EditText(activity).apply{setSingleLine();hint="#bdcbd0";setText(String.format("#%06x",state.sky and 0xffffff))};val dialog=AlertDialog.Builder(activity).setTitle("Custom sky colour").setView(input).setPositiveButton("Apply",null).setNegativeButton("Cancel",null).create();dialog.setOnShowListener{dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener{try{val color=Color.parseColor(input.text.toString());settings.change{it.copy(sky=color)};dialog.dismiss();render()}catch(_:Exception){input.error="Enter a colour such as #bdcbd0"}}};dialog.show()}}.show()
         })
         slider(parent,"Terrain relief",10,((state.relief-1)*10).toInt(),{String.format(java.util.Locale.ROOT,"%.1f×",1+it/10f)}){v->settings.change{it.copy(relief=1+v/10f)}}
-        parent.addView(NativeUi.text(activity,"Relief affects the view. Route distances and elevation statistics use real heights.",11f));NativeUi.divider(parent)
+        parent.addView(NativeUi.text(activity,"Relief affects the 3D view. Route distances and elevation statistics use real heights.",11f));NativeUi.divider(parent)
         for(mode in DownloadLimits.Mode.entries){val label=when(mode){DownloadLimits.Mode.MOVING->"Download jobs while moving";DownloadLimits.Mode.STATIONARY->"Download jobs while stationary";DownloadLimits.Mode.BACKGROUND->"Additional background jobs"};slider(parent,label,49,loader.downloadJobs(mode)-1,{(it+1).toString()}){loader.downloadJobs(mode,it+1)}}
         parent.addView(NativeUi.button(activity,"Reset download jobs"){loader.resetDownloadJobs();render()})
         parent.addView(NativeUi.text(activity,"More jobs share bandwidth. Routes, names and map backgrounds use the same bounded transport and cache.",11f))
@@ -71,6 +71,10 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
         check(parent,"Prepare nearby terrain while idle",loader.prepareAhead){loader.prepareAhead(it)}
         check(parent,"Downloaded maps only",loader.offlineOnly){loader.offlineOnly(it)}
         parent.addView(NativeUi.button(activity,"Offline maps, imagery ZIPs & diagnostics"){dismiss();offline.show()})
+        parent.addView(NativeUi.button(activity,"About & licences"){
+            val text=NativeUi.text(activity,"Ridgeline Native\nNative map and route planner\n\nLINZ imagery, elevation and topographic data · CC BY 4.0. Esri World Imagery and contributors.\n\nMapLibre adaptation notice:\n"+activity.assets.open("licenses/maplibre-gl-js.txt").bufferedReader().use{it.readText()},12f).apply{setPadding(dp(16),dp(12),dp(16),dp(12));setTextIsSelectable(true)}
+            AlertDialog.Builder(activity).setTitle("About Ridgeline").setView(ScrollView(activity).apply{addView(text)}).setPositiveButton("Close",null).show()
+        })
         parent.addView(NativeUi.text(activity,"LINZ topographic data · CC BY 4.0. Mapped tracks and huts are not a condition or availability report.",11f))
     }
 }

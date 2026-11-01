@@ -22,6 +22,13 @@ object NativeGeo {
         val a=samples[lo-1];val t=(d-a.distance)/(b.distance-a.distance)
         return ProfilePoint(Coordinate(a.point.longitude+(b.point.longitude-a.point.longitude)*t,a.point.latitude+(b.point.latitude-a.point.latitude)*t),d,if(a.height!=null&&b.height!=null)a.height+(b.height-a.height)*t else null)
     }
+    fun grade(samples:List<ProfilePoint>,distance:Double):Double?{
+        if(samples.size<2||!distance.isFinite())return null
+        val lo=max(samples.first().distance,distance-10);val hi=min(samples.last().distance,distance+10);if(hi<=lo)return null
+        if(samples.any{it.distance>lo&&it.distance<hi&&it.height==null})return null
+        val a=profileAt(samples,lo)?.height?:return null;val b=profileAt(samples,hi)?.height?:return null
+        return (b-a)/(hi-lo)*100
+    }
     /** Same endpoint interpolation and missing-gap accounting as the Capacitor chart. */
     fun section(samples:List<ProfilePoint>,a:Double,b:Double):Section?{
         if(samples.isEmpty()||!a.isFinite()||!b.isFinite())return null
@@ -95,6 +102,7 @@ class RouteEditor {
     private fun snapshot()=Snapshot(points.toList(),selected)
     private fun remember(value:Snapshot=snapshot()){history.addLast(value);while(history.size>50)history.removeFirst()}
     fun reset(value:List<Coordinate>,selection:Int=-1){require(value.size<=2000&&value.all{it.inNewZealand()});points=value.toList();selected=selection.takeIf{it in value.indices}?:-1;history.clear();drag=null}
+    fun clearSelection(){if(drag==null)selected=-1}
     fun select(index:Int):Boolean {if(drag!=null||index !in points.indices)return false;selected=index;return true}
     fun append(value:Coordinate):Result {
         cancelDrag();val p=value.rounded();if(!p.inNewZealand())return Result.OUTSIDE_NZ

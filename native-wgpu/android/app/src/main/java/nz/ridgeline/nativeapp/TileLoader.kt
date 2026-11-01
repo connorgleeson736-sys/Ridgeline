@@ -90,6 +90,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     // enter that executor's FIFO; the reader thread expires while idle.
     private val offlineQueries=ThreadPoolExecutor(0,1,15,TimeUnit.SECONDS,LinkedBlockingQueue<Runnable>())
     private val regionContext=ThreadLocal<String>()
+    private val profileContext=ThreadLocal<Boolean>()
     private val regionSources=ThreadLocal<TileTransport.Consumer>()
     @Volatile private var regionPrefetch:OfflinePrefetch?=null
     @Volatile private var downloadLease:TileTransport.Consumer?=null
@@ -185,6 +186,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         private val finished=java.util.concurrent.atomic.AtomicBoolean(false)
         val consumer=transport.consumer(priority,speculative,imagery=!source.geometry)
         private val imageryGeneration=preferences.getLong("imageryGeneration",0)
+        private val terrainMode=mapSettings.state.let{it.threeD to it.needsElevation()}
         val local=localImages.consumer(priority+if(speculative)10000 else 0)
         fun localInput(key:String,read:()->ByteArray?)=local.acquire("$imageryGeneration:$key",read)
         val records=LinkedHashMap<String,SourceStamp>()
@@ -204,7 +206,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             (pipelinePauseUntil==0L||System.nanoTime()-pipelinePauseUntil>=0)
         @Volatile var started=false;private set
         @Volatile private var parkedUntil=0L
-        fun eligible()=!dead&&active&&!finished.get()&&(source in wanted||source in warmWanted&&prepareAhead||parkedUntil>System.currentTimeMillis())
+        fun eligible():Boolean{val state=mapSettings.state;return !dead&&active&&!finished.get()&&(!source.geometry||terrainMode.first==state.threeD&&terrainMode.second==state.needsElevation())&&(source in wanted||source in warmWanted&&prepareAhead||parkedUntil>System.currentTimeMillis())}
         override fun compareTo(other:Task)=compareValuesBy(this,other,{it.priority+(if(it.speculative||it.parkedUntil!=0L)10000 else 0)},{it.order})
         fun enqueue(){if(!finished.get()&&!dead&&queued.compareAndSet(false,true))try{workers(source).execute(this)}catch(_:RejectedExecutionException){queued.set(false);cancel()}}
         fun promote(rank:Int){if(priority==rank&&!speculative&&parkedUntil==0L)return;priority=rank;speculative=false;parkedUntil=0;consumer.promote(rank);local.promote(rank);if(!pipelineEligible())inputs.clear();if(workers(source).remove(this)){queued.set(false);enqueue()}}
@@ -223,6 +225,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
                     ready.put(source,data)?.let{readyBytes-=it.capacity()};readyBytes+=data.capacity();trimReady()
                     if((source in wanted||source in warmWanted)&&!resident(source))upload(source,data)
                 }
+                if(source.geometry)refineProfileSoon()
             }catch(pending:ResourcePending){waiting=pending.ready
             }catch(_:PreparationAborted){
             }catch(e:Exception){
@@ -254,6 +257,8 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         val output=planBuffer;output.rewind()
         val budget=maxOf(16,(if(geometry)geometryLimit else imageLimit)*3/4)
         val focus=key.surfaceFocus
+        val state=mapSettings.state
+        if(!state.threeD)FlatSelection.plan(key.width,key.height,pose,DetailPolicy.target(geometry,if(geometry)key.terrainDetail else key.imageryDetail)*(if(!geometry&&state.base==MapSettings.Base.TOPO).5 else 1.0),budget,if(geometry)22 else if(state.base==MapSettings.Base.LINZ)19 else 18)?.let{return it.map{tile->Id(tile.z,tile.x,tile.y)}}
         val count=NativeBridge.planFocused(key.width,key.height,pose.longitude,pose.latitude,
             pose.zoom,pose.bearing,pose.pitch,pose.elevation,budget,
             DetailPolicy.target(geometry,if(geometry)key.terrainDetail else key.imageryDetail)*(if(!geometry&&mapSettings.state.base==MapSettings.Base.TOPO).5 else 1.0),if(geometry)22 else if(mapSettings.state.base!=MapSettings.Base.LINZ)18 else 19,1.0,
@@ -390,12 +395,16 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         cacheThreadFactory=ThreadFactory{work->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);work.run()},"RidgelineHttpCache")},
         metrics=httpMetrics,offlineRead=offline::read)}
     private val transport by lazy{TileTransport(backend,ramBudget.encoded,initialLimits=downloadLimits)}
-    internal fun layerConsumer()=transport.consumer(800,true)
+    internal fun layerConsumer()=transport.consumer(800,true,cacheDeadline=true)
     internal fun layerBody(consumer:TileTransport.Consumer,url:String)=consumer.acquire(ResourceKey(url,offlineOnly))
     internal fun vectorUrl(z:Int,x:Int,y:Int)="https://basemaps.linz.govt.nz/v1/tiles/topographic-v2/3857/$z/$x/$y.pbf?api=$key"
     internal fun changeMapStyle(before:MapSettings.State,after:MapSettings.State){
-        if(before.base!=after.base||before.natural!=after.natural)runCatching{scheduler.execute{plans.clear();imageryChanged();view.clearImages()}}
-        view.configure(after)
+        runCatching{scheduler.execute{
+            val resetGeometry=before.threeD!=after.threeD||before.needsElevation()!=after.needsElevation()
+            if(resetGeometry){for(task in jobs.values)if(task.source.geometry)task.cancel();clearWarm();synchronized(ready){val it=ready.entries.iterator();while(it.hasNext()){val row=it.next();if(row.key.geometry){readyBytes-=row.value.capacity();it.remove()}}};plans.clear();cameraChanged()}
+            if(before.base!=after.base||before.natural!=after.natural){plans.clear();imageryChanged()}
+            view.configure(after,resetGeometry)
+        }}
     }
     internal var externalDiagnostics:()->String={""}
     fun loadingDiagnostics():String {
@@ -436,13 +445,13 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     }
     private fun fetchRecord(url:String):TileBody{
         check(!dead);val current=taskContext.get();val regionLease=regionSources.get()
-        val owned=current?.consumer?:regionLease?:transport.consumer(if(regionContext.get()!=null)1000 else 16,regionContext.get()!=null)
+        val owned=current?.consumer?:regionLease?:transport.consumer(if(regionContext.get()!=null)1000 else if(profileContext.get()==true)700 else 16,regionContext.get()!=null||profileContext.get()==true,cacheDeadline=profileContext.get()==true)
         val downloading=current==null&&regionContext.get()!=null
         if(downloading){downloadLease=owned;if(downloadCancel.get()){owned.release(true);throw PreparationAborted()}}
         try{
             val future=owned.acquire(resourceKey(url))
             if(current!=null&&!future.isDone)throw ResourcePending(future)
-            val body=try{future.get()}catch(e:ExecutionException){throw(e.cause as? Exception?:IOException("Shared tile request failed"))}
+            val body=try{future.get()}catch(e:InterruptedException){owned.release(true);Thread.currentThread().interrupt();throw e}catch(e:ExecutionException){throw(e.cause as? Exception?:IOException("Shared tile request failed"))}
             body.stamp?.let{sourceRecords.get()?.set(it.key,it)}
             return body
         }finally{if(current==null&&regionLease==null)owned.close();if(downloading&&downloadLease===owned)downloadLease=null}
@@ -457,7 +466,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         clearWarm()
         synchronized(compositionLock){preferences.edit().putLong("imageryGeneration",preferences.getLong("imageryGeneration",0)+1).apply();compositionStore=null}
         synchronized(ready){val iter=ready.entries.iterator();while(iter.hasNext()){val row=iter.next();if(!row.key.geometry){readyBytes-=row.value.capacity();iter.remove()}}}
-        transport.invalidate();failures.clear();cameraChanged()
+        transport.invalidate();failures.clear();view.clearImages();cameraChanged()
     }
     private fun demPixels(data: ByteArray): FloatArray {
         val options = BitmapFactory.Options().apply {
@@ -511,6 +520,8 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         return Decoded(raster,dependencies.values.toList()).also{synchronized(decoded){decoded[id]=it;trimDecoded()}}
     }
     private fun loadGeometry(id: Id): ByteBuffer {
+        if(!mapSettings.state.needsElevation())return ByteBuffer.allocateDirect(129*129*4).order(ByteOrder.LITTLE_ENDIAN) // Explicit cartographic plane, not an elevation raster.
+
         checkPreparation()
         // Derived files are optional. Do not let their index, read or gzip
         // delay source admission or occupy the two geometry workers. Expired
@@ -580,20 +591,22 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             for(yy in y0..y1)for(xx in x0..x1)result.add(Id(z,xx,yy))
         };return result
     }
-    fun regionEstimate(bounds:Bounds,maxZoom:Int)=regionTiles(bounds,maxZoom).size
+    fun regionEstimate(bounds:Bounds,maxZoom:Int)=regionTiles(bounds,if(mapSettings.state.base==MapSettings.Base.TOPO)minOf(maxZoom,18)else maxZoom).size
     fun regions(callback:(List<OfflineStore.Region>)->Unit){offlineQueries.execute{val rows=offline.regions();view.post{if(!dead)callback(rows)}}}
     fun removeRegion(id:String,callback:()->Unit){downloadJobs.execute{offline.delete(id);view.post{if(!dead)callback()}}}
     fun cancelDownload(){downloadCancel.set(true);regionPrefetch?.close();downloadLease?.release(true)}
     fun downloadRegion(name:String,bounds:Bounds,maxZoom:Int,progress:(String)->Unit,done:()->Unit){
-        val tiles=regionTiles(bounds,maxZoom);downloadCancel.set(false)
+        val display=mapSettings.state;val detail=if(display.base==MapSettings.Base.TOPO)minOf(maxZoom,18)else maxZoom;val tiles=regionTiles(bounds,detail);downloadCancel.set(false)
+        val downloadImagery=NativeImagery(context,::fetch,{z,x,y->linz("aerial",Id(z,x,y),"webp")},overviews,::checkPreparation,::localImage,{display})
         downloadJobs.execute{
-            val region=offline.begin(name);regionContext.set(region);val demDone=HashSet<Id>()
+            val region=offline.begin(name,OfflineStore.Metadata(bounds,detail,display.base.name));regionContext.set(region);val demDone=HashSet<Id>()
             val prefetch=OfflinePrefetch(transport);regionPrefetch=prefetch
             fun checkActive(){check(!dead&&!downloadCancel.get()){ "Download cancelled" }}
             fun inputs(id:Id):List<ResourceKey>{
-                val urls=ArrayList(imagery.inputs(id.z,id.x,id.y))
+                val urls=ArrayList(downloadImagery.inputs(id.z,id.x,id.y))
+                if(display.base!=MapSettings.Base.TOPO&&id.z in 7..15)urls+=vectorUrl(id.z,id.x,id.y)
                 val dz=min(id.z,18);val f=1 shl(id.z-dz);val n=1 shl dz
-                for(dy in -1..1)for(dx in -1..1){val dem=Id(dz,Math.floorMod(id.x/f+dx,n),(id.y/f+dy).coerceIn(0,n-1));if(dem !in demDone)urls+=linz("elevation",dem,"png")}
+                if(display.base!=MapSettings.Base.TOPO)for(dy in -1..1)for(dx in -1..1){val dem=Id(dz,Math.floorMod(id.x/f+dx,n),(id.y/f+dy).coerceIn(0,n-1));if(dem !in demDone)urls+=linz("elevation",dem,"png")}
                 return urls.distinct().map{ResourceKey(it,false)}
             }
             fun dem(id:Id){
@@ -605,10 +618,11 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
                 for((index,id)in tiles.withIndex()){
                     checkActive()
                     regionSources.set(prefetch.advance(index,tiles.subList(index,minOf(index+2,tiles.size)).map(::inputs)))
-                    imagery.load(id.z,id.x,id.y)
+                    downloadImagery.load(id.z,id.x,id.y)
+                    if(display.base!=MapSettings.Base.TOPO&&id.z in 7..15)try{fetch(vectorUrl(id.z,id.x,id.y))}catch(e:TileHttpException){if(e.code!=404)throw e}
                     val dz=min(id.z,18);val f=1 shl(id.z-dz);val n=1 shl dz
-                    for(dy in -1..1)for(dx in -1..1)dem(Id(dz,Math.floorMod(id.x/f+dx,n),(id.y/f+dy).coerceIn(0,n-1)))
-                    if(index%5==0||index==tiles.lastIndex)view.post{if(!dead)progress("${index+1}/${tiles.size} image tiles · terrain included")}
+                    if(display.base!=MapSettings.Base.TOPO)for(dy in -1..1)for(dx in -1..1)dem(Id(dz,Math.floorMod(id.x/f+dx,n),(id.y/f+dy).coerceIn(0,n-1)))
+                    if(index%5==0||index==tiles.lastIndex)view.post{if(!dead)progress("${index+1}/${tiles.size} "+if(display.base==MapSettings.Base.TOPO)"Topo tiles"else"image tiles · terrain and overlays included")}
                 }
                 offline.status(region,"Ready")
             }catch(e:Exception){offline.status(region,if(downloadCancel.get()||dead)"Partial · cancelled"else"Partial · source unavailable")}
@@ -618,20 +632,48 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private val profileJobs=Executors.newSingleThreadScheduledExecutor()
     private var profileJob:Future<*>?=null
     private val profileRevision=AtomicLong()
-    fun cancelProfile(){profileRevision.incrementAndGet();profileJob?.cancel(true)}
+    private data class ProfileDelivery(val revision:Long,val values:List<NativeGeo.ProfilePoint>,val quality:IntArray,val callback:(List<NativeGeo.ProfilePoint>)->Unit)
+    @Volatile private var profileDelivery:ProfileDelivery?=null
+    private val refineLock=Any();private var refineWake:ScheduledFuture<*>?=null
+    fun cancelProfile(){profileRevision.incrementAndGet();profileJob?.cancel(true);profileDelivery=null;synchronized(refineLock){refineWake?.cancel(false);refineWake=null}}
+    private fun profileRasters()=synchronized(decoded){decoded.values.map{it.raster}.associateBy{it.id}}
+    private fun localProfile(point:Coordinate,quality:Int,rasters:Map<GpuUploadQueue.Id,Dem>,zooms:List<Int>):Pair<Double,Int>?{
+        val mx=(point.longitude+180)/360;val my=(1-asinh(tan(Math.toRadians(point.latitude)))/PI)/2
+        for(z in zooms)if(z>quality){val n=1 shl z;val id=GpuUploadQueue.Id(z,floor(mx*n).toInt(),floor(my*n).toInt());if(id !in rasters)continue;val height=DemSampling.point(z,mx,my){rasters[it]}?.toDouble();if(height!=null&&height.isFinite())return height to z}
+        return null
+    }
+    private fun refineProfileSoon(){
+        if(profileDelivery==null||dead||profileJobs.isShutdown)return
+        synchronized(refineLock){if(refineWake!=null&&!refineWake!!.isDone)return;refineWake=profileJobs.schedule({
+            synchronized(refineLock){refineWake=null};val old=profileDelivery?:return@schedule
+            if(old.revision!=profileRevision.get())return@schedule
+            val rasters=profileRasters();val zooms=rasters.keys.map{it.z}.distinct().sortedDescending();val quality=old.quality.copyOf();var changed=false
+            val values=old.values.mapIndexed{i,p->localProfile(p.point,quality[i],rasters,zooms)?.let{(height,z)->quality[i]=z;changed=changed||p.height!=height;p.copy(height=height)}?:p}
+            if(old.revision!=profileRevision.get())return@schedule
+            profileDelivery=old.copy(values=values,quality=quality)
+            if(changed)view.post{if(!dead&&old.revision==profileRevision.get())old.callback(values)}
+        },150,TimeUnit.MILLISECONDS)}
+    }
     fun profile(points:List<Coordinate>,callback:(List<NativeGeo.ProfilePoint>)->Unit){
-        val revision=profileRevision.incrementAndGet();profileJob?.cancel(true)
+        cancelProfile();val revision=profileRevision.get()
         val samples=NativeGeo.samples(points)
         profileJob=profileJobs.schedule({
-            val result=ArrayList<NativeGeo.ProfilePoint>(samples.size)
-            for(p in samples){
+            profileContext.set(true)
+            try{
+            val result=ArrayList<NativeGeo.ProfilePoint>(samples.size);val qualities=IntArray(samples.size){-1}
+            for((index,p) in samples.withIndex()){
                 if(dead||revision!=profileRevision.get()||Thread.currentThread().isInterrupted)return@schedule
                 val mx=(p.point.longitude+180)/360
                 val my=(1-asinh(tan(Math.toRadians(p.point.latitude)))/PI)/2
-                val height=try{DemSampling.point(14,mx,my){raw(Id(it.z,it.x,it.y))}?.toDouble()}catch(_:Exception){null}
-                result.add(p.copy(height=height))
+                var sourceZoom=14
+                val height=try{DemSampling.point(14,mx,my){raw(Id(it.z,it.x,it.y)).also{record->sourceZoom=minOf(sourceZoom,record.id.z)}}?.toDouble()}catch(_:Exception){null}
+                qualities[index]=if(height==null)-1 else sourceZoom;result.add(p.copy(height=height))
             }
+            if(dead||revision!=profileRevision.get())return@schedule
+            profileDelivery=ProfileDelivery(revision,result,qualities,callback)
             view.post{if(!dead&&revision==profileRevision.get())callback(result)}
+            refineProfileSoon()
+            }finally{profileContext.remove()}
         },350,TimeUnit.MILLISECONDS)
     }
     fun memoryPressure(){

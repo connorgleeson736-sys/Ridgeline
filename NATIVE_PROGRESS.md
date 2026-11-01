@@ -1,14 +1,22 @@
 # Durable progress log
 
-## 2026-11-01 — Capacitor UI/layers/route migration in progress
+## 2026-11-02 — Capacitor UI/layers/route migration source complete
 
 Latest user explicitly requests the Capacitor UI, all route features and every
 map layer, and specifically asks to modify the existing route editor directly.
-Reference refreshed/pinned at0.18.0 d880143; keep native renderer/0.1.8 HTTP fixes.
-Source work is in progress, not a delivered0.1.9 APK. Eight focused JVM checks
-pass; Kotlin compile and host Rust check pass. Actual GPU/JNI/packaging checks
-are still pending. Working inventory, measured disabled-layer decode savings and
-remaining work: native-wgpu/research/UI-LAYERS-MIGRATION-2026-11-01.md.
+Reference refreshed/pinned at0.18.0 d880143; native renderer/0.1.8 HTTP fixes kept.
+Direct existing-editor port, route drawer/sheet/combination/chart/GPX sharing;
+all map-layer groups and persisted Advanced controls implemented. Unshaded2D
+skips DEM/halo downloads with separate planar cover; source pixels unchanged.
+One shared/background MVT stream, native cached font atlas, useful cached parents,
+disabled-layer skipping; cached instanced line batches use6x fewer upload bytes.
+Profiles stay background and refine from resident realDEM without extraHTTP.
+11unique focused JVM checks, finalKotlin compile, hostRust releasecheck and actual
+Vulkan/GLES graphics fixtures pass. Original618source assets preserved. Android
+JNI builds and final packaging follow this source checkpoint; no device connected.
+Report: native-wgpu/research/UI-LAYERS-MIGRATION-2026-11-02.md. Remaining native
+font/line-label differences, dense3D drape costs and unported paper-frame/PDF
+offline workflows are explicit. Do not claim full-app/device/pixel-perfect parity.
 
 ## 2026-11-01 — HTTP-specific latency improvements, APK 0.1.8
 

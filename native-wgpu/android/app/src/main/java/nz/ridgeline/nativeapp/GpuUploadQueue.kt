@@ -3,7 +3,7 @@ import java.nio.ByteBuffer
 /** Separate immutable sources coalesce independently, with a hard per-frame byte budget. */
 class GpuUploadQueue(private val capacity:Int) {
     enum class Kind{COMBINED,GEOMETRY,IMAGE}
-    data class Id(val z:Int,val x:Int,val y:Int){val packed get()=(z.toLong() shl 44)or(x.toLong() shl 22)or y.toLong()}
+    data class Id(val z:Int,val x:Int,val y:Int){val bounds get()=doubleArrayOf(x.toDouble()/(1 shl z),y.toDouble()/(1 shl z),(x+1.0)/(1 shl z),(y+1.0)/(1 shl z));val packed get()=(z.toLong() shl 44)or(x.toLong() shl 22)or y.toLong()}
     data class Tile(val id:Id,val heights:ByteBuffer,val rgba:ByteBuffer,val kind:Kind=Kind.COMBINED){val bytes get()=heights.capacity()+rgba.capacity()}
     private val entries=LinkedHashMap<Pair<Id,Kind>,Tile>()
     private data class Retry(val at:Long,val attempts:Int)
@@ -111,6 +111,7 @@ class GpuUploadQueue(private val capacity:Int) {
     }
     @Synchronized fun isNotEmpty()=entries.isNotEmpty()
     @Synchronized fun size()=entries.size
+    @Synchronized fun clearGeometry(){entries.entries.removeAll{it.value.kind!=Kind.IMAGE};retries.keys.removeAll{it.second!=Kind.IMAGE}}
     @Synchronized fun clearImages(){entries.entries.removeAll{it.value.kind!=Kind.GEOMETRY};retries.keys.removeAll{it.second!=Kind.GEOMETRY}}
     @Synchronized fun clear(){entries.clear();retries.clear()}
     companion object{

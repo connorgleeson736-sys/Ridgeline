@@ -113,13 +113,18 @@ class OfflineUi(private val activity:Activity,root:FrameLayout,private val terra
         content.addView(button("Add imagery ZIPs"){dialog.dismiss();addImagery()})
         content.addView(TextView(activity).apply{text="Overview imagery: ${loader.overviews.list().size}/6 packs attached. Keep the ZIPs at their selected location. Overviews contain imagery; terrain needs a connection or a saved region.";textSize=12f})
         for(pack in loader.overviews.list())content.addView(button("Detach ${pack.name}"){loader.detachOverview(pack.payload){dialog.dismiss();show()}})
-        content.addView(TextView(activity).apply{text="Saved regions include imagery and terrain. Saved data stays on this device until you delete it.";textSize=12f})
+        content.addView(TextView(activity).apply{text="Aerial and Satellite regions include terrain and available topographic overlays. NZ Topo regions contain printed cartography. Saved data stays until you delete it.";textSize=12f})
         content.addView(button("Download around map center"){if(downloading)Toast.makeText(activity,"A region is already downloading.",Toast.LENGTH_SHORT).show()else{dialog.dismiss();newRegion()}})
         if(downloading)content.addView(button("Cancel current download"){loader.cancelDownload()})
         content.addView(status);content.addView(list)
         fun refresh(){loader.regions{rows->if(dialog.isShowing){list.removeAllViews();status.text=if(rows.isEmpty())"No saved regions"else"${rows.size} saved regions";for(region in rows){
             val line=LinearLayout(activity)
             line.addView(TextView(activity).apply{text="${region.name}\n${region.status} · ${region.bytes/1048576} MB · ${region.resources} resources";setPadding(0,dp(8),0,dp(8))},LinearLayout.LayoutParams(0,-2,1f))
+            line.addView(button("Open"){
+                val meta=region.metadata
+                if(meta==null)Toast.makeText(activity,"This older region has no saved area metadata. Its downloaded tiles remain available on the map.",Toast.LENGTH_LONG).show()
+                else{dialog.dismiss();val base=runCatching{MapSettings.Base.valueOf(meta.basemap)}.getOrDefault(MapSettings.Base.LINZ);loader.mapSettings.change{it.copy(base=base)};terrain.focus(listOf(Coordinate(meta.bounds.west,meta.bounds.south),Coordinate(meta.bounds.east,meta.bounds.north)))}
+            })
             line.addView(button("Delete"){AlertDialog.Builder(activity).setMessage("Delete ${region.name} from this device?").setPositiveButton("Delete"){_,_->loader.removeRegion(region.id){refresh()}}.setNegativeButton("Cancel",null).show()});list.addView(line)
         }}}}
         dialog.show();refresh()

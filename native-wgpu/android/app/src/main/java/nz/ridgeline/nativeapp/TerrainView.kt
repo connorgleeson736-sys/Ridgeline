@@ -66,10 +66,17 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     var onWaypointDragEnd:((Boolean)->Unit)?=null
     @Volatile private var routePacket:ByteBuffer?=null
     private var appliedRoutes:ByteBuffer?=null
-    @Volatile private var stylePacket:ByteBuffer?=null
-    private var appliedStyle:ByteBuffer?=null
+    private data class StylePacket(val bytes:ByteBuffer,val resetGeometry:Boolean)
+    @Volatile private var stylePacket:StylePacket?=null
+    @Volatile private var appliedStyle:StylePacket?=null
     @Volatile private var layerBatch:NativeLayerBatch?=null
     private var appliedLayers:NativeLayerBatch?=null
+    @Volatile private var inspection:Pair<Long,Coordinate?> = 0L to null
+    private var appliedInspection:Pair<Long,Coordinate?>?=null
+    @Volatile private var gpsPoint:Pair<Long,Coordinate?> = 0L to null
+    private var appliedGps:Pair<Long,Coordinate?>?=null
+    fun locationPoint(point:Coordinate?){if(gpsPoint.second==point)return;gpsPoint=gpsPoint.first+1 to point;requestFrame()}
+    fun inspect(point:Coordinate?){if(inspection.second==point)return;inspection=inspection.first+1 to point;requestFrame()}
     @Volatile private var labelPlacement:Pair<NativeLabelAtlas,ByteBuffer>?=null
     private var appliedPlacement:Pair<NativeLabelAtlas,ByteBuffer>?=null
     private val labelProjection=ByteBuffer.allocateDirect(512*12).order(ByteOrder.LITTLE_ENDIAN)
@@ -78,7 +85,8 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     internal fun mapLayers(batch:NativeLayerBatch){layerBatch=batch;requestFrame()}
     internal fun placeMapLabels(atlas:NativeLabelAtlas,buffer:ByteBuffer){if(labelPlacement?.let{it.first===atlas&&it.second==buffer}==true)return;labelPlacement=atlas to buffer;requestFrame()}
 
-    internal fun configure(value:MapSettings.State){stylePacket=ByteBuffer.allocateDirect(20).order(ByteOrder.LITTLE_ENDIAN).apply{putInt(value.base.ordinal);putInt(if(value.natural)1 else 0);putInt(if(value.hillshade)1 else 0);putFloat(value.relief);putInt(value.sky);rewind()};requestFrame()}
+    internal fun configure(value:MapSettings.State,resetGeometry:Boolean=false){val previous=stylePacket;val bytes=ByteBuffer.allocateDirect(24).order(ByteOrder.LITTLE_ENDIAN).apply{putInt(value.base.ordinal);putInt(if(value.natural)1 else 0);putInt(if(value.hillshade)1 else 0);putFloat(value.relief);putInt(value.sky);putInt(if(value.threeD)1 else 0);rewind()};stylePacket=StylePacket(bytes,resetGeometry||(previous?.resetGeometry==true&&previous!==appliedStyle));requestFrame()}
+    internal fun clearGeometry(){uploads.clearGeometry();gpu.post{if(handle!=0L){NativeBridge.clearGeometry(handle);refreshResidency()};safetyPose=null;post{onData()};requestFrame()}}
     internal fun clearImages(){uploads.clearImages();gpu.post{if(handle!=0L){NativeBridge.clearImages(handle);refreshResidency()};post{onData()};requestFrame()}}
     @Volatile private var demandPacket:ByteBuffer?=null
     private var appliedDemand:ByteBuffer?=null
@@ -97,16 +105,16 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         for(i in 0 until points.size/3)if(points[i*3+2]>0){val dx=x-points[i*3];val dy=y-points[i*3+1];val d=dx*dx+dy*dy;if(d<best){best=d;found=i}}
         return found
     }
-    fun focus(points:List<Coordinate>){
+    fun focus(points:List<Coordinate>,maximumZoom:Double=14.0){
         if(points.isEmpty())return
         val minLon=points.minOf{it.longitude};val maxLon=points.maxOf{it.longitude}
         val minLat=points.minOf{it.latitude};val maxLat=points.maxOf{it.latitude}
         val span=max((maxLon-minLon)/360,(asinh(tan(Math.toRadians(maxLat)))-asinh(tan(Math.toRadians(minLat))))/(2*PI))
         val size=min(width/pixelScale,height/pixelScale)*.65
         val z=if(span>0)ln(size/(512*span))/ln(2.0) else 15.0
-        cameraPose=cameraPose.copy(longitude=(minLon+maxLon)/2,latitude=(minLat+maxLat)/2,zoom=z.coerceIn(4.0,19.0),pitch=min(pitch,45f));changed()
+        cameraPose=cameraPose.copy(longitude=(minLon+maxLon)/2,latitude=CameraMath.latitude((CameraMath.mercatorY(minLat)+CameraMath.mercatorY(maxLat))*.5),zoom=z.coerceIn(4.0,maximumZoom.coerceIn(4.0,19.0)),pitch=min(pitch,45f));changed()
     }
-    fun goTo(point:Coordinate){cameraPose=cameraPose.copy(longitude=point.longitude,latitude=point.latitude);changed()}
+    fun goTo(point:Coordinate,minimumZoom:Double=4.0){cameraPose=cameraPose.copy(longitude=point.longitude,latitude=point.latitude,zoom=max(zoom,minimumZoom).coerceIn(4.0,19.0));changed()}
     var onCamera:()->Unit={}
     var onData:()->Unit={}
     internal var onInvalidUpload:(GpuUploadQueue.Tile)->Unit={}
@@ -165,7 +173,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         if(!live||!active)return
         gpu.removeCallbacks(retryWake)
         if(handle==0L){recoverGpu();return}
-        stylePacket?.let{if(it!==appliedStyle&&NativeBridge.configure(handle,it)){appliedStyle=it;safetyPose=null;labelPose=null}}
+        stylePacket?.let{if(it!==appliedStyle){if(it.resetGeometry){uploads.clearGeometry();NativeBridge.clearGeometry(handle);refreshResidency();post{onData()}};if(NativeBridge.configure(handle,it.bytes)){appliedStyle=it;safetyPose=null;labelPose=null}}}
         // Nonblocking completion polling measures real outstanding submissions.
         // Keep the newest camera; do not queue more old frames behind a busy GPU.
         val backlog=NativeBridge.gpuBacklog(handle);lastBacklog=backlog
@@ -202,6 +210,10 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         }
         val placement=labelPlacement
         if(placement!=null&&placement!==appliedPlacement&&placement.first===appliedLayers?.atlas&&NativeBridge.placeLabels(handle,placement.second))appliedPlacement=placement
+        val cursor=inspection
+        if(cursor!==appliedInspection&&NativeBridge.inspect(handle,cursor.second?.longitude?:0.0,cursor.second?.latitude?:0.0,cursor.second!=null))appliedInspection=cursor
+        val gps=gpsPoint
+        if(gps!==appliedGps&&NativeBridge.location(handle,gps.second?.longitude?:0.0,gps.second?.latitude?:0.0,gps.second!=null))appliedGps=gps
         val packet=routePacket
         if(packet!=null&&packet!==appliedRoutes&&NativeBridge.routes(handle,packet))appliedRoutes=packet
         val requested=cameraPose // One immutable snapshot, no mixed camera revisions.
@@ -320,7 +332,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             NativeBridge.textureBackend(context.getSharedPreferences("display",0).getInt("textureBackend",0))
             val created=NativeBridge.create(surface,width,height)
             if(!live||generation.get()!=token){if(created!=0L)NativeBridge.destroy(created);return@post}
-            handle=created;safetyPose=null;safetyValid=false;appliedRoutes=null;appliedDemand=null;appliedStyle=null;appliedLayers=null;appliedPlacement=null;labelPose=null;presentationFailures=0
+            handle=created;safetyPose=null;safetyValid=false;appliedRoutes=null;appliedDemand=null;appliedStyle=null;appliedLayers=null;appliedPlacement=null;appliedInspection=null;appliedGps=null;labelPose=null;presentationFailures=0
             if(handle!=0L){val am=context.getSystemService(android.app.ActivityManager::class.java);NativeBridge.tileBudget(handle,if(am.isLowRamDevice)32 else (am.memoryClass/2).coerceIn(64,128))}
             post{onStatus(if(created==0L)"Native GPU initialization failed"else "Loading terrain and imagery…")};requestFrame()
         }
@@ -383,7 +395,8 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     fun zoomBy(delta:Double){
         if(delta.isFinite())easeControls((zoom+delta).coerceIn(4.0,19.0),bearing,width*.5,height*.5)
     }
-    fun toggleDimension(){cameraPose=cameraPose.copy(pitch=if(pitch>1f)0f else 58f);changed()}
+    fun dimension(threeD:Boolean){cameraPose=cameraPose.copy(pitch=if(threeD)58f else 0f,elevation=if(threeD)cameraPose.elevation else 0f);surfaceFocus.clear();changed()}
+    fun toggleDimension(){dimension(pitch<=1f)}
     fun northUp(){
         val difference=(((bearing+180f)%360f+360f)%360f)-180f
         if(abs(difference)>.001f)easeControls(zoom,bearing-difference,width*.5,height*.5)

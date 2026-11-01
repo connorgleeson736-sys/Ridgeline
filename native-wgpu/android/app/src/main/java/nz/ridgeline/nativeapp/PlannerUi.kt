@@ -49,11 +49,16 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
     private var drawer:View?=null
     private var drawerList:LinearLayout?=null
     private var drawerStamp:Any?=null
+    private data class Card(val view:LinearLayout,val check:CheckBox,val thumb:RouteThumbnailView,val summary:TextView,val open:Button,val close:Button,val order:Button)
+    private val drawerCards=linkedMapOf<String,Card>()
+    private var updatingCards=false
+    private var combineButton:Button?=null
     private val combineSelection=linkedMapOf<String,Boolean>()
     var onOffline:()->Unit={}
     var onProfilePoint:(Coordinate?)->Unit={}
     var onDrawing:(Boolean)->Unit={}
     private var fitOpenedPending=false
+    private var combiningPending=false
     private fun dp(value:Int)=(value*activity.resources.displayMetrics.density+.5f).toInt()
     private fun button(text:String,action:()->Unit)=NativeUi.button(activity,text,action=action)
     private fun toast(message:String){Toast.makeText(activity,message,Toast.LENGTH_LONG).show()}
@@ -73,7 +78,7 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
             override fun afterTextChanged(s:Editable?){}
         })
         title.setOnFocusChangeListener{_,focused->if(!focused)controller.flush()}
-        chart.onInspect={p,_->caption.text="${formatDistance(p.distance)} · ${p.height?.let{"${it.roundToInt()} m"}?:"Elevation unavailable"}";onProfilePoint(p.point)}
+        chart.onInspect={p,_->caption.text="${formatDistance(p.distance)} · ${p.height?.let{"${it.roundToInt()} m"}?:"Elevation unavailable"}"+(NativeGeo.grade(profileValues,p.distance)?.let{" · "+String.format(java.util.Locale.ROOT,"%.1f%%",it)}?:"");onProfilePoint(p.point)}
         chart.onRange={section->caption.text=section?.let{"Section ${formatDistance(it.distance)} · ↑ ${it.ascent.roundToInt()} m · ↓ ${it.descent.roundToInt()} m${if(it.complete)""else" · incomplete"}"}?:profileCaption()}
         chart.onLeave={onProfilePoint(null)}
         terrain.onMapTap={x,y,index->
@@ -95,6 +100,7 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         terrain.onWaypointDrag={controller.previewDrag(it)}
         terrain.onWaypointDragEnd={if(it)controller.finishDrag()else controller.cancelDrag()}
         controller.observe{state,change->
+            if(combiningPending&&change==RouteController.Change.OPENED){combineSelection.clear();combiningPending=false}else if(state.error!=null&&!state.busy)combiningPending=false
             if(!restoring&&state.loaded){restoring=true;val old=preferences.getString("active",null);if(old!=null&&state.records.any{it.id==old}){restoreId=old;main.post{controller.open(old)}}}
             sheet.show(state.drawing||state.points.isNotEmpty()||state.id!=null)
             terrain.routeEditing=state.drawing;onDrawing(state.drawing)
@@ -110,8 +116,8 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
             passive.keys.retainAll(state.records.map{it.id}.toSet()+state.opened)
             syncRoutes()
             if(change==RouteController.Change.OPENED&&state.points.isNotEmpty()){if(state.id!=restoreId){if(fitOpenedPending)fitOpened()else terrain.focus(state.points)};restoreId=null}
-            if(state.dragging){loader.cancelProfile();profileDirty=true}
-            else if((state.points!=profilePoints||profileDirty)&&change!=RouteController.Change.PREVIEW){
+            if(state.dragging){if(change==RouteController.Change.PREVIEW){loader.cancelProfile();onProfilePoint(null);profileDirty=true}}
+            else if(state.points!=profilePoints||profileDirty){
                 profileDirty=false;profilePoints=state.points;profileValues=emptyList();chart.data(emptyList());onProfilePoint(null)
                 for(i in 1..3)stats[i].text=listOf("","Ascent","Descent","Highest")[i]+"\n—"
                 caption.text=if(state.points.size>=2)"Loading elevation profile…"else"Tap to add · tap a line to insert · drag a point to move it."
@@ -119,17 +125,18 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
                 if(state.points.size>=2)loader.profile(state.points){values->
                     if(closed||profilePoints!=state.points)return@profile
                     profileValues=values;chart.data(values);val totals=NativeGeo.totals(values.map{it.height})
-                    stats[1].text="Ascent\n${totals.ascent.roundToInt()} m";stats[2].text="Descent\n${totals.descent.roundToInt()} m";stats[3].text="Highest\n${totals.high?.roundToInt()?:"—"} m"
-                    caption.text=profileCaption()
+                    val measured=values.count{it.height!=null}>=2
+                    stats[1].text="Ascent\n"+if(measured)"${totals.ascent.roundToInt()} m"else"—";stats[2].text="Descent\n"+if(measured)"${totals.descent.roundToInt()} m"else"—";stats[3].text="Highest\n${totals.high?.roundToInt()?:"—"} m"
+                    caption.text=profileCaption();chart.refreshInspection()
                 }
             }
             if(drawer!=null)renderDrawer()
         }
     }
     private fun profileCaption():String{val totals=NativeGeo.totals(profileValues.map{it.height});return if(profileValues.isEmpty())"Elevation unavailable"else"${profileValues.size} samples${if(totals.complete)""else" · incomplete coverage"} · Drag the chart for section statistics"}
-    private fun routeMenu(){AlertDialog.Builder(activity).setItems(arrayOf("Fit route","New route","Close route")){_,index->when(index){0->terrain.focus(controller.state.points);1->controller.newRoute();2->controller.unload()}}.show()}
+    private fun routeMenu(){AlertDialog.Builder(activity).setItems(arrayOf("Fit route","New route","Close route","Share GPX")){_,index->when(index){0->terrain.focus(controller.state.points);1->controller.newRoute();2->controller.unload();3->shareGpx()}}.show()}
     fun newRoute(){dismissDrawer();controller.newRoute()}
-    fun dismissDrawer():Boolean{val view=drawer?:return false;root.removeView(view);drawer=null;drawerList=null;drawerStamp=null;return true}
+    fun dismissDrawer():Boolean{val view=drawer?:return false;root.removeView(view);drawer=null;drawerList=null;drawerStamp=null;drawerCards.clear();combineButton=null;return true}
     private fun fitOpened(){
         val state=controller.state;val all=ArrayList<Coordinate>();all.addAll(state.points)
         for(id in state.opened)if(id!=state.id)passive[id]?.let(all::addAll)
@@ -152,7 +159,7 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         paths.add(Triple(state.points,NativeUi.orange,state.selected))
         for(key in state.opened)if(key!=state.id){
             val points=passive[key]
-            if(points!=null)paths.add(Triple(points,Color.rgb(81,137,153),-1))
+            if(points!=null)paths.add(Triple(points,Color.argb(230,81,137,153),-1))
             else if(loading.add(key))controller.loadOther(key){route->loading.remove(key);if(!closed&&route!=null&&key in controller.state.opened){passive[key]=route.points;syncRoutes();if(fitOpenedPending)fitOpened()}}
         }
         if(paths!=lastPaths){lastPaths=paths;terrain.routes(paths)}
@@ -175,39 +182,51 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         val list=drawerList?:return;val state=controller.state
         combineSelection.keys.retainAll(state.records.map{it.id}.toSet())
         val stamp=listOf(state.records,state.id,state.opened,combineSelection.toMap())
-        if(stamp==drawerStamp)return;drawerStamp=stamp;list.removeAllViews()
-        list.addView(NativeUi.heading(activity,"Saved routes"))
-        if(state.records.isEmpty())list.addView(NativeUi.text(activity,"No saved routes. Create a route to begin."))
-        for(row in state.records){
-            val card=NativeUi.column(activity);NativeUi.divider(card)
-            val line=LinearLayout(activity);val thumb=RouteThumbnailView(activity);thumb.contentDescription="Route preview for ${row.name}";line.addView(thumb,LinearLayout.LayoutParams(dp(64),dp(56)))
-            passive[row.id]?.let{thumb.data(it)}?:run{if(loading.add(row.id))controller.loadOther(row.id){route->loading.remove(row.id);if(!closed&&route!=null){passive[row.id]=route.points;if(drawer!=null)thumb.data(route.points)}}}
-            val label=CheckBox(activity).apply{text=row.name;textSize=13f;setTextColor(NativeUi.ink);isChecked=combineSelection.containsKey(row.id);contentDescription="Select ${row.name} for combining";setOnCheckedChangeListener{_,checked->if(checked)combineSelection[row.id]=false else combineSelection.remove(row.id);renderDrawer()}}
-            line.addView(label,LinearLayout.LayoutParams(0,-2,1f));card.addView(line)
-            card.addView(NativeUi.text(activity,"${formatDistance(row.lengthMeters)} · ${row.pointCount} waypoints",11f))
-            val actions=LinearLayout(activity)
-            for((text,action) in listOf<Pair<String,()->Unit>>((if(row.id==state.id)"Editing"else"Open") to {fitOpenedPending=true;controller.open(row.id)},"Rename" to {renameRoute(row)},"Delete" to {deleteRoute(row)}))actions.addView(button(text,action),LinearLayout.LayoutParams(0,dp(40),1f))
-            if(row.id in state.opened)actions.addView(button("Close"){controller.closeOther(row.id)},LinearLayout.LayoutParams(0,dp(40),1f))
-            card.addView(actions)
-            if(row.id in combineSelection){val position=combineSelection.keys.indexOf(row.id)+1;card.addView(button("Join $position · "+if(combineSelection[row.id]==true)"Direction: reversed"else"Direction: original"){combineSelection[row.id]=combineSelection[row.id]!=true;renderDrawer()})}
-            list.addView(card)
+        if(stamp==drawerStamp)return;drawerStamp=stamp
+        if(list.childCount==0){list.addView(NativeUi.heading(activity,"Saved routes"));combineButton=button("Combine selected"){if(combineSelection.size>=2){val order=combineSelection.map{it.key to it.value};dismissDrawer();combiningPending=true;controller.combine(order)}};list.addView(combineButton);list.addView(button("Close all routes"){controller.closeAll()})}
+        val ids=state.records.map{it.id}.toSet()
+        for(id in drawerCards.keys.toList())if(id !in ids){list.removeView(drawerCards.remove(id)!!.view)}
+        updatingCards=true
+        for((index,row)in state.records.withIndex()){
+            val card=drawerCards.getOrPut(row.id){
+                val view=NativeUi.column(activity);NativeUi.divider(view);val heading=LinearLayout(activity)
+                val thumb=RouteThumbnailView(activity).apply{contentDescription="Route preview for ${row.name}"};heading.addView(thumb,LinearLayout.LayoutParams(dp(64),dp(56)))
+                val check=CheckBox(activity).apply{textSize=13f;setTextColor(NativeUi.ink);setOnCheckedChangeListener{_,checked->if(!updatingCards){if(checked)combineSelection[row.id]=false else combineSelection.remove(row.id);renderDrawer()}}};heading.addView(check,LinearLayout.LayoutParams(0,-2,1f));view.addView(heading)
+                val summary=NativeUi.text(activity,"",11f);view.addView(summary)
+                val actions=LinearLayout(activity)
+                val open=button("Open"){fitOpenedPending=true;controller.open(row.id)}
+                val close=button("Close"){controller.closeOther(row.id)}
+                for(action in listOf(open,button("Rename"){controller.state.records.firstOrNull{it.id==row.id}?.let(::renameRoute)},button("Delete"){controller.state.records.firstOrNull{it.id==row.id}?.let(::deleteRoute)},close))actions.addView(action,LinearLayout.LayoutParams(0,dp(40),1f))
+                view.addView(actions);val order=button(""){combineSelection[row.id]=combineSelection[row.id]!=true;renderDrawer()};view.addView(order)
+                Card(view,check,thumb,summary,open,close,order)
+            }
+            if(list.getChildAt(index+1)!==card.view){(card.view.parent as? LinearLayout)?.removeView(card.view);list.addView(card.view,index+1)}
+            if(card.check.text.toString()!=row.name)card.check.text=row.name;card.check.contentDescription="Select ${row.name} for combining";card.check.isChecked=row.id in combineSelection
+            val summaryText="${formatDistance(row.lengthMeters)} · ${row.pointCount} waypoints";if(card.summary.text.toString()!=summaryText)card.summary.text=summaryText
+            val openText=if(state.id==row.id)"Editing"else"Open";if(card.open.text.toString()!=openText)card.open.text=openText;card.close.visibility=if(row.id in state.opened)View.VISIBLE else View.GONE
+            card.order.visibility=if(row.id in combineSelection)View.VISIBLE else View.GONE
+            val orderText="Join ${combineSelection.keys.indexOf(row.id)+1} · Direction: "+if(combineSelection[row.id]==true)"reversed"else"original";if(card.order.text.toString()!=orderText)card.order.text=orderText
+            passive[row.id]?.let{card.thumb.data(it)}?:run{if(loading.add(row.id))controller.loadOther(row.id){route->
+                loading.remove(row.id);if(!closed&&route!=null){val points=if(controller.state.id==row.id)controller.state.points else route.points;passive[row.id]=points;drawerCards[row.id]?.thumb?.data(points);syncRoutes();if(fitOpenedPending)fitOpened()}
+            }}
         }
-        NativeUi.divider(list)
-        list.addView(button("Combine selected (${combineSelection.size})"){
-            if(combineSelection.size<2)toast("Select at least two routes in the order you want to join them.")else{val order=combineSelection.map{it.key to it.value};dismissDrawer();controller.combine(order)}
-        })
-        list.addView(button("Close all routes"){controller.closeAll()})
+        updatingCards=false
+        combineButton?.apply{val label="Combine selected (${combineSelection.size})";if(text.toString()!=label)text=label;isEnabled=combineSelection.size>=2}
     }
     private fun renameRoute(route:RouteSummary){val input=EditText(activity).apply{setSingleLine();setText(route.name);filters=arrayOf(android.text.InputFilter.LengthFilter(80))};AlertDialog.Builder(activity).setTitle("Rename route").setView(input).setPositiveButton("Save name"){_,_->try{controller.rename(route.id,input.text.toString())}catch(e:Exception){toast(e.message?:"Invalid name")}}.setNegativeButton("Cancel",null).show()}
     private fun deleteRoute(route:RouteSummary){AlertDialog.Builder(activity).setMessage("Delete ${route.name}?").setPositiveButton("Delete"){_,_->controller.delete(route.id)}.setNegativeButton("Cancel",null).show()}
-    private fun routeActions(route:RouteSummary,parent:AlertDialog){
-        AlertDialog.Builder(activity).setTitle(route.name).setItems(arrayOf("Open","Rename","Delete")){_,which->when(which){
-            0->{parent.dismiss();controller.open(route.id)}
-            1->{val input=EditText(activity).apply{setSingleLine();setText(route.name)};AlertDialog.Builder(activity).setTitle("Rename route").setView(input).setPositiveButton("Save"){_,_->try{controller.rename(route.id,input.text.toString());parent.dismiss()}catch(e:Exception){toast(e.message?:"Invalid name")}}.setNegativeButton("Cancel",null).show()}
-            2->AlertDialog.Builder(activity).setMessage("Delete ${route.name}?").setPositiveButton("Delete"){_,_->controller.delete(route.id);parent.dismiss()}.setNegativeButton("Cancel",null).show()
-        }}.show()
-    }
     private fun importGpx(){activity.startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).apply{type="*/*";addCategory(Intent.CATEGORY_OPENABLE);putExtra(Intent.EXTRA_MIME_TYPES,arrayOf("application/gpx+xml","application/xml","text/xml","application/octet-stream"))},4101)}
+    private fun shareGpx(){
+        val state=controller.state;if(state.points.size<2){toast("Add at least two waypoints first.");return}
+        val name=state.name;val points=state.points.toList()
+        files.execute{try{
+            val folder=java.io.File(activity.cacheDir,"route-share").apply{mkdirs()}
+            folder.listFiles()?.filter{it.name.matches(Regex("[a-f0-9-]{36}\\.gpx"))}?.sortedByDescending{it.lastModified()}?.drop(19)?.forEach{it.delete()}
+            val file=java.io.File(folder,java.util.UUID.randomUUID().toString()+".gpx");file.writeBytes(GpxCodec.encode(name,points))
+            val uri=android.net.Uri.Builder().scheme("content").authority(activity.packageName+".routes").appendPath("gpx").appendPath(file.name).appendQueryParameter("name",GpxCodec.exportName(name)).build()
+            main.post{if(!closed)runCatching{activity.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply{type="application/gpx+xml";putExtra(Intent.EXTRA_STREAM,uri);clipData=android.content.ClipData.newRawUri("GPX route",uri);addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)},"Share GPX"))}.onFailure{toast("No app is available to share GPX. Use Export GPX to save it.")}}
+        }catch(_:Exception){main.post{if(!closed)toast("GPX could not be prepared for sharing.")}}}
+    }
     private fun exportGpx(){
         val state=controller.state;if(state.points.size<2){toast("Add at least two waypoints first.");return}
         export=state.name to state.points.toList()
@@ -225,7 +244,8 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         }catch(e:Exception){main.post{if(!closed)toast(e.message?:"File operation failed")}}}
     }
     fun back():Boolean{if(dismissDrawer())return true;if(controller.state.drawing){controller.drawing(false);return true};if(controller.state.id!=null||controller.state.points.isNotEmpty()){controller.unload();return true};return false}
-    fun pause(){controller.flush()}
+    fun pause(){controller.cancelDrag();controller.flush();loader.cancelProfile();profileDirty=true}
+    fun resume(){if(profileDirty)controller.drawing(controller.state.drawing)}
     override fun close(){closed=true;loader.cancelProfile();controller.close();files.shutdown()}
     private fun formatDistance(m:Double)=if(m>=1000)String.format(java.util.Locale.ROOT,"%.2f km",m/1000)else"${m.roundToInt()} m"
 }

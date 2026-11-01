@@ -21,7 +21,13 @@ class ElevationProfileView(context:Context):View(context){
     var onRange:(NativeGeo.Section?)->Unit={}
     var onLeave:()->Unit={}
     init{isFocusable=true;contentDescription="Route elevation profile. Drag for section statistics; arrow keys inspect samples."}
-    fun data(value:List<NativeGeo.ProfilePoint>){samples=value;cursor=null;range=null;start=null;rebuild();invalidate()}
+    fun data(value:List<NativeGeo.ProfilePoint>){
+        val sameGeometry=samples.size==value.size&&samples.indices.all{samples[it].point==value[it].point&&samples[it].distance==value[it].distance}
+        val distance=cursor?.distance;samples=value
+        if(sameGeometry)cursor=distance?.let{NativeGeo.profileAt(value,it)}else{cursor=null;range=null;start=null}
+        rebuild();invalidate()
+    }
+    fun refreshInspection(){cursor?.let{onInspect(it,false)};range?.let{onRange(NativeGeo.section(samples,it.first,it.second))}}
     override fun onSizeChanged(w:Int,h:Int,oldw:Int,oldh:Int){rebuild()}
     private fun x(d:Double)=(left+d/max(1.0,samples.lastOrNull()?.distance?:1.0)*(right-left)).toFloat()
     private fun y(h:Double)=(bottom-(h-low)/(high-low)*(bottom-top)).toFloat()

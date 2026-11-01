@@ -7,10 +7,11 @@ use wgpu::util::DeviceExt;
 mod adaptive;
 mod appearance;
 mod cartography;
+mod inspection;
 mod labels;
+pub use appearance::MapStyle;
 pub use cartography::CartographicPath;
 pub use labels::LabelSprite;
-pub use appearance::MapStyle;
 mod camera_safety;
 mod cover_plans;
 mod diagnostics;
@@ -41,7 +42,7 @@ struct Scene {
     matrix: [f32; 16],
     grade: [f32; 4],
     metrics: [f32; 4],
-    style: [f32;4],
+    style: [f32; 4],
 }
 #[repr(C)]
 #[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]
@@ -107,17 +108,22 @@ pub struct Renderer {
     width: u32,
     height: u32,
     route_gpu: routes::RouteGpu,
-    cartographic_gpu:routes::RouteGpu,
-    cartographic_paths:Vec<CartographicPath>,
-    cartographic_dirty:bool,
-    cartographic_anchor:[f64;2],
-    cartographic_vertices:u32,
-    cartographic_overflow:bool,
-    labels_gpu:labels::LabelGpu,
-    label_sprites:Vec<LabelSprite>,
-    label_selection:Vec<(usize,[f32;2])>,
-    label_anchor:[f64;2],
-    labels_dirty:bool,
+    cartographic_gpu: routes::RouteGpu,
+    cartographic_paths: Vec<CartographicPath>,
+    cartographic_dirty: bool,
+    cartographic_anchor: [f64; 2],
+    cartographic_vertices: u32,
+    cartographic_overflow: bool,
+    labels_gpu: labels::LabelGpu,
+    label_sprites: Vec<LabelSprite>,
+    label_selection: Vec<(usize, [f32; 2])>,
+    label_anchor: [f64; 2],
+    labels_dirty: bool,
+    inspection_gpu: routes::RouteGpu,
+    inspection_point: Option<[f64; 2]>,
+    location_point: Option<[f64; 2]>,
+    inspection_anchor: [f64; 2],
+    inspection_dirty: bool,
     route_paths: Vec<RoutePath>,
     route_dirty: bool,
     exact_route_sources: HashSet<TileId>,
@@ -249,7 +255,7 @@ impl Renderer {
                 matrix: Mat4::IDENTITY.to_cols_array(),
                 grade: [0.058, 1., 0.25, 1. / 0.74],
                 metrics: [1., 0., 0., 1.],
-                style:[0.,512.,0.,0.],
+                style: [0., 512., 0., 0.],
             }),
             usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
         });
@@ -471,8 +477,9 @@ impl Renderer {
         });
         let depth = Self::depth(&device, width, height);
         let route_gpu = routes::RouteGpu::new(&device, format);
-        let cartographic_gpu=route_gpu.fork(&device);
-        let labels_gpu=labels::LabelGpu::new(&device,&queue,format);
+        let cartographic_gpu = route_gpu.fork(&device);
+        let inspection_gpu = route_gpu.fork(&device);
+        let labels_gpu = labels::LabelGpu::new(&device, &queue, format);
         let mut renderer = Self {
             device,
             queue,
@@ -481,7 +488,7 @@ impl Renderer {
             unclipped_pipeline,
             scene,
             last_scene: None,
-            map_style:MapStyle::default(),
+            map_style: MapStyle::default(),
             last_instances: Vec::new(),
             scene_uploads: 0,
             instance_uploads: 0,
@@ -512,8 +519,22 @@ impl Renderer {
             width,
             height,
             route_gpu,
-            cartographic_gpu,cartographic_paths:vec![],cartographic_dirty:false,cartographic_anchor:[0.5,0.5],cartographic_vertices:0,cartographic_overflow:false,
-            labels_gpu,label_sprites:vec![],label_selection:vec![],label_anchor:[0.5,0.5],labels_dirty:false,
+            cartographic_gpu,
+            cartographic_paths: vec![],
+            cartographic_dirty: false,
+            cartographic_anchor: [0.5, 0.5],
+            cartographic_vertices: 0,
+            cartographic_overflow: false,
+            labels_gpu,
+            label_sprites: vec![],
+            label_selection: vec![],
+            label_anchor: [0.5, 0.5],
+            labels_dirty: false,
+            inspection_gpu,
+            inspection_point: None,
+            location_point: None,
+            inspection_anchor: [0.5, 0.5],
+            inspection_dirty: false,
             route_paths: vec![],
             route_dirty: true,
             exact_route_sources: HashSet::new(),
@@ -1069,7 +1090,7 @@ impl Renderer {
                             world,
                             ppm,
                             view.elevation,
-                            self.map_style.relief,
+                            self.map_style.height_scale(),
                         )
                     {
                         protected.insert(row.source);
@@ -1265,7 +1286,7 @@ impl Renderer {
         world: f64,
         ppm: f32,
         elevation: f32,
-        relief:f32,
+        relief: f32,
     ) -> bool {
         let b = row.region.bounds();
         selection::visible_box(
@@ -1273,12 +1294,12 @@ impl Renderer {
             [
                 ((b[0] - center[0]) * world) as f32,
                 ((center[1] - b[3]) * world) as f32,
-                (tile.field.min*relief - elevation) * ppm,
+                (tile.field.min * relief - elevation) * ppm,
             ],
             [
                 ((b[2] - center[0]) * world) as f32,
                 ((center[1] - b[1]) * world) as f32,
-                (tile.field.max*relief - elevation) * ppm,
+                (tile.field.max * relief - elevation) * ppm,
             ],
         )
     }
@@ -1319,6 +1340,33 @@ impl Renderer {
         let direction = (far - origin).normalize();
         let world = 512. * 2f64.powf(view.zoom);
         let max_t = (far - origin).length() as f64;
+        if !self.map_style.three_d {
+            let dz = direction.z as f64 / ppm as f64;
+            let z = view.elevation as f64 + origin.z as f64 / ppm as f64;
+            if dz.abs() < 1e-20 {
+                return None;
+            };
+            let t = -z / dz;
+            if t < 0. || t > max_t {
+                return None;
+            };
+            let mx = view.center[0] + (origin.x as f64 + direction.x as f64 * t) / world;
+            let my = view.center[1] - (origin.y as f64 + direction.y as f64 * t) / world;
+            if !self.draws.iter().any(|row| {
+                let b = row.region.bounds();
+                mx >= b[0] && mx <= b[2] && my >= b[1] && my <= b[3]
+            }) {
+                return None;
+            }
+            return Some([
+                mx * 360. - 180.,
+                (std::f64::consts::PI * (1. - 2. * my))
+                    .sinh()
+                    .atan()
+                    .to_degrees(),
+                0.,
+            ]);
+        }
         let mut best: Option<(f64, [f64; 3])> = None;
         for row in &self.draws {
             let bounds = row.geometry.bounds();
@@ -1328,12 +1376,13 @@ impl Renderer {
                 origin: [
                     (view.center[0] + origin.x as f64 / world - bounds[0]) / span,
                     (view.center[1] - origin.y as f64 / world - bounds[1]) / span,
-                    (view.elevation as f64 + origin.z as f64 / ppm as f64)/self.map_style.relief as f64,
+                    (view.elevation as f64 + origin.z as f64 / ppm as f64)
+                        / self.map_style.relief as f64,
                 ],
                 direction: [
                     direction.x as f64 / world / span,
                     -direction.y as f64 / world / span,
-                    direction.z as f64 / ppm as f64/self.map_style.relief as f64,
+                    direction.z as f64 / ppm as f64 / self.map_style.relief as f64,
                 ],
             };
             if let Some(hit) = self.tiles[&row.geometry].field.intersect_region(
@@ -1356,7 +1405,7 @@ impl Renderer {
                                 .sinh()
                                 .atan()
                                 .to_degrees(),
-                            hit.point[2]*self.map_style.relief as f64,
+                            hit.point[2] * self.map_style.relief as f64,
                         ],
                     ));
                 }
@@ -1378,10 +1427,21 @@ impl Renderer {
             self.cover_dirty = false;
         }
         if self.route_dirty {
-            self.rebuild_routes();self.cartographic_dirty=true;self.labels_dirty=true;
+            self.rebuild_routes();
+            self.cartographic_dirty = true;
+            self.labels_dirty = true;
+            self.inspection_dirty = true;
         }
-        if self.cartographic_dirty{self.cartographic_overflow=false;self.rebuild_cartography();}
-        if self.labels_dirty{self.rebuild_labels();}
+        if self.cartographic_dirty {
+            self.cartographic_overflow = false;
+            self.rebuild_cartography();
+        }
+        if self.labels_dirty {
+            self.rebuild_labels();
+        }
+        if self.inspection_dirty {
+            self.rebuild_inspection();
+        }
         let world = 512. * 2f64.powf(zoom);
         let (matrix, px_meter) = camera_matrix(
             self.width,
@@ -1410,17 +1470,48 @@ impl Renderer {
             px_meter,
             route_scale,
         );
-        self.cartographic_gpu.camera(&self.queue,matrix,self.cartographic_anchor,&route_view,px_meter,route_scale);
-        self.labels_gpu.camera(&self.queue,matrix,self.label_anchor,&route_view,px_meter,route_scale);
+        self.cartographic_gpu.camera(
+            &self.queue,
+            matrix,
+            self.cartographic_anchor,
+            &route_view,
+            px_meter,
+            route_scale,
+        );
+        self.labels_gpu.camera(
+            &self.queue,
+            matrix,
+            self.label_anchor,
+            &route_view,
+            px_meter,
+            route_scale,
+        );
+        self.inspection_gpu.camera(
+            &self.queue,
+            matrix,
+            self.inspection_anchor,
+            &route_view,
+            px_meter,
+            route_scale,
+        );
         let scene = Scene {
             matrix: matrix.to_cols_array(),
             grade: self.map_style.grade(),
-            style:[if self.map_style.hillshade{1.}else{0.},world as f32,if self.map_style.basemap==2{1.}else{0.},0.],
+            style: [
+                if self.map_style.hillshade && self.map_style.basemap != 2 {
+                    1.
+                } else {
+                    0.
+                },
+                world as f32,
+                if self.map_style.basemap == 2 { 1. } else { 0. },
+                0.,
+            ],
             metrics: [
                 px_meter,
                 elevation,
                 ridgeline_core::surface::skirt_length(self.logical_zoom.unwrap_or(zoom)) as f32,
-                self.map_style.relief,
+                self.map_style.height_scale(),
             ],
         };
         if self.last_scene != Some(scene) {
@@ -1455,7 +1546,7 @@ impl Renderer {
                 world,
                 px_meter,
                 elevation,
-                self.map_style.relief,
+                self.map_style.height_scale(),
             )
         }));
         let now = std::time::Instant::now();
@@ -1472,8 +1563,11 @@ impl Renderer {
                 &route_view,
                 px_meter,
                 now,
-                self.exact_route_sources.contains(&id),
-                self.map_style.relief,
+                self.exact_route_sources.contains(&id)
+                    || (!self.map_style.three_d
+                        && self.map_style.hillshade
+                        && self.map_style.basemap != 2),
+                self.map_style.height_scale(),
             );
             self.adaptive_levels.insert(id, step);
             if let Some(delay) = wake {
@@ -1631,9 +1725,9 @@ impl Renderer {
                     resolve_target: None,
                     ops: wgpu::Operations {
                         load: wgpu::LoadOp::Clear(wgpu::Color {
-                            r: ((self.map_style.sky>>16)&255) as f64 / 255.,
-                            g: ((self.map_style.sky>>8)&255) as f64 / 255.,
-                            b: (self.map_style.sky&255) as f64 / 255.,
+                            r: ((self.map_style.sky >> 16) & 255) as f64 / 255.,
+                            g: ((self.map_style.sky >> 8) & 255) as f64 / 255.,
+                            b: (self.map_style.sky & 255) as f64 / 255.,
                             a: 1.,
                         }),
                         store: wgpu::StoreOp::Store,
@@ -1720,6 +1814,7 @@ impl Renderer {
             self.cartographic_gpu.draw(&mut pass);
             self.route_gpu.draw(&mut pass);
             self.labels_gpu.draw(&mut pass);
+            self.inspection_gpu.draw(&mut pass);
         }
         self.pending_frames
             .fetch_add(1, std::sync::atomic::Ordering::Release);

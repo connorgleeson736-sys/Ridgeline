@@ -10,15 +10,14 @@ import kotlin.math.*
 
 /** Visible source tiles only; one optional background transfer shares the existing transport. */
 internal class MapLayers(private val view:TerrainView,private val loader:TileLoader):AutoCloseable {
-    private data class Id(val z:Int,val x:Int,val y:Int){val bounds get()=doubleArrayOf(x.toDouble()/(1 shl z),y.toDouble()/(1 shl z),(x+1.0)/(1 shl z),(y+1.0)/(1 shl z))}
     private data class Tile(val body:TileBody,var mask:Set<String>,var features:List<VectorTile.Feature>)
     private val worker=Executors.newSingleThreadScheduledExecutor{run->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);run.run()},"RidgelineCartography")}
     private val main=Handler(Looper.getMainLooper())
     private val style=TopographyStyle(view.context.assets.open("topography-style.json").bufferedReader().use{it.readText()})
-    private val tiles=LinkedHashMap<Id,Tile>()
-    private val retry=HashMap<Id,Long>()
-    private var current=emptyList<Id>();@Volatile private var lease:Pair<Id,TileTransport.Consumer>?=null
-    private var timer:ScheduledFuture<*>?=null;private var publication:ScheduledFuture<*>?=null
+    private val tiles=LinkedHashMap<GpuUploadQueue.Id,Tile>()
+    private val retry=HashMap<GpuUploadQueue.Id,Long>()
+    private var current=emptyList<GpuUploadQueue.Id>();@Volatile private var lease:Pair<GpuUploadQueue.Id,TileTransport.Consumer>?=null
+    private var timer:ScheduledFuture<*>?=null;private var publication:ScheduledFuture<*>?=null;private var retryWake:ScheduledFuture<*>?=null
     @Volatile private var closed=false
     @Volatile private var active=true
     private var lastKey:Any?=null;private var lastLabels=emptyList<TopographyStyle.Label>();private var atlas=NativeLabelAtlas.empty()
@@ -35,26 +34,35 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         timer?.cancel(false);val state=loader.mapSettings.state
         if(view.gestureInProgress){lease?.let{it.second.release(true)};lease=null}
         if(state!=displayState){displayState=state;lastKey=null;schedulePublication()}
-        timer=worker.schedule({update()},if(view.gestureInProgress)180 else 80,TimeUnit.MILLISECONDS)
+        timer=worker.schedule({try{update()}catch(_:Exception){diagnostics="Topographic view selection failed; imagery and routes remain available."}},if(view.gestureInProgress)180 else 80,TimeUnit.MILLISECONDS)
     }}}
     private fun mask(state:MapSettings.State)=style.sourceLayers(state,view.planningPose.zoom)
-    fun setActive(value:Boolean){active=value;if(value)refresh()else{lease?.second?.release(true);lease=null;timer?.cancel(false);publication?.cancel(false)}}
+    fun setActive(value:Boolean){active=value;if(value)refresh()else{lease?.second?.release(true);lease=null;timer?.cancel(false);publication?.cancel(false);retryWake?.cancel(false)}}
     private fun update(){
         if(closed||!active||view.width==0||view.height==0)return
         val state=loader.mapSettings.state;val pose=view.planningPose
         if(mask(state).isEmpty()&&!(state.borders&&state.base==MapSettings.Base.LINZ&&pose.zoom>=8)){lease?.second?.release(true);lease=null;current=emptyList();tiles.clear();lastKey=null;schedulePublication();return}
-        plan.rewind();val focus=view.surfaceFocusFor(pose)
-        val n=NativeBridge.planFocused((view.width/view.pixelScale).roundToInt().coerceAtLeast(1),(view.height/view.pixelScale).roundToInt().coerceAtLeast(1),pose.longitude,pose.latitude,pose.zoom,pose.bearing,pose.pitch,pose.elevation,24,512.0,15,1.0,focus?.longitude?:Double.NaN,focus?.latitude?:Double.NaN,focus?.range?:Double.NaN,plan)
-        plan.rewind();val wanted=List(n){Id(plan.int,plan.int,plan.int)}
-        if(current!=wanted){current=wanted;tiles.keys.retainAll(wanted.toSet());retry.keys.retainAll(wanted.toSet());lease?.takeIf{it.first !in wanted}?.let{it.second.release(true);lease=null};lastKey=null}
+        val flat=if(!state.threeD)FlatSelection.plan((view.width/view.pixelScale).roundToInt(),(view.height/view.pixelScale).roundToInt(),pose,512.0,24,15)else null
+        val wanted=if(flat!=null)flat.map{GpuUploadQueue.Id(it.z,it.x,it.y)}else{
+            plan.rewind();val focus=view.surfaceFocusFor(pose)
+            val n=NativeBridge.planFocused((view.width/view.pixelScale).roundToInt().coerceAtLeast(1),(view.height/view.pixelScale).roundToInt().coerceAtLeast(1),pose.longitude,pose.latitude,pose.zoom,pose.bearing,pose.pitch,pose.elevation,24,512.0,15,1.0,focus?.longitude?:Double.NaN,focus?.latitude?:Double.NaN,focus?.range?:Double.NaN,plan)
+            plan.rewind();List(n){GpuUploadQueue.Id(plan.int,plan.int,plan.int)}
+        }
+        if(current!=wanted){current=wanted;tiles.keys.retainAll(wanted.toSet()+LayerCover.display(wanted,tiles.keys).map{it.source});retry.keys.retainAll(wanted.toSet());lease?.takeIf{it.first !in wanted}?.let{it.second.release(true);lease=null};lastKey=null}
         if(mask(state).isEmpty()){lease?.second?.release(true);lease=null;tiles.clear()}
         schedulePublication();pump()
     }
     private fun pump(){
         if(closed||!active||lease!=null||view.gestureInProgress||mask(loader.mapSettings.state).isEmpty())return
-        val now=System.currentTimeMillis();val id=current.firstOrNull{it !in tiles&&(retry[it]?:0)<=now}?:return
+        val now=System.currentTimeMillis();val id=current.firstOrNull{it !in tiles&&(retry[it]?:0)<=now}?:run{
+            val wake=current.filter{it !in tiles}.mapNotNull{retry[it]}.minOrNull()
+            if(wake!=null&&(retryWake==null||retryWake!!.isDone))retryWake=worker.schedule({retryWake=null;pump()},(wake-now).coerceAtLeast(1),TimeUnit.MILLISECONDS)
+            return
+        }
         val owned=loader.layerConsumer();lease=id to owned
-        loader.layerBody(owned,loader.vectorUrl(id.z,id.x,id.y)).whenComplete{body,error->runCatching{worker.execute{
+        if(closed||!active){lease=null;owned.release(true);return}
+        val bodyFuture=try{loader.layerBody(owned,loader.vectorUrl(id.z,id.x,id.y))}catch(_:IllegalStateException){owned.release(true);if(lease?.second===owned)lease=null;return}
+        bodyFuture.whenComplete{body,error->runCatching{worker.execute{
             if(lease?.second!==owned){owned.close();return@execute};lease=null;owned.close()
             if(closed||id !in current)return@execute
             if(error==null&&body!=null&&body.status in 200..299){
@@ -65,15 +73,17 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
             pump();schedulePublication()
         }}}
     }
-    private fun schedulePublication(){if(closed||publication!=null&&!publication!!.isDone)return;publication=worker.schedule({publication=null;publish()},60,TimeUnit.MILLISECONDS)}
+    private fun schedulePublication(){if(closed||publication!=null&&!publication!!.isDone)return;publication=worker.schedule({publication=null;try{publish()}catch(_:Exception){diagnostics="Visible topographic data exceeds the current layer budget or could not be prepared; imagery and routes remain available.";lastKey=null}},60,TimeUnit.MILLISECONDS)}
     private fun publish(){
         if(closed)return;val state=loader.mapSettings.state;val pose=view.planningPose;val zoom=floor(pose.zoom*4)/4
         val key=listOf(state,current,tiles.mapValues{it.value.body.stamp?.fingerprint?:it.value.body.bytes.hashCode()},zoom)
         if(key==lastKey)return;lastKey=key
         val start=System.nanoTime();val lines=ArrayList<TopographyStyle.Line>();val labels=ArrayList<TopographyStyle.Label>();val enabled=mask(state)
-        if(state.overlays())for(id in current){val tile=tiles[id]?:continue
+        val patches=LayerCover.display(current,tiles.keys);val styled=HashMap<GpuUploadQueue.Id,TopographyStyle.Output>()
+        tiles.keys.retainAll(current.toSet()+patches.map{it.source})
+        if(state.overlays())for(patch in patches){val id=patch.source;val tile=tiles[id]?:continue
             if(tile.mask!=enabled){tile.features=VectorTile.decode(tile.body.bytes,id.z,id.x,id.y,enabled);tile.mask=enabled;decoded++}
-            val output=style.build(tile.features,state,zoom);val b=id.bounds
+            val output=styled.getOrPut(id){style.build(tile.features,state,zoom)};val b=patch.clip.bounds
             for(line in output.lines)for(path in clip(line.points,b))lines.add(line.copy(points=path))
             labels.addAll(output.labels.filter{it.point.x>=b[0]&&it.point.x<b[2]&&it.point.y>=b[1]&&it.point.y<b[3]})
         }
@@ -86,7 +96,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         }
         val mx=(pose.longitude+180)/360;val my=(1-asinh(tan(Math.toRadians(pose.latitude)))/PI)/2
         val chosen=labels.distinctBy{it.key}.sortedWith(compareBy<TopographyStyle.Label>{it.priority}.thenBy{(it.point.x-mx).pow(2)+(it.point.y-my).pow(2)}).take(512)
-        if(lines!=lastLines){lastLines=lines;linePacket=pack(lines)}
+        if(lines!=lastLines){val packed=pack(lines);lastLines=lines;linePacket=packed}
         lastBuildMs=(System.nanoTime()-start)/1_000_000
         if(chosen!=lastLabels){val a=System.nanoTime();atlas=NativeLabels.atlas(chosen);lastLabels=chosen;lastAtlasMs=(System.nanoTime()-a)/1_000_000}
         val batch=NativeLayerBatch(linePacket,atlas)
@@ -112,5 +122,5 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
             }else if(part.isNotEmpty()){if(part.size>1)result.add(part);part=ArrayList()}
         };if(part.size>1)result.add(part);return result
     }
-    override fun close(){closed=true;timer?.cancel(false);publication?.cancel(false);lease?.second?.release(true);lease=null;worker.shutdownNow();view.onLayerProjection={_,_->}}
+    override fun close(){closed=true;timer?.cancel(false);publication?.cancel(false);retryWake?.cancel(false);lease?.second?.release(true);lease=null;worker.shutdownNow();view.onLayerProjection={_,_->}}
 }

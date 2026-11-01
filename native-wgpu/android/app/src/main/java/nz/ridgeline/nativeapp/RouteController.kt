@@ -58,7 +58,7 @@ class RouteController(
     fun previewDrag(point:Coordinate){if(editable()&&editor.previewDrag(point))emit(Change.PREVIEW)}
     fun finishDrag(){if(!editable())return;val was=editor.isDragging;if(editor.commitDrag())edited()else if(was)emit(Change.VIEW)}
     fun cancelDrag(){val was=editor.isDragging;if(editor.cancelDrag())emit(Change.PREVIEW)else if(was)emit(Change.VIEW)}
-    fun drawing(value:Boolean){if(!editable())return;finishDrag();drawing=value;emit(Change.VIEW)}
+    fun drawing(value:Boolean){if(!editable())return;finishDrag();drawing=value;if(!value)editor.clearSelection();emit(Change.VIEW)}
     fun name(value:String){if(!editable()||name==value.take(80))return;name=value.take(80);saveRevision++;dirty=true;error=null;emit(Change.VIEW);save(400)}
     private fun save(delay:Long,after:(()->Unit)?=null) {
         timer?.cancel(false)
