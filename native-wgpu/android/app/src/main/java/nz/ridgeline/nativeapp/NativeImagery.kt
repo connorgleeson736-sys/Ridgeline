@@ -23,6 +23,7 @@ class NativeImagery(
     private val linz: (Int, Int, Int) -> String,
     private val attachments:OverviewAttachments?=null,
     private val checkPreparation:()->Unit={},
+    private val readLocal:(String,()->ByteArray?)->ByteArray?={_,read->read()},
 ) {
     private class FineTransportFailure(cause:java.io.IOException):java.io.IOException(cause)
     private val catalog by lazy { json("overview-index.json") }
@@ -30,8 +31,11 @@ class NativeImagery(
     private data class Meta(val data: JSONObject, val outer: List<List<SourceGeometry.Point>>,
                             val inner: List<List<SourceGeometry.Point>>, val seams: List<List<SourceGeometry.Point>>)
     private val metadata = ConcurrentHashMap<String, Meta>()
+    private val payloadPattern=Regex("[a-f0-9]{64}")
     private fun json(name: String) = context.assets.open(name).use { JSONObject(it.readBytes().toString(Charsets.UTF_8)) }
-    private fun asset(name: String) = context.assets.open(name.removePrefix("/")).use { it.readBytes() }
+    private fun assetBytes(name:String)=context.assets.open(name.removePrefix("/")).use{it.readBytes()}
+    private fun asset(name:String)=requireNotNull(readLocal("asset:$name"){assetBytes(name)})
+    internal fun initialize(){catalog;atlas}
     /** Existing, original coarse asset covering the focus: no provider request
      * is needed to establish imagery in a completely new region. */
     internal fun bootstrap(z:Int,x:Int,y:Int):GpuUploadQueue.Id? {
@@ -53,7 +57,7 @@ class NativeImagery(
         val entry=catalog.getJSONObject("tiles").optJSONObject(key) ?: return null
         val row=entry.optJSONObject("natural") ?: entry
         val file=row.getString("file"); val offset=row.getLong("offset"); val length=row.getInt("bytes")
-        require(file.matches(Regex("[a-f0-9]{64}")) && offset>=0 && length in 20..1048576)
+        require(file.matches(payloadPattern) && offset>=0 && length in 20..1048576)
         attachments?.read(file,offset,length)?.let{return it}
         val archive=catalog.getJSONObject("archives").optJSONObject(file) ?: return null
         val base=archive.getLong("offset");require(base>=0&&offset+length<=archive.getLong("bytes"))
@@ -71,7 +75,7 @@ class NativeImagery(
         }
     }
     private fun base(z:Int,x:Int,y:Int):Bitmap {
-        return bitmap((if(z<=12) saved(z,x,y) else null) ?: fetch(linz(z,x,y)))
+        return bitmap((if(hasSaved(z,x,y)) readLocal("saved:$z/$x/$y"){saved(z,x,y)} else null) ?: fetch(linz(z,x,y)))
     }
     private fun rings(rows:JSONArray?):List<List<SourceGeometry.Point>> = if(rows==null) emptyList() else List(rows.length()) { i ->
         val ring=rows.getJSONArray(i)
@@ -105,11 +109,18 @@ class NativeImagery(
         val key="$z/$x/$y";if(catalog.getJSONObject("coarse").has(key))return true
         val entry=catalog.getJSONObject("tiles").optJSONObject(key)?:return false
         val row=entry.optJSONObject("natural")?:entry;val file=row.getString("file")
-        if(attachments?.list()?.any{it.payload==file}==true)return true
+        if(attachments?.contains(file)==true)return true
         val archive=catalog.getJSONObject("archives").optJSONObject(file)?:return false
         return bundled.getOrPut(file){try{context.assets.openFd(archive.getString("asset")).use{true}}catch(_:FileNotFoundException){false}}
     }
     /** Discover all independent dependencies before suspending a CPU task. */
+    internal data class LocalInput(val key:String,val read:()->ByteArray?)
+    internal fun localInputs(z:Int,x:Int,y:Int):List<LocalInput>{
+        val p=plan(z,x,y);val inputs=ArrayList<LocalInput>(2)
+        if((p.mode=="linz"||p.mode=="boundary")&&hasSaved(z,x,y))inputs+=LocalInput("saved:$z/$x/$y"){saved(z,x,y)}
+        p.coarse?.let{val name=it.getString("url");inputs+=LocalInput("asset:$name"){assetBytes(name)}}
+        return inputs
+    }
     fun inputs(z:Int,x:Int,y:Int):List<String>{
         val p=plan(z,x,y);val urls=ArrayList<String>()
         if(p.mode=="linz"||p.mode=="boundary")if(!hasSaved(z,x,y))urls+=linz(z,x,y)

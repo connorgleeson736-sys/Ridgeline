@@ -39,7 +39,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     private var focusCoverDirty=false
     val gestureInProgress get()=gestureActive
     @Volatile private var lastBacklog=0
-    internal fun loadingSnapshot()="GPU uploads waiting: ${uploads.size()} · outstanding submissions: $lastBacklog\nResident geometry/images: ${residency.geometry.size}/${residency.images.size}\nDetail focus: "+if(surfaceFocusFor(planningPose)!=null)"measured visible terrain"else"map pivot (no current terrain hit)"
+    internal fun loadingSnapshot()="GPU uploads waiting: ${uploads.size()} · outstanding submissions: $lastBacklog\nGPU admission: ${uploads.outcomeStats()}\nResident geometry/images: ${residency.geometry.size}/${residency.images.size}\nDetail focus: "+if(surfaceFocusFor(planningPose)!=null)"measured visible terrain"else"map pivot (no current terrain hit)"
     val canPrepareAhead get()=live&&active&&!gestureActive&&lastBacklog==0&&!uploads.isNotEmpty()
     fun checkPreparationRoom(callback:(Boolean)->Unit){gpu.post{
         if(live&&active&&handle!=0L&&!gestureActive&&presentationFailures==0){lastBacklog=NativeBridge.gpuBacklog(handle);callback(canPrepareAhead)}else callback(false)
@@ -94,6 +94,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     fun goTo(point:Coordinate){cameraPose=cameraPose.copy(longitude=point.longitude,latitude=point.latitude);changed()}
     var onCamera:()->Unit={}
     var onData:()->Unit={}
+    internal var onInvalidUpload:(GpuUploadQueue.Tile)->Unit={}
     var onStatus:(String)->Unit={}
     private val uploads=GpuUploadQueue(192)
     private data class Residency(val geometry:LongArray,val images:LongArray,
@@ -149,20 +150,25 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         val demand=demandPacket
         if(demand!=null&&demand!==appliedDemand&&NativeBridge.demand(handle,demand)){appliedDemand=demand;safetyPose=null}
         val started=System.nanoTime();val allowance=uploadAdmission.allowance(gestureActive)
-        var count=0;var bytes=0;var accepted=false;var geometryChanged=false
+        var count=0;var bytes=0;var accepted=false;var geometryChanged=false;var deviceUnavailable=false
         while(presentationFailures==0){
             val next=uploads.peek()?:break
             if(!uploadAdmission.allows(next.kind,System.nanoTime()-started,count,bytes,next.bytes,allowance,backlog))break
-            val tile=uploads.take(1,650*1024).firstOrNull()?:break
+            val tile=next
             val id=tile.id;val uploadStarted=System.nanoTime()
-            val ok=when(tile.kind){
-                GpuUploadQueue.Kind.COMBINED->NativeBridge.upload(handle,id.z,id.x,id.y,tile.heights,tile.rgba)
-                GpuUploadQueue.Kind.GEOMETRY->NativeBridge.uploadGeometry(handle,id.z,id.x,id.y,tile.heights)
-                GpuUploadQueue.Kind.IMAGE->NativeBridge.uploadImage(handle,id.z,id.x,id.y,tile.rgba)
+            val outcome=when(tile.kind){
+                GpuUploadQueue.Kind.COMBINED->NativeBridge.uploadResult(handle,id.z,id.x,id.y,tile.heights,tile.rgba)
+                GpuUploadQueue.Kind.GEOMETRY->NativeBridge.uploadGeometryResult(handle,id.z,id.x,id.y,tile.heights)
+                GpuUploadQueue.Kind.IMAGE->NativeBridge.uploadImageResult(handle,id.z,id.x,id.y,tile.rgba)
             }
+            uploads.acknowledge(tile,outcome)
+            val ok=outcome==GpuUploadQueue.ACCEPTED
+            if(outcome==GpuUploadQueue.INVALID)post{onInvalidUpload(tile)}
+            if(outcome==GpuUploadQueue.DEVICE_UNAVAILABLE){deviceUnavailable=true;break}
             uploadAdmission.uploaded(tile.kind,System.nanoTime()-uploadStarted)
             count++;bytes+=tile.bytes;accepted=accepted||ok;geometryChanged=geometryChanged||(ok&&tile.kind!=GpuUploadQueue.Kind.IMAGE)
         }
+        if(deviceUnavailable){recoverGpu();return}
         if(count>0)refreshResidency()
         focusCoverDirty=focusCoverDirty||accepted
         if(accepted)post{onStatus("");onData()}
@@ -239,7 +245,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         }
         gpu.removeCallbacks(adaptiveWake)
         if(shown>1)gpu.postDelayed(adaptiveWake,(shown-2).toLong())
-        if(shown>0&&uploads.isNotEmpty())requestFrame()
+        if(shown>0)uploads.nextDelayMillis()?.let{requestFrame(it)}
     }
     private var lastRecovery=0L
     private fun recoverGpu(){
@@ -253,6 +259,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         handle=NativeBridge.create(holder.surface,width,height)
         residency=Residency(LongArray(0),LongArray(0));safetyPose=null;safetyValid=false;appliedRoutes=null;appliedDemand=null
         if(handle!=0L){
+            uploads.wakeRetries()
             val am=context.getSystemService(android.app.ActivityManager::class.java)
             NativeBridge.tileBudget(handle,if(am.isLowRamDevice)32 else(am.memoryClass/2).coerceIn(64,128))
             presentationFailures=0;post{onStatus("");onData()};requestFrame()

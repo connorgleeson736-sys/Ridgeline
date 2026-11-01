@@ -15,6 +15,12 @@ mod routes;
 mod seams;
 mod texture_arrays;
 pub use mipmaps::MipmapStats;
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum UploadError {
+    InvalidGeometry,
+    InvalidImagery,
+    Capacity,
+}
 pub use routes::RoutePath;
 pub mod selection;
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -609,19 +615,23 @@ impl Renderer {
         g && i
     }
     /// Compatibility path for controlled fixtures; production loads sources independently.
-    pub fn upload(&mut self, id: TileId, heights: &[f32], rgba: &[u8]) -> Result<(), String> {
+    pub fn upload(&mut self, id: TileId, heights: &[f32], rgba: &[u8]) -> Result<(), UploadError> {
         if rgba.len() != 256 * 256 * 4 {
-            return Err("Invalid imagery payload".into());
+            return Err(UploadError::InvalidImagery);
         }
         self.upload_geometry(id, heights)?;
         self.upload_image(id, rgba)
     }
-    pub fn upload_geometry(&mut self, id: TileId, heights: &[f32]) -> Result<(), String> {
+    pub fn upload_geometry(&mut self, id: TileId, heights: &[f32]) -> Result<(), UploadError> {
         self.upload_geometry_owned(id, heights.to_vec())
     }
-    pub fn upload_geometry_owned(&mut self, id: TileId, heights: Vec<f32>) -> Result<(), String> {
+    pub fn upload_geometry_owned(
+        &mut self,
+        id: TileId,
+        heights: Vec<f32>,
+    ) -> Result<(), UploadError> {
         if heights.len() != 129 * 129 || heights.iter().any(|h| !h.is_finite()) {
-            return Err("Invalid geometry payload".into());
+            return Err(UploadError::InvalidGeometry);
         }
         if self.touch_geometry(id) {
             return Ok(());
@@ -637,13 +647,16 @@ impl Renderer {
                     .keys()
                     .any(|old| id.contains(*old) || old.contains(id))
             {
-                return Err("Terrain residency full; waiting for fallback capacity".into());
+                return Err(UploadError::Capacity);
             }
         }
         self.clock += 1;
         // Preserve each f32 height exactly; only the invariant grid is shared.
         let allocation = if let Some(pool) = &mut self.height_arrays {
-            Some(pool.allocate(&self.device, &self.height_layout, None)?)
+            Some(
+                pool.allocate(&self.device, &self.height_layout, None)
+                    .map_err(|_| UploadError::Capacity)?,
+            )
         } else {
             None
         };
@@ -718,7 +731,7 @@ impl Renderer {
                     128,
                     heights.into_boxed_slice(),
                 )
-                .map_err(str::to_owned)?,
+                .map_err(|_| UploadError::InvalidGeometry)?,
             },
         );
         self.trim_geometry();
@@ -730,9 +743,9 @@ impl Renderer {
         self.cover_dirty = true;
         Ok(())
     }
-    pub fn upload_image(&mut self, id: TileId, rgba: &[u8]) -> Result<(), String> {
+    pub fn upload_image(&mut self, id: TileId, rgba: &[u8]) -> Result<(), UploadError> {
         if rgba.len() != 256 * 256 * 4 {
-            return Err("Invalid imagery payload".into());
+            return Err(UploadError::InvalidImagery);
         }
         if self.touch_image(id) {
             return Ok(());
@@ -745,12 +758,15 @@ impl Renderer {
                     .keys()
                     .any(|old| id.contains(*old) || old.contains(id))
             {
-                return Err("Imagery residency full; waiting for fallback capacity".into());
+                return Err(UploadError::Capacity);
             }
         }
         self.clock += 1;
         let allocation = if let Some(pool) = &mut self.image_arrays {
-            Some(pool.allocate(&self.device, &self.texture_layout, Some(&self.sampler))?)
+            Some(
+                pool.allocate(&self.device, &self.texture_layout, Some(&self.sampler))
+                    .map_err(|_| UploadError::Capacity)?,
+            )
         } else {
             None
         };
@@ -906,6 +922,16 @@ impl Renderer {
     }
     pub fn set_mip_scratch_reuse(&self, reuse: bool) {
         self.mipmaps.set_reuse(reuse)
+    }
+    /// Android admits a bounded upload batch before each frame. Encode its mip
+    /// chains together and submit them immediately before that frame's commands.
+    pub fn set_upload_batching(&self, enabled: bool) {
+        if !enabled {
+            if let Some(commands) = self.mipmaps.take_pending() {
+                self.queue.submit([commands]);
+            }
+        }
+        self.mipmaps.set_deferred(enabled);
     }
     pub fn index_cache_stats(&self) -> [u64; 5] {
         self.index_atlas.stats()
@@ -1660,7 +1686,12 @@ impl Renderer {
         }
         self.pending_frames
             .fetch_add(1, std::sync::atomic::Ordering::Release);
-        self.queue.submit([encoder.finish()]);
+        self.queue.submit(
+            self.mipmaps
+                .take_pending()
+                .into_iter()
+                .chain(std::iter::once(encoder.finish())),
+        );
         let pending = self.pending_frames.clone();
         self.queue.on_submitted_work_done(move || {
             pending.fetch_sub(1, std::sync::atomic::Ordering::Release);

@@ -7,6 +7,9 @@ object NativeBridge {
  @JvmStatic external fun terrainProfile(data:ByteBuffer):Boolean
  @JvmStatic external fun uploadGeometry(handle:Long,z:Int,x:Int,y:Int,data:ByteBuffer):Boolean
  @JvmStatic external fun uploadImage(handle:Long,z:Int,x:Int,y:Int,data:ByteBuffer):Boolean
+ @JvmStatic external fun uploadGeometryResult(handle:Long,z:Int,x:Int,y:Int,data:ByteBuffer):Int
+ @JvmStatic external fun uploadImageResult(handle:Long,z:Int,x:Int,y:Int,data:ByteBuffer):Int
+ @JvmStatic external fun uploadResult(handle:Long,z:Int,x:Int,y:Int,heights:ByteBuffer,rgba:ByteBuffer):Int
  @JvmStatic external fun demand(handle:Long,input:ByteBuffer):Boolean
  @JvmStatic external fun residency(handle:Long,output:ByteBuffer):Boolean
  @JvmStatic external fun cameraSafety(handle:Long,width:Int,height:Int,longitude:Double,latitude:Double,zoom:Double,bearing:Float,pitch:Float,elevation:Float,output:ByteBuffer):Boolean

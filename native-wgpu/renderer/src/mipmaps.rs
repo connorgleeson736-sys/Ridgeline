@@ -20,6 +20,7 @@ pub struct MipmapStats {
     pub bind_groups: u64,
     pub submissions: u64,
     pub pooled_bytes: u64,
+    pub batched_chains: u64,
 }
 enum Pipeline {
     Cpu,
@@ -33,6 +34,8 @@ pub struct Mipmaps {
     reuse: Cell<bool>,
     scratch: RefCell<Option<Scratch>>,
     stats: Cell<MipmapStats>,
+    deferred: Cell<bool>,
+    pending: RefCell<Option<wgpu::CommandEncoder>>,
 }
 impl Mipmaps {
     pub fn cpu() -> Self {
@@ -43,10 +46,39 @@ impl Mipmaps {
             reuse: Cell::new(true),
             scratch: RefCell::new(None),
             stats: Cell::new(MipmapStats::default()),
+            deferred: Cell::new(false),
+            pending: RefCell::new(None),
         }
     }
     pub fn is_cpu(&self) -> bool {
         matches!(self.pipeline, Pipeline::Cpu)
+    }
+    pub fn set_deferred(&self, enabled: bool) {
+        self.deferred.set(enabled);
+    }
+    pub fn take_pending(&self) -> Option<wgpu::CommandBuffer> {
+        self.pending
+            .borrow_mut()
+            .take()
+            .map(|encoder| encoder.finish())
+    }
+    fn encoder(&self, device: &wgpu::Device) -> wgpu::CommandEncoder {
+        self.pending.borrow_mut().take().unwrap_or_else(|| {
+            device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
+                label: Some("exact mip upload batch"),
+            })
+        })
+    }
+    fn finish(&self, queue: &wgpu::Queue, encoder: wgpu::CommandEncoder) {
+        let mut stats = self.stats.get();
+        if self.deferred.get() {
+            stats.batched_chains += 1;
+            *self.pending.borrow_mut() = Some(encoder);
+        } else {
+            stats.submissions += 1;
+            queue.submit([encoder.finish()]);
+        }
+        self.stats.set(stats);
     }
     fn generate_cpu(queue: &wgpu::Queue, texture: &wgpu::Texture, rgba: &[u8], layer: u32) {
         let mut previous = std::borrow::Cow::Borrowed(rgba);
@@ -158,6 +190,8 @@ impl Mipmaps {
             reuse: Cell::new(true),
             scratch: RefCell::new(None),
             stats: Cell::new(MipmapStats::default()),
+            deferred: Cell::new(false),
+            pending: RefCell::new(None),
         }
     }
     pub fn destination_usage(&self) -> wgpu::TextureUsages {
@@ -325,9 +359,7 @@ impl Mipmaps {
             });
             Some(self.bind(device, &source, &scratch.views[0]))
         };
-        let mut encoder = device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
-            label: Some("pooled exact mip chain"),
-        });
+        let mut encoder = self.encoder(device);
         if array {
             encoder.copy_texture_to_texture(
                 wgpu::TexelCopyTextureInfo {
@@ -406,10 +438,7 @@ impl Mipmaps {
         }
         // All uses share one queue: copies consuming a scratch level precede
         // any subsequent image's writes. No CPU wait or fence readback is needed.
-        let mut stats = self.stats.get();
-        stats.submissions += 1;
-        self.stats.set(stats);
-        queue.submit([encoder.finish()]);
+        self.finish(queue, encoder);
     }
     fn generate_fresh(
         &self,
@@ -423,9 +452,7 @@ impl Mipmaps {
             Self::generate_cpu(queue, texture, rgba, layer);
             return;
         }
-        let mut encoder = device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
-            label: Some("bounded imagery mip upload"),
-        });
+        let mut encoder = self.encoder(device);
         let mut levels: Vec<wgpu::Texture> = Vec::new();
         for level in 1..texture.mip_level_count() {
             let view = |mip| {
@@ -542,9 +569,6 @@ impl Mipmaps {
                 levels.push(target);
             }
         }
-        let mut stats = self.stats.get();
-        stats.submissions += 1;
-        self.stats.set(stats);
-        queue.submit([encoder.finish()]);
+        self.finish(queue, encoder);
     }
 }

@@ -76,7 +76,12 @@ impl Renderer {
                 },
             );
         }
-        self.queue.submit([encoder.finish()]);
+        self.queue.submit(
+            self.mipmaps
+                .take_pending()
+                .into_iter()
+                .chain(std::iter::once(encoder.finish())),
+        );
         let (tx, rx) = std::sync::mpsc::channel();
         buffer.slice(..).map_async(wgpu::MapMode::Read, move |v| {
             let _ = tx.send(v);
@@ -220,7 +225,12 @@ impl Renderer {
                 },
             );
         }
-        self.queue.submit([encoder.finish()]);
+        self.queue.submit(
+            self.mipmaps
+                .take_pending()
+                .into_iter()
+                .chain(std::iter::once(encoder.finish())),
+        );
         let (tx, rx) = std::sync::mpsc::channel();
         buffer.slice(..).map_async(wgpu::MapMode::Read, move |v| {
             let _ = tx.send(v);

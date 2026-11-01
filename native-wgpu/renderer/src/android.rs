@@ -121,6 +121,9 @@ fn state_for_backend(
         }
         Err(error) => return Err(error),
     };
+    // Vulkan benefits from removing CPU submission stalls. GLES software-driver
+    // timings varied/regressed between trials, so preserve its validated path.
+    renderer.set_upload_batching(backend == wgpu::Backends::VULKAN);
     let config = wgpu::SurfaceConfiguration {
         usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
         format: renderer.format,
@@ -626,12 +629,12 @@ unsafe fn upload_source(
     y: i32,
     data: jni::sys::jobject,
     geometry: bool,
-) -> u8 {
+) -> i32 {
     let mut env = unsafe { jni::EnvUnowned::from_raw(env) };
     match env
-        .with_env(|env| -> Result<u8, jni::errors::Error> {
+        .with_env(|env| -> Result<i32, jni::errors::Error> {
             if !(0..=22).contains(&z) || x < 0 || y < 0 || x >= 1i32 << z || y >= 1i32 << z {
-                return Ok(0);
+                return Ok(-1);
             }
             let data = unsafe { jni::objects::JByteBuffer::from_raw(env, data) };
             let size = if geometry {
@@ -641,14 +644,17 @@ unsafe fn upload_source(
             };
             let capacity = env.get_direct_buffer_capacity(&data)?;
             if capacity != size && (!geometry || capacity != size + 16) {
-                return Ok(0);
+                return Ok(-1);
             }
             let Ok(mut states) = states().lock() else {
-                return Ok(0);
+                return Ok(-2);
             };
             let Some(state) = states.get_mut(&(handle as u64)) else {
-                return Ok(0);
+                return Ok(-2);
             };
+            if state.device_lost.load(Ordering::Acquire) {
+                return Ok(-2);
+            }
             let id = TileId {
                 z: z as u8,
                 x: x as u32,
@@ -664,7 +670,7 @@ unsafe fn upload_source(
             let bytes = unsafe {
                 std::slice::from_raw_parts(env.get_direct_buffer_address(&data)?, capacity)
             };
-            Ok(if geometry {
+            let result = if geometry {
                 let heights: Vec<f32> = bytes[..size]
                     .chunks_exact(4)
                     .map(|b| f32::from_le_bytes(b.try_into().unwrap()))
@@ -682,13 +688,17 @@ unsafe fn upload_source(
                 result
             } else {
                 state.renderer.upload_image(id, bytes)
-            }
-            .is_ok() as u8)
+            };
+            Ok(match result {
+                Ok(()) => 1,
+                Err(UploadError::Capacity) => 0,
+                Err(UploadError::InvalidGeometry | UploadError::InvalidImagery) => -1,
+            })
         })
         .into_outcome()
     {
         jni::Outcome::Ok(result) => result,
-        _ => 0,
+        _ => -1,
     }
 }
 #[unsafe(no_mangle)]
@@ -701,7 +711,7 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_uploadGeo
     y: i32,
     data: jni::sys::jobject,
 ) -> u8 {
-    unsafe { upload_source(env, handle, z, x, y, data, true) }
+    (unsafe { upload_source(env, handle, z, x, y, data, true) } == 1) as u8
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_uploadImage(
@@ -713,7 +723,50 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_uploadIma
     y: i32,
     data: jni::sys::jobject,
 ) -> u8 {
+    (unsafe { upload_source(env, handle, z, x, y, data, false) } == 1) as u8
+}
+// Upload acknowledgement: 1 accepted/resident, 0 retryable capacity,
+// -1 invalid data, -2 unavailable/lost GPU. Legacy Boolean exports stay compatible.
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_uploadGeometryResult(
+    env: *mut jni::sys::JNIEnv,
+    _class: jni::sys::jclass,
+    handle: i64,
+    z: i32,
+    x: i32,
+    y: i32,
+    data: jni::sys::jobject,
+) -> i32 {
+    unsafe { upload_source(env, handle, z, x, y, data, true) }
+}
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_uploadImageResult(
+    env: *mut jni::sys::JNIEnv,
+    _class: jni::sys::jclass,
+    handle: i64,
+    z: i32,
+    x: i32,
+    y: i32,
+    data: jni::sys::jobject,
+) -> i32 {
     unsafe { upload_source(env, handle, z, x, y, data, false) }
+}
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_uploadResult(
+    env: *mut jni::sys::JNIEnv,
+    _class: jni::sys::jclass,
+    handle: i64,
+    z: i32,
+    x: i32,
+    y: i32,
+    heights: jni::sys::jobject,
+    rgba: jni::sys::jobject,
+) -> i32 {
+    let geometry = unsafe { upload_source(env, handle, z, x, y, heights, true) };
+    if geometry != 1 {
+        return geometry;
+    }
+    unsafe { upload_source(env, handle, z, x, y, rgba, false) }
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_residency(

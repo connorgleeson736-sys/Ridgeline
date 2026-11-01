@@ -12,9 +12,13 @@ class OfflineStore(context:Context,name:String="offline-v1.sqlite"):SQLiteOpenHe
     data class Region(val id:String,val name:String,val status:String,val bytes:Long,val resources:Int)
     @Volatile private var resourceState=-1
     init{setWriteAheadLoggingEnabled(true)}
-    @Synchronized private fun hasResources():Boolean {
-        if(resourceState<0)resourceState=readableDatabase.rawQuery("SELECT 1 FROM resources LIMIT 1",null).use{if(it.moveToFirst())1 else 0}
-        return resourceState==1
+    private fun hasResources():Boolean {
+        val known=resourceState
+        if(known>=0)return known==1 // WAL readers must not take the writer's application monitor.
+        return synchronized(this){
+            if(resourceState<0)resourceState=readableDatabase.rawQuery("SELECT 1 FROM resources LIMIT 1",null).use{if(it.moveToFirst())1 else 0}
+            resourceState==1
+        }
     }
     override fun onCreate(db:SQLiteDatabase){
         db.execSQL("CREATE TABLE regions(id TEXT PRIMARY KEY,name TEXT NOT NULL,status TEXT NOT NULL)")
@@ -41,8 +45,9 @@ class OfflineStore(context:Context,name:String="offline-v1.sqlite"):SQLiteOpenHe
         try{
             db.insertWithOnConflict("resources",null,ContentValues().apply{put("key",key);put("body",body)},SQLiteDatabase.CONFLICT_IGNORE)
             db.insertWithOnConflict("membership",null,ContentValues().apply{put("region",region);put("key",key)},SQLiteDatabase.CONFLICT_IGNORE)
-            db.setTransactionSuccessful();resourceState=1
+            db.setTransactionSuccessful()
         }finally{db.endTransaction()}
+        resourceState=1 // Publish only after the durable transaction has committed.
     }
     @Synchronized fun status(id:String,status:String){writableDatabase.update("regions",ContentValues().apply{put("status",status)},"id=?",arrayOf(id))}
     fun regions():List<Region> = readableDatabase.rawQuery("SELECT r.id,r.name,r.status,COALESCE(SUM(length(b.body)),0),COUNT(m.key) FROM regions r LEFT JOIN membership m ON m.region=r.id LEFT JOIN resources b ON b.key=m.key GROUP BY r.id ORDER BY r.rowid DESC",null).use{c->buildList{while(c.moveToNext())add(Region(c.getString(0),c.getString(1),c.getString(2),c.getLong(3),c.getInt(4)))}}

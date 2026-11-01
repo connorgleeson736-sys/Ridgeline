@@ -82,6 +82,8 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private val offline=OfflineStore(context)
     private val downloadJobs=Executors.newSingleThreadExecutor()
     private val regionContext=ThreadLocal<String>()
+    private val regionSources=ThreadLocal<TileTransport.Consumer>()
+    @Volatile private var regionPrefetch:OfflinePrefetch?=null
     @Volatile private var downloadLease:TileTransport.Consumer?=null
     private val downloadCancel=java.util.concurrent.atomic.AtomicBoolean(false)
     @Volatile var offlineOnly=preferences.getBoolean("offlineOnly",false);private set
@@ -90,7 +92,8 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     fun offlineOnly(value:Boolean){offlineOnly=value;preferences.edit().putBoolean("offlineOnly",value).apply();transport.batchDemand{for(task in jobs.values)task.cancel();clearWarm()};synchronized(ready){ready.clear();readyBytes=0};synchronized(decoded){decoded.clear()};cameraChanged()}
     val overviews=OverviewAttachments(context)
     private val attachmentJobs=Executors.newSingleThreadExecutor()
-    private val imagery = NativeImagery(context, ::fetch, {z,x,y->linz("aerial",Id(z,x,y),"webp")},overviews,::checkPreparation)
+    private val imagery = NativeImagery(context, ::fetch, {z,x,y->linz("aerial",Id(z,x,y),"webp")},overviews,::checkPreparation,::localImage)
+    private val imageryReady=CompletableFuture.runAsync({imagery.initialize()},attachmentJobs)
     fun attachOverview(uri:android.net.Uri,done:(String?)->Unit){attachmentJobs.execute{
         val error=try{overviews.attach(uri);imageryChanged();null}catch(e:Exception){e.message?:"Could not attach imagery ZIP."}
         view.post{if(!dead)done(error)}
@@ -157,6 +160,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     // shared DEM futures, and no per-halo executor multiplication.
     private val geometryWorkers = ThreadPoolExecutor(2,2,0,TimeUnit.MILLISECONDS,PriorityBlockingQueue<Runnable>())
     private val imageWorkers = ThreadPoolExecutor(2,2,0,TimeUnit.MILLISECONDS,PriorityBlockingQueue<Runnable>())
+    private val localImages=SharedLocalReads()
     private fun workers(source:Source)=if(source.geometry)geometryWorkers else imageWorkers
     private data class Failure(val attempts:Int,val retryAt:Long)
     private val failures=ConcurrentHashMap<Source,Failure>()
@@ -171,6 +175,9 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         private val queued=java.util.concurrent.atomic.AtomicBoolean(false)
         private val finished=java.util.concurrent.atomic.AtomicBoolean(false)
         val consumer=transport.consumer(priority,speculative,imagery=!source.geometry)
+        private val imageryGeneration=preferences.getLong("imageryGeneration",0)
+        val local=localImages.consumer(priority+if(speculative)10000 else 0)
+        fun localInput(key:String,read:()->ByteArray?)=local.acquire("$imageryGeneration:$key",read)
         val records=LinkedHashMap<String,SourceStamp>()
         val decodeWait=SharedDecode.Waiter<Pair<Id,String>,FloatArray>()
         @Volatile private var derivedRead:CompletableFuture<ByteBuffer?>?=null
@@ -189,10 +196,10 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         fun eligible()=!dead&&active&&!finished.get()&&(source in wanted||source in warmWanted&&prepareAhead||parkedUntil>System.currentTimeMillis())
         override fun compareTo(other:Task)=compareValuesBy(this,other,{it.priority+(if(it.speculative||it.parkedUntil!=0L)10000 else 0)},{it.order})
         fun enqueue(){if(!finished.get()&&!dead&&queued.compareAndSet(false,true))try{workers(source).execute(this)}catch(_:RejectedExecutionException){queued.set(false);cancel()}}
-        fun promote(rank:Int){if(priority==rank&&!speculative&&parkedUntil==0L)return;priority=rank;speculative=false;parkedUntil=0;consumer.promote(rank);if(!pipelineEligible())inputs.clear();if(workers(source).remove(this)){queued.set(false);enqueue()}}
-        fun park(){if(parkedUntil!=0L)return;inputs.clear();if(!consumer.park()){cancel();return};parkedUntil=System.currentTimeMillis()+600;
+        fun promote(rank:Int){if(priority==rank&&!speculative&&parkedUntil==0L)return;priority=rank;speculative=false;parkedUntil=0;consumer.promote(rank);local.promote(rank);if(!pipelineEligible())inputs.clear();if(workers(source).remove(this)){queued.set(false);enqueue()}}
+        fun park(){if(parkedUntil!=0L)return;inputs.clear();if(!consumer.park()){cancel();return};local.promote(priority+10000);parkedUntil=System.currentTimeMillis()+600;
             if(workers(source).remove(this)){queued.set(false);enqueue()};scheduler.schedule({if(source !in wanted)cancel()},600,TimeUnit.MILLISECONDS)}
-        fun cancel(){if(finished.compareAndSet(false,true)){workers(source).remove(this);jobs.remove(source,this);consumer.release(true);inputs.clear();decodeWait.clear();derivedRead?.cancel(false)}}
+        fun cancel(){if(finished.compareAndSet(false,true)){workers(source).remove(this);jobs.remove(source,this);consumer.release(true);local.close();inputs.clear();decodeWait.clear();derivedRead?.cancel(false)}}
         override fun run(){
             queued.set(false);if(!eligible()){cancel();return}
             var waiting:CompletableFuture<*>?=null
@@ -242,6 +249,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     }
     private fun loadView() {
         if (dead||!active||view.width==0||view.height==0) return
+        if(!imageryReady.isDone||imageryReady.isCompletedExceptionally)return
         val planningPose=view.planningPose
         val key=DemandPlanKey((view.width/view.pixelScale).roundToInt().coerceAtLeast(1),
             (view.height/view.pixelScale).roundToInt().coerceAtLeast(1),planningPose,terrainDetail,imageryDetail,view.surfaceFocusFor(planningPose))
@@ -372,6 +380,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         val counts=transport.stats();val times=transport.latencyStats()
         val http=backend.stats()
         val limits=transport.limitStats()
+        val local=localImages.stats()
         return "Native loading snapshot\n"+
             "Download limits moving/stationary/background: ${limits["movingLimit"]}/${limits["stationaryLimit"]}/${limits["backgroundLimit"]} · current foreground: ${limits["foregroundLimit"]}\n"+
             "HTTP active/queued: ${counts["networkActive"]}/${counts["networkQueued"]} · local reads queued: ${counts["localQueued"]}\n"+
@@ -382,18 +391,28 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             "Last local/queue wait before HTTP: ${times["lastAdmissionMs"]} ms\n"+
             "Geometry CPU active/queued: ${geometryWorkers.activeCount}/${geometryWorkers.queue.size}\n"+
             "Imagery CPU active/queued: ${imageWorkers.activeCount}/${imageWorkers.queue.size}\n"+
+            "Original imagery I/O active/queued: ${local["active"]}/${local["queued"]} · oldest ${local["oldestMs"]} ms · last/max read ${local["lastMs"]}/${local["maxMs"]} ms\n"+
             "Tiles in progress: ${jobs.size} · retry backoffs: ${failures.size}\n"+
             "RAM/disk hits: ${counts["ramHits"]}/${counts["localHits"]} · cache escape starts: ${counts["uncachedStarts"]}\n"+
             view.loadingSnapshot()+"\nHTTP stage includes cache, connection, provider and body transfer; it does not isolate Wi-Fi latency."
     }
     private fun resourceKey(url:String)=ResourceKey(url,offlineOnly&&regionContext.get()==null)
-    private fun awaitInputs(urls:List<String>){
-        val consumer=taskContext.get()?.consumer?:return
-        val futures=urls.distinct().map{consumer.acquire(resourceKey(it))}
+    private fun awaitInputs(urls:List<String>,local:List<NativeImagery.LocalInput> = emptyList()){
+        val task=taskContext.get()?:return
+        // Admit independent HTTP and original local reads together, before decode.
+        val futures=urls.distinct().map{task.consumer.acquire(resourceKey(it))}+local.map{task.localInput(it.key,it.read)}
         if(futures.any{!it.isDone})throw ResourcePending(CompletableFuture.allOf(*futures.toTypedArray()))
     }
+    private fun localImage(key:String,read:()->ByteArray?):ByteArray? {
+        val task=taskContext.get()?:return read() // Offline preparation owns its separate worker.
+        checkPreparation();val future=task.localInput(key,read)
+        if(!future.isDone)throw ResourcePending(future)
+        return try{future.getNow(null).also{checkPreparation()}}
+        catch(e:CompletionException){throw(e.cause as? Exception?:IOException("Original imagery unavailable"))}
+    }
     private fun fetchRecord(url:String):TileBody{
-        check(!dead);val current=taskContext.get();val owned=current?.consumer?:transport.consumer(if(regionContext.get()!=null)1000 else 16,regionContext.get()!=null)
+        check(!dead);val current=taskContext.get();val regionLease=regionSources.get()
+        val owned=current?.consumer?:regionLease?:transport.consumer(if(regionContext.get()!=null)1000 else 16,regionContext.get()!=null)
         val downloading=current==null&&regionContext.get()!=null
         if(downloading){downloadLease=owned;if(downloadCancel.get()){owned.release(true);throw PreparationAborted()}}
         try{
@@ -402,7 +421,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             val body=try{future.get()}catch(e:ExecutionException){throw(e.cause as? Exception?:IOException("Shared tile request failed"))}
             body.stamp?.let{sourceRecords.get()?.set(it.key,it)}
             return body
-        }finally{if(current==null)owned.close();if(downloading&&downloadLease===owned)downloadLease=null}
+        }finally{if(current==null&&regionLease==null)owned.close();if(downloading&&downloadLease===owned)downloadLease=null}
     }
     private fun fetch(url:String):ByteArray{
         val body=fetchRecord(url);if(body.status !in 200..299)throw TileHttpException(body.status)
@@ -511,7 +530,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         val imageryGeneration=preferences.getLong("imageryGeneration",0)
         val composed=imagery.composed(id.z,id.x,id.y)
         if(composed)taskContext.get()?.derived{imageStore().get(id.gpu(),::dependencyFresh)}?.let{return it}
-        awaitInputs(imagery.inputs(id.z,id.x,id.y))
+        awaitInputs(imagery.inputs(id.z,id.x,id.y),imagery.localInputs(id.z,id.x,id.y))
         val image = imagery.load(id.z, id.x, id.y)
         checkPreparation()
         val rgba=PixelPacking.rgbaOwned(image,::checkPreparation)
@@ -540,12 +559,19 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     fun regionEstimate(bounds:Bounds,maxZoom:Int)=regionTiles(bounds,maxZoom).size
     fun regions(callback:(List<OfflineStore.Region>)->Unit){downloadJobs.execute{val rows=offline.regions();view.post{if(!dead)callback(rows)}}}
     fun removeRegion(id:String,callback:()->Unit){downloadJobs.execute{offline.delete(id);view.post{if(!dead)callback()}}}
-    fun cancelDownload(){downloadCancel.set(true);downloadLease?.release(true)}
+    fun cancelDownload(){downloadCancel.set(true);regionPrefetch?.close();downloadLease?.release(true)}
     fun downloadRegion(name:String,bounds:Bounds,maxZoom:Int,progress:(String)->Unit,done:()->Unit){
         val tiles=regionTiles(bounds,maxZoom);downloadCancel.set(false)
         downloadJobs.execute{
             val region=offline.begin(name);regionContext.set(region);val demDone=HashSet<Id>()
+            val prefetch=OfflinePrefetch(transport);regionPrefetch=prefetch
             fun checkActive(){check(!dead&&!downloadCancel.get()){ "Download cancelled" }}
+            fun inputs(id:Id):List<ResourceKey>{
+                val urls=ArrayList(imagery.inputs(id.z,id.x,id.y))
+                val dz=min(id.z,18);val f=1 shl(id.z-dz);val n=1 shl dz
+                for(dy in -1..1)for(dx in -1..1){val dem=Id(dz,Math.floorMod(id.x/f+dx,n),(id.y/f+dy).coerceIn(0,n-1));if(dem !in demDone)urls+=linz("elevation",dem,"png")}
+                return urls.distinct().map{ResourceKey(it,false)}
+            }
             fun dem(id:Id){
                 if(!demDone.add(id))return;checkActive()
                 val pixels=try{demPixels(fetch(linz("elevation",id,"png")))}catch(e:TileHttpException){if(e.code==404&&id.z>0)null else throw e}
@@ -553,14 +579,16 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             }
             try{
                 for((index,id)in tiles.withIndex()){
-                    checkActive();imagery.load(id.z,id.x,id.y)
+                    checkActive()
+                    regionSources.set(prefetch.advance(index,tiles.subList(index,minOf(index+2,tiles.size)).map(::inputs)))
+                    imagery.load(id.z,id.x,id.y)
                     val dz=min(id.z,18);val f=1 shl(id.z-dz);val n=1 shl dz
                     for(dy in -1..1)for(dx in -1..1)dem(Id(dz,Math.floorMod(id.x/f+dx,n),(id.y/f+dy).coerceIn(0,n-1)))
                     if(index%5==0||index==tiles.lastIndex)view.post{if(!dead)progress("${index+1}/${tiles.size} image tiles · terrain included")}
                 }
                 offline.status(region,"Ready")
             }catch(e:Exception){offline.status(region,if(downloadCancel.get()||dead)"Partial · cancelled"else"Partial · source unavailable")}
-            finally{regionContext.remove();view.post{if(!dead)done()}}
+            finally{regionSources.remove();prefetch.close();if(regionPrefetch===prefetch)regionPrefetch=null;regionContext.remove();view.post{if(!dead)done()}}
         }
     }
     private val profileJobs=Executors.newSingleThreadScheduledExecutor()
@@ -592,8 +620,22 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     fun close() {
         escapedWrites.shutdown()
         derivedReads.close()
-        dead = true;transport.batchDemand{for(task in jobs.values)task.cancel();clearWarm();transport.close()};preparedWrites.shutdownNow();attachmentJobs.shutdown();downloadCancel.set(true);downloadJobs.shutdown(); profileRevision.incrementAndGet();profileJob?.cancel(true);profileJobs.shutdownNow();timer?.cancel(true); scheduler.shutdownNow(); geometryWorkers.shutdownNow();imageWorkers.shutdownNow()
+        dead = true;transport.batchDemand{for(task in jobs.values)task.cancel();clearWarm();transport.close()};localImages.close();preparedWrites.shutdownNow();attachmentJobs.shutdown();downloadCancel.set(true);downloadJobs.shutdown(); profileRevision.incrementAndGet();profileJob?.cancel(true);profileJobs.shutdownNow();timer?.cancel(true); scheduler.shutdownNow(); geometryWorkers.shutdownNow();imageWorkers.shutdownNow()
         client.dispatcher.cancelAll(); client.connectionPool.evictAll(); client.cache?.close(); client.dispatcher.executorService.shutdown(); synchronized(ready) { ready.clear(); readyBytes=0 }; synchronized(decoded) { decoded.clear() }
-        Thread({downloadJobs.awaitTermination(60,TimeUnit.SECONDS);profileJobs.awaitTermination(60,TimeUnit.SECONDS);geometryWorkers.awaitTermination(60,TimeUnit.SECONDS);imageWorkers.awaitTermination(60,TimeUnit.SECONDS);attachmentJobs.awaitTermination(60,TimeUnit.SECONDS);transport.awaitClosed();overviews.close();offline.close()},"ridgeline-offline-close").start()
+        Thread({downloadJobs.awaitTermination(60,TimeUnit.SECONDS);profileJobs.awaitTermination(60,TimeUnit.SECONDS);geometryWorkers.awaitTermination(60,TimeUnit.SECONDS);imageWorkers.awaitTermination(60,TimeUnit.SECONDS);attachmentJobs.awaitTermination(60,TimeUnit.SECONDS);localImages.awaitClosed();transport.awaitClosed();overviews.close();offline.close()},"ridgeline-offline-close").start()
+    }
+    init{
+        imageryReady.whenComplete{_,error->if(error==null)cameraChanged()else view.post{if(!dead)view.onStatus("Imagery metadata unavailable")}}
+        view.onInvalidUpload={tile->
+            for(geometry in listOf(true,false)){
+                if(tile.kind==GpuUploadQueue.Kind.GEOMETRY&&!geometry||tile.kind==GpuUploadQueue.Kind.IMAGE&&geometry)continue
+                val source=Source(Id(tile.id.z,tile.id.x,tile.id.y),geometry)
+                val bytes=if(geometry)tile.heights else tile.rgba
+                val removed=synchronized(ready){if(ready[source]===bytes){readyBytes-=ready.remove(source)!!.capacity();true}else false}
+                // Do not re-offer the same permanently invalid buffer each frame.
+                if(removed)failures[source]=Failure(1,Long.MAX_VALUE)
+            }
+            view.onStatus("Invalid prepared tile; see loading diagnostics")
+        }
     }
 }

@@ -25,6 +25,7 @@ class OverviewAttachments(private val context:Context):AutoCloseable {
         saved.keys().asSequence().map{key->val row=saved.getJSONObject(key);key to Pack(key,row.getString("name"),row.getString("uri"),row.getLong("offset"),row.getLong("bytes"))}.toMap()
     }.getOrDefault(emptyMap())
     fun list()=packs.values.sortedBy{it.name}
+    internal fun contains(payload:String)=packs.containsKey(payload)
     @Synchronized private fun persist(next:Map<String,Pack>){
         val json=JSONObject()
         for((key,p)in next)json.put(key,JSONObject().put("name",p.name).put("uri",p.uri).put("offset",p.offset).put("bytes",p.bytes))
