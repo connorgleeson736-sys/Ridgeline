@@ -8,7 +8,7 @@
     "capacitor": "0.18.0-performance",
     "capacitorSource": "d880143418ac46ece98adff0b3b2fbaedf044d46"
   },
-  "jvmTestsPassed": 9,
+  "jvmTestsPassed": 11,
   "fullSuiteOrLintRun": false,
   "changedPathChecks": [
     "original local I/O isolation/latency",
@@ -19,7 +19,9 @@
     "offline lookahead, cancellation closure, bounded background admission and zero-RAM reuse",
     "late prepared hit versus a 350ms source fallback using an actual lossless cache file",
     "current validity rechecked at late adoption, rejected hits cannot cause a busy wake loop, cancellation retains actual reader permits",
-    "legacy deadline-only cache read behavior remains compatible"
+    "legacy deadline-only cache read behavior remains compatible",
+    "published reader handles bypass a held helper monitor by more than 200ms in the fixture; read-only fallback is not cached; clear/reopen and writer publication preserve ownership",
+    "extended GPU retry check: a class-specific capacity wake eliminates a pending 512ms backoff without waking the other source class"
   ],
   "gpu": {
     "fixture": "upload_batch_bench",
@@ -76,5 +78,16 @@
     "cpuCheckpointsCanAdoptDuringRebuild": true,
     "firstReadyFallbackWaitCanWakeOnLateHit": true,
     "over200msFixtureSaved": 321.23701700000004
-  }
+  },
+  "savedMapReadHandle": {
+    "initializedWritableReadBypassesApplicationMonitor": true,
+    "writerMayPublishEstablishedWritableHandle": true,
+    "readOnlyHandleNotRetained": true,
+    "availabilityPublishedAfterCommit": true,
+    "initialAvailabilityCASCannotOverwriteCommittedState": true,
+    "androidSourceEvidence": "sqlite-helper-evidence.json",
+    "physicalAndroidDatabaseBenchmark": false
+  },
+  "savedRegionUIQueriesShareLongDownloadExecutor": false,
+  "httpDiskCacheCloseOnUIThread": false
 }

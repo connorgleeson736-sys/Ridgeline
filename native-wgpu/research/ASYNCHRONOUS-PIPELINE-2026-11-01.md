@@ -7,7 +7,7 @@ the requested 0.1.1 checkpoint ancestry. Reference refreshed from
 `android-preview-download`: Capacitor Performance 0.18.0, source
 `d880143418ac46ece98adff0b3b2fbaedf044d46`.
 
-This pass implements six improvements across file I/O, CPU admission, offline
+This pass implements eight improvements across file I/O, CPU admission, offline
 loading, saved-map contention and GPU submission. Original imagery pixels,
 terrain resolution, source ceilings, mip filters, skirts and renderer remain.
 The 1–50 controls from 0.1.6 remain. Route-planning algorithms were not changed.
@@ -92,6 +92,9 @@ Rust now returns a typed upload error, translated by new JNI methods into:
 Capacity retries start after 16 ms and cap at 512 ms. Deferred entries are skipped
 when selecting other eligible uploads, so a blocked head cannot occupy every
 attempt. Idle retries use a scheduled wake rather than continuous empty frames.
+Actual residency-count reductions wake the affected class immediately, so a
+newly freed slot does not remain unused behind up to 512 ms of old backoff. A
+focused logical-clock check covers that wake and the other class remaining asleep.
 Demand changes prune obsolete ownership; a late acknowledgement cannot remove a
 newer payload for the same source. Device recovery wakes the retained entries.
 Legacy Boolean JNI methods remain available for existing controlled clients.
@@ -149,14 +152,47 @@ exercise the exact mip generators, not a replacement shader or reduced image.
 same Java monitor used around background transactions. WAL cannot make a reader
 concurrent if application code makes it wait before the query.
 
-A published-state fast path now bypasses that monitor after initialization.
-The unknown state still initializes under the lock. Resource availability is
-published only after a successful durable transaction commit. SQLite still owns
-database concurrency and snapshot consistency. This is a source-verified lock
-removal, not a measured Android SQLite throughput claim; no device DB benchmark
-was run for this change.
+Tracing the inherited API exposed a second acquisition:
+`SQLiteOpenHelper.getReadableDatabase()` itself synchronizes on the helper. Merely
+removing `hasResources`' own monitor would therefore be incomplete. The
+[pinned Android 16 source evidence](../validation/asynchronous-pipeline-2026-11-01/sqlite-helper-evidence.json)
+records that getter explicitly.
 
-## A further change avoiding more than 200 ms in the fixture
+`PublishedReadHandle` now publishes the established writable database object for
+readers. Resource queries and region-list queries use that object directly.
+Writers can publish their opened writable handle before a transaction. Read-only
+fallback handles are not retained: a later writable open may replace/close them.
+Close clears the published handle. Initial availability uses an atomic comparison
+so an old empty-reader snapshot cannot overwrite a writer's committed state.
+Resource availability is published only after a durable transaction commit.
+
+**Controlled measurement:** the production handle helper, an established writable
+handle and a writer holding the shared application monitor for 250 ms. Median
+**250.218 ms → 0.000431 ms**, saving **250.217 ms**. The same handle is returned,
+without invoking the synchronized opener again. This measures the eliminated
+monitor wait; Android SQLite query time and storage contention remain unmeasured.
+
+### 6. Saved-region queries do not queue behind an entire download
+
+The region list used the same single executor as the full region-download loop.
+A read could wait for a download lasting minutes, regardless of SQL query speed.
+Read-only UI region queries now have an independent one-worker executor. Its
+thread expires after 15 idle seconds. Database mutation/deletion stays on its
+existing serialized owner. The region query also uses the published WAL handle
+above. This removes a source-verified queue dependency; no phone UI timing is
+claimed.
+
+### 7. Activity finish does not close the HTTP disk cache on the UI thread
+
+`TileLoader.close` canceled transfers, then synchronously closed OkHttp's disk
+cache on the caller. MainActivity calls it during teardown. Cache shutdown can
+wait for its disk/journal monitor and storage work. It now runs in the existing
+cleanup thread after reader shutdown, alongside independent ZIP/database cleanup.
+Transfer cancellation is still immediate. This does not change the separate
+SurfaceHolder ownership contract or remove its required surface-release wait.
+The potentially long disk close is no longer part of the UI teardown call.
+
+### 8. Late prepared-cache adoption avoids more than 200 ms in the fixture
 
 The prepared-cache deadline previously resolved a lookup as a permanent miss
 after 12 ms. A valid file arriving at 40 ms could be discarded while fallback
@@ -168,7 +204,7 @@ bounded read completion. The default deadline-only API remains compatible.
 `PreparedShortcut` can select a late cache entry while the operation is waiting
 on sources or at an existing CPU cancellation checkpoint during rebuilding.
 Only a non-null hit wakes source waits; a late miss cannot create a busy loop.
-Completed fresh fallback work is not subsequently replaced.
+Once the operation finishes, a late result cannot subsequently replace it.
 
 The cache returns its original dependency metadata alongside the unchanged
 payload. At adoption the operation rechecks eligibility, current imagery
@@ -215,9 +251,11 @@ CPU/GPU cache remains another correctness prerequisite for deeper racing work.
 
 ## Verification and research
 
-Nine targeted JVM checks pass: local-I/O isolation/latency and ownership/capacity,
+Eleven targeted JVM checks pass: local-I/O isolation/latency and ownership/capacity,
 GPU acknowledgement/retry, two existing rank/coalescing regressions, and the
-offline lookahead regression, plus three late-cache/compatibility checks. Three targeted graphics configurations exercise
+offline lookahead regression, three late-cache/compatibility checks, and two
+published-handle concurrency/ownership checks. The existing GPU acknowledgement
+check was also extended and rerun for capacity-release wakes. Three targeted graphics configurations exercise
 the three submission modes. No full suite or lint was run. The optimized Android
 libraries are rebuilt for ARM64, ARMv7 and x86_64; APK provenance, signature,
 alignment and unchanged original-asset checks accompany the installer.

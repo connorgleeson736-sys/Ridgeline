@@ -20,6 +20,12 @@ class GpuUploadAckTest {
   assertFalse(q.isNotEmpty());assertNull(q.nextDelayMillis(start))
   q.offer(first);q.acknowledge(first,GpuUploadQueue.DEVICE_UNAVAILABLE,start)
   assertEquals(250L,q.nextDelayMillis(start));q.wakeRetries();assertSame(first,q.peek(start))
+  var now=start
+  repeat(7){q.acknowledge(first,GpuUploadQueue.RETRY,now);now+=(q.nextDelayMillis(now)!!)*1_000_000}
+  q.acknowledge(first,GpuUploadQueue.RETRY,now)
+  assertEquals(512L,q.nextDelayMillis(now))
+  q.wakeRetries(GpuUploadQueue.Kind.GEOMETRY);assertEquals(512L,q.nextDelayMillis(now))
+  q.wakeRetries(GpuUploadQueue.Kind.IMAGE);assertEquals(0L,q.nextDelayMillis(now));assertSame(first,q.peek(now))
   q.updateDemand(emptySet(),emptySet());assertFalse(q.isNotEmpty());assertNull(q.nextDelayMillis(start))
  }
 }

@@ -119,8 +119,15 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         val token=generation.get();residencyBytes.rewind()
         if(NativeBridge.residency(handle,residencyBytes)){
             val g=residencyBytes.int;val i=residencyBytes.int
-            val next=residency.updated(LongArray(g){residencyBytes.long},LongArray(i){residencyBytes.long})
-            if(live&&generation.get()==token)residency=next
+            val previous=residency
+            val next=previous.updated(LongArray(g){residencyBytes.long},LongArray(i){residencyBytes.long})
+            if(live&&generation.get()==token){
+                // A real release invalidates capacity backoff immediately; a
+                // retry must not sleep for hundreds of ms after room is freed.
+                if(g<previous.geometry.size)uploads.wakeRetries(GpuUploadQueue.Kind.GEOMETRY)
+                if(i<previous.images.size)uploads.wakeRetries(GpuUploadQueue.Kind.IMAGE)
+                residency=next
+            }
         }
     }
     private val queued=AtomicBoolean(false)

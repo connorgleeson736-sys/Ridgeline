@@ -81,6 +81,9 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             (if (kind == "elevation") "pipeline=terrain-rgb&" else "") + "api=$key"
     private val offline=OfflineStore(context)
     private val downloadJobs=Executors.newSingleThreadExecutor()
+    // A region download may run for minutes. Read-only UI queries must not
+    // enter that executor's FIFO; the reader thread expires while idle.
+    private val offlineQueries=ThreadPoolExecutor(0,1,15,TimeUnit.SECONDS,LinkedBlockingQueue<Runnable>())
     private val regionContext=ThreadLocal<String>()
     private val regionSources=ThreadLocal<TileTransport.Consumer>()
     @Volatile private var regionPrefetch:OfflinePrefetch?=null
@@ -561,7 +564,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         };return result
     }
     fun regionEstimate(bounds:Bounds,maxZoom:Int)=regionTiles(bounds,maxZoom).size
-    fun regions(callback:(List<OfflineStore.Region>)->Unit){downloadJobs.execute{val rows=offline.regions();view.post{if(!dead)callback(rows)}}}
+    fun regions(callback:(List<OfflineStore.Region>)->Unit){offlineQueries.execute{val rows=offline.regions();view.post{if(!dead)callback(rows)}}}
     fun removeRegion(id:String,callback:()->Unit){downloadJobs.execute{offline.delete(id);view.post{if(!dead)callback()}}}
     fun cancelDownload(){downloadCancel.set(true);regionPrefetch?.close();downloadLease?.release(true)}
     fun downloadRegion(name:String,bounds:Bounds,maxZoom:Int,progress:(String)->Unit,done:()->Unit){
@@ -624,9 +627,9 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     fun close() {
         escapedWrites.shutdown()
         derivedReads.close()
-        dead = true;transport.batchDemand{for(task in jobs.values)task.cancel();clearWarm();transport.close()};localImages.close();preparedWrites.shutdownNow();attachmentJobs.shutdown();downloadCancel.set(true);downloadJobs.shutdown(); profileRevision.incrementAndGet();profileJob?.cancel(true);profileJobs.shutdownNow();timer?.cancel(true); scheduler.shutdownNow(); geometryWorkers.shutdownNow();imageWorkers.shutdownNow()
-        client.dispatcher.cancelAll(); client.connectionPool.evictAll(); client.cache?.close(); client.dispatcher.executorService.shutdown(); synchronized(ready) { ready.clear(); readyBytes=0 }; synchronized(decoded) { decoded.clear() }
-        Thread({downloadJobs.awaitTermination(60,TimeUnit.SECONDS);profileJobs.awaitTermination(60,TimeUnit.SECONDS);geometryWorkers.awaitTermination(60,TimeUnit.SECONDS);imageWorkers.awaitTermination(60,TimeUnit.SECONDS);attachmentJobs.awaitTermination(60,TimeUnit.SECONDS);localImages.awaitClosed();transport.awaitClosed();overviews.close();offline.close()},"ridgeline-offline-close").start()
+        dead = true;transport.batchDemand{for(task in jobs.values)task.cancel();clearWarm();transport.close()};localImages.close();preparedWrites.shutdownNow();attachmentJobs.shutdown();downloadCancel.set(true);downloadJobs.shutdown();offlineQueries.shutdownNow(); profileRevision.incrementAndGet();profileJob?.cancel(true);profileJobs.shutdownNow();timer?.cancel(true); scheduler.shutdownNow(); geometryWorkers.shutdownNow();imageWorkers.shutdownNow()
+        client.dispatcher.cancelAll(); client.connectionPool.evictAll(); client.dispatcher.executorService.shutdown(); synchronized(ready) { ready.clear(); readyBytes=0 }; synchronized(decoded) { decoded.clear() }
+        Thread({downloadJobs.awaitTermination(60,TimeUnit.SECONDS);offlineQueries.awaitTermination(5,TimeUnit.SECONDS);profileJobs.awaitTermination(60,TimeUnit.SECONDS);geometryWorkers.awaitTermination(60,TimeUnit.SECONDS);imageWorkers.awaitTermination(60,TimeUnit.SECONDS);attachmentJobs.awaitTermination(60,TimeUnit.SECONDS);localImages.awaitClosed();transport.awaitClosed();runCatching{overviews.close()};runCatching{offline.close()};runCatching{client.cache?.close()}},"ridgeline-offline-close").start()
     }
     init{
         imageryReady.whenComplete{_,error->if(error==null)cameraChanged()else view.post{if(!dead)view.onStatus("Imagery metadata unavailable")}}

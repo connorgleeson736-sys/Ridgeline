@@ -93,7 +93,7 @@ class GpuUploadQueue(private val capacity:Int) {
         val at=entries.keys.minOf{retries[it]?.at?:now}
         return if(at<=now)0 else (at-now+999_999)/1_000_000
     }
-    @Synchronized fun wakeRetries(){retries.clear()}
+    @Synchronized fun wakeRetries(kind:Kind?=null){if(kind==null)retries.clear()else retries.keys.removeAll{it.second==kind||it.second==Kind.COMBINED}}
     @Synchronized fun outcomeStats()="accepted $accepted · capacity/device retries $deferred · invalid $invalid"
     @Synchronized fun take(count:Int,byteBudget:Int=Int.MAX_VALUE):List<Tile>{
         val out=ArrayList<Tile>(count);var bytes=0
