@@ -9,6 +9,7 @@ internal data class TileBody(val bytes:ByteArray,val status:Int,val until:Long,v
 internal data class ResourceKey(val url:String,val offline:Boolean){val id:String by lazy{PreparedTerrainCache.digest((if(offline)"offline:" else "online:").plus(url).toByteArray())}}
 internal interface TileBackend:AutoCloseable {
     override fun close(){}
+    fun awaitClosed(){}
     /** Local storage only; a miss MUST NOT initiate HTTP. */
     fun local(key:ResourceKey):TileBody?
     fun network(key:ResourceKey,done:(Result<TileBody>)->Unit):()->Unit
@@ -323,7 +324,7 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
             "oldestWaitingMs" to (jobs.values.filter{it.phase==Phase.QUEUED||it.phase==Phase.LOCAL}.maxOfOrNull{TimeUnit.NANOSECONDS.toMillis(now-it.createdNs)}?:0L))
     }
     fun limitStats():Map<String,Long> = synchronized(lock){mapOf("movingLimit" to downloadLimits.moving.toLong(),"stationaryLimit" to downloadLimits.stationary.toLong(),"foregroundLimit" to foregroundLimit.toLong(),"backgroundLimit" to downloadLimits.background.toLong())}
-    fun awaitClosed(){local.awaitTermination(5,TimeUnit.SECONDS);timers.awaitTermination(5,TimeUnit.SECONDS)}
+    fun awaitClosed(){local.awaitTermination(5,TimeUnit.SECONDS);timers.awaitTermination(5,TimeUnit.SECONDS);backend.awaitClosed()}
     override fun close(){
         val rows=synchronized(lock){if(closed)return;closed=true;localWatchEpoch++;localWatch?.cancel(false);localWatch=null;val rows=jobs.values.toList();for(job in rows){job.stopped=true;job.expiry?.cancel(false)};jobs.clear();ram.clear();metadata.clear();bytes=0;rows}
         for(job in rows){job.cancel?.invoke();job.result.completeExceptionally(PreparationAborted())}

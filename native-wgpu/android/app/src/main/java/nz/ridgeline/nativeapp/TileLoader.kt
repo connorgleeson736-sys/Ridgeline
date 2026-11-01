@@ -58,9 +58,13 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private val escapedWrites=ThreadPoolExecutor(1,1,0,TimeUnit.MILLISECONDS,ArrayBlockingQueue<Runnable>(8),ThreadFactory{work->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);work.run()},"RidgelineSourceCache")},ThreadPoolExecutor.DiscardOldestPolicy())
     private val preparedWrites=ThreadPoolExecutor(1,1,0,TimeUnit.MILLISECONDS,ArrayBlockingQueue<Runnable>(8),ThreadFactory{work->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);work.run()},"RidgelinePreparedCache")},ThreadPoolExecutor.DiscardOldestPolicy())
     private val derivedReads=DerivedReadGate()
+    private val httpMetrics=HttpMetrics()
     private val client = OkHttpClient.Builder()
         .cache(if(automaticCacheBytes>0)Cache(File(context.cacheDir, "native-http-v1"), automaticCacheBytes-preparedBytes)else null)
         .dispatcher(Dispatcher().apply{maxRequests=DownloadLimits.HTTP_CAPACITY;maxRequestsPerHost=DownloadLimits.HTTP_CAPACITY})
+        .fastFallback(true)
+        .eventListenerFactory{httpMetrics.listener(it)}
+        .addNetworkInterceptor{httpMetrics.intercept(it)}
         .connectTimeout(12, TimeUnit.SECONDS).readTimeout(15, TimeUnit.SECONDS).build()
     init {
         if(automaticCacheBytes==0L)preparedWrites.execute {
@@ -380,7 +384,8 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private val backend by lazy{HttpTileBackend(client,
         escapeRead={escaped.get(it)},
         escapeWrite={resource,body->if(escapedBytes>0&&!escapedWrites.isShutdown)runCatching{escapedWrites.execute{escaped.put(resource,body)}}},
-        offlineRead=offline::read)}
+        cacheThreadFactory=ThreadFactory{work->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);work.run()},"RidgelineHttpCache")},
+        metrics=httpMetrics,offlineRead=offline::read)}
     private val transport by lazy{TileTransport(backend,ramBudget.encoded,initialLimits=downloadLimits)}
     fun loadingDiagnostics():String {
         val counts=transport.stats();val times=transport.latencyStats()
@@ -391,7 +396,8 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             "Download limits moving/stationary/background: ${limits["movingLimit"]}/${limits["stationaryLimit"]}/${limits["backgroundLimit"]} · current foreground: ${limits["foregroundLimit"]}\n"+
             "HTTP active/queued: ${counts["networkActive"]}/${counts["networkQueued"]} · local reads queued: ${counts["localQueued"]}\n"+
             "Underlying HTTP running/queued: ${http["httpRunning"]}/${http["httpQueued"]} · canceled but still occupying slots: ${http["retiredHttpRunning"]}/${http["retiredHttpQueued"]}\n"+
-            "Isolated escape HTTP running/queued: ${http["escapeRunning"]}/${http["escapeQueued"]}\n"+
+            "Cache-free HTTP running/queued: ${http["escapeRunning"]}/${http["escapeQueued"]}\n"+
+            "Async HTTP cache writes queued: ${http["cacheWritesQueued"]} · pending bytes ${http["pendingCacheBytes"]} · completed/dropped/errors ${http["cacheWrites"]}/${http["cacheWriteDrops"]}/${http["cacheWriteErrors"]}\n"+
             "Oldest active HTTP: ${times["oldestActiveHttpMs"]} ms · waiting source: ${times["oldestWaitingMs"]} ms\n"+
             "Last HTTP stage: ${times["lastHttpMs"]} ms · max this session: ${times["maxHttpMs"]} ms\n"+
             "Last local/queue wait before HTTP: ${times["lastAdmissionMs"]} ms\n"+
@@ -401,7 +407,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             "Tiles in progress: ${jobs.size} · retry backoffs: ${failures.size}\n"+
             "Late prepared-cache wins: ${latePreparedWins.get()}\n"+
             "RAM/disk hits: ${counts["ramHits"]}/${counts["localHits"]} · cache escape starts: ${counts["uncachedStarts"]}\n"+
-            view.loadingSnapshot()+"\nHTTP stage includes cache, connection, provider and body transfer; it does not isolate Wi-Fi latency."
+            httpMetrics.snapshot()+"\n"+view.loadingSnapshot()+"\nHTTP spans may overlap during route retries. Wire reads are before cache/decompression; processing includes cache and body handling. Body rate excludes headers/TLS/other apps."
     }
     private fun resourceKey(url:String)=ResourceKey(url,offlineOnly&&regionContext.get()==null)
     private fun awaitInputs(urls:List<String>,local:List<NativeImagery.LocalInput> = emptyList()){

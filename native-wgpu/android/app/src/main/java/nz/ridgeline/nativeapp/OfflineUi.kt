@@ -104,7 +104,7 @@ class OfflineUi(private val activity:Activity,root:FrameLayout,private val terra
         content.addView(CheckBox(activity).apply{text="Offline only";isChecked=loader.offlineOnly;setOnCheckedChangeListener{_,checked->loader.offlineOnly(checked)}})
         content.addView(button("Loading diagnostics"){
             val snapshot=TextView(activity).apply{setPadding(dp(16),dp(12),dp(16),dp(12));setTextIsSelectable(true)}
-            val loading=AlertDialog.Builder(activity).setTitle("Loading diagnostics").setView(snapshot).setNegativeButton("Close",null).setNeutralButton("Copy"){_,_->
+            val loading=AlertDialog.Builder(activity).setTitle("Loading diagnostics").setView(ScrollView(activity).apply{addView(snapshot)}).setNegativeButton("Close",null).setNeutralButton("Copy"){_,_->
                 activity.getSystemService(android.content.ClipboardManager::class.java).setPrimaryClip(android.content.ClipData.newPlainText("Ridgeline loading",snapshot.text))
             }.create()
             fun refresh(){if(loading.isShowing){snapshot.text=loader.loadingDiagnostics();snapshot.postDelayed({refresh()},1000)}}

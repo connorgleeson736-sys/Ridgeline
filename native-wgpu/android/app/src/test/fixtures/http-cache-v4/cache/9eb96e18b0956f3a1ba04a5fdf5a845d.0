@@ -1,0 +1,13 @@
+http://127.0.0.1:46015/legacy-tile
+GET
+2
+User-Agent: Ridgeline-Native/0.1.0
+Accept-Encoding: gzip
+HTTP/1.1 200 OK
+6
+Cache-Control: public, max-age=2147483647
+Vary: Accept-Encoding, User-Agent
+Content-Length: 38
+Connection: close
+OkHttp-Sent-Millis: 1793515626464
+OkHttp-Received-Millis: 1793515626466
