@@ -1,5 +1,10 @@
 # Remaining differences from the MapLibre-based app, native 0.1.4
 
+**Follow-up:** measured surface focus was implemented in 0.1.5. This is a
+historical 0.1.4 comparison. The GPU-budget row below is corrected after tracing
+the Android JNI call to coordinated retention; see the
+[application-wide audit](FULL-APP-PERFORMANCE-AUDIT-2026-11-01.md).
+
 The user confirms the APK installs, but new-area imagery still stalls while
 coarse coverage is visible. Previous host reproductions establish individual
 delay mechanisms; they do not establish the root cause of that phone symptom.
@@ -19,7 +24,7 @@ Ridgeline's adapters around MapLibre, rather than unmodified upstream MapLibre.
 | Elevation-aware tile covering | The packaged engine's tile-bounds code calls `terrain.getMinMaxElevation(...)` and uses returned bounds when available. Its cover/LOD operates through the terrain-aware hierarchy. | Every planned candidate is tested using the same conservative -100..4000 m prism, even after relevant terrain has loaded. | Conservative false positives can retain/request tiles whose actual terrain is off screen. Do not fix this by guessing a lower maximum: real height bounds need to reach selection. |
 | One coherent covering/retention policy | Tile managers maintain in-view tiles, retained parents/children, source load states and out-of-view caches; app adapters order these using surface focus and readiness. | Independent geometry/image plans are augmented with hand-ranked parents: focus parent, four nearby leaves, remaining parents, remaining leaves. Network, CPU and upload stages then apply their own admission decisions. | A local priority fix does not guarantee that the next completed job improves the visible blurry patch. A richer per-tile state/relevance model is still needed. |
 | Error recovery | `tile-retry.js` excludes 401/403/404 and aborts, honors retry metadata, and bounds attempts by source-manager lifetime/time window. | Generic task failures use 1 s, 4 s, then 15 s backoff; individual failures are not exposed in the queue snapshot. An unrelated successful upload clears the status message. | A source/decode/preparation error can resemble a loading stall. A 15 s backoff is a concrete candidate, not evidence that it occurred on the user's phone. |
-| Residency accounting | Raster/DEM/drape adapters use byte budgets, protect live dependencies and keep bounded off-screen work according to resource state. | Retained CPU payloads have byte budgets, but Android sets renderer GPU residency largely through tile-count budgets. Native has ancestors, sharper descendants and bounded parked work already. | Eviction/working-set decisions differ. This can affect memory pressure/churn, but a larger cache alone is not a cold-area fix. |
+| Residency accounting | Raster/DEM/drape adapters use byte budgets, protect live dependencies and keep bounded off-screen work according to resource state. | Retained CPU payloads have byte budgets; Android JNI enables a coordinated GPU payload-byte target plus count caps. Native has ancestors, sharper descendants and bounded parked work already. | Remaining gaps concern combined active-work accounting, physical page allocation and eviction policy; GPU byte budgeting is already implemented. |
 | Per-tile diagnosis | `tile-trace.js` records queue, fetch headers/body, decode, transform, adoption/upload and draw stages, with source/tile correlation. | Loading diagnostics exposes useful aggregate logical/underlying HTTP, CPU/GPU queue counts and some HTTP timings. It cannot trace a particular blurry patch to its blocking dependency and first draw. | This is why earlier fixes cannot yet be called a complete diagnosis. Instrumenting a selected stalled tile should precede another speculative concurrency change. |
 
 The source selector's focus and elevation inputs are the most important structural

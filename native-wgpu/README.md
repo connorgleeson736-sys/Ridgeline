@@ -1,5 +1,10 @@
 # Ridgeline native migration — in progress
 
+[Application-wide performance audit, 1 November 2026](research/FULL-APP-PERFORMANCE-AUDIT-2026-11-01.md):
+23 ranked findings, pinned code evidence and current research. Report only;
+the latest APK remains 0.1.5. Main next candidates are raw local-I/O isolation,
+GPU upload acknowledgement, classified recovery and per-tile critical-path tracing.
+
 Latest APK: **[0.1.5 Surface Focus Base](checkpoints/README.md)**, source `b0d76de`.
 Both source plans now prioritize the actual centre-ray terrain intersection,
 separately from the navigation pivot. CPU picking is reused; unavailable or

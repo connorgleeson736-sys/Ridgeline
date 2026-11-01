@@ -1,5 +1,30 @@
 # Durable progress log
 
+## 2026-11-01 — application-wide performance audit delivered
+
+Surface-focus 0.1.5 implementation/APK already complete at publication8c06ca6,
+sourceb0d76de. User then requested a full audit and cutting-edge research report.
+Reviewed startup/lifecycle/input/selection/IO/decode/caches/storage/offline/GPU/
+memory/presentation/UI/build paths; inventoried63production source/shader/manifest
+files. No application code changes or new tests for the audit; no phone timing.
+
+Report: native-wgpu/research/FULL-APP-PERFORMANCE-AUDIT-2026-11-01.md.
+23ranked findings with pinned anchors/source hashes and CSV in
+native-wgpu/validation/full-audit-2026-11-01. Key verified paths: direct attached
+ZIP/asset reads on image workers, GPU queue item removed before a failed upload
+without requeue, generic1/4/15s retries, saved-reader/writer common monitor,
+irreversible12msderived-cache miss, broadheightprisms, discarded offline image
+composition, startup GPU diagnostic indefinite waits. Conditions and phone
+frequency remain unmeasured; these are not claims of the user's root cause.
+
+Research assessed dependency-aware visual-benefit scheduling, measured bounds,
+pipeline caches/binaries, batched mip submissions/staging, QUIC/Cronet, virtual
+texturing/visibility feedback, optional Vulkan features, ADPF/pacing, profiles/PGO.
+Report includes compatibility/quality constraints and smallest useful checks.
+Corrected earlier GPU-budget claim: Android already calls coordinated byte
+retention. Perfetto FrameTimeline requires Android12+ and retrieved docs warn
+about SurfaceView support; it is not automatic native-map FPS instrumentation.
+
 ## 2026-11-01 — measured visible-surface detail focus
 
 User explicitly selected implementing MapLibre-style focus on the terrain face
