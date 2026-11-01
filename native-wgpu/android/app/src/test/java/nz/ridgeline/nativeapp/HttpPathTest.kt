@@ -182,4 +182,23 @@ class HttpPathTest {
    }finally{release.countDown();holder.join(1000);close(client,backend);dir.deleteRecursively()}
   }
  }
+ @Test fun pendingPublicationUsesSdkFreshnessAndMustRevalidateRules(){
+  val dir=Files.createTempDirectory("pending-policy").toFile();val cache=Cache(dir,1_048_576);val publisher=HttpCachePublisher(cache)
+  val disk=cache.javaClass.getDeclaredField("cache").apply{isAccessible=true}.get(cache)!!
+  val entered=CountDownLatch(1);val release=CountDownLatch(1)
+  val holder=Thread{synchronized(disk){entered.countDown();release.await(3,TimeUnit.SECONDS)}}.apply{start()}
+  try{
+   assertTrue(entered.await(1,TimeUnit.SECONDS))
+   for((i,policy)in listOf("public, max-age=0","public, max-age=0, must-revalidate","no-cache","no-store").withIndex()){
+    val request=Request.Builder().url("http://policy.fixture.invalid/$i").build()
+    val now=System.currentTimeMillis()
+    val response=Response.Builder().request(request).protocol(Protocol.HTTP_1_1).code(200).message("OK")
+     .header("Cache-Control",policy).sentRequestAtMillis(now-2000).receivedResponseAtMillis(now-1000).build()
+    publisher.publish(response,TileBody(byteArrayOf(1),200,0))
+    assertNull(publisher.lookup(ResourceKey(request.url.toString(),false)))
+    if(i==0)assertNotNull(publisher.lookup(ResourceKey(request.url.toString(),true)))
+    else assertNull("Offline max-stale cannot override $policy",publisher.lookup(ResourceKey(request.url.toString(),true)))
+   }
+  }finally{release.countDown();holder.join(1000);publisher.close();publisher.awaitClosed();cache.close();dir.deleteRecursively()}
+ }
 }

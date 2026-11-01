@@ -19,8 +19,8 @@ internal class HttpCachePublisher(private val cache:Cache?,private val byteLimit
     fun lookup(key:ResourceKey):TileBody?=synchronized(lock){
         val row=pending[key.url]?:return@synchronized null
         if(row.body.status !in 200..299&&row.body.status!=404)return@synchronized null
-        if(key.offline&&!row.response.cacheControl.noCache)row.body.copy(until=Long.MAX_VALUE)
-        else row.body.takeIf{it.until>System.currentTimeMillis()}
+        if(!OkHttpCacheAccess.usable(row.response,key.offline))return@synchronized null
+        if(key.offline)row.body.copy(until=Long.MAX_VALUE)else row.body
     }
     /** Runs only on the bounded local-I/O workers. Retain standard OkHttp
      * conditional validation for existing stale/no-cache entries. */

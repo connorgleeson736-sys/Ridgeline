@@ -2,6 +2,7 @@ package nz.ridgeline.nativeapp;
 
 import java.io.IOException;
 import okhttp3.Cache;
+import okhttp3.CacheControl;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.internal.cache.CacheRequest;
@@ -14,6 +15,12 @@ import okio.Okio;
 final class OkHttpCacheAccess {
     static boolean cacheable(Response response) {
         return CacheStrategy.Companion.isCacheable(response, response.request());
+    }
+    static boolean usable(Response response, boolean offline) {
+        CacheControl policy = offline ? CacheControl.FORCE_CACHE : new CacheControl.Builder().onlyIfCached().build();
+        Request request = response.request().newBuilder().cacheControl(policy).build();
+        CacheStrategy strategy = new CacheStrategy.Factory(System.currentTimeMillis(), request, response).compute();
+        return strategy.getCacheResponse() != null && strategy.getNetworkRequest() == null;
     }
     static boolean contains(Cache cache, Request request) throws IOException {
         try (Response response = cache.get$okhttp(request)) { return response != null; }

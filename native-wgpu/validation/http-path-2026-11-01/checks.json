@@ -7,7 +7,7 @@
   "okhttpAfter": "5.3.2",
   "compatibleSdk": 36,
   "whyNotNewest": "5.5.1 Android variant requires compileSdk37; kept the existing SDK36/AGP toolchain.",
-  "focusedJvmTestsPassed": 7,
+  "focusedJvmTestsPassed": 8,
   "additionalBurstRegressionRerun": true,
   "fullSuiteOrLintRun": false,
   "covered": [
@@ -18,7 +18,8 @@
     "50-download cache publication burst with cache held and zero transport RAM; all50persist across reopen",
     "retired canceled-call queue isolation",
     "50 real simultaneous HTTP downloads on both existing paths",
-    "phase probe identifies non-wire cache wait; cache hits do not count as wire bytes; diagnostics omit query credentials"
+    "phase probe identifies non-wire cache wait; cache hits do not count as wire bytes; diagnostics omit query credentials",
+    "pending handoff uses SDK freshness; offline max-stale cannot override must-revalidate/no-cache/no-store"
   ],
   "cache": {
     "sameOriginalAutomaticHttpCacheBudget": true,
@@ -31,12 +32,6 @@
     "cacheFormatVersion": 201105
   },
   "primarySources": [
-    {
-      "url": "https://square.github.io/okhttp/features/fast_fallback/"
-    },
-    {
-      "url": "https://square.github.io/okhttp/features/caching/"
-    },
     {
       "url": "https://repo.maven.apache.org/maven2/com/squareup/okhttp3/okhttp-jvm/5.3.2/okhttp-jvm-5.3.2-sources.jar",
       "sourceFiles": [
@@ -65,6 +60,12 @@
           "sha256": "b3ae8cd4d79338e3def08e73c45bec3d3acc3398e5f40b7608f3c2f38a4fb768"
         }
       ]
+    },
+    {
+      "url": "https://datatracker.ietf.org/doc/html/rfc6555"
+    },
+    {
+      "url": "https://www.rfc-editor.org/rfc/rfc9111.html"
     }
   ],
   "legacyProducer": {
