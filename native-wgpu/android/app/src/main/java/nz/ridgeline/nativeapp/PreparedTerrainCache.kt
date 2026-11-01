@@ -12,6 +12,7 @@ import java.util.zip.Deflater
  * and file I/O never own the LRU monitor; replacements are atomic. */
 internal class PreparedTerrainCache(private val directory:File,private val limit:Long,namespace:String,private val payloadBytes:Int=129*129*4+16) {
     data class Dependency(val id:GpuUploadQueue.Id,val fingerprint:String,val until:Long=0,val resourceKey:String="")
+    data class Entry(val payload:ByteBuffer,val dependencies:List<Dependency>)
     private val prefix=digest(namespace.toByteArray()).take(16)
     private val entries=LinkedHashMap<File,Long>(16,.75f,true)
     private var bytes=0L
@@ -25,7 +26,9 @@ internal class PreparedTerrainCache(private val directory:File,private val limit
     private fun remove(file:File){entries.remove(file)?.let{bytes-=it};file.delete()}
     private fun trim(){while(bytes>limit&&entries.isNotEmpty())remove(entries.keys.first())}
     fun get(id:GpuUploadQueue.Id,validate:(Dependency)->Boolean):ByteBuffer?=getChecked(id){it.all(validate)}
-    fun getChecked(id:GpuUploadQueue.Id,validate:(List<Dependency>)->Boolean):ByteBuffer? {
+    fun getChecked(id:GpuUploadQueue.Id,validate:(List<Dependency>)->Boolean):ByteBuffer?=getEntryChecked(id,validate)?.payload
+    fun getEntry(id:GpuUploadQueue.Id,validate:(Dependency)->Boolean):Entry?=getEntryChecked(id){it.all(validate)}
+    private fun getEntryChecked(id:GpuUploadQueue.Id,validate:(List<Dependency>)->Boolean):Entry? {
         val file=path(id)
         synchronized(this){if(entries[file]==null)return null}
         val raw=try{file.inputStream().buffered()}
@@ -45,7 +48,7 @@ internal class PreparedTerrainCache(private val directory:File,private val limit
                 val size=input.readInt();require(size==payloadBytes)
                 ByteArray(size).also{input.readFully(it);require(input.read()==-1)}
             }catch(_:Exception){synchronized(this){remove(file)};return null}
-            return ByteBuffer.allocateDirect(payload.size).order(ByteOrder.LITTLE_ENDIAN).apply{put(payload);rewind()}
+            return Entry(ByteBuffer.allocateDirect(payload.size).order(ByteOrder.LITTLE_ENDIAN).apply{put(payload);rewind()},dependencies)
         }finally{runCatching{input.close()}}
     }
 

@@ -8,7 +8,7 @@
     "capacitor": "0.18.0-performance",
     "capacitorSource": "d880143418ac46ece98adff0b3b2fbaedf044d46"
   },
-  "jvmTestsPassed": 6,
+  "jvmTestsPassed": 9,
   "fullSuiteOrLintRun": false,
   "changedPathChecks": [
     "original local I/O isolation/latency",
@@ -16,7 +16,10 @@
     "GPU upload retry ownership, bounded delays, head skipping and stale acknowledgements",
     "existing live upload rank ordering",
     "existing prepared-buffer coalescing",
-    "offline lookahead, cancellation closure, bounded background admission and zero-RAM reuse"
+    "offline lookahead, cancellation closure, bounded background admission and zero-RAM reuse",
+    "late prepared hit versus a 350ms source fallback using an actual lossless cache file",
+    "current validity rechecked at late adoption, rejected hits cannot cause a busy wake loop, cancellation retains actual reader permits",
+    "legacy deadline-only cache read behavior remains compatible"
   ],
   "gpu": {
     "fixture": "upload_batch_bench",
@@ -59,5 +62,19 @@
       "title": "Cesium Native selection/load/render separation",
       "url": "https://cesium.com/learn/cesium-native/ref-doc/selection-algorithm-details.html"
     }
-  ]
+  ],
+  "latePreparedCache": {
+    "deadlineMs": 12,
+    "readerThreads": 2,
+    "unchangedOutstandingCapacity": 16,
+    "validateOnAdoption": [
+      "current operation eligibility",
+      "current imagery attachment generation when applicable",
+      "current dependency fingerprint and expiry"
+    ],
+    "cancelsOnlyThisConsumersSourceLeases": true,
+    "cpuCheckpointsCanAdoptDuringRebuild": true,
+    "firstReadyFallbackWaitCanWakeOnLateHit": true,
+    "over200msFixtureSaved": 321.23701700000004
+  }
 }
