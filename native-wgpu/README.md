@@ -5,7 +5,21 @@
 the audited APK was 0.1.5. Main next candidates are raw local-I/O isolation,
 GPU upload acknowledgement, classified recovery and per-tile critical-path tracing.
 
-Latest APK: **[0.1.7 Latency Base](checkpoints/README.md)**, source `36f9477`.
+Latest APK: **[0.1.8 HTTP Latency Base](checkpoints/README.md)**, source `9b7e82f`.
+Cold HTTP responses now reach decoding before their full-size disk-cache writes.
+OkHttp 5.3.2 races alternative connection addresses after 250 ms, so an
+unresponsive first address need not block a working route. Loading diagnostics
+separates DNS, connection/TLS, provider headers, wire reads and cache processing,
+and shows observed body throughput. Existing cache entries remain readable.
+
+Controlled real-HTTP host fixtures save **503 ms** under a 500 ms cache hold and
+**400 ms** with an unresponsive first address. These do not establish the cause
+of the phone's five-second waits. Eight focused JVM checks pass; same package/key
+for updates, all 618 original assets and three optimized native libraries
+unchanged. No broad suite/lint or phone benchmark.
+[Implementation, results and remaining HTTP limits](research/HTTP-LATENCY-2026-11-01.md).
+
+Previous 0.1.7 Latency Base, source `36f9477`:
 Original file I/O yields before CPU decoding; revalidated late prepared-cache hits
 can beat source rebuilding; saved WAL readers bypass both application and inherited
 helper locks. Offline source lookahead and independent region queries remove

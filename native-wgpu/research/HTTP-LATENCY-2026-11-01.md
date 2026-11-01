@@ -1,6 +1,6 @@
 # HTTP latency investigation and implementation — native 0.1.8
 
-**1 November 2026, Australia/Melbourne.** Baseline: native 0.1.7, source
+**1 November 2026, UTC.** Baseline: native 0.1.7, source
 `36f94778587447c5519623bea318f2d0e0b5e072`. Final source and installer hashes
 are pinned in the accompanying release record. This pass changes HTTP/cache
 delivery and diagnostics; imagery/terrain pixels, renderer, source selection,
@@ -162,7 +162,8 @@ JVM platform for these fixtures. No physical Android TLS/network execution is
 claimed. Source and results are in
 [http-path-2026-11-01](../validation/http-path-2026-11-01/checks.json).
 
-The APK reuses all three optimized 0.1.7 native libraries and the original assets.
+The APK reuses all three optimized 0.1.7 native libraries and all 618 original
+assets byte-for-byte. The upgraded SDK adds its public-suffix database asset.
 Package/signature/alignment and downloaded-byte verification accompany it.
 
 Connection prewarming was also inspected. The compatible stable connection-pool

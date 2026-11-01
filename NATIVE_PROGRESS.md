@@ -1,5 +1,51 @@
 # Durable progress log
 
+## 2026-11-01 — HTTP-specific latency improvements, APK 0.1.8
+
+Investigated HTTP intervals sometimes exceeding five seconds. Found synchronous
+OkHttp cache metadata/body writes after provider headers, beyond the earlier
+local-cache escape deadline. Genuine cold misses now deliver through the
+cache-free client, then publish asynchronously into the same full-size HTTP
+cache. One background-priority writer, 512 queued jobs and 8 MiB aggregate payload
+cap; temporary handoff bytes remain reusable even with retained RAM at zero.
+Stale entries retain standard conditional validation and may still incur SDK
+cache writes; diagnostics now exposes that remaining path.
+
+Upgraded OkHttp 4.12.0 to compatible 5.3.2 with fast fallback explicitly enabled.
+Alternative TCP addresses race after 250 ms; losing attempts cancel without
+duplicate tile HTTP requests. Inspected 5.5.1 but it requires compileSdk37; kept
+SDK36 and existing TLS/proxy/hostname verification. No forced IPv4 or speculative
+duplicate-request hedge. Safe public preconnect API absent in the pinned version.
+
+Phase metrics distinguish dispatch/cache, DNS, connect including TLS, TLS,
+provider headers, raw-source reads and outer cache/body processing. Fixed-size
+body-rate buckets report observed payload throughput over about five seconds.
+Oldest uncanceled phase plus latest/longest records and cache-publication counts
+appear in the scrollable/copyable Loading diagnostics. Queries/credentials omitted.
+
+Three alternating real-loopback HTTP pairs each: 500 ms cache-monitor hold after
+headers gives 505.143→2.557 ms (502.587 ms saved); injected 650 ms unresponsive
+first socket with working second address gives 651.938→251.875 ms (400.063 ms
+saved). Same bytes, one actual GET per trial. Host fixtures do not identify the
+cause or prove the magnitude of the user's phone stall.
+
+Eight distinct focused JVM checks pass; no broad suite/lint or phone run.
+Checks cover actual 4.12 disk-cache compatibility/readability, freshness, ETag/304,
+Vary, gzip/chunked gzip, redirects, no-store, pending must-revalidate policy,
+retired HTTP calls and all 50 responses persisting across a held-cache burst.
+Pinned internal cache ABI is isolated in a Java adapter, with upgrade checks.
+Failed buffered writes abort instead of committing a partial body.
+
+Final app source9b7e82fbe9e33dce2f70c81d1ab80624f7bd1f83. APK
+Ridgeline-Native-HTTP-Latency-0.1.8-Base.apk, code9,32,219,650bytes,
+SHA2567b6934099becce7b93eefb0be9923028be9e8709b203243f31534a697f5454fe.
+Same Performance package/key, in-place update over0.1.2–0.1.7. Signature and
+ZIP16KiB/ELF alignment verified; all618original assets and3native libraries
+byte-identical to0.1.7. SDK adds PublicSuffixDatabase.list. No sessionCA/WebView/
+bigpacks; renderer/detail/route planning unchanged. Report/validation:
+native-wgpu/research/HTTP-LATENCY-2026-11-01.md and
+native-wgpu/validation/http-path-2026-11-01/release.json.
+
 ## 2026-11-01 — eight pipeline/latency improvements, APK 0.1.7
 
 User asked for continuing broad performance work, then prioritized improvements

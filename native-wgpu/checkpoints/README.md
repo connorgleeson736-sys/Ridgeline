@@ -1,6 +1,34 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.7 Latency Base APK — 32.1 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-Latency-0.1.7-Base.apk)**.
+Latest: **[Download 0.1.8 HTTP Latency Base APK — 32.2 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-HTTP-Latency-0.1.8-Base.apk)**.
+Source `9b7e82fbe9e33dce2f70c81d1ab80624f7bd1f83`, version code 9. Same Native
+Performance package and signer; installs over 0.1.2–0.1.7 preserving data.
+
+Cold HTTP responses reach decoding before publication into the existing full-size
+disk cache. Pending bytes remain reusable during publication, including at zero
+retained RAM. OkHttp 5.3.2 starts an alternative connection address after 250 ms
+and cancels losing attempts. Existing 4.12 cache files remain readable, and stale
+responses retain the SDK's conditional-validation policy.
+
+Controlled real-HTTP host fixtures: cache-publication delay **505.143 → 2.557 ms**;
+unresponsive first address **651.938 → 251.875 ms**. Three alternating pairs each,
+same bytes and one actual GET per trial. These reproduce avoidable waits rather
+than establish the cause or magnitude of the phone's five-second HTTP stalls.
+Loading diagnostics now reports DNS, connect/TLS, provider headers, raw wire
+reads, cache/body processing and observed payload rate over about five seconds.
+
+Eight distinct focused JVM checks pass, covering caching policy, redirects,
+gzip/chunked bodies, old-cache compatibility, retired-call isolation and 50-job
+bursts. Signature, package/version and ZIP/ELF alignment verified. All 618 original
+assets and three optimized native libraries match 0.1.7 byte-for-byte; the SDK
+adds its public-suffix database asset. No broad suite/lint or physical-device run.
+[HTTP report and limits](../research/HTTP-LATENCY-2026-11-01.md) ·
+[Exact release record](../validation/http-path-2026-11-01/release.json) ·
+[SHA-256](Ridgeline-Native-HTTP-Latency-0.1.8-Base.apk.sha256).
+
+## Previous 0.1.7 latency checkpoint
+
+**[Download 0.1.7 Latency Base APK — 32.1 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-Latency-0.1.7-Base.apk)**.
 Source `36f94778587447c5519623bea318f2d0e0b5e072`, version code 8. Same Native
 Performance package and signer; installs over 0.1.2–0.1.6 preserving data.
 
