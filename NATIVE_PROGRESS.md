@@ -1,6 +1,6 @@
 # Durable progress log
 
-## 2026-11-02 — Capacitor UI/layers/route migration source complete
+## 2026-11-02 — Capacitor UI/layers/route checkpoint APK 0.1.9
 
 Latest user explicitly requests the Capacitor UI, all route features and every
 map layer, and specifically asks to modify the existing route editor directly.
@@ -12,11 +12,18 @@ One shared/background MVT stream, native cached font atlas, useful cached parent
 disabled-layer skipping; cached instanced line batches use6x fewer upload bytes.
 Profiles stay background and refine from resident realDEM without extraHTTP.
 11unique focused JVM checks, finalKotlin compile, hostRust releasecheck and actual
-Vulkan/GLES graphics fixtures pass. Original618source assets preserved. Android
-JNI builds and final packaging follow this source checkpoint; no device connected.
+Vulkan/GLES graphics fixtures pass. All3optimized AndroidJNI releasebuilds pass.
+FinalAPK source d258866d31509174c01aa0022094015d687566c2, code10,
+Ridgeline-Native-UI-Layers-0.1.9-Base.apk,32,513,845bytes,
+SHA2566faf1d0b4f0466834048859781aeb3fb05aaff236404935d2bfdf1102ebedf23.
+Same Performance package/key; all619baseline APK assets byte-identical (618source
+plusSDKpublic-suffix data); adds onlystyleJSON/boundaryGeoJSON. Signature and
+ZIP/ELF16KiB alignment,33JNIexports perABI, native-only payload pass. No sessionCA,
+WebView or largepacks. No device connected; no phone speed/interaction claim.
 Report: native-wgpu/research/UI-LAYERS-MIGRATION-2026-11-02.md. Remaining native
 font/line-label differences, dense3D drape costs and unported paper-frame/PDF
 offline workflows are explicit. Do not claim full-app/device/pixel-perfect parity.
+Exact record: native-wgpu/validation/ui-layers-2026-11-01/release.json.
 
 ## 2026-11-01 — HTTP-specific latency improvements, APK 0.1.8
 

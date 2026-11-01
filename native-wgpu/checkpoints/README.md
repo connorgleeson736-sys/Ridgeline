@@ -1,6 +1,34 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.8 HTTP Latency Base APK — 32.2 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-HTTP-Latency-0.1.8-Base.apk)**.
+Latest: **[Download 0.1.9 UI and Layers Base APK — 32.5 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-UI-Layers-0.1.9-Base.apk)**.
+Source `d258866d31509174c01aa0022094015d687566c2`, version code 10. Same Native
+Performance package and signer; updates 0.1.2–0.1.8 in place, preserving app data.
+
+Native map controls, route drawer and two-stop sheet now follow Capacitor 0.18.0.
+The existing route editor gains gated direct waypoint dragging, single-step
+drag undo, ordered route combination/reversal, multiple opened routes, chart
+inspection/ranges and GPX sharing. All map-layer groups are present, including
+Aerial/Satellite/NZ Topo, names/peaks/roads/tracks/huts/contours/boundary, natural
+colour, hillshade, relief and sky. Detail, download-job and cache controls remain.
+
+Unshaded 2D skips DEM/halo requests and uses planar selection. A shared background
+vector stream, cached native font atlas, parent/child cover and disabled-layer
+skipping bound extra map work. Instanced lines use 29,952 → 4,992 upload bytes
+with identical pixels in the host graphics fixture. Real-MVT names-only decode
+median is 2.414 → 0.063 ms in the controlled host case; not phone FPS/latency.
+
+Eleven targeted JVM checks and Vulkan/GLES graphics fixtures pass; all three
+optimized Android ABIs rebuilt. Signature, package/version, ZIP/ELF 16 KiB
+alignment, every JNI export and original assets verified. No full suite/lint or
+physical-device run. Native fonts/horizontal line labels approximate MapLibre;
+native offline forms remain, with paper-frame/Topo PDF outside this checkpoint.
+[Scope, measurements and remaining differences](../research/UI-LAYERS-MIGRATION-2026-11-02.md) ·
+[Exact release record](../validation/ui-layers-2026-11-01/release.json) ·
+[SHA-256](Ridgeline-Native-UI-Layers-0.1.9-Base.apk.sha256).
+
+## Previous 0.1.8 HTTP checkpoint
+
+**[Download 0.1.8 HTTP Latency Base APK — 32.2 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-HTTP-Latency-0.1.8-Base.apk)**.
 Source `9b7e82fbe9e33dce2f70c81d1ab80624f7bd1f83`, version code 9. Same Native
 Performance package and signer; installs over 0.1.2–0.1.7 preserving data.
 

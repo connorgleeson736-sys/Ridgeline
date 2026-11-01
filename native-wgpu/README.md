@@ -5,7 +5,25 @@
 the audited APK was 0.1.5. Main next candidates are raw local-I/O isolation,
 GPU upload acknowledgement, classified recovery and per-tile critical-path tracing.
 
-Latest APK: **[0.1.8 HTTP Latency Base](checkpoints/README.md)**, source `9b7e82f`.
+Latest APK: **[0.1.9 UI and Layers Base](checkpoints/README.md)**, source `d258866`.
+Capacitor-style map controls, route drawer and sheet, direct waypoint editing,
+ordered route combination, chart inspection, GPX sharing and every map-layer
+group now use the native renderer. Aerial, Satellite and NZ Topo, names, peaks,
+roads, tracks, huts, contours, imagery boundary and Advanced controls are included.
+
+Unshaded 2D avoids DEM/halo downloads and uses a planar viewport cover. Cached
+native font atlases avoid remote glyph requests; disabled vector geometry is
+skipped. Shared background source loading and useful parent/child tiles preserve
+imagery priority. Instanced route/layer lines use one sixth of the equivalent
+expanded upload bytes with identical pixels in the controlled fixture.
+
+Eleven focused JVM checks, Kotlin and three Android release builds, plus Vulkan
+and GLES graphics fixtures pass. Same Performance package/key; original assets
+preserved. No physical-device interaction or speed benchmark. Native font/line
+placement and offline paper-frame/PDF differences are documented in the
+[implementation and performance report](research/UI-LAYERS-MIGRATION-2026-11-02.md).
+
+Previous 0.1.8 HTTP Latency Base, source `9b7e82f`:
 Cold HTTP responses now reach decoding before their full-size disk-cache writes.
 OkHttp 5.3.2 races alternative connection addresses after 250 ms, so an
 unresponsive first address need not block a working route. Loading diagnostics

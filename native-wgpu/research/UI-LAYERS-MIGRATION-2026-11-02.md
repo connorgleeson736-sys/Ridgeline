@@ -127,7 +127,9 @@ No full test suite or lint was run for this checkpoint.
 | Instanced vs expanded line rendering | Exact frame pixels; 29,952 → 4,992 uploaded bytes for the same fixture |
 | Full planar vs adaptive planar mesh | Exact checker-image pixels in the 2D fixture |
 | Route cache behavior | Idle and camera pan do not repeat route geometry uploads in the fixture |
-| Original source assets | All 618 original source assets byte-identical to the 0.1.8 APK; packaged SDK asset checked at APK verification |
+| Android release builds | ARM64, ARMv7 and x86-64 optimized/stripped JNI libraries pass; all 33 NativeBridge exports present per ABI |
+| APK verification | Signature/package/version, ZIP/ELF 16 KiB alignment and native-only payload pass; no session CA or large packs |
+| Original assets | All 619 baseline APK assets byte-identical to 0.1.8, including 618 source assets and the SDK public-suffix database |
 | Tile schema migration | Host SQLite original resource bytes and membership preserved; nullable legacy metadata; not Android lifecycle execution |
 
 The real LINZ z12/3983/2600 MVT fixture is 41,926 decompressed bytes with 135
@@ -162,3 +164,9 @@ hash are recorded without credentials.
 
 See the checkpoint README and release JSON for the exact final source, signer,
 APK hash, three ABI build records and packaging results.
+
+Final source and native builds: `d258866d31509174c01aa0022094015d687566c2`.
+APK: `Ridgeline-Native-UI-Layers-0.1.9-Base.apk`, 32,513,845 bytes, code 10,
+SHA-256 `6faf1d0b4f0466834048859781aeb3fb05aaff236404935d2bfdf1102ebedf23`.
+Same `nz.ridgeline.nativeapp.performance` package and existing signer; compatible
+in-place update over 0.1.2–0.1.8. Android OS/device migration behavior is untested.
