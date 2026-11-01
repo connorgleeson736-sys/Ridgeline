@@ -59,6 +59,22 @@ class OfflineUi(private val activity:Activity,root:FrameLayout,private val terra
             })
         }
         content.addView(TextView(activity).apply{text="Higher detail loads finer tiles and uses more memory and data. Changes apply immediately.";textSize=12f})
+        content.addView(TextView(activity).apply{text="Download jobs";textSize=16f})
+        val downloadSliders=LinkedHashMap<DownloadLimits.Mode,SeekBar>()
+        for(mode in DownloadLimits.Mode.entries){
+            val name=when(mode){DownloadLimits.Mode.MOVING->"While moving";DownloadLimits.Mode.STATIONARY->"While stationary";DownloadLimits.Mode.BACKGROUND->"Background"}
+            val label=TextView(activity).apply{textSize=13f}
+            val slider=SeekBar(activity).apply{max=DownloadLimits.MAX-1;progress=loader.downloadJobs(mode)-1;contentDescription="$name download jobs"}
+            fun update(){val jobs=slider.progress+1;label.text="$name: $jobs "+if(jobs==1)"job"else"jobs"}
+            update();downloadSliders[mode]=slider;content.addView(label);content.addView(slider)
+            slider.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener{
+                override fun onProgressChanged(bar:SeekBar?,value:Int,user:Boolean){update();if(user)loader.downloadJobs(mode,value+1)}
+                override fun onStartTrackingTouch(bar:SeekBar?){}
+                override fun onStopTrackingTouch(bar:SeekBar?){}
+            })
+        }
+        content.addView(TextView(activity).apply{text="Simultaneous network downloads, from 1 to 50. Saved automatically and applied immediately; current downloads finish normally. Background jobs are additional. More jobs can use more memory and data.";textSize=12f})
+        content.addView(button("Reset download jobs"){loader.resetDownloadJobs();for((mode,slider)in downloadSliders)slider.progress=loader.downloadJobs(mode)-1})
         val cacheLabel=TextView(activity).apply{textSize=12f}
         val cacheSize=SeekBar(activity).apply{max=1000;progress=loader.automaticCacheMiB;contentDescription="Automatic map cache size in MiB"}
         fun cacheText(){cacheLabel.text="Automatic disk cache: ${cacheSize.progress} MiB maximum · active limit ${loader.automaticCacheBytes/1_048_576} MiB. Adjusted for free storage. Changes apply after restarting the app; 0 disables automatic disk caching. Saved regions and attached ZIPs are separate."}

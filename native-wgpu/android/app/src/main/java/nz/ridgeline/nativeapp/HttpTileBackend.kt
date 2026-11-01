@@ -24,7 +24,7 @@ internal class HttpTileBackend(private val client:OkHttpClient,
     // behind canceled off-screen calls even after transport permits were free.
     // Isolate this bounded queue; retain connection pool, proxy and TLS settings.
     private val directClient=lazy{client.newBuilder().cache(null).dispatcher(Dispatcher().apply{
-        maxRequests=14;maxRequestsPerHost=14 // existing 12 foreground + 2 background maximum
+        maxRequests=DownloadLimits.HTTP_CAPACITY;maxRequestsPerHost=DownloadLimits.HTTP_CAPACITY
     }).build()}
     private val direct by directClient
     override fun network(key:ResourceKey,done:(Result<TileBody>)->Unit):()->Unit {

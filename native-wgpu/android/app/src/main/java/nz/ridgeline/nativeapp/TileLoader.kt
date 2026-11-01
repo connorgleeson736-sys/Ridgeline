@@ -28,6 +28,15 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private data class Source(val id:Id,val geometry:Boolean)
     // Automatic HTTP cache is disposable. Saved regions/packs are never evicted here.
     private val preferences=context.getSharedPreferences("display",0)
+    @Volatile private var downloadLimits=DownloadLimits(preferences.getInt("downloadMoving",DownloadLimits.DEFAULT.moving),preferences.getInt("downloadStationary",DownloadLimits.DEFAULT.stationary),preferences.getInt("downloadBackground",DownloadLimits.DEFAULT.background)).normalized()
+    fun downloadJobs(mode:DownloadLimits.Mode)=downloadLimits.value(mode)
+    fun downloadJobs(mode:DownloadLimits.Mode,value:Int)=setDownloadLimits(downloadLimits.with(mode,value))
+    fun resetDownloadJobs()=setDownloadLimits(DownloadLimits.DEFAULT)
+    private fun setDownloadLimits(value:DownloadLimits){
+        downloadLimits=value.normalized()
+        preferences.edit().putInt("downloadMoving",downloadLimits.moving).putInt("downloadStationary",downloadLimits.stationary).putInt("downloadBackground",downloadLimits.background).apply()
+        transport.limits(downloadLimits)
+    }
     @Volatile private var detailSteps=preferences.getInt("terrainDetail",DetailPolicy.DEFAULT).coerceIn(0,DetailPolicy.MAX) to
         preferences.getInt("imageryDetail",DetailPolicy.DEFAULT).coerceIn(0,DetailPolicy.MAX)
     val terrainDetail get()=detailSteps.first
@@ -51,7 +60,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private val derivedReads=DerivedReadGate()
     private val client = OkHttpClient.Builder()
         .cache(if(automaticCacheBytes>0)Cache(File(context.cacheDir, "native-http-v1"), automaticCacheBytes-preparedBytes)else null)
-        .dispatcher(Dispatcher().apply{maxRequests=32;maxRequestsPerHost=16})
+        .dispatcher(Dispatcher().apply{maxRequests=DownloadLimits.HTTP_CAPACITY;maxRequestsPerHost=DownloadLimits.HTTP_CAPACITY})
         .connectTimeout(12, TimeUnit.SECONDS).readTimeout(15, TimeUnit.SECONDS).build()
     init {
         if(automaticCacheBytes==0L)preparedWrites.execute {
@@ -358,11 +367,13 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         escapeRead={escaped.get(it)},
         escapeWrite={resource,body->if(escapedBytes>0&&!escapedWrites.isShutdown)runCatching{escapedWrites.execute{escaped.put(resource,body)}}},
         offlineRead=offline::read)}
-    private val transport by lazy{TileTransport(backend,ramBudget.encoded)}
+    private val transport by lazy{TileTransport(backend,ramBudget.encoded,initialLimits=downloadLimits)}
     fun loadingDiagnostics():String {
         val counts=transport.stats();val times=transport.latencyStats()
         val http=backend.stats()
+        val limits=transport.limitStats()
         return "Native loading snapshot\n"+
+            "Download limits moving/stationary/background: ${limits["movingLimit"]}/${limits["stationaryLimit"]}/${limits["backgroundLimit"]} · current foreground: ${limits["foregroundLimit"]}\n"+
             "HTTP active/queued: ${counts["networkActive"]}/${counts["networkQueued"]} · local reads queued: ${counts["localQueued"]}\n"+
             "Underlying HTTP running/queued: ${http["httpRunning"]}/${http["httpQueued"]} · canceled but still occupying slots: ${http["retiredHttpRunning"]}/${http["retiredHttpQueued"]}\n"+
             "Isolated escape HTTP running/queued: ${http["escapeRunning"]}/${http["escapeQueued"]}\n"+

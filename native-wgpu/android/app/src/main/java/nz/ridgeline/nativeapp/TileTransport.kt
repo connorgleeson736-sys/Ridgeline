@@ -22,7 +22,8 @@ internal class ResourcePending(val ready:CompletableFuture<*>):RuntimeException(
  * CPU consumers suspend by continuation instead of occupying a decode worker. */
 internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
     private val clock:()->Long=System::currentTimeMillis,private val graceMs:Long=600,
-    private val localWaitMs:Long=40,private val localCooldownMs:Long=30000):AutoCloseable {
+    private val localWaitMs:Long=40,private val localCooldownMs:Long=30000,
+    initialLimits:DownloadLimits=DownloadLimits.DEFAULT):AutoCloseable {
     private val lock=Any()
     private var ramLimit=ramLimit.coerceAtLeast(0)
     fun setRamLimit(limit:Long){synchronized(lock){
@@ -38,7 +39,9 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
     private var nextExpiry=Long.MAX_VALUE
     private fun prune(){val now=clock();if(now<nextExpiry)return;nextExpiry=Long.MAX_VALUE;val it=ram.entries.iterator();while(it.hasNext()){val row=it.next();if(row.value.until<=now){bytes-=row.value.bytes.size;it.remove()}else nextExpiry=minOf(nextExpiry,row.value.until)}}
     private var bytes=0L;private var networkActive=0;private var backgroundActive=0
-    private var foregroundLimit=12;private var closed=false;private var demandBatch=0
+    private var downloadLimits=initialLimits.normalized()
+    private var moving=false
+    private var foregroundLimit=downloadLimits.stationary;private var closed=false;private var demandBatch=0
     private var imageryPending=false
     private val localEpoch=System.nanoTime()
     private fun localNow()=TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-localEpoch)
@@ -160,13 +163,13 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
             for(job in owned.values)reprioritize(job)
         };pump()}
         /** Preserve a returning request only if its whole dependency fan-out
-         * fits the two background slots. One DEM job can own several transfers. */
+         * fits the configured background cap. One DEM job can own several transfers. */
         fun park():Boolean {
             synchronized(lock){
                 if(released||closed)return false
                 val extra=owned.values.count{job->job.phase==Phase.NETWORK&&!job.background&&
                     job.users.none{it!==this&&!it.speculative}}
-                if(backgroundActive+extra>2)return false
+                if(backgroundActive+extra>downloadLimits.background)return false
                 priority=1000;speculative=true
                 for(job in owned.values)reprioritize(job)
             }
@@ -224,10 +227,11 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
     }
     fun consumer(priority:Int=0,speculative:Boolean=false,imagery:Boolean=false)=Consumer(priority,speculative,imagery)
     /** Publish before CPU work can fan out DEM dependencies. Keep two existing
-     * foreground slots available for sharper images until visible demand is
+     * foreground slots (when the limit permits) available for sharper images until visible demand is
      * satisfied; no extra connections or cancellation of shared terrain work. */
     fun imageryDemand(pending:Boolean){synchronized(lock){imageryPending=pending};pump()}
-    fun movement(moving:Boolean){synchronized(lock){val next=if(moving)8 else 12;if(next==foregroundLimit)return;foregroundLimit=next};pump()}
+    fun limits(value:DownloadLimits){synchronized(lock){downloadLimits=value.normalized();foregroundLimit=if(moving)downloadLimits.moving else downloadLimits.stationary};pump()}
+    fun movement(value:Boolean){synchronized(lock){if(moving==value)return;moving=value;foregroundLimit=if(moving)downloadLimits.moving else downloadLimits.stationary};pump()}
     private fun abandon(job:Job){
         val cancel=synchronized(lock){
             if(job.users.isNotEmpty()||job.phase==Phase.DONE||job.stopped)return
@@ -249,15 +253,17 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
         synchronized(lock){
             if(closed||demandBatch>0)return
             while(true){
-                if(networkActive>=foregroundLimit+2)break
+                if(networkActive>=foregroundLimit+downloadLimits.background)break
                 var best:Job?=null;var bestRank=Int.MAX_VALUE
                 val reserve=imageryPending||jobs.values.any{it.phase!=Phase.DONE&&it.imagery()}
                 val nonImageActive=if(reserve)jobs.values.count{it.phase==Phase.NETWORK&&!it.background&&!it.imagery()}else 0
+                val imageReserve=minOf(2,(foregroundLimit-1).coerceAtLeast(0))
                 // One scan, no temporary filtered lists per admitted transfer.
                 for(candidate in jobs.values){
                     if(candidate.phase!=Phase.QUEUED||candidate.stopped||candidate.users.isEmpty())continue
-                    if(if(candidate.speculative())backgroundActive>=2 else networkActive-backgroundActive>=foregroundLimit)continue
-                    if(reserve&&!candidate.speculative()&&!candidate.imagery()&&nonImageActive>=foregroundLimit-2)continue
+                    if(if(candidate.speculative())backgroundActive>=downloadLimits.background else networkActive-backgroundActive>=foregroundLimit)continue
+                    // A one-slot setting must still allow terrain to progress.
+                    if(reserve&&!candidate.speculative()&&!candidate.imagery()&&nonImageActive>=foregroundLimit-imageReserve)continue
                     val rank=candidate.rank()
                     if(best==null||rank<bestRank){best=candidate;bestRank=rank}
                 }
@@ -316,6 +322,7 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
             "oldestActiveHttpMs" to (jobs.values.filter{it.phase==Phase.NETWORK}.maxOfOrNull{TimeUnit.NANOSECONDS.toMillis(now-it.networkNs)}?:0L),
             "oldestWaitingMs" to (jobs.values.filter{it.phase==Phase.QUEUED||it.phase==Phase.LOCAL}.maxOfOrNull{TimeUnit.NANOSECONDS.toMillis(now-it.createdNs)}?:0L))
     }
+    fun limitStats():Map<String,Long> = synchronized(lock){mapOf("movingLimit" to downloadLimits.moving.toLong(),"stationaryLimit" to downloadLimits.stationary.toLong(),"foregroundLimit" to foregroundLimit.toLong(),"backgroundLimit" to downloadLimits.background.toLong())}
     fun awaitClosed(){local.awaitTermination(5,TimeUnit.SECONDS);timers.awaitTermination(5,TimeUnit.SECONDS)}
     override fun close(){
         val rows=synchronized(lock){if(closed)return;closed=true;localWatchEpoch++;localWatch?.cancel(false);localWatch=null;val rows=jobs.values.toList();for(job in rows){job.stopped=true;job.expiry?.cancel(false)};jobs.clear();ram.clear();metadata.clear();bytes=0;rows}
