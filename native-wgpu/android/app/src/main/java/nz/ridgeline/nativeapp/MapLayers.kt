@@ -23,7 +23,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
     private var lastKey:Any?=null;private var lastLabels=emptyList<TopographyStyle.Label>();private var atlas=NativeLabelAtlas.empty()
     private var lastLines=emptyList<TopographyStyle.Line>();private var linePacket=ByteBuffer.allocateDirect(4).order(ByteOrder.LITTLE_ENDIAN).apply{putInt(0);rewind()}
     private val plan=ByteBuffer.allocateDirect(32*12).order(ByteOrder.LITTLE_ENDIAN)
-    private var boundary:List<List<VectorTile.Point>>?=null
+    private var boundary:BoundaryIndex?=null
     @Volatile private var diagnostics="Map layers: waiting for view"
     private var decoded=0L;private var lastDecodeMs=0L;private var lastBuildMs=0L;private var lastAtlasMs=0L
     private var displayState=loader.mapSettings.state
@@ -112,8 +112,8 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
             labels.addAll(output.labels.filter{it.point.x>=b[0]&&it.point.x<b[2]&&it.point.y>=b[1]&&it.point.y<b[3]})
         }
         if(state.borders&&state.base==MapSettings.Base.LINZ&&zoom>=8){
-            val parts=boundary?:readBoundary().also{boundary=it}
-            for(id in ordered)for(path in parts)for(clipped in clip(path,id.bounds)){
+            val parts=boundary?:BoundaryIndex(readBoundary()).also{boundary=it}
+            for(id in ordered)for(clipped in parts.fragments(id)){
                 lines.add(TopographyStyle.Line(clipped,0x8c111111.toInt(),1f,.2f,3.8f))
                 if(zoom>=11&&clipped.size>1){val p=clipped[clipped.size/2];labels.add(TopographyStyle.Label(p,"LINZ imagery | Esri World Imagery",10f,0xffdddddd.toInt(),85.0,key="boundary:${p.x}:${p.y}"))}
             }
@@ -137,15 +137,6 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         val total=lines.sumOf{it.points.size};require(lines.size<=32768&&total<=500000){"Visible vector geometry exceeds safe upload budget"}
         return ByteBuffer.allocateDirect(4+lines.size*20+total*16).order(ByteOrder.LITTLE_ENDIAN).apply{putInt(lines.size);for(line in lines){putInt(line.points.size);putInt(line.color);putFloat(line.width);putFloat(line.dash);putFloat(line.gap);for(p in line.points){putDouble(p.x);putDouble(p.y)}};rewind()}
     }
-    private fun clip(path:List<VectorTile.Point>,box:DoubleArray):List<List<VectorTile.Point>>{
-        val result=ArrayList<List<VectorTile.Point>>();var part=ArrayList<VectorTile.Point>()
-        for(i in 1 until path.size){val a=path[i-1];val b=path[i];val dx=b.x-a.x;val dy=b.y-a.y;var t0=0.0;var t1=1.0
-            fun edge(p:Double,q:Double):Boolean{if(p==0.0)return q>=0;val t=q/p;if(p<0){if(t>t1)return false;t0=max(t0,t)}else{if(t<t0)return false;t1=min(t1,t)};return true}
-            if(edge(-dx,a.x-box[0])&&edge(dx,box[2]-a.x)&&edge(-dy,a.y-box[1])&&edge(dy,box[3]-a.y)){
-                val p=VectorTile.Point(a.x+dx*t0,a.y+dy*t0);val q=VectorTile.Point(a.x+dx*t1,a.y+dy*t1)
-                if(part.isNotEmpty()&&part.last()!=p){if(part.size>1)result.add(part);part=ArrayList()};if(part.isEmpty())part.add(p);part.add(q)
-            }else if(part.isNotEmpty()){if(part.size>1)result.add(part);part=ArrayList()}
-        };if(part.size>1)result.add(part);return result
-    }
+    private fun clip(path:List<VectorTile.Point>,box:DoubleArray)=BoundaryIndex.clip(path,box)
     override fun close(){closed=true;timer?.cancel(false);publication?.cancel(false);retryWake?.cancel(false);lease?.second?.release(true);lease=null;worker.shutdownNow();view.onLayerProjection={_,_->}}
 }

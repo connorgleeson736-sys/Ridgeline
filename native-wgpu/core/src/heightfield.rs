@@ -12,12 +12,24 @@ pub struct Hit {
 }
 pub struct Heightfield {
     cells: usize,
+    valid: [usize; 4],
     heights: Box<[f32]>,
     pub min: f32,
     pub max: f32,
 }
 impl Heightfield {
     pub fn new(cells: usize, heights: Box<[f32]>) -> Result<Self, &'static str> {
+        Self::new_region(cells, heights, [0, 0, cells, cells])
+    }
+    /// Only the measured vertex rectangle can supply bounds, samples or intersections.
+    pub fn new_region(
+        cells: usize,
+        heights: Box<[f32]>,
+        valid: [usize; 4],
+    ) -> Result<Self, &'static str> {
+        if valid[0] >= valid[2] || valid[1] >= valid[3] || valid[2] > cells || valid[3] > cells {
+            return Err("Invalid measured rectangle");
+        }
         if cells == 0
             || cells > 256
             || heights.len() != (cells + 1) * (cells + 1)
@@ -25,14 +37,28 @@ impl Heightfield {
         {
             return Err("Invalid height field");
         }
-        let min = heights.iter().copied().fold(f32::INFINITY, f32::min);
-        let max = heights.iter().copied().fold(f32::NEG_INFINITY, f32::max);
+        let mut min = f32::INFINITY;
+        let mut max = f32::NEG_INFINITY;
+        for y in valid[1]..=valid[3] {
+            for x in valid[0]..=valid[2] {
+                let h = heights[y * (cells + 1) + x];
+                min = min.min(h);
+                max = max.max(h);
+            }
+        }
         Ok(Self {
             cells,
+            valid,
             heights,
             min,
             max,
         })
+    }
+    pub fn complete(&self) -> bool {
+        self.valid == [0, 0, self.cells, self.cells]
+    }
+    pub fn valid_rect(&self) -> [usize; 4] {
+        self.valid
     }
     fn height(&self, x: usize, y: usize) -> f64 {
         self.heights[y * (self.cells + 1) + x] as f64
@@ -59,8 +85,16 @@ impl Heightfield {
         {
             return None;
         }
-        let x = ((u * self.cells as f64).floor() as usize).min(self.cells - 1);
-        let y = ((v * self.cells as f64).floor() as usize).min(self.cells - 1);
+        let n = self.cells as f64;
+        if u < self.valid[0] as f64 / n
+            || u > self.valid[2] as f64 / n
+            || v < self.valid[1] as f64 / n
+            || v > self.valid[3] as f64 / n
+        {
+            return None;
+        }
+        let x = ((u * n).floor() as usize).clamp(self.valid[0], self.valid[2] - 1);
+        let y = ((v * n).floor() as usize).clamp(self.valid[1], self.valid[3] - 1);
         let fx = u * self.cells as f64 - x as f64;
         let fy = v * self.cells as f64 - y as f64;
         Some(if fx + fy <= 1. {
@@ -146,6 +180,16 @@ impl Heightfield {
         {
             return None;
         }
+        let n = self.cells as f64;
+        let clip = [
+            clip[0].max(self.valid[0] as f64 / n),
+            clip[1].max(self.valid[1] as f64 / n),
+            clip[2].min(self.valid[2] as f64 / n),
+            clip[3].min(self.valid[3] as f64 / n),
+        ];
+        if clip[0] >= clip[2] || clip[1] >= clip[3] {
+            return None;
+        }
         if !ray
             .origin
             .iter()
@@ -162,8 +206,12 @@ impl Heightfield {
         )?;
         let p = add(ray.origin, mul(ray.direction, enter));
         let n = self.cells as f64;
-        let mut x = (p[0] * n).floor().clamp(0., n - 1.) as i32;
-        let mut y = (p[1] * n).floor().clamp(0., n - 1.) as i32;
+        let mut x = (p[0] * n)
+            .floor()
+            .clamp(self.valid[0] as f64, self.valid[2] as f64 - 1.) as i32;
+        let mut y = (p[1] * n)
+            .floor()
+            .clamp(self.valid[1] as f64, self.valid[3] as f64 - 1.) as i32;
         let step = |d: f64| {
             if d > 0. {
                 1
@@ -196,7 +244,11 @@ impl Heightfield {
             (1. / n / ray.direction[1]).abs()
         };
         for _ in 0..self.cells * 2 + 2 {
-            if x < 0 || y < 0 || x >= self.cells as i32 || y >= self.cells as i32 {
+            if x < self.valid[0] as i32
+                || y < self.valid[1] as i32
+                || x >= self.valid[2] as i32
+                || y >= self.valid[3] as i32
+            {
                 break;
             }
             let hit = self

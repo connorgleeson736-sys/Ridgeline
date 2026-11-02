@@ -4,7 +4,7 @@ import java.nio.ByteBuffer
 class GpuUploadQueue(private val capacity:Int) {
     enum class Kind{COMBINED,GEOMETRY,IMAGE}
     data class Id(val z:Int,val x:Int,val y:Int){val bounds get()=doubleArrayOf(x.toDouble()/(1 shl z),y.toDouble()/(1 shl z),(x+1.0)/(1 shl z),(y+1.0)/(1 shl z));val packed get()=(z.toLong() shl 44)or(x.toLong() shl 22)or y.toLong()}
-    data class Tile(val id:Id,val heights:ByteBuffer,val rgba:ByteBuffer,val kind:Kind=Kind.COMBINED){val bytes get()=heights.capacity()+rgba.capacity()}
+    data class Tile(val id:Id,val heights:ByteBuffer,val rgba:ByteBuffer,val kind:Kind=Kind.COMBINED,val plane:Boolean=false){val bytes get()=if(plane&&kind==Kind.GEOMETRY)0 else heights.capacity()+rgba.capacity()}
     private val entries=LinkedHashMap<Pair<Id,Kind>,Tile>()
     private data class Retry(val at:Long,val attempts:Int)
     private val retries=HashMap<Pair<Id,Kind>,Retry>()
@@ -63,7 +63,7 @@ class GpuUploadQueue(private val capacity:Int) {
     @Synchronized fun offer(tile:Tile):Boolean {
         if(!wanted(tile))return false
         val key=tile.id to tile.kind;val old=entries[key]
-        if(old!=null&&old.heights===tile.heights&&old.rgba===tile.rgba)return false
+        if(old!=null&&old.heights===tile.heights&&old.rgba===tile.rgba&&old.plane==tile.plane)return false
         if(old==null&&entries.size>=capacity&&ranks!=null){
             val worst=entries.entries.maxByOrNull{rank(it.value)}?:return false
             if(rank(tile)>=rank(worst.value))return false

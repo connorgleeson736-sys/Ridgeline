@@ -15,13 +15,14 @@ internal class GeometryInputPipeline<K:Any,V:Any>(private val capacity:Int=8,pri
     }
     @Synchronized fun clear()=decoded.clear()
     @Synchronized fun size()=decoded.size
-    fun prepare(keys:Collection<K>,request:(K)->CompletableFuture<*>,decode:(K)->V) {
+    fun prepare(keys:Collection<K>,request:(K)->CompletableFuture<*>,decode:(K)->V,onProgress:(Int)->Unit={}) {
         val rows=keys.filter{get(it)==null}.map{it to request(it)}
         val pending=ArrayList<CompletableFuture<*>>()
         for((key,body)in rows){
             if(!body.isDone){pending+=body;continue}
             try{remember(key,decode(key))}catch(waiting:ResourcePending){pending+=waiting.ready}
         }
+        onProgress(pending.size)
         if(pending.isNotEmpty())throw ResourcePending(CompletableFuture.anyOf(*pending.toTypedArray()))
     }
 }

@@ -58,6 +58,14 @@ struct AndroidState {
 }
 static STATES: OnceLock<Mutex<HashMap<u64, AndroidState>>> = OnceLock::new();
 static NEXT: AtomicU64 = AtomicU64::new(1);
+static PICKING: OnceLock<
+    Mutex<HashMap<u64, std::sync::Arc<crate::picking_snapshot::PickingSnapshot>>>,
+> = OnceLock::new();
+fn picking()
+-> &'static Mutex<HashMap<u64, std::sync::Arc<crate::picking_snapshot::PickingSnapshot>>> {
+    PICKING.get_or_init(|| Mutex::new(HashMap::new()))
+}
+
 fn states() -> &'static Mutex<HashMap<u64, AndroidState>> {
     STATES.get_or_init(|| Mutex::new(HashMap::new()))
 }
@@ -234,6 +242,11 @@ pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_destroy(
     protect(|| {
         if let Ok(mut s) = states().lock() {
             s.remove(&(handle as u64));
+            let retired = picking()
+                .lock()
+                .ok()
+                .and_then(|mut snapshots| snapshots.remove(&(handle as u64)));
+            drop(retired);
         }
     });
 }
@@ -312,6 +325,15 @@ pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_render(
             pitch,
             elevation,
         );
+        if let Some(snapshot) = s.renderer.picking_snapshot() {
+            let retired = picking()
+                .lock()
+                .ok()
+                .and_then(|mut snapshots| snapshots.insert(handle as u64, snapshot));
+            // A retired scene may own the last references to large heightfields.
+            // Release them after the input worker can acquire its snapshot.
+            drop(retired);
+        }
         s.renderer.queue.present(frame);
         s.renderer
             .next_adaptive_frame()
@@ -785,7 +807,12 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_residency
             let Some(state) = states.get(&(handle as u64)) else {
                 return Ok(0);
             };
-            let g = state.renderer.tiles.len();
+            let g = state
+                .renderer
+                .tiles
+                .values()
+                .filter(|t| t.field.complete())
+                .count();
             let images = state.renderer.images.len();
             let size = 8 + (g + images) * 8;
             if env.get_direct_buffer_capacity(&output)? < size {
@@ -800,7 +827,9 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_residency
                 state
                     .renderer
                     .tiles
-                    .keys()
+                    .iter()
+                    .filter(|(_, t)| t.field.complete())
+                    .map(|(id, _)| id)
                     .chain(state.renderer.images.keys()),
             ) {
                 let key = ((id.z as u64) << 44) | ((id.x as u64) << 22) | id.y as u64;
@@ -1576,6 +1605,247 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_clearGeom
     if let Ok(mut all) = states().lock() {
         if let Some(state) = all.get_mut(&(handle as u64)) {
             state.renderer.clear_geometry();
+        }
+    }
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_pickSnapshot(
+    env: *mut jni::sys::JNIEnv,
+    _class: jni::sys::jclass,
+    handle: i64,
+    x: f64,
+    y: f64,
+    width: i32,
+    height: i32,
+    lon: f64,
+    lat: f64,
+    zoom: f64,
+    bearing: f32,
+    pitch: f32,
+    elevation: f32,
+    three_d: u8,
+    relief: f32,
+    output: jni::sys::jobject,
+) -> u8 {
+    let snapshot = picking()
+        .lock()
+        .ok()
+        .and_then(|s| s.get(&(handle as u64)).cloned());
+    let Some(snapshot) = snapshot else {
+        return 0;
+    };
+    let v = &snapshot.view;
+    if !snapshot.matches_style(three_d != 0, relief)
+        || v.width != width as u32
+        || v.height != height as u32
+        || v.center != mercator(lon, lat)
+        || v.zoom != zoom
+        || v.bearing != bearing
+        || v.pitch != pitch
+        || v.elevation != elevation
+    {
+        return 0;
+    }
+    let Some(point) = snapshot.pick(x, y) else {
+        return 0;
+    };
+    let mut env = unsafe { jni::EnvUnowned::from_raw(env) };
+    match env
+        .with_env(|env| -> Result<u8, jni::errors::Error> {
+            let buffer = unsafe { jni::objects::JByteBuffer::from_raw(env, output) };
+            if env.get_direct_buffer_capacity(&buffer)? < 24 {
+                return Ok(0);
+            }
+            let bytes = unsafe {
+                std::slice::from_raw_parts_mut(env.get_direct_buffer_address(&buffer)?, 24)
+            };
+            for (slot, value) in bytes.chunks_exact_mut(8).zip(point) {
+                slot.copy_from_slice(&value.to_le_bytes());
+            }
+            Ok(1)
+        })
+        .into_outcome()
+    {
+        jni::Outcome::Ok(v) => v,
+        _ => 0,
+    }
+}
+
+#[unsafe(no_mangle)]
+pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_uploadPlaneResult(
+    _env: *mut c_void,
+    _class: *mut c_void,
+    handle: i64,
+    z: i32,
+    x: i32,
+    y: i32,
+) -> i32 {
+    if !(0..=22).contains(&z) || x < 0 || y < 0 || x >= 1i32 << z || y >= 1i32 << z {
+        return -1;
+    }
+    let Ok(mut all) = states().lock() else {
+        return -2;
+    };
+    let Some(s) = all.get_mut(&(handle as u64)) else {
+        return -2;
+    };
+    if s.device_lost.load(Ordering::Acquire) {
+        return -2;
+    }
+    match s.renderer.upload_plane(TileId {
+        z: z as u8,
+        x: x as u32,
+        y: y as u32,
+    }) {
+        Ok(()) => 1,
+        Err(UploadError::Capacity) => 0,
+        Err(_) => -1,
+    }
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_labelMetadata(
+    env: *mut jni::sys::JNIEnv,
+    _class: jni::sys::jclass,
+    handle: i64,
+    input: jni::sys::jobject,
+) -> u8 {
+    let mut env = unsafe { jni::EnvUnowned::from_raw(env) };
+    match env
+        .with_env(|env| -> Result<u8, jni::errors::Error> {
+            let input = unsafe { jni::objects::JByteBuffer::from_raw(env, input) };
+            let size = env.get_direct_buffer_capacity(&input)?;
+            if !(4..=4 + 512 * 40).contains(&size) {
+                return Ok(0);
+            }
+            let bytes =
+                unsafe { std::slice::from_raw_parts(env.get_direct_buffer_address(&input)?, size) };
+            let count = u32::from_le_bytes(bytes[..4].try_into().unwrap()) as usize;
+            if count > 512 || size != 4 + count * 40 {
+                return Ok(0);
+            }
+            let mut sprites = Vec::with_capacity(count);
+            for row in bytes[4..].chunks_exact(40) {
+                let point = [
+                    f64::from_le_bytes(row[..8].try_into().unwrap()),
+                    f64::from_le_bytes(row[8..16].try_into().unwrap()),
+                ];
+                let f = |i| f32::from_le_bytes(row[i..i + 4].try_into().unwrap());
+                let uv = [f(16), f(20), f(24), f(28)];
+                let size = [f(32), f(36)];
+                if point
+                    .iter()
+                    .any(|v| !v.is_finite() || !(0. ..=1.).contains(v))
+                    || uv.iter().any(|v| !v.is_finite() || !(0. ..=1.).contains(v))
+                    || size
+                        .iter()
+                        .any(|v| !v.is_finite() || *v <= 0. || *v > 2048.)
+                {
+                    return Ok(0);
+                }
+                sprites.push(crate::LabelSprite { point, uv, size });
+            }
+            let Ok(mut all) = states().lock() else {
+                return Ok(0);
+            };
+            let Some(state) = all.get_mut(&(handle as u64)) else {
+                return Ok(0);
+            };
+            state.renderer.set_label_metadata(sprites);
+            Ok(1)
+        })
+        .into_outcome()
+    {
+        jni::Outcome::Ok(v) => v,
+        _ => 0,
+    }
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_uploadInterior(
+    env: *mut jni::sys::JNIEnv,
+    _class: jni::sys::jclass,
+    handle: i64,
+    z: i32,
+    x: i32,
+    y: i32,
+    token: i64,
+    input: jni::sys::jobject,
+) -> u8 {
+    if !(1..=19).contains(&z) || x < 0 || y < 0 || x >= 1i32 << z || y >= 1i32 << z {
+        return 0;
+    }
+    let mut env = unsafe { jni::EnvUnowned::from_raw(env) };
+    match env
+        .with_env(|env| -> Result<u8, jni::errors::Error> {
+            let input = unsafe { jni::objects::JByteBuffer::from_raw(env, input) };
+            let size = 16 + 129 * 129 * 4;
+            if env.get_direct_buffer_capacity(&input)? != size {
+                return Ok(0);
+            }
+            let bytes =
+                unsafe { std::slice::from_raw_parts(env.get_direct_buffer_address(&input)?, size) };
+            let mut rect = [0; 4];
+            for (i, row) in bytes[..16].chunks_exact(4).enumerate() {
+                rect[i] = u32::from_le_bytes(row.try_into().unwrap()) as usize;
+            }
+            let heights = bytes[16..]
+                .chunks_exact(4)
+                .map(|row| f32::from_le_bytes(row.try_into().unwrap()))
+                .collect();
+            let Ok(mut all) = states().lock() else {
+                return Ok(0);
+            };
+            let Some(state) = all.get_mut(&(handle as u64)) else {
+                return Ok(0);
+            };
+            if state.device_lost.load(Ordering::Acquire) {
+                return Ok(0);
+            }
+            Ok(state
+                .renderer
+                .upload_interior(
+                    TileId {
+                        z: z as u8,
+                        x: x as u32,
+                        y: y as u32,
+                    },
+                    token as u64,
+                    heights,
+                    rect,
+                )
+                .is_ok() as u8)
+        })
+        .into_outcome()
+    {
+        jni::Outcome::Ok(v) => v,
+        _ => 0,
+    }
+}
+#[unsafe(no_mangle)]
+pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_clearInterior(
+    _env: *mut c_void,
+    _class: *mut c_void,
+    handle: i64,
+    z: i32,
+    x: i32,
+    y: i32,
+    token: i64,
+) {
+    if !(1..=19).contains(&z) || x < 0 || y < 0 || x >= 1i32 << z || y >= 1i32 << z {
+        return;
+    }
+    if let Ok(mut all) = states().lock() {
+        if let Some(state) = all.get_mut(&(handle as u64)) {
+            state.renderer.clear_interior(
+                TileId {
+                    z: z as u8,
+                    x: x as u32,
+                    y: y as u32,
+                },
+                token as u64,
+            );
         }
     }
 }

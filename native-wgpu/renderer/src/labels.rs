@@ -20,6 +20,10 @@ struct Scene {
     size: [f32; 4],
 }
 pub(crate) struct LabelGpu {
+    width: u32,
+    height: u32,
+    pixels: Vec<u8>,
+    uploaded_bytes: u64,
     pipeline: wgpu::RenderPipeline,
     uniform: wgpu::Buffer,
     bind: wgpu::BindGroup,
@@ -96,6 +100,10 @@ impl LabelGpu {
             mapped_at_creation: false,
         });
         Self {
+            width: 1,
+            height: 1,
+            pixels: vec![0; 4],
+            uploaded_bytes: 4,
             pipeline,
             uniform,
             bind,
@@ -178,9 +186,63 @@ impl LabelGpu {
         height: u32,
         rgba: &[u8],
     ) {
-        let (texture, bind) = Self::atlas(device, queue, &self.pipeline, width, height, rgba);
-        self._atlas = texture;
-        self.atlas_bind = bind;
+        if self.width != width || self.height != height {
+            let (texture, bind) = Self::atlas(device, queue, &self.pipeline, width, height, rgba);
+            self._atlas = texture;
+            self.atlas_bind = bind;
+            self.width = width;
+            self.height = height;
+            self.uploaded_bytes += rgba.len() as u64;
+        } else {
+            let stride = width as usize * 4;
+            let mut row = 0usize;
+            while row < height as usize {
+                if self.pixels[row * stride..(row + 1) * stride]
+                    == rgba[row * stride..(row + 1) * stride]
+                {
+                    row += 1;
+                    continue;
+                }
+                let first = row;
+                row += 1;
+                while row < height as usize
+                    && self.pixels[row * stride..(row + 1) * stride]
+                        != rgba[row * stride..(row + 1) * stride]
+                {
+                    row += 1;
+                }
+                let bytes = &rgba[first * stride..row * stride];
+                queue.write_texture(
+                    wgpu::TexelCopyTextureInfo {
+                        texture: &self._atlas,
+                        mip_level: 0,
+                        origin: wgpu::Origin3d {
+                            x: 0,
+                            y: first as u32,
+                            z: 0,
+                        },
+                        aspect: wgpu::TextureAspect::All,
+                    },
+                    bytes,
+                    wgpu::TexelCopyBufferLayout {
+                        offset: 0,
+                        bytes_per_row: Some(width * 4),
+                        rows_per_image: Some((row - first) as u32),
+                    },
+                    wgpu::Extent3d {
+                        width,
+                        height: (row - first) as u32,
+                        depth_or_array_layers: 1,
+                    },
+                );
+                self.uploaded_bytes += bytes.len() as u64;
+            }
+        }
+        self.pixels.clear();
+        self.pixels.extend_from_slice(rgba);
+        if self.pixels.len() < self.pixels.capacity() / 4 {
+            self.pixels.shrink_to_fit();
+        }
         self.count = 0;
     }
     pub fn camera(
@@ -231,9 +293,16 @@ impl crate::Renderer {
     ) {
         self.labels_gpu
             .set_atlas(&self.device, &self.queue, width, height, rgba);
+        self.set_label_metadata(sprites);
+    }
+    pub fn set_label_metadata(&mut self, sprites: Vec<LabelSprite>) {
         self.label_sprites = sprites;
         self.label_selection.clear();
+        self.labels_gpu.count = 0;
         self.labels_dirty = true;
+    }
+    pub fn label_texture_upload_bytes(&self) -> u64 {
+        self.labels_gpu.uploaded_bytes
     }
     pub fn select_labels(&mut self, selection: Vec<(usize, [f32; 2])>) {
         if self.label_selection != selection {

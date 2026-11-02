@@ -10,6 +10,7 @@ struct Patch {
     bounds: [f64; 4],
     clip: [f64; 4],
     field: Arc<Heightfield>,
+    generation: u64,
 }
 struct Job {
     paths: Arc<[CartographicPath]>,
@@ -57,6 +58,7 @@ impl Worker {
                     // Linux PRIO_PROCESS/0 applies to the calling thread, below foreground work.
                     setpriority(0, 0, 10);
                 }
+                let mut cache = Cache::default();
                 loop {
                     let job = {
                         let mut slot = state.input.lock().unwrap();
@@ -72,7 +74,7 @@ impl Worker {
                         !state.stopped.load(Ordering::Relaxed)
                             && state.revision.load(Ordering::Acquire) == job.revision
                     };
-                    if let Some(output) = build(&job, valid) {
+                    if let Some(output) = build(&job, valid, &mut cache) {
                         if valid() {
                             *state.output.lock().unwrap() = Some(output);
                         }
@@ -112,7 +114,7 @@ impl Drop for Worker {
     }
 }
 /// Exact former synchronous arithmetic, now executed only by a cancelable worker.
-fn build(job: &Job, valid: impl Fn() -> bool) -> Option<Output> {
+fn reference_build(job: &Job, valid: impl Fn() -> bool) -> Option<Output> {
     let anchor = job
         .paths
         .iter()
@@ -186,6 +188,153 @@ fn build(job: &Job, valid: impl Fn() -> bool) -> Option<Output> {
     })
 }
 
+type FragmentKey = ([u64; 8], u64);
+#[derive(Default)]
+struct Cache {
+    paths: Option<Arc<[CartographicPath]>>,
+    relief: u32,
+    flat: bool,
+    entries: std::collections::HashMap<FragmentKey, Vec<(usize, Vec<Vertex>)>>,
+    large: bool,
+    builds: u64,
+}
+fn fragment_key(p: &Patch) -> FragmentKey {
+    (
+        [
+            p.bounds[0].to_bits(),
+            p.bounds[1].to_bits(),
+            p.bounds[2].to_bits(),
+            p.bounds[3].to_bits(),
+            p.clip[0].to_bits(),
+            p.clip[1].to_bits(),
+            p.clip[2].to_bits(),
+            p.clip[3].to_bits(),
+        ],
+        p.generation,
+    )
+}
+fn build(job: &Job, valid: impl Fn() -> bool, cache: &mut Cache) -> Option<Output> {
+    if cache
+        .paths
+        .as_ref()
+        .is_none_or(|p| !Arc::ptr_eq(p, &job.paths))
+        || cache.relief != job.relief.to_bits()
+        || cache.flat != job.flat
+    {
+        cache.paths = Some(job.paths.clone());
+        cache.relief = job.relief.to_bits();
+        cache.flat = job.flat;
+        cache.entries.clear();
+        cache.large = false;
+    }
+    if cache.large {
+        return reference_build(job, valid);
+    }
+    let keys: std::collections::HashSet<_> = job.patches.iter().map(fragment_key).collect();
+    cache.entries.retain(|k, _| keys.contains(k));
+    let anchor = job
+        .paths
+        .iter()
+        .find_map(|p| p.points.first())
+        .copied()
+        .unwrap_or([0.5, 0.5]);
+    let mut total = cache
+        .entries
+        .values()
+        .flat_map(|paths| paths.iter())
+        .map(|(_, v)| v.len())
+        .sum::<usize>();
+    for patch in &job.patches {
+        let key = fragment_key(patch);
+        if cache.entries.contains_key(&key) {
+            continue;
+        }
+        let mut fragments = Vec::new();
+        for (index, path) in job.paths.iter().enumerate() {
+            let mut distance = 0.;
+            let mut vertices = Vec::new();
+            for segment in path.points.windows(2) {
+                if !valid() {
+                    return None;
+                }
+                let a = segment[0];
+                let b = segment[1];
+                let lo = [a[0].min(b[0]), a[1].min(b[1])];
+                let hi = [a[0].max(b[0]), a[1].max(b[1])];
+                let clip = patch.clip;
+                if !(hi[0] < clip[0] || lo[0] > clip[2] || hi[1] < clip[1] || lo[1] > clip[3]) {
+                    let bounds = patch.bounds;
+                    let span = bounds[2] - bounds[0];
+                    let point =
+                        |p: [f64; 2]| [(p[0] - bounds[0]) / span, (p[1] - bounds[1]) / span];
+                    let draped = drape(
+                        &patch.field,
+                        point(a),
+                        point(b),
+                        [
+                            (clip[0] - bounds[0]) / span,
+                            (clip[1] - bounds[1]) / span,
+                            (clip[2] - bounds[0]) / span,
+                            (clip[3] - bounds[1]) / span,
+                        ],
+                        job.flat,
+                    );
+                    for pair in draped.windows(2) {
+                        if total >= 333333 {
+                            cache.entries.clear();
+                            cache.large = true;
+                            return reference_build(job, valid);
+                        }
+                        let world = |p: [f64; 3]| {
+                            [
+                                (bounds[0] + p[0] * span - anchor[0]) as f32,
+                                (bounds[1] + p[1] * span - anchor[1]) as f32,
+                                (p[2] * job.relief as f64) as f32,
+                            ]
+                        };
+                        let start_world =
+                            [bounds[0] + pair[0][0] * span, bounds[1] + pair[0][1] * span];
+                        let phase = distance + (start_world[0] - a[0]).hypot(start_world[1] - a[1]);
+                        vertices.push(Vertex {
+                            start: world(pair[0]),
+                            end: world(pair[1]),
+                            corner: [0., 0., -path.width * 0.5],
+                            color: path.color,
+                            style: [path.dash[0], path.dash[1], phase as f32],
+                        });
+                        total += 1;
+                    }
+                }
+                distance += (b[0] - a[0]).hypot(b[1] - a[1]);
+            }
+            if !vertices.is_empty() {
+                fragments.push((index, vertices));
+            }
+        }
+        cache.builds += 1;
+        cache.entries.insert(key, fragments);
+    }
+    // Preserve the original path-major then cover-major draw order, including alpha.
+    let mut ordered = std::collections::BTreeMap::<usize, Vec<&[Vertex]>>::new();
+    for patch in &job.patches {
+        for (index, vertices) in &cache.entries[&fragment_key(patch)] {
+            ordered.entry(*index).or_default().push(vertices);
+        }
+    }
+    let mut vertices = Vec::with_capacity(total);
+    for parts in ordered.values() {
+        for part in parts {
+            vertices.extend_from_slice(part);
+        }
+    }
+    Some(Output {
+        anchor,
+        vertices,
+        overflow: false,
+        revision: job.revision,
+    })
+}
+
 #[derive(Clone, PartialEq)]
 pub struct CartographicPath {
     pub points: Vec<[f64; 2]>,
@@ -227,6 +376,7 @@ impl Renderer {
                     bounds: row.source.bounds(),
                     clip: row.region.bounds(),
                     field: tile.field.clone(),
+                    generation: tile.generation,
                 })
             })
             .collect();
@@ -354,4 +504,83 @@ pub(crate) fn drape(
         [a[0] + delta[0] * lo, a[1] + delta[1] * lo, 0.],
         [a[0] + delta[0] * hi, a[1] + delta[1] * hi, 0.],
     ]
+}
+
+#[cfg(test)]
+mod audit_tests {
+    use super::*;
+    fn job() -> Job {
+        let field =
+            Arc::new(Heightfield::new(128, vec![500.; 129 * 129].into_boxed_slice()).unwrap());
+        Job {
+            paths: vec![CartographicPath {
+                points: vec![[0.1, 0.2], [0.9, 0.8]],
+                color: [0.2, 0.5, 0.8, 1.],
+                width: 2.,
+                dash: [2., 3.],
+            }]
+            .into(),
+            patches: vec![
+                Patch {
+                    bounds: [0., 0., 1., 1.],
+                    clip: [0., 0., 0.5, 1.],
+                    field: field.clone(),
+                    generation: 1,
+                },
+                Patch {
+                    bounds: [0., 0., 1., 1.],
+                    clip: [0.5, 0., 1., 1.],
+                    field,
+                    generation: 2,
+                },
+            ],
+            relief: 1.5,
+            flat: false,
+            revision: 1,
+        }
+    }
+    #[test]
+    fn audit_cached_fragments_and_latest_worker() {
+        let mut job = job();
+        let mut cache = Cache::default();
+        let direct = reference_build(&job, || true).unwrap();
+        let cached = build(&job, || true, &mut cache).unwrap();
+        assert_eq!(
+            bytemuck::cast_slice::<_, u8>(&direct.vertices),
+            bytemuck::cast_slice::<_, u8>(&cached.vertices)
+        );
+        assert_eq!(cache.builds, 2);
+        job.patches[1].generation = 3;
+        job.patches[1].field =
+            Arc::new(Heightfield::new(128, vec![900.; 129 * 129].into_boxed_slice()).unwrap());
+        let cached = build(&job, || true, &mut cache).unwrap();
+        let direct = reference_build(&job, || true).unwrap();
+        assert_eq!(cache.builds, 3, "only changed terrain fragment rebuilds");
+        assert_eq!(
+            bytemuck::cast_slice::<_, u8>(&direct.vertices),
+            bytemuck::cast_slice::<_, u8>(&cached.vertices)
+        );
+        job.patches[1].generation = 4;
+        assert!(build(&job, || false, &mut cache).is_none());
+        let worker = Worker::new().unwrap();
+        worker.submit(job);
+        let mut last = super::audit_tests::job();
+        last.relief = 2.;
+        worker.submit(last);
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
+        loop {
+            if let Some(result) = worker.take() {
+                assert_eq!(result.revision, 2);
+                assert!(
+                    result
+                        .vertices
+                        .iter()
+                        .all(|v| v.start[2] == 1000. && v.end[2] == 1000.)
+                );
+                break;
+            }
+            assert!(std::time::Instant::now() < deadline);
+            std::thread::sleep(std::time::Duration::from_millis(1));
+        }
+    }
 }

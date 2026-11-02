@@ -7,8 +7,8 @@ internal class UploadAdmission {
     private var renderCost=2_000_000.0
     fun allowance(gesturing:Boolean,frameNanos:Long=16_666_667L):Long =
         minOf(if(gesturing)2_000_000L else 4_000_000L,maxOf(0L,(frameNanos-renderCost-2_000_000).toLong()))
-    fun allows(kind:GpuUploadQueue.Kind,elapsed:Long,count:Int,bytes:Int,nextBytes:Int,allowance:Long,backlog:Int):Boolean =
-        backlog<2&&count<4&&bytes+nextBytes<=650*1024&&(count==0||elapsed+costs[kind.ordinal]<=allowance)
+    fun allows(kind:GpuUploadQueue.Kind,elapsed:Long,count:Int,bytes:Int,nextBytes:Int,allowance:Long,backlog:Int,urgent:Boolean=false):Boolean =
+        backlog<2&&count<4&&bytes+nextBytes<=650*1024&&(count==0&&(urgent||allowance>0)||count>0&&elapsed+costs[kind.ordinal]<=allowance)
     fun uploaded(kind:GpuUploadQueue.Kind,nanos:Long){costs[kind.ordinal]=costs[kind.ordinal]*.5+nanos.coerceAtLeast(1)*.5}
     fun rendered(nanos:Long){renderCost=renderCost*.8+nanos.coerceAtLeast(1)*.2}
 }

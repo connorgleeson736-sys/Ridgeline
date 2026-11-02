@@ -7,12 +7,16 @@ object NativeBridge {
  @JvmStatic external fun terrainProfile(data:ByteBuffer):Boolean
  @JvmStatic external fun uploadGeometry(handle:Long,z:Int,x:Int,y:Int,data:ByteBuffer):Boolean
  @JvmStatic external fun uploadImage(handle:Long,z:Int,x:Int,y:Int,data:ByteBuffer):Boolean
+ @JvmStatic external fun uploadInterior(handle:Long,z:Int,x:Int,y:Int,token:Long,data:ByteBuffer):Boolean
+ @JvmStatic external fun clearInterior(handle:Long,z:Int,x:Int,y:Int,token:Long)
+ @JvmStatic external fun uploadPlaneResult(handle:Long,z:Int,x:Int,y:Int):Int
  @JvmStatic external fun uploadGeometryResult(handle:Long,z:Int,x:Int,y:Int,data:ByteBuffer):Int
  @JvmStatic external fun uploadImageResult(handle:Long,z:Int,x:Int,y:Int,data:ByteBuffer):Int
  @JvmStatic external fun uploadResult(handle:Long,z:Int,x:Int,y:Int,heights:ByteBuffer,rgba:ByteBuffer):Int
  @JvmStatic external fun demand(handle:Long,input:ByteBuffer):Boolean
  @JvmStatic external fun residency(handle:Long,output:ByteBuffer):Boolean
  @JvmStatic external fun cameraSafety(handle:Long,width:Int,height:Int,longitude:Double,latitude:Double,zoom:Double,bearing:Float,pitch:Float,elevation:Float,output:ByteBuffer):Boolean
+ @JvmStatic external fun pickSnapshot(handle:Long,x:Double,y:Double,width:Int,height:Int,longitude:Double,latitude:Double,zoom:Double,bearing:Float,pitch:Float,elevation:Float,threeD:Boolean,relief:Float,output:ByteBuffer):Boolean
  @JvmStatic external fun pick(handle:Long,x:Double,y:Double,output:ByteBuffer):Boolean
  @JvmStatic external fun mipmapProof(handle:Long,output:ByteBuffer):Boolean
  @JvmStatic external fun routes(handle:Long,input:ByteBuffer):Boolean
@@ -21,6 +25,7 @@ object NativeBridge {
  @JvmStatic external fun inspect(handle:Long,longitude:Double,latitude:Double,enabled:Boolean):Boolean
  @JvmStatic external fun cartography(handle:Long,input:ByteBuffer):Boolean
  @JvmStatic external fun project(handle:Long,input:ByteBuffer,output:ByteBuffer):Int
+ @JvmStatic external fun labelMetadata(handle:Long,metadata:ByteBuffer):Boolean
  @JvmStatic external fun labelAtlas(handle:Long,width:Int,height:Int,rgba:ByteBuffer,metadata:ByteBuffer):Boolean
  @JvmStatic external fun placeLabels(handle:Long,input:ByteBuffer):Boolean
  @JvmStatic external fun configure(handle:Long,input:ByteBuffer):Boolean

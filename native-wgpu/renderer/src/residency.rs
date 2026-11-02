@@ -25,7 +25,7 @@ impl Renderer {
         self.images.contains_key(&id)
     }
     pub fn has_geometry(&self, id: TileId) -> bool {
-        self.tiles.contains_key(&id)
+        self.tiles.get(&id).is_some_and(|t| t.field.complete())
     }
     pub(crate) fn trim_joint(&mut self) {
         let Some(limit) = self.residency_byte_budget else {

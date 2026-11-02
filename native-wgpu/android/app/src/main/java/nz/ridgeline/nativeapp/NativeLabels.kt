@@ -18,38 +18,53 @@ internal object NativeLabels {
     private const val SCALE=2f
     private const val WIDTH=2048
     private data class Packed(val label:TopographyStyle.Label,val text:List<String>,val x:Int,val y:Int,val width:Int,val height:Int)
-    fun atlas(input:List<TopographyStyle.Label>):NativeLabelAtlas{
+    private data class SpriteKey(val text:String,val size:Float,val color:Int,val bold:Boolean,val circle:Boolean)
+    private val sprites=LinkedHashMap<SpriteKey,Packed>()
+    private var bitmap:Bitmap?=null
+    private var nextX=2;private var nextY=2;private var rowHeight=0
+    private var pixels:ByteBuffer?=null
+    @Synchronized fun atlas(input:List<TopographyStyle.Label>):NativeLabelAtlas=buildAtlas(input,true)
+    private fun buildAtlas(input:List<TopographyStyle.Label>,canReset:Boolean):NativeLabelAtlas{
         if(input.isEmpty())return NativeLabelAtlas.empty()
-        val paint=Paint(Paint.ANTI_ALIAS_FLAG);val packed=ArrayList<Packed>();var x=2;var y=2;var rowHeight=0
+        val paint=Paint(Paint.ANTI_ALIAS_FLAG);val packed=ArrayList<Pair<TopographyStyle.Label,Packed>>();var dirty=false
         for(label in input.take(512)){
-            paint.textSize=label.size*SCALE;paint.typeface=if(label.bold)Typeface.DEFAULT_BOLD else Typeface.DEFAULT
-            val lines=if(label.circle)emptyList()else wrap(label.text,paint,label.size*SCALE*9)
-            val width=if(label.circle)ceil(label.size*2*SCALE+8).toInt()else ceil((lines.maxOfOrNull{paint.measureText(it)}?:1f)+8*SCALE).toInt()
-            val height=if(label.circle)width else ceil(lines.size*label.size*SCALE*1.25+8*SCALE).toInt()
-            if(width>WIDTH-4||height>512)continue
-            if(x+width>WIDTH){x=2;y+=rowHeight+2;rowHeight=0}
-            if(y+height>2048)break
-            packed.add(Packed(label,lines,x,y,width,height));x+=width+2;rowHeight=max(rowHeight,height)
+            val key=SpriteKey(label.text,label.size,label.color,label.bold,label.circle)
+            var slot=sprites[key]
+            if(slot==null){
+                paint.textSize=label.size*SCALE;paint.typeface=if(label.bold)Typeface.DEFAULT_BOLD else Typeface.DEFAULT
+                val lines=if(label.circle)emptyList()else wrap(label.text,paint,label.size*SCALE*9)
+                val w=if(label.circle)ceil(label.size*2*SCALE+8).toInt()else ceil((lines.maxOfOrNull{paint.measureText(it)}?:1f)+8*SCALE).toInt()
+                val h=if(label.circle)w else ceil(lines.size*label.size*SCALE*1.25+8*SCALE).toInt()
+                if(w>WIDTH-4||h>512)continue
+                if(nextX+w>WIDTH){nextX=2;nextY+=rowHeight+2;rowHeight=0}
+                if(nextY+h>2048){
+                    if(canReset){sprites.clear();bitmap?.recycle();bitmap=null;pixels=null;nextX=2;nextY=2;rowHeight=0;return buildAtlas(input,false)}
+                    break
+                }
+                val required=nextY+h
+                if(bitmap==null||bitmap!!.height<required){
+                    val height=Integer.highestOneBit(max(128,required)-1)*2
+                    val grown=Bitmap.createBitmap(WIDTH,height,Bitmap.Config.ARGB_8888)
+                    bitmap?.let{Canvas(grown).drawBitmap(it,0f,0f,null);it.recycle()};bitmap=grown
+                }
+                slot=Packed(label,lines,nextX,nextY,w,h);sprites[key]=slot;nextX+=w+2;rowHeight=max(rowHeight,h);dirty=true
+                val canvas=Canvas(bitmap!!);val p=slot
+                if(label.circle){paint.style=Paint.Style.FILL;paint.color=NativeUi.ink;canvas.drawCircle(p.x+p.width/2f,p.y+p.height/2f,label.size*SCALE+1.5f*SCALE,paint);paint.color=label.color;canvas.drawCircle(p.x+p.width/2f,p.y+p.height/2f,label.size*SCALE,paint)}
+                else for((i,text)in p.text.withIndex()){
+                    val tx=p.x+(p.width-paint.measureText(text))/2;val ty=p.y+4*SCALE-paint.fontMetrics.top+i*label.size*SCALE*1.25f
+                    paint.strokeJoin=Paint.Join.ROUND;paint.style=Paint.Style.STROKE;paint.strokeWidth=2.8f*SCALE;paint.color=0xe0122023.toInt();canvas.drawText(text,tx,ty,paint)
+                    paint.style=Paint.Style.FILL;paint.color=label.color;canvas.drawText(text,tx,ty,paint)
+                }
+            }
+            packed.add(label to slot)
         }
         if(packed.isEmpty())return NativeLabelAtlas.empty()
-        val h=((y+rowHeight+31)/32*32).coerceAtMost(2048)
-        val bitmap=Bitmap.createBitmap(WIDTH,h,Bitmap.Config.ARGB_8888);val canvas=Canvas(bitmap)
+        val h=bitmap!!.height
+        if(dirty||pixels==null){val rgba=IntArray(WIDTH*h);bitmap!!.getPixels(rgba,0,WIDTH,0,0,WIDTH,h);pixels=PixelPacking.rgbaOwned(rgba)}
         val metadata=ByteBuffer.allocateDirect(4+packed.size*40).order(ByteOrder.LITTLE_ENDIAN).apply{putInt(packed.size)}
-        val points=ByteBuffer.allocateDirect(packed.size*16).order(ByteOrder.LITTLE_ENDIAN)
-        val rows=ArrayList<NativeLabelAtlas.Row>()
-        for(p in packed){
-            val label=p.label;paint.textSize=label.size*SCALE;paint.typeface=if(label.bold)Typeface.DEFAULT_BOLD else Typeface.DEFAULT
-            if(label.circle){paint.style=Paint.Style.FILL;paint.color=NativeUi.ink;canvas.drawCircle(p.x+p.width/2f,p.y+p.height/2f,label.size*SCALE+1.5f*SCALE,paint);paint.color=label.color;canvas.drawCircle(p.x+p.width/2f,p.y+p.height/2f,label.size*SCALE,paint)}
-            else for((i,text)in p.text.withIndex()){
-                val tx=p.x+(p.width-paint.measureText(text))/2;val ty=p.y+4*SCALE-paint.fontMetrics.top+i*label.size*SCALE*1.25f
-                paint.strokeJoin=Paint.Join.ROUND;paint.style=Paint.Style.STROKE;paint.strokeWidth=2.8f*SCALE;paint.color=0xe0122023.toInt();canvas.drawText(text,tx,ty,paint)
-                paint.style=Paint.Style.FILL;paint.color=label.color;canvas.drawText(text,tx,ty,paint)
-            }
-            metadata.putDouble(label.point.x).putDouble(label.point.y).putFloat(p.x.toFloat()/WIDTH).putFloat(p.y.toFloat()/h).putFloat(p.width.toFloat()/WIDTH).putFloat(p.height.toFloat()/h).putFloat(p.width/SCALE).putFloat(p.height/SCALE)
-            points.putDouble(label.point.x).putDouble(label.point.y);rows.add(NativeLabelAtlas.Row(label,p.width/SCALE,p.height/SCALE))
-        }
-        val pixels=IntArray(WIDTH*h);bitmap.getPixels(pixels,0,WIDTH,0,0,WIDTH,h);bitmap.recycle();metadata.rewind();points.rewind()
-        return NativeLabelAtlas(rows,WIDTH,h,PixelPacking.rgbaOwned(pixels),metadata,points)
+        val points=ByteBuffer.allocateDirect(packed.size*16).order(ByteOrder.LITTLE_ENDIAN);val rows=ArrayList<NativeLabelAtlas.Row>()
+        for((label,p)in packed){metadata.putDouble(label.point.x).putDouble(label.point.y).putFloat(p.x.toFloat()/WIDTH).putFloat(p.y.toFloat()/h).putFloat(p.width.toFloat()/WIDTH).putFloat(p.height.toFloat()/h).putFloat(p.width/SCALE).putFloat(p.height/SCALE);points.putDouble(label.point.x).putDouble(label.point.y);rows.add(NativeLabelAtlas.Row(label,p.width/SCALE,p.height/SCALE))}
+        metadata.rewind();points.rewind();return NativeLabelAtlas(rows,WIDTH,h,pixels!!,metadata,points)
     }
     private fun wrap(text:String,paint:Paint,maxWidth:Float):List<String>{
         val rows=ArrayList<String>()

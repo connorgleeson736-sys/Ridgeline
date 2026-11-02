@@ -1,5 +1,20 @@
 # Durable progress log
 
+## 2026-11-03 — Native audit implementation / 0.1.10 APK preparation
+
+Implemented supplied native0.1.9 audit: submitted-scene picking snapshot and
+independent input worker; camera-first bounded optional uploads; national boundary
+index/cache; isolated route invalidation and per-terrain cartography fragments;
+stable label slots/metadata/dirty-row texture updates; shared explicit unshaded
+2D resource and direct plane admission. Existing bounded background cartography
+and label placement retained. Experimental single focus measured interior is
+OFF by default, conservative parent/skirt joins only, exact parent rim ownership.
+No unsafe planar quad. Full imagery/terrain detail and original assets retained.
+Focused JVM/Rust/production Vulkan/GLES evidence and restrictions are in
+native-wgpu/research/NATIVE-LATENCY-AUDIT-2026-11-03.md and validation/native-audit.
+Version code11/name0.1.10-native-audit; same native Performance package/signing key.
+Android APK packaging/publication record to follow. No handset speed claim.
+
 ## 2026-11-02 — Capacitor UI/layers/route checkpoint APK 0.1.9
 
 Latest user explicitly requests the Capacitor UI, all route features and every

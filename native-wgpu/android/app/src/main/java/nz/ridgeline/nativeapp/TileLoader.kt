@@ -176,12 +176,18 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private val failures=ConcurrentHashMap<Source,Failure>()
     private fun upload(source:Source,data:ByteBuffer) {
         val id=source.id
-        if(source.geometry)view.uploadGeometry(id.z,id.x,id.y,data)
+        if(source.geometry)view.uploadGeometry(id.z,id.x,id.y,data,plane=data===cartographicPlane)
         else view.uploadImage(id.z,id.x,id.y,data)
     }
     private fun resident(source:Source)=view.isResident(source.id.gpu(),source.geometry)
+    private val interiorOwner=java.util.concurrent.atomic.AtomicReference<Task?>()
+    fun progressiveTerrain(enabled:Boolean){mapSettings.progressiveTerrain(enabled);if(!enabled)interiorOwner.getAndSet(null)?.let{view.clearInterior(it.source.id.gpu(),it.stageToken)}}
     private inner class Task(val source:Source,@Volatile var priority:Int,@Volatile var speculative:Boolean=false):Runnable,Comparable<Task>{
         private val order=sequence.getAndIncrement()
+        val stageToken=order
+        var interiorOffered=false
+        var centreReadyAt=0L
+        var haloRecorded=false
         private val queued=java.util.concurrent.atomic.AtomicBoolean(false)
         private val finished=java.util.concurrent.atomic.AtomicBoolean(false)
         val consumer=transport.consumer(priority,speculative,imagery=!source.geometry)
@@ -212,10 +218,11 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         fun promote(rank:Int){if(priority==rank&&!speculative&&parkedUntil==0L)return;priority=rank;speculative=false;parkedUntil=0;consumer.promote(rank);local.promote(rank);if(!pipelineEligible())inputs.clear();if(workers(source).remove(this)){queued.set(false);enqueue()}}
         fun park(){if(parkedUntil!=0L)return;inputs.clear();if(!consumer.park()){cancel();return};local.promote(priority+10000);parkedUntil=System.currentTimeMillis()+600;
             if(workers(source).remove(this)){queued.set(false);enqueue()};scheduler.schedule({if(source !in wanted)cancel()},600,TimeUnit.MILLISECONDS)}
-        fun cancel(){if(finished.compareAndSet(false,true)){workers(source).remove(this);jobs.remove(source,this);consumer.release(true);local.close();inputs.clear();decodeWait.clear();derivedRead?.close()}}
+        fun cancel(preserveInterior:Boolean=false){if(finished.compareAndSet(false,true)){if(interiorOwner.compareAndSet(this,null)&&!preserveInterior)view.clearInterior(source.id.gpu(),stageToken);workers(source).remove(this);jobs.remove(source,this);consumer.release(true);local.close();inputs.clear();decodeWait.clear();derivedRead?.close()}}
         override fun run(){
             queued.set(false);if(!eligible()){cancel();return}
             var waiting:CompletableFuture<*>?=null
+            var complete=false
             try{
                 started=true;preparation.enter{eligible()};taskContext.set(this);sourceRecords.set(records)
                 val data=try{val loaded=if(source.geometry)loadGeometry(source.id)else loadImage(source.id);checkPreparation();loaded}catch(ready:PreparedAvailable){ready.data}
@@ -225,6 +232,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
                     ready.put(source,data)?.let{readyBytes-=it.capacity()};readyBytes+=data.capacity();trimReady()
                     if((source in wanted||source in warmWanted)&&!resident(source))upload(source,data)
                 }
+                complete=true
                 if(source.geometry)refineProfileSoon()
             }catch(pending:ResourcePending){waiting=pending.ready
             }catch(_:PreparationAborted){
@@ -239,7 +247,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
                 preparation.leave();geometryDependencies.remove();sourceRecords.remove();taskContext.remove()
                 if(finished.get()){inputs.clear();decodeWait.clear()}
                 if(waiting!=null&&!finished.get())(derivedRead?.resumeOn(waiting)?:waiting).whenComplete{_,_->enqueue()} else{
-                    cancel();if(!dead&&active&&source in wanted&&!resident(source))cameraChanged()
+                    cancel(preserveInterior=complete);if(!dead&&active&&source in wanted&&!resident(source))cameraChanged()
                 }
             }
         }
@@ -322,6 +330,11 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
                 val fallback=source in fallbackSources
                 if(view.hasResidentCoverage(source.id.gpu(),source.geometry,!fallback))continue
                 val old=synchronized(ready){ready[source]};if(old!=null){upload(source,old);continue}
+                if(source.geometry&&!mapSettings.state.needsElevation()){
+                    val data=cartographicPlane
+                    synchronized(ready){ready.put(source,data)?.let{readyBytes-=it.capacity()};readyBytes+=data.capacity();trimReady()}
+                    upload(source,data);continue // Explicit planes never queue behind DEM decoders.
+                }
                 val failure=failures[source];if(failure!=null&&android.os.SystemClock.elapsedRealtime()<failure.retryAt)continue
                 schedule(source,priority,false)
             }
@@ -425,6 +438,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             "Imagery CPU active/queued: ${imageWorkers.activeCount}/${imageWorkers.queue.size}\n"+
             "Original imagery I/O active/queued: ${local["active"]}/${local["queued"]} · oldest ${local["oldestMs"]} ms · last/max read ${local["lastMs"]}/${local["maxMs"]} ms\n"+
             "Tiles in progress: ${jobs.size} · retry backoffs: ${failures.size}\n"+
+            "Focus centre-to-halo samples: ${centreHaloSamples.get()} · mean/max ${if(centreHaloSamples.get()>0)centreHaloNanos.get()/centreHaloSamples.get()/1_000_000 else 0}/${centreHaloMax.get()/1_000_000} ms\n"+
             "Late prepared-cache wins: ${latePreparedWins.get()}\n"+
             "RAM/disk hits: ${counts["ramHits"]}/${counts["localHits"]} · cache escape starts: ${counts["uncachedStarts"]}\n"+
             httpMetrics.snapshot()+"\n"+externalDiagnostics()+"\n"+view.loadingSnapshot()+"\nHTTP spans may overlap during route retries. Wire reads are before cache/decompression; processing includes cache and body handling. Body rate excludes headers/TLS/other apps."
@@ -519,8 +533,29 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         }
         return Decoded(raster,dependencies.values.toList()).also{synchronized(decoded){decoded[id]=it;trimDecoded()}}
     }
+    private val centreHaloSamples=java.util.concurrent.atomic.AtomicLong()
+    private val centreHaloNanos=java.util.concurrent.atomic.AtomicLong()
+    private val centreHaloMax=java.util.concurrent.atomic.AtomicLong()
+    private fun interiorProgress(task:Task,id:Id,pending:Int){
+        val source=Id(DemSampling.terrainSourceZoom(id.z),id.x/2,id.y/2)
+        val main=task.inputs.get(source)?:return
+        if(main.raster.id!=source.gpu())return
+        val now=System.nanoTime();if(task.centreReadyAt==0L)task.centreReadyAt=now
+        if(pending==0){if(task.haloRecorded)return;task.haloRecorded=true;val elapsed=now-task.centreReadyAt;centreHaloSamples.incrementAndGet();centreHaloNanos.addAndGet(elapsed);centreHaloMax.accumulateAndGet(elapsed,::maxOf);return}
+        if(!mapSettings.progressiveTerrain||task.interiorOffered||!task.eligible()||!mapSettings.state.threeD||id.z !in 1..19||task.priority>2||id.z-source.z!=1)return
+        if(!view.hasResidentCoverage(id.gpu(),true)||!view.hasResidentCoverage(id.gpu(),false))return
+        val focus=view.surfaceFocusFor(view.planningPose)?:return
+        val n=1 shl id.z;val x=(focus.longitude+180)/360*n-id.x;val y=CameraMath.mercatorY(focus.latitude)*n-id.y
+        if(x !in 0.0..1.0||y !in 0.0..1.0)return
+        if(!main.dependencies.all(::dependencyFresh)||!interiorOwner.compareAndSet(null,task))return
+        val patch=MeasuredInterior.sample(id.z,id.x,id.y,main.raster)
+        if(patch==null){interiorOwner.compareAndSet(task,null);return}
+        task.interiorOffered=true
+        view.offerInterior(id.gpu(),task.stageToken,patch.packet){mapSettings.progressiveTerrain&&task.eligible()}
+    }
+    private val cartographicPlane=ByteBuffer.allocateDirect(129*129*4).asReadOnlyBuffer().order(ByteOrder.LITTLE_ENDIAN)
     private fun loadGeometry(id: Id): ByteBuffer {
-        if(!mapSettings.state.needsElevation())return ByteBuffer.allocateDirect(129*129*4).order(ByteOrder.LITTLE_ENDIAN) // Explicit cartographic plane, not an elevation raster.
+        if(!mapSettings.state.needsElevation())return cartographicPlane // Shared explicit cartographic plane, not an elevation raster.
 
         checkPreparation()
         // Derived files are optional. Do not let their index, read or gzip
@@ -541,7 +576,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
                 if(old!=null&&old.dependencies.all(::dependencyFresh)){
                     task.inputs.remember(input,old);CompletableFuture.completedFuture(Unit)
                 }else task.consumer.acquire(resourceKey(linz("elevation",input,"png")))
-            },decode={input->checkPreparation();rawRecord(input)})
+            },decode={input->checkPreparation();rawRecord(input)},onProgress={pending->interiorProgress(task,id,pending)})
         }else{
             // Fresh decoded inputs need no encoded disk/network lookup.
             val missing=footprint.filter{input->

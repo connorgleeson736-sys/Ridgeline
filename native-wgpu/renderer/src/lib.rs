@@ -9,6 +9,8 @@ mod appearance;
 mod cartography;
 mod inspection;
 mod labels;
+mod planar;
+mod progressive;
 pub use appearance::MapStyle;
 pub use cartography::CartographicPath;
 pub use labels::LabelSprite;
@@ -17,6 +19,7 @@ mod cover_plans;
 mod diagnostics;
 mod index_atlas;
 mod mipmaps;
+pub mod picking_snapshot;
 mod residency;
 mod routes;
 mod seams;
@@ -56,6 +59,7 @@ pub enum TextureBackend {
     Arrays,
 }
 struct Tile {
+    height_layer: u32,
     height_bind: Arc<wgpu::BindGroup>,
     array: Option<texture_arrays::LayerLease>,
     _heights: wgpu::Texture,
@@ -72,6 +76,9 @@ struct ImageTile {
     used: u64,
 }
 pub struct Renderer {
+    plane: Option<planar::Plane>,
+    interior: Option<progressive::Interior>,
+    submitted_pick: Option<Arc<picking_snapshot::PickingSnapshot>>,
     pub device: wgpu::Device,
     pub queue: wgpu::Queue,
     pub format: wgpu::TextureFormat,
@@ -483,6 +490,9 @@ impl Renderer {
         let inspection_gpu = route_gpu.fork(&device);
         let labels_gpu = labels::LabelGpu::new(&device, &queue, format);
         let mut renderer = Self {
+            plane: None,
+            interior: None,
+            submitted_pick: None,
             device,
             queue,
             format,
@@ -644,6 +654,9 @@ impl Renderer {
     }
     pub fn touch_geometry(&mut self, id: TileId) -> bool {
         if let Some(tile) = self.tiles.get_mut(&id) {
+            if !tile.field.complete() {
+                return false;
+            }
             self.clock += 1;
             tile.used = self.clock;
             true
@@ -681,11 +694,32 @@ impl Renderer {
         id: TileId,
         heights: Vec<f32>,
     ) -> Result<(), UploadError> {
+        self.upload_geometry_region(id, heights, [0, 0, 128, 128])
+    }
+    fn upload_geometry_region(
+        &mut self,
+        id: TileId,
+        heights: Vec<f32>,
+        valid: [usize; 4],
+    ) -> Result<(), UploadError> {
         if heights.len() != 129 * 129 || heights.iter().any(|h| !h.is_finite()) {
             return Err(UploadError::InvalidGeometry);
         }
-        if self.touch_geometry(id) {
+        if valid == [0, 0, 128, 128] {
+            if let Some(p) = &self.interior {
+                if p.id != id && p.id.contains(id) {
+                    let (old, token) = (p.id, p.token);
+                    self.clear_interior(old, token);
+                }
+            }
+        }
+        if valid == [0, 0, 128, 128] && self.touch_geometry(id) {
             return Ok(());
+        }
+        if self.tiles.get(&id).is_some_and(|t| !t.field.complete()) {
+            self.tiles.remove(&id);
+            self.cover_dirty = true;
+            self.seams_dirty = true;
         }
         if self.tiles.len() >= 192 {
             self.trim_geometry();
@@ -771,6 +805,7 @@ impl Renderer {
         self.tiles.insert(
             id,
             Tile {
+                height_layer: layer,
                 height_bind,
                 array: allocation,
                 _heights: heights_texture,
@@ -779,8 +814,12 @@ impl Renderer {
                 used: self.clock,
                 generation: self.clock,
                 field: Arc::new(
-                    ridgeline_core::heightfield::Heightfield::new(128, heights.into_boxed_slice())
-                        .map_err(|_| UploadError::InvalidGeometry)?,
+                    ridgeline_core::heightfield::Heightfield::new_region(
+                        128,
+                        heights.into_boxed_slice(),
+                        valid,
+                    )
+                    .map_err(|_| UploadError::InvalidGeometry)?,
                 ),
             },
         );
@@ -791,6 +830,9 @@ impl Renderer {
             self.terrain_overlays_changed();
         }
         self.cover_dirty = true;
+        if valid == [0, 0, 128, 128] && self.interior.as_ref().is_some_and(|p| p.id == id) {
+            self.interior = None;
+        }
         Ok(())
     }
     pub fn upload_image(&mut self, id: TileId, rgba: &[u8]) -> Result<(), UploadError> {
@@ -1029,20 +1071,40 @@ impl Renderer {
     }
     fn active_sources(&self, geometry: bool) -> Vec<TileId> {
         let available: Vec<_> = if geometry {
-            self.tiles.keys().copied().collect()
+            self.geometry_cover_sources()
         } else {
             self.images.keys().copied().collect()
         };
         if let Some((g, i)) = &self.ideal_demand {
-            ridgeline_core::render_sources(&available, if geometry { g } else { i })
+            let sources = ridgeline_core::render_sources(&available, if geometry { g } else { i });
+            if geometry {
+                self.physical_sources(sources)
+            } else {
+                sources
+            }
         } else {
-            available
+            if geometry {
+                self.physical_sources(available)
+            } else {
+                available
+            }
         }
     }
     fn rebuild_cover(&mut self) {
-        let geometry = self.active_sources(true);
+        let available = self.geometry_cover_sources();
+        let geometry = if let Some((g, _)) = &self.ideal_demand {
+            ridgeline_core::render_sources(&available, g)
+        } else {
+            available
+        };
         let images = self.active_sources(false);
-        let cover = ridgeline_core::resident_cover(&geometry);
+        let cover = ridgeline_core::resident_cover(&geometry)
+            .into_iter()
+            .map(|mut row| {
+                row.source = self.physical_geometry(row.source);
+                row
+            })
+            .collect::<Vec<_>>();
         if self.cover != cover || self.seams_dirty {
             self.edge_masks = seams::masks(&cover, &self.tiles, &mut self.seam_proofs);
             self.seams_dirty = false;
@@ -1051,7 +1113,16 @@ impl Renderer {
             self.terrain_overlays_changed();
             self.cover = cover;
         }
-        self.draws = self.cover_plans.get(&geometry, &images);
+        self.draws = self
+            .cover_plans
+            .get(&geometry, &images)
+            .into_iter()
+            .map(|mut row| {
+                row.geometry = self.physical_geometry(row.geometry);
+                row
+            })
+            .collect();
+        self.coalesce_interior_draws(&images);
     }
     fn trim_geometry(&mut self) {
         let mut coarse = self.tiles.keys().filter(|id| id.z <= 12).count();
@@ -1360,7 +1431,7 @@ impl Renderer {
             let mx = view.center[0] + (origin.x as f64 + direction.x as f64 * t) / world;
             let my = view.center[1] - (origin.y as f64 + direction.y as f64 * t) / world;
             if !self.draws.iter().any(|row| {
-                let b = row.region.bounds();
+                let b = row.bounds();
                 mx >= b[0] && mx <= b[2] && my >= b[1] && my <= b[3]
             }) {
                 return None;
@@ -1378,7 +1449,7 @@ impl Renderer {
         for row in &self.draws {
             let bounds = row.geometry.bounds();
             let span = bounds[2] - bounds[0];
-            let clip = row.region.bounds();
+            let clip = row.bounds();
             let ray = ridgeline_core::heightfield::Ray {
                 origin: [
                     (view.center[0] + origin.x as f64 / world - bounds[0]) / span,
@@ -1429,6 +1500,7 @@ impl Renderer {
         pitch: f32,
         elevation: f32,
     ) {
+        self.validate_interior(self.logical_zoom.unwrap_or(zoom));
         if self.cover_dirty {
             self.rebuild_cover();
             self.cover_dirty = false;
@@ -1569,6 +1641,7 @@ impl Renderer {
                 px_meter,
                 now,
                 self.exact_route_sources.contains(&id)
+                    || self.interior.as_ref().is_some_and(|p| p.parent == id)
                     || (!self.map_style.three_d
                         && self.map_style.hillshade
                         && self.map_style.basemap != 2),
@@ -1584,15 +1657,11 @@ impl Renderer {
         // neighbours in quadtree order. Surface ownership remains disjoint.
         if self.image_arrays.is_some() && self.height_arrays.is_some() {
             rows.sort_by_cached_key(|row| {
-                let rect = ridgeline_core::surface::GridRect::for_region(row.geometry, row.region);
-                let mask = ridgeline_core::surface::skirt_edges(row.geometry_region, row.region)
-                    & self
-                        .edge_masks
-                        .get(&row.geometry_region)
-                        .copied()
-                        .unwrap_or(15);
+                let rect =
+                    ridgeline_core::surface::GridRect::for_bounds(row.geometry, row.bounds());
+                let mask = self.draw_mask(row);
                 (
-                    row.region.z - row.geometry.z > 7,
+                    self.draw_clipped(row),
                     Arc::as_ptr(&self.images[&row.image].bind) as usize,
                     Arc::as_ptr(&self.tiles[&row.geometry].height_bind) as usize,
                     rect.x0,
@@ -1608,7 +1677,7 @@ impl Renderer {
         data.clear();
         data.extend(rows.iter().map(|row| {
             let b = row.geometry.bounds();
-            let region = row.region.bounds();
+            let region = row.bounds();
             let size = b[2] - b[0];
             let image = row.image.bounds();
             let image_size = image[2] - image[0];
@@ -1629,10 +1698,7 @@ impl Renderer {
                     .array
                     .as_ref()
                     .map_or(0., |a| a.layer as f32),
-                self.tiles[&row.geometry]
-                    .array
-                    .as_ref()
-                    .map_or(0., |a| a.layer as f32),
+                self.tiles[&row.geometry].height_layer as f32,
             ]
         }));
         if data.len() > self.instance_capacity {
@@ -1657,14 +1723,9 @@ impl Renderer {
             .iter()
             .map(|row| {
                 (
-                    ridgeline_core::surface::GridRect::for_region(row.geometry, row.region),
-                    ridgeline_core::surface::skirt_edges(row.geometry_region, row.region)
-                        & self
-                            .edge_masks
-                            .get(&row.geometry_region)
-                            .copied()
-                            .unwrap_or(15),
-                    ridgeline_core::surface::GridRect::for_region(row.geometry, row.region)
+                    ridgeline_core::surface::GridRect::for_bounds(row.geometry, row.bounds()),
+                    self.draw_mask(row),
+                    ridgeline_core::surface::GridRect::for_bounds(row.geometry, row.bounds())
                         .adaptive_step(self.adaptive_levels[&row.geometry]),
                 )
             })
@@ -1761,7 +1822,7 @@ impl Renderer {
             let mut i = 0;
             while i < rows.len() {
                 let row = rows[i];
-                let clipped = row.region.z - row.geometry.z > 7;
+                let clipped = self.draw_clipped(&row);
                 if clipped_pipeline != Some(clipped) {
                     pass.set_pipeline(if clipped {
                         &self.pipeline
@@ -1784,7 +1845,7 @@ impl Renderer {
                 }
                 let mut end_instance = i + 1;
                 while end_instance < rows.len()
-                    && (rows[end_instance].region.z - rows[end_instance].geometry.z > 7) == clipped
+                    && self.draw_clipped(&rows[end_instance]) == clipped
                     && Arc::ptr_eq(
                         &self.tiles[&rows[end_instance].geometry].height_bind,
                         &self.tiles[&row.geometry].height_bind,
@@ -1845,6 +1906,7 @@ impl Renderer {
         }
         self.visible_scratch = rows;
         self.frames += 1;
+        self.submitted_pick = self.build_picking_snapshot();
     }
 }
 

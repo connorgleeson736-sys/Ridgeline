@@ -7,6 +7,13 @@ pub struct SurfacePatch {
     pub geometry_region: TileId,
     pub image: TileId,
     pub region: TileId,
+    pub clip: Option<[f64; 4]>,
+    pub skirt_override: Option<u8>,
+}
+impl SurfacePatch {
+    pub fn bounds(&self) -> [f64; 4] {
+        self.clip.unwrap_or_else(|| self.region.bounds())
+    }
 }
 pub fn surface_cover(geometry: &[TileId], images: &[TileId]) -> Vec<SurfacePatch> {
     let ground = resident_cover(geometry);
@@ -33,6 +40,8 @@ pub fn surface_cover(geometry: &[TileId], images: &[TileId]) -> Vec<SurfacePatch
                 unreachable!("disjoint quadtree intervals cannot overlap");
             };
             out.push(SurfacePatch {
+                clip: None,
+                skirt_override: None,
                 geometry: g.source,
                 geometry_region: g.region,
                 image: i.source,
@@ -85,8 +94,10 @@ pub struct GridRect {
 impl GridRect {
     pub fn for_region(geometry: TileId, region: TileId) -> Self {
         assert!(geometry.contains(region));
+        Self::for_bounds(geometry, region.bounds())
+    }
+    pub fn for_bounds(geometry: TileId, r: [f64; 4]) -> Self {
         let g = geometry.bounds();
-        let r = region.bounds();
         let scale = 128. / (g[2] - g[0]);
         Self {
             x0: ((r[0] - g[0]) * scale).floor().clamp(0., 127.) as u16,
@@ -406,6 +417,8 @@ mod join_tests {
                     continue;
                 };
                 out.push(SurfacePatch {
+                    clip: None,
+                    skirt_override: None,
                     geometry: g.source,
                     geometry_region: g.region,
                     image: i.source,

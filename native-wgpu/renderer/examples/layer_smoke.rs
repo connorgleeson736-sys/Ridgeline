@@ -334,6 +334,154 @@ async fn run() {
     render(&mut r, &target, [0.6, 0.6], 11., 0., 0., 0.);
     let sky = read(&r, &output);
     assert_eq!(&sky[..4], &[23, 36, 47, 255]);
+    // Audit regression: exact snapshot picks, masked interiors, complete promotion.
+    r.set_cartography(vec![]);
+    r.set_routes(vec![]);
+    r.set_label_atlas(1, 1, &[0; 4], vec![]);
+    r.inspect_point(None);
+    r.location_point(None);
+    r.clear_demand();
+    for child in id.children() {
+        r.clear_geometry();
+        r.clear_images();
+        r.set_map_style(ridgeline_renderer::MapStyle {
+            three_d: true,
+            relief: 1.,
+            hillshade: false,
+            basemap: 0,
+            natural: false,
+            ..style
+        });
+        r.upload(
+            id,
+            &vec![1000.; 129 * 129],
+            &[150, 160, 170, 255].repeat(256 * 256),
+        )
+        .unwrap();
+        r.upload_geometry(child, &vec![1400.; 129 * 129]).unwrap();
+        r.set_demand(vec![id, child], vec![id]);
+        let cb = child.bounds();
+        let cs = cb[2] - cb[0];
+        let cc = [(cb[0] + cb[2]) / 2., (cb[1] + cb[3]) / 2.];
+        render(&mut r, &target, cc, 11., -24., 35., 1400.);
+        let expected = read(&r, &output);
+        r.clear_geometry();
+        r.upload_geometry(id, &vec![1000.; 129 * 129]).unwrap();
+        render(&mut r, &target, cc, 11., -24., 35., 1400.);
+        let rect = [
+            if child.x % 2 == 0 { 1 } else { 0 },
+            if child.y % 2 == 0 { 1 } else { 0 },
+            if child.x % 2 == 0 { 128 } else { 127 },
+            if child.y % 2 == 0 { 128 } else { 127 },
+        ];
+        let mut heights = vec![0.; 129 * 129];
+        for y in rect[1]..=rect[3] {
+            for x in rect[0]..=rect[2] {
+                heights[y * 129 + x] = 1400.;
+            }
+        }
+        r.upload_interior(child, 7, heights, rect).unwrap();
+        render(&mut r, &target, cc, 11., -24., 35., 1400.);
+        assert!(
+            !r.has_geometry(child),
+            "partial readiness never acknowledges a full patch"
+        );
+        assert!(
+            r.last_frame_draw_calls <= 8,
+            "rectangular clips avoid hundreds of interim terrain draws"
+        );
+        println!("Progressive terrain calls: {}", r.last_frame_draw_calls);
+        assert_eq!(r.terrain_height(cc), Some(1400.));
+        let rimx = if child.x % 2 == 0 {
+            0.5 / 128.
+        } else {
+            127.5 / 128.
+        };
+        let rim = [cb[0] + rimx * cs, cc[1]];
+        assert_eq!(
+            r.terrain_height(rim),
+            Some(1000.),
+            "missing rim retains measured parent"
+        );
+        let snapshot = r.picking_snapshot().unwrap();
+        let mut samples = Vec::new();
+        for y in (24..256).step_by(40) {
+            for x in (24..256).step_by(40) {
+                let picked = r.pick_at(x as f64, y as f64);
+                assert_eq!(snapshot.pick(x as f64, y as f64), picked);
+                samples.push((x, y, picked));
+            }
+        }
+        r.upload_geometry(child, &vec![1400.; 129 * 129]).unwrap();
+        render(&mut r, &target, cc, 11., -24., 35., 1400.);
+        assert!(r.has_geometry(child));
+        assert!(
+            expected == read(&r, &output),
+            "completed progressive frame is pixel-identical to complete-only rendering"
+        );
+        r.clear_interior(child, 7);
+        assert!(
+            r.has_geometry(child),
+            "late cancellation cannot delete a promoted patch"
+        );
+        for (x, y, picked) in samples {
+            assert_eq!(
+                snapshot.pick(x as f64, y as f64),
+                picked,
+                "old snapshots retain immutable fields across promotion"
+            );
+        }
+    }
+    println!(
+        "PASS audit progressive: four quadrant owners, measured parent rims, snapshot parity/immutability, complete frames pixel-identical; no fake full acknowledgements"
+    );
+    r.clear_geometry();
+    r.set_map_style(ridgeline_renderer::MapStyle {
+        three_d: false,
+        hillshade: false,
+        basemap: 0,
+        natural: false,
+        ..style
+    });
+    for child in id.children() {
+        r.upload_plane(child).unwrap();
+    }
+    assert_eq!(r.unique_height_resources(), 1);
+    render(&mut r, &target, center, 11., -24., 0., 0.);
+    let shared = read(&r, &output);
+    r.clear_geometry();
+    for child in id.children() {
+        r.upload_geometry(child, &vec![0.; 129 * 129]).unwrap();
+    }
+    render(&mut r, &target, center, 11., -24., 0., 0.);
+    assert!(
+        shared == read(&r, &output),
+        "shared plane has exact existing rasterisation"
+    );
+    let sprites = || {
+        vec![ridgeline_renderer::LabelSprite {
+            point: center,
+            uv: [0., 0., 1., 1.],
+            size: [30., 12.],
+        }]
+    };
+    r.set_label_atlas(16, 8, &[0, 0, 255, 255].repeat(128), sprites());
+    let before = r.label_texture_upload_bytes();
+    r.set_label_metadata(sprites());
+    assert_eq!(before, r.label_texture_upload_bytes());
+    let mut pixels = [0, 0, 255, 255].repeat(128);
+    pixels[16 * 4 * 3..16 * 4 * 4].fill(255);
+    r.set_label_atlas(16, 8, &pixels, sprites());
+    assert_eq!(
+        r.label_texture_upload_bytes() - before,
+        16 * 4,
+        "only the dirty atlas row uploads"
+    );
+    render(&mut r, &target, center, 11., 0., 0., 0.);
+    read(&r, &output);
+    println!(
+        "PASS audit plane sharing, unchanged pixels, metadata-only labels and dirty-row upload"
+    );
     println!(
         "PASS native layers: cartographic line, depth-tested native-font atlas, projection, ungraded nearest Topo, relief picking/clearance and sky on actual GPU. Synthetic source fixture, not device/visual acceptance."
     );

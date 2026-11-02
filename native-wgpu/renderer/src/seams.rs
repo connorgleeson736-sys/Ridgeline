@@ -66,11 +66,11 @@ fn continuous(a: Edge, b: Edge, lo: u32, hi: u32, tiles: &HashMap<TileId, Tile>)
     }
     let fixed = (a.line as u64) << 7;
     for id in [a.source, b.source] {
-        if fixed % (1u64 << (22 - id.z)) != 0 {
+        if fixed % (1u64 << (29 - id.z)) != 0 {
             return false;
         }
     }
-    let step = 1u64 << (22 - a.source.z.max(b.source.z));
+    let step = 1u64 << (29 - a.source.z.max(b.source.z));
     let sample = |edge: Edge, p: u64| {
         let (x, y) = if edge.axis == 0 {
             (fixed, p)
@@ -80,8 +80,8 @@ fn continuous(a: Edge, b: Edge, lo: u32, hi: u32, tiles: &HashMap<TileId, Tile>)
         let bounds = edge.source.bounds();
         let size = bounds[2] - bounds[0];
         tiles[&edge.source].field.sample(
-            (x as f64 / (1u64 << 29) as f64 - bounds[0]) / size,
-            (y as f64 / (1u64 << 29) as f64 - bounds[1]) / size,
+            (x as f64 / (1u64 << 36) as f64 - bounds[0]) / size,
+            (y as f64 / (1u64 << 36) as f64 - bounds[1]) / size,
         )
     };
     let mut p = (lo as u64) << 7;
@@ -107,7 +107,7 @@ pub(crate) fn masks(
     let mut masks = HashMap::new();
     for row in cover {
         let id = row.region;
-        let shift = 22 - id.z;
+        let shift = 29 - id.z;
         let x0 = id.x << shift;
         let x1 = (id.x + 1) << shift;
         let y0 = id.y << shift;
