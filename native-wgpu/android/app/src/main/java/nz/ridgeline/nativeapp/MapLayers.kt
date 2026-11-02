@@ -27,7 +27,26 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
     @Volatile private var diagnostics="Map layers: waiting for view"
     private var decoded=0L;private var lastDecodeMs=0L;private var lastBuildMs=0L;private var lastAtlasMs=0L
     private var displayState=loader.mapSettings.state
-    init{view.onLayerProjection={data,positions->val start=System.nanoTime();val selection=NativeLabels.place(data,positions,view.width,view.height,view.pixelScale.toFloat());view.placeMapLabels(data,selection);val count=selection.getInt(0);diagnostics=diagnostics.substringBefore("\nLabel placement:")+"\nLabel placement: $count/${data.labels.size} · ${(System.nanoTime()-start)/1_000_000} ms"}}
+    private data class Projection(val revision:Long,val atlas:NativeLabelAtlas,val positions:FloatArray,val width:Int,val height:Int,val scale:Float)
+    private val projectionRevision=java.util.concurrent.atomic.AtomicLong()
+    private val projection=java.util.concurrent.atomic.AtomicReference<Projection?>()
+    private val placementQueued=java.util.concurrent.atomic.AtomicBoolean()
+    init{view.onLayerProjection={data,positions->
+        projection.set(Projection(projectionRevision.incrementAndGet(),data,positions,view.width,view.height,view.pixelScale.toFloat()))
+        schedulePlacement()
+    }}
+    private fun schedulePlacement(){
+        if(closed||!placementQueued.compareAndSet(false,true))return
+        runCatching{worker.execute{
+            try{
+                val next=projection.getAndSet(null)
+                if(next!=null&&!closed&&active){val start=System.nanoTime();val selection=NativeLabels.place(next.atlas,next.positions,next.width,next.height,next.scale)
+                    main.post{if(!closed&&active&&projectionRevision.get()==next.revision)view.placeMapLabels(next.atlas,selection)}
+                    diagnostics=diagnostics.substringBefore("\nLabel placement:")+"\nLabel placement: ${selection.getInt(0)}/${next.atlas.labels.size} · ${(System.nanoTime()-start)/1_000_000} ms · background"
+                }
+            }finally{placementQueued.set(false);if(projection.get()!=null)schedulePlacement()}
+        }}.onFailure{placementQueued.set(false)}
+    }
     fun snapshot()=diagnostics
     fun refresh(){if(closed)return;runCatching{worker.execute{
         if(closed)return@execute
@@ -48,7 +67,8 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
             val n=NativeBridge.planFocused((view.width/view.pixelScale).roundToInt().coerceAtLeast(1),(view.height/view.pixelScale).roundToInt().coerceAtLeast(1),pose.longitude,pose.latitude,pose.zoom,pose.bearing,pose.pitch,pose.elevation,24,512.0,15,1.0,focus?.longitude?:Double.NaN,focus?.latitude?:Double.NaN,focus?.range?:Double.NaN,plan)
             plan.rewind();List(n){GpuUploadQueue.Id(plan.int,plan.int,plan.int)}
         }
-        if(current!=wanted){current=wanted;tiles.keys.retainAll(wanted.toSet()+LayerCover.display(wanted,tiles.keys).map{it.source});retry.keys.retainAll(wanted.toSet());lease?.takeIf{it.first !in wanted}?.let{it.second.release(true);lease=null};lastKey=null}
+        if(current.toSet()!=wanted.toSet()){current=wanted;tiles.keys.retainAll(wanted.toSet()+LayerCover.display(wanted,tiles.keys).map{it.source});retry.keys.retainAll(wanted.toSet());lease?.takeIf{it.first !in wanted}?.let{it.second.release(true);lease=null};lastKey=null}
+        current=wanted
         if(mask(state).isEmpty()){lease?.second?.release(true);lease=null;tiles.clear()}
         schedulePublication();pump()
     }
@@ -75,11 +95,15 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
     }
     private fun schedulePublication(){if(closed||publication!=null&&!publication!!.isDone)return;publication=worker.schedule({publication=null;try{publish()}catch(_:Exception){diagnostics="Visible topographic data exceeds the current layer budget or could not be prepared; imagery and routes remain available.";lastKey=null}},60,TimeUnit.MILLISECONDS)}
     private fun publish(){
-        if(closed)return;val state=loader.mapSettings.state;val pose=view.planningPose;val zoom=floor(pose.zoom*4)/4
-        val key=listOf(state,current,tiles.mapValues{it.value.body.stamp?.fingerprint?:it.value.body.bytes.hashCode()},zoom)
+        if(closed||!active)return
+        // Keep the current map batch during a gesture; publish one latest batch after it settles.
+        if(view.gestureInProgress)return
+        val state=loader.mapSettings.state;val pose=view.planningPose;val zoom=floor(pose.zoom*4)/4
+        val ordered=current.sortedWith(compareBy<GpuUploadQueue.Id>{it.z}.thenBy{it.x}.thenBy{it.y})
+        val key=listOf(state,ordered,tiles.mapValues{it.value.body.stamp?.fingerprint?:it.value.body.bytes.hashCode()},zoom)
         if(key==lastKey)return;lastKey=key
         val start=System.nanoTime();val lines=ArrayList<TopographyStyle.Line>();val labels=ArrayList<TopographyStyle.Label>();val enabled=mask(state)
-        val patches=LayerCover.display(current,tiles.keys);val styled=HashMap<GpuUploadQueue.Id,TopographyStyle.Output>()
+        val patches=LayerCover.display(ordered,tiles.keys);val styled=HashMap<GpuUploadQueue.Id,TopographyStyle.Output>()
         tiles.keys.retainAll(current.toSet()+patches.map{it.source})
         if(state.overlays())for(patch in patches){val id=patch.source;val tile=tiles[id]?:continue
             if(tile.mask!=enabled){tile.features=VectorTile.decode(tile.body.bytes,id.z,id.x,id.y,enabled);tile.mask=enabled;decoded++}
@@ -89,13 +113,14 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         }
         if(state.borders&&state.base==MapSettings.Base.LINZ&&zoom>=8){
             val parts=boundary?:readBoundary().also{boundary=it}
-            for(id in current)for(path in parts)for(clipped in clip(path,id.bounds)){
+            for(id in ordered)for(path in parts)for(clipped in clip(path,id.bounds)){
                 lines.add(TopographyStyle.Line(clipped,0x8c111111.toInt(),1f,.2f,3.8f))
                 if(zoom>=11&&clipped.size>1){val p=clipped[clipped.size/2];labels.add(TopographyStyle.Label(p,"LINZ imagery | Esri World Imagery",10f,0xffdddddd.toInt(),85.0,key="boundary:${p.x}:${p.y}"))}
             }
         }
-        val mx=(pose.longitude+180)/360;val my=(1-asinh(tan(Math.toRadians(pose.latitude)))/PI)/2
-        val chosen=labels.distinctBy{it.key}.sortedWith(compareBy<TopographyStyle.Label>{it.priority}.thenBy{(it.point.x-mx).pow(2)+(it.point.y-my).pow(2)}).take(512)
+        // A camera-dependent atlas order repainted/reuploaded the same strings on pans.
+        // Fixed priority/key order keeps atlas slots stable; screen placement still follows camera.
+        val chosen=labels.distinctBy{it.key}.sortedWith(compareBy<TopographyStyle.Label>{it.priority}.thenBy{it.key}).take(512)
         if(lines!=lastLines){val packed=pack(lines);lastLines=lines;linePacket=packed}
         lastBuildMs=(System.nanoTime()-start)/1_000_000
         if(chosen!=lastLabels){val a=System.nanoTime();atlas=NativeLabels.atlas(chosen);lastLabels=chosen;lastAtlasMs=(System.nanoTime()-a)/1_000_000}

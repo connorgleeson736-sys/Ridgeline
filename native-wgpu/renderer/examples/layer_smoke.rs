@@ -3,6 +3,28 @@ use ridgeline_renderer::{Renderer, TileId};
 fn main() {
     pollster::block_on(run());
 }
+fn render(
+    r: &mut Renderer,
+    target: &wgpu::TextureView,
+    center: [f64; 2],
+    zoom: f64,
+    bearing: f32,
+    pitch: f32,
+    elevation: f32,
+) {
+    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(10);
+    loop {
+        r.render(target, center, zoom, bearing, pitch, elevation);
+        if !r.cartography_pending() {
+            break;
+        }
+        assert!(
+            std::time::Instant::now() < deadline,
+            "asynchronous cartography completes"
+        );
+        std::thread::sleep(std::time::Duration::from_millis(1));
+    }
+}
 fn read(r: &Renderer, output: &wgpu::Texture) -> Vec<u8> {
     let buffer = r.device.create_buffer(&wgpu::BufferDescriptor {
         label: Some("readback"),
@@ -86,7 +108,7 @@ async fn run() {
         view_formats: &[],
     });
     let target = output.create_view(&Default::default());
-    r.render(&target, center, 11., 0., 0., 500.);
+    render(&mut r, &target, center, 11., 0., 0., 500.);
     let before = read(&r, &output);
     r.set_routes(vec![ridgeline_renderer::RoutePath {
         points: vec![
@@ -96,7 +118,7 @@ async fn run() {
         color: [1., 0.1, 0.1, 1.],
         selected: Some(0),
     }]);
-    r.render(&target, center, 11., 0., 0., 500.);
+    render(&mut r, &target, center, 11., 0., 0., 500.);
     let after = read(&r, &output);
     let changed = before
         .chunks_exact(4)
@@ -107,9 +129,10 @@ async fn run() {
     let pixel = &after[(128 * 256 + 128) * 4..][..4];
     assert!(pixel[0] > pixel[1] + 40, "route crosses the actual center");
     let uploads = r.route_uploads();
-    r.render(&target, center, 11., 0., 0., 500.);
+    render(&mut r, &target, center, 11., 0., 0., 500.);
     assert_eq!(uploads, r.route_uploads());
-    r.render(
+    render(
+        &mut r,
         &target,
         [center[0] + span * 0.01, center[1]],
         11.,
@@ -135,16 +158,37 @@ async fn run() {
         width: 3.,
         dash: [0., 0.],
     }]);
-    r.render(&target, center, 11., 0., 0., 500.);
+    render(&mut r, &target, center, 11., 0., 0., 500.);
     let cartography = read(&r, &output);
     let pixel = &cartography[(128 * 256 + 128) * 4..][..4];
     assert!(
         pixel[1] > pixel[0] + 40,
         "real cartographic batch crosses terrain"
     );
+    let jobs = r.cartography_jobs();
+    let map_bytes = r.cartographic_upload_bytes();
+    r.set_routes(vec![ridgeline_renderer::RoutePath {
+        points: vec![center],
+        color: [1., 0., 0., 1.],
+        selected: Some(0),
+    }]);
+    render(&mut r, &target, center, 11., 0., 0., 500.);
+    assert_eq!(
+        jobs,
+        r.cartography_jobs(),
+        "route selection must not restart map draping"
+    );
+    assert_eq!(
+        map_bytes,
+        r.cartographic_upload_bytes(),
+        "route selection must not reupload map lines"
+    );
+    r.set_routes(vec![]);
+    render(&mut r, &target, center, 11., 0., 0., 500.);
+    println!("PASS route-only invalidation: no cartography job or upload");
     let instanced_bytes = r.cartographic_upload_bytes();
     r.expanded_overlay_validation(true);
-    r.render(&target, center, 11., 0., 0., 500.);
+    render(&mut r, &target, center, 11., 0., 0., 500.);
     let expanded = read(&r, &output);
     let expanded_bytes = r.cartographic_upload_bytes();
     assert!(
@@ -168,7 +212,7 @@ async fn run() {
         }],
     );
     r.select_labels(vec![(0, [10., -6.])]);
-    r.render(&target, center, 11., 0., 0., 500.);
+    render(&mut r, &target, center, 11., 0., 0., 500.);
     let labels = read(&r, &output);
     let pixel = &labels[(128 * 256 + 145) * 4..][..4];
     assert!(
@@ -189,7 +233,7 @@ async fn run() {
         three_d: true,
     };
     r.set_map_style(style);
-    r.render(&target, center, 11., 0., 0., 500.);
+    render(&mut r, &target, center, 11., 0., 0., 500.);
     let topo = read(&r, &output);
     assert_eq!(
         &topo[(128 * 256 + 128) * 4..][..4],
@@ -200,7 +244,7 @@ async fn run() {
         relief: 1.5,
         ..style
     });
-    r.render(&target, center, 11., 0., 0., 750.);
+    render(&mut r, &target, center, 11., 0., 0., 750.);
     let hit = r.pick_at(128., 128.).unwrap();
     assert!(
         (hit[2] - 750.).abs() < 0.01,
@@ -220,7 +264,7 @@ async fn run() {
         three_d: false,
         ..style
     });
-    r.render(&target, center, 11., 0., 0., 0.);
+    render(&mut r, &target, center, 11., 0., 0., 0.);
     let flat = r.pick_at(128., 128.).unwrap();
     assert!(
         flat[2].abs() < 0.001,
@@ -228,7 +272,7 @@ async fn run() {
     );
     r.inspect_point(Some(center));
     r.location_point(Some([center[0] + span * 0.1, center[1]]));
-    r.render(&target, center, 11., 0., 0., 0.);
+    render(&mut r, &target, center, 11., 0., 0., 0.);
     let marker = read(&r, &output);
     assert!(
         marker[(128 * 256 + 128) * 4 + 1] > marker[(128 * 256 + 128) * 4],
@@ -249,13 +293,13 @@ async fn run() {
         .collect();
     r.upload_image(id, &checker).unwrap();
     r.set_map_style(style);
-    r.render(&target, center, 11., 0., 0., 500.);
+    render(&mut r, &target, center, 11., 0., 0., 500.);
     let planar_fine = read(&r, &output);
     r.set_map_style(ridgeline_renderer::MapStyle {
         three_d: false,
         ..style
     });
-    r.render(&target, center, 11., 0., 0., 0.);
+    render(&mut r, &target, center, 11., 0., 0., 0.);
     assert!(
         planar_fine == read(&r, &output),
         "2D plane subdivision retains all original raster pixels"
@@ -272,7 +316,7 @@ async fn run() {
         hillshade: false,
         ..style
     });
-    r.render(&target, center, 11., 0., 0., 0.);
+    render(&mut r, &target, center, 11., 0., 0., 0.);
     let unshaded = read(&r, &output);
     r.set_map_style(ridgeline_renderer::MapStyle {
         three_d: false,
@@ -281,13 +325,13 @@ async fn run() {
         hillshade: true,
         ..style
     });
-    r.render(&target, center, 11., 0., 0., 0.);
+    render(&mut r, &target, center, 11., 0., 0., 0.);
     let shaded = read(&r, &output);
     assert!(
         unshaded != shaded,
         "Igor shade changes actual pixels using real resident heights while geometry stays 2D"
     );
-    r.render(&target, [0.6, 0.6], 11., 0., 0., 0.);
+    render(&mut r, &target, [0.6, 0.6], 11., 0., 0., 0.);
     let sky = read(&r, &output);
     assert_eq!(&sky[..4], &[23, 36, 47, 255]);
     println!(

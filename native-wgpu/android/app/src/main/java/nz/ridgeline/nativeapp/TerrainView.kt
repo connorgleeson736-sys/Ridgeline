@@ -39,7 +39,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     private var focusCoverDirty=false
     val gestureInProgress get()=gestureActive
     @Volatile private var lastBacklog=0
-    internal fun loadingSnapshot()="GPU uploads waiting: ${uploads.size()} · outstanding submissions: $lastBacklog\nGPU admission: ${uploads.outcomeStats()}\nResident geometry/images: ${residency.geometry.size}/${residency.images.size}\nDetail focus: "+if(surfaceFocusFor(planningPose)!=null)"measured visible terrain"else"map pivot (no current terrain hit)"
+    internal fun loadingSnapshot()="GPU uploads waiting: ${uploads.size()} · outstanding submissions: $lastBacklog\nGPU admission: ${uploads.outcomeStats()}\nResident geometry/images: ${residency.geometry.size}/${residency.images.size}\nNative render CPU/wait last/max: $renderLastMs/$renderMaxMs ms\nDetail focus: "+if(surfaceFocusFor(planningPose)!=null)"measured visible terrain"else"map pivot (no current terrain hit)"
     val canPrepareAhead get()=live&&active&&!gestureActive&&lastBacklog==0&&!uploads.isNotEmpty()
     fun checkPreparationRoom(callback:(Boolean)->Unit){gpu.post{
         if(live&&active&&handle!=0L&&!gestureActive&&presentationFailures==0){lastBacklog=NativeBridge.gpuBacklog(handle);callback(canPrepareAhead)}else callback(false)
@@ -167,6 +167,8 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     private val focusWake=Runnable{requestFrame()}
     private val retryWake=Runnable{requestFrame()}
     private val uploadAdmission=UploadAdmission()
+    @Volatile private var renderLastMs=0L
+    @Volatile private var renderMaxMs=0L
     private val clearanceBytes=ByteBuffer.allocateDirect(12).order(ByteOrder.LITTLE_ENDIAN)
     private fun drawFrame() {
         queued.set(false)
@@ -249,7 +251,9 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         }}
         val renderStarted=System.nanoTime()
         val shown=NativeBridge.render(handle,width,height,pose.longitude,pose.latitude,pose.zoom+ln(pixelScale)/ln(2.0),pose.zoom,pose.bearing,pose.pitch,pose.elevation)
-        uploadAdmission.rendered(System.nanoTime()-renderStarted)
+        val renderElapsed=System.nanoTime()-renderStarted
+        renderLastMs=renderElapsed/1_000_000;renderMaxMs=maxOf(renderMaxMs,renderLastMs)
+        uploadAdmission.rendered(renderElapsed)
         if(shown>0){presentationFailures=0
             val previous=presentedPose;presentedPose=pose;presentedFrom=requested
             val rendered=pose
@@ -307,7 +311,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         if(handle!=0L)NativeBridge.destroy(handle)
         NativeBridge.textureBackend(context.getSharedPreferences("display",0).getInt("textureBackend",0))
         handle=NativeBridge.create(holder.surface,width,height)
-        residency=Residency(LongArray(0),LongArray(0));safetyPose=null;safetyValid=false;appliedRoutes=null;appliedDemand=null
+        residency=Residency(LongArray(0),LongArray(0));safetyPose=null;safetyValid=false;appliedRoutes=null;appliedDemand=null;appliedLayers=null;appliedPlacement=null;appliedStyle=null;appliedInspection=null;appliedGps=null;labelPose=null
         if(handle!=0L){
             uploads.wakeRetries()
             val am=context.getSystemService(android.app.ActivityManager::class.java)
@@ -332,7 +336,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             NativeBridge.textureBackend(context.getSharedPreferences("display",0).getInt("textureBackend",0))
             val created=NativeBridge.create(surface,width,height)
             if(!live||generation.get()!=token){if(created!=0L)NativeBridge.destroy(created);return@post}
-            handle=created;safetyPose=null;safetyValid=false;appliedRoutes=null;appliedDemand=null;appliedStyle=null;appliedLayers=null;appliedPlacement=null;appliedInspection=null;appliedGps=null;labelPose=null;presentationFailures=0
+            handle=created;safetyPose=null;safetyValid=false;appliedRoutes=null;appliedDemand=null;appliedLayers=null;appliedPlacement=null;appliedStyle=null;appliedInspection=null;appliedGps=null;labelPose=null;presentationFailures=0
             if(handle!=0L){val am=context.getSystemService(android.app.ActivityManager::class.java);NativeBridge.tileBudget(handle,if(am.isLowRamDevice)32 else (am.memoryClass/2).coerceIn(64,128))}
             post{onStatus(if(created==0L)"Native GPU initialization failed"else "Loading terrain and imagery…")};requestFrame()
         }

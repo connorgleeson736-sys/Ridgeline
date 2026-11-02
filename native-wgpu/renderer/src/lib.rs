@@ -61,7 +61,7 @@ struct Tile {
     _heights: wgpu::Texture,
     used: u64,
     generation: u64,
-    field: ridgeline_core::heightfield::Heightfield,
+    field: Arc<ridgeline_core::heightfield::Heightfield>,
     adaptive_profile: Option<[f64; 2]>,
     adaptive_state: std::cell::Cell<adaptive::State>,
 }
@@ -109,7 +109,9 @@ pub struct Renderer {
     height: u32,
     route_gpu: routes::RouteGpu,
     cartographic_gpu: routes::RouteGpu,
-    cartographic_paths: Vec<CartographicPath>,
+    cartographic_paths: Arc<[CartographicPath]>,
+    cartographic_worker: Option<cartography::Worker>,
+    cartographic_pending: bool,
     cartographic_dirty: bool,
     cartographic_anchor: [f64; 2],
     cartographic_vertices: u32,
@@ -520,7 +522,9 @@ impl Renderer {
             height,
             route_gpu,
             cartographic_gpu,
-            cartographic_paths: vec![],
+            cartographic_paths: Vec::new().into(),
+            cartographic_worker: None,
+            cartographic_pending: false,
             cartographic_dirty: false,
             cartographic_anchor: [0.5, 0.5],
             cartographic_vertices: 0,
@@ -774,18 +778,17 @@ impl Renderer {
                 adaptive_state: std::cell::Cell::new(adaptive::State::new()),
                 used: self.clock,
                 generation: self.clock,
-                field: ridgeline_core::heightfield::Heightfield::new(
-                    128,
-                    heights.into_boxed_slice(),
-                )
-                .map_err(|_| UploadError::InvalidGeometry)?,
+                field: Arc::new(
+                    ridgeline_core::heightfield::Heightfield::new(128, heights.into_boxed_slice())
+                        .map_err(|_| UploadError::InvalidGeometry)?,
+                ),
             },
         );
         self.trim_geometry();
         self.trim_joint();
         self.seams_dirty = true;
         if self.cover.iter().any(|row| row.source == id) {
-            self.route_dirty = true;
+            self.terrain_overlays_changed();
         }
         self.cover_dirty = true;
         Ok(())
@@ -916,7 +919,11 @@ impl Renderer {
         }
     }
     pub fn next_adaptive_frame(&self) -> Option<u64> {
-        self.next_adaptive_frame
+        if self.cartographic_pending {
+            Some(self.next_adaptive_frame.map_or(32, |delay| delay.min(32)))
+        } else {
+            self.next_adaptive_frame
+        }
     }
     /// Memory pressure releases only cache entries outside current demand/cover.
     pub fn release_unused(&mut self) {
@@ -1041,7 +1048,7 @@ impl Renderer {
             self.seams_dirty = false;
         }
         if self.cover != cover {
-            self.route_dirty = true;
+            self.terrain_overlays_changed();
             self.cover = cover;
         }
         self.draws = self.cover_plans.get(&geometry, &images);
@@ -1159,7 +1166,7 @@ impl Renderer {
             }
             self.tiles.remove(&victim);
             if self.exact_route_sources.contains(&victim) {
-                self.route_dirty = true;
+                self.terrain_overlays_changed();
             }
         }
     }
@@ -1428,14 +1435,12 @@ impl Renderer {
         }
         if self.route_dirty {
             self.rebuild_routes();
-            self.cartographic_dirty = true;
-            self.labels_dirty = true;
-            self.inspection_dirty = true;
         }
         if self.cartographic_dirty {
             self.cartographic_overflow = false;
             self.rebuild_cartography();
         }
+        self.poll_cartography();
         if self.labels_dirty {
             self.rebuild_labels();
         }
