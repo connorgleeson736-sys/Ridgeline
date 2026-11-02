@@ -100,3 +100,19 @@ No broad suite/lint, Android APK build, browser device session or physical-phone
 benchmark was run. A handset comparison must still check frame pacing, cold
 centre-tile sharpness, peak memory, worker/CSP behavior and sustained performance
 with matching camera path, caches, detail and layer visibility.
+
+## APK delivery
+
+A separately installable **0.19.0 Latency Audit Base** APK is now built from
+`2b9aefb41b1e252def846c6b1e526e42bee5f1e8`. The original Capacitor key was not
+available; `nz.ridgeline.mobile.performance.latencyaudit` preserves the original
+installed application by using a distinct package and private data directory.
+The existing backed-up development key signs future updates of this audit app.
+
+See [the download page](checkpoints/README.md) and
+[APK verification](validation/latency-audit-2026-11-03/apk/release.json).
+Build/signature/alignment and 1,134 unchanged original payloads verified; Android's
+automatic release-vital lint passed. No additional tests/full lint were requested
+for packaging and no handset run was performed. Initial source-validation records
+above predate this APK delivery. Base retains 67 original coarse overviews and
+supports importing the larger packs; the new app does not inherit old app caches.
