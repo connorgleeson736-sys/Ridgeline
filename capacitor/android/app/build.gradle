@@ -8,8 +8,8 @@ android {
         applicationId "nz.ridgeline.mobile"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 21
-        versionName "0.18.0"
+        versionCode 22
+        versionName "0.19.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
             noCompress 'bin'
@@ -23,6 +23,12 @@ android {
         targetCompatibility JavaVersion.VERSION_21
         coreLibraryDesugaringEnabled true
     }
+    signingConfigs {
+        debug {
+            def externalKey = System.getenv("RIDGELINE_SIGNING_KEYSTORE")
+            if (externalKey) storeFile file(externalKey)
+        }
+    }
     buildTypes {
         preview {
             initWith release
@@ -35,6 +41,14 @@ android {
             versionNameSuffix "-performance"
             resValue "string", "app_name", "Ridgeline 3D Performance"
             resValue "string", "title_activity_main", "Ridgeline 3D Performance"
+            matchingFallbacks = ['release']
+        }
+        latencyAudit {
+            initWith performance
+            applicationIdSuffix ".performance.latencyaudit"
+            versionNameSuffix "-latency-audit"
+            resValue "string", "app_name", "Ridgeline Capacitor Audit"
+            resValue "string", "title_activity_main", "Ridgeline Capacitor Audit"
             matchingFallbacks = ['release']
         }
         release {
