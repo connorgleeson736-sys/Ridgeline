@@ -3,7 +3,7 @@
   "version": "6.14.0",
   "npm_integrity": "sha512-L7U9y9TyPJ3P/JJbW+eH+A3FzdPq+3fnZFqqeCwf/S6cRGganHwVI5b/C8/zOYzreUzsloDPZVVaMQA94wOt4A==",
   "files": {
-    "maplibre-gl.mjs": "37611c5ee952f5fcb76215a1be4b9fdcfde8bf415a8493db435fd05d3a7727fb",
+    "maplibre-gl.mjs": "7bb11f19f43ea39a6327a3e2faa08f09d3a43b438daf84832b2f670a1bcd25b1",
     "maplibre-gl-worker.mjs": "5f1e2f0e1624082b7e88a06e4c86085992b0f8c02929801e552f3f7a119856a9",
     "maplibre-gl.css": "bacba6a85a867fcf602f2ff88331b8acf7edf3fbd063a519888cfbff39970193"
   },
@@ -39,11 +39,6 @@
       "scope": "Index native fallback-child candidates; retain native isChildOf, loaded order, requested detail and coverage checks."
     },
     {
-      "id": "RIDGE_SCHEDULER_V2",
-      "script": "scripts/patch-image-scheduler.py",
-      "scope": "Indexed image admission, adaptive ready reserve, optional tracing and bounded moving RTT refresh; no shaders or terrain data changes."
-    },
-    {
       "id": "RIDGE_LOD_INVARIANTS_V1",
       "script": "scripts/patch-lod-invariants.py",
       "scope": "Reuse native integrals only when FOV, vertical distance and range match exactly; preserve native arithmetic, per-tile distance, selection and detail."
@@ -57,6 +52,16 @@
       "id": "RIDGE_DEM_PARENT_KEYS_V1",
       "script": "scripts/patch-dem-parent-keys.py",
       "scope": "Use the pinned native calculateScaledKey for DEM ancestry lookups; preserve exact lookup keys/order, cache reads, min/max zoom and fallback behavior."
+    },
+    {
+      "id": "RIDGE_SCHEDULER_V2",
+      "script": "scripts/patch-image-scheduler.py",
+      "scope": "Indexed image admission, adaptive ready reserve, optional tracing and bounded moving RTT refresh; no shaders or terrain data changes."
+    },
+    {
+      "id": "RIDGE_LATENCY_AUDIT_V1",
+      "script": "scripts/patch-latency-audit.py",
+      "scope": "Separate cached ideal demand from live reconciliation; reuse resolved DEM for conservative bounds. Original pixels and shaders preserved."
     }
   ]
 }

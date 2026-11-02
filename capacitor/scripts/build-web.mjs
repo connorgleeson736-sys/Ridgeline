@@ -84,6 +84,7 @@ for(const name of await readdir(out))if(/\.(?:m?js)$/.test(name)){
  if(name==='topographic-overlays.js'){
   text=replace(text,"const show=!!s[group(l.id)]&&!rasterTopo&&(!l.id.startsWith('nz-peaks')||peaks)","const show=(l.id.startsWith('nz-peaks')?peaks:!!s[group(l.id)])&&!rasterTopo");
  }
+ if(name==='loading-controls.js')text=replace(text,"max:200,value:0","max:200,value:100");
  if(name==='linz-topo.js'){text=replace(text,'maxzoom:16','maxzoom:18');text=replace(text,'tileSize:256','tileSize:(root.devicePixelRatio||1)>1?128:256');}
  if(name==='performance.js')text=replace(text,"setRatio(lowPower()?1:native);return;", "const source=map.getSource('topo'),size=(lowPower()?1:native)>1?128:256;if(source&&source.tileSize!==size){source.tileSize=size;map._update?.(true);}setRatio(lowPower()?1:native);return;");
  // Keep the app drawing buffer stable during gestures; retain frame-health reporting.

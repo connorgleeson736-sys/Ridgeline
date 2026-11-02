@@ -1,0 +1,22 @@
+bodies ready, all first decodes held: {
+  delivered: 16,
+  decodeStarted: 8,
+  stats: {
+    active: 0,
+    stagedItems: 16,
+    stagedBytes: 128,
+    stagingItemLimit: 16,
+    stagingByteLimit: 16777216,
+    cachedActive: 0,
+    queued: 8,
+    moving: true,
+    limit: 8,
+    cachedReserve: 0,
+    policyEvaluations: 40,
+    queueRebuilds: 0,
+    activeDecodes: 8,
+    queuedDecodes: 8,
+    decodeLimit: 8
+  }
+}
+after releasing one decode: { delivered: 17, decodeStarted: 9, queued: 7 }
