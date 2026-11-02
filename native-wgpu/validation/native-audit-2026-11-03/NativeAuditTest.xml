@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="nz.ridgeline.nativeapp.NativeAuditTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-02T22:27:12.075Z" hostname="ac7dde5028c2" time="1.595">
+  <properties/>
+  <testcase name="measuredInteriorExactlyMatchesCompleteGrid" classname="nz.ridgeline.nativeapp.NativeAuditTest" time="0.711"/>
+  <testcase name="zeroBudgetRequiresCoverageUrgency" classname="nz.ridgeline.nativeapp.NativeAuditTest" time="0.001"/>
+  <testcase name="boundaryIndexMatchesEveryOriginalFragment" classname="nz.ridgeline.nativeapp.NativeAuditTest" time="0.874"/>
+  <system-out><![CDATA[Exact production interior comparisons: 262144
+Production boundary segment tests: 767520 -> 4642, exact ordered coordinates
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -199,7 +199,13 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         var count=0;var bytes=0;var accepted=false;var geometryChanged=false;var deviceUnavailable=false
         while(presentationFailures==0){
             val next=uploads.peek()?:break
-            if(next.kind==GpuUploadQueue.Kind.GEOMETRY&&next.plane!=(appliedStyle?.plane==true)){deferredOptional=true;break}
+            if(next.kind==GpuUploadQueue.Kind.GEOMETRY){
+                // A retired mode must never block imagery at the head of the
+                // queue. Discard it without permanently blacklisting the tile.
+                val desired=stylePacket
+                if(desired!=null&&next.plane!=desired.plane){uploads.acknowledge(next,GpuUploadQueue.INVALID);continue}
+                if(next.plane!=(appliedStyle?.plane==true)){deferredOptional=true;break}
+            }
             val urgent=!hasResidentCoverage(next.id,next.kind!=GpuUploadQueue.Kind.IMAGE)
             if(cameraFirst&&!urgent){deferredOptional=true;break}
             if(!uploadAdmission.allows(next.kind,System.nanoTime()-started,count,bytes,next.bytes,allowance,backlog,urgent))break
