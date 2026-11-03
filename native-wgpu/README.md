@@ -5,7 +5,15 @@
 the audited APK was 0.1.5. Main next candidates are raw local-I/O isolation,
 GPU upload acknowledgement, classified recovery and per-tile critical-path tracing.
 
-Latest APK: **[0.1.10 Native Latency Audit Base](checkpoints/README.md)**,
+Latest APK: **[0.1.11 Imagery Border Recovery Base](checkpoints/README.md)**,
+source`aab3c12`, versioncode12. Fixes accepted/cached LINZ-only failure fallbacks
+at survey seams and missing stationary retry wakeups after repeated transient
+failures. Prepared compositions are invalidated; original HTTP caches, saved maps,
+all621assets and3optimized renderer libraries remain unchanged. Four focused JVM
+checks and APK packaging checks pass; no physical-device failure trace/run.
+[Mount Cook border findings and scope](research/IMAGERY-BORDER-RECOVERY-2026-11-03.md).
+
+Previous APK: **[0.1.10 Native Latency Audit Base](checkpoints/README.md)**,
 source `655de14`, version code11, same Native Performance package/signing key.
 Independent submitted-scene input picking, camera-first bounded uploads,
 indexed/cached boundary clipping, per-terrain cartography fragments, route-only

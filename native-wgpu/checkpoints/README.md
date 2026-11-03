@@ -1,6 +1,28 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.10 Native Latency Audit Base APK — 32.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-Latency-Audit-0.1.10-Base.apk)**.
+Latest: **[Download 0.1.11 Imagery Border Recovery Base APK — 32.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-Imagery-Border-Recovery-0.1.11-Base.apk)**.
+Source `aab3c12`, version code12. Same Native Performance package/signer;
+updates 0.1.2–0.1.10 in place, preserving app data.
+
+Fixes two recovery paths relevant to blurry LINZ/Esri border tiles around Mount
+Cook: survey network failures can no longer publish/cache LINZ-only pixels as a
+completed seam tile, and repeated transient failures keep scheduling bounded
+retries for still-wanted tiles while the camera is stationary. Old prepared
+compositions are bypassed; valid original HTTP caches and saved maps remain.
+
+A live Cook source sample has detailed Esri replacement for36,308pixels of the
+256×256 border tile. This is a source comparison, not a phone failure trace.
+Four focused JVM checks pass, including real HTTP recovery after four503s and the
+exact Cook source-mask reference. All621original assets and all3renderer libraries
+are unchanged from0.1.10. Signature, package/version and ZIP/ELF16KiB verified.
+No broad tests/lint, Rust/GPU changes or physical-device run.
+[Findings and limitations](../research/IMAGERY-BORDER-RECOVERY-2026-11-03.md) ·
+[Exact release record](../validation/border-recovery-2026-11-03/release.json) ·
+[SHA-256](Ridgeline-Native-Imagery-Border-Recovery-0.1.11-Base.apk.sha256).
+
+## Previous 0.1.10 native audit checkpoint
+
+**[Download 0.1.10 Native Latency Audit Base APK — 32.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-Latency-Audit-0.1.10-Base.apk)**.
 Source `655de14`, version code 11. Same Native Performance package and signer;
 updates 0.1.2–0.1.9 in place, preserving app data.
 

@@ -88,3 +88,19 @@ No physical device was connected. Phone installation, touch behaviour, actual
 outage reproduction and the user's exact blurred tiles remain unverified. A new
 APK cannot increase the underlying source imagery's true detail. The correction
 addresses two concrete ways required fine imagery can fail to replace a parent.
+
+## Signed checkpoint
+
+Source`aab3c12c38db3304ebd0f628f3c674d5e0922962`, versioncode12/name
+`0.1.11-border-recovery`. Same Native Performance package and signing certificate
+as0.1.10; updates in place. APK32,716,613bytes, SHA-256
+`f871578201586c074bad30003d95eb584f454ec1ad45ef7275a60c4db2995c00`.
+All621original assets and all3optimized renderer libraries are byte-identical to
+0.1.10. Signature, ZIP/ELF16KiB alignment,38JNIexports perABI and native-only/Base
+payload pass. No session CA. Four focused JVM checks passed; no broad suite/lint.
+No Rust/GPU code changed or additional device/graphics run claimed.
+
+Existing saved regions are retained. A region previously marked ready despite a
+missing survey donor can still require that donor to be downloaded online; this
+update does not invent missing offline data. Prepared-image namespace retirement
+needs no manual clearing of the app's original tile cache or saved maps.

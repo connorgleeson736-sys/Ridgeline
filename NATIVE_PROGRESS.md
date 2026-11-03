@@ -14,7 +14,12 @@ composition restores36,308Esri pixels vs bad fallback (29,213different). Referen
 mask matches native. Four focused JVM checks pass, including real HTTP4x503→200
 recovery and finite404control; retry delays virtual. No phone failure trace/run.
 Source/report: native-wgpu/research/IMAGERY-BORDER-RECOVERY-2026-11-03.md.
-Versioncode12/name0.1.11-border-recovery; same signer/package. APK build pending.
+Sourceaab3c12. Versioncode12/name0.1.11-border-recovery; same signer/package.
+APK Ridgeline-Native-Imagery-Border-Recovery-0.1.11-Base.apk,32,716,613bytes,
+SHA256f871578201586c074bad30003d95eb584f454ec1ad45ef7275a60c4db2995c00.
+Assembly/signature/ZIP+ELF16KiB checks pass; all621assets and3optimized renderer
+libraries byte-identical to0.1.10; all38JNIexports perABI; no sessionCA/WebView.
+Exact release/download record: validation/border-recovery-2026-11-03.
 
 ## 2026-11-03 — Native audit implementation / signed 0.1.10 APK
 
