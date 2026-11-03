@@ -165,7 +165,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private var lastGesture=false
     private var compositionStore:PreparedTerrainCache?=null
     private val compositionLock=Any()
-    private fun imageStore():PreparedTerrainCache=synchronized(compositionLock){compositionStore?:PreparedTerrainCache(File(context.cacheDir,"native-compositions-v1"),compositionBytes,"rgba-premultiplied-gap-v1:$key:"+preferences.getLong("imageryGeneration",0),256*256*4).also{compositionStore=it}}
+    private fun imageStore():PreparedTerrainCache=synchronized(compositionLock){compositionStore?:PreparedTerrainCache(File(context.cacheDir,"native-compositions-v1"),compositionBytes,"rgba-premultiplied-gap-v2-complete-seam:$key:"+preferences.getLong("imageryGeneration",0),256*256*4).also{compositionStore=it}}
     // DEM halo work cannot occupy every imagery worker. Four bounded requests,
     // shared DEM futures, and no per-halo executor multiplication.
     private val geometryWorkers = ThreadPoolExecutor(2,2,0,TimeUnit.MILLISECONDS,PriorityBlockingQueue<Runnable>())
@@ -238,9 +238,14 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             }catch(_:PreparationAborted){
             }catch(e:Exception){
                 if(eligible()&&source in wanted){
-                    val attempt=(failures[source]?.attempts?:0)+1;val delay=when(attempt){1->1000L;2->4000L;else->15000L}
-                    failures[source]=Failure(attempt,android.os.SystemClock.elapsedRealtime()+delay)
-                    if(!offlineOnly&&attempt<=3)runCatching{scheduler.schedule({cameraChanged()},delay,TimeUnit.MILLISECONDS)}
+                    val attempt=((failures[source]?.attempts?:0)+1).coerceAtMost(1000);val delay=TileRetryPolicy.delayMillis(attempt)
+                    val failure=Failure(attempt,android.os.SystemClock.elapsedRealtime()+delay)
+                    failures[source]=failure
+                    if(!offlineOnly&&TileRetryPolicy.shouldWake(attempt,e))runCatching{scheduler.schedule({
+                        // Only the current wanted failure may wake a stationary
+                        // view; canceled/replaced work must not revive old demand.
+                        if(!dead&&active&&source in wanted&&failures[source]===failure)cameraChanged()
+                    },delay,TimeUnit.MILLISECONDS)}
                     view.post{view.onStatus("Terrain load failed: "+if(e is TileHttpException)"provider HTTP ${e.code}" else "source unavailable")}
                 }
             }finally{

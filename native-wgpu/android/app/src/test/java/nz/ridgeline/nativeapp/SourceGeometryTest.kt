@@ -8,6 +8,15 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class SourceGeometryTest {
+    @Test fun mountCookBorderSelectsTheActualSeam() {
+        val m=JSONObject(File(System.getProperty("ridgeline.assets"),"gap-atlas.json").readText()).getJSONObject("entries").getJSONObject("7966/5200")
+        val outer=rings(m.getJSONArray("outer"));val seams=rings(m.optJSONArray("seamRings"))
+        assertEquals("boundary",SourceGeometry.mode(17,127471,83202,13,7966,5200,256,256,outer,emptyList(),seams,true))
+        val mask=SourceGeometry.mask(outer,17,127471,83202,13,7966,5200)
+        val digest=MessageDigest.getInstance("SHA-256").digest(ByteArray(mask.size){if(mask[it])255.toByte()else 0})
+        // Independent website vectorAlpha result for the live Cook source probe.
+        assertEquals("16e4cefa03b41adbd63969b2629f15b705b9c7e7fff91d0ab86ae7c34744a965",digest.joinToString(""){"%02x".format(it)})
+    }
     private fun rings(rows: JSONArray?) = if (rows == null) emptyList() else List(rows.length()) { i ->
         val ring = rows.getJSONArray(i)
         List(ring.length()) { j -> ring.getJSONArray(j).let { SourceGeometry.Point(it.getDouble(0), it.getDouble(1)) } }

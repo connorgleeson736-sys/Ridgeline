@@ -1,5 +1,21 @@
 # Durable progress log
 
+## 2026-11-03 — Mount Cook imagery-border recovery / 0.1.11
+
+User reports blurry native tiles around LINZ/Esri borders near Mt Cook.
+Found survey transport error returning LINZ-only pixels as completed tile, then
+persisting composition without failed donor provenance; removed false success.
+Bumped only composed-image namespace, keeping valid original HTTP caches/data.
+Also found fourth transient failure has no automatic wakeup in stationary view;
+IO/408/429/5xx now continue bounded15s retries while wanted/active/currentfailure.
+Permanent HTTP/decode failures keep established finite retries. No resolution or
+seam/pixel/math changes. Live Cook17/127471/83202 probe: all3sources200, complete
+composition restores36,308Esri pixels vs bad fallback (29,213different). Reference
+mask matches native. Four focused JVM checks pass, including real HTTP4x503→200
+recovery and finite404control; retry delays virtual. No phone failure trace/run.
+Source/report: native-wgpu/research/IMAGERY-BORDER-RECOVERY-2026-11-03.md.
+Versioncode12/name0.1.11-border-recovery; same signer/package. APK build pending.
+
 ## 2026-11-03 — Native audit implementation / signed 0.1.10 APK
 
 Implemented supplied native0.1.9 audit: submitted-scene picking snapshot and

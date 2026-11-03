@@ -1,0 +1,18 @@
+{
+  "tile": [
+    17,
+    127471,
+    83202
+  ],
+  "centreLongitude": 170.11093139648438,
+  "centreLatitude": -43.585364764009746,
+  "esriSelectedPixels": 36308,
+  "pixelsDifferentFromLinzOnlyFallback": 29213,
+  "maskSha256": "16e4cefa03b41adbd63969b2629f15b705b9c7e7fff91d0ab86ae7c34744a965",
+  "sourceImageHashes": [
+    "4a617def433615a8ac763a4e5eb6591d265df2ffd0ece6514e73b10058d861be",
+    "bcb341bac2024097e2dd8fb60f7e76ad14e4e0c6e671962e10e656262f69ed34",
+    "76365cbd16fb22b9cef7472ba2ac1e59fd449a3fac92f3f5299ab5fa8dbaeca7"
+  ],
+  "scope": "Decoded live source images and reference hard-mask composition. Not an Android device frame."
+}

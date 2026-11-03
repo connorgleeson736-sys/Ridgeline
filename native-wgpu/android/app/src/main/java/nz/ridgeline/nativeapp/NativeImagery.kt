@@ -26,7 +26,6 @@ internal class NativeImagery(
     private val readLocal:(String,()->ByteArray?)->ByteArray?={_,read->read()},
     private val settings:()->MapSettings.State={MapSettings.State()},
 ) {
-    private class FineTransportFailure(cause:java.io.IOException):java.io.IOException(cause)
     private val catalog by lazy { json("overview-index.json") }
     private val atlas by lazy { json("gap-atlas.json") }
     private data class Meta(val data: JSONObject, val outer: List<List<SourceGeometry.Point>>,
@@ -165,10 +164,11 @@ internal class NativeImagery(
                         val size=256/factor; val px=x*size-m.getInt("x")*256; val py=y*size-m.getInt("y")*256
                         val onSeam=entry.seams.isNotEmpty() && SourceGeometry.relation(entry.seams,doubleArrayOf(px-2,py-2,px+size+2,py+size+2))!=-1
                         val fine=m.optJSONArray("fineSources")
-                        // The packaged preview retains original data if supplementary
-                        // fine survey alpha cannot be fetched. Never create a hole.
-                        if(onSeam && fine!=null) try { vetoFine(mask,fine,z,x,y) }
-                            catch(e:FineTransportFailure) { if(Thread.currentThread().isInterrupted) throw e; return@originalScope pixels(original) }
+                        // Survey alpha is part of the final source decision. A
+                        // failed donor must keep the retained parent visible and
+                        // retry, rather than certify/cache LINZ-only pixels as a
+                        // complete border tile with no dependency on that donor.
+                        if(onSeam && fine!=null) vetoFine(mask,fine,z,x,y)
                         val a=pixels(original); val b=pixels(cropped)
                         IntArray(a.size) { if(mask[it]) b[it] else a[it] }
                     }
@@ -189,7 +189,7 @@ internal class NativeImagery(
                 val row=fine.getJSONObject(i); val name=row.getString("name")
                 val fz=minOf(z,row.optInt("maxZoom",19),19); val f=1 shl(z-fz)
                 val url=linz(fz,x/f,y/f).replace("/aerial/","/$name/").replace(".webp?",".png?")
-                val bytes=try{fetch(url)}catch(e:java.io.IOException){if(e is TileHttpException)throw e;throw FineTransportFailure(e)}
+                val bytes=fetch(url)
                 bitmap(bytes).using { drawCrop(canvas,it,x,y,f) }
             }
             val valid=pixels(survey)
