@@ -1,6 +1,34 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.9 UI and Layers Base APK — 32.5 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-UI-Layers-0.1.9-Base.apk)**.
+Latest: **[Download 0.1.10 Native Latency Audit Base APK — 32.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-Latency-Audit-0.1.10-Base.apk)**.
+Source `655de14`, version code 11. Same Native Performance package and signer;
+updates 0.1.2–0.1.9 in place, preserving app data.
+
+Submitted-scene CPU picking runs on an independent input worker. A changed camera
+gets priority over optional uploads with complete coverage. Boundary indexing,
+per-terrain line caches and route-only invalidation avoid repeated map-layer work.
+Stable label sprites support metadata-only changes and dirty-row texture uploads.
+Unshaded 2D shares one height resource and bypasses DEM preparation queues while
+keeping the original grid rasterisation and imagery pixels.
+
+**Progressive focus terrain is experimental and off by default.** It can reveal
+measured interior detail while a small rim retains a measured parent, only when
+strict parent/image/skirt checks pass. Unsupported joins keep complete-patch
+loading. The proposed two-triangle planar quad is deferred due to texel ties.
+
+Three focused JVM checks, a focused Rust fragment-cache check and production
+Vulkan/GLES fixtures pass. Boundary segment tests fall 767,520 → 4,642 with exact
+ordered output in 72 tile fixtures; this is not a handset latency measurement.
+All three optimized Android ABIs rebuilt; signature, package/version, ZIP/ELF
+16KiB alignment, all38 JNI exports perABI and all621 original assets verified.
+No broad test suite/lint or physical-device execution.
+[Implementation and restrictions](../research/NATIVE-LATENCY-AUDIT-2026-11-03.md) ·
+[Exact release record](../validation/native-audit-2026-11-03/release.json) ·
+[SHA-256](Ridgeline-Native-Latency-Audit-0.1.10-Base.apk.sha256).
+
+## Previous 0.1.9 UI and layers checkpoint
+
+**[Download 0.1.9 UI and Layers Base APK — 32.5 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-UI-Layers-0.1.9-Base.apk)**.
 Source `d258866d31509174c01aa0022094015d687566c2`, version code 10. Same Native
 Performance package and signer; updates 0.1.2–0.1.8 in place, preserving app data.
 

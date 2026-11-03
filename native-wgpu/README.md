@@ -5,7 +5,18 @@
 the audited APK was 0.1.5. Main next candidates are raw local-I/O isolation,
 GPU upload acknowledgement, classified recovery and per-tile critical-path tracing.
 
-Latest APK: **[0.1.9 UI and Layers Base](checkpoints/README.md)**, source `d258866`.
+Latest APK: **[0.1.10 Native Latency Audit Base](checkpoints/README.md)**,
+source `655de14`, version code11, same Native Performance package/signing key.
+Independent submitted-scene input picking, camera-first bounded uploads,
+indexed/cached boundary clipping, per-terrain cartography fragments, route-only
+invalidation, stable label slots/dirty-row updates and shared unshaded 2D resources.
+Experimental measured focus interior is off by default; unsupported measured
+parent/skirt joins use normal complete-patch loading. Original rasterisation and
+full imagery/terrain detail are retained. Focused JVM/Rust and production
+Vulkan/GLES fixtures pass; no handset speed claim.
+[Audit implementation and rollout limits](research/NATIVE-LATENCY-AUDIT-2026-11-03.md).
+
+Previous APK: **[0.1.9 UI and Layers Base](checkpoints/README.md)**, source `d258866`.
 Capacitor-style map controls, route drawer and sheet, direct waypoint editing,
 ordered route combination, chart inspection, GPX sharing and every map-layer
 group now use the native renderer. Aerial, Satellite and NZ Topo, names, peaks,

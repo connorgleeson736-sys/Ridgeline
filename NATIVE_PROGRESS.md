@@ -1,6 +1,6 @@
 # Durable progress log
 
-## 2026-11-03 — Native audit implementation / 0.1.10 APK preparation
+## 2026-11-03 — Native audit implementation / signed 0.1.10 APK
 
 Implemented supplied native0.1.9 audit: submitted-scene picking snapshot and
 independent input worker; camera-first bounded optional uploads; national boundary
@@ -13,7 +13,14 @@ No unsafe planar quad. Full imagery/terrain detail and original assets retained.
 Focused JVM/Rust/production Vulkan/GLES evidence and restrictions are in
 native-wgpu/research/NATIVE-LATENCY-AUDIT-2026-11-03.md and validation/native-audit.
 Version code11/name0.1.10-native-audit; same native Performance package/signing key.
-Android APK packaging/publication record to follow. No handset speed claim.
+Final Kotlin APK source655de14 (Rust inputs identical to native build c0a420d).
+All3optimized Android JNI builds and APK assembly pass. Signed artifact
+Ridgeline-Native-Latency-Audit-0.1.10-Base.apk,32,716,605bytes,
+SHA2562cdfc17f0e3e8c2146f88dd3b0f6497ffa485641a9899f279e1f3e0047ccd26c.
+Same signer as0.1.9; all621original APK assets unchanged; all38JNIexports perABI,
+ZIP/ELF16KiB alignment, native-only payload and no sessionCA verified.
+Exact packaging/publication record: validation/native-audit-2026-11-03.
+No handset speed or installation-execution claim.
 
 ## 2026-11-02 — Capacitor UI/layers/route checkpoint APK 0.1.9
 

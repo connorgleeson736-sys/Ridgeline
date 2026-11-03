@@ -104,8 +104,13 @@ route-planning changes were introduced.
   Route-only edits launch no cartography job/upload. Metadata-only labels upload
   no texture bytes; the small dirty-row fixture uploads 64 bytes. Existing native
   layer/route, projection, sky and relief checks also pass.
-* Android release JNI builds, signed APK and published-download results are
-  recorded in the adjacent validation directory once packaging is complete.
+* All three optimized Android release JNI builds and signed APK assembly pass.
+  Source `655de14`, code11/name `0.1.10-native-audit`; artifact 32,716,605 bytes.
+  Same native Performance signer/package as0.1.9; all621 original APK assets are
+  byte-identical. Signature, ZIP/ELF16KiB alignment and all38 JNI exports perABI
+  pass. No session CA, WebView/Capacitor runtime or large overview packs.
+  Exact source/digests and published-download proof are in
+  `../validation/native-audit-2026-11-03/`.
 
 No broad test suite/lint was run. No handset or emulator was connected. Software
 GPU fixtures cannot establish Android driver performance, touch drift, thermal
