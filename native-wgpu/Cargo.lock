@@ -726,6 +726,7 @@ version = "0.1.0"
 name = "ridgeline-renderer"
 version = "0.1.0"
 dependencies = [
+ "ash",
  "bytemuck",
  "glam",
  "jni",

@@ -121,9 +121,11 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         // A camera-dependent atlas order repainted/reuploaded the same strings on pans.
         // Fixed priority/key order keeps atlas slots stable; screen placement still follows camera.
         val chosen=labels.distinctBy{it.key}.sortedWith(compareBy<TopographyStyle.Label>{it.priority}.thenBy{it.key}).take(512)
+        // Match MapLibre layer-major paint order across all visible tiles.
+        lines.sortBy{it.order}
         if(lines!=lastLines){val packed=pack(lines);lastLines=lines;linePacket=packed}
         lastBuildMs=(System.nanoTime()-start)/1_000_000
-        if(chosen!=lastLabels){val a=System.nanoTime();atlas=NativeLabels.atlas(chosen);lastLabels=chosen;lastAtlasMs=(System.nanoTime()-a)/1_000_000}
+        if(chosen!=lastLabels){val a=System.nanoTime();atlas=NativeLabels.atlas(chosen,view.context.assets);lastLabels=chosen;lastAtlasMs=(System.nanoTime()-a)/1_000_000}
         val batch=NativeLayerBatch(linePacket,atlas)
         diagnostics="Topography tiles: ${tiles.size}/${current.size} · decoded $decoded · one shared background transfer\nVector decode: $lastDecodeMs ms · layer build: $lastBuildMs ms · font atlas: $lastAtlasMs ms\nLines: ${lines.size} · label candidates ${atlas.labels.size} · atlas ${atlas.width}×${atlas.height}"
         main.post{if(!closed)view.mapLayers(batch)}

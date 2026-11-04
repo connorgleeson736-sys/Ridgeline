@@ -1726,3 +1726,14 @@ Final parent-fallback Base source`da2579c`: 31,930,328bytes, SHA256
 `c5c0b9654998a663d560bc644eb2f2666f175b09dd8ebabc4fe24d505c59c8aa`. Includes RAM-only parent restoration for ready GPU fine tiles;
 11targetedJVM checks/lint/assembly/signature/alignment pass. Native3ABIs unchanged
 from1fd7000. No largepacks/sessionCA.
+
+
+### 2026-11-05 — additional native audit and overlay alignment
+
+Implemented post-acquire camera latching, optional Vulkan actual-presentation feedback,
+strict active-refresh optional budgets, immediate first-qualified adaptive density,
+completion-triggered cartography/route workers, and acknowledged incremental GPU
+overlay updates with coherent bounded staging. Matched Capacitor route colour/width
+semantics, perspective screen-space antialiasing, layer ordering and Open Sans.
+See `native-wgpu/research/ADDITIONAL-AUDIT-2026-11-05.md`. Native 0.1.12 code13
+uses the existing Performance package and signing identity. No handset speed claim.

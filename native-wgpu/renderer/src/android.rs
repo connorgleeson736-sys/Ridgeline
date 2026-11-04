@@ -49,6 +49,11 @@ fn configure_surface(
     }
 }
 struct AndroidState {
+    pending_frame: Option<wgpu::SurfaceTexture>,
+    presentation: crate::presentation::Presentation,
+    acquire_ns: u64,
+    latch_ns: u64,
+    submitted_revision: u64,
     surface: Option<wgpu::Surface<'static>>,
     instance: wgpu::Instance,
     device_lost: std::sync::Arc<std::sync::atomic::AtomicBool>,
@@ -140,7 +145,11 @@ fn state_for_backend(
         alpha_mode: wgpu::CompositeAlphaMode::Auto,
         width: w.max(1) as u32,
         height: h.max(1) as u32,
-        desired_maximum_frame_latency: 2,
+        desired_maximum_frame_latency: if backend == wgpu::Backends::VULKAN {
+            1
+        } else {
+            2
+        },
         present_mode: wgpu::PresentMode::AutoVsync,
     };
     configure_surface(&surface, &renderer, &config)?;
@@ -152,7 +161,13 @@ fn state_for_backend(
             log(&format!("GPU device lost: {reason:?}"));
             flag.store(true, Ordering::Release);
         });
+    let presentation = crate::presentation::Presentation::new(&renderer.device);
     Ok(AndroidState {
+        pending_frame: None,
+        presentation,
+        acquire_ns: 0,
+        latch_ns: 0,
+        submitted_revision: 0,
         surface: Some(surface),
         instance,
         device_lost,
@@ -241,6 +256,9 @@ pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_destroy(
 ) {
     protect(|| {
         if let Ok(mut s) = states().lock() {
+            if let Some(state) = s.get(&(handle as u64)) {
+                state.renderer.completion_wake.set(None);
+            }
             s.remove(&(handle as u64));
             let retired = picking()
                 .lock()
@@ -249,6 +267,123 @@ pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_destroy(
             drop(retired);
         }
     });
+}
+fn acquire_state(s: &mut AndroidState, w: i32, h: i32) -> i32 {
+    s.pending_frame.take();
+    if s.device_lost.load(Ordering::Acquire) {
+        return -6;
+    }
+    if s.surface.is_none() && restore_surface(s).is_err() {
+        return -4;
+    }
+    if w < 1 || h < 1 {
+        return 0;
+    }
+    if s.config.width != w as u32 || s.config.height != h as u32 {
+        s.config.width = w as u32;
+        s.config.height = h as u32;
+        s.renderer.resize(w as u32, h as u32);
+        if let Err(error) = configure_surface(s.surface.as_ref().unwrap(), &s.renderer, &s.config) {
+            log(&format!("Surface configuration failed: {error}"));
+            return 0;
+        }
+    }
+    if !s.presentation.poll(s.surface.as_ref().unwrap()) {
+        return -7;
+    }
+    let started = std::time::Instant::now();
+    let acquired = s.surface.as_ref().unwrap().get_current_texture();
+    s.acquire_ns = started.elapsed().as_nanos() as u64;
+    let frame = match acquired {
+        wgpu::CurrentSurfaceTexture::Success(frame)
+        | wgpu::CurrentSurfaceTexture::Suboptimal(frame) => frame,
+        wgpu::CurrentSurfaceTexture::Timeout => return -1,
+        wgpu::CurrentSurfaceTexture::Occluded => return -2,
+        wgpu::CurrentSurfaceTexture::Outdated => {
+            if let Err(error) =
+                configure_surface(s.surface.as_ref().unwrap(), &s.renderer, &s.config)
+            {
+                log(&format!("Surface reconfigure failed: {error}"));
+                return -4;
+            }
+            return -3;
+        }
+        wgpu::CurrentSurfaceTexture::Lost => {
+            if let Err(error) = restore_surface(s) {
+                log(&format!("Surface recreation failed: {error}"));
+            }
+            return -4;
+        }
+        wgpu::CurrentSurfaceTexture::Validation => return -5,
+    };
+    s.pending_frame = Some(frame);
+    1
+}
+#[unsafe(no_mangle)]
+pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_acquire(
+    _env: *mut c_void,
+    _class: *mut c_void,
+    handle: i64,
+    w: i32,
+    h: i32,
+) -> i32 {
+    protect(|| {
+        recover_poisoned_state();
+        let Ok(mut map) = states().lock() else {
+            return 0;
+        };
+        let Some(s) = map.get_mut(&(handle as u64)) else {
+            return 0;
+        };
+        acquire_state(s, w, h)
+    })
+}
+#[unsafe(no_mangle)]
+pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_prepareFrame(
+    _env: *mut c_void,
+    _class: *mut c_void,
+    handle: i64,
+    nanos: i64,
+    idle: u8,
+) {
+    protect(|| {
+        if let Ok(mut map) = states().lock() {
+            if let Some(s) = map.get_mut(&(handle as u64)) {
+                if !s.device_lost.load(Ordering::Acquire) {
+                    s.renderer
+                        .prepare_frame_work(nanos.max(0) as u64, idle != 0);
+                }
+            }
+        }
+    });
+}
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_frameWake(
+    raw: *mut jni::sys::JNIEnv,
+    _class: jni::sys::jclass,
+    handle: i64,
+    callback: jni::sys::jobject,
+) {
+    let mut env = unsafe { jni::EnvUnowned::from_raw(raw) };
+    let _ = env
+        .with_env(|env| -> Result<(), jni::errors::Error> {
+            let callback = unsafe { jni::objects::JObject::from_raw(env, callback) };
+            let global = env.new_global_ref(callback)?;
+            let vm = env.get_java_vm()?;
+            let wake = Arc::new(move || {
+                let _ = vm.attach_current_thread(|env| -> Result<(), jni::errors::Error> {
+                    env.call_method(&global, jni::jni_str!("run"), jni::jni_sig!("()V"), &[])?;
+                    Ok(())
+                });
+            });
+            if let Ok(mut map) = states().lock() {
+                if let Some(s) = map.get_mut(&(handle as u64)) {
+                    s.renderer.completion_wake.set(Some(wake));
+                }
+            }
+            Ok(())
+        })
+        .into_outcome();
 }
 #[unsafe(no_mangle)]
 pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_render(
@@ -264,6 +399,9 @@ pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_render(
     bearing: f32,
     pitch: f32,
     elevation: f32,
+    camera_revision: i64,
+    camera_input_ns: i64,
+    camera_latch_ns: i64,
 ) -> i32 {
     protect(|| {
         recover_poisoned_state();
@@ -273,49 +411,12 @@ pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_render(
         let Some(s) = states.get_mut(&(handle as u64)) else {
             return 0;
         };
-        if s.device_lost.load(Ordering::Acquire) {
-            return -6;
-        }
-        if s.surface.is_none() && restore_surface(s).is_err() {
-            return -4;
-        }
-        if w < 1 || h < 1 {
-            return 0;
-        }
-        if s.config.width != w as u32 || s.config.height != h as u32 {
-            s.config.width = w as u32;
-            s.config.height = h as u32;
-            s.renderer.resize(w as u32, h as u32);
-            if let Err(error) =
-                configure_surface(s.surface.as_ref().unwrap(), &s.renderer, &s.config)
-            {
-                log(&format!("Surface configuration failed: {error}"));
-                return 0;
-            }
-        }
-        let acquired = s.surface.as_ref().unwrap().get_current_texture();
-        let frame = match acquired {
-            wgpu::CurrentSurfaceTexture::Success(frame)
-            | wgpu::CurrentSurfaceTexture::Suboptimal(frame) => frame,
-            wgpu::CurrentSurfaceTexture::Timeout => return -1,
-            wgpu::CurrentSurfaceTexture::Occluded => return -2,
-            wgpu::CurrentSurfaceTexture::Outdated => {
-                if let Err(error) =
-                    configure_surface(s.surface.as_ref().unwrap(), &s.renderer, &s.config)
-                {
-                    log(&format!("Surface reconfigure failed: {error}"));
-                    return -4;
-                }
-                return -3;
-            }
-            wgpu::CurrentSurfaceTexture::Lost => {
-                if let Err(error) = restore_surface(s) {
-                    log(&format!("Surface recreation failed: {error}"));
-                }
-                return -4;
-            }
-            wgpu::CurrentSurfaceTexture::Validation => return -5,
+        let Some(frame) = s.pending_frame.take() else {
+            return -3;
         };
+        if s.config.width != w as u32 || s.config.height != h as u32 {
+            return -3;
+        }
         s.renderer.logical_zoom = Some(logical_zoom);
         s.renderer.render(
             &frame.texture.create_view(&Default::default()),
@@ -334,6 +435,13 @@ pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_render(
             // Release them after the input worker can acquire its snapshot.
             drop(retired);
         }
+        s.latch_ns = camera_latch_ns.max(0) as u64;
+        s.submitted_revision = camera_revision.max(0) as u64;
+        s.presentation.submit(
+            s.surface.as_ref().unwrap(),
+            s.submitted_revision,
+            camera_input_ns.max(0) as u64,
+        );
         s.renderer.queue.present(frame);
         s.renderer
             .next_adaptive_frame()
@@ -1848,4 +1956,64 @@ pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_clearInterior(
             );
         }
     }
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_frameStats(
+    raw: *mut jni::sys::JNIEnv,
+    _class: jni::sys::jclass,
+    handle: i64,
+    buffer: jni::sys::jobject,
+) {
+    let mut env = unsafe { jni::EnvUnowned::from_raw(raw) };
+    let _ = env
+        .with_env(|env| -> Result<(), jni::errors::Error> {
+            let output = unsafe { jni::objects::JByteBuffer::from_raw(env, buffer) };
+            if env.get_direct_buffer_capacity(&output)? < 112 {
+                return Ok(());
+            }
+            let bytes = unsafe {
+                std::slice::from_raw_parts_mut(env.get_direct_buffer_address(&output)?, 112)
+            };
+            if let Ok(map) = states().lock() {
+                if let Some(s) = map.get(&(handle as u64)) {
+                    let values = [
+                        s.acquire_ns,
+                        s.latch_ns,
+                        s.submitted_revision,
+                        s.presentation.actual,
+                        s.presentation.input_to_display,
+                        s.presentation.revision,
+                        s.presentation.pending(),
+                        s.presentation.refresh,
+                        s.presentation.available() as u64,
+                        s.renderer.gpu_backlog() as u64,
+                        s.renderer.route_gpu.uploaded_bytes,
+                        s.renderer.cartographic_gpu.uploaded_bytes,
+                        s.renderer.route_gpu.uploads,
+                        s.renderer.cartographic_gpu.uploads,
+                    ];
+                    for (chunk, value) in bytes.chunks_exact_mut(8).zip(values) {
+                        chunk.copy_from_slice(&value.to_le_bytes());
+                    }
+                }
+            }
+            Ok(())
+        })
+        .into_outcome();
+}
+
+#[unsafe(no_mangle)]
+pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_discardFrame(
+    _env: *mut c_void,
+    _class: *mut c_void,
+    handle: i64,
+) {
+    protect(|| {
+        if let Ok(mut map) = states().lock() {
+            if let Some(s) = map.get_mut(&(handle as u64)) {
+                s.pending_frame.take();
+            }
+        }
+    });
 }

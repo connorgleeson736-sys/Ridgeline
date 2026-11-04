@@ -7,9 +7,13 @@ use wgpu::util::DeviceExt;
 mod adaptive;
 mod appearance;
 mod cartography;
+mod frame_work;
 mod inspection;
 mod labels;
+mod latest_worker;
 mod planar;
+#[cfg(target_os = "android")]
+mod presentation;
 mod progressive;
 pub use appearance::MapStyle;
 pub use cartography::CartographicPath;
@@ -118,6 +122,9 @@ pub struct Renderer {
     cartographic_gpu: routes::RouteGpu,
     cartographic_paths: Arc<[CartographicPath]>,
     cartographic_worker: Option<cartography::Worker>,
+    cartographic_upload: Option<cartography::Output>,
+    completion_wake: frame_work::CompletionWake,
+    frame_prepared: bool,
     cartographic_pending: bool,
     cartographic_dirty: bool,
     cartographic_anchor: [f64; 2],
@@ -133,8 +140,11 @@ pub struct Renderer {
     location_point: Option<[f64; 2]>,
     inspection_anchor: [f64; 2],
     inspection_dirty: bool,
-    route_paths: Vec<RoutePath>,
+    route_paths: Arc<[RoutePath]>,
+    route_pending: bool,
     route_dirty: bool,
+    route_worker: Option<latest_worker::LatestWorker<routes::RouteJob, routes::RouteOutput>>,
+    route_upload: Option<routes::RouteOutput>,
     exact_route_sources: HashSet<TileId>,
     next_adaptive_frame: Option<u64>,
     adaptive_levels: HashMap<TileId, u8>,
@@ -231,6 +241,8 @@ impl Renderer {
         let (device, queue) = adapter
             .request_device(&wgpu::DeviceDescriptor {
                 required_limits: adapter.limits(),
+                required_features: adapter.features()
+                    & wgpu::Features::VULKAN_GOOGLE_DISPLAY_TIMING,
                 ..Default::default()
             })
             .await
@@ -534,6 +546,9 @@ impl Renderer {
             cartographic_gpu,
             cartographic_paths: Vec::new().into(),
             cartographic_worker: None,
+            cartographic_upload: None,
+            completion_wake: Default::default(),
+            frame_prepared: false,
             cartographic_pending: false,
             cartographic_dirty: false,
             cartographic_anchor: [0.5, 0.5],
@@ -549,8 +564,11 @@ impl Renderer {
             location_point: None,
             inspection_anchor: [0.5, 0.5],
             inspection_dirty: false,
-            route_paths: vec![],
+            route_paths: vec![].into(),
+            route_pending: false,
             route_dirty: true,
+            route_worker: None,
+            route_upload: None,
             exact_route_sources: HashSet::new(),
             next_adaptive_frame: None,
             adaptive_levels: HashMap::new(),
@@ -961,8 +979,14 @@ impl Renderer {
         }
     }
     pub fn next_adaptive_frame(&self) -> Option<u64> {
-        if self.cartographic_pending {
-            Some(self.next_adaptive_frame.map_or(32, |delay| delay.min(32)))
+        if self.route_upload.is_some()
+            || self.cartographic_upload.is_some()
+            || self.cartographic_dirty
+            || self.route_dirty
+            || self.labels_dirty
+            || self.inspection_dirty
+        {
+            Some(self.next_adaptive_frame.map_or(1, |delay| delay.min(1)))
         } else {
             self.next_adaptive_frame
         }
@@ -1491,6 +1515,30 @@ impl Renderer {
         }
         best.map(|(_, point)| point)
     }
+    pub fn prepare_frame_work(&mut self, nanos: u64, idle: bool) {
+        let budget = frame_work::Budget::with_idle(nanos, idle);
+        self.validate_interior(self.logical_zoom.unwrap_or(0.));
+        if self.cover_dirty {
+            self.rebuild_cover();
+            self.cover_dirty = false;
+        }
+        if self.route_dirty && budget.allows(500_000) {
+            self.rebuild_routes();
+        }
+        if self.cartographic_dirty {
+            self.cartographic_overflow = false;
+            self.rebuild_cartography();
+        }
+        self.poll_routes(&budget);
+        self.poll_cartography(&budget);
+        if self.labels_dirty && budget.allows(250_000) {
+            self.rebuild_labels();
+        }
+        if self.inspection_dirty && budget.allows(100_000) {
+            self.rebuild_inspection();
+        }
+        self.frame_prepared = true;
+    }
     pub fn render(
         &mut self,
         target: &wgpu::TextureView,
@@ -1500,24 +1548,14 @@ impl Renderer {
         pitch: f32,
         elevation: f32,
     ) {
+        if !self.frame_prepared {
+            self.prepare_frame_work(4_000_000, true);
+        }
+        self.frame_prepared = false;
         self.validate_interior(self.logical_zoom.unwrap_or(zoom));
         if self.cover_dirty {
             self.rebuild_cover();
             self.cover_dirty = false;
-        }
-        if self.route_dirty {
-            self.rebuild_routes();
-        }
-        if self.cartographic_dirty {
-            self.cartographic_overflow = false;
-            self.rebuild_cartography();
-        }
-        self.poll_cartography();
-        if self.labels_dirty {
-            self.rebuild_labels();
-        }
-        if self.inspection_dirty {
-            self.rebuild_inspection();
         }
         let world = 512. * 2f64.powf(zoom);
         let (matrix, px_meter) = camera_matrix(

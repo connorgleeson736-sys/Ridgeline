@@ -156,7 +156,7 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
     private fun syncRoutes(){
         val state=controller.state
         val paths=ArrayList<Triple<List<Coordinate>,Int,Int>>()
-        paths.add(Triple(state.points,NativeUi.orange,state.selected))
+        paths.add(Triple(state.points,Color.rgb(232,121,68),state.selected))
         for(key in state.opened)if(key!=state.id){
             val points=passive[key]
             if(points!=null)paths.add(Triple(points,Color.argb(230,81,137,153),-1))

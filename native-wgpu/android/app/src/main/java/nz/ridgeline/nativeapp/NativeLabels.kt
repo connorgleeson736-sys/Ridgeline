@@ -23,7 +23,12 @@ internal object NativeLabels {
     private var bitmap:Bitmap?=null
     private var nextX=2;private var nextY=2;private var rowHeight=0
     private var pixels:ByteBuffer?=null
-    @Synchronized fun atlas(input:List<TopographyStyle.Label>):NativeLabelAtlas=buildAtlas(input,true)
+    private var regular:Typeface?=null
+    private var bold:Typeface?=null
+    @Synchronized fun atlas(input:List<TopographyStyle.Label>,assets:android.content.res.AssetManager):NativeLabelAtlas {
+        if(regular==null){regular=Typeface.Builder(assets,"fonts/OpenSans.ttf").setFontVariationSettings("'wght' 400, 'wdth' 100").build();bold=Typeface.Builder(assets,"fonts/OpenSans.ttf").setFontVariationSettings("'wght' 700, 'wdth' 100").build()}
+        return buildAtlas(input,true)
+    }
     private fun buildAtlas(input:List<TopographyStyle.Label>,canReset:Boolean):NativeLabelAtlas{
         if(input.isEmpty())return NativeLabelAtlas.empty()
         val paint=Paint(Paint.ANTI_ALIAS_FLAG);val packed=ArrayList<Pair<TopographyStyle.Label,Packed>>();var dirty=false
@@ -31,7 +36,7 @@ internal object NativeLabels {
             val key=SpriteKey(label.text,label.size,label.color,label.bold,label.circle)
             var slot=sprites[key]
             if(slot==null){
-                paint.textSize=label.size*SCALE;paint.typeface=if(label.bold)Typeface.DEFAULT_BOLD else Typeface.DEFAULT
+                paint.textSize=label.size*SCALE;paint.typeface=if(label.bold)bold else regular
                 val lines=if(label.circle)emptyList()else wrap(label.text,paint,label.size*SCALE*9)
                 val w=if(label.circle)ceil(label.size*2*SCALE+8).toInt()else ceil((lines.maxOfOrNull{paint.measureText(it)}?:1f)+8*SCALE).toInt()
                 val h=if(label.circle)w else ceil(lines.size*label.size*SCALE*1.25+8*SCALE).toInt()
@@ -49,7 +54,7 @@ internal object NativeLabels {
                 }
                 slot=Packed(label,lines,nextX,nextY,w,h);sprites[key]=slot;nextX+=w+2;rowHeight=max(rowHeight,h);dirty=true
                 val canvas=Canvas(bitmap!!);val p=slot
-                if(label.circle){paint.style=Paint.Style.FILL;paint.color=NativeUi.ink;canvas.drawCircle(p.x+p.width/2f,p.y+p.height/2f,label.size*SCALE+1.5f*SCALE,paint);paint.color=label.color;canvas.drawCircle(p.x+p.width/2f,p.y+p.height/2f,label.size*SCALE,paint)}
+                if(label.circle){paint.style=Paint.Style.FILL;paint.color=0xff233d34.toInt();canvas.drawCircle(p.x+p.width/2f,p.y+p.height/2f,label.size*SCALE+1.5f*SCALE,paint);paint.color=label.color;canvas.drawCircle(p.x+p.width/2f,p.y+p.height/2f,label.size*SCALE,paint)}
                 else for((i,text)in p.text.withIndex()){
                     val tx=p.x+(p.width-paint.measureText(text))/2;val ty=p.y+4*SCALE-paint.fontMetrics.top+i*label.size*SCALE*1.25f
                     paint.strokeJoin=Paint.Join.ROUND;paint.style=Paint.Style.STROKE;paint.strokeWidth=2.8f*SCALE;paint.color=0xe0122023.toInt();canvas.drawText(text,tx,ty,paint)

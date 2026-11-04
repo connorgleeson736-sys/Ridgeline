@@ -26,22 +26,28 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     @Volatile private var live=false
     @Volatile private var active=true
     private val cameraPreferences=context.getSharedPreferences("camera",0)
-    @Volatile var cameraPose=runCatching{
+    private val latestCamera=LatestCamera(runCatching{
         CameraPose(Double.fromBits(cameraPreferences.getLong("lon",170.14219572.toBits())),Double.fromBits(cameraPreferences.getLong("lat",(-43.5955671).toBits())),Double.fromBits(cameraPreferences.getLong("zoom",11.9.toBits())),cameraPreferences.getFloat("bearing",-24f),cameraPreferences.getFloat("pitch",58f),cameraPreferences.getFloat("elevation",3724f)).also{
             require(it.longitude in 165.0..180.0&&it.latitude in -49.0..-33.0&&it.zoom in 4.0..19.0&&it.bearing.isFinite()&&it.pitch in 0f..85f&&it.elevation.isFinite())
         }
-    }.getOrElse{CameraPose()};private set
+    }.getOrElse{CameraPose()})
+    var cameraPose:CameraPose
+        get()=latestCamera.read().pose
+        private set(value){latestCamera.publish(value)}
     @Volatile private var groundedPose:CameraPose?=null
-    @Volatile private var presentedPose:CameraPose?=null
-    @Volatile private var presentedFrom:CameraPose?=null
-    val planningPose:CameraPose get()=if(presentedFrom==cameraPose)presentedPose?:cameraPose else cameraPose
+    @Volatile private var submittedPose:CameraPose?=null
+    @Volatile private var submittedFrom:CameraPose?=null
+    val planningPose:CameraPose get()=if(submittedFrom==cameraPose)submittedPose?:cameraPose else cameraPose
     private val surfaceFocus=SurfaceFocusTracker()
     fun surfaceFocusFor(pose:CameraPose):SurfaceFocus?=surfaceFocus.current(pose,width,height,pixelScale,android.os.SystemClock.elapsedRealtime())
+    private val frameStats=ByteBuffer.allocateDirect(112).order(ByteOrder.LITTLE_ENDIAN)
+    private val frameTimings=java.util.concurrent.atomic.AtomicLongArray(14)
+    private fun frameReport():String{val t=LongArray(14){frameTimings.get(it)};return "Acquire wait: ${t[0]/1_000_000.0} ms · submitted revision ${t[2]} · GPU outstanding ${t[9]}\nHost→GPU overlay bytes route/cartography: ${t[10]}/${t[11]} · coherent commits ${t[12]}/${t[13]}\n"+if(t[8]!=0L&&t[3]!=0L)"Actual displayed revision ${t[5]} · last input→display ${if(t[4]>0)"${t[4]/1_000_000.0} ms"else "n/a"} · display queue ${t[6]}"else "Actual display timestamps unavailable on this backend/driver"}
     private val focusBytes=ByteBuffer.allocateDirect(24).order(ByteOrder.LITTLE_ENDIAN)
     private var focusCoverDirty=false
     val gestureInProgress get()=gestureActive
     @Volatile private var lastBacklog=0
-    internal fun loadingSnapshot()="GPU uploads waiting: ${uploads.size()} · outstanding submissions: $lastBacklog\nGPU admission: ${uploads.outcomeStats()}\nResident geometry/images: ${residency.geometry.size}/${residency.images.size}\nNative render CPU/wait last/max: $renderLastMs/$renderMaxMs ms\nDetail focus: "+if(surfaceFocusFor(planningPose)!=null)"measured visible terrain"else"map pivot (no current terrain hit)"
+    internal fun loadingSnapshot()=frameReport()+"\nGPU uploads waiting: ${uploads.size()} · outstanding submissions: $lastBacklog\nGPU admission: ${uploads.outcomeStats()}\nResident geometry/images: ${residency.geometry.size}/${residency.images.size}\nNative render CPU/wait last/max: $renderLastMs/$renderMaxMs ms\nDetail focus: "+if(surfaceFocusFor(planningPose)!=null)"measured visible terrain"else"map pivot (no current terrain hit)"
     val canPrepareAhead get()=live&&active&&!gestureActive&&lastBacklog==0&&!uploads.isNotEmpty()
     fun checkPreparationRoom(callback:(Boolean)->Unit){gpu.post{
         if(live&&active&&handle!=0L&&!gestureActive&&presentationFailures==0){lastBacklog=NativeBridge.gpuBacklog(handle);callback(canPrepareAhead)}else callback(false)
@@ -51,8 +57,8 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         val current=residency
         return (if(geometry)current.geometryCoverage else current.imageCoverage).complete(id,!sharp)
     }
-    internal fun frameReady()=presentedPose==cameraPose
-    internal fun groundedFrameReady()=groundedPose==cameraPose&&presentedPose==cameraPose
+    internal fun frameReady()=submittedPose==cameraPose
+    internal fun groundedFrameReady()=groundedPose==cameraPose&&submittedPose==cameraPose
     val longitude get()=cameraPose.longitude
     val latitude get()=cameraPose.latitude
     val zoom get()=cameraPose.zoom
@@ -73,6 +79,24 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     @Volatile private var appliedStyle:StylePacket?=null
     @Volatile private var layerBatch:NativeLayerBatch?=null
     private var appliedLayers:NativeLayerBatch?=null
+    @Volatile private var parsedLines:Pair<Long,ByteBuffer>?=null
+    private val parsingLines=AtomicBoolean()
+    private val lineParser=java.util.concurrent.Executors.newSingleThreadExecutor{run->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);run.run()},"RidgelineLinePackets")}
+    private var deferredLayer:NativeLayerBatch?=null
+    private var deferredLayerSince=0L
+    private fun prepareMapLines(){
+        if(!live||!active||handle==0L||!parsingLines.compareAndSet(false,true))return
+        try{lineParser.execute{
+            try{while(live&&active){
+                val scene=handle;val packet=layerBatch?.lines?:break
+                if(scene==0L||parsedLines?.let{it.first==scene&&it.second===packet}==true)break
+                // Parsing happens before the renderer mutex inside JNI. Never
+                // hold the camera or GPU HandlerThread behind a large packet.
+                if(!NativeBridge.cartography(scene,packet))break
+                if(scene==handle&&live){parsedLines=scene to packet;requestFrame()}
+            }}finally{parsingLines.set(false)}
+        }}catch(_:java.util.concurrent.RejectedExecutionException){parsingLines.set(false)}
+    }
     @Volatile private var inspection:Pair<Long,Coordinate?> = 0L to null
     private var appliedInspection:Pair<Long,Coordinate?>?=null
     @Volatile private var gpsPoint:Pair<Long,Coordinate?> = 0L to null
@@ -84,7 +108,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     private val labelProjection=ByteBuffer.allocateDirect(512*12).order(ByteOrder.LITTLE_ENDIAN)
     private var labelPose:CameraPose?=null;private var labelSize=0L;private var labelTime=0L
     internal var onLayerProjection:(NativeLabelAtlas,FloatArray)->Unit={_,_->}
-    internal fun mapLayers(batch:NativeLayerBatch){layerBatch=batch;requestFrame()}
+    internal fun mapLayers(batch:NativeLayerBatch){layerBatch=batch;prepareMapLines();requestFrame()}
     internal fun placeMapLabels(atlas:NativeLabelAtlas,buffer:ByteBuffer){if(labelPlacement?.let{it.first===atlas&&it.second==buffer}==true)return;labelPlacement=atlas to buffer;requestFrame()}
 
     internal fun configure(value:MapSettings.State,resetGeometry:Boolean=false){val previous=stylePacket;val bytes=ByteBuffer.allocateDirect(24).order(ByteOrder.LITTLE_ENDIAN).apply{putInt(value.base.ordinal);putInt(if(value.natural)1 else 0);putInt(if(value.hillshade)1 else 0);putFloat(value.relief);putInt(value.sky);putInt(if(value.threeD)1 else 0);rewind()};stylePacket=StylePacket(bytes,resetGeometry||(previous?.resetGeometry==true&&previous!==appliedStyle),!value.needsElevation());requestFrame()}
@@ -168,12 +192,20 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     private var safetyValid=false
     // Created and used exclusively on the GPU HandlerThread's Looper.
     private val choreographer by lazy{Choreographer.getInstance()}
-    private val vsync=Choreographer.FrameCallback{drawFrame()}
+    private var frameTimeNanos=0L
+    private var activeFrameNanos=16_666_667L
+    private val vsync=Choreographer.FrameCallback{stamp->
+        frameTimeNanos=stamp
+        display?.refreshRate?.takeIf{it.isFinite()&&it in 20f..240f}?.let{activeFrameNanos=(1_000_000_000.0/it).toLong()}
+        drawFrame()
+    }
     private val adaptiveWake=Runnable{requestFrame()}
     private val focusWake=Runnable{requestFrame()}
     private val retryWake=Runnable{requestFrame()}
     private val uploadAdmission=UploadAdmission()
     private var optionalSince=0L
+    private var deferredTile:GpuUploadQueue.Tile?=null
+    private var deferredTileSince=0L
     @Volatile private var renderLastMs=0L
     @Volatile private var renderMaxMs=0L
     private val clearanceBytes=ByteBuffer.allocateDirect(12).order(ByteOrder.LITTLE_ENDIAN)
@@ -189,13 +221,13 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         if(backlog>=2){requestFrame();return}
         val demand=demandPacket
         if(demand!=null&&demand!==appliedDemand&&NativeBridge.demand(handle,demand)){appliedDemand=demand;safetyPose=null}
-        val moved=cameraPose!=presentedFrom
+        val moved=cameraPose!=submittedFrom
         val covered=uploadDemand?.let{(g,i)->g.isNotEmpty()&&i.isNotEmpty()&&g.all{hasResidentCoverage(it,true)}&&i.all{hasResidentCoverage(it,false)}}==true
         val nowAdmission=android.os.SystemClock.uptimeMillis()
         if(moved&&covered&&optionalSince==0L)optionalSince=nowAdmission
         val cameraFirst=moved&&covered&&nowAdmission-optionalSince<64
         var deferredOptional=false
-        val started=System.nanoTime();val allowance=uploadAdmission.allowance(gestureActive).let{if(!cameraFirst)maxOf(1L,it)else it}
+        val started=System.nanoTime();val allowance=uploadAdmission.allowance(gestureActive,activeFrameNanos,(started-frameTimeNanos).coerceAtLeast(0))
         var count=0;var bytes=0;var accepted=false;var geometryChanged=false;var deviceUnavailable=false
         while(presentationFailures==0){
             val next=uploads.peek()?:break
@@ -208,7 +240,12 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             }
             val urgent=!hasResidentCoverage(next.id,next.kind!=GpuUploadQueue.Kind.IMAGE)
             if(cameraFirst&&!urgent){deferredOptional=true;break}
-            if(!uploadAdmission.allows(next.kind,System.nanoTime()-started,count,bytes,next.bytes,allowance,backlog,urgent))break
+            if(deferredTile!==next){deferredTile=next;deferredTileSince=nowAdmission}
+            // A known over-budget, non-preemptible tile may run once after a
+            // bounded idle wait. Never smuggle it into a zero-budget gesture.
+            val starvedIdle=!moved&&!gestureActive&&nowAdmission-deferredTileSince>=250
+            if(!uploadAdmission.allows(next.kind,System.nanoTime()-started,count,bytes,next.bytes,allowance,backlog,urgent,starvedIdle))break
+            deferredTile=null
             val tile=next
             val id=tile.id;val uploadStarted=System.nanoTime()
             val outcome=when(tile.kind){
@@ -225,18 +262,25 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         }
         if(deviceUnavailable){recoverGpu();return}
         val interior=interiorPacket
-        if(interior!=null){if(!cameraFirst){interiorPacket=null;if(interior.valid()&&NativeBridge.uploadInterior(handle,interior.id.z,interior.id.x,interior.id.y,interior.token,interior.data)){geometryChanged=true;accepted=true}}else deferredOptional=true}
+        if(interior!=null){if(!cameraFirst&&allowance>0&&System.nanoTime()-started+1_000_000<=allowance){interiorPacket=null;if(interior.valid()&&NativeBridge.uploadInterior(handle,interior.id.z,interior.id.x,interior.id.y,interior.token,interior.data)){geometryChanged=true;accepted=true}}else deferredOptional=true}
 
         if(count>0)refreshResidency()
         focusCoverDirty=focusCoverDirty||accepted
         if(accepted)post{onStatus("");onData()}
         val layers=layerBatch
         if(cameraFirst&&layers!=null&&layers!==appliedLayers)deferredOptional=true
-        if(!cameraFirst&&layers!=null&&layers!==appliedLayers){
+        if(layers!=null&&layers!==appliedLayers){
+            prepareMapLines()
+            if(deferredLayer!==layers){deferredLayer=layers;deferredLayerSince=nowAdmission}
             val changedAtlas=layers.atlas!==appliedLayers?.atlas
-            val lineReady=layers.lines===appliedLayers?.lines||NativeBridge.cartography(handle,layers.lines)
-            val atlasReady=!changedAtlas||if(layers.atlas.rgba===appliedLayers?.atlas?.rgba)NativeBridge.labelMetadata(handle,layers.atlas.metadata)else NativeBridge.labelAtlas(handle,layers.atlas.width,layers.atlas.height,layers.atlas.rgba,layers.atlas.metadata)
-            if(lineReady&&atlasReady){appliedLayers=layers;if(changedAtlas){labelPose=null;appliedPlacement=null}}
+            val pixelsChanged=layers.atlas.rgba!==appliedLayers?.atlas?.rgba
+            val predicted=250_000L+if(changedAtlas&&pixelsChanged)layers.atlas.rgba.capacity().toLong()*4 else 0
+            val starvedIdle=!moved&&!gestureActive&&nowAdmission-deferredLayerSince>=250
+            val lineReady=parsedLines?.let{it.first==handle&&it.second===layers.lines}==true
+            if(!cameraFirst&&lineReady&&(System.nanoTime()-started+predicted<=allowance||starvedIdle)){
+                val atlasReady=!changedAtlas||if(!pixelsChanged)NativeBridge.labelMetadata(handle,layers.atlas.metadata)else NativeBridge.labelAtlas(handle,layers.atlas.width,layers.atlas.height,layers.atlas.rgba,layers.atlas.metadata)
+                if(atlasReady){appliedLayers=layers;deferredLayer=null;if(changedAtlas){labelPose=null;appliedPlacement=null}}
+            }else deferredOptional=true
         }
         if(!cameraFirst)optionalSince=0L
         val placement=labelPlacement
@@ -247,10 +291,20 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         if(gps!==appliedGps&&NativeBridge.location(handle,gps.second?.longitude?:0.0,gps.second?.latitude?:0.0,gps.second!=null))appliedGps=gps
         val packet=routePacket
         if(packet!=null&&packet!==appliedRoutes&&NativeBridge.routes(handle,packet))appliedRoutes=packet
-        val requested=cameraPose // One immutable snapshot, no mixed camera revisions.
-        val size=(width.toLong() shl 32) or height.toLong()
+        val frameWidth=width;val frameHeight=height
+        NativeBridge.prepareFrame(handle,if(presentationFailures==0)(allowance-(System.nanoTime()-started)).coerceAtLeast(0)else 0,!moved&&!gestureActive)
+        val acquireGeneration=generation.get()
+        val acquired=NativeBridge.acquire(handle,frameWidth,frameHeight)
+        if(acquired<=0){presentationFailures++;if(acquired==-6||acquired==-5&&presentationFailures>=3)recoverGpu()else requestFrame(if(acquired==-2)250 else 16);return}
+        if(!live||!active||generation.get()!=acquireGeneration||width!=frameWidth||height!=frameHeight){NativeBridge.discardFrame(handle);if(live&&active)requestFrame();return}
+        // Acquisition may block; latch input only after it returns. All camera,
+        // clearance, picking and label bookkeeping below use this same packet.
+        val latched=latestCamera.read()
+        val latchedAt=System.nanoTime()
+        val requested=latched.pose
+        val size=(frameWidth.toLong() shl 32) or frameHeight.toLong()
         if(requested!=safetyPose||size!=safetySize||geometryChanged){
-            safetyBytes.rewind();safetyValid=NativeBridge.cameraSafety(handle,width,height,requested.longitude,requested.latitude,requested.zoom+ln(pixelScale)/ln(2.0),requested.bearing,requested.pitch,requested.elevation,safetyBytes)
+            safetyBytes.rewind();safetyValid=NativeBridge.cameraSafety(handle,frameWidth,frameHeight,requested.longitude,requested.latitude,requested.zoom+ln(pixelScale)/ln(2.0),requested.bearing,requested.pitch,requested.elevation,safetyBytes)
             safetyPose=requested;safetySize=size
         }
         safetyBytes.rewind()
@@ -261,49 +315,51 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         var pose=if(gestureActive){
             val held=max(gestureHeldElevation,if(floor.isFinite())floor else gestureHeldElevation)
             if(abs(held-requested.elevation)>.01f)requested.copy(elevation=held)else requested
-        }else CameraMath.clearTerrain(requested,height,pixelScale,lift)
+        }else CameraMath.clearTerrain(requested,frameHeight,pixelScale,lift)
         if(!gestureActive&&pose!=requested){
             for(pass in 0 until 2){
                 clearanceBytes.rewind()
-                if(!NativeBridge.cameraSafety(handle,width,height,pose.longitude,pose.latitude,pose.zoom+log2(pixelScale),pose.bearing,pose.pitch,pose.elevation,clearanceBytes))break
+                if(!NativeBridge.cameraSafety(handle,frameWidth,frameHeight,pose.longitude,pose.latitude,pose.zoom+log2(pixelScale),pose.bearing,pose.pitch,pose.elevation,clearanceBytes))break
                 val nextFloor=clearanceBytes.float
                 if(!nextFloor.isFinite()||nextFloor<=pose.elevation+.01f)break
-                pose=CameraMath.clearTerrain(pose,height,pixelScale,(nextFloor-pose.elevation).toDouble())
+                pose=CameraMath.clearTerrain(pose,frameHeight,pixelScale,(nextFloor-pose.elevation).toDouble())
             }
         }
         // Refined terrain changes the pivot, not the physical eye. No per-frame
-        // height-follow animation, and no collision correction fed back at rest.
+        // frameHeight-follow animation, and no collision correction fed back at rest.
         val shouldRecenter=ground.isFinite()&&groundZoom>=0&&!gestureActive&&(geometryChanged||recenterPending)
         val corrected=pose
         if(gestureActive&&corrected!=requested)post{if(cameraPose==requested&&live&&active){
             cameraPose=corrected;applyGesture()
         }}
         val renderStarted=System.nanoTime()
-        val shown=NativeBridge.render(handle,width,height,pose.longitude,pose.latitude,pose.zoom+ln(pixelScale)/ln(2.0),pose.zoom,pose.bearing,pose.pitch,pose.elevation)
+        val shown=NativeBridge.render(handle,frameWidth,frameHeight,pose.longitude,pose.latitude,pose.zoom+ln(pixelScale)/ln(2.0),pose.zoom,pose.bearing,pose.pitch,pose.elevation,latched.revision,latched.inputNanos,latchedAt)
+        NativeBridge.frameStats(handle,frameStats)
+        for(i in 0 until 14)frameTimings.set(i,frameStats.getLong(i*8))
         val renderElapsed=System.nanoTime()-renderStarted
         renderLastMs=renderElapsed/1_000_000;renderMaxMs=maxOf(renderMaxMs,renderLastMs)
         uploadAdmission.rendered(renderElapsed)
         if(shown>0){presentationFailures=0
-            val previous=presentedPose;presentedPose=pose;presentedFrom=requested
+            val previous=submittedPose;submittedPose=pose;submittedFrom=requested
             val rendered=pose
             if(previous!=pose&&pose!=requested)post{if(cameraPose==requested&&live&&active)onCamera()}
             val focusNow=android.os.SystemClock.elapsedRealtime()
-            val sampleFocus=surfaceFocus.needsSample(pose,width,height,pixelScale,focusNow,focusCoverDirty,gestureActive)
+            val sampleFocus=surfaceFocus.needsSample(pose,frameWidth,frameHeight,pixelScale,focusNow,focusCoverDirty,gestureActive)
             var centerPoint:DoubleArray?=null
             gpu.removeCallbacks(focusWake)
             if(sampleFocus||shouldRecenter){
                 focusBytes.rewind()
-                centerPoint=if(NativeBridge.pick(handle,width*.5,height*.5,focusBytes))DoubleArray(3){focusBytes.double}else null
-                val changedFocus=surfaceFocus.update(pose,width,height,pixelScale,focusNow,centerPoint)
+                centerPoint=if(NativeBridge.pick(handle,frameWidth*.5,frameHeight*.5,focusBytes))DoubleArray(3){focusBytes.double}else null
+                val changedFocus=surfaceFocus.update(pose,frameWidth,frameHeight,pixelScale,focusNow,centerPoint)
                 focusCoverDirty=false
                 if(changedFocus)post{if(cameraPose==requested&&live&&active)onCamera()}
-            }else if(surfaceFocus.pending(pose,width,height,pixelScale,focusCoverDirty))gpu.postDelayed(focusWake,240)
+            }else if(surfaceFocus.pending(pose,frameWidth,frameHeight,pixelScale,focusCoverDirty))gpu.postDelayed(focusWake,240)
             if(shouldRecenter){
             recenterPending=false
             val token=gestureEpoch
             val point=centerPoint
             post{if(point!=null&&token==gestureEpoch&&!gestureActive&&cameraPose==requested&&live&&active){
-                val recentered=CameraMath.recenter(rendered,height,pixelScale,point[2])
+                val recentered=CameraMath.recenter(rendered,frameHeight,pixelScale,point[2])
                 if(recentered!=null){cameraPose=recentered;groundedPose=recentered;changed()}
                 else if(abs(point[2]-rendered.elevation)<.001)groundedPose=requested
             }}
@@ -332,6 +388,10 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         if(deferredOptional)requestFrame(32)
     }
     private var lastRecovery=0L
+    private fun registerFrameWake(){
+        val token=generation.get()
+        NativeBridge.frameWake(handle,Runnable{if(live&&active&&generation.get()==token)requestFrame()})
+    }
     private fun recoverGpu(){
         surfaceFocus.clear()
         val now=android.os.SystemClock.uptimeMillis()
@@ -343,6 +403,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         handle=NativeBridge.create(holder.surface,width,height)
         residency=Residency(LongArray(0),LongArray(0));safetyPose=null;safetyValid=false;appliedRoutes=null;appliedDemand=null;appliedLayers=null;appliedPlacement=null;appliedStyle=null;appliedInspection=null;appliedGps=null;labelPose=null
         if(handle!=0L){
+            registerFrameWake()
             uploads.wakeRetries()
             val am=context.getSystemService(android.app.ActivityManager::class.java)
             NativeBridge.tileBudget(handle,if(am.isLowRamDevice)32 else(am.memoryClass/2).coerceIn(64,128))
@@ -367,7 +428,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             val created=NativeBridge.create(surface,width,height)
             if(!live||generation.get()!=token){if(created!=0L)NativeBridge.destroy(created);return@post}
             handle=created;safetyPose=null;safetyValid=false;appliedRoutes=null;appliedDemand=null;appliedLayers=null;appliedPlacement=null;appliedStyle=null;appliedInspection=null;appliedGps=null;labelPose=null;presentationFailures=0
-            if(handle!=0L){val am=context.getSystemService(android.app.ActivityManager::class.java);NativeBridge.tileBudget(handle,if(am.isLowRamDevice)32 else (am.memoryClass/2).coerceIn(64,128))}
+            if(handle!=0L){registerFrameWake();val am=context.getSystemService(android.app.ActivityManager::class.java);NativeBridge.tileBudget(handle,if(am.isLowRamDevice)32 else (am.memoryClass/2).coerceIn(64,128))}
             post{onStatus(if(created==0L)"Native GPU initialization failed"else "Loading terrain and imagery…")};requestFrame()
         }
         changed()
@@ -375,7 +436,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     override fun surfaceChanged(holder:SurfaceHolder,format:Int,width:Int,height:Int){changed()}
     override fun surfaceDestroyed(holder:SurfaceHolder) {
         surfaceFocus.clear();gestureEpoch++;anchorPending=false;gestureActive=false;input.removeCallbacksAndMessages(null)
-        live=false;presentedPose=null;generation.incrementAndGet();residency=Residency(LongArray(0),LongArray(0));queued.set(false)
+        live=false;submittedPose=null;generation.incrementAndGet();residency=Residency(LongArray(0),LongArray(0));queued.set(false)
         val done=CountDownLatch(1)
         gpu.post{gpu.removeCallbacks(adaptiveWake);gpu.removeCallbacks(focusWake);gpu.removeCallbacks(retryWake);choreographer.removeFrameCallback(vsync);if(handle!=0L)NativeBridge.destroy(handle);handle=0L;done.countDown()}
         done.await(5,TimeUnit.SECONDS)
@@ -388,6 +449,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         if(handle!=0L){NativeBridge.releaseUnused(handle);refreshResidency();safetyPose=null}
     }}
     fun close() {
+        lineParser.shutdownNow()
         input.removeCallbacksAndMessages(null);inputThread.quitSafely()
         stopMotion();active=false;live=false;generation.incrementAndGet();uploads.clear();queued.set(false)
         gpu.post{gpu.removeCallbacks(adaptiveWake);gpu.removeCallbacks(focusWake);gpu.removeCallbacks(retryWake);choreographer.removeFrameCallback(vsync);if(handle!=0L)NativeBridge.destroy(handle);handle=0;thread.quitSafely()}
@@ -480,7 +542,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     private var tilting=false
     private fun beginGesture(x:Double,y:Double,time:Long=android.os.SystemClock.uptimeMillis(),keepHold:Boolean=false){
         stopMotion();gestureActive=true
-        if(presentedFrom==cameraPose)presentedPose?.let{cameraPose=it}
+        if(submittedFrom==cameraPose)submittedPose?.let{cameraPose=it}
         finishGesturePending=false
         val token=++gestureEpoch;touchX=x;touchY=y;touchZoom=zoom;touchBearing=bearing;touchPitch=pitch
         val pose=cameraPose

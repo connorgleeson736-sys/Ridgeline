@@ -42,7 +42,11 @@ fn read(r: &Renderer, output: &wgpu::Texture) -> Vec<u8> {
 }
 async fn run() {
     let mut descriptor = wgpu::InstanceDescriptor::new_without_display_handle();
-    descriptor.backends = if std::env::args().any(|s|s=="--gles"){wgpu::Backends::GL}else{wgpu::Backends::VULKAN};
+    descriptor.backends = if std::env::args().any(|s| s == "--gles") {
+        wgpu::Backends::GL
+    } else {
+        wgpu::Backends::VULKAN
+    };
     let instance = wgpu::Instance::new(descriptor);
     let mut r = Renderer::new(
         &instance,
@@ -89,10 +93,16 @@ async fn run() {
             [bounds[0] + span * 0.2, center[1]],
             [bounds[0] + span * 0.8, center[1]],
         ],
-        color: [1., 0.1, 0.1, 1.],
+        color: [232. / 255., 121. / 255., 68. / 255., 1.],
         selected: Some(0),
     }]);
     r.render(&target, center, 11., 0., 0., 500.);
+    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
+    while r.overlays_pending() {
+        assert!(std::time::Instant::now() < deadline);
+        std::thread::sleep(std::time::Duration::from_millis(1));
+        r.render(&target, center, 11., 0., 0., 500.);
+    }
     let after = read(&r, &output);
     let changed = before
         .chunks_exact(4)
@@ -102,6 +112,11 @@ async fn run() {
     assert!(changed > 100, "native route is visible");
     let pixel = &after[(128 * 256 + 128) * 4..][..4];
     assert!(pixel[0] > pixel[1] + 40, "route crosses the actual center");
+    assert_eq!(
+        &pixel[..3],
+        &[232, 121, 68],
+        "Capacitor active-route colour"
+    );
     let uploads = r.route_uploads();
     r.render(&target, center, 11., 0., 0., 500.);
     assert_eq!(uploads, r.route_uploads());

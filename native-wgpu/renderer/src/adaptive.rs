@@ -4,6 +4,7 @@ use glam::{Mat4, Vec4};
 use std::time::Instant;
 #[derive(Clone, Copy)]
 pub(crate) struct State {
+    initialized: bool,
     step: u8,
     target: u8,
     since: Instant,
@@ -11,6 +12,7 @@ pub(crate) struct State {
 impl State {
     pub fn new() -> Self {
         Self {
+            initialized: false,
             step: 1,
             target: 1,
             since: Instant::now(),
@@ -98,30 +100,10 @@ pub(crate) fn choose(
         1
     };
     let mut target = level(0.6, 10.);
-    if old.step > target && level(0.9, 13.) >= old.step {
+    if old.initialized && old.step > target && level(0.9, 13.) >= old.step {
         target = old.step;
     }
-    let state = if target <= old.step {
-        State {
-            step: target,
-            target,
-            since: now,
-        }
-    } else if target != old.target {
-        State {
-            step: old.step,
-            target,
-            since: now,
-        }
-    } else if now.duration_since(old.since).as_millis() >= 350 {
-        State {
-            step: target,
-            target,
-            since: now,
-        }
-    } else {
-        old
-    };
+    let state = advance(old, target, now, exact || metrics.is_some());
     tile.adaptive_state.set(state);
     let wake = if state.step != state.target {
         Some(
@@ -133,4 +115,56 @@ pub(crate) fn choose(
         None
     };
     (state.step, wake)
+}
+
+fn advance(old: State, target: u8, now: Instant, qualified: bool) -> State {
+    if !old.initialized || target <= old.step {
+        State {
+            initialized: old.initialized || qualified,
+            step: target,
+            target,
+            since: now,
+        }
+    } else if target != old.target {
+        State {
+            initialized: true,
+            step: old.step,
+            target,
+            since: now,
+        }
+    } else if now.duration_since(old.since).as_millis() >= 350 {
+        State {
+            initialized: true,
+            step: target,
+            target,
+            since: now,
+        }
+    } else {
+        old
+    }
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn additional_adaptive_cold_start_and_hysteresis() {
+        let t = Instant::now();
+        let cold = advance(State::new(), 4, t, true);
+        assert_eq!(cold.step, 4);
+        assert_eq!(cold.target, 4);
+        let exact = advance(State::new(), 1, t, true);
+        let waiting = advance(exact, 4, t, true);
+        assert_eq!(waiting.step, 1);
+        assert_eq!(
+            advance(waiting, 4, t + std::time::Duration::from_millis(349), true).step,
+            1
+        );
+        assert_eq!(
+            advance(waiting, 4, t + std::time::Duration::from_millis(350), true).step,
+            4
+        );
+        assert_eq!(advance(cold, 1, t, true).step, 1);
+        assert!(!advance(State::new(), 1, t, false).initialized);
+        assert!(advance(cold, 1, t, false).initialized);
+    }
 }

@@ -3,6 +3,11 @@ import android.view.Surface
 import java.nio.ByteBuffer
 object NativeBridge {
  init {System.loadLibrary("ridgeline_renderer")}
+ @JvmStatic external fun discardFrame(handle:Long)
+ @JvmStatic external fun acquire(handle:Long,width:Int,height:Int):Int
+ @JvmStatic external fun prepareFrame(handle:Long,remainingNanos:Long,idle:Boolean)
+ @JvmStatic external fun frameStats(handle:Long,output:ByteBuffer)
+ @JvmStatic external fun frameWake(handle:Long,callback:Runnable)
  @JvmStatic external fun create(surface:Surface,width:Int,height:Int):Long
  @JvmStatic external fun terrainProfile(data:ByteBuffer):Boolean
  @JvmStatic external fun uploadGeometry(handle:Long,z:Int,x:Int,y:Int,data:ByteBuffer):Boolean
@@ -39,6 +44,6 @@ object NativeBridge {
  @JvmStatic external fun textureBackend(mode:Int)
  @JvmStatic external fun tileBudget(handle:Long,tiles:Int)
  @JvmStatic external fun destroy(handle:Long)
- @JvmStatic external fun render(handle:Long,width:Int,height:Int,longitude:Double,latitude:Double,zoom:Double,logicalZoom:Double,bearing:Float,pitch:Float,elevation:Float):Int
+ @JvmStatic external fun render(handle:Long,width:Int,height:Int,longitude:Double,latitude:Double,zoom:Double,logicalZoom:Double,bearing:Float,pitch:Float,elevation:Float,cameraRevision:Long,cameraInputNanos:Long,cameraLatchNanos:Long):Int
  @JvmStatic external fun upload(handle:Long,z:Int,x:Int,y:Int,heights:ByteBuffer,rgba:ByteBuffer):Boolean
 }

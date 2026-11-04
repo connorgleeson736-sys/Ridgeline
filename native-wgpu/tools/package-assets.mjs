@@ -34,3 +34,9 @@ const layerContext=load('topographic-overlays.js');
 fs.writeFileSync(path.join(out,'topography-style.json'),JSON.stringify(layerContext.RidgeTopography.layers()));
 const boundaryMeta=load('imagery-boundary-data.js').RidgeImageryBoundaryData;
 fs.copyFileSync(path.join(root,'public',boundaryMeta.url.replace(/^\//,'')),path.join(out,'imagery-boundary.geojson'));
+
+// Match the Capacitor map's Open Sans regular/bold glyph design. The variable
+// font is used only while generating the native cached atlas on its worker.
+fs.mkdirSync(path.join(out,'fonts'),{recursive:true});
+fs.copyFileSync(path.join(root,'native-wgpu/assets/fonts/OpenSans.ttf'),path.join(out,'fonts/OpenSans.ttf'));
+fs.copyFileSync(path.join(root,'native-wgpu/assets/fonts/OFL.txt'),path.join(out,'licenses/OpenSans-OFL.txt'));

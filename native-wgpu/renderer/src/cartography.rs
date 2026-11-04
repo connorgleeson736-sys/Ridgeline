@@ -19,9 +19,9 @@ struct Job {
     flat: bool,
     revision: u64,
 }
-struct Output {
+pub(crate) struct Output {
     anchor: [f64; 2],
-    vertices: Vec<Vertex>,
+    fragments: Vec<Arc<[Vertex]>>,
     overflow: bool,
     revision: u64,
 }
@@ -31,6 +31,7 @@ struct Shared {
     input: Mutex<Option<Job>>,
     wake: Condvar,
     output: Mutex<Option<Output>>,
+    notify: crate::frame_work::CompletionWake,
 }
 /// One running job and one replaceable latest snapshot; no unbounded geometry queue.
 /// No Android JNI or GPU object is accessed by this worker.
@@ -38,8 +39,9 @@ pub(crate) struct Worker {
     shared: Arc<Shared>,
 }
 impl Worker {
-    fn new() -> Option<Self> {
+    fn new(notify: crate::frame_work::CompletionWake) -> Option<Self> {
         let shared = Arc::new(Shared {
+            notify,
             revision: AtomicU64::new(0),
             stopped: AtomicBool::new(false),
             input: Mutex::new(None),
@@ -77,6 +79,7 @@ impl Worker {
                     if let Some(output) = build(&job, valid, &mut cache) {
                         if valid() {
                             *state.output.lock().unwrap() = Some(output);
+                            state.notify.notify();
                         }
                     }
                 }
@@ -182,7 +185,7 @@ fn reference_build(job: &Job, valid: impl Fn() -> bool) -> Option<Output> {
     }
     Some(Output {
         anchor,
-        vertices,
+        fragments: vec![vertices.into()],
         overflow,
         revision: job.revision,
     })
@@ -194,7 +197,7 @@ struct Cache {
     paths: Option<Arc<[CartographicPath]>>,
     relief: u32,
     flat: bool,
-    entries: std::collections::HashMap<FragmentKey, Vec<(usize, Vec<Vertex>)>>,
+    entries: std::collections::HashMap<FragmentKey, Vec<(usize, Arc<[Vertex]>)>>,
     large: bool,
     builds: u64,
 }
@@ -308,28 +311,25 @@ fn build(job: &Job, valid: impl Fn() -> bool, cache: &mut Cache) -> Option<Outpu
                 distance += (b[0] - a[0]).hypot(b[1] - a[1]);
             }
             if !vertices.is_empty() {
-                fragments.push((index, vertices));
+                fragments.push((index, Arc::from(vertices)));
             }
         }
         cache.builds += 1;
         cache.entries.insert(key, fragments);
     }
-    // Preserve the original path-major then cover-major draw order, including alpha.
-    let mut ordered = std::collections::BTreeMap::<usize, Vec<&[Vertex]>>::new();
+    // Keep cached immutable fragment owners; no full concatenation or copy.
+    // The GPU compares these against its last committed layout, so canceled
+    // worker snapshots can never become an unacknowledged delta base.
+    let mut ordered = std::collections::BTreeMap::<usize, Vec<Arc<[Vertex]>>>::new();
     for patch in &job.patches {
         for (index, vertices) in &cache.entries[&fragment_key(patch)] {
-            ordered.entry(*index).or_default().push(vertices);
+            ordered.entry(*index).or_default().push(vertices.clone());
         }
     }
-    let mut vertices = Vec::with_capacity(total);
-    for parts in ordered.values() {
-        for part in parts {
-            vertices.extend_from_slice(part);
-        }
-    }
+    let fragments = ordered.into_values().flatten().collect();
     Some(Output {
         anchor,
-        vertices,
+        fragments,
         overflow: false,
         revision: job.revision,
     })
@@ -352,6 +352,8 @@ impl Renderer {
     /// Only snapshots immutable CPU inputs. Terrain draping never runs on the frame thread.
     pub(crate) fn rebuild_cartography(&mut self) {
         self.cartographic_dirty = false;
+        self.cartographic_upload = None;
+        self.cartographic_gpu.cancel_staging();
         if self.cartographic_paths.is_empty() || self.cover.is_empty() {
             if let Some(worker) = &self.cartographic_worker {
                 worker.cancel();
@@ -362,9 +364,10 @@ impl Renderer {
             return;
         }
         if self.cartographic_worker.is_none() {
-            self.cartographic_worker = Worker::new();
+            self.cartographic_worker = Worker::new(self.completion_wake.clone());
         }
         let Some(worker) = &self.cartographic_worker else {
+            self.cartographic_dirty = true;
             return;
         };
         let patches = self
@@ -389,16 +392,23 @@ impl Renderer {
         });
         self.cartographic_pending = true;
     }
-    pub(crate) fn poll_cartography(&mut self) {
-        let Some(output) = self.cartographic_worker.as_ref().and_then(Worker::take) else {
-            return;
-        };
-        self.cartographic_anchor = output.anchor;
-        self.cartographic_vertices = output.vertices.len() as u32 * 6;
-        self.cartographic_overflow = output.overflow;
-        self.cartographic_gpu
-            .upload(&self.device, &self.queue, &output.vertices);
-        self.cartographic_pending = false;
+    pub(crate) fn poll_cartography(&mut self, budget: &crate::frame_work::Budget) {
+        if let Some(output) = self.cartographic_worker.as_ref().and_then(Worker::take) {
+            self.cartographic_gpu
+                .stage_fragments(output.fragments.clone());
+            self.cartographic_upload = Some(output);
+        }
+        if self.cartographic_upload.is_some()
+            && self
+                .cartographic_gpu
+                .advance_fragments(&self.device, &self.queue, budget)
+        {
+            let output = self.cartographic_upload.take().unwrap();
+            self.cartographic_anchor = output.anchor;
+            self.cartographic_vertices = output.fragments.iter().map(|v| v.len() as u32 * 6).sum();
+            self.cartographic_overflow = output.overflow;
+            self.cartographic_pending = false;
+        }
     }
     pub fn cartography_pending(&self) -> bool {
         self.cartographic_pending || self.cartographic_dirty
@@ -419,6 +429,7 @@ impl Renderer {
             worker.cancel();
         }
         self.cartographic_pending = false;
+        self.cartographic_upload = None;
         self.cartographic_gpu.upload(&self.device, &self.queue, &[]);
         self.cartographic_vertices = 0;
     }
@@ -473,7 +484,22 @@ pub(crate) fn drape(
     flat: bool,
 ) -> Vec<[f64; 3]> {
     if !flat {
-        return field.drape_segment(a, b, clip);
+        let mut points = field.drape_segment(a, b, clip);
+        // Consecutive DEM-triangle intervals on this original straight path
+        // with exactly equal heights are the same 3D segment. Keep every real
+        // height change; remove only redundant constant-height subdivisions.
+        // This also avoids repeatedly blending translucent round caps there.
+        let mut n = 0;
+        for i in 0..points.len() {
+            let p = points[i];
+            if n >= 2 && points[n - 2][2] == points[n - 1][2] && points[n - 1][2] == p[2] {
+                n -= 1;
+            }
+            points[n] = p;
+            n += 1;
+        }
+        points.truncate(n);
+        return points;
     }
     let delta = [b[0] - a[0], b[1] - a[1]];
     let mut lo = 0f64;
@@ -540,29 +566,80 @@ mod audit_tests {
         }
     }
     #[test]
+    fn constant_height_drape_keeps_exact_endpoints() {
+        let field = Heightfield::new(128, vec![500.; 129 * 129].into_boxed_slice()).unwrap();
+        let a = [0.1, 0.2];
+        let b = [0.9, 0.8];
+        let clip = [0., 0., 1., 1.];
+        let raw = field.drape_segment(a, b, clip);
+        assert!(raw.len() > 50);
+        assert_eq!(
+            drape(&field, a, b, clip, false),
+            vec![raw[0], *raw.last().unwrap()]
+        );
+        let heights: Vec<_> = (0..129 * 129).map(|i| (i % 129) as f32).collect();
+        let field = Heightfield::new(128, heights.into_boxed_slice()).unwrap();
+        let raw = field.drape_segment(a, b, clip);
+        let compact = drape(&field, a, b, clip, false);
+        for i in 1..raw.len() - 1 {
+            if raw[i - 1][2] != raw[i][2] || raw[i][2] != raw[i + 1][2] {
+                assert!(compact.contains(&raw[i]), "real height change removed");
+            }
+        }
+    }
+    #[test]
     fn audit_cached_fragments_and_latest_worker() {
         let mut job = job();
         let mut cache = Cache::default();
         let direct = reference_build(&job, || true).unwrap();
         let cached = build(&job, || true, &mut cache).unwrap();
         assert_eq!(
-            bytemuck::cast_slice::<_, u8>(&direct.vertices),
-            bytemuck::cast_slice::<_, u8>(&cached.vertices)
+            bytemuck::cast_slice::<_, u8>(
+                &direct
+                    .fragments
+                    .iter()
+                    .flat_map(|p| p.iter().copied())
+                    .collect::<Vec<_>>()
+            ),
+            bytemuck::cast_slice::<_, u8>(
+                &cached
+                    .fragments
+                    .iter()
+                    .flat_map(|p| p.iter().copied())
+                    .collect::<Vec<_>>()
+            )
         );
         assert_eq!(cache.builds, 2);
+        let retained = cached.fragments[0].clone();
         job.patches[1].generation = 3;
         job.patches[1].field =
             Arc::new(Heightfield::new(128, vec![900.; 129 * 129].into_boxed_slice()).unwrap());
         let cached = build(&job, || true, &mut cache).unwrap();
         let direct = reference_build(&job, || true).unwrap();
         assert_eq!(cache.builds, 3, "only changed terrain fragment rebuilds");
+        assert!(
+            Arc::ptr_eq(&retained, &cached.fragments[0]),
+            "unchanged fragments reach GPU staging without copying"
+        );
         assert_eq!(
-            bytemuck::cast_slice::<_, u8>(&direct.vertices),
-            bytemuck::cast_slice::<_, u8>(&cached.vertices)
+            bytemuck::cast_slice::<_, u8>(
+                &direct
+                    .fragments
+                    .iter()
+                    .flat_map(|p| p.iter().copied())
+                    .collect::<Vec<_>>()
+            ),
+            bytemuck::cast_slice::<_, u8>(
+                &cached
+                    .fragments
+                    .iter()
+                    .flat_map(|p| p.iter().copied())
+                    .collect::<Vec<_>>()
+            )
         );
         job.patches[1].generation = 4;
         assert!(build(&job, || false, &mut cache).is_none());
-        let worker = Worker::new().unwrap();
+        let worker = Worker::new(Default::default()).unwrap();
         worker.submit(job);
         let mut last = super::audit_tests::job();
         last.relief = 2.;
@@ -573,8 +650,9 @@ mod audit_tests {
                 assert_eq!(result.revision, 2);
                 assert!(
                     result
-                        .vertices
+                        .fragments
                         .iter()
+                        .flat_map(|p| p.iter())
                         .all(|v| v.start[2] == 1000. && v.end[2] == 1000.)
                 );
                 break;

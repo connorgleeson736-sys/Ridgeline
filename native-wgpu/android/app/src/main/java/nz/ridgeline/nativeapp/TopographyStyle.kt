@@ -6,7 +6,7 @@ import kotlin.math.*
 
 /** Evaluates the actual pinned Capacitor style, rather than duplicating its zoom/filter tables. */
 internal class TopographyStyle(json:String){
-    data class Line(val points:List<VectorTile.Point>,val color:Int,val width:Float,val dash:Float=0f,val gap:Float=0f)
+    data class Line(val points:List<VectorTile.Point>,val color:Int,val width:Float,val dash:Float=0f,val gap:Float=0f,val order:Int=Int.MAX_VALUE)
     data class Label(val point:VectorTile.Point,val text:String,val size:Float,val color:Int,val priority:Double,val bold:Boolean=false,val circle:Boolean=false,val key:String="",val anchor:String="center",val variable:Boolean=false)
     data class Output(val lines:List<Line>,val labels:List<Label>)
     private val specs=JSONArray(json).let{rows->List(rows.length()){rows.getJSONObject(it)}}
@@ -40,7 +40,7 @@ internal class TopographyStyle(json:String){
     fun sourceLayers(state:MapSettings.State,zoom:Double):Set<String> = specs.filter{state.enabled(group(it.getString("id")))&&zoom>=it.optDouble("minzoom",0.0)&&zoom<it.optDouble("maxzoom",30.0)}.map{it.getString("source-layer")}.toSet()
     fun build(features:List<VectorTile.Feature>,state:MapSettings.State,zoom:Double):Output{
         val lines=ArrayList<Line>();val labels=ArrayList<Label>();val grouped=features.groupBy{it.layer}
-        for(spec in specs){val id=spec.getString("id");val group=group(id)
+        for((order,spec) in specs.withIndex()){val id=spec.getString("id");val group=group(id)
             if(!state.enabled(group)||zoom<spec.optDouble("minzoom",0.0)||zoom>=spec.optDouble("maxzoom",30.0))continue
             val kind=spec.getString("type");val paint=spec.getJSONObject("paint");val layout=spec.optJSONObject("layout")?:JSONObject()
             for(f in grouped[spec.getString("source-layer")].orEmpty()){
@@ -49,7 +49,7 @@ internal class TopographyStyle(json:String){
                     val c=color(eval(paint.opt("line-color"),f.properties,zoom));val opacity=number(eval(paint.opt("line-opacity")?:1.0,f.properties,zoom),1.0)
                     val rgba=(c and 0x00ffffff) or (((c ushr 24)*opacity).roundToInt().coerceIn(0,255) shl 24)
                     val width=number(eval(paint.opt("line-width")?:1,f.properties,zoom),1.0).toFloat();val dash=paint.optJSONArray("line-dasharray")
-                    for(path in f.paths)if(path.size>=2)lines.add(Line(path,rgba,width,if(dash!=null)dash.optDouble(0).toFloat()*width else 0f,if(dash!=null)dash.optDouble(1).toFloat()*width else 0f))
+                    for(path in f.paths)if(path.size>=2)lines.add(Line(path,rgba,width,if(dash!=null)dash.optDouble(0).toFloat()*width else 0f,if(dash!=null)dash.optDouble(1).toFloat()*width else 0f,order))
                 }else{
                     val path=f.paths.maxByOrNull{it.size}?:continue;val point=(if(f.type==3)polygonAnchor(f.paths)else anchor(path))?:continue
                     val text=if(kind=="circle")""else eval(layout.opt("text-field"),f.properties,zoom)?.toString()?.replace("\\n","\n")?.trim().orEmpty()
