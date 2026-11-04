@@ -1,5 +1,13 @@
 # Capacitor 0.18.0 latency-audit implementation
 
+> **Correction, 4 November:** ordinary native tile-completion events have no
+> `sourceDataType: content` tag and already respected selection cadence in0.18.
+> The earlier fixture injected explicit content events and cannot support a
+> claim that all ordinary arrivals bypassed the interval. That priority/speed
+> expectation is withdrawn.0.20 preserves forced explicit content/metadata
+> invalidation while continuing live reconciliation and bounded ideal reuse.
+
+
 Target: Capacitor Original + Direct, released source
 `d880143418ac46ece98adff0b3b2fbaedf044d46`. Refreshed
 `android-preview-download` and checked its Base validation/source record.

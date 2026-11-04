@@ -1,5 +1,6 @@
 import {createCoordinateIndexCache} from './coordinate-index-cache.mjs';
 import {profileMainThread} from './main-thread-profile.mjs';
+import {additionalWeb} from './additional-latency.mjs';
 // App-only work reductions. No source/detail/mesh selection changes.
 function replace(text, from, to) {
  if(!text.includes(from))throw Error('Optimisation integration changed: '+from.slice(0,80));
@@ -102,5 +103,5 @@ function imageReadiness(map){`);
   text=replace(text,'   let coarseBytes=0;for(const [tile,entry]of entries)if(tile.tileID.canonical.z<=12)coarseBytes+=entry.bytes;','');
   text=replace(text,'   if(wrapper){evictions++;','   if(tile.tileID.canonical.z<=12)coarseBytes-=entry.bytes;\n   if(wrapper){evictions++;');
  }
- return text;
+ return additionalWeb(name,text);
 }

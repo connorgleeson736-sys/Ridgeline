@@ -51,12 +51,24 @@ final class TileHttpClient implements AutoCloseable {
   }
 
   private final OkHttpClient client, sampling;
+  private final long cacheLimitBytes;
   private final Validator validator;
   private final TileDispatcher<Resource> dispatcher = new TileDispatcher<>(2);
 
   static OkHttpClient create(File directory) {
+    return create(directory, CACHE_BYTES);
+  }
+
+  static OkHttpClient create(File directory, long bytes) {
+    if (bytes < 0) throw new IllegalArgumentException("Negative disk cache budget");
+    if (bytes == 0 && directory.isDirectory()) {
+      // Only on process startup, before a client owns this journal. Saved maps
+      // use a different store. No concurrent cache reopen or request teardown.
+      try (Cache old = new Cache(directory, 1)) { old.delete(); }
+      catch (IOException ignored) { /* Remain cache-free if cleanup fails. */ }
+    }
     return new OkHttpClient.Builder()
-        .cache(new Cache(directory, CACHE_BYTES))
+        .cache(bytes == 0 ? null : new Cache(directory, bytes))
         .connectTimeout(12, TimeUnit.SECONDS)
         .readTimeout(15, TimeUnit.SECONDS)
         .followRedirects(false)
@@ -65,6 +77,7 @@ final class TileHttpClient implements AutoCloseable {
   }
 
   TileHttpClient(OkHttpClient client, Validator validator) {
+    cacheLimitBytes = client.cache() == null ? 0 : client.cache().maxSize();
     this.client =
         client
             .newBuilder()
@@ -185,6 +198,7 @@ final class TileHttpClient implements AutoCloseable {
   Map<String, Long> stats() {
     Map<String, Long> values = new java.util.HashMap<>(dispatcher.stats());
     if (client.cache() != null) {
+      values.put("httpCacheLimitBytes", cacheLimitBytes);
       values.put("httpCacheHits", (long) client.cache().hitCount());
       values.put("httpCacheRequests", (long) client.cache().requestCount());
       values.put("httpNetworkRequests", (long) client.cache().networkCount());

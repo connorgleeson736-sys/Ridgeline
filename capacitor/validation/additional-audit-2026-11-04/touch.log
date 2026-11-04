@@ -1,0 +1,14 @@
+{
+  "events": 120,
+  "baseline": {
+    "unprojects": 0,
+    "terrainSamples": 0,
+    "ms": 0.07508699999999635
+  },
+  "guarded": {
+    "unprojects": 0,
+    "terrainSamples": 0,
+    "ms": 0.01870199999999045
+  },
+  "listenersAndParentPreserved": true
+}

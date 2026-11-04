@@ -7,6 +7,7 @@ import {optimiseWeb} from './optimise-web.mjs';
 import {createReadStream} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {resetWebsiteRenderPreferences} from '../mobile/render-preferences.js';
+import {additionalEngine} from './additional-latency.mjs';
 
 const base=fileURLToPath(new URL('../',import.meta.url)), source=path.resolve(base,'../public'), out=path.join(base,'www');
 await rm(out,{recursive:true,force:true});await mkdir(out,{recursive:true});
@@ -77,7 +78,8 @@ const hosts=[['https://basemaps.linz.govt.nz','https://localhost/_ridge/linz'],[
 for(const name of await readdir(out))if(/\.(?:m?js)$/.test(name)){
  let text=optimiseWeb(name,await readFile(path.join(out,name),'utf8'));for(const [from,to] of hosts)text=text.replaceAll(from,to);
  text=text.replaceAll("u.hostname==='basemaps.linz.govt.nz'&&u.pathname.match(","u.hostname==='localhost'&&u.pathname.replace(/^\\/_ridge\\/linz/,'').match(");
- if(name==='gap-imagery.js')text=text.replace("if(fail)throw fail.reason;","if(fail&&fineRequests.length&&a?.ok&&b?.ok)return base(url,options);if(fail)throw fail.reason;");
+ // A failed seam donor is a failed fine tile. Never publish LINZ-only pixels
+ // as a successful completed boundary response; retain the existing parent.
  // Server-side packed overviews are not part of a static Capacitor app.
  // Keep bundled overviews; read the provider for other tiles.
  if(name==='topographic-overlays.js')text=replace(text,'maxzoom:15','maxzoom:14');
@@ -125,13 +127,21 @@ for(const name of await readdir(out))if(/\.(?:m?js)$/.test(name)){
 }
 await cp(path.join(base,'mobile/native-transport.js'),path.join(out,'native-transport.js'));
 await cp(path.join(base,'mobile/native-bitmap-cache.js'),path.join(out,'native-bitmap-cache.js'));
+await cp(path.join(base,'mobile/tile-retry.js'),path.join(out,'tile-retry.js'));
+const enginePath=path.join(out,'assets/maplibre-gl.mjs');
+const auditEngine=additionalEngine(await readFile(enginePath,'utf8'),await readFile(path.join(base,'../scripts/maplibre-image-queue.js'),'utf8'));
+await writeFile(enginePath,auditEngine);
+const provenancePath=path.join(out,'assets/maplibre-provenance.json'),provenance=JSON.parse(await readFile(provenancePath,'utf8'));
+provenance.files['maplibre-gl.mjs']=createHash('sha256').update(auditEngine).digest('hex');
+provenance.patches.push({id:'RIDGE_ADDITIONAL_LATENCY_V1',script:'capacitor/scripts/additional-latency.mjs',scope:'App-only touch listener guard and owned composite/fallback metadata delivery. Renderer/detail preserved.'});
+await writeFile(provenancePath,JSON.stringify(provenance,null,2)+'\n');
 await writeFile(path.join(out,'native-transport-worker.mjs'),"import './native-transport.js';globalThis.RidgeNativeTransport.installWorker();\n");
 await writeFile(path.join(out,'native-map-worker.mjs'),"import './native-transport-worker.mjs';import './assets/maplibre-gl-worker.mjs?v=6.14.0';\n");
 await writeFile(path.join(out,'native-terrain-worker.js'),"importScripts('/native-transport.js');RidgeNativeTransport.installWorker();importScripts('/terrain-worker.js?v=5');\n");
 await writeFile(path.join(out,'native-regional-worker.js'),"importScripts('/native-transport.js');RidgeNativeTransport.installWorker();importScripts('/regional-imagery-worker.js?v=8');\n");
 const {document}=parseHTML(await readFile(path.join(out,'index.html'),'utf8'));
 document.documentElement.setAttribute('data-overviews-bundled',String(bundled));
-const nativeBootstrap=document.createElement('script');nativeBootstrap.textContent=await readFile(path.join(base,'mobile/native-transport.js'),'utf8')+'\nRidgeNativeTransport.installPage();';document.head.prepend(nativeBootstrap);
+const nativeBootstrap=document.createElement('script');nativeBootstrap.textContent=await readFile(path.join(base,'mobile/image-result.js'),'utf8')+'\n'+await readFile(path.join(base,'mobile/native-transport.js'),'utf8')+'\nRidgeNativeTransport.installPage();';document.head.prepend(nativeBootstrap);
 const renderDefaults=document.createElement('script');renderDefaults.textContent='try{('+resetWebsiteRenderPreferences.toString()+')(localStorage);}catch{}';document.head.prepend(renderDefaults);
 const $=id=>{const el=document.getElementById(id);if(!el)throw Error('Missing website control '+id);return el;};
 document.querySelector('meta[name=viewport]').setAttribute('content','width=device-width,initial-scale=1,viewport-fit=cover');
@@ -156,6 +166,9 @@ const note=document.createElement('p');note.textContent='3D terrain · Original 
 const tabs=document.createElement('div');tabs.className='layers-tabs';tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label','Layer settings');
 tabs.innerHTML='<button id="basic-tab" role="tab" aria-controls="layers-basic" aria-selected="true">Layers</button><button id="advanced-tab" role="tab" aria-controls="layers-advanced" aria-selected="false" tabindex="-1">Advanced</button>';
 panel.append(tabs,basic,advanced);
+const diskCache=document.createElement('fieldset');diskCache.className='detail-controls';
+diskCache.innerHTML='<legend>Automatic disk cache</legend><label for="automatic-disk-cache">Original map tiles <output id="automatic-disk-cache-value">256 MB</output></label><input id="automatic-disk-cache" type="range" min="0" max="1000" step="1" value="256" aria-describedby="automatic-disk-cache-help automatic-disk-cache-status"><p id="automatic-disk-cache-help">Keep recently used imagery and elevation responses on this device. Older cached tiles are removed when full. Saved offline maps are separate. Changes apply after restarting the app.</p><p id="automatic-disk-cache-status" role="status"></p>';
+advanced.prepend(diskCache);
 const about=document.createElement('details');about.innerHTML='<summary>Licences &amp; data sources</summary><p>Summits adapted from NZAC / ClimbNZ; Aoraki Tai Poutini (Rob Frost, 2018). CC BY-NC-SA 3.0 NZ. Imagery and terrain attribution appears on the map.</p>';
 for(const [name,file] of [['Capacitor','licenses/capacitor.txt'],['MapLibre','assets/maplibre-LICENSE.txt'],['Native HTTP libraries','licenses/apache-2.0.txt'],['Third-party notices','licenses/NOTICE.txt']]){const row=document.createElement('details'),title=document.createElement('summary'),text=document.createElement('pre');title.textContent=name;text.textContent=await readFile(path.join(out,file),'utf8');text.style.cssText='white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px;max-height:300px;overflow:auto';row.append(title,text);about.append(row);}advanced.append(about);
 const css=document.createElement('link');css.rel='stylesheet';css.href='/mobile.css';document.head.append(css);
