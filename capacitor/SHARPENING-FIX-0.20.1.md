@@ -59,3 +59,11 @@ alignment, original-asset and public-download records are stored in
 The original-response 0–1GB disk-cache slider, existing elevation PNG HTTP
 caching, saved regions and all four additional audit changes remain. No new
 prepared terrain/mesh disk cache is included.
+
+Signed APK assembly and normal release-vital checks passed. Package/version,
+signer, 16KiB ZIP alignment and packaged fixes were verified. All 1,134 original
+image/data assets and all public assets except native-residency.js and
+terrain-streaming.js match 0.20.0 byte-for-byte. The strengthened rendering replay
+passes: 13 drawn terrain patches equal the 13 native desired patches, 47 image
+and 19 DEM tiles loaded, no waiting covers, no false quality holds and no captured
+page/console errors. See final-browser.json and apk/release.json for exact records.

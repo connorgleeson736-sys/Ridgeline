@@ -1,4 +1,4 @@
-> **Capacitor additional audit APK: 0.20.0 Base.** [Download and installation details](checkpoints/README.md). Updates 0.19.0 Audit in place. Includes all four additional audit fixes, boundary recovery and a 0–1 GB original-tile disk-cache slider. The new processed terrain cache was removed. No phone speedup has been measured.
+> **Capacitor sharpening-fix APK: 0.20.1 Audit Base.** [Download and installation details](checkpoints/README.md). Updates 0.20.0/0.19.0 Audit in place. Fixes coarse covers blocking finer imagery. Retains the audit improvements and 0–1 GB original-response disk-cache slider; no new prepared terrain cache. No phone speedup has been measured.
 
 > **Latest Performance build: 0.18.0 Full.** [Additional selection CPU findings, exact quality checks and measurement limits](PERFORMANCE-0.18.0.md). All original overview imagery is included; updates the existing Performance app with its data retained. No phone speedup is established.
 
