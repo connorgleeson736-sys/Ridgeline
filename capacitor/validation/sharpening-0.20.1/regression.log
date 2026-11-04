@@ -1,0 +1,12 @@
+✔ visible coverage admits completed refinement without waiting for unrequested terrain corners (3.152029ms)
+✔ unchanged loaded image keys cannot retain a previous camera demand snapshot (0.856302ms)
+✔ residency releases a coarse drape for finer visible imagery and still holds genuinely missing or worse detail (12.503638ms)
+✔ geometry handoff follows native DEM deltaZoom and source ceiling, and still waits for a missing native dependency (7.738777ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1671.760871

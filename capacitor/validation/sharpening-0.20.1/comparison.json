@@ -1,0 +1,50 @@
+{
+  "before": {
+    "waitingCovers": 1,
+    "qualityHolds": 6,
+    "deferredRefreshes": 2,
+    "queue": {
+      "active": 0,
+      "stagedItems": 0,
+      "stagedBytes": 0,
+      "stagingItemLimit": 16,
+      "stagingByteLimit": 16777216,
+      "cachedActive": 0,
+      "queued": 0,
+      "moving": false,
+      "limit": 12,
+      "cachedReserve": 1,
+      "policyEvaluations": 270,
+      "queueRebuilds": 2,
+      "activeDecodes": 0,
+      "queuedDecodes": 0,
+      "decodeLimit": 12
+    },
+    "loadedImages": 47,
+    "loadedDEMs": 19
+  },
+  "after": {
+    "waitingCovers": 0,
+    "qualityHolds": 0,
+    "deferredRefreshes": 0,
+    "queue": {
+      "active": 0,
+      "stagedItems": 0,
+      "stagedBytes": 0,
+      "stagingItemLimit": 16,
+      "stagingByteLimit": 16777216,
+      "cachedActive": 0,
+      "queued": 0,
+      "moving": false,
+      "limit": 12,
+      "cachedReserve": 1,
+      "policyEvaluations": 291,
+      "queueRebuilds": 3,
+      "activeDecodes": 0,
+      "queuedDecodes": 0,
+      "decodeLimit": 12
+    },
+    "loadedImages": 47,
+    "loadedDEMs": 19
+  }
+}
