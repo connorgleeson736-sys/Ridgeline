@@ -15,6 +15,31 @@ export function additionalEngine(text,queue){
 }
 export function additionalWeb(name,text){
  const r=(from,to)=>{text=once(text,from,to);};
+ if(name==='terrain-streaming.js'){
+  r('const readinessChecks=new WeakMap();',`// Native imagery demand covers the camera frustum, not every off-screen
+// corner of a terrain patch. Waiting for those corners can block refinement
+// forever after all requested images have arrived. Unknown demand keeps the
+// conservative full-patch rule.
+function visibleCoverage(manager,ids,complete=completeCoverage(ids)){
+ const wanted=manager?._ridgeIdeal?.ids;
+ if(!Array.isArray(wanted)||!wanted.length)return complete;
+ return id=>{
+  if(complete(id))return true;
+  const p=id.canonical||id,wrap=id.wrap||0;
+  for(const target of wanted){
+   if((target.wrap||0)!==wrap)continue;
+   const q=target.canonical||target,z=Math.min(p.z,q.z);
+   if(Math.floor(p.x/2**(p.z-z))!==Math.floor(q.x/2**(q.z-z))||Math.floor(p.y/2**(p.z-z))!==Math.floor(q.y/2**(q.z-z)))continue;
+   if(!complete(q.z>p.z?target:id))return false;
+  }
+  return true;
+ };
+}
+const readinessChecks=new WeakMap();`);
+  r('return old.check;','return visibleCoverage(manager,ids,old.check);');
+  r(' return check;\n}\nfunction imageReadiness', ' return visibleCoverage(manager,ids,check);\n}\nfunction imageReadiness');
+  r('priority,completeCoverage,partitionCover,imageReadiness','priority,completeCoverage,visibleCoverage,partitionCover,imageReadiness');
+ }
  if(name==='selection-interval.js')r("event.sourceDataType==='metadata'||event.tile?.dem||event.sourceDataType==='content'&&source?.type!=='raster'","event.sourceDataType==='metadata'||event.tile?.dem||event.sourceDataType==='content'");
  if(name==='maplibre-direct-sampling.js'){
   // Direct ownership represents one complete draped surface. If symbols or
@@ -42,6 +67,15 @@ export function additionalWeb(name,text){
   r('function lowerQuality(tile,saved,renderer,coverage){','function lowerQuality(tile,saved,renderer,coverage,style){');
   r('lowerQuality(tile,saved.quality,this,root.RidgeTerrainStreaming?.completeCoverage)','lowerQuality(tile,saved.quality,this,root.RidgeTerrainStreaming?.completeCoverage,scope.style)');
   r('ids.filter(id=>id.canonical.z>=r.minZoom)','ids.filter(id=>(style?.tileManagers?.[entry.source]?.getTile?.(id)?._ridgeFallback?.z??id.canonical.z)>=r.minZoom)');
+  r('checks.set(r.minZoom,coverage(ids.filter(id=>(style?.tileManagers?.[entry.source]?.getTile?.(id)?._ridgeFallback?.z??id.canonical.z)>=r.minZoom)))',`checks.set(r.minZoom,(()=>{const selected=ids.filter(id=>(style?.tileManagers?.[entry.source]?.getTile?.(id)?._ridgeFallback?.z??id.canonical.z)>=r.minZoom),full=coverage(selected);return root.RidgeTerrainStreaming?.visibleCoverage?.(style?.tileManagers?.[entry.source],selected,full)||full;})())`);
+  // MapLibre's colour patch deliberately uses a DEM one zoom lower
+  // (deltaZoom), bounded by source maxzoom. A neighbour's finer request must
+  // not turn that already complete native dependency into a permanent wait.
+  r('if(loadedZoom===undefined)return true;',`if(loadedZoom===undefined)return true;
+   const sourceMax=manager.tileManager?._source?.maxzoom??id.canonical.z;
+   const requestedZoom=Math.min((id.overscaledZ??id.canonical.z)-(manager.deltaZoom??0),sourceMax);
+   if(loadedZoom>=requestedZoom)return true;`);
+  r('for(let z=q.z;z>loadedZoom;z--)','for(let z=Math.min(q.z,requestedZoom);z>loadedZoom;z--)');
   r('const cost=tile=>', 'const direct=tile=>!!tile?._ridgeDirectCoverage?.valid?.();\n const available=tile=>cost(tile)>0||direct(tile);\n const cost=tile=>');
   text=text.replaceAll('cost(tile)>0','available(tile)');
   // The helper itself must measure RTT cost rather than recurse.
