@@ -1737,3 +1737,8 @@ overlay updates with coherent bounded staging. Matched Capacitor route colour/wi
 semantics, perspective screen-space antialiasing, layer ordering and Open Sans.
 See `native-wgpu/research/ADDITIONAL-AUDIT-2026-11-05.md`. Native 0.1.12 code13
 uses the existing Performance package and signing identity. No handset speed claim.
+
+Published-build artifact: `Ridgeline-Native-Additional-Audit-0.1.12-Base.apk`, 33,192,122 bytes, SHA256
+`085fff49995826f07da20d451c63a968c3afc15b8a4ce3390f7bf486f57f61ce`. Source `60520651aed447bd862b6e47b2ab8948875eb2e9`; package/code/signer,
+43 JNI exports in all3 rebuilt optimized ABIs, 16KiB ELF/APK alignment and621
+original assets verified. Four focused JVM checks and16renderer checks pass.

@@ -1,0 +1,53 @@
+   Compiling ridgeline-renderer v0.1.0 (/workspace/Ridgeline/native-wgpu/renderer)
+warning: method `matches_style` is never used
+  --> renderer/src/picking_snapshot.rs:56:19
+   |
+41 | impl PickingSnapshot {
+   | -------------------- method in this implementation
+...
+56 |     pub(crate) fn matches_style(&self, three_d: bool, relief: f32) -> bool {
+   |                   ^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `ridgeline-renderer` (lib test) generated 1 warning
+    Finished `test` profile [unoptimized] target(s) in 3.92s
+     Running unittests src/lib.rs (native-wgpu/target/debug/deps/ridgeline_renderer-e39f21c360f60648)
+
+running 19 tests
+test adaptive::tests::additional_adaptive_cold_start_and_hysteresis ... ok
+test cartography::audit_tests::audit_cached_fragments_and_latest_worker ... ok
+test frame_work::tests::wake_releases_lock_before_callback ... ok
+test frame_work::tests::zero_deadline_never_admits_first_work ... ok
+test cartography::audit_tests::constant_height_drape_keeps_exact_endpoints ... ok
+test index_atlas::tests::coalesces_adjacent_holes_without_moving_visible_ranges ... ok
+INDEX_CHURN: previous 45 pattern uploads (15 hot), stable 31 (1 hot); uploaded bytes 1080 -> 744
+test index_atlas::tests::churn_preserves_hot_topology_and_reduces_uploads ... ok
+test latest_worker::tests::additional_latest_result_wakes_without_polling ... ok
+test seams::tests::benchmark_reused_continuity ... ignored, explicit release host CPU benchmark
+test seams::tests::benchmark_sweep ... ignored, explicit host CPU benchmark
+test seams::tests::continuity_proofs_require_identical_source_generations_and_join ... ok
+test seams::tests::sweep_matches_pairwise_with_mixed_lod_holes_and_discontinuities ... ok
+test selection::tests::benchmark_selection_paths ... ignored, explicit release CPU selection A/B
+close detail pitch=0 sourceMax=22 centerLevel=20 count=35
+close detail pitch=0 sourceMax=19 centerLevel=19 count=71
+close detail pitch=45 sourceMax=22 centerLevel=20 count=36
+close detail pitch=45 sourceMax=19 centerLevel=19 count=72
+close detail pitch=58 sourceMax=22 centerLevel=20 count=36
+close detail pitch=58 sourceMax=19 centerLevel=19 count=72
+close detail pitch=75 sourceMax=22 centerLevel=21 count=36
+close detail pitch=75 sourceMax=19 centerLevel=19 count=72
+close detail pitch=80 sourceMax=22 centerLevel=21 count=36
+close detail pitch=80 sourceMax=19 centerLevel=19 count=72
+test selection::tests::close_zoom_keeps_maximum_source_detail_at_the_surface_focus ... ok
+test selection::tests::covers_center_without_overlap_or_unbounded_requests ... ok
+PASS Backends(VULKAN):20,480,000 ->640,000 host/GPU bytes; exact ordered GPU stream; zero-budget/partial/canceled generations safe
+PASS Backends(GL):20,480,000 ->640,000 host/GPU bytes; exact ordered GPU stream; zero-budget/partial/canceled generations safe
+test routes::additional_tests::additional_coherent_incremental_overlay_gpu ... ok
+test selection::tests::surface_focus_missing_or_invalid_preserves_the_old_plan ... ok
+SURFACE_FOCUS: old face request rank=33, level=15; new rank=0, level=16; before sources=72, after sources=72, real hit height=3000
+test selection::tests::surface_focus_prioritizes_the_first_actual_terrain_intersection ... ok
+test selection::tests::optimized_selection_preserves_every_ordered_leaf ... ok
+
+test result: ok. 16 passed; 0 failed; 3 ignored; 0 measured; 0 filtered out; finished in 1.79s
+

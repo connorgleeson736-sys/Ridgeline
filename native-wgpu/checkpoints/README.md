@@ -1,6 +1,26 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.11 Imagery Border Recovery Base APK — 32.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-Imagery-Border-Recovery-0.1.11-Base.apk)**.
+Latest: **[Download 0.1.12 Additional Latency Audit Base APK — 33.2 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-Additional-Audit-0.1.12-Base.apk)**.
+Source `6052065`, version code13. Same Native Performance package and signer;
+updates recent Native Performance builds in place, preserving app data.
+
+Post-acquire camera latching, bounded incremental GPU overlays, completion-triggered
+background draping, first-qualified adaptive terrain and active-refresh budgets.
+Routes match Capacitor's nominal stroke widths and colours, with corrected
+perspective/antialiasing, reference layer ordering and Open Sans labels.
+
+In the synthetic one-patch workload, host-to-GPU overlay bytes fall from
+20,480,000 to640,000 (96.875%). Four focused JVM and16renderer checks pass,
+including Vulkan/GLES GPU readback and route rendering. All three optimized ABIs,
+signer, install metadata, 16KiB alignment and621original assets are verified.
+No physical-device speedup measurement or full MapLibre pixel-parity claim.
+[Implementation and limits](../research/ADDITIONAL-AUDIT-2026-11-05.md) ·
+[Exact release record](../validation/additional-audit-2026-11-05/release.json) ·
+[SHA-256](Ridgeline-Native-Additional-Audit-0.1.12-Base.apk.sha256).
+
+## Previous 0.1.11 imagery border recovery checkpoint
+
+**[Download 0.1.11 Imagery Border Recovery Base APK — 32.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-Imagery-Border-Recovery-0.1.11-Base.apk)**.
 Source `aab3c12`, version code12. Same Native Performance package/signer;
 updates 0.1.2–0.1.10 in place, preserving app data.
 
