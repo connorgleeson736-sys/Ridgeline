@@ -1,4 +1,4 @@
-> **Capacitor latency audit APK: 0.19.0 Base.** [Download and installation details](checkpoints/README.md). Installs alongside the original app with separate private data because the original Capacitor signing key is unavailable. Includes all six audit changes; no phone speedup has been measured.
+> **Capacitor additional audit APK: 0.20.0 Base.** [Download and installation details](checkpoints/README.md). Updates 0.19.0 Audit in place. Includes all four additional audit fixes, boundary recovery and a 0–1 GB original-tile disk-cache slider. The new processed terrain cache was removed. No phone speedup has been measured.
 
 > **Latest Performance build: 0.18.0 Full.** [Additional selection CPU findings, exact quality checks and measurement limits](PERFORMANCE-0.18.0.md). All original overview imagery is included; updates the existing Performance app with its data retained. No phone speedup is established.
 

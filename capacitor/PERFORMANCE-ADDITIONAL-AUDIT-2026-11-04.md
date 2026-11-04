@@ -137,5 +137,8 @@ and the targeted engine/browser fixtures are recorded in the adjacent validation
 folder. Real HTTP checks cover persistence after reopening, LRU eviction under a
 small cap, disabling and preserving separately saved data. No broad suite/full
 lint or route-planning work. APK assembly performs its normal required checks;
-signing, download-byte verification and original-asset comparisons are recorded
-at publication. No handset/emulator execution or overall speedup is claimed.
+The signed 0.20.0 Audit Base APK passes signature, package/version, alignment,
+exact engine-patch and original-asset comparisons. Its source is 70a3f0b and
+all 1,134 original image/data assets match 0.19.0 byte-for-byte. The release and
+download records are in `validation/additional-audit-2026-11-04/apk/`.
+No handset/emulator execution or overall speedup is claimed.
