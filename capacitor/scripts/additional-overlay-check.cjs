@@ -75,5 +75,14 @@ process.chdir(process.argv[2]||'audit');
   afterLineArrival,retainedExistingOverlayWhenCoordinatesMissing:true,removedConfirmedEmptyOverlay:true,
   textureBytesPerPatch:Array.from({length:11},(_,i)=>4*Math.floor(1025/2**i)**2).reduce((a,b)=>a+b,0)},null,2));
  const beforeMode=directDraws;adapter.setEnabled(false);assert.equal(adapter.draw(painter,terrain,patches[1],state),true,'A committed Direct cover remains drawable before Original composition');assert.equal(directDraws,beforeMode+1);adapter.setEnabled(true);frame();
+ // A non-draped separator must preserve normal imagery composition in every
+ // stack, including a transition from previously committed zero-RTT Direct.
+ style._layers.names={id:'names',type:'symbol',isHidden:()=>false};
+ style._order=['background','linz','names','route'];
+ rtt.prepareForRender(style,tr.zoom,false);
+ assert.equal(adapter.stats().directPatches,0,'Multiple terrain stacks use native composition');
+ assert.equal(adapter.skipLayer(rtt,patches[1],photo),false,'Base imagery is never omitted from composed stacks');
+ assert.equal(adapter.skipTile(rtt,patches[1],0,['background','linz'],style),false);
+ console.log(JSON.stringify({multipleStacksRetainNativeComposition:true}));
   adapter.destroy();drapes.destroy();terrain.tileManager.destruct();
 })().catch(e=>{console.error(e);process.exitCode=1;});

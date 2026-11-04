@@ -1,6 +1,6 @@
-✔ a failed seam donor cannot become successful LINZ-only imagery; recovery composes all sources (46.527765ms)
-✔ stationary transient failures keep recovering; retired tiles, aborts and permanent errors stop (2.117906ms)
-✔ disk slider persists the latest value through overlapping saves and reports the restart (11.445634ms)
+✔ a failed seam donor cannot become successful LINZ-only imagery; recovery composes all sources (48.97793ms)
+✔ stationary transient failures keep recovering; retired tiles, aborts and permanent errors stop (4.876512ms)
+✔ disk slider persists the latest value through overlapping saves and reports the restart (7.921014ms)
 ℹ tests 3
 ℹ suites 0
 ℹ pass 3
@@ -8,4 +8,4 @@
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 369.151907
+ℹ duration_ms 512.897823

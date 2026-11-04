@@ -17,6 +17,11 @@ export function additionalWeb(name,text){
  const r=(from,to)=>{text=once(text,from,to);};
  if(name==='selection-interval.js')r("event.sourceDataType==='metadata'||event.tile?.dem||event.sourceDataType==='content'&&source?.type!=='raster'","event.sourceDataType==='metadata'||event.tile?.dem||event.sourceDataType==='content'");
  if(name==='maplibre-direct-sampling.js'){
+  // Direct ownership represents one complete draped surface. If symbols or
+  // circles separate terrain stacks, let native composition own every pass.
+  r("const eligible=on&&map.getProjection",`let stackCount=0,inStack=false;
+  for(const layer of visible){const draped=['background','fill','line','raster','hillshade','color-relief'].includes(layer.type);if(draped&&!inStack)stackCount++;inStack=draped;}
+  const eligible=on&&stackCount===1&&map.getProjection`);
   r('if(!manager||!Array.isArray(coords))return false;',`if(!manager)return false;
   if(coords===undefined&&rtt._coordsAscending[layer.source]&&!tile.getRTT(0))continue;
   if(!Array.isArray(coords))return false;`);
@@ -33,10 +38,10 @@ export function additionalWeb(name,text){
   r('function restored(){transparent=null;', 'function restored(){epoch++;transparent=null;');
  }
  if(name==='native-residency.js'){
-  r('minZoom:q.z','minZoom:style.tileManagers[layer.source].getTile(id)?._ridgeFallback?.z??q.z');
+  r('minZoom:q.z','minZoom:style.tileManagers[layer.source].getTile?.(id)?._ridgeFallback?.z??q.z');
   r('function lowerQuality(tile,saved,renderer,coverage){','function lowerQuality(tile,saved,renderer,coverage,style){');
   r('lowerQuality(tile,saved.quality,this,root.RidgeTerrainStreaming?.completeCoverage)','lowerQuality(tile,saved.quality,this,root.RidgeTerrainStreaming?.completeCoverage,scope.style)');
-  r('ids.filter(id=>id.canonical.z>=r.minZoom)','ids.filter(id=>(style?.tileManagers?.[entry.source]?.getTile(id)?._ridgeFallback?.z??id.canonical.z)>=r.minZoom)');
+  r('ids.filter(id=>id.canonical.z>=r.minZoom)','ids.filter(id=>(style?.tileManagers?.[entry.source]?.getTile?.(id)?._ridgeFallback?.z??id.canonical.z)>=r.minZoom)');
   r('const cost=tile=>', 'const direct=tile=>!!tile?._ridgeDirectCoverage?.valid?.();\n const available=tile=>cost(tile)>0||direct(tile);\n const cost=tile=>');
   text=text.replaceAll('cost(tile)>0','available(tile)');
   // The helper itself must measure RTT cost rather than recurse.

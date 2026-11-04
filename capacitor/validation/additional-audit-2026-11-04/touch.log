@@ -3,12 +3,12 @@
   "baseline": {
     "unprojects": 0,
     "terrainSamples": 0,
-    "ms": 0.07508699999999635
+    "ms": 0.10422699999998031
   },
   "guarded": {
     "unprojects": 0,
     "terrainSamples": 0,
-    "ms": 0.01870199999999045
+    "ms": 0.028980000000018435
   },
   "listenersAndParentPreserved": true
 }
