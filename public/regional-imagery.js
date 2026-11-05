@@ -49,7 +49,7 @@ function webpBytes(data){
   new DataView(data).getUint32(4,true)+8===b.length&&
   b[12]===86&&b[13]===80&&b[14]===56&&[32,76,88].includes(b[15]);
 }
-function create({fetcher=(...a)=>root.fetch(...a),meta=root.RidgeWestCoastFootprint,overviews=root.RidgeAlpineOverviews,south=root.RidgeSouthOverviews,reference=root.RidgeReferenceOverviews,composer,workerFactory=()=>new root.Worker('/regional-imagery-worker.js?v=8'),concurrency=2}={}){
+function create({fetcher=(...a)=>root.fetch(...a),meta=root.RidgeWestCoastFootprint,overviews=root.RidgeAlpineOverviews,south=root.RidgeSouthOverviews,reference=root.RidgeReferenceOverviews,composer,workerFactory=()=>new root.Worker('/regional-imagery-worker.js?v=9'),concurrency=2}={}){
  const inputs=root.RidgeResponses?.create({fetcher}),inputFetch=inputs?.fetch||fetcher;
  const Scheduler=root.RidgeRegionalScheduler||(typeof require==='function'?require('./regional-scheduler.js'):null);
  const scheduler=Scheduler.create({concurrency});let worker=null,restartAt=0,workerFailures=0,failureWindow=0,fallbackBusy=false,nextId=0,dead=false,mask=null;const jobs=new Map(),overviewCooldown=new Map(),metrics={untouchedLINZ:0,regionalEsri:0,boundaryComposites:0,overzoomCrops:0,esriColourCompensations:0,precomputedOverviews:0,southOverviews:0,southRangeBytes:0,southFailures:0,southStatic:0,overviewGenericContentType:0,overviewFallbacks:0,workerJobs:0,mainThreadJobs:0,compositionFailures:0,referenceOverviews:0};
@@ -57,18 +57,45 @@ function create({fetcher=(...a)=>root.fetch(...a),meta=root.RidgeWestCoastFootpr
  function ensureWorker(){
   if(worker||dead||Date.now()<restartAt)return worker;
   if(typeof root.Worker!=='function')return null;
-  try{worker=workerFactory();worker.onmessage=({data})=>{const job=jobs.get(data.id);if(!job)return;jobs.delete(data.id);clearTimeout(job.timer);job.cleanup?.();data.cancelled?job.reject(Scheduler.abort()):data.error?job.reject(Error(data.error)):job.resolve(data.data);};
-   worker.onerror=()=>failWorker(Error('Imagery worker unavailable'));
+  try{const current=workerFactory();worker=current;worker.onmessage=({data})=>{if(worker!==current){data.data?.close?.();return;}const job=jobs.get(data.id);if(!job)return;if(data.needsEsri){job.needEsri?.();return;}jobs.delete(data.id);clearTimeout(job.timer);job.cleanup?.();data.cancelled?job.reject(Scheduler.abort()):data.error?job.reject(Error(data.error)):job.resolve(data.data);};
+   worker.onerror=event=>{event.preventDefault?.();if(worker===current)failWorker(Error('Imagery worker unavailable'));};
   }catch{failWorker(Error('Imagery worker unavailable'));}return worker;
  }
  async function compose(data,signal,original=false){
   if(dead||signal?.aborted)throw Object.assign(Error('Cancelled'),{name:'AbortError'});
   if(composer)return composer(data,signal);
+  const deferred=typeof data.loadEsri==='function',payload={...data,deferEsri:deferred};delete payload.loadEsri;
   const w=ensureWorker();
-  if(w){metrics.workerJobs++;return new Promise((resolve,reject)=>{const id=++nextId,timer=setTimeout(()=>failWorker(Error('Imagery worker timeout')),12000);const cancel=()=>{try{w.postMessage({cancel:id});}catch(error){failWorker(error);}},cleanup=()=>signal?.removeEventListener('abort',cancel);jobs.set(id,{resolve,reject,timer,cleanup});signal?.addEventListener('abort',cancel,{once:true});try{w.postMessage({...data,id},[data.linz,data.esri,...(data.fine||[]).map(v=>v.data)].filter(buffer=>buffer instanceof ArrayBuffer));if(signal?.aborted)cancel();}catch(error){failWorker(error);}});}
+  if(w){metrics.workerJobs++;return new Promise((resolve,reject)=>{
+   const id=++nextId;let finalResolve,finalReject,sent=false;
+   const final=new Promise((a,b)=>{finalResolve=a;finalReject=b;});final.catch(()=>{});
+   const cancel=()=>{try{w.postMessage({cancel:id});}catch(error){failWorker(error);}},cleanup=()=>signal?.removeEventListener('abort',cancel);
+   const job={timer:null,cleanup,resolve(value){resolve(value);finalResolve(value);},reject(error){reject(error);finalReject(error);},needEsri(){
+    if(!deferred){failWorker(Error('Unexpected imagery input request'));return;}
+    job.waitingEsri=true;clearTimeout(job.timer);job.timer=null;
+    const close=()=>{if(jobs.get(id)!==job)return;jobs.delete(id);clearTimeout(job.timer);cleanup();cancel();finalReject(Scheduler.abort());};
+    resolve({ridgeDeferred:true,close,waitForEsri(input){return Promise.race([input,final.then(()=>{throw Scheduler.abort();})]);},finish(esri){
+     if(sent||jobs.get(id)!==job)return Promise.reject(Scheduler.abort());sent=true;job.waitingEsri=false;
+     job.timer=setTimeout(()=>failWorker(Error('Imagery worker timeout')),12000);
+     try{w.postMessage({esriFor:id,data:esri},[esri]);}catch(error){failWorker(error);}return final;
+    }});
+   }};
+   job.timer=setTimeout(()=>failWorker(Error('Imagery worker timeout')),12000);jobs.set(id,job);signal?.addEventListener('abort',cancel,{once:true});
+   try{w.postMessage({...payload,id},[data.linz,data.esri,...(data.fine||[]).map(v=>v.data)].filter(buffer=>buffer instanceof ArrayBuffer));if(signal?.aborted)cancel();}catch(error){failWorker(error);}
+  });}
   if(typeof root.OffscreenCanvas!=='function'||!root.RidgeRegionalBlend)throw Error('Regional composition unavailable');
-  if(fallbackBusy)throw Object.assign(Error('Regional fallback busy'),{status:503});fallbackBusy=true;metrics.mainThreadJobs++;if(original)root.dispatchEvent?.(new Event('ridge-imagery-main-thread'));if(data.linz&&!data.overlay&&!data.meta?.rings)mask=fetcher(data.meta?.maskURL||'/assets/west-coast-mask.png?v=1',{}).then(r=>{if(!r.ok)throw Error('Mask unavailable');return r.blob();}).then(b=>root.createImageBitmap(b)).catch(error=>{mask=null;throw error;});
-  try{return await root.RidgeRegionalBlend.composite({...data,mask:data.linz&&!data.overlay?mask:Promise.resolve(null),checkCancelled:()=>{if(dead||signal?.aborted)throw Scheduler.abort();}});}finally{mask?.then(m=>m.close()).catch(()=>{});mask=null;fallbackBusy=false;}
+  if(fallbackBusy)throw Object.assign(Error('Regional fallback busy'),{status:503});fallbackBusy=true;metrics.mainThreadJobs++;
+  if(original)root.dispatchEvent?.(new Event('ridge-imagery-main-thread'));
+  if(data.linz&&!data.overlay&&!data.meta?.rings)mask=fetcher(data.meta?.maskURL||'/assets/west-coast-mask.png?v=1',{}).then(r=>{if(!r.ok)throw Error('Mask unavailable');return r.blob();}).then(b=>root.createImageBitmap(b)).catch(error=>{mask=null;throw error;});
+  const checkCancelled=()=>{if(dead||signal?.aborted)throw Scheduler.abort();};
+  try{
+   const prepared=await root.RidgeRegionalBlend.prepare({...payload,mask:data.linz&&!data.overlay?mask:Promise.resolve(null),checkCancelled});
+   if(deferred&&prepared.needsEsri)return{ridgeDeferred:true,close:prepared.close,async finish(esri){
+    if(fallbackBusy)throw Object.assign(Error('Regional fallback busy'),{status:503});fallbackBusy=true;
+    try{return await prepared.finish(esri);}finally{fallbackBusy=false;}
+   }};
+   return await prepared.finish(data.esri);
+  }finally{mask?.then(m=>m.close()).catch(()=>{});mask=null;fallbackBusy=false;}
  }
  const schedule=(run,signal,options)=>scheduler.schedule(run,signal,options);
  async function regionalFetch(url,options={},catalogReady=false){
@@ -165,8 +192,18 @@ function create({fetcher=(...a)=>root.fetch(...a),meta=root.RidgeWestCoastFootpr
   }catch(error){if(error.name!=='AbortError')metrics.compositionFailures++;throw error;}
  }
  function destroy(){dead=true;inputs?.destroy();scheduler.destroy();overviewCooldown.clear();worker?.terminate();worker=null;for(const job of jobs.values()){clearTimeout(job.timer);job.cleanup?.();job.reject(Object.assign(Error('Cancelled'),{name:'AbortError'}));}jobs.clear();mask?.then(m=>m.close()).catch(()=>{});}
- const expanded=root.RidgeGapImagery?.create({fetcher:inputFetch,base:regionalFetch,compose:(data,signal,options)=>{const bytes=(data.linz?.byteLength||0)+data.esri.byteLength+(data.fine||[]).reduce((n,v)=>n+v.data.byteLength,0);root.RidgeTileTrace?.emit('transform-queued','linz',data,{bytes});return schedule(async()=>{root.RidgeTileTrace?.emit('transform-start','linz',data);try{return await compose(data,signal);}catch(error){if(error.name!=='AbortError')metrics.compositionFailures++;throw error;}finally{root.RidgeTileTrace?.emit('transform-finished','linz',data);}},signal,{bytes,priority:options.ridgePriority||(()=>options.priority||'high'),rank:options.ridgeRank});}});
- return{fetch:expanded?.fetch||regionalFetch,destroy(){expanded?.destroy();destroy();},stats:()=>({...metrics,...inputs?.stats(),...expanded?.stats(),...scheduler.stats(),workerFailures,workerRestartAfterMs:Math.max(0,restartAt-Date.now()),mainThreadFallback:fallbackBusy})};
+ const expanded=root.RidgeGapImagery?.create({fetcher:inputFetch,base:regionalFetch,deferEsri:true,compose:async(data,signal,options)=>{
+  const bytes=(data.linz?.byteLength||0)+(data.esri?.byteLength||0)+(data.loadEsri?262144:0)+(data.fine||[]).reduce((n,v)=>n+v.data.byteLength,0);
+  const demand={bytes,priority:options.ridgePriority||(()=>options.priority||'high'),rank:options.ridgeRank};
+  const run=async()=>{root.RidgeTileTrace?.emit('transform-start','linz',data);try{return await compose(data,signal);}catch(error){if(error.name!=='AbortError')metrics.compositionFailures++;throw error;}finally{root.RidgeTileTrace?.emit('transform-finished','linz',data);}};
+  root.RidgeTileTrace?.emit('transform-queued','linz',data,{bytes});
+  const prepared=await schedule(run,signal,demand);
+  if(!prepared?.ridgeDeferred)return prepared;
+  // The alpha/decode slot is released before waiting on network I/O. Later
+  // LINZ-only jobs can still run while a genuine mixed tile awaits Esri.
+  try{const input=data.loadEsri(),esri=await(prepared.waitForEsri?prepared.waitForEsri(input):input);return await schedule(()=>prepared.finish(esri),signal,demand);}finally{prepared.close();}
+ }});
+ return{fetch:expanded?.fetch||regionalFetch,destroy(){expanded?.destroy();destroy();},stats:()=>({...metrics,...inputs?.stats(),...expanded?.stats(),...scheduler.stats(),workerFailures,pendingWorkerCompositions:jobs.size,waitingEsriCompositions:[...jobs.values()].filter(j=>j.waitingEsri).length,workerRestartAfterMs:Math.max(0,restartAt-Date.now()),mainThreadFallback:fallbackBusy})};
 }
 const api={mode,inside,relation,webpBytes,create};if(typeof module!=='undefined')module.exports=api;else root.RidgeRegionalImagery=api;
 })(globalThis);

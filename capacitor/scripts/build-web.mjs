@@ -116,7 +116,7 @@ for(const name of await readdir(out))if(/\.(?:m?js)$/.test(name)){
  }
  if(name==='terrain-core.js')text=replace(text,'/terrain-worker.js?v=5','/native-terrain-worker.js');
  if(name==='regional-imagery.js'){
-  text=replace(text,'/regional-imagery-worker.js?v=8','/native-regional-worker.js');
+  text=replace(text,'/regional-imagery-worker.js?v=9','/native-regional-worker.js?v=2');
   text=replace(text,'if(entry){',"if(entry&&(entry.url||entry[compensate?'natural':'raw']?.url)){");
   text=replace(text,"if(!/^\\/assets\\/south-overviews-v1\\/[a-f0-9]{24}\\.webp$/.test(row.url))", "if(!/^\\/assets\\/south-overviews-v1\\/[a-f0-9]{24}\\.webp$/.test(row.url)&&!/^https:\\/\\/localhost\\/_ridge\\/overviews\\/[a-f0-9]{64}\\/\\d+\\/\\d+$/.test(row.url))");
   const start=text.indexOf('   const headers=new Headers(options.headers);'),end=text.indexOf('  const asset=baked',start);
@@ -138,7 +138,7 @@ await writeFile(provenancePath,JSON.stringify(provenance,null,2)+'\n');
 await writeFile(path.join(out,'native-transport-worker.mjs'),"import './native-transport.js';globalThis.RidgeNativeTransport.installWorker();\n");
 await writeFile(path.join(out,'native-map-worker.mjs'),"import './native-transport-worker.mjs';import './assets/maplibre-gl-worker.mjs?v=6.14.0';\n");
 await writeFile(path.join(out,'native-terrain-worker.js'),"importScripts('/native-transport.js');RidgeNativeTransport.installWorker();importScripts('/terrain-worker.js?v=5');\n");
-await writeFile(path.join(out,'native-regional-worker.js'),"importScripts('/native-transport.js');RidgeNativeTransport.installWorker();importScripts('/regional-imagery-worker.js?v=8');\n");
+await writeFile(path.join(out,'native-regional-worker.js'),"importScripts('/native-transport.js');RidgeNativeTransport.installWorker();importScripts('/regional-imagery-worker.js?v=9');\n");
 const {document}=parseHTML(await readFile(path.join(out,'index.html'),'utf8'));
 document.documentElement.setAttribute('data-overviews-bundled',String(bundled));
 const nativeBootstrap=document.createElement('script');nativeBootstrap.textContent=await readFile(path.join(base,'mobile/image-result.js'),'utf8')+'\n'+await readFile(path.join(base,'mobile/native-transport.js'),'utf8')+'\nRidgeNativeTransport.installPage();';document.head.prepend(nativeBootstrap);

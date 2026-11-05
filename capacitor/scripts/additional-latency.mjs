@@ -90,18 +90,10 @@ const readinessChecks=new WeakMap();`);
   r("const listeners=[['terrain',sync]", "const listeners=[['moveend',()=>retry.scan()],['terrain',sync]");
   r('recycled=boundRecyclePool(map.painter,root.navigator?.connection?.saveData?8*1048576:16*1048576);sync();map.triggerRepaint();','recycled=boundRecyclePool(map.painter,root.navigator?.connection?.saveData?8*1048576:16*1048576);sync();retry.scan();map.triggerRepaint();');
  }
- if(name==='regional-blend.js'){
-  r('hardMask=false,compensate=false,checkCancelled=', 'hardMask=false,compensate=false,bitmap=false,bitmapOptions,checkCancelled=');
-  r("checkCancelled();const blob=await result.convertToBlob({type:'image/png'});", `checkCancelled();if(bitmap&&typeof result.transferToImageBitmap==='function')return result.transferToImageBitmap();const blob=await result.convertToBlob({type:'image/png'});`);
- }
- if(name==='regional-imagery-worker.js'){
-  r('const data=await RidgeRegionalBlend.composite({...job,mask,checkCancelled});checkCancelled();self.postMessage({id:job.id,data},[data]);',`const data=await RidgeRegionalBlend.composite({...job,mask,checkCancelled});
-  try{checkCancelled();self.postMessage({id:job.id,data},[data]);}catch(error){data?.close?.();throw error;}`);
- }
+ // Prepared bitmap ownership and cancellation live in the shared compositor/worker.
  if(name==='regional-scheduler.js')r('if(j.settled)return;j.settled=true;','if(j.settled){value?.close?.();return;}j.settled=true;');
  if(name==='regional-imagery.js'){
-  r("worker.onerror=()=>failWorker(Error('Imagery worker unavailable'));","worker.onerror=event=>{event.preventDefault?.();failWorker(Error('Imagery worker unavailable'));};");
-  r('if(!job)return;jobs.delete(data.id);','if(!job){data.data?.close?.();return;}jobs.delete(data.id);');
+  r('if(!job)return;','if(!job){data.data?.close?.();return;}');
   // A recoverable worker/decode failure must not exhaust the unknown-error
   // retry allowance and leave an owned boundary tile coarse indefinitely.
   r('data.cancelled?job.reject(Scheduler.abort()):data.error?job.reject(Error(data.error)):job.resolve(data.data);','data.cancelled?job.reject(Scheduler.abort()):data.error?job.reject(Object.assign(Error(data.error),{status:503})):job.resolve(data.data);');
@@ -119,7 +111,7 @@ const readinessChecks=new WeakMap();`);
   if(dead||options.signal?.aborted){data?.close?.();throw Object.assign(Error('Cancelled'),{name:'AbortError'});}
   return root.RidgeImageResult.result(data,headers);`);
   // The earlier cancellation check must also dispose a completed bitmap.
-  r("if(dead||options.signal?.aborted)throw Object.assign(Error('Cancelled'),{name:'AbortError'});\n  stats[coarse?", "if(dead||options.signal?.aborted){data?.close?.();throw Object.assign(Error('Cancelled'),{name:'AbortError'});}\n  stats[coarse?");
+  r("if(dead||options.signal?.aborted)throw Object.assign(Error('Cancelled'),{name:'AbortError'});\n  stats[kind]", "if(dead||options.signal?.aborted){data?.close?.();throw Object.assign(Error('Cancelled'),{name:'AbortError'});}\n  stats[kind]");
  }
  if(name==='tile-cache.js'){
   r('let bytes=0,nextExpiry=Infinity;', 'let bytes=0,nextExpiry=Infinity,bitmapSequence=0;');

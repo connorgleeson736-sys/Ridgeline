@@ -17,40 +17,58 @@ function vectorAlpha(meta,z,x,y,w,h){
  }
  return data;
 }
-async function composite({linz,esri,fine=[],z,x,y,esriZ=z,meta,mask,overlay=false,hardMask=false,compensate=false,checkCancelled=()=>{}},environment=root){
- checkCancelled();let disposed=false;const owned=[];
- const decode=async data=>{const bitmap=await environment.createImageBitmap(new Blob([data]));
-  try{checkCancelled();if(disposed)throw cancelled();}catch(error){bitmap.close();throw error;}
-  owned.push(bitmap);return bitmap;
- };
- let a,b,m,decoded;
+// Preparation owns its decoded inputs until finish/close. A mask-only first
+// stage can finish a LINZ tile without ever consuming the optional Esri input.
+async function prepare(settings,environment=root){
+ const {linz,fine=[],z,x,y,esriZ=z,meta,mask,overlay=false,hardMask=false,compensate=false,bitmap=false,checkCancelled=()=>{}}=settings;
+ let disposed=false,finished=false;const owned=[];
+ const close=()=>{if(disposed)return;disposed=true;for(const b of owned)b.close();owned.length=0;};
+ const check=()=>{checkCancelled();if(disposed)throw cancelled();};
+ const decode=async data=>{const b=await environment.createImageBitmap(new Blob([data]));try{check();}catch(e){b.close();throw e;}owned.push(b);return b;};
  try{
-  decoded=await Promise.all([linz?decode(linz):null,decode(esri),linz&&!overlay&&!meta?.rings?mask:null,...fine.map(row=>decode(row.data))]);
-  [a,b,m]=decoded;checkCancelled();
-  if(a&&(a.width!==b.width||a.height!==b.height))throw Error('Imagery dimensions differ');
-  const w=a?.width||b.width,h=a?.height||b.height,canvas=new environment.OffscreenCanvas(w,h),ctx=canvas.getContext('2d',compensate?{willReadFrequently:true}:undefined),factor=2**(z-esriZ);
-  if(w>512||h>512)throw Error('Unexpected imagery dimensions');
-  // Esri's verified local ceiling is z18. At z19, crop the correct z18 parent
-  // rather than accepting its HTTP-200 "not available" placeholder image.
-  ctx.drawImage(b,(x%factor)*b.width/factor,(y%factor)*b.height/factor,b.width/factor,b.height/factor,0,0,w,h);
-  if(compensate){const pixels=ctx.getImageData(0,0,w,h);environment.RidgeImagery.compensateEsri(pixels.data);ctx.putImageData(pixels,0,0);}
-  let result=canvas;
-  if(a&&overlay){const out=new environment.OffscreenCanvas(w,h),oc=out.getContext('2d');oc.drawImage(a,0,0,w,h);oc.drawImage(canvas,0,0);result=out;}
-  else if(a){
-   const alpha=new environment.OffscreenCanvas(w,h),out=new environment.OffscreenCanvas(w,h),ac=alpha.getContext('2d'),oc=out.getContext('2d');
-   const scale=2**(z-meta.z)*w/256,dx=(meta.x/2**meta.z-x/2**z)*2**z*w,dy=(meta.y/2**meta.z-y/2**z)*2**z*h;
+  check();
+  const decoded=await Promise.all([linz?decode(linz):null,linz&&!overlay&&!meta?.rings?mask:null,...fine.map(row=>decode(row.data))]);
+  const [a,m]=decoded;check();let alpha=null,needsEsri=true;
+  if(a&&(a.width>512||a.height>512))throw Error('Unexpected imagery dimensions');
+  if(a&&!overlay){
+   const w=a.width,h=a.height;alpha=new environment.OffscreenCanvas(w,h);const ac=alpha.getContext('2d',{willReadFrequently:true});
    if(meta.rings){const pixels=ac.createImageData(w,h);pixels.data.set(vectorAlpha(meta,z,x,y,w,h));
     if(fine.length){const survey=new environment.OffscreenCanvas(w,h),sc=survey.getContext('2d',{willReadFrequently:true});
-     for(let i=0;i<fine.length;i++){const bitmap=decoded[i+3],ff=2**(z-fine[i].z);sc.drawImage(bitmap,(x%ff)*bitmap.width/ff,(y%ff)*bitmap.height/ff,bitmap.width/ff,bitmap.height/ff,0,0,w,h);}
+     for(let i=0;i<fine.length;i++){const b=decoded[i+2],ff=2**(z-fine[i].z);sc.drawImage(b,(x%ff)*b.width/ff,(y%ff)*b.height/ff,b.width/ff,b.height/ff,0,0,w,h);}
      const valid=sc.getImageData(0,0,w,h).data;for(let i=3;i<valid.length;i+=4)if(valid[i]>0)pixels.data[i]=0;
     }
-    ac.putImageData(pixels,0,0);}else{if(hardMask)ac.imageSmoothingEnabled=false;ac.drawImage(m,dx,dy,meta.width*scale,meta.height*scale);}
-   ctx.globalCompositeOperation='destination-in';ctx.drawImage(alpha,0,0);
-   oc.drawImage(a,0,0,w,h);oc.drawImage(canvas,0,0);result=out;
+    ac.putImageData(pixels,0,0);
+   }else{
+    const scale=2**(z-meta.z)*w/256,dx=(meta.x/2**meta.z-x/2**z)*2**z*w,dy=(meta.y/2**meta.z-y/2**z)*2**z*h;
+    if(hardMask)ac.imageSmoothingEnabled=false;ac.drawImage(m,dx,dy,meta.width*scale,meta.height*scale);
+   }
+   const pixels=ac.getImageData(0,0,w,h).data;needsEsri=false;for(let i=3;i<pixels.length;i+=4)if(pixels[i]){needsEsri=true;break;}
   }
-  checkCancelled();const blob=await result.convertToBlob({type:'image/png'});checkCancelled();const data=await blob.arrayBuffer();checkCancelled();return data;
- }finally{disposed=true;for(const bitmap of owned)bitmap.close();owned.length=0;}
+  // Only the original photograph and prepared mask survive a network wait.
+  for(let i=decoded.length-1;i>=2;i--){const b=decoded[i];owned.splice(owned.lastIndexOf(b),1);b.close();}
+  return{needsEsri,close,async finish(esri=settings.esri){
+   if(finished)throw Error('Composition already consumed');finished=true;
+   try{
+    check();const b=needsEsri?await decode(esri):null;check();
+    if(a&&b&&(a.width!==b.width||a.height!==b.height))throw Error('Imagery dimensions differ');
+    const w=a?.width||b.width,h=a?.height||b.height;if(w>512||h>512)throw Error('Unexpected imagery dimensions');
+    const canvas=new environment.OffscreenCanvas(w,h),ctx=canvas.getContext('2d',compensate?{willReadFrequently:true}:undefined);let result=canvas;
+    if(!needsEsri)ctx.drawImage(a,0,0,w,h);
+    else{
+     const factor=2**(z-esriZ);ctx.drawImage(b,(x%factor)*b.width/factor,(y%factor)*b.height/factor,b.width/factor,b.height/factor,0,0,w,h);
+     if(compensate){const p=ctx.getImageData(0,0,w,h);environment.RidgeImagery.compensateEsri(p.data);ctx.putImageData(p,0,0);}
+     if(a){const out=new environment.OffscreenCanvas(w,h),oc=out.getContext('2d');
+      if(!overlay){ctx.globalCompositeOperation='destination-in';ctx.drawImage(alpha,0,0);}
+      oc.drawImage(a,0,0,w,h);oc.drawImage(canvas,0,0);result=out;
+     }
+    }
+    check();if(bitmap&&typeof result.transferToImageBitmap==='function')return result.transferToImageBitmap();
+    const blob=await result.convertToBlob({type:'image/png'});check();const data=await blob.arrayBuffer();check();return data;
+   }finally{close();}
+  }};
+ }catch(error){close();throw error;}
 }
+async function composite(settings,environment=root){const prepared=await prepare(settings,environment);return prepared.finish(settings.esri);}
 
-const api={composite,cancelled,vectorAlpha};if(typeof module!=='undefined')module.exports=api;else root.RidgeRegionalBlend=api;
+const api={prepare,composite,cancelled,vectorAlpha};if(typeof module!=='undefined')module.exports=api;else root.RidgeRegionalBlend=api;
 })(globalThis);
