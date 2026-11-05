@@ -1,4 +1,36 @@
-# Capacitor LINZ border fix APK
+# Capacitor border recovery APK
+
+[Download 0.20.3 Audit Base — 27.0 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/capacitor-latency-audit/capacitor/checkpoints/Ridgeline-Capacitor-Border-Recovery-0.20.3-Base.apk)
+
+Install over **Ridgeline Capacitor Audit 0.20.2** without uninstalling. Same
+package/signer, code 26; keeps routes, downloads, settings and cache.
+
+Fixes border tiles waiting for unused Esri inputs, including incorrect fallback
+quality inherited from an unused donor. Mixed tiles release their preparation
+slot during network waits. Original LINZ tiles outside the replacement polygon
+bypass donor requests. Worker errors retain bounded recovery while still wanted.
+
+The dotted overlay now follows measured source masks, removing the numerous
+nominal Rolling Pin outlines. Display contours remain approximate at close zoom.
+All 1,134 original photo/data assets, masks, the MapLibre engine, shaders and
+source detail remain unchanged. Retains the decimal survey-name fix, sharpening
+handoff fixes and 0–1 GB original-response cache slider. No cache wipe is needed.
+
+With real Rolling Pin photo inputs and an **injected five-second Esri delay**,
+the LINZ-only result became ready in 83.1 ms instead of 5,098.6 ms, with identical
+pixels and no false fallback flag. Required-source failure, cancellation, worker
+loss, no-worker output and processing-slot checks pass. These are controlled
+host results, not phone measurements. Five focused JS checks, seam-source checks,
+independent source-mask verification and APK checks pass. No physical-device run.
+
+Source `f92dade`, version `0.20.3-latency-audit`. APK 27,005,763 bytes;
+SHA-256 `cb22610e28528e9f7eaeb1a29faac6a5da166aa2f480ed6add695e068a2d66de`.
+
+[Implementation and limits](../BORDER-RECOVERY-0.20.3.md) ·
+[Exact APK record](../validation/borders-0.20.3/release.json) ·
+[SHA-256 file](Ridgeline-Capacitor-Border-Recovery-0.20.3-Base.apk.sha256)
+
+# Previous Capacitor 0.20.2 LINZ border fix APK
 
 [Download 0.20.2 Audit Base — 26.9 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/capacitor-latency-audit/capacitor/checkpoints/Ridgeline-Capacitor-LINZ-Border-Fix-0.20.2-Base.apk)
 
