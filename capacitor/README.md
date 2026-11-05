@@ -1,3 +1,5 @@
+> **Capacitor LINZ border-fix APK: 0.20.2 Audit Base.** [Download and installation details](checkpoints/README.md). Fixes the Android gateway rejecting decimal survey names at imagery borders; all 46 catalogue survey names now route correctly. Same Audit package/signer, app data preserved. Renderer/masks/assets unchanged from 0.20.1. [Cause and focused evidence](LINZ-BORDER-FIX-0.20.2.md).
+
 > **Capacitor sharpening-fix APK: 0.20.1 Audit Base.** [Download and installation details](checkpoints/README.md). Updates 0.20.0/0.19.0 Audit in place. Fixes coarse covers blocking finer imagery. Retains the audit improvements and 0–1 GB original-response disk-cache slider; no new prepared terrain cache. No phone speedup has been measured.
 
 > **Latest Performance build: 0.18.0 Full.** [Additional selection CPU findings, exact quality checks and measurement limits](PERFORMANCE-0.18.0.md). All original overview imagery is included; updates the existing Performance app with its data retained. No phone speedup is established.
