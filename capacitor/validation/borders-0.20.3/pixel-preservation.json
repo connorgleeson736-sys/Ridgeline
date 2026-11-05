@@ -1,0 +1,56 @@
+[
+  {
+    "z": 13,
+    "x": 7935,
+    "y": 5224,
+    "effectiveEsriPixels": 276,
+    "outputs": [
+      {
+        "bitmap": false,
+        "protectedDiff": 0,
+        "changed": 276
+      },
+      {
+        "bitmap": true,
+        "protectedDiff": 0,
+        "changed": 276
+      }
+    ]
+  },
+  {
+    "z": 16,
+    "x": 63480,
+    "y": 41798,
+    "effectiveEsriPixels": 3947,
+    "outputs": [
+      {
+        "bitmap": false,
+        "protectedDiff": 0,
+        "changed": 3947
+      },
+      {
+        "bitmap": true,
+        "protectedDiff": 0,
+        "changed": 3947
+      }
+    ]
+  },
+  {
+    "z": 17,
+    "x": 126961,
+    "y": 83596,
+    "effectiveEsriPixels": 0,
+    "outputs": [
+      {
+        "bitmap": false,
+        "protectedDiff": 0,
+        "changed": 0
+      },
+      {
+        "bitmap": true,
+        "protectedDiff": 0,
+        "changed": 0
+      }
+    ]
+  }
+]

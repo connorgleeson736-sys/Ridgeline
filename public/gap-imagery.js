@@ -16,7 +16,7 @@ function create({fetcher,base,compose,atlas=root.RidgeGapAtlas}){
   // Fine-survey PNGs have transparent nodata. They veto Esri at the actual
   // aerial edge, avoiding a fixed-width coarse-imagery guard strip.
   const size=256/f,px=x*size-entry?.x*256,py=y*size-entry?.y*256;
-  const onSeam=!coarse&&entry?.seamRings?.length&&root.RidgeRegionalImagery.relation(entry.seamRings,[px-2,py-2,px+size+2,py+size+2])!==-1;
+  const onSeam=!coarse&&entry?.seamRings?.length&&root.RidgeRegionalImagery.relation(entry.seamRings,[px-2,py-2,px+size+2,py+size+2],true)!==-1;
   const fineRows=onSeam?(entry.fineSources||[]):[];
   const fineRequests=fineRows.map(row=>{const fineZ=Math.min(z,row.maxZoom??19,19),ff=2**(z-fineZ);const address=new URL(`https://basemaps.linz.govt.nz/v1/tiles/${row.name}/WebMercatorQuad/${fineZ}/${Math.floor(x/ff)}/${Math.floor(y/ff)}.png`);address.searchParams.set('api',u.searchParams.get('api')||'');return{url:address.href,z:fineZ};});
   const pair=await Promise.allSettled([mode==='boundary'?base(url,options,true):Promise.resolve(null),fetcher(source,options),...fineRequests.map(row=>fetcher(row.url,options))]);

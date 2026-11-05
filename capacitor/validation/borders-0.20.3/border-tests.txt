@@ -1,0 +1,13 @@
+✔ a failed seam donor cannot become successful LINZ-only imagery; recovery composes all sources (52.962744ms)
+✔ stationary transient failures keep recovering; retired tiles, aborts and permanent errors stop (3.160044ms)
+✔ diagonal bounding boxes are not geographic boundary intersections (38.046139ms)
+✔ a wholly LINZ tile returns its original response without any donor or compositor dependency (9.717859ms)
+✔ repeated worker composition failures retain transient status for stationary tile recovery (13.059556ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 354.783097

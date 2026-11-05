@@ -31,7 +31,7 @@ const imageBase='https://services.arcgisonline.com/ArcGIS/rest/services/World_Im
 const topoBase='https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile';
 const linzApiKey='c01m4qdyhrj5r73hrta4pwb1tb8';
 const linzAttribution='<a href="https://www.linz.govt.nz/data/linz-data/linz-basemaps/data-attribution">LINZ CC BY 4.0 © Imagery Basemap contributors</a> · Imagery gap coverage: Esri World Imagery & contributors';
-const linzTiles=key=>`ridge://linz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp?api=${encodeURIComponent(key)}${$('natural-colour').checked?'&ridge-grade=snow-v3':''}&ridge-reference=cook-reference-v1&ridge-gap=gap-v4`;
+const linzTiles=key=>`ridge://linz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp?api=${encodeURIComponent(key)}${$('natural-colour').checked?'&ridge-grade=snow-v3':''}&ridge-reference=cook-reference-v1&ridge-gap=gap-v5`;
 let activeLinzKey=linzApiKey,terrainProvider='linz';
 const elevationTiles=key=>`ridge://linz/v1/tiles/elevation/WebMercatorQuad/{z}/{x}/{y}.png?pipeline=terrain-rgb&api=${encodeURIComponent(key)}`;
 const terrainAttribution='<a href="https://www.linz.govt.nz/">LINZ elevation CC BY 4.0 & contributors</a>';

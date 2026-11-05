@@ -6,21 +6,39 @@ function inside(rings,x,y){let hit=false;for(const ring of rings)for(let i=0,j=r
  const a=ring[i],b=ring[j];if((a[1]>y)!==(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0])hit=!hit;
  }return hit;
 }
-function relation(rings,box){
+function relation(rings,box,conservative=false){
  const [x0,y0,x1,y1]=box;
  for(const ring of rings)for(let i=1;i<ring.length;i++){
-  const a=ring[i-1],b=ring[i];if(Math.max(a[0],b[0])>=x0&&Math.min(a[0],b[0])<=x1&&Math.max(a[1],b[1])>=y0&&Math.min(a[1],b[1])<=y1)return 0;
+  const a=ring[i-1],b=ring[i];
+  if(Math.max(a[0],b[0])<x0||Math.min(a[0],b[0])>x1||Math.max(a[1],b[1])<y0||Math.min(a[1],b[1])>y1)continue;
+  if(conservative)return 0;
+  // A diagonal's bounding box can cover a tile without the edge touching it.
+  // Clip the actual segment to the rectangle before calling this a boundary.
+  let lo=0,hi=1;
+  for(let axis=0;axis<2&&lo<=hi;axis++){
+   const d=b[axis]-a[axis];
+   if(d===0){if(a[axis]<box[axis]||a[axis]>box[axis+2])hi=-1;continue;}
+   let enter=(box[axis]-a[axis])/d,leave=(box[axis+2]-a[axis])/d;
+   if(enter>leave)[enter,leave]=[leave,enter];
+   lo=Math.max(lo,enter);hi=Math.min(hi,leave);
+  }
+  if(lo<=hi)return 0;
  }
  return inside(rings,(x0+x1)/2,(y0+y1)/2)?1:-1;
 }
 function mode(z,x,y,meta=root.RidgeWestCoastFootprint){
  if(!meta)return'linz';const size=256*2**(meta.z-z),px=x*size-meta.x*256,py=y*size-meta.y*256;
  if(px+size<0||py+size<0||px>meta.width||py>meta.height)return'linz';
+ // No replacement polygon touches this tile: none of its pixels can use
+ // Esri. Seam padding must not make original LINZ wait for unrelated donors.
+ if(relation(meta.outer,[px,py,px+size,py+size])===-1)return'linz';
  // Routing is conservative. The official vector or legacy raster mask
  // determines the actual source of every boundary pixel.
  const b=[px-2,py-2,px+size+2,py+size+2];
- if(meta.seamRings?.length&&relation(meta.seamRings,b)!==-1)return'boundary';
- if(relation(meta.outer,b)===-1)return'linz';if(relation(meta.vector?meta.outer:meta.inner,b)===1)return'esri';return'boundary';
+ // Keep the reviewed, conservative fine-alpha protection for every tile
+ // that can actually contain replacement pixels.
+ if(meta.seamRings?.length&&relation(meta.seamRings,b,true)!==-1)return'boundary';
+ if(relation(meta.vector?meta.outer:meta.inner,b,true)===1)return'esri';return'boundary';
 }
 function webpBytes(data){
  const b=new Uint8Array(data);

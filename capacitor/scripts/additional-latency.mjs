@@ -102,7 +102,9 @@ const readinessChecks=new WeakMap();`);
  if(name==='regional-imagery.js'){
   r("worker.onerror=()=>failWorker(Error('Imagery worker unavailable'));","worker.onerror=event=>{event.preventDefault?.();failWorker(Error('Imagery worker unavailable'));};");
   r('if(!job)return;jobs.delete(data.id);','if(!job){data.data?.close?.();return;}jobs.delete(data.id);');
-  r('data.cancelled?job.reject(Scheduler.abort()):data.error?job.reject(Error(data.error)):job.resolve(data.data);','data.cancelled?job.reject(Scheduler.abort()):data.error?job.reject(Error(data.error)):job.resolve(data.data);');
+  // A recoverable worker/decode failure must not exhaust the unknown-error
+  // retry allowance and leave an owned boundary tile coarse indefinitely.
+  r('data.cancelled?job.reject(Scheduler.abort()):data.error?job.reject(Error(data.error)):job.resolve(data.data);','data.cancelled?job.reject(Scheduler.abort()):data.error?job.reject(Object.assign(Error(data.error),{status:503})):job.resolve(data.data);');
   r('meta:{z:meta.z,x:meta.x,y:meta.y,width:meta.width,height:meta.height}},options.signal','meta:{z:meta.z,x:meta.x,y:meta.y,width:meta.width,height:meta.height},bitmap:options.ridgeBitmap===true,bitmapOptions:options.ridgeBitmapOptions},options.signal');
   r('const data=await schedule(async()=>', 'const data=await schedule(async()=>');
   r("return new Response(data,{headers:{'Content-Type':'image/png','Cache-Control':ttl?'private, max-age='+ttl:'no-store'}});",`const headers=root.RidgeImageResult.headers([a,b],ttl);

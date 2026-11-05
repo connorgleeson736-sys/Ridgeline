@@ -854,5 +854,16 @@
   "removedPixelsComparedWithV111": 23,
   "oldBoundaryLayers": 6,
   "newBoundaryLayers": 2,
-  "oldBoundaryBytes": 1308986
+  "oldBoundaryBytes": 1308986,
+  "displayBoundary": {
+    "version": "gap-v5",
+    "url": "/assets/imagery-boundary-v5/0991c7b863aa63d6f58c37fe.geojson",
+    "bytes": 261630,
+    "sourceZoom": 13,
+    "sourceMasks": 630,
+    "method": "Measured source-selection contours; display only",
+    "minimumOutlinedAreaM2": 10000,
+    "simplificationMaskPixels": 1.0,
+    "nominalReferenceURL": "/assets/imagery-boundary-v4/335bcd9378652dfa88919f3b.geojson"
+  }
 }
