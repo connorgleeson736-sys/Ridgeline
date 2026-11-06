@@ -5,6 +5,7 @@ struct Scene { matrix: mat4x4<f32>, grade: vec4<f32>, metrics: vec4<f32>, style:
 @group(2) @binding(0) var heights: texture_2d<f32>;
 @group(3) @binding(0) var overlay: texture_2d_array<f32>;
 @group(3) @binding(1) var overlay_sampler: sampler;
+@group(3) @binding(2) var overlay_small: texture_2d_array<f32>;
 struct Out { @builtin(position) position: vec4<f32>, @location(0) uv: vec2<f32>, @location(1) @interpolate(flat) clip: vec4<f32>, @location(2) @interpolate(flat) image: vec4<f32>, @location(4) ground:vec3<f32>, @location(5) @interpolate(flat) demzoom:f32, @location(6) @interpolate(flat) overlay:f32 };
 @vertex fn vs(@builtin(vertex_index) vertex_index:u32, @location(0) vertex: vec2<f32>, @location(1) tile: vec4<f32>, @location(2) clip: vec4<f32>, @location(3) image: vec4<f32>) -> Out {
  var o:Out;
@@ -46,9 +47,13 @@ fn shade(i:Out,dx:vec2<f32>,dy:vec2<f32>,normal:vec3<f32>)->vec4<f32>{
 
 // Topographic lines painted for this image tile (overlay.rs), laid over the
 // graded photo like MapLibre's terrain drape. Slot 0 means no overlay.
+// Positive slots are 512 px textures, negative ones the 256 px tier.
 fn drape(i:Out,c:vec4<f32>,dx:vec2<f32>,dy:vec2<f32>)->vec4<f32>{
- if(i.overlay<0.5){return c;}
- let o=textureSampleGrad(overlay,overlay_sampler,clamp(i.uv*i.image.xy+i.image.zw,vec2<f32>(0.),vec2<f32>(1.)),i32(i.overlay-0.5),dx,dy);
+ if(abs(i.overlay)<0.5){return c;}
+ let uv=clamp(i.uv*i.image.xy+i.image.zw,vec2<f32>(0.),vec2<f32>(1.));
+ var o:vec4<f32>;
+ if(i.overlay>0.){o=textureSampleGrad(overlay,overlay_sampler,uv,i32(i.overlay-0.5),dx,dy);}
+ else{o=textureSampleGrad(overlay_small,overlay_sampler,uv,i32(-i.overlay-0.5),dx,dy);}
  return o+c*(1.-o.a);
 }
 
