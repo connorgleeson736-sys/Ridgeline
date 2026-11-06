@@ -38,6 +38,10 @@ impl Renderer {
         };
         self.set_overlay_groups(groups);
     }
+    /// (visible tiles showing an overlay, visible tiles with lines but no texture)
+    pub fn overlay_coverage(&self) -> (usize, usize) {
+        (self.overlay.shown, self.overlay.missing)
+    }
     pub fn set_overlay_layers(&mut self, layers: usize) {
         self.overlay.set_layers(layers);
     }

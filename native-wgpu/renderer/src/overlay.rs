@@ -13,6 +13,8 @@ use std::hash::{Hash, Hasher};
 use std::sync::Arc;
 
 pub(crate) const SIZE: u32 = 512;
+/// Second tier for the farther, coarser tiles: four times as many per MiB.
+pub(crate) const SMALL: u32 = 256;
 /// Line instances painted per frame; the rest follow on the next frames.
 const SEGMENTS_PER_FRAME: usize = 160_000;
 const RENDERS_PER_FRAME: usize = 24;
@@ -148,7 +150,8 @@ fn segments(tile: TileId, groups: &[Arc<Group>], scale: f64, out: &mut Vec<Segme
 }
 
 struct Gpu {
-    texture: wgpu::Texture,
+    textures: [wgpu::Texture; 2],
+    /// Layer views: the 512 px tier first, then the 256 px tier.
     views: Vec<wgpu::TextureView>,
     bind: wgpu::BindGroup,
     buffer: wgpu::Buffer,
@@ -167,7 +170,9 @@ pub(crate) struct Overlay {
     pipeline: Option<wgpu::RenderPipeline>,
     empty: wgpu::BindGroup,
     gpu: Option<Gpu>,
-    layers: u32,
+    /// Layers in the 512 px and 256 px tiers; slots [0, big) are 512 px.
+    big: u32,
+    small: u32,
     slots: Vec<Slot>,
     by_tile: HashMap<TileId, usize>,
     frame: u64,
@@ -176,6 +181,10 @@ pub(crate) struct Overlay {
     pub renders: u64,
     pub painted_segments: u64,
     pub revision: u64,
+    /// Visible tiles with lines but no free texture in the last frame.
+    pub missing: usize,
+    /// Visible tiles showing an overlay in the last frame.
+    pub shown: usize,
 }
 impl Overlay {
     pub fn new(device: &wgpu::Device) -> Self {
@@ -198,6 +207,16 @@ impl Overlay {
                     ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Filtering),
                     count: None,
                 },
+                wgpu::BindGroupLayoutEntry {
+                    binding: 2,
+                    visibility: wgpu::ShaderStages::FRAGMENT,
+                    ty: wgpu::BindingType::Texture {
+                        sample_type: wgpu::TextureSampleType::Float { filterable: true },
+                        view_dimension: wgpu::TextureViewDimension::D2Array,
+                        multisampled: false,
+                    },
+                    count: None,
+                },
             ],
         });
         let sampler = device.create_sampler(&wgpu::SamplerDescriptor {
@@ -217,15 +236,16 @@ impl Overlay {
             usage: wgpu::TextureUsages::TEXTURE_BINDING,
             view_formats: &[],
         });
-        let empty = Self::bind(device, &layout, &texture, &sampler);
-        Self {
+        let empty = Self::bind(device, &layout, [&texture, &texture], &sampler);
+        let mut overlay = Self {
             groups: Vec::new(),
             layout,
             sampler,
             pipeline: None,
             empty,
             gpu: None,
-            layers: 49,
+            big: 0,
+            small: 0,
             slots: Vec::new(),
             by_tile: HashMap::new(),
             frame: 0,
@@ -233,19 +253,27 @@ impl Overlay {
             renders: 0,
             painted_segments: 0,
             revision: 0,
-        }
+            missing: 0,
+            shown: 0,
+        };
+        overlay.set_layers(48);
+        overlay
     }
-    fn bind(device: &wgpu::Device, layout: &wgpu::BindGroupLayout, texture: &wgpu::Texture, sampler: &wgpu::Sampler) -> wgpu::BindGroup {
-        let view = texture.create_view(&wgpu::TextureViewDescriptor {
-            dimension: Some(wgpu::TextureViewDimension::D2Array),
-            ..Default::default()
-        });
+    fn bind(device: &wgpu::Device, layout: &wgpu::BindGroupLayout, textures: [&wgpu::Texture; 2], sampler: &wgpu::Sampler) -> wgpu::BindGroup {
+        let view = |t: &wgpu::Texture| {
+            t.create_view(&wgpu::TextureViewDescriptor {
+                dimension: Some(wgpu::TextureViewDimension::D2Array),
+                ..Default::default()
+            })
+        };
+        let (big, small) = (view(textures[0]), view(textures[1]));
         device.create_bind_group(&wgpu::BindGroupDescriptor {
             label: Some("terrain overlay"),
             layout,
             entries: &[
-                wgpu::BindGroupEntry { binding: 0, resource: wgpu::BindingResource::TextureView(&view) },
+                wgpu::BindGroupEntry { binding: 0, resource: wgpu::BindingResource::TextureView(&big) },
                 wgpu::BindGroupEntry { binding: 1, resource: wgpu::BindingResource::Sampler(sampler) },
+                wgpu::BindGroupEntry { binding: 2, resource: wgpu::BindingResource::TextureView(&small) },
             ],
         })
     }
@@ -255,33 +283,32 @@ impl Overlay {
     pub fn bind_group(&self) -> &wgpu::BindGroup {
         self.gpu.as_ref().map_or(&self.empty, |g| &g.bind)
     }
-    /// Overlay pool size, from the renderer's tile budget (32..64 textures of 1 MiB).
+    /// Overlay pool from the renderer's tile budget (desktop/tests).
     pub fn set_budget(&mut self, tiles: usize) {
-        let mut layers = (tiles / 2).clamp(32, 64) as u32;
+        self.set_layers((tiles / 2).clamp(32, 64));
+    }
+    /// Pool memory in MiB (from device RAM on Android): half as 512 px textures
+    /// for the nearest, finest tiles, half as 256 px textures (four per MiB) for
+    /// the rest, so far more visible tiles get their lines from the same memory.
+    pub fn set_layers(&mut self, mib: usize) {
         // wgpu's GL backend creates 2D textures whose layer count is a multiple
         // of 6 as cube maps, which cannot be rendered per layer.
-        if layers % 6 == 0 {
-            layers += 1;
-        }
-        if layers != self.layers {
-            self.layers = layers;
+        let safe = |n: u32| if n % 6 == 0 { n + 1 } else { n };
+        let mib = mib.clamp(12, 64) as u32;
+        let big = safe((mib / 2).max(4));
+        let small = safe((mib - mib / 2) * 4);
+        if (big, small) != (self.big, self.small) {
+            (self.big, self.small) = (big, small);
             self.gpu = None;
             self.slots.clear();
             self.by_tile.clear();
         }
     }
-    /// Pool size set directly (from device RAM on Android).
-    pub fn set_layers(&mut self, layers: usize) {
-        let mut layers = layers.clamp(12, 64) as u32;
-        if layers % 6 == 0 {
-            layers += 1;
-        }
-        if layers != self.layers {
-            self.layers = layers;
-            self.gpu = None;
-            self.slots.clear();
-            self.by_tile.clear();
-        }
+    fn encode(&self, slot: usize) -> f32 {
+        if slot < self.big as usize { slot as f32 + 1. } else { -((slot - self.big as usize) as f32 + 1.) }
+    }
+    fn is_big(&self, slot: usize) -> bool {
+        slot < self.big as usize
     }
     pub fn is_empty(&self) -> bool {
         self.groups.is_empty()
@@ -329,6 +356,9 @@ impl Overlay {
         order.dedup();
         let mut batch: Vec<Segment> = Vec::new();
         let mut paints: Vec<(usize, std::ops::Range<u32>)> = Vec::new();
+        // (tile, groups, fingerprint, current slot, rank among tiles with lines)
+        let mut work: Vec<(TileId, Vec<Arc<Group>>, u64, Option<usize>, usize)> = Vec::new();
+        let mut rank = 0;
         for tile in order {
             let b = tile.bounds();
             let s = b[2] - b[0];
@@ -345,6 +375,7 @@ impl Overlay {
                 }
                 continue;
             }
+            rank += 1;
             let mut hasher = std::collections::hash_map::DefaultHasher::new();
             (band as i64, tile.z, tile.x, tile.y).hash(&mut hasher);
             for g in &near {
@@ -353,83 +384,105 @@ impl Overlay {
             let fingerprint = hasher.finish();
             let existing = self.by_tile.get(&tile).copied();
             if let Some(slot) = existing {
+                self.slots[slot].used = self.frame;
                 if self.slots[slot].fingerprint == fingerprint {
-                    self.slots[slot].used = self.frame;
-                    result.insert(tile, slot as f32 + 1.);
+                    result.insert(tile, self.encode(slot));
                     continue;
                 }
             }
+            work.push((tile, near, fingerprint, existing, rank - 1));
+        }
+        // Tiles with no overlay at all are painted before stale ones are
+        // refreshed, so lines never go missing while others are repainted.
+        work.sort_by_key(|w| (w.3.is_some(), w.4));
+        self.missing = 0;
+        for (tile, near, fingerprint, existing, rank) in work {
             if paints.len() >= RENDERS_PER_FRAME || batch.len() >= SEGMENTS_PER_FRAME {
                 // Show the previous texture of this tile until it is repainted.
                 self.pending = true;
                 if let Some(slot) = existing {
-                    self.slots[slot].used = self.frame;
-                    result.insert(tile, slot as f32 + 1.);
+                    result.insert(tile, self.encode(slot));
                 }
                 continue;
             }
-            let slot = existing.or_else(|| self.free_slot());
+            // The finest (nearest) tiles get 512 px textures, the rest 256 px.
+            let want_big = rank < self.big as usize;
+            let slot = existing
+                .filter(|s| self.is_big(*s) == want_big)
+                .or_else(|| self.free_slot(want_big))
+                .or(existing)
+                .or_else(|| self.free_slot(!want_big));
             let Some(slot) = slot else {
                 // Every texture already serves a nearer, finer tile this frame.
+                self.missing += 1;
                 continue;
             };
+            if let Some(old) = existing {
+                if old != slot {
+                    self.slots[old].tile = None;
+                }
+            }
             if let Some(old) = self.slots[slot].tile {
                 if old != tile {
                     self.by_tile.remove(&old);
                 }
             }
             let start = batch.len() as u32;
-            // CSS px to texture px: the tile spans 512 * 2^(zoom - z) CSS px.
+            // CSS px to texture px (512 px space; the 256 px tier renders the
+            // same space at half resolution): the tile spans 512 * 2^(zoom - z) CSS px.
             let scale = SIZE as f64 / (512. * 2f64.powf(zoom - tile.z as f64));
             segments(tile, &near, scale, &mut batch);
             paints.push((slot, start..batch.len() as u32));
             self.slots[slot] = Slot { tile: Some(tile), fingerprint, used: self.frame };
             self.by_tile.insert(tile, slot);
-            result.insert(tile, slot as f32 + 1.);
+            result.insert(tile, self.encode(slot));
         }
+        self.shown = result.len();
         if !paints.is_empty() {
             self.paint(device, queue, &batch, &paints);
         }
         result
     }
-    fn free_slot(&mut self) -> Option<usize> {
-        if self.slots.len() < self.layers as usize {
-            self.slots.push(Slot { tile: None, fingerprint: 0, used: 0 });
-            return Some(self.slots.len() - 1);
+    fn free_slot(&mut self, big: bool) -> Option<usize> {
+        let range = if big { 0..self.big as usize } else { self.big as usize..(self.big + self.small) as usize };
+        if self.slots.len() < (self.big + self.small) as usize {
+            self.slots.resize((self.big + self.small) as usize, Slot { tile: None, fingerprint: 0, used: 0 });
         }
-        if let Some(i) = self.slots.iter().position(|s| s.tile.is_none()) {
+        if let Some(i) = range.clone().find(|&i| self.slots[i].tile.is_none()) {
             return Some(i);
         }
         // Least recently used texture that no tile of this frame is showing.
-        self.slots
-            .iter()
-            .enumerate()
-            .filter(|(_, s)| s.used < self.frame)
-            .min_by_key(|(_, s)| s.used)
-            .map(|(i, _)| i)
+        range.filter(|&i| self.slots[i].used < self.frame).min_by_key(|&i| self.slots[i].used)
     }
     fn create(&mut self, device: &wgpu::Device) {
-        let texture = device.create_texture(&wgpu::TextureDescriptor {
-            label: Some("terrain overlay pool"),
-            size: wgpu::Extent3d { width: SIZE, height: SIZE, depth_or_array_layers: self.layers },
-            mip_level_count: 1,
-            sample_count: 1,
-            dimension: wgpu::TextureDimension::D2,
-            format: wgpu::TextureFormat::Rgba8Unorm,
-            usage: wgpu::TextureUsages::TEXTURE_BINDING | wgpu::TextureUsages::RENDER_ATTACHMENT,
-            view_formats: &[],
-        });
-        let views = (0..self.layers)
-            .map(|layer| {
-                texture.create_view(&wgpu::TextureViewDescriptor {
-                    dimension: Some(wgpu::TextureViewDimension::D2),
-                    base_array_layer: layer,
-                    array_layer_count: Some(1),
-                    ..Default::default()
+        let tier = |size: u32, layers: u32| {
+            device.create_texture(&wgpu::TextureDescriptor {
+                label: Some("terrain overlay pool"),
+                size: wgpu::Extent3d { width: size, height: size, depth_or_array_layers: layers },
+                mip_level_count: 1,
+                sample_count: 1,
+                dimension: wgpu::TextureDimension::D2,
+                format: wgpu::TextureFormat::Rgba8Unorm,
+                usage: wgpu::TextureUsages::TEXTURE_BINDING | wgpu::TextureUsages::RENDER_ATTACHMENT,
+                view_formats: &[],
+            })
+        };
+        let textures = [tier(SIZE, self.big), tier(SMALL, self.small)];
+        let views = textures
+            .iter()
+            .zip([self.big, self.small])
+            .flat_map(|(texture, layers)| {
+                (0..layers).map(move |layer| {
+                    texture.create_view(&wgpu::TextureViewDescriptor {
+                        dimension: Some(wgpu::TextureViewDimension::D2),
+                        base_array_layer: layer,
+                        array_layer_count: Some(1),
+                        ..Default::default()
+                    })
                 })
             })
             .collect();
-        let bind = Self::bind(device, &self.layout, &texture, &self.sampler);
+        let bind = Self::bind(device, &self.layout, [&textures[0], &textures[1]], &self.sampler);
         let buffer = device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("overlay segments"),
             size: 4096 * std::mem::size_of::<Segment>() as u64,
@@ -471,7 +524,7 @@ impl Overlay {
                 cache: None,
             }));
         }
-        self.gpu = Some(Gpu { texture, views, bind, buffer, capacity: 4096 });
+        self.gpu = Some(Gpu { textures, views, bind, buffer, capacity: 4096 });
         self.slots.clear();
         self.by_tile.clear();
     }
@@ -514,9 +567,9 @@ impl Overlay {
         queue.submit([encoder.finish()]);
         self.renders += paints.len() as u64;
         self.painted_segments += batch.len() as u64;
-        let _ = &gpu.texture;
+        let _ = &gpu.textures;
     }
     pub fn texture_bytes(&self) -> u64 {
-        self.gpu.as_ref().map_or(0, |_| SIZE as u64 * SIZE as u64 * 4 * self.layers as u64)
+        self.gpu.as_ref().map_or(0, |_| 4 * (SIZE as u64 * SIZE as u64 * self.big as u64 + SMALL as u64 * SMALL as u64 * self.small as u64))
     }
 }

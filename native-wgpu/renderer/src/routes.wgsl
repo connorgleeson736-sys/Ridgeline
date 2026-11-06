@@ -22,6 +22,19 @@ fn build(start:vec3<f32>,end:vec3<f32>,corner:vec3<f32>,color:vec4<f32>,style:ve
   let raised=project(start+vec3<f32>(0.,0.,lift));
   if(raised.w>0.){p.z=clamp(raised.z/raised.w,0.,1.)*p.w;}
  }
+ else {
+  // Route lines are draped on the exact elevation, but the drawn terrain mesh
+  // is simplified with distance and can sit above them; their screen-facing
+  // width also crosses ground nearer the camera. Test each segment's depth
+  // from its ends raised 10 m plus 3 px of ground (scaled with distance), so
+  // mesh simplification no longer hides parts of the route as the view
+  // changes, while a real ridge in front still does.
+  let centre=(scene.matrix*vec4<f32>(0.,0.,0.,1.)).w;
+  let px=3./max(scene.anchor.w,1e-6);
+  let ra=project(start+vec3<f32>(0.,0.,10.+px*clamp(a.w/max(centre,1e-6),.25,16.)));
+  let rb=project(end+vec3<f32>(0.,0.,10.+px*clamp(b.w/max(centre,1e-6),.25,16.)));
+  if(ra.w>0.&&rb.w>0.){p.z=clamp(mix(ra.z/ra.w,rb.z/rb.w,corner.x),0.,1.)*p.w;}
+ }
  o.position=p;o.uv*=p.w;return o;
 }
 // Coverage of one dash cycle at a reference scale; [pixel] is one screen pixel

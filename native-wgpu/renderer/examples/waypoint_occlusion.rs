@@ -104,6 +104,12 @@ async fn run() {
     let (top, bottom) = (*rows.first().unwrap() as f32, *rows.last().unwrap() as f32);
     let middle = (top + bottom + 1.) / 2.;
     assert!(bottom - top + 1. >= 7. && (middle - dot[1]).abs() <= 1., "the whole dot is drawn: rows {top}..{bottom}, point at {:.1}", dot[1]);
+    // The route line north of the dot: its full width is drawn (previously
+    // the half nearer the camera failed the depth test against the ground).
+    let orange = |pixels: &[u8], y: usize| (0..256).filter(|x| { let p = &pixels[(y * 256 + x) * 4..][..3]; p[0] > 200 && p[1] > 90 && p[1] < 150 && p[2] < 110 }).count();
+    let row = (dot[1] - 30.).round() as usize;
+    let width = orange(&flat, row);
+    assert!(width >= 2, "route line drawn ({width} px at row {row})");
     // A 3,000 m ridge between the camera and the waypoint still hides it.
     let mut ridge = vec![500f32; 129 * 129];
     for row in 70..=74 {
@@ -114,5 +120,9 @@ async fn run() {
     let (blocked, dot) = scene(&instance, &ridge).await;
     let hidden = dot[2] == 0. || (-3..=3).all(|dy| !fill(&blocked, dot[0], dot[1] + dy as f32));
     assert!(hidden, "a ridge in front still hides the waypoint");
-    println!("PASS waypoint dots drawn whole on the ground and hidden behind ridges ({})", if gles { "GLES" } else { "Vulkan" });
+    // The route runs north, behind the ridge: the raised depth test must not
+    // let it show through real terrain.
+    let leaked: usize = (0..256).map(|y| orange(&blocked, y)).sum();
+    assert_eq!(leaked, 0, "a ridge in front still hides the route line");
+    println!("PASS waypoint dots drawn whole on the ground and hidden behind ridges; route line {width} px wide ({})", if gles { "GLES" } else { "Vulkan" });
 }
