@@ -228,6 +228,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         val stationary=!moved&&!gestureActive
         val started=System.nanoTime();val allowance=uploadAdmission.allowance(gestureActive,activeFrameNanos,(started-frameTimeNanos).coerceAtLeast(0),stationary)
         var count=0;var bytes=0;var accepted=false;var geometryChanged=false;var deviceUnavailable=false
+        var geometryThisFrame=0;var imagesThisFrame=0
         while(presentationFailures==0){
             val next=uploads.peek()?:break
             if(next.kind==GpuUploadQueue.Kind.GEOMETRY){
@@ -238,11 +239,14 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
                 if(next.plane!=(appliedStyle?.plane==true)){deferredOptional=true;break}
             }
             val urgent=!hasResidentCoverage(next.id,next.kind!=GpuUploadQueue.Kind.IMAGE)
-            if(cameraFirst&&!urgent){deferredOptional=true;break}
+            // During movement a bounded minimum keeps terrain and imagery
+            // refining instead of waiting for the camera to stop.
+            val minimum=!stationary&&!urgent&&uploadAdmission.movementMinimum(next.kind,System.nanoTime()-started,count,bytes,next.bytes,backlog,geometryThisFrame,imagesThisFrame,System.nanoTime())
+            if(cameraFirst&&!urgent&&!minimum){deferredOptional=true;break}
             // While still, the first upload of each frame always proceeds, even a
             // known over-budget one: it can only delay a refinement-only frame.
             // Never smuggle it into a zero-budget gesture or movement frame.
-            if(!uploadAdmission.allows(next.kind,System.nanoTime()-started,count,bytes,next.bytes,allowance,backlog,urgent,stationary))break
+            if(!minimum&&!uploadAdmission.allows(next.kind,System.nanoTime()-started,count,bytes,next.bytes,allowance,backlog,urgent,stationary))break
             val tile=next
             val id=tile.id;val uploadStarted=System.nanoTime()
             val outcome=when(tile.kind){
@@ -255,6 +259,8 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             if(outcome==GpuUploadQueue.INVALID)post{onInvalidUpload(tile)}
             if(outcome==GpuUploadQueue.DEVICE_UNAVAILABLE){deviceUnavailable=true;break}
             uploadAdmission.uploaded(tile.kind,System.nanoTime()-uploadStarted)
+            if(tile.kind==GpuUploadQueue.Kind.GEOMETRY)geometryThisFrame++ else imagesThisFrame++
+            if(minimum)uploadAdmission.movementUploaded(tile.kind,System.nanoTime())
             count++;bytes+=tile.bytes;accepted=accepted||ok;geometryChanged=geometryChanged||(ok&&tile.kind!=GpuUploadQueue.Kind.IMAGE)
         }
         if(deviceUnavailable){recoverGpu();return}
