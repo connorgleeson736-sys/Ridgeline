@@ -76,10 +76,10 @@ class MainActivity:Activity(){
         mapHost.addView(location.button,FrameLayout.LayoutParams(dp(44),dp(44),Gravity.TOP or Gravity.START).apply{marginStart=dp(10);topMargin=dp(62)})
         val perspective=MapControls.Perspective(this){enabled->loader.mapSettings.change{it.copy(threeD=enabled,base=if(enabled&&it.base==MapSettings.Base.TOPO)it.lastPhoto else it.base)}}
         perspective.set(loader.mapSettings.state.threeD)
-        mapHost.addView(perspective,FrameLayout.LayoutParams(-2,dp(40),Gravity.TOP or Gravity.END).apply{marginEnd=dp(64);topMargin=dp(12)})
+        mapHost.addView(perspective,FrameLayout.LayoutParams(-2,dp(34),Gravity.TOP or Gravity.END).apply{marginEnd=dp(54);topMargin=dp(10)})
         val compass=MapControls.Compass(this){terrain.northUp()}
-        mapHost.addView(compass,FrameLayout.LayoutParams(dp(44),dp(44),Gravity.TOP or Gravity.END).apply{marginEnd=dp(10);topMargin=dp(10)})
-        mapHost.addView(MapControls.iconButton(this,MapControls.LayersIcon(this),"Map layers"){planner.dismissDrawer();layersUi.show()},FrameLayout.LayoutParams(dp(44),dp(44),Gravity.TOP or Gravity.END).apply{marginEnd=dp(10);topMargin=dp(66)})
+        mapHost.addView(compass,FrameLayout.LayoutParams(dp(34),dp(34),Gravity.TOP or Gravity.END).apply{marginEnd=dp(10);topMargin=dp(10)})
+        mapHost.addView(MapControls.iconButton(this,MapControls.LayersIcon(this),"Map layers"){planner.dismissDrawer();layersUi.show()},FrameLayout.LayoutParams(dp(34),dp(34),Gravity.TOP or Gravity.END).apply{marginEnd=dp(10);topMargin=dp(52)})
         fun updateChrome(){compass.bearing=terrain.bearing;scale.update(terrain.cameraPose)}
         updateChrome()
         terrain.onCamera={updateChrome();loader.cameraChanged();mapLayers.refresh();planner.cameraChanged()}

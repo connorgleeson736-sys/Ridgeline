@@ -22,6 +22,8 @@ internal object NativeUi {
     fun heading(context:Context,value:String)=text(context,value,19f).apply{setTypeface(null,Typeface.BOLD);setPadding(0,dp(context,12),0,dp(context,10))}
     fun button(context:Context,value:String,primary:Boolean=false,action:()->Unit)=Button(context).apply{
         text=value;isAllCaps=false;textSize=12f;minimumHeight=dp(context,44);minimumWidth=0
+        // No Material press elevation: its shadow drew dark, uneven corners.
+        stateListAnimator=null;elevation=0f
         setTextColor(if(primary)Color.WHITE else ink);setPadding(dp(context,9),0,dp(context,9),0)
         background=pressable(context,background(context,if(primary)ink else Color.WHITE,7,true))
         setOnClickListener{action()}
