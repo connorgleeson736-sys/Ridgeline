@@ -1,0 +1,63 @@
+{
+  "artifact": "Ridgeline-Capacitor-Full-Audit-0.21.0-Base.apk",
+  "bytes": 26974363,
+  "sha256": "b55aee147836e618ca7394fd020b11cbc7a992d31d22d9c3f22361e769ab33da",
+  "versionName": "0.21.0-full-audit",
+  "versionCode": 27,
+  "applicationId": "nz.ridgeline.mobile.performance.fullaudit",
+  "label": "Ridgeline Full Audit",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "newSigningKey": true,
+  "updatesPreviousAuditInPlace": false,
+  "installsAlongside": "nz.ridgeline.mobile.performance.latencyaudit (0.20.3 Audit) and every other Ridgeline app",
+  "comparedWith": {
+    "artifact": "Ridgeline-Capacitor-Border-Recovery-0.20.3-Base.apk",
+    "sha256": "cb22610e28528e9f7eaeb1a29faac6a5da166aa2f480ed6add695e068a2d66de"
+  },
+  "changedAssets": [
+    "dexopt/baseline.prof",
+    "dexopt/baseline.profm",
+    "public/gap-imagery.js",
+    "public/index.html",
+    "public/motion-detail.js",
+    "public/raster-residency.js",
+    "public/south-overviews.js"
+  ],
+  "addedAssets": [],
+  "removedAssets": [],
+  "imageDataGeojsonAssetsByteIdenticalTo0203": 1140,
+  "imageDataGeojsonAssets": 1140,
+  "engineSha256": "418e23a87cf64cbbd02a29a1edd77a8f43ced39184b32d032eec2613762bc5e9",
+  "engineIdenticalTo0203": true,
+  "allPackagedPublicAssetsMatchGenerated": 1217,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "lintErrors": 0,
+  "javaUnitTests": {
+    "run": 98,
+    "failures": 0
+  },
+  "jsTests": {
+    "run": 75,
+    "passed": 71,
+    "failedPreExistingOnBaseline": [
+      "expired compressed tiles release reserved admission and speculative cache space",
+      "real pinned engine retains textures, invalidates changed content and reduces wrapper allocation",
+      "arrivals inspect texture sizes only for related active/warm patches, with identical invalidation decisions",
+      "rendering engine and quality policies are identical to website source (maplibre-direct-sampling.js, already different on the baseline)"
+    ]
+  },
+  "browserCheck": {
+    "pageErrors": 0,
+    "consoleErrors": 0
+  },
+  "surveyMaskQualification": {
+    "tiles": 1064,
+    "surveys": 46,
+    "zooms": "13-19",
+    "alphaIdentical": 1064,
+    "pngBytes": 37797239,
+    "webpBytes": 4028922
+  },
+  "physicalDeviceRun": false
+}

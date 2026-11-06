@@ -7,9 +7,9 @@ and the earlier research findings. Native Rust is out of scope. No APK was
 built and nothing was measured on a handset; every number below says where it
 came from.
 
-This audit adds **three implemented fixes**. Each changes only what happens at
-startup or on the native transport side. Imagery resolution, terrain detail,
-the renderer and the quality policies are unchanged.
+Implemented fixes 1–3 (below) came first; 4–6 were added for the 0.21.0 Full
+Audit APK. Imagery resolution, terrain detail, the renderer and the in-motion
+quality policy are unchanged.
 
 ## Implemented in this change
 
@@ -118,44 +118,84 @@ slower. New tests cover both directions:
 The 27 existing `TileHttpClientTest`, `TileDispatcherTest` and
 `SharedTileBodyTest` cases still pass. They were compiled against OkHttp 4.12.0
 and MockWebServer with small Android stubs, because this workspace has no
-Android SDK. Gradle unit tests, lint and an APK build still need to run on a
-machine with SDK 36.
+Android SDK. They were later run in Gradle with SDK 36 for the 0.21.0 build: 98 unit tests
+pass and lint reports 0 errors.
 
-## Highest-value remaining work (not implemented here)
+## Added for the 0.21.0 Full Audit APK
 
-Ranked by expected user-visible latency. Items 1–4 come from the 5 November
-research and are still open; this audit re-checked the code paths and found
-them unchanged.
+The research items below were implemented and tested for
+[`Ridgeline-Capacitor-Full-Audit-0.21.0-Base.apk`](checkpoints/README.md).
+All are app-only build patches or native changes; website files are unchanged.
 
-1. **Obsolete transfers starving visible imagery.** `raster-residency.js`
-   parks reloading tiles that already have textures/DEMs regardless of
-   `pendingLimit`. Their transfers keep image-queue slots, so visible requests
-   wait behind off-screen work. In the controlled reproduction, cancelling
-   obsolete transfers cut readiness from 1,200 ms to 202 ms (injected delays).
-   This is the largest single opportunity, but it touches tile lifecycle,
-   abort and cache-adoption semantics. It needs integration tests before it
-   ships. See `LATENCY-BREAKTHROUGHS-2026-11-05.md` §1.
-2. **WebP survey-mask inputs.** The colour channels of mask PNGs are discarded.
-   WebP was 88% smaller with identical alpha in 8 live samples (paced replay
-   792 → 144 ms). Requires `TileAddress` format support and a PNG fallback.
-3. **Motion-detail policy.** Full detail returns only 350 ms after `moveend`,
-   and orbit/pitch gestures register as zero speed. Restoring focused detail
-   at `moveend` brings full-detail requests 350 ms earlier. Best done *after*
-   item 1, otherwise faster refinement adds to slot pressure. This lives in
-   shared website code (`public/motion-detail.js`), so it needs a website
-   decision or an app-only build patch.
-4. **Local adaptive terrain triangulation** (45.8% fewer triangles in the
-   prototype) and **cache-aware HLOD admission**. These are GPU/traffic
-   improvements and need on-device validation.
-5. **JS transport stream re-wrapping (new, unmeasured).** `native-transport.js`
-   wraps every provider response body in a new `ReadableStream`, purely to
-   notice completion. Each chunk takes an extra promise hop on the thread that
-   issued the fetch, which for raster imagery is the main thread. Completion
-   could instead be detected from the decorated `arrayBuffer()`/`blob()` result,
-   which is how MapLibre consumes tiles. Expected gain is small per tile but
-   spread across every tile; profile on a device before changing it.
+### 4. Obsolete off-screen reloads release their download slots
 
-Areas re-checked with no significant new opportunity:
+`raster-residency.js` parked unfinished off-screen tiles whenever they held a
+texture/DEM, even with the off-screen allowance (4 imagery, 2 elevation) used
+up. Their transfers kept image-queue slots, so visible tiles waited behind
+them. The 5 November controlled replay measured 1,200 ms → 202 ms visible
+readiness when obsolete transfers were cancelled (injected delays).
+
+Now a reload that has resident data and arrives when the allowance is full is
+still parked with its old texture/DEM, but its transfer is aborted. The engine
+leaves such a tile `errored` with its data intact. When the tile returns to view,
+it is shown with that data immediately and reloaded once the abort has settled.
+
+These cases are deliberately left to finish:
+- prepare-ahead jobs;
+- DEM tiles whose image has already arrived (no live request controller);
+- reloads that fit within the allowance.
+
+Every map error listener already ignores `AbortError`. Tested in
+`tests/obsolete-transfers.test.mjs` against the real pinned TileManager. With
+12 reloads and an allowance of 4, exactly 4 stay in flight and 8 are released
+with their textures kept. Every returning tile shows its old texture at once
+and ends with the refreshed one. With an allowance of 0, all are released and
+first loads without data follow the original path. Both tests fail without the patch.
+
+### 5. WebP survey seam masks
+
+Boundary composition uses only the alpha channel of fine-survey inputs
+(`valid[i]>0` after scaling). I qualified LINZ WebP against PNG on **1,064 live
+tiles covering all 46 catalogue surveys**, at every zoom from 13 to each
+survey's maximum (19). Results:
+
+- alpha was identical on all 1,064 tiles;
+- every status matched;
+- 37,797,239 PNG bytes against 4,028,922 WebP bytes, **89.3% less**.
+
+Evidence: `validation/full-audit-0.21.0/survey-mask-qualification.json`.
+
+- JS (`gap-imagery.js`, app build) requests `.webp`. If a WebP response fails or is not OK, it requests the original PNG instead (`gapMaskPngFallbacks`). A cancelled request never triggers that fallback.
+- Native `TileAddress` accepts survey `.webp` as a new `mask-<survey>` address, fetched as WebP. Offline archive reads and saved-parent fallbacks use `saved()`, the unchanged `survey-<survey>` PNG identity, so existing downloaded regions still supply seam masks offline. Elevation never accepts WebP.
+
+Tests: `tests/survey-mask-webp.test.mjs` and `TileAddressTest.webpSeamMasksFetchWebpButReadSavedSurveyPngs`.
+
+### 6. Full detail at the end of movement
+
+`motion-detail.js` held in-motion detail reduction for 350 ms after `moveend`.
+The app now restores full detail at `moveend`. In-motion reductions,
+thresholds and hysteresis are unchanged. `package.test.mjs` now allows exactly
+this one difference from the website file.
+
+I also tried counting orbit/pitch gestures as motion. That would *lower* detail
+during rotations, which is a quality-policy change, so it was not shipped.
+
+## Not shipped, with reasons
+
+- **JS transport stream re-wrap.** Measured in Chromium (4× throttle, 64 ×
+  100 KB): ~47 of ~61 ms of wrapper overhead is the per-chunk JS stream. A
+  native `TransformStream` relay was not faster. Removing the wrapper loses the
+  completion signal that retires native request entries, so it was left as is.
+- **Local adaptive terrain triangulation.** A geometry change to terrain meshes
+  that needs shader, picking and on-device validation. The project requires
+  terrain detail and the renderer to be preserved.
+- **Aggressive HLOD.** The research showed it can add up to 26% more cold
+  parent requests. It should only be done as cache-aware admission, which is
+  still a design rather than a measured change.
+
+## Areas re-checked with no significant new opportunity
+
+
 
 - foreground dispatcher (uncapped, shared transfers, subscriber-aware cancellation);
 - priority batching over the JS bridge (coalesced to one JNI call per task);
@@ -166,8 +206,10 @@ Areas re-checked with no significant new opportunity:
 
 ## Test status note
 
-`npm test` on the unmodified branch tip already has 4 failing tests: 8, 14, 22
-and 45 (`cache-efficiency`, `coordinate-index-cache`, `invalidation-work`,
-`package`). The same 4 fail after this change, and nothing else does. The
+`npm test` on the unmodified branch tip already has 4 failing tests:
+`cache-efficiency`, `coordinate-index-cache`, `invalidation-work` and the
+`package` engine/policy parity test. The parity test fails on
+`maplibre-direct-sampling.js`, which already differs on the baseline. The
+same 4 fail after these changes, and nothing else does. The
 assertions are stale against the current generated assets and should be
 updated or re-baselined separately. The new `startup-latency` tests pass.

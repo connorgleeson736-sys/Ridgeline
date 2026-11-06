@@ -32,7 +32,39 @@ public class TileAddressTest {
           + "/WebMercatorQuad/17/127471/83202.png"));
     }
     assertNull(TileAddress.local("https://localhost/_ridge/linz/v1/tiles/canterbury-2015-2016-0.3m/WebMercatorQuad/17/131072/83202.png"));
-    assertNull(TileAddress.local("https://localhost/_ridge/linz/v1/tiles/canterbury-2015-2016-0.3m/WebMercatorQuad/17/127471/83202.webp"));
+    assertNull(TileAddress.local("https://localhost/_ridge/linz/v1/tiles/canterbury-2015-2016-0.3m/WebMercatorQuad/17/131072/83202.webp"));
+    assertNull(TileAddress.local("https://localhost/_ridge/linz/v1/tiles/../aerial/WebMercatorQuad/17/127471/83202.webp"));
+  }
+
+  @Test
+  public void webpSeamMasksFetchWebpButReadSavedSurveyPngs() {
+    for (String source : new String[] {"canterbury-2015-2016-0.3m", "west-coast-2016-2017-0.3m"}) {
+      String path = "/v1/tiles/" + source + "/WebMercatorQuad/17/127471/83202.webp";
+      TileAddress mask = TileAddress.local("https://localhost/_ridge/linz" + path + "?api=demo");
+      assertNotNull(source, mask);
+      assertEquals("mask-" + source, mask.kind);
+      assertEquals(path, mask.path);
+      assertEquals("image/webp", mask.mime());
+      assertTrue(mask.raster());
+      assertEquals("https://basemaps.linz.govt.nz" + path + "?api=demo", mask.network("demo"));
+      TileAddress saved = mask.saved();
+      assertEquals("survey-" + source, saved.kind);
+      assertEquals("image/png", saved.mime());
+      assertEquals(
+          TileAddress.local(
+                  "https://localhost/_ridge/linz/v1/tiles/" + source
+                      + "/WebMercatorQuad/17/127471/83202.png")
+              .id(),
+          saved.id());
+      assertNotEquals(saved.id(), mask.id());
+    }
+    // Primary imagery keeps its own address; only survey masks map to PNG.
+    TileAddress aerial =
+        TileAddress.local("https://localhost/_ridge/linz/v1/tiles/aerial/WebMercatorQuad/17/127471/83202.webp");
+    assertSame(aerial, aerial.saved());
+    assertEquals("aerial", aerial.kind);
+    // Elevation never accepts WebP.
+    assertNull(TileAddress.local("https://localhost/_ridge/linz/v1/tiles/elevation/WebMercatorQuad/12/4000/2500.webp"));
   }
 
   @Test

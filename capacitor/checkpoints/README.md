@@ -1,4 +1,40 @@
-# Capacitor border recovery APK
+# Capacitor full latency audit APK
+
+[Download 0.21.0 Full Audit Base — 27.0 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/capacitor/checkpoints/Ridgeline-Capacitor-Full-Audit-0.21.0-Base.apk)
+
+**A separate app, "Ridgeline Full Audit"** (`nz.ridgeline.mobile.performance.fullaudit`).
+The original Audit signing key was not available, so this APK is signed with a
+new key. It installs alongside 0.20.3 Audit and every other Ridgeline app and
+does not touch their data. It starts with its own empty routes, downloads and settings.
+
+Contains every finished, tested latency improvement from the
+[full audit](../PERFORMANCE-FULL-AUDIT-2026-11-06.md), on top of 0.20.3:
+
+- Off-screen reloads that still hold a texture/elevation no longer keep
+  image-download slots past the off-screen allowance. Their transfer is
+  cancelled, the old data stays visible, and the tile refreshes when it returns.
+- Survey seam masks download as WebP instead of PNG: 89% fewer bytes. Alpha was
+  identical on 1,064 live tiles across all 46 surveys. PNG is still used as a
+  fallback and for offline regions.
+- Full detail returns as soon as movement ends instead of 350 ms later.
+- South Island catalogue loads 302 → 59 ms (Chromium, 4× CPU throttle).
+- Native storage, cache and provider connections are warmed during launch.
+- A dropped download no longer scans the whole HTTP disk cache.
+
+All 1,140 image/data/GeoJSON assets and the MapLibre engine are byte-identical
+to 0.20.3. Imagery resolution, terrain detail and the renderer are unchanged.
+98 Java unit tests, lint, the new JS tests and the browser check pass.
+No physical-device run, so no phone speedup is claimed.
+
+Version `0.21.0-full-audit`, code 27. APK 26,974,363 bytes;
+SHA-256 `b55aee147836e618ca7394fd020b11cbc7a992d31d22d9c3f22361e769ab33da`;
+signer SHA-256 `c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46`.
+
+[Audit and measurements](../PERFORMANCE-FULL-AUDIT-2026-11-06.md) ·
+[Exact APK record](../validation/full-audit-0.21.0/release.json) ·
+[SHA-256 file](Ridgeline-Capacitor-Full-Audit-0.21.0-Base.apk.sha256)
+
+# Previous Capacitor 0.20.3 border recovery APK
 
 [Download 0.20.3 Audit Base — 27.0 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/capacitor-latency-audit/capacitor/checkpoints/Ridgeline-Capacitor-Border-Recovery-0.20.3-Base.apk)
 

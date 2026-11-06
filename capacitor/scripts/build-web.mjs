@@ -119,6 +119,33 @@ for(const name of await readdir(out))if(/\.(?:m?js)$/.test(name)){
   text=replace(text," const listeners=[['movestart',start]", " const hidden=()=>{if(root.document?.hidden)cancelPredictions();};root.document?.addEventListener?.('visibilitychange',hidden);\n const listeners=[['movestart',start]");
   text=replace(text,'function destroy(){if(dead)return;dead=true;',"function destroy(){if(dead)return;dead=true;root.document?.removeEventListener?.('visibilitychange',hidden);");
  }
+ // Off-screen reloads of tiles that still hold a texture/DEM no longer bypass
+ // the pending limit: their transfer is cancelled (freeing its image-queue
+ // slot for visible tiles) while the old decoded data stays resident. The tile
+ // reloads when it returns to view. Nearly finished DEM decodes (no live
+ // request controller) and explicit prepare-ahead jobs are left to complete.
+ if(name==='raster-residency.js'){
+  text=replace(text,"const entries=new Map(),adapters=new Map();let total=0,","const entries=new Map(),adapters=new Map();let obsoleteReleased=0,total=0,");
+  text=replace(text,"for(const tile of entries.keys())if(['loading','reloading','expired'].includes(tile.state)&&++count>=pendingLimit)","for(const tile of entries.keys())if(!tile._ridgeReloadOnReturn&&['loading','reloading','expired'].includes(tile.state)&&++count>=pendingLimit)");
+  text=replace(text,"  const bump=()=>{","  function release(tile){const entry=entries.get(tile);if(!entry||!tile.abortController||!['loading','reloading','expired'].includes(tile.state)||typeof manager._abortTile!=='function')return;if(entry.pending){entry.pending=false;pendingCount--;}tile._ridgeReloadOnReturn=true;obsoleteReleased++;manager._abortTile(tile);}\n  function reloadWhenSettled(tile,tries=0){if(dead||manager.getTile?.(tile.tileID)!==tile)return;if(['loading','reloading','expired'].includes(tile.state)){if(tries<120)root.setTimeout(()=>reloadWhenSettled(tile,tries+1),16);return;}if((tile.state==='errored'||tile.state==='loaded')&&(tile.texture||tile.dem)&&typeof manager._reloadTile==='function'){tile.state='loaded';manager._reloadTile(tile.tileID.key,'reloading');}}\n  const bump=()=>{");
+  text=replace(text,"  cache.getAndRemove=function(id){const tile=original.getAndRemove.call(this,id);if(tile){bump();forget(tile);","  cache.getAndRemove=function(id){const tile=original.getAndRemove.call(this,id);if(tile){bump();forget(tile);\n   if(tile._ridgeReloadOnReturn){delete tile._ridgeReloadOnReturn;if(tile.texture||tile.dem){if(tile.state==='errored')tile.state='loaded';Promise.resolve().then(()=>reloadWhenSettled(tile));root.RidgeTileTrace?.emit('source-adopted',sourceId,tile.tileID.canonical,{tier:'native-source'});reuses++;return tile;}}");
+  text=replace(text,"tile.uses--;this._inViewTiles.deleteTileById(id);this._clearTileReloadTimer(id);cache.add(tile.tileID,tile,tile.getExpiryTimeout());return;","const holds=(tile.texture||tile.dem)&&!options?.prepareAhead&&!pendingRoom();tile.uses--;this._inViewTiles.deleteTileById(id);this._clearTileReloadTimer(id);cache.add(tile.tileID,tile,tile.getExpiryTimeout());if(holds)release(tile);return;");
+  text=replace(text,"pendingLimit,pendingOffscreen:pendingCount})","pendingLimit,pendingOffscreen:pendingCount,obsoleteReleased})");
+ }
+ // Seam masks use only survey alpha. Request LINZ's lossless-alpha WebP (89%
+ // fewer bytes; alpha identical to PNG on 1,064 tiles across all 46 surveys)
+ // and fall back to the original PNG if a WebP response is unavailable.
+ // Displayed photographs and elevation are unchanged.
+ if(name==='gap-imagery.js'){
+  text=replace(text,"/${Math.floor(x/ff)}/${Math.floor(y/ff)}.png`);address.searchParams.set('api',u.searchParams.get('api')||'');return{url:address.href,z:fineZ};});","/${Math.floor(x/ff)}/${Math.floor(y/ff)}.webp`);address.searchParams.set('api',u.searchParams.get('api')||'');const png=new URL(address.href);png.pathname=png.pathname.replace(/\\.webp$/,'.png');return{url:address.href,png:png.href,z:fineZ};});");
+  text=replace(text," let dead=false;const stats={gapInterior:0,gapBoundary:0,gapOverview:0,gapEsriWaitsAvoided:0};"," let dead=false;const stats={gapInterior:0,gapBoundary:0,gapOverview:0,gapEsriWaitsAvoided:0,gapMaskPngFallbacks:0};\n const cancelled=()=>Object.assign(Error('Cancelled'),{name:'AbortError'});\n async function maskFetch(row,options){let response;try{response=await fetcher(row.url,options);}catch(error){if(dead||options.signal?.aborted||error?.name==='AbortError')throw error;stats.gapMaskPngFallbacks++;return fetcher(row.png,options);}\n  if(response.ok)return response;await response.body?.cancel();if(dead||options.signal?.aborted)throw cancelled();stats.gapMaskPngFallbacks++;return fetcher(row.png,options);}");
+  if(text.split('fineRequests.map(row=>fetcher(row.url,options))').length!==3)throw Error('Website integration changed: survey mask requests');
+  text=text.replaceAll('fineRequests.map(row=>fetcher(row.url,options))','fineRequests.map(row=>maskFetch(row,options))');
+ }
+ // Motion detail: focused full detail is restored at moveend instead of a fixed
+ // 350 ms later. This only returns detail sooner; in-motion reductions, their
+ // thresholds and hysteresis remain the website's.
+ if(name==='motion-detail.js')text=replace(text,"function end(){moving=false;previous=null;clear();timer=root.setTimeout(()=>{timer=null;if(dead||moving)return;smoothed=0;apply(0);},350);}","function end(){moving=false;previous=null;clear();if(dead)return;smoothed=0;apply(0);}");
  if(name==='terrain-core.js')text=replace(text,'/terrain-worker.js?v=5','/native-terrain-worker.js');
  if(name==='regional-imagery.js'){
   text=replace(text,'/regional-imagery-worker.js?v=9','/native-regional-worker.js?v=2');

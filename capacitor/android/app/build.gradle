@@ -8,8 +8,8 @@ android {
         applicationId "nz.ridgeline.mobile"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 26
-        versionName "0.20.3"
+        versionCode 27
+        versionName "0.21.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
             noCompress 'bin'
@@ -49,6 +49,16 @@ android {
             versionNameSuffix "-latency-audit"
             resValue "string", "app_name", "Ridgeline Capacitor Audit"
             resValue "string", "title_activity_main", "Ridgeline Capacitor Audit"
+            matchingFallbacks = ['release']
+        }
+        // Separately installable app signed with its own key (RIDGELINE_SIGNING_KEYSTORE).
+        // It cannot update the Audit app, whose original signing key is unavailable.
+        fullAudit {
+            initWith performance
+            applicationIdSuffix ".performance.fullaudit"
+            versionNameSuffix "-full-audit"
+            resValue "string", "app_name", "Ridgeline Full Audit"
+            resValue "string", "title_activity_main", "Ridgeline Full Audit"
             matchingFallbacks = ['release']
         }
         release {

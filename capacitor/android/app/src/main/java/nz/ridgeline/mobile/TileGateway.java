@@ -54,8 +54,9 @@ final class TileGateway {
     try {
       if (demand.cancelled()) return response(499, "text/plain", new byte[0]);
       TileArchive archive = TileArchive.get(context);
-      byte[] data = archive.read(tile);
-      if (data != null) return response(200, tile.mime(), data);
+      TileAddress saved = tile.saved();
+      byte[] data = archive.read(saved);
+      if (data != null) return response(200, saved.mime(), data);
       int failure = 404;
       String retryAfter = null;
       if (!"1".equals(header(request, "X-Ridge-Only-Saved"))
@@ -82,7 +83,7 @@ final class TileGateway {
             retryAfter = ((TileNetwork.HttpFailure) e).retryAfter;
         }
       if (demand.cancelled()) return response(499, "text/plain", new byte[0]);
-      TileResampler.Parent parent = TileResampler.parentWithSource(archive, tile);
+      TileResampler.Parent parent = TileResampler.parentWithSource(archive, saved);
       if (parent != null) {
         Map<String,String> h=headers("no-store",retryAfter);
         h.put("X-Ridge-Fallback",parent.z()+"/"+parent.x()+"/"+parent.y());
