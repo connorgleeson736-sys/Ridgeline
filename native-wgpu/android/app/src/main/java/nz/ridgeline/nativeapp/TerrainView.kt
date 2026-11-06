@@ -204,8 +204,6 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     private val retryWake=Runnable{requestFrame()}
     private val uploadAdmission=UploadAdmission()
     private var optionalSince=0L
-    private var deferredTile:GpuUploadQueue.Tile?=null
-    private var deferredTileSince=0L
     @Volatile private var renderLastMs=0L
     @Volatile private var renderMaxMs=0L
     private val clearanceBytes=ByteBuffer.allocateDirect(12).order(ByteOrder.LITTLE_ENDIAN)
@@ -227,7 +225,8 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         if(moved&&covered&&optionalSince==0L)optionalSince=nowAdmission
         val cameraFirst=moved&&covered&&nowAdmission-optionalSince<64
         var deferredOptional=false
-        val started=System.nanoTime();val allowance=uploadAdmission.allowance(gestureActive,activeFrameNanos,(started-frameTimeNanos).coerceAtLeast(0))
+        val stationary=!moved&&!gestureActive
+        val started=System.nanoTime();val allowance=uploadAdmission.allowance(gestureActive,activeFrameNanos,(started-frameTimeNanos).coerceAtLeast(0),stationary)
         var count=0;var bytes=0;var accepted=false;var geometryChanged=false;var deviceUnavailable=false
         while(presentationFailures==0){
             val next=uploads.peek()?:break
@@ -240,12 +239,10 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             }
             val urgent=!hasResidentCoverage(next.id,next.kind!=GpuUploadQueue.Kind.IMAGE)
             if(cameraFirst&&!urgent){deferredOptional=true;break}
-            if(deferredTile!==next){deferredTile=next;deferredTileSince=nowAdmission}
-            // A known over-budget, non-preemptible tile may run once after a
-            // bounded idle wait. Never smuggle it into a zero-budget gesture.
-            val starvedIdle=!moved&&!gestureActive&&nowAdmission-deferredTileSince>=250
-            if(!uploadAdmission.allows(next.kind,System.nanoTime()-started,count,bytes,next.bytes,allowance,backlog,urgent,starvedIdle))break
-            deferredTile=null
+            // While still, the first upload of each frame always proceeds, even a
+            // known over-budget one: it can only delay a refinement-only frame.
+            // Never smuggle it into a zero-budget gesture or movement frame.
+            if(!uploadAdmission.allows(next.kind,System.nanoTime()-started,count,bytes,next.bytes,allowance,backlog,urgent,stationary))break
             val tile=next
             val id=tile.id;val uploadStarted=System.nanoTime()
             val outcome=when(tile.kind){
