@@ -23,9 +23,13 @@ internal object NativeUi {
     fun button(context:Context,value:String,primary:Boolean=false,action:()->Unit)=Button(context).apply{
         text=value;isAllCaps=false;textSize=12f;minimumHeight=dp(context,44);minimumWidth=0
         setTextColor(if(primary)Color.WHITE else ink);setPadding(dp(context,9),0,dp(context,9),0)
-        background=background(context,if(primary)ink else Color.WHITE,7,true)
+        background=pressable(context,background(context,if(primary)ink else Color.WHITE,7,true))
         setOnClickListener{action()}
     }
+    /** Visible touch feedback on every control (a ripple over its background). */
+    fun pressable(context:Context,content:android.graphics.drawable.Drawable?)=android.graphics.drawable.RippleDrawable(
+        android.content.res.ColorStateList.valueOf(Color.argb(40,35,61,52)),content,
+        if(content==null)GradientDrawable().apply{setColor(Color.WHITE);cornerRadius=dp(context,8).toFloat()}else null)
     fun column(context:Context)=LinearLayout(context).apply{orientation=LinearLayout.VERTICAL}
     fun space(parent:LinearLayout,height:Int=10){parent.addView(View(parent.context),LinearLayout.LayoutParams(1,dp(parent.context,height)))}
     fun divider(parent:LinearLayout){parent.addView(View(parent.context).apply{setBackgroundColor(line)},LinearLayout.LayoutParams(-1,dp(parent.context,1)).apply{topMargin=dp(parent.context,10);bottomMargin=dp(parent.context,10)})}

@@ -33,26 +33,11 @@ class MainActivity:Activity(){
             text="Loading map…"
             textSize=11f
             setPadding(dp(8),dp(5),dp(8),dp(5))
-            setBackgroundColor(Color.argb(220,255,255,250))
+            background=NativeUi.background(this@MainActivity,Color.argb(235,255,255,255),14)
             setTextColor(Color.rgb(40,55,48))
         }
         mapHost.addView(status,FrameLayout.LayoutParams(-2,-2,Gravity.TOP or Gravity.CENTER_HORIZONTAL).apply{topMargin=dp(62)})
         terrain.onStatus={if(status.text.toString()!=it)status.text=it;status.visibility=if(it.isEmpty())View.GONE else View.VISIBLE}
-        val controls=LinearLayout(this).apply{orientation=LinearLayout.VERTICAL;gravity=Gravity.END}
-        fun control(label:String,description:String,action:()->Unit){
-            controls.addView(NativeUi.button(this,label,action=action).apply{
-                textSize=20f;contentDescription=description
-                setTextColor(Color.rgb(40,55,48))
-                setPadding(0,0,0,0);minimumWidth=0;minimumHeight=0
-                setOnClickListener{action()}
-            },LinearLayout.LayoutParams(dp(44),dp(44)).apply{bottomMargin=dp(4)})
-        }
-        control("+","Zoom in"){terrain.zoomBy(1.0)}
-        control("−","Zoom out"){terrain.zoomBy(-1.0)}
-        control("N","Reset bearing to north"){terrain.northUp()}
-        mapHost.addView(controls,FrameLayout.LayoutParams(-2,-2,Gravity.TOP or Gravity.END).apply{
-            topMargin=dp(85);marginEnd=dp(10)
-        })
         val attribution=TextView(this).apply{
             text=Html.fromHtml(
                 "<a href=\"https://www.linz.govt.nz/data/linz-data/linz-basemaps/data-attribution\">LINZ imagery, elevation &amp; topography · CC BY 4.0 &amp; contributors</a><br>"+
@@ -61,9 +46,14 @@ class MainActivity:Activity(){
             textSize=10f;movementMethod=LinkMovementMethod.getInstance()
             setTextColor(Color.rgb(40,55,48));setLinkTextColor(Color.rgb(40,55,48))
             setPadding(dp(8),dp(4),dp(8),dp(4))
-            setBackgroundColor(Color.argb(220,255,255,250))
+            background=NativeUi.background(this@MainActivity,Color.argb(235,255,255,255),12);visibility=View.GONE
         }
-        mapHost.addView(attribution,FrameLayout.LayoutParams(-1,-2,Gravity.BOTTOM))
+        // Capacitor compact attribution: an "i" button toggles the credits.
+        val info=MapControls.iconButton(this,MapControls.InfoIcon(this),"Show map attribution"){attribution.visibility=if(attribution.visibility==View.VISIBLE)View.GONE else View.VISIBLE}.apply{background=NativeUi.pressable(this@MainActivity,null);elevation=0f}
+        mapHost.addView(attribution,FrameLayout.LayoutParams(-2,-2,Gravity.BOTTOM or Gravity.END).apply{marginStart=dp(60);marginEnd=dp(44);bottomMargin=dp(8)})
+        mapHost.addView(info,FrameLayout.LayoutParams(dp(36),dp(36),Gravity.BOTTOM or Gravity.END).apply{marginEnd=dp(6);bottomMargin=dp(6)})
+        val scale=MapControls.Scale(this)
+        mapHost.addView(scale,FrameLayout.LayoutParams(dp(100),dp(20),Gravity.BOTTOM or Gravity.START).apply{marginStart=dp(12);bottomMargin=dp(14)})
         setContentView(root)
         loader=TileLoader(this,terrain)
         mapLayers=MapLayers(terrain,loader)
@@ -79,19 +69,21 @@ class MainActivity:Activity(){
         drawingBanner.addView(NativeUi.button(this,"Done"){planner.controller.drawing(false)})
         mapHost.addView(drawingBanner,FrameLayout.LayoutParams(-2,dp(44),Gravity.TOP or Gravity.CENTER_HORIZONTAL).apply{topMargin=dp(62)})
         planner.onDrawing={drawingBanner.visibility=if(it)View.VISIBLE else View.GONE}
-        val launcher=NativeUi.button(this,"RIDGELINE ☰"){layersUi.dismiss();planner.showRoutes()}
-        mapHost.addView(launcher,FrameLayout.LayoutParams(-2,dp(44),Gravity.TOP or Gravity.START).apply{marginStart=dp(10);topMargin=dp(10)})
-        mapHost.addView(NativeUi.button(this,"Layers"){planner.dismissDrawer();layersUi.show()},FrameLayout.LayoutParams(dp(86),dp(44),Gravity.TOP or Gravity.END).apply{marginEnd=dp(10);topMargin=dp(10)})
-        val modes=LinearLayout(this)
-        val dimension=NativeUi.button(this,if(loader.mapSettings.state.threeD)"2D"else"3D"){loader.mapSettings.change{val enabled=!it.threeD;it.copy(threeD=enabled,base=if(enabled&&it.base==MapSettings.Base.TOPO)it.lastPhoto else it.base)}}.apply{contentDescription="Switch between 2D and 3D"}
-        modes.addView(dimension,LinearLayout.LayoutParams(dp(44),dp(44)));modes.addView(location.button,LinearLayout.LayoutParams(dp(44),dp(44)));controls.addView(modes)
-        val coordinates=NativeUi.text(this,"",10f).apply{setPadding(dp(6),dp(2),dp(6),dp(2));background=NativeUi.background(this@MainActivity,Color.argb(210,250,250,245),4)}
-        mapHost.addView(coordinates,FrameLayout.LayoutParams(-2,-2,Gravity.BOTTOM or Gravity.START).apply{marginStart=dp(6);bottomMargin=dp(38)})
-        var coordinateTime=0L
-        fun updateCoordinates(){val now=android.os.SystemClock.uptimeMillis();if(now-coordinateTime<200)return;coordinateTime=now;coordinates.text=String.format(java.util.Locale.ROOT,"Map centre · %.5f° S · %.5f° E",-terrain.latitude,terrain.longitude)}
-        updateCoordinates()
-        terrain.onCamera={updateCoordinates();val label=if(loader.mapSettings.state.threeD)"2D"else"3D";if(dimension.text.toString()!=label)dimension.text=label;loader.cameraChanged();mapLayers.refresh();planner.cameraChanged()}
-        loader.mapSettings.onChange={before,after->if(before.threeD!=after.threeD)terrain.dimension(after.threeD);loader.changeMapStyle(before,after);mapLayers.refresh()}
+        // Capacitor layout: kea launcher and locate (top left), 2D/3D switch,
+        // compass and layers (top right). No zoom buttons: pinch and double-tap zoom.
+        val launcher=MapControls.logo(this){layersUi.dismiss();planner.showRoutes()}
+        mapHost.addView(launcher,FrameLayout.LayoutParams(dp(44),dp(44),Gravity.TOP or Gravity.START).apply{marginStart=dp(10);topMargin=dp(10)})
+        mapHost.addView(location.button,FrameLayout.LayoutParams(dp(44),dp(44),Gravity.TOP or Gravity.START).apply{marginStart=dp(10);topMargin=dp(62)})
+        val perspective=MapControls.Perspective(this){enabled->loader.mapSettings.change{it.copy(threeD=enabled,base=if(enabled&&it.base==MapSettings.Base.TOPO)it.lastPhoto else it.base)}}
+        perspective.set(loader.mapSettings.state.threeD)
+        mapHost.addView(perspective,FrameLayout.LayoutParams(-2,dp(40),Gravity.TOP or Gravity.END).apply{marginEnd=dp(64);topMargin=dp(12)})
+        val compass=MapControls.Compass(this){terrain.northUp()}
+        mapHost.addView(compass,FrameLayout.LayoutParams(dp(44),dp(44),Gravity.TOP or Gravity.END).apply{marginEnd=dp(10);topMargin=dp(10)})
+        mapHost.addView(MapControls.iconButton(this,MapControls.LayersIcon(this),"Map layers"){planner.dismissDrawer();layersUi.show()},FrameLayout.LayoutParams(dp(44),dp(44),Gravity.TOP or Gravity.END).apply{marginEnd=dp(10);topMargin=dp(66)})
+        fun updateChrome(){compass.bearing=terrain.bearing;scale.update(terrain.cameraPose)}
+        updateChrome()
+        terrain.onCamera={updateChrome();loader.cameraChanged();mapLayers.refresh();planner.cameraChanged()}
+        loader.mapSettings.onChange={before,after->perspective.set(after.threeD);if(before.threeD!=after.threeD)terrain.dimension(after.threeD);loader.changeMapStyle(before,after);mapLayers.refresh()}
         loader.externalDiagnostics={mapLayers.snapshot()}
         if(!loader.mapSettings.state.threeD)terrain.dimension(false)
         terrain.configure(loader.mapSettings.state)

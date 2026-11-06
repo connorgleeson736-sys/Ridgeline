@@ -147,7 +147,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     @Volatile private var dead = false
     @Volatile private var active = true
     @Volatile private var wanted = emptySet<Source>()
-    private var timer: ScheduledFuture<*>? = null
+    @Volatile private var timer: ScheduledFuture<*>? = null
     private val planCadence=PlanCadence()
     private val scheduler = Executors.newSingleThreadScheduledExecutor()
     @Volatile private var warmWanted=emptySet<Source>()
@@ -278,13 +278,20 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             }
         }
     }
-    fun cameraChanged() = synchronized(this) {
+    private val planPending=java.util.concurrent.atomic.AtomicBoolean(false)
+    /** Called on the UI thread for every camera change. Lock-free: it never waits
+     * behind demand cancellation (clearWarm/cancelPredictions hold the loader
+     * monitor), so taps on map controls are never delayed by tile bookkeeping. */
+    fun cameraChanged() {
         // Throttle using the latest immutable camera; a continuous drag must not
         // indefinitely postpone source selection, as a cancel/reschedule debounce did.
-        if(!dead&&active&&timer==null)timer=scheduler.schedule({
-            synchronized(this){timer=null;planCadence.started(android.os.SystemClock.elapsedRealtime())}
-            loadView()
-        },planCadence.delay(android.os.SystemClock.elapsedRealtime()),TimeUnit.MILLISECONDS)
+        if(dead||!active||!planPending.compareAndSet(false,true))return
+        try{
+            timer=scheduler.schedule({
+                planPending.set(false);planCadence.started(android.os.SystemClock.elapsedRealtime())
+                loadView()
+            },planCadence.delay(android.os.SystemClock.elapsedRealtime()),TimeUnit.MILLISECONDS)
+        }catch(_:java.util.concurrent.RejectedExecutionException){planPending.set(false)}
     }
     private fun sourcePlan(geometry:Boolean,key:DemandPlanKey):List<Id> {
         val pose=key.pose
