@@ -5,7 +5,12 @@
 the audited APK was 0.1.5. Main next candidates are raw local-I/O isolation,
 GPU upload acknowledgement, classified recovery and per-tile critical-path tracing.
 
-Latest APK: **[0.1.15 Fast Coverage Base](checkpoints/README.md)** — updates
+Latest APK: **[0.1.16 Connection Recovery Base](checkpoints/README.md)** — updates
+0.1.13–0.1.15 in place. Stalled HTTP requests are hedged on fresh connections,
+Android network changes recover stalled tiles immediately, and provider
+connections are warmed. [Details](research/FULL-AUDIT-2026-11-06.md#0116-network-transport).
+
+Previous APK: **[0.1.15 Fast Coverage Base](checkpoints/README.md)** — updates
 0.1.13/0.1.14 in place. Coarse backdrop under every view, imagery drapes before
 fine terrain, multi-tile progressive terrain on by default, longer-lived parked
 transfers. [Details](research/FULL-AUDIT-2026-11-06.md#0115-fast-coverage).

@@ -286,3 +286,96 @@ It fails on the previous single-interior renderer. `BackdropTest` covers backdro
 selection and eligibility ranks. The older `layer_smoke`/`gpu_smoke` examples fail
 at the same lines on untouched 0.1.12 with both lavapipe and SwiftShader, before
 reaching their progressive sections. They are stale and were not used as evidence.
+
+## 0.1.16 network transport
+
+The user reports most of their latency is network. This pass looked at the
+providers on the wire and at the native client.
+
+### Provider measurements
+
+All of these were made through this workspace's proxy, so absolute times are
+inflated; comparisons and headers are valid.
+
+| Finding | Evidence | Consequence |
+| --- | --- | --- |
+| LINZ serves HTTP/2 via CloudFront and advertises no HTTP/3 | No `Alt-Svc` header | Cronet/QUIC would not change LINZ transport today |
+| CloudFront ignores query-parameter order | Warmed with native order: 25/30 hits same order, 28/30 Capacitor order | Native and Capacitor share the CDN cache |
+| Elevation is terrain-RGB PNG only | `.webp` returns 400; `.lerc` 404 | Elevation bytes are fixed by LINZ; a Mount Cook z13 tile is 150,045 bytes, the heaviest payload |
+| Esri imagery is HTTP/1.1 on both public hostnames | Identical bytes from `services.` and `server.` | Each concurrent Esri request needs its own connection |
+
+### Client findings
+
+The OkHttp configuration was already sound:
+- dispatchers allow 100 concurrent calls, so there is no per-host cap of 5;
+- fast fallback is on;
+- the cache-free escape path and per-phase metrics are in place.
+
+Three gaps remained:
+
+1. **A silently dead HTTP/2 connection stalled everything for 15 s.** Every LINZ
+   request multiplexes onto one connection. After a Wi-Fi/mobile handover, a
+   tower change or a NAT timeout, the socket can die without FIN/RST. OkHttp
+   then keeps assigning requests to it until each one reaches the 15 s read
+   timeout, and the stalled requests hold transfer slots meanwhile. There were
+   no pings, no reaction to Android network changes and no hedging.
+2. **No reaction to Android network changes.** The app did not listen for
+   default-network changes at all.
+3. **No connection warm-up.** The first tiles paid DNS + TCP + TLS.
+
+### Changes
+
+- `HttpTileBackend` runs each network request as a race. If the primary has no
+  response headers after 2.5 s, one hedge goes out on a separate connection
+  pool, so it always uses a new connection. The first success is delivered; a
+  failure only once no attempt remains; cancellation never starts a hedge.
+  Provider errors (headers received) are reported at once without a hedge.
+- When a hedge beats a primary that had no headers, cache-free requests move to
+  that proven pool, and later hedges get a new pool. On HTTP/2 this stops new
+  requests landing on the dead connection while its other stalled streams keep
+  it busy.
+- `TileLoader` registers a default-network callback. On a change it evicts
+  pooled connections, hedges every request still waiting for headers on the new
+  network at once, and re-warms connections.
+- HEAD requests warm LINZ and Esri connections at start; they bypass caches and
+  are discarded.
+- Cache semantics are unchanged: hedge results publish to the HTTP cache exactly
+  like the existing cache-free path.
+
+Hedging adds a duplicate request only for requests already 2.5 s without headers.
+LINZ origin time on a miss was about 70 ms for imagery and 5 ms for elevation
+(`server-timing`), so healthy requests should essentially never be hedged.
+Battery cost is nil when healthy: there are no periodic pings.
+
+### Validation
+
+`HedgedTransportTest` uses real sockets behind a TCP proxy that black-holes
+existing connections without closing them:
+- **Stall recovery:** about 0.3 s with a 300 ms test hedge. Without hedging the
+  same stall lasts the whole read timeout: 2 s in the test, 15 s in the app.
+- **HTTP/2:** with a second stalled stream keeping the dead connection busy, a
+  new request is served without its own hedge. Disabling the proven-pool switch
+  makes this fail (307 ms and an extra hedge).
+- **Network change:** recovery 0.17 s after `networkChanged()`.
+- **No false hedges:** 20 healthy requests produce no duplicates, a 503 is
+  reported promptly with no hedge, and a cancelled request never hedges.
+
+`PipelineWaitTest.realCacheFreeHttpWinner…` failed intermittently on 0.1.12 and
+more often after this change. Its assertion that the escape path leaves no HTTP
+cache entry predates 0.1.8 (`cd9b82d`), which deliberately publishes the
+cache-free winner asynchronously. It passed only while that background write
+lagged. It now waits for the writer and asserts the restart-visible entry; 8/8
+runs pass. The full JVM suite passes: 159 tests, 0 failures.
+
+### Not changed, and recommended next
+
+- **Concurrency.** Defaults stay at 8 transfers moving and 12 still. On HTTP/2,
+  more concurrent requests are nearly free per connection, but on slow links
+  they split bandwidth and delay focus tiles; OkHttp does not use HTTP/2
+  priorities. Users can already try 16–24 under Offline/imagery → Download jobs.
+  An adaptive limit from measured bandwidth × round-trip time needs a phone trace.
+- **Esri HTTP/1.1.** Warm-up opens one connection; bursts still open more.
+  Neither public hostname offers HTTP/2.
+- **Elevation bytes** dominate and are fixed by LINZ's format. Reducing them
+  needs pre-built meshes or an edge bundle service, the larger ideas recorded
+  earlier in this report.
