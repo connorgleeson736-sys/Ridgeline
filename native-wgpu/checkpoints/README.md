@@ -1,6 +1,30 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.21 GPU Labels Base APK — 32.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-GPU-Labels-0.1.21-Base.apk)**.
+Latest: **[Download 0.1.22 Lighter Frames Base APK — 32.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Lighter-Frames-0.1.22-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 23:
+**updates 0.1.13–0.1.21 in place, keeping its data.**
+
+From a Perfetto trace on an Exynos 7884B phone (GPU-bound, ~15 fps, memory
+pressure):
+
+- **Labels back in the main render pass.** 0.1.21 drew labels in a second pass,
+  which on phone GPUs stores and reloads the whole screen every frame. Labels
+  now read the previous frame's terrain depth (projected with that frame's
+  camera, so hiding behind terrain stays exact while moving).
+- **Controls redraw less while panning.** The scale bar updates at most 4 times
+  a second while touching and once when you stop.
+- **Less memory on smaller phones.** The overlay texture pool is sized by RAM
+  (16 MB on 3 GB phones; it was 49 MB on every phone).
+
+174 JVM tests, Rust tests and GPU checks pass, including label occlusion with a
+moving camera on Vulkan and GLES; lint 0 errors; 623 original assets identical.
+Not yet re-traced on a phone.
+[Exact release record](../validation/lighter-frames-2026-11-07/release.json) ·
+[SHA-256](Ridgeline-Native-Lighter-Frames-0.1.22-Base.apk.sha256).
+
+## Previous 0.1.21 GPU labels checkpoint
+
+**[Download 0.1.21 GPU Labels Base APK — 32.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-GPU-Labels-0.1.21-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 22:
 **updates 0.1.13–0.1.20 in place, keeping its data.**
 

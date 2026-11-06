@@ -18,9 +18,20 @@ struct Vertex {
 #[repr(C)]
 struct Scene {
     matrix: [f32; 16],
+    /// Current-frame local coordinates to the previous frame's clip space.
+    previous: [f32; 16],
     anchor: [f32; 4],
     size: [f32; 4],
+    /// x: renderer time (s); y: 1 when the previous frame's depth is valid.
     time: [f32; 4],
+}
+#[derive(Clone, Copy)]
+struct Frame {
+    matrix: glam::Mat4,
+    center: [f64; 2],
+    world: f64,
+    ppm: f64,
+    elevation: f64,
 }
 pub(crate) struct LabelGpu {
     width: u32,
@@ -35,7 +46,11 @@ pub(crate) struct LabelGpu {
     vertices: wgpu::Buffer,
     count: u32,
     last: Option<Scene>,
-    depth_bind: Option<wgpu::BindGroup>,
+    /// One bind per depth slot; labels read the slot the previous frame wrote.
+    depth_binds: Vec<wgpu::BindGroup>,
+    read_slot: usize,
+    previous_valid: bool,
+    previous: Option<Frame>,
 }
 impl LabelGpu {
     pub fn new(device: &wgpu::Device, queue: &wgpu::Queue, format: wgpu::TextureFormat) -> Self {
@@ -68,16 +83,23 @@ impl LabelGpu {
             }),
             primitive: Default::default(),
             // Like MapLibre symbols: screen-space text drawn whole on top of the
-            // terrain, in its own pass. Occlusion is decided on the GPU from the
-            // terrain depth at each label's anchor (labels.wgsl), never per pixel.
-            depth_stencil: None,
+            // terrain, inside the main pass (no depth test). Occlusion is decided
+            // on the GPU from the previous frame's terrain depth at each label's
+            // anchor (labels.wgsl), never per pixel.
+            depth_stencil: Some(wgpu::DepthStencilState {
+                format: wgpu::TextureFormat::Depth32Float,
+                depth_write_enabled: Some(false),
+                depth_compare: Some(wgpu::CompareFunction::Always),
+                stencil: Default::default(),
+                bias: Default::default(),
+            }),
             multisample: Default::default(),
             multiview_mask: None,
             cache: None,
         });
         let uniform = device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("label camera"),
-            size: 112,
+            size: 176,
             usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
             mapped_at_creation: false,
         });
@@ -109,11 +131,24 @@ impl LabelGpu {
             vertices,
             count: 0,
             last: None,
-            depth_bind: None,
+            depth_binds: Vec::new(),
+            read_slot: 0,
+            previous_valid: false,
+            previous: None,
         }
     }
-    /// The main pass's depth texture, read by labels for occlusion.
-    pub fn set_depth(&mut self, device: &wgpu::Device, depth: &wgpu::Texture) {
+    /// The renderer's two alternating depth textures.
+    pub fn set_depths(&mut self, device: &wgpu::Device, depths: &[wgpu::Texture]) {
+        self.depth_binds = depths.iter().map(|d| self.depth_bind(device, d)).collect();
+        self.previous_valid = false;
+    }
+    /// Before a frame: labels read [read_slot]; [valid] says whether the
+    /// previous frame stored its depth there.
+    pub fn begin_frame(&mut self, read_slot: usize, valid: bool) {
+        self.read_slot = read_slot;
+        self.previous_valid = valid;
+    }
+    fn depth_bind(&self, device: &wgpu::Device, depth: &wgpu::Texture) -> wgpu::BindGroup {
         // Passes (1.0) when the reference depth is <= the terrain depth, i.e.
         // nothing nearer than the raised anchor covers it.
         let compare = device.create_sampler(&wgpu::SamplerDescriptor {
@@ -121,7 +156,7 @@ impl LabelGpu {
             compare: Some(wgpu::CompareFunction::LessEqual),
             ..Default::default()
         });
-        self.depth_bind = Some(device.create_bind_group(&wgpu::BindGroupDescriptor {
+        device.create_bind_group(&wgpu::BindGroupDescriptor {
             label: Some("label terrain depth"),
             layout: &self.pipeline.get_bind_group_layout(2),
             entries: &[
@@ -131,10 +166,10 @@ impl LabelGpu {
                 },
                 wgpu::BindGroupEntry { binding: 1, resource: wgpu::BindingResource::Sampler(&compare) },
             ],
-        }));
+        })
     }
     pub fn visible(&self) -> bool {
-        self.count > 0 && self.depth_bind.is_some()
+        self.count > 0 && !self.depth_binds.is_empty()
     }
     fn atlas(
         device: &wgpu::Device,
@@ -279,12 +314,35 @@ impl LabelGpu {
         scale: f32,
         time: f32,
     ) {
+        let world = 512. * 2f64.powf(view.zoom);
+        let frame = Frame {
+            matrix,
+            center: view.center,
+            world,
+            ppm: ppm as f64,
+            elevation: view.elevation as f64,
+        };
+        // Current local coordinates -> previous local coordinates -> previous clip.
+        let previous = self.previous.replace(frame).unwrap_or(frame);
+        let s = previous.world / world;
+        let a = glam::DMat4::from_cols(
+            glam::DVec4::new(s, 0., 0., 0.),
+            glam::DVec4::new(0., s, 0., 0.),
+            glam::DVec4::new(0., 0., previous.ppm / frame.ppm, 0.),
+            glam::DVec4::new(
+                (view.center[0] - previous.center[0]) * previous.world,
+                (previous.center[1] - view.center[1]) * previous.world,
+                (frame.elevation - previous.elevation) * previous.ppm,
+                1.,
+            ),
+        );
+        let previous_matrix = previous.matrix * a.as_mat4();
         if self.count == 0 {
             return;
         };
-        let world = 512. * 2f64.powf(view.zoom);
         let scene = Scene {
             matrix: matrix.to_cols_array(),
+            previous: previous_matrix.to_cols_array(),
             anchor: [
                 ((anchor[0] - view.center[0]) * world) as f32,
                 ((view.center[1] - anchor[1]) * world) as f32,
@@ -292,7 +350,7 @@ impl LabelGpu {
                 ppm,
             ],
             size: [view.elevation, view.width as f32, view.height as f32, scale],
-            time: [time, 0., 0., 0.],
+            time: [time, if self.previous_valid { 1. } else { 0. }, 0., 0.],
         };
         if self.last != Some(scene) {
             queue.write_buffer(&self.uniform, 0, bytemuck::bytes_of(&scene));
@@ -300,7 +358,7 @@ impl LabelGpu {
         }
     }
     pub fn draw(&self, pass: &mut wgpu::RenderPass<'_>) {
-        if let (true, Some(depth)) = (self.count > 0, &self.depth_bind) {
+        if let (true, Some(depth)) = (self.count > 0, self.depth_binds.get(self.read_slot)) {
             pass.set_pipeline(&self.pipeline);
             pass.set_bind_group(0, &self.bind, &[]);
             pass.set_bind_group(1, &self.atlas_bind, &[]);

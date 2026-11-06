@@ -44,6 +44,11 @@ fn read(r: &Renderer, output: &wgpu::Texture) -> Vec<u8> {
 }
 /// Magenta label pixels around the anchor, after the fade-in has finished.
 async fn label_pixels(instance: &wgpu::Instance, heights: &[f32], anchor_at: f64) -> usize {
+    label_pixels_moving(instance, heights, anchor_at, false).await
+}
+/// With [moving], every frame pans and turns the camera, so occlusion must be
+/// read through the previous frame's camera to stay correct.
+async fn label_pixels_moving(instance: &wgpu::Instance, heights: &[f32], anchor_at: f64, moving: bool) -> usize {
     let mut r = Renderer::new(instance, None, Some(wgpu::TextureFormat::Rgba8Unorm), 256, 256)
         .await
         .unwrap();
@@ -70,6 +75,12 @@ async fn label_pixels(instance: &wgpu::Instance, heights: &[f32], anchor_at: f64
     }
     std::thread::sleep(std::time::Duration::from_millis(260));
     r.render(&target, center, 11., 0., 60., 500.);
+    if moving {
+        for step in 1..=8 {
+            let c = [center[0] + (b[2] - b[0]) * 0.006 * step as f64, center[1] - (b[3] - b[1]) * 0.004 * step as f64];
+            r.render(&target, c, 11. + 0.01 * step as f64, 1.5 * step as f32, 60., 500.);
+        }
+    }
     let pixels = read(&r, &output);
     pixels.chunks_exact(4).filter(|p| p[0] > 200 && p[1] < 80 && p[2] > 200).count()
 }
@@ -100,12 +111,17 @@ async fn run() {
     // A subsidiary ridge just in front of the anchor and a single-row ridge.
     assert_eq!(label_pixels(&instance, &ridge(39..=40), 0.30).await, 0, "near-summit ridge hides the label");
     assert_eq!(label_pixels(&instance, &ridge(50..=50), 0.30).await, 0, "single-row ridge hides the label");
+    // While the camera moves every frame, the same decisions hold.
+    let moving_flat = label_pixels_moving(&instance, &flat, 0.30, true).await;
+    let moving_behind = label_pixels_moving(&instance, &ridge(56..=60), 0.30, true).await;
+    assert!(moving_flat >= 200, "moving: label whole on flat ground ({moving_flat} px)");
+    assert_eq!(moving_behind, 0, "moving: label behind the ridge stays hidden");
     // On a slope rising towards the camera the label is not cut (whole or hidden, never partial).
     let slope: Vec<f32> = (0..129 * 129).map(|i| 500. + ((i / 129) as f32) * 4.).collect();
     let on_slope = label_pixels(&instance, &slope, 0.30).await;
     assert!(on_slope == 0 || on_slope >= 200, "never a partial label ({on_slope} px)");
     println!(
-        "PASS GPU label occlusion: whole on flat ground ({north}/{south} px), hidden behind ridges, near-summit and thin ridges, slope {on_slope} px ({})",
+        "PASS GPU label occlusion: whole on flat ground ({north}/{south} px), hidden behind ridges, near-summit and thin ridges, slope {on_slope} px; same while moving ({})",
         if gles { "GLES" } else { "Vulkan" }
     );
 }

@@ -270,6 +270,19 @@ impl Overlay {
             self.by_tile.clear();
         }
     }
+    /// Pool size set directly (from device RAM on Android).
+    pub fn set_layers(&mut self, layers: usize) {
+        let mut layers = layers.clamp(12, 64) as u32;
+        if layers % 6 == 0 {
+            layers += 1;
+        }
+        if layers != self.layers {
+            self.layers = layers;
+            self.gpu = None;
+            self.slots.clear();
+            self.by_tile.clear();
+        }
+    }
     pub fn is_empty(&self) -> bool {
         self.groups.is_empty()
     }
