@@ -33,7 +33,7 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
         panel.addView(tabs);panel.addView(View(activity).apply{setBackgroundColor(NativeUi.line)},LinearLayout.LayoutParams(-1,dp(1)))
         val content=NativeUi.column(activity);panel.addView(ScrollView(activity).apply{addView(content)},LinearLayout.LayoutParams(-1,0,1f))
         if(advanced)advanced(content)else basic(content)
-        cover.addView(panel,FrameLayout.LayoutParams(minOf(dp(340),activity.resources.displayMetrics.widthPixels-dp(82)),-1,Gravity.TOP or Gravity.END).apply{topMargin=dp(66);bottomMargin=dp(16);marginEnd=dp(10)})
+        cover.addView(panel,FrameLayout.LayoutParams(minOf(dp(340),activity.resources.displayMetrics.widthPixels-dp(82)),-1,Gravity.TOP or Gravity.END).apply{topMargin=dp(52);bottomMargin=dp(16);marginEnd=dp(10)})
         root.addView(cover,FrameLayout.LayoutParams(-1,-1));overlay=cover
     }
     private fun closeButton(action:()->Unit)=TextView(activity).apply{text="✕";textSize=18f;gravity=Gravity.CENTER;setTextColor(NativeUi.ink);background=NativeUi.pressable(activity,null);isClickable=true;setOnClickListener{action()}}

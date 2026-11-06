@@ -103,6 +103,11 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     private var appliedGps:Pair<Long,Coordinate?>?=null
     fun locationPoint(point:Coordinate?){if(gpsPoint.second==point)return;gpsPoint=gpsPoint.first+1 to point;requestFrame()}
     fun inspect(point:Coordinate?){if(inspection.second==point)return;inspection=inspection.first+1 to point;requestFrame()}
+    /** Elevation-chart section ends (A, B), projected each frame like labels. */
+    @Volatile private var rangeMarkers:List<Coordinate> = emptyList()
+    private var appliedMarkers:List<Coordinate>?=null;private var markerPose:CameraPose?=null;private var markerSize=0L
+    internal var onRangeMarkers:(List<Coordinate>,FloatArray)->Unit={_,_->}
+    fun rangeMarkers(points:List<Coordinate>){if(points==rangeMarkers)return;rangeMarkers=points;requestFrame()}
     @Volatile private var labelPlacement:Pair<NativeLabelAtlas,ByteBuffer>?=null
     private var appliedPlacement:Pair<NativeLabelAtlas,ByteBuffer>?=null
     private val labelProjection=ByteBuffer.allocateDirect(512*12).order(ByteOrder.LITTLE_ENDIAN)
@@ -382,6 +387,17 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             val count=NativeBridge.waypoints(handle,projectedBytes)
             projectedBytes.rewind();projected=FloatArray(count*3){projectedBytes.float}
             if(geometryChanged)labelPose=null
+            val markers=rangeMarkers
+            if(markers!==appliedMarkers||markers.isNotEmpty()&&(markerPose!=pose||markerSize!=size||geometryChanged)){
+                val positions=if(markers.isEmpty())FloatArray(0)else{
+                    val input=ByteBuffer.allocateDirect(markers.size*16).order(ByteOrder.LITTLE_ENDIAN)
+                    for(m in markers)input.putDouble((m.longitude+180)/360).putDouble(CameraMath.mercatorY(m.latitude))
+                    input.rewind();val output=ByteBuffer.allocateDirect(markers.size*12).order(ByteOrder.LITTLE_ENDIAN)
+                    val n=NativeBridge.project(handle,input,output);output.rewind();FloatArray(n*3){output.float}
+                }
+                appliedMarkers=markers;markerPose=pose;markerSize=size
+                post{if(rangeMarkers===markers)onRangeMarkers(markers,positions)}
+            }
             val atlas=appliedLayers?.atlas;val now=android.os.SystemClock.uptimeMillis()
             if(atlas!=null&&atlas.labels.isNotEmpty()&&(labelPose!=pose||labelSize!=size)&&now-labelTime>=33){
                 val n=NativeBridge.project(handle,atlas.points,labelProjection);labelProjection.rewind();val positions=FloatArray(n*3){labelProjection.float}

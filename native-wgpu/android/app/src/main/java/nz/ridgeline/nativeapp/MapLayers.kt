@@ -14,9 +14,15 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         /** Capacitor's topographic source: maxzoom 14, overzoomed beyond. */
         const val VECTOR_MAX_ZOOM=14
         const val PARALLEL_TILES=4
-        const val GESTURE_PUBLISH_MILLIS=300L
+        /** Newly arrived overlay tiles appear within this time while moving. */
+        const val GESTURE_PUBLISH_MILLIS=100L
+        /** View selection runs at most this often, never postponed by movement. */
+        const val SELECTION_MILLIS=50L
     }
-    private data class Tile(val body:TileBody,var mask:Set<String>,var features:List<VectorTile.Feature>)
+    private data class Tile(val body:TileBody,var mask:Set<String>,var features:List<VectorTile.Feature>){
+        /** Styled output for the last (settings, quarter zoom); reused across publications. */
+        var styledKey:Any?=null;var styled:TopographyStyle.Output?=null
+    }
     private val worker=Executors.newSingleThreadScheduledExecutor{run->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);run.run()},"RidgelineCartography")}
     private val main=Handler(Looper.getMainLooper())
     private val style=TopographyStyle(view.context.assets.open("topography-style.json").bufferedReader().use{it.readText()})
@@ -28,7 +34,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
     // moving, so tracks could take seconds to appear after stopping.)
     private val leases=ConcurrentHashMap<GpuUploadQueue.Id,TileTransport.Consumer>()
     private fun releaseAll(){for((id,owned)in leases.entries.toList())if(leases.remove(id,owned))owned.release(true)}
-    private var lastPublishAt=0L
+    private var lastPublishAt=0L;private var lastSelectionAt=0L
     private var timer:ScheduledFuture<*>?=null;private var publication:ScheduledFuture<*>?=null;private var retryWake:ScheduledFuture<*>?=null
     @Volatile private var closed=false
     @Volatile private var active=true
@@ -62,9 +68,14 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
     fun snapshot()=diagnostics
     fun refresh(){if(closed)return;runCatching{worker.execute{
         if(closed)return@execute
-        timer?.cancel(false);val state=loader.mapSettings.state
+        val state=loader.mapSettings.state
         if(state!=displayState){displayState=state;lastKey=null;schedulePublication()}
-        timer=worker.schedule({try{update()}catch(_:Exception){diagnostics="Topographic view selection failed; imagery and routes remain available."}},if(view.gestureInProgress)180 else 80,TimeUnit.MILLISECONDS)
+        // Leading-edge throttle (was a 180 ms debounce that every camera frame
+        // restarted, so tiles for new ground were not even selected until the
+        // finger paused). A pending selection already reads the latest camera.
+        if(timer?.isDone==false)return@execute
+        val wait=(SELECTION_MILLIS-(android.os.SystemClock.uptimeMillis()-lastSelectionAt)).coerceIn(0,SELECTION_MILLIS)
+        timer=worker.schedule({lastSelectionAt=android.os.SystemClock.uptimeMillis();try{update()}catch(_:Exception){diagnostics="Topographic view selection failed; imagery and routes remain available."}},wait,TimeUnit.MILLISECONDS)
     }}}
     private fun mask(state:MapSettings.State)=style.sourceLayers(state,view.planningPose.zoom)
     fun setActive(value:Boolean){active=value;if(value)refresh()else{releaseAll();timer?.cancel(false);publication?.cancel(false);retryWake?.cancel(false)}}
@@ -107,7 +118,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
             if(wake!=null&&(retryWake==null||retryWake!!.isDone))retryWake=worker.schedule({retryWake=null;pump()},(wake-now).coerceAtLeast(1),TimeUnit.MILLISECONDS)
         }
     }
-    private fun schedulePublication(delay:Long=60){if(closed||publication!=null&&!publication!!.isDone)return;publication=worker.schedule({publication=null;try{publish()}catch(_:Exception){diagnostics="Visible topographic data exceeds the current layer budget or could not be prepared; imagery and routes remain available.";lastKey=null}},delay.coerceAtLeast(1),TimeUnit.MILLISECONDS)}
+    private fun schedulePublication(delay:Long=8){if(closed||publication!=null&&!publication!!.isDone)return;publication=worker.schedule({publication=null;try{publish()}catch(_:Exception){diagnostics="Visible topographic data exceeds the current layer budget or could not be prepared; imagery and routes remain available.";lastKey=null}},delay.coerceAtLeast(1),TimeUnit.MILLISECONDS)}
     private fun publish(){
         if(closed||!active)return
         // During gestures, publish newly arrived overlay tiles at a bounded rate
@@ -127,7 +138,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
             if(tile.mask!=enabled){tile.features=VectorTile.decode(tile.body.bytes,id.z,id.x,id.y,enabled);tile.mask=enabled;decoded++}
             // MapLibre evaluates ["zoom"] in filters at the tile's own zoom, layer
             // ranges and paint at the camera zoom.
-            val output=styled.getOrPut(id){style.build(tile.features,state,zoom,id.z.toDouble())};val b=patch.clip.bounds
+            val output=styled.getOrPut(id){val key=listOf(state,zoom,enabled);if(tile.styledKey!=key||tile.styled==null){tile.styled=style.build(tile.features,state,zoom,id.z.toDouble());tile.styledKey=key};tile.styled!!};val b=patch.clip.bounds
             for(line in output.lines)for(path in clip(line.points,b))lines.add(line.copy(points=path))
             labels.addAll(output.labels.filter{it.point.x>=b[0]&&it.point.x<b[2]&&it.point.y>=b[1]&&it.point.y<b[3]})
         }

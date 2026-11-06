@@ -1,6 +1,36 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.17 Capacitor Parity Base APK — 32.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Capacitor-Parity-0.1.17-Base.apk)**.
+Latest: **[Download 0.1.18 Smooth Overlays Base APK — 32.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Smooth-Overlays-0.1.18-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 19:
+**updates 0.1.13–0.1.17 in place, keeping its data.**
+
+- **Tracks and roads keep up while moving.** Overlay view selection was a
+  180 ms wait that every camera frame restarted, so new tiles were not even
+  requested until you paused; it now runs every 50 ms while moving. Arrived
+  tiles appear within 100 ms (was 300 ms plus 60 ms), and per-tile styling is
+  cached so this stays cheap.
+- **Route dots are drawn whole.** Their lower half used to fail the depth test
+  against the ground just in front of them; a ridge in front still hides them.
+- **Route sheet like Capacitor.** Square corners; no ⋮ or boxed × (the top ×
+  stays; long-press Export GPX to share). The elevation chart fills the
+  expanded sheet with Capacitor's tooltip instead of the caption line. Edit,
+  Undo, Export GPX and Delete point are spaced apart with clean corners.
+  Smaller top-right controls.
+- **A/B sections.** Dragging the chart marks the start A (green) and end B
+  (orange) in the chart and on the map, with distance, ascent and descent.
+- **Faster chart dragging.** The chart is cached as an image and section
+  statistics are O(log n), so a drag redraws only the cursor, section and
+  tooltip; no sheet re-layout on each move.
+
+171 JVM tests, Rust tests and GPU route/label/terrain checks pass (new
+waypoint test on Vulkan and GLES); lint 0 errors; 623 original assets
+identical. Not run on a phone; UI not seen on a device.
+[Exact release record](../validation/smooth-overlays-2026-11-06/release.json) ·
+[SHA-256](Ridgeline-Native-Smooth-Overlays-0.1.18-Base.apk.sha256).
+
+## Previous 0.1.17 Capacitor parity checkpoint
+
+**[Download 0.1.17 Capacitor Parity Base APK — 32.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Capacitor-Parity-0.1.17-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 18:
 **updates 0.1.13–0.1.16 in place, keeping its data.**
 

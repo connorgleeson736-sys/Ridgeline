@@ -9,7 +9,7 @@ import kotlin.math.*
 internal class NativeSheet(private val root:FrameLayout,private val map:FrameLayout) {
     private val context=root.context
     val panel=NativeUi.column(context).apply{
-        background=NativeUi.background(context,radius=24);clipToOutline=true;elevation=NativeUi.dp(context,8).toFloat();visibility=View.GONE
+        background=NativeUi.background(context,radius=0);clipToOutline=true;elevation=NativeUi.dp(context,8).toFloat();visibility=View.GONE
     }
     val content=NativeUi.column(context).apply{setPadding(dp(16),0,dp(16),dp(12))}
     private val grip=FrameLayout(context).apply{contentDescription="Resize route panel";isClickable=true;isFocusable=true}

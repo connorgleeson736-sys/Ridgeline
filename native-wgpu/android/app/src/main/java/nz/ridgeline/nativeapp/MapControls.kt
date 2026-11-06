@@ -51,7 +51,7 @@ internal object MapControls {
     /** Two stacked map sheets (the Capacitor layers icon). */
     class LayersIcon(private val context:Context):Drawable(){
         private val paint=Paint(Paint.ANTI_ALIAS_FLAG).apply{style=Paint.Style.STROKE;strokeJoin=Paint.Join.ROUND;strokeCap=Paint.Cap.ROUND}
-        override fun getIntrinsicWidth()=dp(context,24);override fun getIntrinsicHeight()=dp(context,24)
+        override fun getIntrinsicWidth()=dp(context,20);override fun getIntrinsicHeight()=dp(context,20)
         override fun draw(canvas:Canvas){
             val b=bounds;val u=b.width()/24f;val x=b.left.toFloat();val y=b.top.toFloat()
             paint.color=NativeUi.ink;paint.strokeWidth=1.8f*u
@@ -86,12 +86,12 @@ internal object MapControls {
         private val flat=segment("2D","Show the map in 2D"){choose(false)}
         private val relief=segment("3D","Show the map in 3D"){choose(true)}
         private fun segment(label:String,description:String,action:()->Unit)=TextView(context).apply{
-            text=label;textSize=14f;gravity=Gravity.CENTER;contentDescription=description;isClickable=true;isFocusable=true
+            text=label;textSize=12f;gravity=Gravity.CENTER;contentDescription=description;isClickable=true;isFocusable=true
             setOnClickListener{action()}
         }
         init{
             background=tile(context,10);elevation=dp(context,2).toFloat();setPadding(dp(context,3),dp(context,3),dp(context,3),dp(context,3))
-            addView(flat,LayoutParams(dp(context,46),-1));addView(relief,LayoutParams(dp(context,46),-1))
+            addView(flat,LayoutParams(dp(context,38),-1));addView(relief,LayoutParams(dp(context,38),-1))
             set(true)
         }
         fun set(threeD:Boolean){
