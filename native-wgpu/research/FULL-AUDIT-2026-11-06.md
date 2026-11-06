@@ -456,3 +456,25 @@ Two causes of buttons that "only work sometimes":
 Buttons also show a pressed ripple. None of this was observed on a device; no
 emulator is available in this environment.
 
+## 0.1.22 trace findings (Exynos 7884B, 7 November)
+
+A 15 s Perfetto trace while panning on an Exynos 7884B (Mali-G71 MP2,
+Android 11), app 0.1.21:
+
+| | Measured |
+|---|---|
+| Map frames | 229 in 15 s (~15 fps); median 28 ms moving, 33 ms still; 39 over 100 ms, max 450 ms |
+| GPU clock | top step (676 MHz) for ~10.5 s of 15 s |
+| Render thread | mostly blocked presenting (QueuePresent up to 442 ms); GPU completion waits up to 458 ms |
+| SurfaceFlinger | GPU composition on 25 of 375 frames (6.6 ms mean); the rest on HWC |
+| Controls (UI) redraws | 155, 144 during input; 541 ms CPU on a spare core |
+| Memory | kswapd 4.2 s CPU; 31 direct reclaims in the app (670 ms); frequent GC incl. NativeAlloc |
+| App CPU | ~1.3 cores; render thread 3.1 s; image decode ~3.4 s |
+
+Conclusion: GPU-bound at full resolution, with memory pressure. Changes in
+0.1.22: labels back in the main pass reading the previous frame's depth (no
+second pass and colour reload), scale bar throttled while touching, overlay
+pool sized by RAM. Not done yet: dynamic render resolution, the largest
+remaining lever on this class of GPU. Controls redraws were measured to cost a
+few percent at most; they were not the cause of the stalls.
+

@@ -5,15 +5,14 @@
 the audited APK was 0.1.5. Main next candidates are raw local-I/O isolation,
 GPU upload acknowledgement, classified recovery and per-tile critical-path tracing.
 
-Latest APK: **[0.1.21 GPU Labels Base](checkpoints/README.md)** — updates
+Latest APK: **[0.1.22 Lighter Frames Base](checkpoints/README.md)** — updates
+0.1.13–0.1.21 in place. From a phone trace: labels back in the main render
+pass, fewer controls redraws while panning, and a RAM-sized overlay pool.
+
+Previous APK: **[0.1.21 GPU Labels Base](checkpoints/README.md)** — updates
 0.1.13–0.1.20 in place. Label occlusion on the GPU (no per-label CPU
 ray-marching), steady labels while moving, fewer river and track names, and a
 crisp, steady NZ Topo.
-
-Previous APK: **[0.1.20 Parent Preload Base](checkpoints/README.md)** — updates
-0.1.13–0.1.19 in place. Preloads coarser surrounding tiles while idle (Advanced
-option), NZ Topo switches to coarser maps when zooming out, and Map layers
-closes on any outside tap.
 
 Older APK: **[0.1.16 Connection Recovery Base](checkpoints/README.md)** — updates
 0.1.13–0.1.15 in place. Stalled HTTP requests are hedged on fresh connections,
