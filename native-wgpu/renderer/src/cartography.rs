@@ -434,22 +434,34 @@ impl Renderer {
         self.cartographic_vertices = 0;
     }
     /// Projection only, no GPU readback or per-label raycast. Text quads use terrain depth.
-    /// True when resident terrain rises above the straight eye→anchor ray.
-    /// The final 2% next to the anchor is ignored so a label is never hidden by
-    /// the surface it stands on; 2 m of tolerance absorbs sampling differences.
+    /// True when resident terrain rises above the straight eye→anchor ray, the
+    /// per-symbol test MapLibre performs against its depth buffer. Samples are
+    /// about 25 m of ground apart (48–512 per label), so a nearer ridge cannot
+    /// slip between samples; only the 30 m of ground around the anchor itself is
+    /// exempt, so a label is never hidden by the summit it names. 2 m tolerance.
     fn line_of_sight_blocked(
         &self,
         eye: [f64; 3],
         anchor: [f64; 3],
         center: [f64; 2],
         world: f64,
+        ppm: f64,
         local_z: &impl Fn(f64) -> f64,
     ) -> bool {
-        const SAMPLES: usize = 48;
         let tolerance = local_z(2.) - local_z(0.);
+        let horizontal = (anchor[0] - eye[0]).hypot(anchor[1] - eye[1]);
+        if !(horizontal > 0.) || !(ppm > 0.) {
+            return false;
+        }
+        let step = 25. * ppm;
+        let samples = ((horizontal / step).ceil() as usize).clamp(48, 512);
+        let exempt = (30. * ppm / horizontal).clamp(0., 0.5);
         let mut hint = 0;
-        (1..SAMPLES).any(|i| {
-            let t = i as f64 / SAMPLES as f64 * 0.98;
+        (1..samples).any(|i| {
+            let t = i as f64 / samples as f64;
+            if t > 1. - exempt {
+                return false;
+            }
             let x = eye[0] + (anchor[0] - eye[0]) * t;
             let y = eye[1] + (anchor[1] - eye[1]) * t;
             let z = eye[2] + (anchor[2] - eye[2]) * t;
@@ -506,7 +518,7 @@ impl Renderer {
                 // MapLibre hides a whole symbol when terrain blocks its anchor,
                 // rather than clipping the text per pixel. March the line of
                 // sight from the eye to the anchor over resident terrain.
-                if self.map_style.three_d && self.line_of_sight_blocked(eye, anchor, view.center, world, &local_z) {
+                if self.map_style.three_d && self.line_of_sight_blocked(eye, anchor, view.center, world, ppm as f64, &local_z) {
                     return [0.; 3];
                 }
                 [

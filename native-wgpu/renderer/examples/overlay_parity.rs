@@ -148,4 +148,33 @@ async fn run() {
     }
     assert!(worst < 1., "dash transitions stay fixed to the ground while zooming (worst {worst:.2} px)");
     println!("PASS ground-fixed dashes: worst transition drift {worst:.2} px over a 0.02 zoom step ({})", if gles { "GLES" } else { "Vulkan" });
+    // Extra GL contexts are created only after the shared renderer's checks:
+    // on GLES, creating/dropping contexts mid-run disturbs the current context.
+    // A subsidiary ridge just in front of the summit (rows 39-40, ~75-240 m), and
+    // a single-row (~150 m) ridge midway: neither may be skipped.
+    for (name, rows) in [("subsidiary ridge beside the anchor", 39..=40), ("single-row ridge", 50..=50)] {
+        let mut near = Renderer::new(&instance, None, Some(wgpu::TextureFormat::Rgba8Unorm), 256, 256)
+            .await
+            .unwrap();
+        let mut heights = vec![500f32; 129 * 129];
+        for row in rows {
+            for column in 0..129 {
+                heights[row * 129 + column] = 3000.;
+            }
+        }
+        near.upload(id, &heights, &grey).unwrap();
+        let out = near.device.create_texture(&wgpu::TextureDescriptor {
+            label: Some("near ridge"),
+            size: wgpu::Extent3d { width: 256, height: 256, depth_or_array_layers: 1 },
+            mip_level_count: 1,
+            sample_count: 1,
+            dimension: wgpu::TextureDimension::D2,
+            format: wgpu::TextureFormat::Rgba8Unorm,
+            usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
+            view_formats: &[],
+        });
+        render(&mut near, &out.create_view(&Default::default()), center, 11., 60.);
+        assert_eq!(near.project_points(&[north])[0][2], 0., "{name}: label hidden");
+    }
+    println!("PASS label line of sight: thin and near-summit ridges hide labels behind them");
 }
