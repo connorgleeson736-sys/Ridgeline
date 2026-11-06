@@ -223,3 +223,66 @@ dashes and are unchanged.
 
 Against the previous code the same checks fail: the label is not hidden and the
 dashes drift 3.15 px.
+
+## 0.1.15 fast coverage
+
+Follow-up for blank or slow-loading ground after fast movement. The causes,
+from the code:
+
+1. The drawable surface is built only from resident terrain, so arrived
+   imagery cannot be drawn where no terrain exists yet.
+2. A terrain tile at zoom *z* samples elevation at *z−1* with a half-pixel
+   border, needing up to four elevation tiles; the tile waits for the slowest.
+3. Each 50 ms replan cancels work that left the plan; at most two started jobs
+   were parked for 600 ms.
+4. After a long move there is often no coarser terrain resident for new ground.
+
+Capacitor/MapLibre draws a photo as soon as it arrives, on available or parent
+elevation, and keeps large fallback caches.
+
+**Coarse backdrop (`SourceDemand.backdrop`).** For terrain and imagery
+separately, the plan adds the ancestors of every planned tile at about four
+levels above the focus leaf, clamped to zoom 5–10. The level climbs until there
+are at most six tiles. They take rank 0, so they load first after a move.
+`finest_sources` already excludes ancestors from the drawing targets, so finer
+resident sources always win and stale fine tiles are not pulled in.
+
+**Imagery without waiting for fine terrain.** `render_sources` selects the
+nearest resident terrain ancestor, and `surface_cover` splits a coarse terrain
+region by finer photo regions. With the backdrop resident, arrived imagery is
+drawn on it immediately. No renderer change was needed beyond item 3.
+
+**Terrain from its own elevation (multi-tile measured interiors).** The
+renderer holds up to 16 disjoint interiors instead of one. Each keeps the
+existing rules:
+- the missing rim stays with a complete parent;
+- downward drops must fit within the skirt;
+- the parent must have drawn the whole patch in the last frame;
+- staging is refused while a complete descendant exists;
+- an interior is cleared when its parent changes.
+
+Overlapping stages are refused. On the Kotlin side, early elevation decoding and
+staging cover the four focus leaves plus the next twelve nearest
+(`ProgressiveTerrain.eligibleRank`). Interior uploads use the terrain admission
+rules, including the movement minimum. The setting is on by default as
+"Progressive terrain".
+
+The 5 November notes asked for phone seam checks before enabling it by default.
+Those still have not been possible here; the GPU check below is synthetic.
+
+**Parked work.** A started job that leaves the plan may now finish for 1.5 s
+(was 0.6 s). Up to the background transfer limit can be parked (was a fixed 2).
+The transport still refuses parking beyond its background cap, so parked
+transfers never take foreground slots.
+
+**Validation.** `renderer/examples/progressive_multi.rs` runs on Vulkan and GLES:
+- four concurrent quadrant interiors, each owning its measured centre;
+- each rim keeps the parent height;
+- an overlapping stage is refused;
+- 12 draw calls in total;
+- promotion is pixel-identical to complete-only rendering.
+
+It fails on the previous single-interior renderer. `BackdropTest` covers backdrop
+selection and eligibility ranks. The older `layer_smoke`/`gpu_smoke` examples fail
+at the same lines on untouched 0.1.12 with both lavapipe and SwiftShader, before
+reaching their progressive sections. They are stale and were not used as evidence.
