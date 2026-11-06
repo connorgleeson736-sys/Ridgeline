@@ -40,7 +40,7 @@ impl LabelGpu {
             source: wgpu::ShaderSource::Wgsl(include_str!("labels.wgsl").into()),
         });
         let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
-            label: Some("depth-tested map labels"),
+            label: Some("map labels over terrain"),
             layout: None,
             vertex: wgpu::VertexState {
                 module: &shader,
@@ -63,16 +63,16 @@ impl LabelGpu {
                 compilation_options: Default::default(),
             }),
             primitive: Default::default(),
+            // Like MapLibre symbols: screen-space text drawn whole on top of the
+            // terrain. Terrain occlusion is decided per label from its anchor's
+            // line of sight (cartography::project_points), never per pixel, so
+            // slopes nearer the camera no longer cut text into the mountain.
             depth_stencil: Some(wgpu::DepthStencilState {
                 format: wgpu::TextureFormat::Depth32Float,
                 depth_write_enabled: Some(false),
-                depth_compare: Some(wgpu::CompareFunction::LessEqual),
+                depth_compare: Some(wgpu::CompareFunction::Always),
                 stencil: Default::default(),
-                bias: wgpu::DepthBiasState {
-                    constant: -4,
-                    slope_scale: -1.,
-                    clamp: 0.,
-                },
+                bias: Default::default(),
             }),
             multisample: Default::default(),
             multiview_mask: None,
