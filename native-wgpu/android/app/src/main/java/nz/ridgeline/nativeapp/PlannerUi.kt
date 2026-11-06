@@ -29,6 +29,10 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
     private var profilePoints=emptyList<Coordinate>()
     private var profileDirty=false
     private var profileValues=emptyList<NativeGeo.ProfilePoint>()
+    /** Last requested profile: detail pass included, and its in-view focus. */
+    private var profileDetail=false
+    private var profileFocus=""
+    private val settle=Runnable{cameraSettled()}
     private var export:Pair<String,List<Coordinate>>?=null
     private var restoring=false
     private var restoreId:String?=null
@@ -122,16 +126,36 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
                 for(i in 1..3)stats[i].text=listOf("","Ascent","Descent","Highest")[i]+"\n—"
                 caption.text=if(state.points.size>=2)"Loading elevation profile…"else"Tap to add · tap a line to insert · drag a point to move it."
                 loader.cancelProfile()
-                if(state.points.size>=2)loader.profile(state.points){values->
-                    if(closed||profilePoints!=state.points)return@profile
-                    profileValues=values;chart.data(values);val totals=NativeGeo.totals(values.map{it.height})
-                    val measured=values.count{it.height!=null}>=2
-                    stats[1].text="Ascent\n"+if(measured)"${totals.ascent.roundToInt()} m"else"—";stats[2].text="Descent\n"+if(measured)"${totals.descent.roundToInt()} m"else"—";stats[3].text="Highest\n${totals.high?.roundToInt()?:"—"} m"
-                    caption.text=profileCaption();chart.refreshInspection()
-                }
+                if(state.points.size>=2)requestProfile(state.points,!state.drawing,true)
+            }else if(!state.drawing&&!profileDetail&&state.points.size>=2){
+                // Capacitor: drawing shows the quick preview; finishing refines it.
+                requestProfile(state.points,true,false)
             }
             if(drawer!=null)renderDrawer()
         }
+    }
+    private fun focusBounds()=RouteProfile.focusBounds(terrain.cameraPose,(terrain.width/terrain.pixelScale).roundToInt(),(terrain.height/terrain.pixelScale).roundToInt())
+    private fun requestProfile(points:List<Coordinate>,detail:Boolean,previewFirst:Boolean){
+        val focus=if(detail)focusBounds()else null
+        profileDetail=detail;profileFocus=focus?.stamp()?:"overview"
+        loader.profile(points,detail,focus,previewFirst){values,_->
+            if(closed||profilePoints!=points)return@profile
+            profileValues=values;chart.data(values);val totals=NativeGeo.totals(values.map{it.height})
+            val measured=values.count{it.height!=null}>=2
+            stats[1].text="Ascent\n"+if(measured&&totals.complete)"${totals.ascent.roundToInt()} m"else"—";stats[2].text="Descent\n"+if(measured&&totals.complete)"${totals.descent.roundToInt()} m"else"—";stats[3].text="Highest\n${totals.high?.roundToInt()?.let{"$it m"}?:"—"}"
+            caption.text=profileCaption();chart.refreshInspection()
+        }
+    }
+    /** Camera moved: once it settles, refine the in-view part of the route at
+     * 2 m spacing (Capacitor re-samples when its zoom-15+ view bounds change). */
+    fun cameraChanged(){main.removeCallbacks(settle);main.postDelayed(settle,400)}
+    private fun cameraSettled(){
+        if(closed)return
+        if(terrain.gestureInProgress){main.postDelayed(settle,400);return}
+        val state=controller.state
+        if(state.drawing||state.dragging||state.points.size<2||state.points!=profilePoints||!profileDetail)return
+        val stamp=focusBounds()?.stamp()?:"overview"
+        if(stamp!=profileFocus)requestProfile(state.points,true,false)
     }
     private fun profileCaption():String{val totals=NativeGeo.totals(profileValues.map{it.height});return if(profileValues.isEmpty())"Elevation unavailable"else"${profileValues.size} samples${if(totals.complete)""else" · incomplete coverage"} · Drag the chart for section statistics"}
     private fun routeMenu(){AlertDialog.Builder(activity).setItems(arrayOf("Fit route","New route","Close route","Share GPX")){_,index->when(index){0->terrain.focus(controller.state.points);1->controller.newRoute();2->controller.unload();3->shareGpx()}}.show()}
@@ -246,6 +270,6 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
     fun back():Boolean{if(dismissDrawer())return true;if(controller.state.drawing){controller.drawing(false);return true};if(controller.state.id!=null||controller.state.points.isNotEmpty()){controller.unload();return true};return false}
     fun pause(){controller.cancelDrag();controller.flush();loader.cancelProfile();profileDirty=true}
     fun resume(){if(profileDirty)controller.drawing(controller.state.drawing)}
-    override fun close(){closed=true;loader.cancelProfile();controller.close();files.shutdown()}
+    override fun close(){closed=true;main.removeCallbacks(settle);loader.cancelProfile();controller.close();files.shutdown()}
     private fun formatDistance(m:Double)=if(m>=1000)String.format(java.util.Locale.ROOT,"%.2f km",m/1000)else"${m.roundToInt()} m"
 }

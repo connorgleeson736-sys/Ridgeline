@@ -90,7 +90,7 @@ class MainActivity:Activity(){
         var coordinateTime=0L
         fun updateCoordinates(){val now=android.os.SystemClock.uptimeMillis();if(now-coordinateTime<200)return;coordinateTime=now;coordinates.text=String.format(java.util.Locale.ROOT,"Map centre · %.5f° S · %.5f° E",-terrain.latitude,terrain.longitude)}
         updateCoordinates()
-        terrain.onCamera={updateCoordinates();val label=if(loader.mapSettings.state.threeD)"2D"else"3D";if(dimension.text.toString()!=label)dimension.text=label;loader.cameraChanged();mapLayers.refresh()}
+        terrain.onCamera={updateCoordinates();val label=if(loader.mapSettings.state.threeD)"2D"else"3D";if(dimension.text.toString()!=label)dimension.text=label;loader.cameraChanged();mapLayers.refresh();planner.cameraChanged()}
         loader.mapSettings.onChange={before,after->if(before.threeD!=after.threeD)terrain.dimension(after.threeD);loader.changeMapStyle(before,after);mapLayers.refresh()}
         loader.externalDiagnostics={mapLayers.snapshot()}
         if(!loader.mapSettings.state.threeD)terrain.dimension(false)
