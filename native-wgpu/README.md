@@ -5,7 +5,12 @@
 the audited APK was 0.1.5. Main next candidates are raw local-I/O isolation,
 GPU upload acknowledgement, classified recovery and per-tile critical-path tracing.
 
-Latest APK: **[0.1.13 Full Audit Base](checkpoints/README.md)** — separate app
+Latest APK: **[0.1.14 Motion and Overlays Base](checkpoints/README.md)** — updates
+0.1.13 in place. Terrain and imagery keep sharpening during movement; labels are
+drawn whole over terrain with line-of-sight hiding; dashes stay fixed to the
+ground while zooming. [Details](research/FULL-AUDIT-2026-11-06.md#0114-movement-and-overlays).
+
+Previous APK: **[0.1.13 Full Audit Base](checkpoints/README.md)** — separate app
 `nz.ridgeline.nativeapp.fullaudit`, new signing key, installs alongside 0.1.12.
 Non-debuggable optimized build, still-camera refinement uploads, direct opaque
 imagery packing and WebP seam masks. Renderer libraries byte-identical to 0.1.12;

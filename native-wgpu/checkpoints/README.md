@@ -1,6 +1,30 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.13 Full Audit Base APK — 32.6 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Full-Audit-0.1.13-Base.apk)**.
+Latest: **[Download 0.1.14 Motion and Overlays Base APK — 32.6 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Motion-Overlays-0.1.14-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer as 0.1.13, version code 15:
+**updates 0.1.13 in place, keeping its data.**
+
+- **Terrain and imagery keep sharpening while moving.** Up to two terrain uploads
+  and one imagery upload per frame during gestures (bounded to 2 ms / 4 ms of
+  upload time, GPU backlog and byte limits kept). Previously non-urgent
+  refinement waited until the camera stopped. 120 Hz gesture replay: 0 → 240
+  uploads/s.
+- **Names no longer sit inside mountains.** Labels are drawn whole on top of
+  the terrain, as in the Capacitor app; a label is hidden when terrain blocks its
+  anchor, instead of being clipped by nearby slopes.
+- **Dotted lines no longer crawl while zooming.** Dash patterns are fixed to the
+  ground and crossfade between zoom levels, like MapLibre. Routes stay solid.
+
+GPU parity checks pass on Vulkan and GLES and fail against the previous code.
+All 623 original assets identical; signature, 16 KiB alignment and
+non-debuggable build verified. No phone measurement.
+[Audit and limits](../research/FULL-AUDIT-2026-11-06.md) ·
+[Exact release record](../validation/motion-overlays-2026-11-06/release.json) ·
+[SHA-256](Ridgeline-Native-Motion-Overlays-0.1.14-Base.apk.sha256).
+
+## Previous 0.1.13 full audit checkpoint
+
+**[Download 0.1.13 Full Audit Base APK — 32.6 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Full-Audit-0.1.13-Base.apk)**.
 **A separate app, "Ridgeline Native Full Audit"** (`nz.ridgeline.nativeapp.fullaudit`),
 signed with a new key because the earlier signing key is unavailable. It installs
 alongside 0.1.12 and does not touch its data. Version code 14.
