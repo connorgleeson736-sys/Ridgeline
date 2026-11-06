@@ -151,7 +151,7 @@ internal class NativeImagery(
                 if(entry.seams.isNotEmpty()&&SourceGeometry.relation(entry.seams,doubleArrayOf(px-2,py-2,px+size+2,py+size+2))!=-1){
                     val fine=m.optJSONArray("fineSources")
                     if(fine!=null)for(i in 0 until fine.length()){val row=fine.getJSONObject(i);val fz=minOf(z,row.optInt("maxZoom",19),19);val factor=1 shl(z-fz)
-                        urls+=linz(fz,x/factor,y/factor).replace("/aerial/","/${row.getString("name")}/").replace(".webp?",".png?")}
+                        urls+=SurveyMasks.url(linz(fz,x/factor,y/factor),row.getString("name"))}
                 }
             }
         }
@@ -208,8 +208,7 @@ internal class NativeImagery(
                 checkPreparation()
                 val row=fine.getJSONObject(i); val name=row.getString("name")
                 val fz=minOf(z,row.optInt("maxZoom",19),19); val f=1 shl(z-fz)
-                val url=linz(fz,x/f,y/f).replace("/aerial/","/$name/").replace(".webp?",".png?")
-                val bytes=fetch(url)
+                val bytes=SurveyMasks.fetch(linz(fz,x/f,y/f),name,fetch,checkPreparation)
                 bitmap(bytes).using { drawCrop(canvas,it,x,y,f) }
             }
             val valid=pixels(survey)
