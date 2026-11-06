@@ -17,11 +17,16 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
     /** Toggles. A tap outside closes the panel and still reaches what was tapped;
      * when that was the Layers button itself, it must not reopen the panel. */
     fun show(){if(overlay!=null){dismiss();return};if(android.os.SystemClock.uptimeMillis()-dismissedAt<400)return;render()}
+    private val bounds=android.graphics.Rect()
+    /** Called by the activity for every touch-down, before normal dispatch: a
+     * touch outside the panel closes it and still reaches what was touched
+     * (Capacitor's layers panel has no modal cover). */
+    fun touchDown(x:Float,y:Float){
+        val panel=(overlay as? FrameLayout)?.getChildAt(0)?:return
+        if(!panel.getGlobalVisibleRect(bounds)||!bounds.contains(x.toInt(),y.toInt()))dismiss()
+    }
     private fun render(){
         dismiss();val cover=FrameLayout(activity)
-        // Light dismiss that never swallows the tap: the touch continues to the
-        // control or map underneath (Capacitor's layers panel has no modal cover).
-        cover.addView(View(activity).apply{setOnTouchListener{_,event->if(event.actionMasked==android.view.MotionEvent.ACTION_DOWN)cover.post{if(overlay===cover)dismiss()};false}},FrameLayout.LayoutParams(-1,-1))
         val panel=NativeUi.column(activity).apply{setPadding(dp(16),dp(8),dp(16),dp(12));background=NativeUi.background(activity,NativeUi.paper,12,true);elevation=dp(10).toFloat();isClickable=true}
         val heading=LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL}
         heading.addView(NativeUi.text(activity,"Map layers",16f).apply{setTypeface(null,android.graphics.Typeface.BOLD)},LinearLayout.LayoutParams(0,-2,1f))
@@ -37,6 +42,7 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
         val content=NativeUi.column(activity);panel.addView(ScrollView(activity).apply{addView(content)},LinearLayout.LayoutParams(-1,0,1f))
         if(advanced)advanced(content)else basic(content)
         cover.addView(panel,FrameLayout.LayoutParams(minOf(dp(296),activity.resources.displayMetrics.widthPixels-dp(82)),-1,Gravity.TOP or Gravity.END).apply{topMargin=dp(52);bottomMargin=dp(16);marginEnd=dp(10)})
+        // The holder does not intercept touches; only the panel is clickable.
         root.addView(cover,FrameLayout.LayoutParams(-1,-1));overlay=cover
     }
     private fun closeButton(action:()->Unit)=TextView(activity).apply{text="✕";textSize=18f;gravity=Gravity.CENTER;setTextColor(NativeUi.ink);background=NativeUi.pressable(activity,null);isClickable=true;setOnClickListener{action()}}
@@ -138,6 +144,8 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
         slider(parent,"Automatic disk cache",1000,loader.automaticCacheMiB,{"$it MiB · applies after restart"}){loader.automaticCacheMiB(it)}
         check(parent,"Progressive terrain",settings.progressiveTerrain){loader.progressiveTerrain(it)}
         check(parent,"Prepare nearby terrain while idle",loader.prepareAhead){loader.prepareAhead(it)}
+        check(parent,"Preload coarser surrounding tiles",loader.parentPreload){loader.parentPreload(it)}
+        parent.addView(NativeUi.text(activity,"After the view loads, keeps lower-detail terrain and imagery for the surrounding area ready, so moving stays smooth while sharp tiles load.",12f).apply{setTextColor(NativeUi.muted)})
         check(parent,"Downloaded maps only",loader.offlineOnly){loader.offlineOnly(it)}
         parent.addView(NativeUi.button(activity,"Offline maps, imagery ZIPs & diagnostics"){dismiss();offline.show()})
         parent.addView(NativeUi.button(activity,"About & licences"){

@@ -181,13 +181,19 @@ pub fn resident_cover(available: &[TileId]) -> Vec<CoverRegion> {
 /// Ready ideal tiles win immediately. Missing ideals keep real loaded children
 /// and their nearest loaded ancestor until replacement is ready.
 pub fn demanded_sources(available: &[TileId], ideal: &[TileId]) -> Vec<TileId> {
-    source_owners(available, ideal, false)
+    source_owners(available, ideal, false, false)
 }
 /// Keep real cached ancestors behind detail until the next camera plan arrives.
 pub fn render_sources(available: &[TileId], ideal: &[TileId]) -> Vec<TileId> {
-    source_owners(available, ideal, true)
+    source_owners(available, ideal, true, false)
 }
-fn source_owners(available: &[TileId], ideal: &[TileId], backdrop: bool) -> Vec<TileId> {
+/// MapLibre raster semantics for maps whose content differs by zoom (NZ Topo:
+/// Topo250 when zoomed out, Topo50 closer): a loaded ideal tile is always drawn
+/// itself; finer or coarser tiles only stand in while it is missing.
+pub fn render_sources_ideal_first(available: &[TileId], ideal: &[TileId]) -> Vec<TileId> {
+    source_owners(available, ideal, true, true)
+}
+fn source_owners(available: &[TileId], ideal: &[TileId], backdrop: bool, ideal_first: bool) -> Vec<TileId> {
     if available.is_empty() || ideal.is_empty() {
         return Vec::new();
     }
@@ -220,6 +226,10 @@ fn source_owners(available: &[TileId], ideal: &[TileId], backdrop: bool) -> Vec<
     }
     let mut selected = HashSet::new();
     for &target in ideal {
+        if ideal_first && exact.contains(&target) {
+            selected.insert(target);
+            continue;
+        }
         let complete = full.contains(&target);
         if complete {
             sharper(target, &full, &mut selected);
@@ -410,5 +420,25 @@ mod fallback_backdrop_tests {
         assert!(full.iter().all(|r| r.source != p));
         // Zooming back out must not revive a lone stale fine child.
         assert_eq!(render_sources(&[p, c], &[p]), vec![p]);
+    }
+}
+
+#[cfg(test)]
+mod ideal_first_tests {
+    use super::*;
+    #[test]
+    fn loaded_ideal_tile_wins_over_finer_children_for_topo() {
+        let parent = TileId { z: 10, x: 4, y: 6 };
+        let children = parent.children();
+        let mut available = children.to_vec();
+        available.push(parent);
+        // Aerial imagery: complete finer children are sharper and win.
+        let sharp = render_sources(&available, &[parent]);
+        assert!(children.iter().all(|c| sharp.contains(c)) && !sharp.contains(&parent));
+        // NZ Topo: the ideal tile is drawn as soon as it is loaded.
+        assert_eq!(render_sources_ideal_first(&available, &[parent]), vec![parent]);
+        // Before it loads, the children stand in.
+        let waiting = render_sources_ideal_first(&children, &[parent]);
+        assert!(children.iter().all(|c| waiting.contains(c)));
     }
 }

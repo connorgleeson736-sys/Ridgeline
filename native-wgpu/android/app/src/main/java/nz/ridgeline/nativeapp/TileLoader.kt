@@ -153,6 +153,13 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     @Volatile private var warmWanted=emptySet<Source>()
     @Volatile var prepareAhead=preferences.getBoolean("prepareAhead",false);private set
     fun prepareAhead(value:Boolean){prepareAhead=value;preferences.edit().putBoolean("prepareAhead",value).apply();clearWarm();cameraChanged()}
+    /** After the view has loaded and the camera is still, keep coarser parent
+     * terrain and imagery (2 and 3 levels up, a few screens wide) resident, so
+     * panning lands on covered ground: frames stay in the camera-first path and
+     * sharp tiles refine in pauses, as after zooming out and back in. */
+    @Volatile var parentPreload=preferences.getBoolean("parentPreload",true);private set
+    fun parentPreload(value:Boolean){parentPreload=value;preferences.edit().putBoolean("parentPreload",value).apply();clearWarm();cameraChanged()}
+    private val idleWork get()=prepareAhead||parentPreload
     private var previousPose:CameraPose?=null
     private var previousFocus:SurfaceFocus?=null
     private var viewRevision=0L
@@ -229,7 +236,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             (pipelinePauseUntil==0L||System.nanoTime()-pipelinePauseUntil>=0)
         @Volatile var started=false;private set
         @Volatile private var parkedUntil=0L
-        fun eligible():Boolean{val state=mapSettings.state;return !dead&&active&&!finished.get()&&(!source.geometry||terrainMode.first==state.threeD&&terrainMode.second==state.needsElevation())&&(source in wanted||source in warmWanted&&prepareAhead||parkedUntil>System.currentTimeMillis())}
+        fun eligible():Boolean{val state=mapSettings.state;return !dead&&active&&!finished.get()&&(!source.geometry||terrainMode.first==state.threeD&&terrainMode.second==state.needsElevation())&&(source in wanted||source in warmWanted&&idleWork||parkedUntil>System.currentTimeMillis())}
         override fun compareTo(other:Task)=compareValuesBy(this,other,{it.priority+(if(it.speculative||it.parkedUntil!=0L)10000 else 0)},{it.order})
         fun enqueue(){if(!finished.get()&&!dead&&queued.compareAndSet(false,true))try{workers(source).execute(this)}catch(_:RejectedExecutionException){queued.set(false);cancel()}}
         fun promote(rank:Int){if(priority==rank&&!speculative&&parkedUntil==0L)return;priority=rank;speculative=false;parkedUntil=0;consumer.promote(rank);local.promote(rank);if(!pipelineEligible())inputs.clear();if(workers(source).remove(this)){queued.set(false);enqueue()}}
@@ -359,11 +366,13 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             lastGesture=view.gestureInProgress
             transport.movement(view.gestureInProgress)
             val returning=jobs.values.filter{it.source !in wanted&&!it.speculative&&it.started}.sortedBy{it.priority}.take(downloadLimits.background.coerceAtLeast(2)).toSet()
-            for(task in jobs.values){if(task.source in wanted)task.promote(ranked[task.source]?:0)else if(task.source in warmWanted&&prepareAhead&&!view.gestureInProgress){}else if(task !in returning)task.cancel()else task.park()}
+            for(task in jobs.values){if(task.source in wanted)task.promote(ranked[task.source]?:0)else if(task.source in warmWanted&&idleWork&&!view.gestureInProgress){}else if(task !in returning)task.cancel()else task.park()}
             for((source,priority)in ranked.entries.sortedBy{it.value}){
                 if(resident(source))continue
                 val fallback=source in fallbackSources
-                if(view.hasResidentCoverage(source.id.gpu(),source.geometry,!fallback))continue
+                // NZ Topo prints different maps per zoom (Topo250 out, Topo50 in):
+                // finer resident tiles never stand in for a wanted coarser one.
+                if(if(!source.geometry&&mapSettings.state.base==MapSettings.Base.TOPO)view.hasResidentTile(source.id.gpu(),false)else view.hasResidentCoverage(source.id.gpu(),source.geometry,!fallback))continue
                 val old=synchronized(ready){ready[source]};if(old!=null){upload(source,old);continue}
                 if(source.geometry&&!mapSettings.state.needsElevation()){
                     val data=cartographicPlane
@@ -415,7 +424,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         }
     }
     private fun scheduleIdle(key:DemandPlanKey,revision:Long){
-        if(!prepareAhead||offlineOnly||preparedRevision==revision||idleWake!=null||view.gestureInProgress||jobs.values.any{!it.speculative}||wanted.any{!resident(it)&&!view.hasResidentCoverage(it.id.gpu(),it.geometry)})return
+        if(!idleWork||offlineOnly||preparedRevision==revision||idleWake!=null||view.gestureInProgress||jobs.values.any{!it.speculative}||wanted.any{!resident(it)&&!view.hasResidentCoverage(it.id.gpu(),it.geometry)})return
         idleWake=scheduler.schedule({
             idleWake=null
             // Poll completion on the GPU owner without drawing an otherwise idle frame.
@@ -423,10 +432,11 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         },650,TimeUnit.MILLISECONDS)
     }
     private fun prepareIdle(key:DemandPlanKey,revision:Long){
-            if(!prepareAhead||revision!=viewRevision||preparedRevision==revision||dead||!active||!view.canPrepareAhead||jobs.values.any{!it.speculative}||wanted.any{!resident(it)&&!view.hasResidentCoverage(it.id.gpu(),it.geometry)})return
+            if(!idleWork||revision!=viewRevision||preparedRevision==revision||dead||!active||!view.canPrepareAhead||jobs.values.any{!it.speculative}||wanted.any{!resident(it)&&!view.hasResidentCoverage(it.id.gpu(),it.geometry)})return
             preparedRevision=revision
             val extras=LinkedHashSet<Source>()
-            for(geometry in listOf(true,false)){
+            if(parentPreload)extras.addAll(ParentPreload.plan(wanted.map{ParentPreload.Tile(it.id.z,it.id.x,it.id.y,it.geometry)},key.pose).map{Source(Id(it.z,it.x,it.y),it.geometry)}.filter{it !in wanted&&!resident(it)})
+            if(prepareAhead)for(geometry in listOf(true,false)){
                 planBuffer.rewind();val pose=key.pose
                 val count=NativeBridge.plan(key.width,key.height,pose.longitude,pose.latitude,pose.zoom,pose.bearing,pose.pitch,pose.elevation,
                     if(geometry)geometryLimit else imageLimit,DetailPolicy.target(geometry,if(geometry)key.terrainDetail else key.imageryDetail),if(geometry)22 else 19,1.3,planBuffer)

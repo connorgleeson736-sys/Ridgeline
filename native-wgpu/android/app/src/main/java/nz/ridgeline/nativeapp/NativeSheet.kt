@@ -23,8 +23,8 @@ internal class NativeSheet(private val root:FrameLayout,private val map:FrameLay
     private fun dp(v:Int)=NativeUi.dp(context,v)
     init{
         grip.addView(View(context).apply{background=NativeUi.background(context,0xff8a9691.toInt(),3)},FrameLayout.LayoutParams(dp(32),dp(4),Gravity.CENTER))
-        grip.addView(NativeUi.button(context,"×"){onClose()}.apply{contentDescription="Close route";background=null},FrameLayout.LayoutParams(dp(44),dp(30),Gravity.END))
-        panel.addView(grip,LinearLayout.LayoutParams(-1,dp(30)))
+        grip.addView(NativeUi.button(context,"×"){onClose()}.apply{contentDescription="Close route";background=null;textSize=19f;setPadding(0,0,0,0)},FrameLayout.LayoutParams(dp(46),dp(32),Gravity.END))
+        panel.addView(grip,LinearLayout.LayoutParams(-1,dp(32)))
         panel.addView(ScrollView(context).apply{isFillViewport=true;addView(content)},LinearLayout.LayoutParams(-1,0,1f))
         root.addView(panel,FrameLayout.LayoutParams(-1,dp(136),Gravity.BOTTOM))
         root.addOnLayoutChangeListener{_,_,_,_,_,_,_,_,_->if(visible&&!dragging)settle(index)}

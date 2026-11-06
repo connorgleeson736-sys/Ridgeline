@@ -1,6 +1,29 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.19 Terrain Drape Base APK — 32.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Terrain-Drape-0.1.19-Base.apk)**.
+Latest: **[Download 0.1.20 Parent Preload Base APK — 32.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Parent-Preload-0.1.20-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 21:
+**updates 0.1.13–0.1.19 in place, keeping its data.**
+
+- **Preload coarser surrounding tiles** (Layers → Advanced, on by default).
+  Once the view has loaded and you stop, lower-detail terrain and imagery for
+  the surrounding area (2 and 3 levels coarser) load at idle priority, so
+  moving stays smooth the way it does after zooming out and back in.
+- **NZ Topo switches maps when zooming out.** A loaded tile at the right zoom
+  is now drawn even when finer tiles are cached, as MapLibre does in
+  Capacitor, so Topo250 replaces shrunken Topo50. Zoom is limited to 16 on
+  NZ Topo, as in Capacitor.
+- **Map layers closes on any tap outside it**, and the tap still works.
+- Saved route cards like Capacitor's; smaller route stats and buttons; slightly
+  larger close X.
+
+173 JVM tests, Rust tests (incl. a new NZ Topo source test) and GPU checks
+pass; lint 0 errors; 623 original assets identical. Not run on a phone.
+[Exact release record](../validation/parent-preload-2026-11-06/release.json) ·
+[SHA-256](Ridgeline-Native-Parent-Preload-0.1.20-Base.apk.sha256).
+
+## Previous 0.1.19 terrain drape checkpoint
+
+**[Download 0.1.19 Terrain Drape Base APK — 32.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Terrain-Drape-0.1.19-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 20:
 **updates 0.1.13–0.1.18 in place, keeping its data.**
 

@@ -1091,7 +1091,13 @@ impl Renderer {
             self.images.keys().copied().collect()
         };
         if let Some((g, i)) = &self.ideal_demand {
-            let sources = ridgeline_core::render_sources(&available, if geometry { g } else { i });
+            // NZ Topo shows different printed maps per zoom, so a loaded ideal
+            // tile wins over resident finer tiles (as MapLibre draws rasters).
+            let sources = if !geometry && self.map_style.basemap == 2 {
+                ridgeline_core::render_sources_ideal_first(&available, i)
+            } else {
+                ridgeline_core::render_sources(&available, if geometry { g } else { i })
+            };
             if geometry {
                 self.physical_sources(sources)
             } else {
