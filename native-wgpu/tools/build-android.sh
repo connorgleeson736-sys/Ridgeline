@@ -12,15 +12,16 @@ RIDGELINE_LLVM="$RIDGELINE_NDK/toolchains/llvm/prebuilt/linux-x86_64/bin"
 RIDGELINE_CARGO="${RIDGELINE_CARGO:-cargo}"
 RIDGELINE_ABIS="${RIDGELINE_ABIS:-arm64-v8a,armeabi-v7a}"
 RIDGELINE_PROFILE="${RIDGELINE_PROFILE:-release}"
+read -ra RIDGELINE_GRADLE_ARGS <<< "${RIDGELINE_GRADLE_PROPERTIES:-}"
 case "$RIDGELINE_PROFILE" in release) RIDGELINE_RELEASE_FLAG=(--release);; debug) RIDGELINE_RELEASE_FLAG=();; *) exit 2;; esac
 node "$RIDGELINE_NATIVE_ROOT/tools/package-assets.mjs"
 "$RIDGELINE_CARGO" test --locked --manifest-path "$RIDGELINE_NATIVE_ROOT/Cargo.toml" --workspace
 IFS=',' read -ra RIDGELINE_ABI_LIST <<< "$RIDGELINE_ABIS"
 for RIDGELINE_ABI in "${RIDGELINE_ABI_LIST[@]}"; do
  case "$RIDGELINE_ABI" in
-  arm64-v8a) RIDGELINE_TARGET=aarch64-linux-android; export CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER="$RIDGELINE_LLVM/aarch64-linux-android26-clang";;
-  armeabi-v7a) RIDGELINE_TARGET=armv7-linux-androideabi; export CARGO_TARGET_ARMV7_LINUX_ANDROIDEABI_LINKER="$RIDGELINE_LLVM/armv7a-linux-androideabi26-clang";;
-  x86_64) RIDGELINE_TARGET=x86_64-linux-android; export CARGO_TARGET_X86_64_LINUX_ANDROID_LINKER="$RIDGELINE_LLVM/x86_64-linux-android26-clang";;
+  arm64-v8a) RIDGELINE_TARGET=aarch64-linux-android; export CARGO_TARGET_AARCH64_LINUX_ANDROID_RUSTFLAGS="-C link-arg=-Wl,-z,max-page-size=16384";export CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER="$RIDGELINE_LLVM/aarch64-linux-android26-clang";;
+  armeabi-v7a) RIDGELINE_TARGET=armv7-linux-androideabi; export CARGO_TARGET_ARMV7_LINUX_ANDROIDEABI_RUSTFLAGS="-C link-arg=-Wl,-z,max-page-size=16384";export CARGO_TARGET_ARMV7_LINUX_ANDROIDEABI_LINKER="$RIDGELINE_LLVM/armv7a-linux-androideabi26-clang";;
+  x86_64) RIDGELINE_TARGET=x86_64-linux-android; export CARGO_TARGET_X86_64_LINUX_ANDROID_RUSTFLAGS="-C link-arg=-Wl,-z,max-page-size=16384";export CARGO_TARGET_X86_64_LINUX_ANDROID_LINKER="$RIDGELINE_LLVM/x86_64-linux-android26-clang";;
   *) echo 'Only tested ABI toolchains are supported: arm64-v8a, armeabi-v7a, x86_64' >&2; exit 2;;
  esac
  "$RIDGELINE_CARGO" build --locked --manifest-path "$RIDGELINE_NATIVE_ROOT/Cargo.toml" -p ridgeline-renderer --target "$RIDGELINE_TARGET" "${RIDGELINE_RELEASE_FLAG[@]}"
@@ -31,9 +32,14 @@ for RIDGELINE_ABI in "${RIDGELINE_ABI_LIST[@]}"; do
 done
 # Incremental APK ZIPs can retain deleted Full-pack bodies as unused bytes.
 # Recreate packaging only; compilation and dependency caches remain reusable.
-rm -rf -- "$RIDGELINE_NATIVE_ROOT/android/app/build/intermediates/incremental/packageDebug" "$RIDGELINE_NATIVE_ROOT/android/app/build/outputs/apk/debug"
-"${RIDGELINE_GRADLE:-$RIDGELINE_NATIVE_ROOT/android/gradlew}" --max-workers="${RIDGELINE_GRADLE_WORKERS:-2}" -p "$RIDGELINE_NATIVE_ROOT/android" -PridgelineAbis="$RIDGELINE_ABIS" :app:testDebugUnitTest :app:assembleDebug :app:lintDebug
+# Device checkpoints use the non-debuggable "performance" build type: ART fully
+# optimizes app code and CheckJNI is off. RIDGELINE_BUILD_TYPE=debug keeps the
+# debuggable build for instrumentation/debugging. Tests and lint run on debug.
+RIDGELINE_BUILD_TYPE="${RIDGELINE_BUILD_TYPE:-performance}"
+case "$RIDGELINE_BUILD_TYPE" in performance) RIDGELINE_VARIANT=Performance;; debug) RIDGELINE_VARIANT=Debug;; *) exit 2;; esac
+rm -rf -- "$RIDGELINE_NATIVE_ROOT/android/app/build/intermediates/incremental/package$RIDGELINE_VARIANT" "$RIDGELINE_NATIVE_ROOT/android/app/build/outputs/apk/$RIDGELINE_BUILD_TYPE"
+"${RIDGELINE_GRADLE:-$RIDGELINE_NATIVE_ROOT/android/gradlew}" --max-workers="${RIDGELINE_GRADLE_WORKERS:-2}" -p "$RIDGELINE_NATIVE_ROOT/android" -PridgelineAbis="$RIDGELINE_ABIS" "${RIDGELINE_GRADLE_ARGS[@]}" :app:testDebugUnitTest :app:lintDebug ":app:assemble$RIDGELINE_VARIANT"
 # Freeze a reviewable artifact; never rebuild a file while it is being installed.
 mkdir -p "$RIDGELINE_NATIVE_ROOT/artifacts"
-cp "$RIDGELINE_NATIVE_ROOT/android/app/build/outputs/apk/debug/app-debug.apk" "$RIDGELINE_NATIVE_ROOT/artifacts/Ridgeline-Native-Prototype-Debug.apk"
-sha256sum "$RIDGELINE_NATIVE_ROOT/artifacts/Ridgeline-Native-Prototype-Debug.apk"
+cp "$RIDGELINE_NATIVE_ROOT/android/app/build/outputs/apk/$RIDGELINE_BUILD_TYPE/app-$RIDGELINE_BUILD_TYPE.apk" "$RIDGELINE_NATIVE_ROOT/artifacts/Ridgeline-Native-$RIDGELINE_VARIANT.apk"
+sha256sum "$RIDGELINE_NATIVE_ROOT/artifacts/Ridgeline-Native-$RIDGELINE_VARIANT.apk"

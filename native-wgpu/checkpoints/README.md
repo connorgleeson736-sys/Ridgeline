@@ -1,6 +1,29 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.12 Additional Latency Audit Base APK — 33.2 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-Additional-Audit-0.1.12-Base.apk)**.
+Latest: **[Download 0.1.13 Full Audit Base APK — 32.6 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Full-Audit-0.1.13-Base.apk)**.
+**A separate app, "Ridgeline Native Full Audit"** (`nz.ridgeline.nativeapp.fullaudit`),
+signed with a new key because the earlier signing key is unavailable. It installs
+alongside 0.1.12 and does not touch its data. Version code 14.
+
+- **Not debuggable.** Every earlier native checkpoint was a debuggable build (ART
+  debuggable mode + CheckJNI); every Capacitor APK it was compared with was not.
+- **Still-camera refinement no longer waits on frame slack.** At 120 Hz/heavy
+  frames the old rule could fall to ~4 tile uploads/s; replay now 240/s.
+- **Opaque imagery is copied directly** into the upload buffer (no 256 KiB int
+  array or per-pixel Kotlin loop); same bytes.
+- **Survey seam masks download as WebP** (alpha identical on 1,064 live tiles,
+  all 46 surveys; 89% fewer bytes) with PNG fallback.
+
+Renderer libraries are byte-identical to 0.1.12 (reproduced with Rust 1.99.1);
+all 623 original assets identical; 16 KiB alignment and signature verified.
+No phone measurement; no speedup is claimed as measured.
+[Audit and limits](../research/FULL-AUDIT-2026-11-06.md) ·
+[Exact release record](../validation/full-audit-2026-11-06/release.json) ·
+[SHA-256](Ridgeline-Native-Full-Audit-0.1.13-Base.apk.sha256).
+
+## Previous 0.1.12 additional latency audit checkpoint
+
+**[Download 0.1.12 Additional Latency Audit Base APK — 33.2 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/native-renderer-performance/native-wgpu/checkpoints/Ridgeline-Native-Additional-Audit-0.1.12-Base.apk)**.
 Source `6052065`, version code13. Same Native Performance package and signer;
 updates recent Native Performance builds in place, preserving app data.
 

@@ -5,7 +5,13 @@
 the audited APK was 0.1.5. Main next candidates are raw local-I/O isolation,
 GPU upload acknowledgement, classified recovery and per-tile critical-path tracing.
 
-Latest APK: **[0.1.12 Additional Latency Audit Base](checkpoints/README.md)**,
+Latest APK: **[0.1.13 Full Audit Base](checkpoints/README.md)** — separate app
+`nz.ridgeline.nativeapp.fullaudit`, new signing key, installs alongside 0.1.12.
+Non-debuggable optimized build, still-camera refinement uploads, direct opaque
+imagery packing and WebP seam masks. Renderer libraries byte-identical to 0.1.12;
+no phone measurement. [Audit and limits](research/FULL-AUDIT-2026-11-06.md).
+
+Previous APK: **[0.1.12 Additional Latency Audit Base](checkpoints/README.md)**,
 source `6052065`, version code13; same Native Performance package/signing identity.
 Late camera latching, completion-driven draping, coherent incremental GPU overlays,
 active-refresh budgets and immediate first-qualified adaptive terrain. Capacitor
