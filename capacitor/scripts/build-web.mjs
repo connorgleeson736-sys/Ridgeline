@@ -26,9 +26,14 @@ const {default:vm}=await import('node:vm');const holder={};vm.runInNewContext(aw
 const south=holder.RidgeSouthOverviews,ranges=new Map();
 for(const [coord,variants] of Object.entries(overview.tiles)){
  const converted={};for(const [mode,r] of Object.entries(variants)){const url=`https://localhost/_ridge/overviews/${r.file}/${r.offset}/${r.bytes}`;converted[mode]={url,range:r};ranges.set(url,[r.file,r.offset,r.bytes]);}
- south.tiles[coord]=converted;
+ // Identical natural/raw variants (5,233 of 5,255) use the single-row form the
+ // reader already accepts for both grades, halving the catalogue.
+ const rows=Object.values(converted);
+ south.tiles[coord]=rows.length&&rows.every(row=>row.url===rows[0].url)?rows[0]:converted;
 }
-await writeFile(path.join(out,'south-overviews.js'),`(function(r){r.RidgeSouthOverviews=${JSON.stringify(south)};})(globalThis);\n`);
+// A JSON string literal parses several times faster than an equivalent object
+// literal, and this catalogue is parsed on the main thread at the first South Island tile.
+await writeFile(path.join(out,'south-overviews.js'),`(function(r){r.RidgeSouthOverviews=JSON.parse(${JSON.stringify(JSON.stringify(south))});})(globalThis);\n`);
 const bundled=process.env.RIDGELINE_BUNDLE_OVERVIEWS!=='0';
 if(bundled){
  const data=process.env.RIDGELINE_OVERVIEW_DATA||path.join(base,'overview-data');await mkdir(path.join(out,'overview-packs'),{recursive:true});
@@ -145,6 +150,9 @@ const nativeBootstrap=document.createElement('script');nativeBootstrap.textConte
 const renderDefaults=document.createElement('script');renderDefaults.textContent='try{('+resetWebsiteRenderPreferences.toString()+')(localStorage);}catch{}';document.head.prepend(renderDefaults);
 const $=id=>{const el=document.getElementById(id);if(!el)throw Error('Missing website control '+id);return el;};
 document.querySelector('meta[name=viewport]').setAttribute('content','width=device-width,initial-scale=1,viewport-fit=cover');
+// Every provider read goes through https://localhost/_ridge/ and native OkHttp,
+// which warms its own pooled connections. WebView sockets to the providers are never used.
+for(const link of document.querySelectorAll('link[rel=preconnect]'))link.remove();
 const panel=$('layers-panel'),heading=panel.firstElementChild,advanced=document.createElement('section'),basic=document.createElement('section');
 advanced.id='layers-advanced';advanced.hidden=true;advanced.setAttribute('role','tabpanel');advanced.setAttribute('aria-labelledby','advanced-tab');
 basic.id='layers-basic';basic.setAttribute('role','tabpanel');basic.setAttribute('aria-labelledby','basic-tab');
