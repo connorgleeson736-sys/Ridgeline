@@ -109,6 +109,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     fun inspect(point:Coordinate?){if(inspection.second==point)return;inspection=inspection.first+1 to point;requestFrame()}
     /** Elevation-chart section ends (A, B), projected each frame like labels. */
     @Volatile private var rangeMarkers:List<Coordinate> = emptyList()
+    private val markerInput=ByteBuffer.allocateDirect(32).order(ByteOrder.LITTLE_ENDIAN);private val markerOutput=ByteBuffer.allocateDirect(24).order(ByteOrder.LITTLE_ENDIAN)
     private var appliedMarkers:List<Coordinate>?=null;private var markerPose:CameraPose?=null;private var markerSize=0L
     internal var onRangeMarkers:(List<Coordinate>,FloatArray)->Unit={_,_->}
     fun rangeMarkers(points:List<Coordinate>){if(points==rangeMarkers)return;rangeMarkers=points;requestFrame()}
@@ -394,9 +395,10 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             val markers=rangeMarkers
             if(markers!==appliedMarkers||markers.isNotEmpty()&&(markerPose!=pose||markerSize!=size||geometryChanged)){
                 val positions=if(markers.isEmpty())FloatArray(0)else{
-                    val input=ByteBuffer.allocateDirect(markers.size*16).order(ByteOrder.LITTLE_ENDIAN)
+                    // Reused buffers (A and B only): no native allocation per frame.
+                    val input=if(markers.size==2)markerInput.also{it.clear()}else ByteBuffer.allocateDirect(markers.size*16).order(ByteOrder.LITTLE_ENDIAN)
                     for(m in markers)input.putDouble((m.longitude+180)/360).putDouble(CameraMath.mercatorY(m.latitude))
-                    input.rewind();val output=ByteBuffer.allocateDirect(markers.size*12).order(ByteOrder.LITTLE_ENDIAN)
+                    input.rewind();val output=if(markers.size==2)markerOutput.also{it.clear()}else ByteBuffer.allocateDirect(markers.size*12).order(ByteOrder.LITTLE_ENDIAN)
                     val n=NativeBridge.project(handle,input,output);output.rewind();FloatArray(n*3){output.float}
                 }
                 appliedMarkers=markers;markerPose=pose;markerSize=size
@@ -444,9 +446,15 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             registerFrameWake()
             uploads.wakeRetries()
             val am=context.getSystemService(android.app.ActivityManager::class.java)
-            NativeBridge.tileBudget(handle,if(am.isLowRamDevice)32 else(am.memoryClass/2).coerceIn(64,128))
+            NativeBridge.tileBudget(handle,if(am.isLowRamDevice)32 else(am.memoryClass/2).coerceIn(64,128));NativeBridge.overlayBudget(handle,overlayLayers(am))
             presentationFailures=0;post{onStatus("");onData()};requestFrame()
         }else{post{onStatus("GPU recovering…")};requestFrame(250)}
+    }
+    /** Overlay textures (1 MiB each) by device RAM: phones with 3-4 GB were
+     * under memory pressure with the fixed 49 (trace: kswapd, direct reclaim). */
+    private fun overlayLayers(am:android.app.ActivityManager):Int{
+        val info=android.app.ActivityManager.MemoryInfo();am.getMemoryInfo(info);val gb=info.totalMem/(1L shl 30).toDouble()
+        return when{am.isLowRamDevice||gb<=3.2->16;gb<=4.2->24;gb<=6.2->40;else->48}
     }
     private fun requestFrame(delay:Long=0) {
         if(delay>0){if(live&&active)gpu.post{gpu.removeCallbacks(retryWake);gpu.postDelayed(retryWake,delay)};return}
@@ -466,7 +474,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             val created=NativeBridge.create(surface,width,height)
             if(!live||generation.get()!=token){if(created!=0L)NativeBridge.destroy(created);return@post}
             handle=created;safetyPose=null;safetyValid=false;appliedRoutes=null;appliedDemand=null;appliedLayers=null;appliedPlacement=null;appliedStyle=null;appliedInspection=null;appliedGps=null;labelPose=null;presentationFailures=0
-            if(handle!=0L){registerFrameWake();val am=context.getSystemService(android.app.ActivityManager::class.java);NativeBridge.tileBudget(handle,if(am.isLowRamDevice)32 else (am.memoryClass/2).coerceIn(64,128))}
+            if(handle!=0L){registerFrameWake();val am=context.getSystemService(android.app.ActivityManager::class.java);NativeBridge.tileBudget(handle,if(am.isLowRamDevice)32 else (am.memoryClass/2).coerceIn(64,128));NativeBridge.overlayBudget(handle,overlayLayers(am))}
             post{onStatus(if(created==0L)"Native GPU initialization failed"else "Loading terrain and imagery…")};requestFrame()
         }
         changed()

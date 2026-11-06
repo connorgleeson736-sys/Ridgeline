@@ -118,6 +118,10 @@ pub struct Renderer {
     residency_byte_budget: Option<u64>,
     pending_frames: std::sync::Arc<std::sync::atomic::AtomicU32>,
     depth: wgpu::Texture,
+    /// The previous frame's depth (labels read it inside the main pass).
+    depth_previous: wgpu::Texture,
+    depth_previous_stored: bool,
+    depth_slot: usize,
     width: u32,
     height: u32,
     route_gpu: routes::RouteGpu,
@@ -500,6 +504,7 @@ impl Renderer {
             mapped_at_creation: false,
         });
         let depth = Self::depth(&device, width, height);
+        let depth_previous = Self::depth(&device, width, height);
         let route_gpu = routes::RouteGpu::new(&device, format);
         let inspection_gpu = route_gpu.fork(&device);
         let labels_gpu = labels::LabelGpu::new(&device, &queue, format);
@@ -541,6 +546,9 @@ impl Renderer {
             draws: Vec::new(),
             index_atlas,
             geometry_budget: 48,
+            depth_previous,
+            depth_previous_stored: false,
+            depth_slot: 0,
             depth,
             width,
             height,
@@ -595,7 +603,7 @@ impl Renderer {
             center: [0.5, 0.5],
             last_view: None,
         };
-        renderer.labels_gpu.set_depth(&renderer.device, &renderer.depth);
+        renderer.labels_gpu.set_depths(&renderer.device, &[renderer.depth.clone(), renderer.depth_previous.clone()]);
         if adapter.get_info().backend == wgpu::Backend::Gl && mipmap_mode == MipmapMode::Auto {
             let gpu = renderer.mipmap_diagnostics()?;
             if gpu.iter().any(|v| v[1] != 0 || v[2] != 255) {
@@ -669,7 +677,10 @@ impl Renderer {
         self.width = w.max(1);
         self.height = h.max(1);
         self.depth = Self::depth(&self.device, self.width, self.height);
-        self.labels_gpu.set_depth(&self.device, &self.depth);
+        self.depth_previous = Self::depth(&self.device, self.width, self.height);
+        self.depth_previous_stored = false;
+        self.depth_slot = 0;
+        self.labels_gpu.set_depths(&self.device, &[self.depth.clone(), self.depth_previous.clone()]);
     }
     pub fn touch_geometry(&mut self, id: TileId) -> bool {
         if let Some(tile) = self.tiles.get_mut(&id) {
@@ -1829,6 +1840,10 @@ impl Renderer {
         self.last_frame_draw_calls = 0;
         self.last_frame_texture_binds = 0;
         let mut encoder = self.device.create_command_encoder(&Default::default());
+        // Alternate depth textures: this frame writes one, labels read the other
+        // (stored by the previous frame), so labels stay in the main pass.
+        let labels_visible = self.labels_gpu.visible();
+        self.labels_gpu.begin_frame(1 - self.depth_slot, self.depth_previous_stored);
         let depth = self.depth.create_view(&Default::default());
         {
             let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
@@ -1852,7 +1867,7 @@ impl Renderer {
                     depth_ops: Some(wgpu::Operations {
                         load: wgpu::LoadOp::Clear(1.),
                         // Kept only when labels read it; otherwise never written out.
-                        store: if self.labels_gpu.visible() { wgpu::StoreOp::Store } else { wgpu::StoreOp::Discard },
+                        store: if labels_visible { wgpu::StoreOp::Store } else { wgpu::StoreOp::Discard },
                     }),
                     stencil_ops: None,
                 }),
@@ -1928,25 +1943,12 @@ impl Renderer {
                 i = end_instance;
             }
             self.route_gpu.draw(&mut pass);
+            self.labels_gpu.draw(&mut pass);
             self.inspection_gpu.draw(&mut pass);
         }
-        if self.labels_gpu.visible() {
-            // Labels after terrain, reading its depth at each anchor.
-            let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-                label: Some("labels"),
-                color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-                    view: target,
-                    depth_slice: None,
-                    resolve_target: None,
-                    ops: wgpu::Operations { load: wgpu::LoadOp::Load, store: wgpu::StoreOp::Store },
-                })],
-                depth_stencil_attachment: None,
-                timestamp_writes: None,
-                occlusion_query_set: None,
-                multiview_mask: None,
-            });
-            self.labels_gpu.draw(&mut pass);
-        }
+        std::mem::swap(&mut self.depth, &mut self.depth_previous);
+        self.depth_slot = 1 - self.depth_slot;
+        self.depth_previous_stored = labels_visible;
         self.pending_frames
             .fetch_add(1, std::sync::atomic::Ordering::Release);
         self.queue.submit(

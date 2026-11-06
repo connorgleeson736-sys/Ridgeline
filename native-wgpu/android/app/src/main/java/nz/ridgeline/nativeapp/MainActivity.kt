@@ -84,7 +84,18 @@ class MainActivity:Activity(){
         planner.onMapCover={cover->
             for((view,margin) in listOf(scale to 14,info to 6,attribution to 8)){val lp=view.layoutParams as FrameLayout.LayoutParams;if(lp.bottomMargin!=dp(margin)+cover){lp.bottomMargin=dp(margin)+cover;view.layoutParams=lp}}
         }
-        fun updateChrome(){compass.bearing=terrain.bearing;scale.update(terrain.cameraPose)}
+        // Android redraws (and recomposites) the controls layer whenever a view
+        // changes. While moving, the scale bar updates at most 4 times a second,
+        // plus once when the camera settles; the compass only when the bearing changes.
+        var scaleAt=0L
+        val settleScale=Runnable{scaleAt=android.os.SystemClock.uptimeMillis();scale.update(terrain.cameraPose)}
+        fun updateChrome(){
+            compass.bearing=terrain.bearing
+            val now=android.os.SystemClock.uptimeMillis()
+            scale.removeCallbacks(settleScale)
+            if(!terrain.gestureInProgress||now-scaleAt>=250){scaleAt=now;scale.update(terrain.cameraPose)}
+            scale.postDelayed(settleScale,300)
+        }
         updateChrome()
         terrain.onCamera={updateChrome();loader.cameraChanged();mapLayers.refresh();planner.cameraChanged()}
         loader.mapSettings.onChange={before,after->perspective.set(after.threeD);terrain.maxZoom=if(after.base==MapSettings.Base.TOPO)16.0 else 19.0;if(before.threeD!=after.threeD)terrain.dimension(after.threeD);loader.changeMapStyle(before,after);mapLayers.refresh()}

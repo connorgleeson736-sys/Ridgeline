@@ -43,6 +43,7 @@ object NativeBridge {
  @JvmStatic external fun gpuBacklog(handle:Long):Int
  @JvmStatic external fun textureBackend(mode:Int)
  @JvmStatic external fun tileBudget(handle:Long,tiles:Int)
+ @JvmStatic external fun overlayBudget(handle:Long,layers:Int)
  @JvmStatic external fun destroy(handle:Long)
  @JvmStatic external fun render(handle:Long,width:Int,height:Int,longitude:Double,latitude:Double,zoom:Double,logicalZoom:Double,bearing:Float,pitch:Float,elevation:Float,cameraRevision:Long,cameraInputNanos:Long,cameraLatchNanos:Long):Int
  @JvmStatic external fun upload(handle:Long,z:Int,x:Int,y:Int,heights:ByteBuffer,rgba:ByteBuffer):Boolean

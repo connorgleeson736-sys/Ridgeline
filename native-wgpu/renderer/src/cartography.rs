@@ -38,6 +38,9 @@ impl Renderer {
         };
         self.set_overlay_groups(groups);
     }
+    pub fn set_overlay_layers(&mut self, layers: usize) {
+        self.overlay.set_layers(layers);
+    }
     pub fn set_overlay_groups(&mut self, groups: Vec<crate::overlay::Group>) {
         self.overlay.set_groups(groups);
         self.overlay.pending = !self.overlay.is_empty();
