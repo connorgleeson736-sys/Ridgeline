@@ -34,7 +34,7 @@ android {
  androidResources {noCompress += listOf("bin","zip")}
 }
 kotlin {compilerOptions {jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)}}
-dependencies { testImplementation("junit:junit:4.13.2"); testImplementation("org.json:json:20250517"); implementation("com.squareup.okhttp3:okhttp:5.3.2") }
+dependencies { testImplementation("junit:junit:4.13.2"); testImplementation("org.json:json:20250517"); testImplementation("com.squareup.okhttp3:mockwebserver3:5.3.2"); implementation("com.squareup.okhttp3:okhttp:5.3.2") }
 
 // Optional managed-environment trust for local debug tests only. No CA is
 // committed, and normal builds retain system trust without a session anchor.
