@@ -167,3 +167,59 @@ Photos and elevation are unchanged. Five JVM tests cover these rules.
 
 No physical device or emulator run was possible, so no frame-rate or loading-time
 claim is made.
+
+## 0.1.14 movement and overlays
+
+Follow-up checkpoint, same day, `Ridgeline-Native-Motion-Overlays-0.1.14-Base.apk`.
+
+### Refinement during movement
+
+While moving, a non-urgent tile was blocked twice: by camera-first deferral
+(repeating 64 ms windows during a gesture) and by a spare-time allowance that is
+usually zero on 90/120 Hz displays. Sharper terrain and imagery therefore
+appeared only after the camera stopped.
+
+`UploadAdmission.movementMinimum` now admits a bounded minimum while moving:
+- up to two terrain-only uploads per frame within 2 ms of measured upload time;
+- one imagery upload per frame within 4 ms;
+- where a single imagery upload is known to cost more than 4 ms, one every 100 ms.
+
+GPU backlog (fewer than 2 outstanding submissions), 4 uploads and 650 KiB per
+frame still apply. Urgent missing coverage and stationary behaviour are unchanged.
+
+In a 120 Hz gesture replay (7 ms render, 0.4 ms terrain, 1.5 ms imagery uploads),
+the previous rule admitted no non-urgent upload; the new rule completes 240 per
+second, one terrain plus one imagery upload per frame. Up to about 6 ms of uploads
+can now land in a movement frame; this trades some frame time for visible
+detail during gestures and has not been measured on a phone.
+
+### Labels inside mountains
+
+Labels were screen-facing quads that took their anchor's depth and were
+depth-tested per pixel, so slopes closer to the camera cut into the text.
+MapLibre (the Capacitor app) instead decides per symbol whether terrain hides
+its anchor and draws visible symbols whole.
+
+The label pipeline now draws over terrain (`CompareFunction::Always`).
+`project_points` marches the straight line from the eye to each anchor over
+resident terrain, with 48 samples, a 2 m tolerance, and the last 2% beside the
+anchor ignored. Occluded labels are dropped by the existing placement step.
+`terrain_height_near` checks the previous sample's cover row first, so a march
+costs about one bounds test per sample.
+
+### Crawling dotted lines
+
+Dash cycles were fixed in screen pixels, while the position along the line was a
+ground distance multiplied by `512·2^zoom`. Every dash boundary therefore slid
+along the line as the zoom changed. The pattern is now fixed to the ground at
+whole logical zoom levels, scales with the map between them, and crossfades to
+the next level, which is MapLibre's line-dasharray behaviour. Routes have no
+dashes and are unchanged.
+
+`renderer/examples/overlay_parity.rs`, on actual Vulkan and GLES execution:
+- a label behind a 3,000 m ridge is hidden while one in front stays visible;
+- a 0.02 zoom step moves dash transitions near the screen centre by at most
+  0.20 px.
+
+Against the previous code the same checks fail: the label is not hidden and the
+dashes drift 3.15 px.

@@ -434,6 +434,33 @@ impl Renderer {
         self.cartographic_vertices = 0;
     }
     /// Projection only, no GPU readback or per-label raycast. Text quads use terrain depth.
+    /// True when resident terrain rises above the straight eye→anchor ray.
+    /// The final 2% next to the anchor is ignored so a label is never hidden by
+    /// the surface it stands on; 2 m of tolerance absorbs sampling differences.
+    fn line_of_sight_blocked(
+        &self,
+        eye: [f64; 3],
+        anchor: [f64; 3],
+        center: [f64; 2],
+        world: f64,
+        local_z: &impl Fn(f64) -> f64,
+    ) -> bool {
+        const SAMPLES: usize = 48;
+        let tolerance = local_z(2.) - local_z(0.);
+        let mut hint = 0;
+        (1..SAMPLES).any(|i| {
+            let t = i as f64 / SAMPLES as f64 * 0.98;
+            let x = eye[0] + (anchor[0] - eye[0]) * t;
+            let y = eye[1] + (anchor[1] - eye[1]) * t;
+            let z = eye[2] + (anchor[2] - eye[2]) * t;
+            let point = [center[0] + x / world, center[1] - y / world];
+            if !(0. ..=1.).contains(&point[0]) || !(0. ..=1.).contains(&point[1]) {
+                return false;
+            }
+            self.terrain_height_near(point, &mut hint)
+                .is_some_and(|h| local_z(h) > z + tolerance)
+        })
+    }
     pub fn project_points(&self, points: &[[f64; 2]]) -> Vec<[f32; 3]> {
         let Some(view) = self.last_view else {
             return vec![[0.; 3]; points.len()];
@@ -448,22 +475,40 @@ impl Renderer {
             view.elevation,
         );
         let world = 512. * 2f64.powf(view.zoom);
+        let scale = self.map_style.height_scale() as f64;
+        let local_z = |h: f64| (h * scale + 1. - view.elevation as f64) * ppm as f64;
+        // Eye in the same local frame as camera_matrix (look-at point at origin).
+        let (b, t) = (
+            (view.bearing as f64).to_radians(),
+            (view.pitch as f64).to_radians(),
+        );
+        let distance = view.height as f64 * 1.5;
+        let eye = [
+            -b.sin() * t.sin() * distance,
+            -b.cos() * t.sin() * distance,
+            t.cos() * distance,
+        ];
         points
             .iter()
             .map(|p| {
                 let Some(height) = self.terrain_height(*p) else {
                     return [0.; 3];
                 };
-                let c = m * glam::Vec4::new(
-                    ((p[0] - view.center[0]) * world) as f32,
-                    ((view.center[1] - p[1]) * world) as f32,
-                    ((height * self.map_style.height_scale() as f64 + 1. - view.elevation as f64)
-                        * ppm as f64) as f32,
-                    1.,
-                );
+                let anchor = [
+                    (p[0] - view.center[0]) * world,
+                    (view.center[1] - p[1]) * world,
+                    local_z(height),
+                ];
+                let c = m * glam::Vec4::new(anchor[0] as f32, anchor[1] as f32, anchor[2] as f32, 1.);
                 if c.w <= 0. || c.z < 0. || c.z > c.w {
                     return [0.; 3];
                 };
+                // MapLibre hides a whole symbol when terrain blocks its anchor,
+                // rather than clipping the text per pixel. March the line of
+                // sight from the eye to the anchor over resident terrain.
+                if self.map_style.three_d && self.line_of_sight_blocked(eye, anchor, view.center, world, &local_z) {
+                    return [0.; 3];
+                }
                 [
                     (c.x / c.w + 1.) * 0.5 * view.width as f32,
                     (1. - c.y / c.w) * 0.5 * view.height as f32,

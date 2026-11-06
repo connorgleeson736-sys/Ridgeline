@@ -857,6 +857,34 @@ impl crate::Renderer {
         }
         None
     }
+    /// [terrain_height] for spatially coherent samples (a line of sight): the
+    /// cover row that answered the previous sample is checked first, so a
+    /// march costs about one bounds test per sample instead of a full scan.
+    /// Rows are otherwise visited in the same order as terrain_height.
+    pub(crate) fn terrain_height_near(&self, point: [f64; 2], hint: &mut usize) -> Option<f64> {
+        let sample = |index: usize| -> Option<f64> {
+            let row = self.cover.get(index)?;
+            let clip = row.region.bounds();
+            if point[0] < clip[0] || point[0] > clip[2] || point[1] < clip[1] || point[1] > clip[3] {
+                return None;
+            }
+            let b = row.source.bounds();
+            let size = b[2] - b[0];
+            self.tiles[&row.source]
+                .field
+                .sample((point[0] - b[0]) / size, (point[1] - b[1]) / size)
+        };
+        if let Some(h) = sample(*hint) {
+            return Some(h);
+        }
+        for index in 0..self.cover.len() {
+            if index != *hint && let Some(h) = sample(index) {
+                *hint = index;
+                return Some(h);
+            }
+        }
+        None
+    }
     pub(crate) fn rebuild_routes(&mut self) {
         self.route_upload = None;
         self.route_gpu.cancel_staging();

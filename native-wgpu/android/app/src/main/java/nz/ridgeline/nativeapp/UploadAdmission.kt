@@ -16,5 +16,22 @@ internal class UploadAdmission {
         backlog<2&&count<4&&bytes+nextBytes<=650*1024&&(count==0&&(urgent||starvedIdle)||allowance>0&&elapsed+costs[kind.ordinal]<=allowance)
     fun uploaded(kind:GpuUploadQueue.Kind,nanos:Long){costs[kind.ordinal]=costs[kind.ordinal]*.5+nanos.coerceAtLeast(1)*.5}
     fun rendered(nanos:Long){renderCost=renderCost*.8+nanos.coerceAtLeast(1)*.2}
+    private var lastMovingImage=Long.MIN_VALUE/2
+    /** Minimum refinement while the camera moves or a gesture is active. Spare
+     * frame time is often zero on 90/120 Hz displays, and camera-first deferral
+     * repeats throughout a gesture, so refinement otherwise waited until the
+     * camera stopped. Bounded so movement frames stay smooth:
+     *  - terrain-only uploads (66 KiB height grids): up to 2 per frame within
+     *    2 ms of measured upload time this frame;
+     *  - imagery: one per frame within 4 ms; where a single upload is known to
+     *    cost more, at most one every 100 ms.
+     * GPU backlog, the 4-upload and 650 KiB per-frame limits always apply. */
+    fun movementMinimum(kind:GpuUploadQueue.Kind,elapsed:Long,count:Int,bytes:Int,nextBytes:Int,backlog:Int,geometryThisFrame:Int,imagesThisFrame:Int,now:Long):Boolean{
+        if(backlog>=2||count>=4||bytes+nextBytes>650*1024)return false
+        val cost=costs[kind.ordinal]
+        return if(kind==GpuUploadQueue.Kind.GEOMETRY)geometryThisFrame<2&&elapsed+cost<=2_000_000
+        else imagesThisFrame==0&&(elapsed+cost<=4_000_000||now-lastMovingImage>=100_000_000L)
+    }
+    fun movementUploaded(kind:GpuUploadQueue.Kind,now:Long){if(kind!=GpuUploadQueue.Kind.GEOMETRY)lastMovingImage=now}
     companion object{const val IDLE_ALLOWANCE=4_000_000L}
 }
