@@ -1,0 +1,29 @@
+{
+  "artifact": "Ridgeline-Native-Steady-Lines-0.1.23-Base.apk",
+  "bytes": 32808879,
+  "sha256": "aabb81db7660ee8c459b842dd25f29f7837218e02ddd99682e2d65db5506e75f",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.23-steady-lines",
+  "versionCode": 24,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.22 Full Audit (same package and signer)",
+  "changes": [
+    "route line segments depth-tested from ends raised 10 m + 3 px of ground (distance-scaled)",
+    "two-tier overlay pool: half the MiB as 512 px, half as 256 px textures; finest tiles get 512 px; missing tiles painted before stale ones"
+  ],
+  "tests": {
+    "kotlinJvm": "174 tests, 0 failures",
+    "rust": "cargo test --workspace: all pass",
+    "gpu": "overlay_pool (new; Vulkan and GLES), waypoint_occlusion with route-line checks (Vulkan and GLES), overlay_drape (Vulkan and GLES), label_occlusion, overlay_parity, route_smoke, progressive_multi pass"
+  },
+  "lintErrors": 0,
+  "originalAssetsIdentical": 623,
+  "jniExportsPerAbi": 44,
+  "loadAlignment": "0x4000",
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

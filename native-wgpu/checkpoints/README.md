@@ -1,6 +1,29 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.22 Lighter Frames Base APK — 32.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Lighter-Frames-0.1.22-Base.apk)**.
+Latest: **[Download 0.1.23 Steady Lines Base APK — 32.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Steady-Lines-0.1.23-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 24:
+**updates 0.1.13–0.1.22 in place, keeping its data.**
+
+- **Route lines no longer flicker in and out.** The terrain you see is
+  simplified with distance and could sit above the route line, hiding pieces
+  that changed as you moved. Route lines are now depth-tested from slightly
+  above the ground (10 m plus 3 px, scaled with distance), like the waypoint
+  dots; a ridge in front still hides them.
+- **Tracks and roads stay on every tile.** Overlay textures now come in two
+  sizes: sharp 512 px for the nearest tiles and 256 px (four per MB) for the
+  rest. A 3 GB phone covers 40 tiles from 16 MB instead of 16, so tiles no
+  longer lose their lines when many are visible. Missing tiles are painted
+  before stale ones.
+
+174 JVM tests, Rust tests and GPU checks pass, including a new overlay pool
+test and route-line checks on Vulkan and GLES; lint 0 errors; 623 original
+assets identical. Not run on a phone.
+[Exact release record](../validation/steady-lines-2026-11-07/release.json) ·
+[SHA-256](Ridgeline-Native-Steady-Lines-0.1.23-Base.apk.sha256).
+
+## Previous 0.1.22 lighter frames checkpoint
+
+**[Download 0.1.22 Lighter Frames Base APK — 32.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Lighter-Frames-0.1.22-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 23:
 **updates 0.1.13–0.1.21 in place, keeping its data.**
 
