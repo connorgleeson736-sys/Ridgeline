@@ -53,6 +53,10 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         if(live&&active&&handle!=0L&&!gestureActive&&presentationFailures==0){lastBacklog=NativeBridge.gpuBacklog(handle);callback(canPrepareAhead)}else callback(false)
     }}
     fun updateWarmDemand(geometry:Set<GpuUploadQueue.Id>,images:Set<GpuUploadQueue.Id>){uploads.updateWarm(geometry,images)}
+    /** Camera zoom limit: 19, or 16 on NZ Topo (as Capacitor sets for its topo map). */
+    var maxZoom=19.0
+        set(value){field=value;if(cameraPose.zoom>value){cameraPose=cameraPose.copy(zoom=value);changed()}}
+    fun hasResidentTile(id:GpuUploadQueue.Id,geometry:Boolean)=id in(if(geometry)residency.geometryIds else residency.imageIds)
     fun hasResidentCoverage(id:GpuUploadQueue.Id,geometry:Boolean,sharp:Boolean=false):Boolean {
         val current=residency
         return (if(geometry)current.geometryCoverage else current.imageCoverage).complete(id,!sharp)
@@ -143,9 +147,9 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         val span=max((maxLon-minLon)/360,(asinh(tan(Math.toRadians(maxLat)))-asinh(tan(Math.toRadians(minLat))))/(2*PI))
         val size=min(width/pixelScale,height/pixelScale)*.65
         val z=if(span>0)ln(size/(512*span))/ln(2.0) else 15.0
-        cameraPose=cameraPose.copy(longitude=(minLon+maxLon)/2,latitude=CameraMath.latitude((CameraMath.mercatorY(minLat)+CameraMath.mercatorY(maxLat))*.5),zoom=z.coerceIn(4.0,maximumZoom.coerceIn(4.0,19.0)),pitch=min(pitch,45f));changed()
+        cameraPose=cameraPose.copy(longitude=(minLon+maxLon)/2,latitude=CameraMath.latitude((CameraMath.mercatorY(minLat)+CameraMath.mercatorY(maxLat))*.5),zoom=z.coerceIn(4.0,maximumZoom.coerceIn(4.0,maxZoom)),pitch=min(pitch,45f));changed()
     }
-    fun goTo(point:Coordinate,minimumZoom:Double=4.0){cameraPose=cameraPose.copy(longitude=point.longitude,latitude=point.latitude,zoom=max(zoom,minimumZoom).coerceIn(4.0,19.0));changed()}
+    fun goTo(point:Coordinate,minimumZoom:Double=4.0){cameraPose=cameraPose.copy(longitude=point.longitude,latitude=point.latitude,zoom=max(zoom,minimumZoom).coerceIn(4.0,maxZoom));changed()}
     var onCamera:()->Unit={}
     var onData:()->Unit={}
     internal var onInvalidUpload:(GpuUploadQueue.Tile)->Unit={}
@@ -521,7 +525,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     // Used by controlled fixtures and explicit initialization, never terrain-follow.
     fun centerHeight(value:Float){if(value.isFinite()&&!gestureActive){cameraPose=cameraPose.copy(elevation=value);groundedPose=cameraPose;changed()}}
     fun zoomBy(delta:Double){
-        if(delta.isFinite())easeControls((zoom+delta).coerceIn(4.0,19.0),bearing,width*.5,height*.5)
+        if(delta.isFinite())easeControls((zoom+delta).coerceIn(4.0,maxZoom),bearing,width*.5,height*.5)
     }
     fun dimension(threeD:Boolean){cameraPose=cameraPose.copy(pitch=if(threeD)58f else 0f,elevation=if(threeD)cameraPose.elevation else 0f);surfaceFocus.clear();changed()}
     fun toggleDimension(){dimension(pitch<=1f)}
@@ -562,7 +566,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             interpolator=if(inertia)android.view.animation.PathInterpolator(0f,0f,.3f,1f)else android.view.animation.PathInterpolator(.25f,.1f,.25f,1f)
             addUpdateListener{val t=(it.animatedValue as Float).toDouble()
                 touchX=x+coast.x*pixelScale*t;touchY=y+coast.y*pixelScale*t
-                touchZoom=(z+coast.zoom*t).coerceIn(4.0,19.0);touchBearing=b+(coast.bearing*t).toFloat();touchPitch=(p+(coast.pitch*t).toFloat()).coerceIn(0f,85f)
+                touchZoom=(z+coast.zoom*t).coerceIn(4.0,maxZoom);touchBearing=b+(coast.bearing*t).toFloat();touchPitch=(p+(coast.pitch*t).toFloat()).coerceIn(0f,85f)
                 applyGesture()
             }
             addListener(object:android.animation.AnimatorListenerAdapter(){override fun onAnimationEnd(animation:android.animation.Animator){motionAnimation=null;programmaticEase=false;endGesture()}})
@@ -637,7 +641,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         override fun onDown(e:MotionEvent)=true
         override fun onSingleTapUp(e:MotionEvent):Boolean {if(routeEditing)onMapTap?.invoke(e.x.toDouble(),e.y.toDouble(),nearestWaypoint(e.x.toDouble(),e.y.toDouble()));return true}
         override fun onSingleTapConfirmed(e:MotionEvent):Boolean {if(!routeEditing)onMapTap?.invoke(e.x.toDouble(),e.y.toDouble(),nearestWaypoint(e.x.toDouble(),e.y.toDouble()));return true}
-        override fun onDoubleTap(e:MotionEvent):Boolean{if(!routeEditing)easeControls((zoom+1).coerceIn(4.0,19.0),bearing,e.x.toDouble(),e.y.toDouble());return true}
+        override fun onDoubleTap(e:MotionEvent):Boolean{if(!routeEditing)easeControls((zoom+1).coerceIn(4.0,maxZoom),bearing,e.x.toDouble(),e.y.toDouble());return true}
         override fun onDoubleTapEvent(e:MotionEvent):Boolean {if(routeEditing&&e.actionMasked==MotionEvent.ACTION_UP)onMapTap?.invoke(e.x.toDouble(),e.y.toDouble(),nearestWaypoint(e.x.toDouble(),e.y.toDouble()));return true}
         override fun onScroll(a:MotionEvent?,b:MotionEvent,dx:Float,dy:Float):Boolean {
             if(b.pointerCount==1&&!multiTouch){multiRelease=null;touchX=b.x.toDouble();touchY=b.y.toDouble();applyGesture();recordMotion(b.eventTime)}
@@ -684,7 +688,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
                     gestureAnchor=CameraMath.Anchor((longitude+180)/360,CameraMath.mercatorY(latitude),centerElevation.toDouble())
                     recordMotion(event.eventTime)
                 }
-                touchZoom=(touchZoom+delta.zoom).coerceIn(4.0,19.0)
+                touchZoom=(touchZoom+delta.zoom).coerceIn(4.0,maxZoom)
                 touchBearing+=delta.bearing.toFloat();touchPitch=(touchPitch+delta.pitch.toFloat()).coerceIn(0f,85f)
                 if(!delta.tilting){touchX=f.first;touchY=f.second}
                 applyGesture();recordMotion(event.eventTime)

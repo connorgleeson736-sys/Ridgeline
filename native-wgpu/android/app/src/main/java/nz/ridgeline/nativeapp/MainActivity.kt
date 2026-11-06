@@ -87,11 +87,16 @@ class MainActivity:Activity(){
         fun updateChrome(){compass.bearing=terrain.bearing;scale.update(terrain.cameraPose)}
         updateChrome()
         terrain.onCamera={updateChrome();loader.cameraChanged();mapLayers.refresh();planner.cameraChanged()}
-        loader.mapSettings.onChange={before,after->perspective.set(after.threeD);if(before.threeD!=after.threeD)terrain.dimension(after.threeD);loader.changeMapStyle(before,after);mapLayers.refresh()}
+        loader.mapSettings.onChange={before,after->perspective.set(after.threeD);terrain.maxZoom=if(after.base==MapSettings.Base.TOPO)16.0 else 19.0;if(before.threeD!=after.threeD)terrain.dimension(after.threeD);loader.changeMapStyle(before,after);mapLayers.refresh()}
         loader.externalDiagnostics={mapLayers.snapshot()}
         if(!loader.mapSettings.state.threeD)terrain.dimension(false)
+        if(loader.mapSettings.state.base==MapSettings.Base.TOPO)terrain.maxZoom=16.0
         terrain.configure(loader.mapSettings.state)
         if(android.os.Build.VERSION.SDK_INT>=33)onBackInvokedDispatcher.registerOnBackInvokedCallback(android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT){if(!layersUi.dismiss()&&!planner.back())finish()}
+    }
+    override fun dispatchTouchEvent(event:android.view.MotionEvent):Boolean{
+        if(event.actionMasked==android.view.MotionEvent.ACTION_DOWN&&::layersUi.isInitialized)layersUi.touchDown(event.rawX,event.rawY)
+        return super.dispatchTouchEvent(event)
     }
     override fun onResume(){super.onResume();if(::terrain.isInitialized)terrain.setActive(true);if(::loader.isInitialized)loader.setActive(true);if(::mapLayers.isInitialized)mapLayers.setActive(true);if(::planner.isInitialized)planner.resume()}
     @Deprecated("Legacy Android back dispatch")
