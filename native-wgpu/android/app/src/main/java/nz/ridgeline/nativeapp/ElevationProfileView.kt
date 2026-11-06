@@ -79,7 +79,7 @@ class ElevationProfileView(context:Context):View(context){
     fun data(value:List<NativeGeo.ProfilePoint>){
         val sameGeometry=samples.size==value.size&&samples.indices.all{samples[it].point==value[it].point&&samples[it].distance==value[it].distance}
         val distance=cursor?.distance;samples=value;index=ProfileIndex(value);measured=value.count{it.height!=null}>=2
-        if(sameGeometry){cursor=distance?.let{NativeGeo.profileAt(value,it)};section=range?.let{index.section(it.first,it.second)}}
+        if(sameGeometry){cursor=distance?.let{NativeGeo.profileAt(value,it)};section=range?.let{directed(it.first,it.second)}}
         else{cursor=null;range=null;start=null;section=null}
         dirty=true;invalidate()
     }
@@ -169,7 +169,10 @@ class ElevationProfileView(context:Context):View(context){
     }
     private fun distance(m:Double)=if(m>=1000)String.format(java.util.Locale.ROOT,"%.2f km",m/1000)else"${m.roundToInt()} m"
     private fun inspect(d:Double){cursor=NativeGeo.profileAt(samples,d);cursor?.let{onInspect(it,false)};invalidate()}
-    private fun select(from:Double,to:Double){range=from to to;section=index.section(from,to);cursor=NativeGeo.profileAt(samples,to);onRange(section);invalidate()}
+    /** Section from A to B in drag order: dragging backwards travels the route in
+     * reverse, so its ascent and descent swap. */
+    private fun directed(from:Double,to:Double)=index.section(from,to)?.let{if(to<from)it.copy(ascent=it.descent,descent=it.ascent)else it}
+    private fun select(from:Double,to:Double){range=from to to;section=directed(from,to);cursor=NativeGeo.profileAt(samples,to);onRange(section);invalidate()}
     override fun onTouchEvent(e:MotionEvent):Boolean{
         if(samples.size<2||width==0||!measured)return false
         val d=((e.x-left)/(right-left)).coerceIn(0f,1f)*samples.last().distance

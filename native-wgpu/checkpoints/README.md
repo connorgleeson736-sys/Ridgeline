@@ -1,6 +1,32 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.18 Smooth Overlays Base APK — 32.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Smooth-Overlays-0.1.18-Base.apk)**.
+Latest: **[Download 0.1.19 Terrain Drape Base APK — 32.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Terrain-Drape-0.1.19-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 20:
+**updates 0.1.13–0.1.18 in place, keeping its data.**
+
+- **Overlays drawn the way the Capacitor app draws them.** Tracks, roads,
+  contours and imagery borders are painted on the GPU into a texture for each
+  visible image tile and laid over the photo, as MapLibre's terrain
+  render-to-texture does. They sit exactly on the terrain, hide behind ridges,
+  and are never rebuilt by moving the camera or by terrain loading; only tiles
+  whose lines change are repainted. The CPU line draping is gone.
+- **No overlay work while overlays are off** (no texture, no selection, no
+  repainting).
+- Smaller Map layers panel; tapping elsewhere closes it. Compact Saved routes
+  card that closes when you open a route. Route sheet rounded on top only. The
+  scale bar and "i" button sit above the sheet. Dragging the elevation chart
+  backwards swaps ascent and descent.
+- The scale bar no longer re-lays-out the screen on every camera change.
+
+171 JVM tests, Rust tests and GPU checks pass, including a new overlay drape
+test on Vulkan and GLES; lint 0 errors; 623 original assets identical. Not run
+on a phone; UI not seen on a device.
+[Exact release record](../validation/terrain-drape-2026-11-06/release.json) ·
+[SHA-256](Ridgeline-Native-Terrain-Drape-0.1.19-Base.apk.sha256).
+
+## Previous 0.1.18 smooth overlays checkpoint
+
+**[Download 0.1.18 Smooth Overlays Base APK — 32.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Smooth-Overlays-0.1.18-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 19:
 **updates 0.1.13–0.1.17 in place, keeping its data.**
 

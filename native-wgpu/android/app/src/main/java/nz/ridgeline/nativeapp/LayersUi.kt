@@ -12,8 +12,11 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
     private val settings get()=loader.mapSettings
     private var overlay:View?=null;private var advanced=false
     private fun dp(v:Int)=NativeUi.dp(activity,v)
-    fun dismiss():Boolean{val view=overlay?:return false;root.removeView(view);overlay=null;return true}
-    fun show(){if(overlay!=null){dismiss();return};render()}
+    private var dismissedAt=0L
+    fun dismiss():Boolean{val view=overlay?:return false;root.removeView(view);overlay=null;dismissedAt=android.os.SystemClock.uptimeMillis();return true}
+    /** Toggles. A tap outside closes the panel and still reaches what was tapped;
+     * when that was the Layers button itself, it must not reopen the panel. */
+    fun show(){if(overlay!=null){dismiss();return};if(android.os.SystemClock.uptimeMillis()-dismissedAt<400)return;render()}
     private fun render(){
         dismiss();val cover=FrameLayout(activity)
         // Light dismiss that never swallows the tap: the touch continues to the
@@ -21,19 +24,19 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
         cover.addView(View(activity).apply{setOnTouchListener{_,event->if(event.actionMasked==android.view.MotionEvent.ACTION_DOWN)cover.post{if(overlay===cover)dismiss()};false}},FrameLayout.LayoutParams(-1,-1))
         val panel=NativeUi.column(activity).apply{setPadding(dp(16),dp(8),dp(16),dp(12));background=NativeUi.background(activity,NativeUi.paper,12,true);elevation=dp(10).toFloat();isClickable=true}
         val heading=LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL}
-        heading.addView(NativeUi.text(activity,"Map layers",17f).apply{setTypeface(null,android.graphics.Typeface.BOLD)},LinearLayout.LayoutParams(0,-2,1f))
+        heading.addView(NativeUi.text(activity,"Map layers",16f).apply{setTypeface(null,android.graphics.Typeface.BOLD)},LinearLayout.LayoutParams(0,-2,1f))
         heading.addView(closeButton{dismiss()}.apply{contentDescription="Close layers"},LinearLayout.LayoutParams(dp(44),dp(44)));panel.addView(heading)
         val tabs=LinearLayout(activity)
         for((label,flag)in listOf("Layers" to false,"Advanced" to true))tabs.addView(TextView(activity).apply{
-            text=label;textSize=15f;gravity=Gravity.CENTER;isClickable=true;isFocusable=true;isSelected=advanced==flag
+            text=label;textSize=14f;gravity=Gravity.CENTER;isClickable=true;isFocusable=true;isSelected=advanced==flag
             setTextColor(if(advanced==flag)Color.WHITE else NativeUi.ink)
             background=if(advanced==flag)android.graphics.drawable.GradientDrawable().apply{setColor(NativeUi.ink);val r=dp(8).toFloat();cornerRadii=floatArrayOf(r,r,r,r,0f,0f,0f,0f)}else NativeUi.pressable(activity,null)
             setOnClickListener{if(advanced!=flag){advanced=flag;render()}}
-        },LinearLayout.LayoutParams(0,dp(40),1f))
+        },LinearLayout.LayoutParams(0,dp(36),1f))
         panel.addView(tabs);panel.addView(View(activity).apply{setBackgroundColor(NativeUi.line)},LinearLayout.LayoutParams(-1,dp(1)))
         val content=NativeUi.column(activity);panel.addView(ScrollView(activity).apply{addView(content)},LinearLayout.LayoutParams(-1,0,1f))
         if(advanced)advanced(content)else basic(content)
-        cover.addView(panel,FrameLayout.LayoutParams(minOf(dp(340),activity.resources.displayMetrics.widthPixels-dp(82)),-1,Gravity.TOP or Gravity.END).apply{topMargin=dp(52);bottomMargin=dp(16);marginEnd=dp(10)})
+        cover.addView(panel,FrameLayout.LayoutParams(minOf(dp(296),activity.resources.displayMetrics.widthPixels-dp(82)),-1,Gravity.TOP or Gravity.END).apply{topMargin=dp(52);bottomMargin=dp(16);marginEnd=dp(10)})
         root.addView(cover,FrameLayout.LayoutParams(-1,-1));overlay=cover
     }
     private fun closeButton(action:()->Unit)=TextView(activity).apply{text="✕";textSize=18f;gravity=Gravity.CENTER;setTextColor(NativeUi.ink);background=NativeUi.pressable(activity,null);isClickable=true;setOnClickListener{action()}}
@@ -46,14 +49,14 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
     /** Capacitor ".setting" row: label on the left, checkbox on the right. */
     private fun check(parent:LinearLayout,label:String,value:Boolean,key:android.graphics.drawable.Drawable?=null,change:(Boolean)->Unit){
         val box=CheckBox(activity).apply{isChecked=value;buttonTintList=android.content.res.ColorStateList.valueOf(NativeUi.ink);contentDescription=label;setOnCheckedChangeListener{_,checked->change(checked)}}
-        val row=LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL;minimumHeight=dp(46);isClickable=true;background=NativeUi.pressable(activity,null);setOnClickListener{box.toggle()}}
+        val row=LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL;minimumHeight=dp(42);isClickable=true;background=NativeUi.pressable(activity,null);setOnClickListener{box.toggle()}}
         if(key!=null)row.addView(ImageView(activity).apply{setImageDrawable(key)},LinearLayout.LayoutParams(dp(22),dp(14)).apply{marginEnd=dp(6)})
-        row.addView(NativeUi.text(activity,label,15f),LinearLayout.LayoutParams(0,-2,1f));row.addView(box)
+        row.addView(NativeUi.text(activity,label,14f),LinearLayout.LayoutParams(0,-2,1f));row.addView(box)
         parent.addView(row)
     }
     private fun slider(parent:LinearLayout,label:String,max:Int,value:Int,format:(Int)->String={it.toString()},change:(Int)->Unit){
         val row=LinearLayout(activity).apply{setPadding(0,dp(10),0,0)};val shown=NativeUi.text(activity,format(value),14f)
-        row.addView(NativeUi.text(activity,label,15f),LinearLayout.LayoutParams(0,-2,1f));row.addView(shown);parent.addView(row)
+        row.addView(NativeUi.text(activity,label,14f),LinearLayout.LayoutParams(0,-2,1f));row.addView(shown);parent.addView(row)
         parent.addView(SeekBar(activity).apply{this.max=max;progress=value;contentDescription=label
             progressTintList=android.content.res.ColorStateList.valueOf(NativeUi.ink);thumbTintList=progressTintList
             setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener{override fun onProgressChanged(bar:SeekBar?,v:Int,user:Boolean){shown.text=format(v);if(user)change(v)};override fun onStartTrackingTouch(bar:SeekBar?){};override fun onStopTrackingTouch(bar:SeekBar?){} })},LinearLayout.LayoutParams(-1,dp(40)))

@@ -9,7 +9,7 @@ import kotlin.math.*
 internal class NativeSheet(private val root:FrameLayout,private val map:FrameLayout) {
     private val context=root.context
     val panel=NativeUi.column(context).apply{
-        background=NativeUi.background(context,radius=0);clipToOutline=true;elevation=NativeUi.dp(context,8).toFloat();visibility=View.GONE
+        background=android.graphics.drawable.GradientDrawable().apply{setColor(NativeUi.paper);val r=NativeUi.dp(context,20).toFloat();cornerRadii=floatArrayOf(r,r,r,r,0f,0f,0f,0f)};clipToOutline=true;elevation=NativeUi.dp(context,8).toFloat();visibility=View.GONE
     }
     val content=NativeUi.column(context).apply{setPadding(dp(16),0,dp(16),dp(12))}
     private val grip=FrameLayout(context).apply{contentDescription="Resize route panel";isClickable=true;isFocusable=true}
@@ -18,6 +18,8 @@ internal class NativeSheet(private val root:FrameLayout,private val map:FrameLay
     private var visible=false
     var onSnap:(Boolean)->Unit={}
     var onClose:()->Unit={}
+    /** Height of map hidden under the sheet's top edge (its rounded corners overlap the map). */
+    var onCover:(Int)->Unit={}
     private fun dp(v:Int)=NativeUi.dp(context,v)
     init{
         grip.addView(View(context).apply{background=NativeUi.background(context,0xff8a9691.toInt(),3)},FrameLayout.LayoutParams(dp(32),dp(4),Gravity.CENTER))
@@ -48,6 +50,7 @@ internal class NativeSheet(private val root:FrameLayout,private val map:FrameLay
         if(panel.layoutParams.height!=h&&visible)panel.layoutParams=panel.layoutParams.apply{height=h}
         val mapHeight=if(visible&&root.height>0)(root.height-root.paddingTop-root.paddingBottom-h+dp(24)).coerceAtLeast(dp(80))else -1
         if(map.layoutParams.height!=mapHeight)map.layoutParams=map.layoutParams.apply{height=mapHeight}
+        onCover(if(visible&&root.height>0)dp(24)else 0)
         grip.contentDescription="Resize route panel · ${if(index==1)"expanded"else"compact"}"
         onSnap(index==1)
     }

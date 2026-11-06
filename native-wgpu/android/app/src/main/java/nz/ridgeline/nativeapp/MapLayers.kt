@@ -22,7 +22,11 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
     private data class Tile(val body:TileBody,var mask:Set<String>,var features:List<VectorTile.Feature>){
         /** Styled output for the last (settings, quarter zoom); reused across publications. */
         var styledKey:Any?=null;var styled:TopographyStyle.Output?=null
+        /** Packed line groups for this tile, per display clip, for the current styling. */
+        val groups=HashMap<List<Double>,Packed>()
     }
+    /** One source tile's clipped lines in the renderer's grouped packet format. */
+    private class Packed(val bytes:ByteArray,val lines:Int)
     private val worker=Executors.newSingleThreadScheduledExecutor{run->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);run.run()},"RidgelineCartography")}
     private val main=Handler(Looper.getMainLooper())
     private val style=TopographyStyle(view.context.assets.open("topography-style.json").bufferedReader().use{it.readText()})
@@ -39,7 +43,8 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
     @Volatile private var closed=false
     @Volatile private var active=true
     private var lastKey:Any?=null;private var lastLabels=emptyList<TopographyStyle.Label>();private var atlas=NativeLabelAtlas.empty()
-    private var lastLines=emptyList<TopographyStyle.Line>();private var linePacket=ByteBuffer.allocateDirect(4).order(ByteOrder.LITTLE_ENDIAN).apply{putInt(0);rewind()}
+    private var lastGroups=emptyList<Packed>();private val borderGroups=HashMap<GpuUploadQueue.Id,Packed>()
+    private var linePacket=ByteBuffer.allocateDirect(4).order(ByteOrder.LITTLE_ENDIAN).apply{putInt(0);rewind()}
     private val plan=ByteBuffer.allocateDirect(32*12).order(ByteOrder.LITTLE_ENDIAN)
     private var boundary:BoundaryIndex?=null
     @Volatile private var diagnostics="Map layers: waiting for view"
@@ -70,6 +75,8 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         if(closed)return@execute
         val state=loader.mapSettings.state
         if(state!=displayState){displayState=state;lastKey=null;schedulePublication()}
+        // Overlays off and already cleared: no selection, fetching or publishing.
+        if(current.isEmpty()&&tiles.isEmpty()&&leases.isEmpty()&&mask(state).isEmpty()&&!(state.borders&&state.base==MapSettings.Base.LINZ))return@execute
         // Leading-edge throttle (was a 180 ms debounce that every camera frame
         // restarted, so tiles for new ground were not even selected until the
         // finger paused). A pending selection already reads the latest camera.
@@ -131,34 +138,45 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         val ordered=current.sortedWith(compareBy<GpuUploadQueue.Id>{it.z}.thenBy{it.x}.thenBy{it.y})
         val key=listOf(state,ordered,tiles.mapValues{it.value.body.stamp?.fingerprint?:it.value.body.bytes.hashCode()},zoom)
         if(key==lastKey)return;lastKey=key
-        val start=System.nanoTime();val lines=ArrayList<TopographyStyle.Line>();val labels=ArrayList<TopographyStyle.Label>();val enabled=mask(state)
-        val patches=LayerCover.display(ordered,tiles.keys);val styled=HashMap<GpuUploadQueue.Id,TopographyStyle.Output>()
+        // Like MapLibre's buckets: each source tile is decoded, styled, clipped and
+        // packed once per styling; a publication only concatenates cached groups,
+        // and the renderer repaints only overlay textures whose groups changed.
+        val start=System.nanoTime();val groups=ArrayList<Packed>();val labels=ArrayList<TopographyStyle.Label>();val enabled=mask(state)
+        val patches=LayerCover.display(ordered,tiles.keys)
         tiles.keys.retainAll(current.toSet()+patches.map{it.source})
         if(state.overlays())for(patch in patches){val id=patch.source;val tile=tiles[id]?:continue
             if(tile.mask!=enabled){tile.features=VectorTile.decode(tile.body.bytes,id.z,id.x,id.y,enabled);tile.mask=enabled;decoded++}
             // MapLibre evaluates ["zoom"] in filters at the tile's own zoom, layer
             // ranges and paint at the camera zoom.
-            val output=styled.getOrPut(id){val key=listOf(state,zoom,enabled);if(tile.styledKey!=key||tile.styled==null){tile.styled=style.build(tile.features,state,zoom,id.z.toDouble());tile.styledKey=key};tile.styled!!};val b=patch.clip.bounds
-            for(line in output.lines)for(path in clip(line.points,b))lines.add(line.copy(points=path))
+            val styledKey=listOf(state,zoom,enabled)
+            if(tile.styledKey!=styledKey||tile.styled==null){tile.styled=style.build(tile.features,state,zoom,id.z.toDouble());tile.styledKey=styledKey;tile.groups.clear()}
+            val output=tile.styled!!;val b=patch.clip.bounds
+            groups.add(tile.groups.getOrPut(b.toList()){
+                val clipped=ArrayList<TopographyStyle.Line>()
+                for(line in output.lines)for(path in clip(line.points,b))if(path.size>=2)clipped.add(line.copy(points=path))
+                group(id.z,id.x,id.y,b,clipped)
+            })
             labels.addAll(output.labels.filter{it.point.x>=b[0]&&it.point.x<b[2]&&it.point.y>=b[1]&&it.point.y<b[3]})
         }
         if(state.borders&&state.base==MapSettings.Base.LINZ&&zoom>=8){
             val parts=boundary?:BoundaryIndex(readBoundary()).also{boundary=it}
-            for(id in ordered)for(clipped in parts.fragments(id)){
-                lines.add(TopographyStyle.Line(clipped,0x8c111111.toInt(),1f,.2f,3.8f))
-                if(zoom>=11&&clipped.size>1){val p=clipped[clipped.size/2];labels.add(TopographyStyle.Label(p,"LINZ imagery | Esri World Imagery",10f,0xffdddddd.toInt(),85.0,key="boundary:${p.x}:${p.y}"))}
+            borderGroups.keys.retainAll(ordered.toSet())
+            for(id in ordered){
+                val fragments=parts.fragments(id)
+                if(fragments.isEmpty())continue
+                val n=1.0/(1 shl id.z)
+                groups.add(borderGroups.getOrPut(id){group(id.z+64,id.x,id.y,doubleArrayOf(id.x*n,id.y*n,(id.x+1)*n,(id.y+1)*n),fragments.map{TopographyStyle.Line(it,0x8c111111.toInt(),1f,.2f,3.8f)})})
+                if(zoom>=11)for(clipped in fragments)if(clipped.size>1){val p=clipped[clipped.size/2];labels.add(TopographyStyle.Label(p,"LINZ imagery | Esri World Imagery",10f,0xffdddddd.toInt(),85.0,key="boundary:${p.x}:${p.y}"))}
             }
-        }
+        }else borderGroups.clear()
         // A camera-dependent atlas order repainted/reuploaded the same strings on pans.
         // Fixed priority/key order keeps atlas slots stable; screen placement still follows camera.
         val chosen=labels.distinctBy{it.key}.sortedWith(compareBy<TopographyStyle.Label>{it.priority}.thenBy{it.key}).take(512)
-        // Match MapLibre layer-major paint order across all visible tiles.
-        lines.sortBy{it.order}
-        if(lines!=lastLines){val packed=pack(lines);lastLines=lines;linePacket=packed}
+        if(groups.size!=lastGroups.size||groups.indices.any{groups[it]!==lastGroups[it]}){linePacket=packet(groups);lastGroups=groups}
         lastBuildMs=(System.nanoTime()-start)/1_000_000
         if(chosen!=lastLabels){val a=System.nanoTime();atlas=NativeLabels.atlas(chosen,view.context.assets);lastLabels=chosen;lastAtlasMs=(System.nanoTime()-a)/1_000_000}
         val batch=NativeLayerBatch(linePacket,atlas)
-        diagnostics="Topography tiles: ${tiles.size}/${current.size} · decoded $decoded · one shared background transfer\nVector decode: $lastDecodeMs ms · layer build: $lastBuildMs ms · font atlas: $lastAtlasMs ms\nLines: ${lines.size} · label candidates ${atlas.labels.size} · atlas ${atlas.width}×${atlas.height}"
+        diagnostics="Topography tiles: ${tiles.size}/${current.size} · decoded $decoded · one shared background transfer\nVector decode: $lastDecodeMs ms · layer build: $lastBuildMs ms · font atlas: $lastAtlasMs ms\nLine groups: ${groups.size} · lines ${groups.sumOf{it.lines}} · label candidates ${atlas.labels.size} · atlas ${atlas.width}×${atlas.height}"
         main.post{if(!closed)view.mapLayers(batch)}
     }
     private fun readBoundary():List<List<VectorTile.Point>>{
@@ -166,9 +184,16 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         val features=json.getJSONArray("features");for(i in 0 until features.length()){val geo=features.getJSONObject(i).getJSONObject("geometry");val paths=geo.getJSONArray("coordinates");for(j in 0 until paths.length()){val path=paths.getJSONArray(j);result.add(List(path.length()){k->val p=path.getJSONArray(k);VectorTile.Point((p.getDouble(0)+180)/360,(1-asinh(tan(Math.toRadians(p.getDouble(1))))/PI)/2)})}}
         return result
     }
-    private fun pack(lines:List<TopographyStyle.Line>):ByteBuffer{
-        val total=lines.sumOf{it.points.size};require(lines.size<=32768&&total<=500000){"Visible vector geometry exceeds safe upload budget"}
-        return ByteBuffer.allocateDirect(4+lines.size*20+total*16).order(ByteOrder.LITTLE_ENDIAN).apply{putInt(lines.size);for(line in lines){putInt(line.points.size);putInt(line.color);putFloat(line.width);putFloat(line.dash);putFloat(line.gap);for(p in line.points){putDouble(p.x);putDouble(p.y)}};rewind()}
+    private fun group(z:Int,x:Int,y:Int,clip:DoubleArray,lines:List<TopographyStyle.Line>):Packed{
+        val total=lines.sumOf{it.points.size};require(lines.size<=65536&&total<=262144*4){"Visible vector geometry exceeds safe upload budget"}
+        val buffer=ByteBuffer.allocate(48+lines.size*24+total*16).order(ByteOrder.LITTLE_ENDIAN)
+        buffer.putInt(z).putInt(x).putInt(y);for(v in clip)buffer.putDouble(v);buffer.putInt(lines.size)
+        for(line in lines){buffer.putInt(line.points.size).putInt(line.color).putFloat(line.width).putFloat(line.dash).putFloat(line.gap).putInt(line.order);for(p in line.points)buffer.putDouble(p.x).putDouble(p.y)}
+        return Packed(buffer.array(),lines.size)
+    }
+    private fun packet(groups:List<Packed>):ByteBuffer{
+        val out=ByteBuffer.allocateDirect(4+groups.sumOf{it.bytes.size}).order(ByteOrder.LITTLE_ENDIAN)
+        out.putInt(groups.size);for(g in groups)out.put(g.bytes);out.rewind();return out
     }
     private fun clip(path:List<VectorTile.Point>,box:DoubleArray)=BoundaryIndex.clip(path,box)
     override fun close(){closed=true;timer?.cancel(false);publication?.cancel(false);retryWake?.cancel(false);releaseAll();worker.shutdownNow();view.onLayerProjection={_,_->}}

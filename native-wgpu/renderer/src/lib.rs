@@ -7,6 +7,7 @@ use wgpu::util::DeviceExt;
 mod adaptive;
 mod appearance;
 mod cartography;
+pub mod overlay;
 mod frame_work;
 mod inspection;
 mod labels;
@@ -120,17 +121,10 @@ pub struct Renderer {
     width: u32,
     height: u32,
     route_gpu: routes::RouteGpu,
-    cartographic_gpu: routes::RouteGpu,
-    cartographic_paths: Arc<[CartographicPath]>,
-    cartographic_worker: Option<cartography::Worker>,
-    cartographic_upload: Option<cartography::Output>,
+    /// Topographic lines painted into per-image-tile textures (MapLibre-style drape).
+    overlay: overlay::Overlay,
     completion_wake: frame_work::CompletionWake,
     frame_prepared: bool,
-    cartographic_pending: bool,
-    cartographic_dirty: bool,
-    cartographic_anchor: [f64; 2],
-    cartographic_vertices: u32,
-    cartographic_overflow: bool,
     labels_gpu: labels::LabelGpu,
     label_sprites: Vec<LabelSprite>,
     label_selection: Vec<(usize, [f32; 2])>,
@@ -328,6 +322,7 @@ impl Renderer {
             cache: None,
         })
         };
+        let overlay_state = overlay::Overlay::new(&device);
         let scene_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
             label: Some("terrain scene"),
             entries: &[wgpu::BindGroupLayoutEntry {
@@ -378,6 +373,7 @@ impl Renderer {
                 Some(&scene_layout),
                 Some(&photo_layout),
                 Some(&height_layout),
+                Some(overlay_state.layout()),
             ],
             immediate_size: 0,
         });
@@ -499,7 +495,6 @@ impl Renderer {
         });
         let depth = Self::depth(&device, width, height);
         let route_gpu = routes::RouteGpu::new(&device, format);
-        let cartographic_gpu = route_gpu.fork(&device);
         let inspection_gpu = route_gpu.fork(&device);
         let labels_gpu = labels::LabelGpu::new(&device, &queue, format);
         let mut renderer = Self {
@@ -544,17 +539,9 @@ impl Renderer {
             width,
             height,
             route_gpu,
-            cartographic_gpu,
-            cartographic_paths: Vec::new().into(),
-            cartographic_worker: None,
-            cartographic_upload: None,
+            overlay: overlay_state,
             completion_wake: Default::default(),
             frame_prepared: false,
-            cartographic_pending: false,
-            cartographic_dirty: false,
-            cartographic_anchor: [0.5, 0.5],
-            cartographic_vertices: 0,
-            cartographic_overflow: false,
             labels_gpu,
             label_sprites: vec![],
             label_selection: vec![],
@@ -966,6 +953,7 @@ impl Renderer {
     }
     /// Bounded geometry height fields and original RGBA mip pyramids; excludes surface/depth.
     pub fn set_tile_budget(&mut self, tiles: usize) {
+        self.overlay.set_budget(tiles);
         self.residency_byte_budget = None;
         self.budget = tiles.clamp(24, 192);
         self.geometry_budget = (self.budget / 2).clamp(16, 96);
@@ -984,8 +972,7 @@ impl Renderer {
     }
     pub fn next_adaptive_frame(&self) -> Option<u64> {
         if self.route_upload.is_some()
-            || self.cartographic_upload.is_some()
-            || self.cartographic_dirty
+            || self.overlay.pending
             || self.route_dirty
             || self.labels_dirty
             || self.inspection_dirty
@@ -1529,12 +1516,7 @@ impl Renderer {
         if self.route_dirty && budget.allows(500_000) {
             self.rebuild_routes();
         }
-        if self.cartographic_dirty {
-            self.cartographic_overflow = false;
-            self.rebuild_cartography();
-        }
         self.poll_routes(&budget);
-        self.poll_cartography(&budget);
         if self.labels_dirty && budget.allows(250_000) {
             self.rebuild_labels();
         }
@@ -1585,14 +1567,6 @@ impl Renderer {
             &self.queue,
             matrix,
             self.route_anchor,
-            &route_view,
-            px_meter,
-            route_scale,
-        );
-        self.cartographic_gpu.camera(
-            &self.queue,
-            matrix,
-            self.cartographic_anchor,
             &route_view,
             px_meter,
             route_scale,
@@ -1715,6 +1689,17 @@ impl Renderer {
                 )
             });
         }
+        // Overlay textures for the visible image tiles (none, and no work, when
+        // overlays are off). The slot travels in the unused 4th tile component.
+        let overlay_slots = self.overlay.prepare(
+            &self.device,
+            &self.queue,
+            rows.iter().map(|row| row.image),
+            self.logical_zoom.unwrap_or(zoom),
+        );
+        if self.overlay.pending {
+            self.next_adaptive_frame = Some(self.next_adaptive_frame.map_or(1, |d| d.min(1)));
+        }
         let mut data = std::mem::take(&mut self.instance_scratch);
         data.clear();
         data.extend(rows.iter().map(|row| {
@@ -1727,7 +1712,7 @@ impl Renderer {
                 ((b[0] - center[0]) * world) as f32,
                 ((center[1] - b[1]) * world) as f32,
                 (size * world) as f32,
-                0.,
+                overlay_slots.get(&row.image).copied().unwrap_or(0.),
                 ((region[0] - b[0]) / size) as f32,
                 ((region[1] - b[1]) / size) as f32,
                 ((region[2] - b[0]) / size) as f32,
@@ -1855,6 +1840,7 @@ impl Renderer {
             });
             let mut clipped_pipeline = None;
             pass.set_bind_group(0, &self.scene_bind, &[]);
+            pass.set_bind_group(3, self.overlay.bind_group(), &[]);
             pass.set_index_buffer(self.indices.slice(..), wgpu::IndexFormat::Uint16);
             let mut atlas_bound = true;
             pass.set_vertex_buffer(0, self.grid.slice(..));
@@ -1919,7 +1905,6 @@ impl Renderer {
                 self.last_frame_draw_calls += 1;
                 i = end_instance;
             }
-            self.cartographic_gpu.draw(&mut pass);
             self.route_gpu.draw(&mut pass);
             self.labels_gpu.draw(&mut pass);
             self.inspection_gpu.draw(&mut pass);

@@ -67,7 +67,6 @@ impl crate::Renderer {
         if self.map_style != style {
             if self.map_style.height_scale() != style.height_scale() {
                 self.terrain_overlays_changed();
-                self.clear_cartography_geometry();
                 self.cover_dirty = true;
                 self.adaptive_levels.clear();
             }
@@ -84,7 +83,6 @@ impl crate::Renderer {
         self.seams_dirty = true;
         self.cover_dirty = true;
         self.terrain_overlays_changed();
-        self.clear_cartography_geometry();
     }
     pub fn clear_images(&mut self) {
         self.images.clear();

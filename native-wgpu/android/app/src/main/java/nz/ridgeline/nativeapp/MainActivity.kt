@@ -53,7 +53,7 @@ class MainActivity:Activity(){
         mapHost.addView(attribution,FrameLayout.LayoutParams(-2,-2,Gravity.BOTTOM or Gravity.END).apply{marginStart=dp(60);marginEnd=dp(44);bottomMargin=dp(8)})
         mapHost.addView(info,FrameLayout.LayoutParams(dp(36),dp(36),Gravity.BOTTOM or Gravity.END).apply{marginEnd=dp(6);bottomMargin=dp(6)})
         val scale=MapControls.Scale(this)
-        mapHost.addView(scale,FrameLayout.LayoutParams(dp(100),dp(20),Gravity.BOTTOM or Gravity.START).apply{marginStart=dp(12);bottomMargin=dp(14)})
+        mapHost.addView(scale,FrameLayout.LayoutParams(dp(102),dp(20),Gravity.BOTTOM or Gravity.START).apply{marginStart=dp(12);bottomMargin=dp(14)})
         setContentView(root)
         loader=TileLoader(this,terrain)
         mapLayers=MapLayers(terrain,loader)
@@ -80,6 +80,10 @@ class MainActivity:Activity(){
         val compass=MapControls.Compass(this){terrain.northUp()}
         mapHost.addView(compass,FrameLayout.LayoutParams(dp(34),dp(34),Gravity.TOP or Gravity.END).apply{marginEnd=dp(10);topMargin=dp(10)})
         mapHost.addView(MapControls.iconButton(this,MapControls.LayersIcon(this),"Map layers"){planner.dismissDrawer();layersUi.show()},FrameLayout.LayoutParams(dp(34),dp(34),Gravity.TOP or Gravity.END).apply{marginEnd=dp(10);topMargin=dp(52)})
+        // Keep the scale bar, "i" and credits clear of the route sheet's top edge.
+        planner.onMapCover={cover->
+            for((view,margin) in listOf(scale to 14,info to 6,attribution to 8)){val lp=view.layoutParams as FrameLayout.LayoutParams;if(lp.bottomMargin!=dp(margin)+cover){lp.bottomMargin=dp(margin)+cover;view.layoutParams=lp}}
+        }
         fun updateChrome(){compass.bearing=terrain.bearing;scale.update(terrain.cameraPose)}
         updateChrome()
         terrain.onCamera={updateChrome();loader.cameraChanged();mapLayers.refresh();planner.cameraChanged()}
