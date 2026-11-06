@@ -606,9 +606,8 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         val composed=imagery.composed(id.z,id.x,id.y)
         if(composed)taskContext.get()?.derived{imageStore().getEntry(id.gpu(),::dependencyFresh)}?.let{return it}
         awaitInputs(imagery.inputs(id.z,id.x,id.y),imagery.localInputs(id.z,id.x,id.y))
-        val image = imagery.load(id.z, id.x, id.y)
+        val rgba=imagery.loadRgba(id.z, id.x, id.y)
         checkPreparation()
-        val rgba=PixelPacking.rgbaOwned(image,::checkPreparation)
         if(composed){val provenance=sourceRecords.get()?.values?.map{PreparedTerrainCache.Dependency(id.gpu(),it.fingerprint,it.until,it.key)}?:emptyList()
             if(provenance.all{it.until>System.currentTimeMillis()}&&!preparedWrites.isShutdown)runCatching{preparedWrites.execute{
                 // Store initialization may still be running on a slow reader.

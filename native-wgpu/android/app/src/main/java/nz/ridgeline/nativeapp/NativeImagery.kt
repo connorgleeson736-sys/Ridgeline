@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.ColorSpace
 import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.RectF
@@ -12,6 +13,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.FileNotFoundException
 import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.floor
 import kotlin.math.pow
@@ -51,6 +53,21 @@ internal class NativeImagery(
     }
     private inline fun <T> Bitmap.using(block:(Bitmap)->T):T = try { block(this) } finally { recycle() }
     private fun pixels(bitmap:Bitmap):IntArray {checkPreparation();return IntArray(65536).also { bitmap.getPixels(it,0,256,0,0,256,256) }}
+    private val srgb=ColorSpace.get(ColorSpace.Named.SRGB)
+    /** Premultiplied little-endian RGBA, identical to PixelPacking.rgbaOwned(pixels()).
+     * An opaque sRGB ARGB_8888 bitmap already stores exactly those bytes (Android
+     * packs it as R | G<<8 | B<<16 | A<<24, alpha 255): one native copy replaces the
+     * 256 KiB int array, getPixels conversion and per-pixel Kotlin packing. Anything
+     * with alpha, another colour space or row padding keeps the original path. */
+    private fun rgba(bitmap:Bitmap):ByteBuffer {
+        checkPreparation()
+        if(!bitmap.hasAlpha()&&bitmap.config==Bitmap.Config.ARGB_8888&&bitmap.width==256&&bitmap.height==256&&bitmap.rowBytes==1024&&bitmap.colorSpace==srgb){
+            val out=ByteBuffer.allocateDirect(262144).order(ByteOrder.LITTLE_ENDIAN)
+            bitmap.copyPixelsToBuffer(out);check(!out.hasRemaining());out.rewind()
+            return out
+        }
+        return PixelPacking.rgbaOwned(pixels(bitmap),checkPreparation)
+    }
     internal fun saved(z:Int,x:Int,y:Int):ByteArray? {
         val key="$z/$x/$y"
         val variant=if(settings().natural)"natural"else"raw"
@@ -140,22 +157,25 @@ internal class NativeImagery(
         }
         return urls.distinct()
     }
-    fun load(z:Int,x:Int,y:Int):IntArray {
+    fun load(z:Int,x:Int,y:Int):IntArray=produce(z,x,y,::pixels){it}
+    /** The prepared upload payload. Same source chain and pixels as load(). */
+    fun loadRgba(z:Int,x:Int,y:Int):ByteBuffer=produce(z,x,y,::rgba){PixelPacking.rgbaOwned(it,checkPreparation)}
+    private fun <T> produce(z:Int,x:Int,y:Int,fromBitmap:(Bitmap)->T,fromPixels:(IntArray)->T):T {
         require(z in 0..19 && x in 0 until (1 shl z) && y in 0 until (1 shl z))
         checkPreparation()
-        alternate(z,x,y)?.let{url->return bitmap(fetch(url)).using{source->if(z<=18)pixels(source)else crop(source,x,y,1 shl(z-18)).using(::pixels)}}
+        alternate(z,x,y)?.let{url->return bitmap(fetch(url)).using{source->if(z<=18)fromBitmap(source)else crop(source,x,y,1 shl(z-18)).using(fromBitmap)}}
         val selected=plan(z,x,y);val factor=selected.factor;val coarse=selected.coarse;val entry=selected.entry;val mode=selected.mode
-        if(mode=="linz") return base(z,x,y).using(::pixels)
+        if(mode=="linz") return base(z,x,y).using(fromBitmap)
         val ez=minOf(z,18); val f=1 shl(z-ez)
         val source=if(coarse!=null) asset(coarse.getString("url")) else fetch("https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/$ez/${y/f}/${x/f}")
         return bitmap(source).using esriScope@{ esri ->
-            if(mode=="esri" && (coarse!=null || z==ez)) return@esriScope pixels(esri)
+            if(mode=="esri" && (coarse!=null || z==ez)) return@esriScope fromBitmap(esri)
             crop(esri,x,y,if(coarse!=null)1 else f).using cropScope@{ cropped ->
-                if(mode!="boundary") return@cropScope pixels(cropped)
+                if(mode!="boundary") return@cropScope fromBitmap(cropped)
                 base(z,x,y).using originalScope@{ original ->
                     if(coarse!=null) {
                         original.copy(Bitmap.Config.ARGB_8888,true).using { result ->
-                            Canvas(result).drawBitmap(cropped,0f,0f,null);pixels(result)
+                            Canvas(result).drawBitmap(cropped,0f,0f,null);fromBitmap(result)
                         }
                     } else {
                         val m=entry!!.data
@@ -170,7 +190,7 @@ internal class NativeImagery(
                         // complete border tile with no dependency on that donor.
                         if(onSeam && fine!=null) vetoFine(mask,fine,z,x,y)
                         val a=pixels(original); val b=pixels(cropped)
-                        IntArray(a.size) { if(mask[it]) b[it] else a[it] }
+                        fromPixels(IntArray(a.size) { if(mask[it]) b[it] else a[it] })
                     }
                 }
             }
