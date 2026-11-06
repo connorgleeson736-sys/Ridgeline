@@ -3,7 +3,9 @@ struct Scene { matrix: mat4x4<f32>, grade: vec4<f32>, metrics: vec4<f32>, style:
 @group(1) @binding(0) var photo: texture_2d<f32>;
 @group(1) @binding(1) var photo_sampler: sampler;
 @group(2) @binding(0) var heights: texture_2d<f32>;
-struct Out { @builtin(position) position: vec4<f32>, @location(0) uv: vec2<f32>, @location(1) @interpolate(flat) clip: vec4<f32>, @location(2) @interpolate(flat) image: vec4<f32>, @location(4) ground:vec3<f32>, @location(5) @interpolate(flat) demzoom:f32 };
+@group(3) @binding(0) var overlay: texture_2d_array<f32>;
+@group(3) @binding(1) var overlay_sampler: sampler;
+struct Out { @builtin(position) position: vec4<f32>, @location(0) uv: vec2<f32>, @location(1) @interpolate(flat) clip: vec4<f32>, @location(2) @interpolate(flat) image: vec4<f32>, @location(4) ground:vec3<f32>, @location(5) @interpolate(flat) demzoom:f32, @location(6) @interpolate(flat) overlay:f32 };
 @vertex fn vs(@builtin(vertex_index) vertex_index:u32, @location(0) vertex: vec2<f32>, @location(1) tile: vec4<f32>, @location(2) clip: vec4<f32>, @location(3) image: vec4<f32>) -> Out {
  var o:Out;
  let height=textureLoad(heights,vec2<i32>(round(vertex*128.)),0).r - select(0.,scene.metrics.z,vertex_index>=16641u);
@@ -11,7 +13,7 @@ struct Out { @builtin(position) position: vec4<f32>, @location(0) uv: vec2<f32>,
  o.position=scene.matrix*vec4<f32>(world,(height*scene.metrics.w-scene.metrics.y)*scene.metrics.x,1.);
  o.ground=vec3<f32>(world,height*scene.metrics.x);
  o.demzoom=min(18.,max(0.,log2(scene.style.y/tile.z)-1.));
- o.uv=vertex.xy;o.clip=clip;o.image=image;return o;
+ o.overlay=tile.w;o.uv=vertex.xy;o.clip=clip;o.image=image;return o;
 }
 fn shade(i:Out,dx:vec2<f32>,dy:vec2<f32>,normal:vec3<f32>)->vec4<f32>{
  var p=textureSampleGrad(photo,photo_sampler,clamp(i.uv*i.image.xy+i.image.zw,vec2<f32>(0.),vec2<f32>(1.)),dx,dy);
@@ -42,6 +44,14 @@ fn shade(i:Out,dx:vec2<f32>,dy:vec2<f32>,normal:vec3<f32>)->vec4<f32>{
  return clamp(vec4<f32>(rgb*p.a,p.a),vec4<f32>(0.),vec4<f32>(1.));
 }
 
+// Topographic lines painted for this image tile (overlay.rs), laid over the
+// graded photo like MapLibre's terrain drape. Slot 0 means no overlay.
+fn drape(i:Out,c:vec4<f32>,dx:vec2<f32>,dy:vec2<f32>)->vec4<f32>{
+ if(i.overlay<0.5){return c;}
+ let o=textureSampleGrad(overlay,overlay_sampler,clamp(i.uv*i.image.xy+i.image.zw,vec2<f32>(0.),vec2<f32>(1.)),i32(i.overlay-0.5),dx,dy);
+ return o+c*(1.-o.a);
+}
+
 // Fine photo subdivisions can be smaller than one terrain cell. Only those
 // rounded-out rectangles need fragment clipping; exact rectangles allow early
 // depth rejection without a discard instruction, including their skirt faces.
@@ -49,9 +59,10 @@ fn shade(i:Out,dx:vec2<f32>,dy:vec2<f32>,normal:vec3<f32>)->vec4<f32>{
  let dx=dpdx(i.uv)*i.image.xy;let dy=dpdy(i.uv)*i.image.xy;
  var normal=vec3<f32>(0.,0.,1.);if(scene.style.x>0.5){normal=cross(dpdx(i.ground),dpdy(i.ground));}
  if(any(i.uv<i.clip.xy)||any(i.uv>i.clip.zw)){discard;}
- return shade(i,dx,dy,normal);
+ return drape(i,shade(i,dx,dy,normal),dx,dy);
 }
 @fragment fn fs_unclipped(i:Out)->@location(0) vec4<f32>{
  var normal=vec3<f32>(0.,0.,1.);if(scene.style.x>0.5){normal=cross(dpdx(i.ground),dpdy(i.ground));}
- return shade(i,dpdx(i.uv)*i.image.xy,dpdy(i.uv)*i.image.xy,normal);
+ let dx=dpdx(i.uv)*i.image.xy;let dy=dpdy(i.uv)*i.image.xy;
+ return drape(i,shade(i,dx,dy,normal),dx,dy);
 }

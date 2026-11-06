@@ -1379,65 +1379,84 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_cartograp
         .with_env(|env| -> Result<u8, jni::errors::Error> {
             let buffer = unsafe { jni::objects::JByteBuffer::from_raw(env, input) };
             let size = env.get_direct_buffer_capacity(&buffer)?;
-            if !(4..=10_000_000).contains(&size) {
+            if !(4..=24_000_000).contains(&size) {
                 return Ok(0);
             }
             let bytes = unsafe {
                 std::slice::from_raw_parts(env.get_direct_buffer_address(&buffer)?, size)
             };
-            let count = u32::from_le_bytes(bytes[..4].try_into().unwrap()) as usize;
-            if count > 32768 {
+            // Lines grouped by source vector tile, parsed before the renderer
+            // lock: [groups] then per group z,x,y, clip[4] (f64), line count,
+            // and per line n, ARGB, width, dash, gap, order, n x (f64 x, f64 y).
+            let int = |at: usize| u32::from_le_bytes(bytes[at..at + 4].try_into().unwrap());
+            let float = |at: usize| f32::from_le_bytes(bytes[at..at + 4].try_into().unwrap());
+            let double = |at: usize| f64::from_le_bytes(bytes[at..at + 8].try_into().unwrap());
+            let count = int(0) as usize;
+            if count > 4096 {
                 return Ok(0);
             }
             let mut at = 4;
-            let mut total = 0;
-            let mut paths = Vec::with_capacity(count);
+            let mut total = 0usize;
+            let mut groups = Vec::with_capacity(count);
             for _ in 0..count {
-                if at + 20 > size {
+                if at + 48 > size {
                     return Ok(0);
                 }
-                let n = u32::from_le_bytes(bytes[at..at + 4].try_into().unwrap()) as usize;
-                let color = u32::from_le_bytes(bytes[at + 4..at + 8].try_into().unwrap());
-                let f = |offset| f32::from_le_bytes(bytes[offset..offset + 4].try_into().unwrap());
-                let width = f(at + 8);
-                let dash = [f(at + 12), f(at + 16)];
-                at += 20;
-                total += n;
-                if n > 262144
-                    || total > 500000
-                    || at + n * 16 > size
-                    || !width.is_finite()
-                    || width <= 0.
-                    || width > 20.
-                    || dash.iter().any(|v| !v.is_finite() || *v < 0. || *v > 100.)
-                {
+                let group_start = at;
+                let (z, x, y) = (int(at), int(at + 4), int(at + 8));
+                let clip = [double(at + 12), double(at + 20), double(at + 28), double(at + 36)];
+                let lines_count = int(at + 44) as usize;
+                at += 48;
+                if lines_count > 65536 || clip.iter().any(|v| !v.is_finite()) {
                     return Ok(0);
                 }
-                let mut points = Vec::with_capacity(n);
-                for row in bytes[at..at + n * 16].chunks_exact(16) {
-                    let x = f64::from_le_bytes(row[..8].try_into().unwrap());
-                    let y = f64::from_le_bytes(row[8..].try_into().unwrap());
-                    if !x.is_finite()
-                        || !y.is_finite()
-                        || !(0. ..=1.).contains(&x)
-                        || !(0. ..=1.).contains(&y)
+                let mut lines = Vec::with_capacity(lines_count);
+                for _ in 0..lines_count {
+                    if at + 24 > size {
+                        return Ok(0);
+                    }
+                    let n = int(at) as usize;
+                    let color = int(at + 4);
+                    let width = float(at + 8);
+                    let dash = [float(at + 12), float(at + 16)];
+                    let order = int(at + 20) as i32;
+                    at += 24;
+                    total += n;
+                    if n > 262144
+                        || total > 2_000_000
+                        || at + n * 16 > size
+                        || !width.is_finite()
+                        || width <= 0.
+                        || width > 40.
+                        || dash.iter().any(|v| !v.is_finite() || *v < 0. || *v > 400.)
                     {
                         return Ok(0);
                     }
-                    points.push([x, y]);
-                }
-                at += n * 16;
-                paths.push(crate::CartographicPath {
-                    points,
-                    color: [
+                    let mut points = Vec::with_capacity(n);
+                    for row in bytes[at..at + n * 16].chunks_exact(16) {
+                        let px = f64::from_le_bytes(row[..8].try_into().unwrap());
+                        let py = f64::from_le_bytes(row[8..].try_into().unwrap());
+                        if !px.is_finite() || !py.is_finite() || !(0. ..=1.).contains(&px) || !(0. ..=1.).contains(&py) {
+                            return Ok(0);
+                        }
+                        points.push([px, py]);
+                    }
+                    at += n * 16;
+                    let rgba = [
                         ((color >> 16) & 255) as f32 / 255.,
                         ((color >> 8) & 255) as f32 / 255.,
                         (color & 255) as f32 / 255.,
                         ((color >> 24) & 255) as f32 / 255.,
-                    ],
-                    width,
-                    dash,
-                });
+                    ];
+                    lines.extend(crate::overlay::Line::new(points, rgba, width, dash, order));
+                }
+                use std::hash::Hasher;
+                let mut hasher = std::collections::hash_map::DefaultHasher::new();
+                hasher.write(&bytes[group_start..at]);
+                let key = crate::overlay::GroupKey { z, x, y, clip: clip.map(f64::to_bits) };
+                if !lines.is_empty() {
+                    groups.push(crate::overlay::Group::new(key, hasher.finish(), lines));
+                }
             }
             if at != size {
                 return Ok(0);
@@ -1448,7 +1467,7 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_cartograp
             let Some(state) = all.get_mut(&(handle as u64)) else {
                 return Ok(0);
             };
-            state.renderer.set_cartography(paths);
+            state.renderer.set_overlay_groups(groups);
             Ok(1)
         })
         .into_outcome()
@@ -1989,9 +2008,9 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_frameStat
                         s.presentation.available() as u64,
                         s.renderer.gpu_backlog() as u64,
                         s.renderer.route_gpu.uploaded_bytes,
-                        s.renderer.cartographic_gpu.uploaded_bytes,
+                        s.renderer.overlay.texture_bytes(),
                         s.renderer.route_gpu.uploads,
-                        s.renderer.cartographic_gpu.uploads,
+                        s.renderer.overlay.renders,
                     ];
                     for (chunk, value) in bytes.chunks_exact_mut(8).zip(values) {
                         chunk.copy_from_slice(&value.to_le_bytes());

@@ -806,14 +806,14 @@ fn build_routes(job: RouteJob, valid: &dyn Fn() -> bool) -> Option<RouteOutput> 
 impl crate::Renderer {
     pub fn expanded_overlay_validation(&mut self, expanded: bool) {
         self.route_gpu = RouteGpu::with_layout(&self.device, self.format, expanded);
-        self.cartographic_gpu = self.route_gpu.fork(&self.device);
         self.inspection_gpu = self.route_gpu.fork(&self.device);
         self.route_dirty = true;
-        self.cartographic_dirty = true;
         self.inspection_dirty = true;
     }
+    /// Overlay segments painted into textures so far (the old draped-geometry
+    /// upload counter's replacement).
     pub fn cartographic_upload_bytes(&self) -> u64 {
-        self.cartographic_gpu.uploaded_bytes
+        self.overlay.painted_segments * 64
     }
     pub fn overlays_pending(&self) -> bool {
         self.route_pending || self.route_dirty || self.cartography_pending()
