@@ -73,8 +73,12 @@ class PipelineWaitTest {
   try{
    backend.uncachedNetwork(key){it.fold(delivered::complete,delivered::completeExceptionally)}
    val response=delivered.get(2,TimeUnit.SECONDS);assertArrayEquals(body,response.bytes);saved.get(2,TimeUnit.SECONDS)
-   // The old path has no HTTP-cache entry. There is no retained transport RAM.
-   assertNull(HttpTileBackend(client){null}.local(key))
+   // Since 0.1.8 (cd9b82d) the cache-free winner is also published
+   // asynchronously into the same HTTP cache. The earlier assertion of no
+   // entry predates that and passed only while the background write lagged.
+   // Wait for the writer, then check the copy a restarted backend can read.
+   backend.awaitCacheWrites()
+   assertArrayEquals(body,HttpTileBackend(client){null}.local(key)!!.bytes)
    val restarted=HedgedBodyCache(File(dir,"escaped"),1048576)
    assertArrayEquals(body,restarted.get(key)!!.bytes)
    assertNull(restarted.get(key,response.until+1))

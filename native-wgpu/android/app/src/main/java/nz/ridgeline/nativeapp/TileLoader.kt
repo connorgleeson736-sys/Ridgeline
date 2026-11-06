@@ -182,7 +182,22 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private fun resident(source:Source)=view.isResident(source.id.gpu(),source.geometry)
     // Provisional terrain interiors currently staged, one owner task per tile.
     private val interiorOwners=ConcurrentHashMap<Source,Task>()
-    private companion object{const val PARK_MILLIS=1500L}
+    private companion object{
+        const val PARK_MILLIS=1500L
+        val WARM_ORIGINS=listOf("https://basemaps.linz.govt.nz/","https://services.arcgisonline.com/")
+    }
+    // Connection health: when Android's default network changes, pooled
+    // connections belong to the old network. Drop them, repeat stalled
+    // requests on the new network at once and warm its connections.
+    private val connectivity=context.getSystemService(android.net.ConnectivityManager::class.java)
+    private val networkLock=Any()
+    private var defaultNetwork:android.net.Network?=null
+    private val networkCallback=object:android.net.ConnectivityManager.NetworkCallback(){
+        override fun onAvailable(network:android.net.Network){
+            val changed=synchronized(networkLock){val old=defaultNetwork;defaultNetwork=network;old!=null&&old!=network}
+            if(changed&&!dead){backend.networkChanged();if(!offlineOnly)backend.warm(WARM_ORIGINS)}
+        }
+    }
     fun progressiveTerrain(enabled:Boolean){mapSettings.progressiveTerrain(enabled);if(!enabled)for(task in interiorOwners.values.toList())if(interiorOwners.remove(task.source,task))view.clearInterior(task.source.id.gpu(),task.stageToken)}
     private inner class Task(val source:Source,@Volatile var priority:Int,@Volatile var speculative:Boolean=false):Runnable,Comparable<Task>{
         private val order=sequence.getAndIncrement()
@@ -733,6 +748,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     }
     fun setActive(value:Boolean){active=value;if(value)cameraChanged()else{transport.batchDemand{for(task in jobs.values)task.cancel();clearWarm()}}}
     fun close() {
+        runCatching{connectivity?.unregisterNetworkCallback(networkCallback)}
         escapedWrites.shutdown()
         derivedReads.close()
         dead = true;transport.batchDemand{for(task in jobs.values)task.cancel();clearWarm();transport.close()};localImages.close();preparedWrites.shutdownNow();attachmentJobs.shutdown();downloadCancel.set(true);downloadJobs.shutdown();offlineQueries.shutdownNow(); profileRevision.incrementAndGet();profileJob?.cancel(true);profileJobs.shutdownNow();timer?.cancel(true); scheduler.shutdownNow(); geometryWorkers.shutdownNow();imageWorkers.shutdownNow()
@@ -740,6 +756,10 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         Thread({downloadJobs.awaitTermination(60,TimeUnit.SECONDS);offlineQueries.awaitTermination(5,TimeUnit.SECONDS);profileJobs.awaitTermination(60,TimeUnit.SECONDS);geometryWorkers.awaitTermination(60,TimeUnit.SECONDS);imageWorkers.awaitTermination(60,TimeUnit.SECONDS);attachmentJobs.awaitTermination(60,TimeUnit.SECONDS);localImages.awaitClosed();transport.awaitClosed();runCatching{overviews.close()};runCatching{offline.close()};runCatching{client.cache?.close()}},"ridgeline-offline-close").start()
     }
     init{
+        runCatching{connectivity?.registerDefaultNetworkCallback(networkCallback)}
+        // DNS, TCP and TLS for both providers overlap start-up instead of
+        // delaying the first visible tiles.
+        if(!offlineOnly)runCatching{scheduler.execute{if(!dead&&!offlineOnly)backend.warm(WARM_ORIGINS)}}
         imageryReady.whenComplete{_,error->if(error==null)cameraChanged()else view.post{if(!dead)view.onStatus("Imagery metadata unavailable")}}
         view.onInvalidUpload={tile->
             for(geometry in listOf(true,false)){

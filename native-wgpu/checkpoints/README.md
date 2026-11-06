@@ -1,6 +1,31 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.15 Fast Coverage Base APK — 32.6 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Fast-Coverage-0.1.15-Base.apk)**.
+Latest: **[Download 0.1.16 Connection Recovery Base APK — 32.6 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Connection-Recovery-0.1.16-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 17:
+**updates 0.1.13–0.1.15 in place, keeping its data.**
+
+Network transport recovery. All LINZ requests share one HTTP/2 connection; when
+it dies silently (Wi-Fi/mobile handover, tower change, NAT timeout) every LINZ
+tile previously stalled until the 15 s read timeout.
+
+- **Stalled requests are hedged.** No response headers after 2.5 s → the same
+  request goes out on a fresh connection; first answer wins. New requests then
+  move to the connection that proved healthy.
+- **Network changes act immediately.** Pooled connections are dropped, stalled
+  requests are repeated over the new network at once, connections re-warmed.
+- **Connections are warmed at start** (LINZ and Esri DNS/TCP/TLS).
+
+Real-socket tests: a stalled connection recovered in ~0.3 s (test hedge) instead
+of the full read timeout; a network change recovered in 0.17 s; healthy
+requests are never duplicated. 159 JVM tests pass. Renderer identical to 0.1.15;
+all 623 original assets identical. No phone measurement.
+[Findings and limits](../research/FULL-AUDIT-2026-11-06.md#0116-network-transport) ·
+[Exact release record](../validation/connection-recovery-2026-11-06/release.json) ·
+[SHA-256](Ridgeline-Native-Connection-Recovery-0.1.16-Base.apk.sha256).
+
+## Previous 0.1.15 fast coverage checkpoint
+
+**[Download 0.1.15 Fast Coverage Base APK — 32.6 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Fast-Coverage-0.1.15-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 16:
 **updates 0.1.13/0.1.14 in place, keeping its data.**
 

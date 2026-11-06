@@ -11,7 +11,7 @@ android {
  compileSdk=36
  defaultConfig { applicationId = explicitId ?: if (sideBySide) "nz.ridgeline.nativeapp.performance" else "nz.ridgeline.nativeapp"
   manifestPlaceholders["ridgelineAppLabel"] = explicitLabel ?: if (sideBySide) "Ridgeline Native Performance" else "Ridgeline Native Prototype"
-  minSdk=26; targetSdk=36; versionCode=16; versionName="0.1.15-fast-coverage"; ndk {abiFilters+=providers.gradleProperty("ridgelineAbis").getOrElse("arm64-v8a").split(",")} }
+  minSdk=26; targetSdk=36; versionCode=17; versionName="0.1.16-connection-recovery"; ndk {abiFilters+=providers.gradleProperty("ridgelineAbis").getOrElse("arm64-v8a").split(",")} }
  // An optional external key makes signing reproducible without committing keys.
  signingConfigs.getByName("debug") {
   providers.environmentVariable("RIDGELINE_SIGNING_KEYSTORE").orNull?.let {storeFile=file(it)}
@@ -34,7 +34,7 @@ android {
  androidResources {noCompress += listOf("bin","zip")}
 }
 kotlin {compilerOptions {jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)}}
-dependencies { testImplementation("junit:junit:4.13.2"); testImplementation("org.json:json:20250517"); implementation("com.squareup.okhttp3:okhttp:5.3.2") }
+dependencies { testImplementation("junit:junit:4.13.2"); testImplementation("org.json:json:20250517"); testImplementation("com.squareup.okhttp3:mockwebserver3:5.3.2"); implementation("com.squareup.okhttp3:okhttp:5.3.2") }
 
 // Optional managed-environment trust for local debug tests only. No CA is
 // committed, and normal builds retain system trust without a session anchor.

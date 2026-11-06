@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="nz.ridgeline.nativeapp.HedgedTransportTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-06T06:37:33.746Z" hostname="vm" time="4.856">
+  <properties/>
+  <testcase name="afterAHedgeWinsNewHttp2RequestsAvoidTheDeadConnection" classname="nz.ridgeline.nativeapp.HedgedTransportTest" time="0.58"/>
+  <testcase name="aProviderErrorIsReportedPromptlyWithoutAHedge" classname="nz.ridgeline.nativeapp.HedgedTransportTest" time="0.506"/>
+  <testcase name="aNetworkChangeRepeatsStalledRequestsImmediately" classname="nz.ridgeline.nativeapp.HedgedTransportTest" time="0.16"/>
+  <testcase name="withoutHedgingTheSameStallLastsTheWholeReadTimeout" classname="nz.ridgeline.nativeapp.HedgedTransportTest" time="2.006"/>
+  <testcase name="aStalledPooledConnectionIsBypassedByAHedgeOnAFreshConnection" classname="nz.ridgeline.nativeapp.HedgedTransportTest" time="0.354"/>
+  <testcase name="healthyRequestsAreNeverDuplicated" classname="nz.ridgeline.nativeapp.HedgedTransportTest" time="0.843"/>
+  <testcase name="cancellingARequestNeverStartsAHedge" classname="nz.ridgeline.nativeapp.HedgedTransportTest" time="0.406"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
