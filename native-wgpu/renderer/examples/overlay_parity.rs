@@ -1,6 +1,6 @@
 //! Capacitor/MapLibre overlay parity on actual GPU execution (synthetic terrain):
-//! labels are hidden whole when terrain blocks their anchor, never clipped per
-//! pixel, and dash patterns stay fixed to the ground while zooming.
+//! dash patterns stay fixed to the ground while zooming. Label occlusion is
+//! covered by label_occlusion.rs.
 use ridgeline_renderer::{Renderer, TileId};
 fn main() {
     pollster::block_on(run());
@@ -68,11 +68,6 @@ async fn run() {
     let mut r = Renderer::new(&instance, None, Some(wgpu::TextureFormat::Rgba8Unorm), 256, 256)
         .await
         .unwrap();
-    // Resident tiles are not replaced by a second upload of the same ID, so the
-    // ridge terrain uses its own renderer.
-    let mut ridged = Renderer::new(&instance, None, Some(wgpu::TextureFormat::Rgba8Unorm), 256, 256)
-        .await
-        .unwrap();
     let id = TileId { z: 11, x: 1991, y: 1300 };
     let b = id.bounds();
     let span = b[2] - b[0];
@@ -89,40 +84,7 @@ async fn run() {
     });
     let target = output.create_view(&Default::default());
     let grey = [160u8, 160, 160, 255].repeat(256 * 256);
-
-    // --- Labels: line-of-sight occlusion, whole-label decisions -------------
-    // The camera looks north (bearing 0) from the south. North and south anchors
-    // are both inside the view over flat ground.
-    let north = [center[0], b[1] + span * 0.30];
-    let south = [center[0], b[1] + span * 0.58];
     r.upload(id, &vec![500.; 129 * 129], &grey).unwrap();
-    render(&mut r, &target, center, 11., 60.);
-    let flat = r.project_points(&[north, south]);
-    assert!(flat[0][2] == 1. && flat[1][2] == 1., "both anchors visible over flat ground: {flat:?}");
-    // A 3,000 m east-west ridge across the middle row now stands between the
-    // camera and the northern anchor only.
-    let mut ridge = vec![500f32; 129 * 129];
-    for row in 56..=60 {
-        for column in 0..129 {
-            ridge[row * 129 + column] = 3000.;
-        }
-    }
-    ridged.upload(id, &ridge, &grey).unwrap();
-    let ridged_output = ridged.device.create_texture(&wgpu::TextureDescriptor {
-        label: Some("ridge parity"),
-        size: wgpu::Extent3d { width: 256, height: 256, depth_or_array_layers: 1 },
-        mip_level_count: 1,
-        sample_count: 1,
-        dimension: wgpu::TextureDimension::D2,
-        format: wgpu::TextureFormat::Rgba8Unorm,
-        usage: wgpu::TextureUsages::RENDER_ATTACHMENT | wgpu::TextureUsages::COPY_SRC,
-        view_formats: &[],
-    });
-    render(&mut ridged, &ridged_output.create_view(&Default::default()), center, 11., 60.);
-    let blocked = ridged.project_points(&[north, south]);
-    assert_eq!(blocked[0][2], 0., "a label behind the ridge is hidden whole");
-    assert_eq!(blocked[1][2], 1., "a label in front of the ridge stays visible");
-    println!("PASS label line of sight: hidden behind ridge, visible in front");
 
     // --- Dashes: fixed to the ground while zooming (flat renderer) --------
     // The line starts far west so the screen centre is ~250 px along it.
@@ -148,33 +110,4 @@ async fn run() {
     }
     assert!(worst < 1., "dash transitions stay fixed to the ground while zooming (worst {worst:.2} px)");
     println!("PASS ground-fixed dashes: worst transition drift {worst:.2} px over a 0.02 zoom step ({})", if gles { "GLES" } else { "Vulkan" });
-    // Extra GL contexts are created only after the shared renderer's checks:
-    // on GLES, creating/dropping contexts mid-run disturbs the current context.
-    // A subsidiary ridge just in front of the summit (rows 39-40, ~75-240 m), and
-    // a single-row (~150 m) ridge midway: neither may be skipped.
-    for (name, rows) in [("subsidiary ridge beside the anchor", 39..=40), ("single-row ridge", 50..=50)] {
-        let mut near = Renderer::new(&instance, None, Some(wgpu::TextureFormat::Rgba8Unorm), 256, 256)
-            .await
-            .unwrap();
-        let mut heights = vec![500f32; 129 * 129];
-        for row in rows {
-            for column in 0..129 {
-                heights[row * 129 + column] = 3000.;
-            }
-        }
-        near.upload(id, &heights, &grey).unwrap();
-        let out = near.device.create_texture(&wgpu::TextureDescriptor {
-            label: Some("near ridge"),
-            size: wgpu::Extent3d { width: 256, height: 256, depth_or_array_layers: 1 },
-            mip_level_count: 1,
-            sample_count: 1,
-            dimension: wgpu::TextureDimension::D2,
-            format: wgpu::TextureFormat::Rgba8Unorm,
-            usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
-            view_formats: &[],
-        });
-        render(&mut near, &out.create_view(&Default::default()), center, 11., 60.);
-        assert_eq!(near.project_points(&[north])[0][2], 0., "{name}: label hidden");
-    }
-    println!("PASS label line of sight: thin and near-summit ridges hide labels behind them");
 }

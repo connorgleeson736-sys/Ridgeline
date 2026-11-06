@@ -1,6 +1,31 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.20 Parent Preload Base APK — 32.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Parent-Preload-0.1.20-Base.apk)**.
+Latest: **[Download 0.1.21 GPU Labels Base APK — 32.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-GPU-Labels-0.1.21-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 22:
+**updates 0.1.13–0.1.20 in place, keeping its data.**
+
+- **Labels no longer slow the app.** Whether terrain hides a label is decided
+  on the GPU from the terrain depth at its anchor, as MapLibre does. The CPU
+  line-of-sight march (up to 512 samples per label, on the render thread) is
+  gone. Labels are still hidden whole, never cut by a slope.
+- **Labels stop flickering while moving.** Labels on screen stay until their
+  replacement placement arrives, keep their place and anchor between
+  placements, keep their height while terrain refines, and fade in.
+- **Fewer river and track names**, 1.5 zooms later (rivers from 15.5, major
+  tracks 13.5, other tracks 15.5), one per name per tile.
+- **NZ Topo crisp and steady.** Capacitor's 128 px topo tiles with rounded
+  tile zoom, and enough tile budget for a full screen (overflowing it made
+  the view drop a level and refine a shifting patch: blurry and jumpy).
+
+174 JVM tests, Rust tests and GPU checks pass, including a new GPU label
+occlusion test on Vulkan and GLES; lint 0 errors; 623 original assets
+identical. Not run on a phone.
+[Exact release record](../validation/gpu-labels-2026-11-06/release.json) ·
+[SHA-256](Ridgeline-Native-GPU-Labels-0.1.21-Base.apk.sha256).
+
+## Previous 0.1.20 parent preload checkpoint
+
+**[Download 0.1.20 Parent Preload Base APK — 32.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Parent-Preload-0.1.20-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 21:
 **updates 0.1.13–0.1.19 in place, keeping its data.**
 

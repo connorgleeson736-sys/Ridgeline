@@ -306,7 +306,11 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         val budget=maxOf(16,(if(geometry)geometryLimit else imageLimit)*3/4)
         val focus=key.surfaceFocus
         val state=mapSettings.state
-        if(!state.threeD)FlatSelection.plan(key.width,key.height,pose,DetailPolicy.target(geometry,if(geometry)key.terrainDetail else key.imageryDetail)*(if(!geometry&&state.base==MapSettings.Base.TOPO).5 else 1.0),budget,if(geometry)22 else if(state.base==MapSettings.Base.LINZ)19 else 18)?.let{return it.map{tile->Id(tile.z,tile.x,tile.y)}}
+        // 2D rasters follow MapLibre: rounded tile zoom (crisper), and NZ Topo's
+        // small 128 px tiles get the full image budget so a screenful never
+        // overflows it (which dropped the view a level and refined only a
+        // shifting patch near the centre: blurry and jumpy).
+        if(!state.threeD)FlatSelection.plan(key.width,key.height,pose,if(!geometry&&state.base==MapSettings.Base.TOPO)128.0 else DetailPolicy.target(geometry,if(geometry)key.terrainDetail else key.imageryDetail),if(!geometry&&state.base==MapSettings.Base.TOPO)maxOf(budget,imageLimit)else budget,if(geometry)22 else if(state.base==MapSettings.Base.LINZ)19 else 18,roundZoom=!geometry)?.let{return it.map{tile->Id(tile.z,tile.x,tile.y)}}
         val count=NativeBridge.planFocused(key.width,key.height,pose.longitude,pose.latitude,
             pose.zoom,pose.bearing,pose.pitch,pose.elevation,budget,
             DetailPolicy.target(geometry,if(geometry)key.terrainDetail else key.imageryDetail)*(if(!geometry&&mapSettings.state.base==MapSettings.Base.TOPO).5 else 1.0),if(geometry)22 else if(mapSettings.state.base!=MapSettings.Base.LINZ)18 else 19,1.0,

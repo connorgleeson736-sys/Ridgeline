@@ -403,10 +403,13 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
                 post{if(rangeMarkers===markers)onRangeMarkers(markers,positions)}
             }
             val atlas=appliedLayers?.atlas;val now=android.os.SystemClock.uptimeMillis()
-            if(atlas!=null&&atlas.labels.isNotEmpty()&&(labelPose!=pose||labelSize!=size)&&now-labelTime>=33){
+            if(atlas!=null&&atlas.labels.isNotEmpty()&&(labelPose!=pose||labelSize!=size)&&now-labelTime>=(if(gestureActive)100 else 33)){
                 val n=NativeBridge.project(handle,atlas.points,labelProjection);labelProjection.rewind();val positions=FloatArray(n*3){labelProjection.float}
                 labelPose=pose;labelSize=size;labelTime=now
                 post{if(live&&layerBatch?.atlas===atlas)onLayerProjection(atlas,positions)}
+            }else if(atlas!=null&&atlas.labels.isNotEmpty()&&(labelPose!=pose||labelSize!=size)){
+                // Placement for the final camera after a gesture, once its interval passes.
+                requestFrame((if(gestureActive)100 else 33)-(now-labelTime))
             }
 
         }else {

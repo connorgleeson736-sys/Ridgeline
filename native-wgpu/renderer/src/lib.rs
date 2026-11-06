@@ -129,6 +129,12 @@ pub struct Renderer {
     label_sprites: Vec<LabelSprite>,
     label_selection: Vec<(usize, [f32; 2])>,
     label_anchor: [f64; 2],
+    /// New-candidate batches keep the shown labels until their placement arrives.
+    labels_stale: bool,
+    label_born: HashMap<(u64, u64), f32>,
+    label_heights: HashMap<(u64, u64), f32>,
+    label_fade_until: f32,
+    label_clock: std::time::Instant,
     labels_dirty: bool,
     inspection_gpu: routes::RouteGpu,
     inspection_point: Option<[f64; 2]>,
@@ -546,6 +552,11 @@ impl Renderer {
             label_sprites: vec![],
             label_selection: vec![],
             label_anchor: [0.5, 0.5],
+            labels_stale: false,
+            label_born: HashMap::new(),
+            label_heights: HashMap::new(),
+            label_fade_until: 0.,
+            label_clock: std::time::Instant::now(),
             labels_dirty: false,
             inspection_gpu,
             inspection_point: None,
@@ -584,6 +595,7 @@ impl Renderer {
             center: [0.5, 0.5],
             last_view: None,
         };
+        renderer.labels_gpu.set_depth(&renderer.device, &renderer.depth);
         if adapter.get_info().backend == wgpu::Backend::Gl && mipmap_mode == MipmapMode::Auto {
             let gpu = renderer.mipmap_diagnostics()?;
             if gpu.iter().any(|v| v[1] != 0 || v[2] != 255) {
@@ -638,7 +650,7 @@ impl Renderer {
             sample_count: 1,
             dimension: wgpu::TextureDimension::D2,
             format: wgpu::TextureFormat::Depth32Float,
-            usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
+            usage: wgpu::TextureUsages::RENDER_ATTACHMENT | wgpu::TextureUsages::TEXTURE_BINDING,
             view_formats: &[],
         })
     }
@@ -657,6 +669,7 @@ impl Renderer {
         self.width = w.max(1);
         self.height = h.max(1);
         self.depth = Self::depth(&self.device, self.width, self.height);
+        self.labels_gpu.set_depth(&self.device, &self.depth);
     }
     pub fn touch_geometry(&mut self, id: TileId) -> bool {
         if let Some(tile) = self.tiles.get_mut(&id) {
@@ -973,6 +986,7 @@ impl Renderer {
     pub fn next_adaptive_frame(&self) -> Option<u64> {
         if self.route_upload.is_some()
             || self.overlay.pending
+            || self.label_clock.elapsed().as_secs_f32() < self.label_fade_until
             || self.route_dirty
             || self.labels_dirty
             || self.inspection_dirty
@@ -1584,6 +1598,7 @@ impl Renderer {
             &route_view,
             px_meter,
             route_scale,
+            self.label_clock.elapsed().as_secs_f32(),
         );
         self.inspection_gpu.camera(
             &self.queue,
@@ -1836,7 +1851,8 @@ impl Renderer {
                     view: &depth,
                     depth_ops: Some(wgpu::Operations {
                         load: wgpu::LoadOp::Clear(1.),
-                        store: wgpu::StoreOp::Discard,
+                        // Kept only when labels read it; otherwise never written out.
+                        store: if self.labels_gpu.visible() { wgpu::StoreOp::Store } else { wgpu::StoreOp::Discard },
                     }),
                     stencil_ops: None,
                 }),
@@ -1912,8 +1928,24 @@ impl Renderer {
                 i = end_instance;
             }
             self.route_gpu.draw(&mut pass);
-            self.labels_gpu.draw(&mut pass);
             self.inspection_gpu.draw(&mut pass);
+        }
+        if self.labels_gpu.visible() {
+            // Labels after terrain, reading its depth at each anchor.
+            let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+                label: Some("labels"),
+                color_attachments: &[Some(wgpu::RenderPassColorAttachment {
+                    view: target,
+                    depth_slice: None,
+                    resolve_target: None,
+                    ops: wgpu::Operations { load: wgpu::LoadOp::Load, store: wgpu::StoreOp::Store },
+                })],
+                depth_stencil_attachment: None,
+                timestamp_writes: None,
+                occlusion_query_set: None,
+                multiview_mask: None,
+            });
+            self.labels_gpu.draw(&mut pass);
         }
         self.pending_frames
             .fetch_add(1, std::sync::atomic::Ordering::Release);

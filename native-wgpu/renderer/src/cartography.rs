@@ -56,46 +56,9 @@ impl Renderer {
         self.labels_dirty = true;
         self.inspection_dirty = true;
     }
-    /// Projection only, no GPU readback or per-label raycast. Text quads use terrain depth.
-    /// True when resident terrain rises above the straight eye→anchor ray, the
-    /// per-symbol test MapLibre performs against its depth buffer. Samples are
-    /// about 25 m of ground apart (48–512 per label), so a nearer ridge cannot
-    /// slip between samples; only the 30 m of ground around the anchor itself is
-    /// exempt, so a label is never hidden by the summit it names. 2 m tolerance.
-    fn line_of_sight_blocked(
-        &self,
-        eye: [f64; 3],
-        anchor: [f64; 3],
-        center: [f64; 2],
-        world: f64,
-        ppm: f64,
-        local_z: &impl Fn(f64) -> f64,
-    ) -> bool {
-        let tolerance = local_z(2.) - local_z(0.);
-        let horizontal = (anchor[0] - eye[0]).hypot(anchor[1] - eye[1]);
-        if !(horizontal > 0.) || !(ppm > 0.) {
-            return false;
-        }
-        let step = 25. * ppm;
-        let samples = ((horizontal / step).ceil() as usize).clamp(48, 512);
-        let exempt = (30. * ppm / horizontal).clamp(0., 0.5);
-        let mut hint = 0;
-        (1..samples).any(|i| {
-            let t = i as f64 / samples as f64;
-            if t > 1. - exempt {
-                return false;
-            }
-            let x = eye[0] + (anchor[0] - eye[0]) * t;
-            let y = eye[1] + (anchor[1] - eye[1]) * t;
-            let z = eye[2] + (anchor[2] - eye[2]) * t;
-            let point = [center[0] + x / world, center[1] - y / world];
-            if !(0. ..=1.).contains(&point[0]) || !(0. ..=1.).contains(&point[1]) {
-                return false;
-            }
-            self.terrain_height_near(point, &mut hint)
-                .is_some_and(|h| local_z(h) > z + tolerance)
-        })
-    }
+    /// Screen position of each point on the resident terrain, for label
+    /// collision. Terrain occlusion is decided on the GPU per label anchor
+    /// (labels.wgsl), as MapLibre does, so this does no line-of-sight work.
     pub fn project_points(&self, points: &[[f64; 2]]) -> Vec<[f32; 3]> {
         let Some(view) = self.last_view else {
             return vec![[0.; 3]; points.len()];
@@ -112,17 +75,6 @@ impl Renderer {
         let world = 512. * 2f64.powf(view.zoom);
         let scale = self.map_style.height_scale() as f64;
         let local_z = |h: f64| (h * scale + 1. - view.elevation as f64) * ppm as f64;
-        // Eye in the same local frame as camera_matrix (look-at point at origin).
-        let (b, t) = (
-            (view.bearing as f64).to_radians(),
-            (view.pitch as f64).to_radians(),
-        );
-        let distance = view.height as f64 * 1.5;
-        let eye = [
-            -b.sin() * t.sin() * distance,
-            -b.cos() * t.sin() * distance,
-            t.cos() * distance,
-        ];
         points
             .iter()
             .map(|p| {
@@ -138,12 +90,6 @@ impl Renderer {
                 if c.w <= 0. || c.z < 0. || c.z > c.w {
                     return [0.; 3];
                 };
-                // MapLibre hides a whole symbol when terrain blocks its anchor,
-                // rather than clipping the text per pixel. March the line of
-                // sight from the eye to the anchor over resident terrain.
-                if self.map_style.three_d && self.line_of_sight_blocked(eye, anchor, view.center, world, ppm as f64, &local_z) {
-                    return [0.; 3];
-                }
                 [
                     (c.x / c.w + 1.) * 0.5 * view.width as f32,
                     (1. - c.y / c.w) * 0.5 * view.height as f32,
