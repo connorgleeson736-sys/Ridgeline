@@ -1,6 +1,42 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.16 Connection Recovery Base APK — 32.6 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Connection-Recovery-0.1.16-Base.apk)**.
+Latest: **[Download 0.1.17 Capacitor Parity Base APK — 32.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Capacitor-Parity-0.1.17-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 18:
+**updates 0.1.13–0.1.16 in place, keeping its data.**
+
+Follows the Capacitor app for overlays, peak labels, route profiles and the map UI:
+
+- **Overlays come on and off by Capacitor's rules.** Vector topography stops at
+  zoom 14 and is over-zoomed closer, as Capacitor's source does (native asked
+  for zoom 15). Layer filters use each tile's own zoom, as MapLibre does.
+  Visible tiles load four at a time, including during gestures, so mapped
+  tracks and roads appear when zoomed close.
+- **Peak names are no longer drawn inside mountains.** Line of sight is checked
+  every 25 m of ground (was 48 samples per ray), and only the last 30 m before
+  the summit is exempt (was 2% of the ray), so thin and near-summit ridges
+  hide the label.
+- **High-detail elevation profiles.** Routes are sampled every 5 m from zoom 17
+  LINZ elevation (was 100 m spacing from zoom 14), with 2 m samples at zoom 17
+  along the part in view at zoom 15+. A quick zoom 13 preview shows first. This is
+  Capacitor's profile engine; ascent and descent appear only with full coverage.
+- **Capacitor map UI.** Kea launcher and locate button, 2D/3D switch, compass
+  and layers buttons, scale bar and an "i" attribution button. The zoom +/−
+  buttons are gone. The Map layers panel and the Saved routes drawer follow
+  Capacitor's layout and wording.
+- **Top buttons respond on the first tap.** An open Layers panel used to swallow
+  the first tap on any other control; camera updates on the UI thread no longer
+  wait on the tile loader's lock; every button shows a pressed state.
+
+170 JVM tests and the Rust and GPU label/terrain checks pass; lint 0 errors.
+All 623 original assets identical, plus the 40 KB launcher icon. Not run on a
+phone, and the UI was not seen on a device (no emulator here).
+[Details](../research/FULL-AUDIT-2026-11-06.md#0117-capacitor-parity) ·
+[Exact release record](../validation/capacitor-parity-2026-11-06/release.json) ·
+[SHA-256](Ridgeline-Native-Capacitor-Parity-0.1.17-Base.apk.sha256).
+
+## Previous 0.1.16 connection recovery checkpoint
+
+**[Download 0.1.16 Connection Recovery Base APK — 32.6 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Connection-Recovery-0.1.16-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 17:
 **updates 0.1.13–0.1.15 in place, keeping its data.**
 

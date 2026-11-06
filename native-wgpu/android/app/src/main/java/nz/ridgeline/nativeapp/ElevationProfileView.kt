@@ -36,7 +36,8 @@ class ElevationProfileView(context:Context):View(context){
         val pad=max(15.0,(max-min)*.08);low=floor((min-pad)/10)*10;high=ceil((max+pad)/10)*10
         if(high<=low)high=low+30
         path.reset();fill.reset();var pen=false;var lastX=0f
-        for(p in samples){val h=p.height
+        // Draw at most four samples per chart column; analysis uses every sample.
+        for(p in RouteProfile.chartSamples(samples)){val h=p.height
             if(h==null){if(pen){fill.lineTo(lastX,bottom);fill.close()};pen=false;continue}
             val px=x(p.distance);val py=y(h)
             if(pen){path.lineTo(px,py);fill.lineTo(px,py)}else{path.moveTo(px,py);fill.moveTo(px,bottom);fill.lineTo(px,py)}

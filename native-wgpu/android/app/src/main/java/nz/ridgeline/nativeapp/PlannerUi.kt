@@ -29,6 +29,10 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
     private var profilePoints=emptyList<Coordinate>()
     private var profileDirty=false
     private var profileValues=emptyList<NativeGeo.ProfilePoint>()
+    /** Last requested profile: detail pass included, and its in-view focus. */
+    private var profileDetail=false
+    private var profileFocus=""
+    private val settle=Runnable{cameraSettled()}
     private var export:Pair<String,List<Coordinate>>?=null
     private var restoring=false
     private var restoreId:String?=null
@@ -45,14 +49,27 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
     private val edit=button("Done"){controller.drawing(!controller.state.drawing)}
     private val undo=button("Undo"){controller.undo()}
     private val delete=button("Delete point"){controller.deleteSelected()}
-    private val stats=listOf("Distance","Ascent","Descent","Highest").map{NativeUi.text(activity,it+"\n—",12f)}
+    private val stats=listOf("Distance","Ascent","Descent","Highest").map{StatView(activity).apply{text=it+"\n—"}}
+    /** Capacitor route stat: small muted label above a larger value. */
+    private class StatView(context:android.content.Context):TextView(context){
+        init{textSize=15f;setTextColor(NativeUi.ink)}
+        override fun setText(text:CharSequence?,type:BufferType?){
+            val plain=text?.toString();val split=plain?.indexOf('\n')?:-1
+            if(text is android.text.Spanned||plain==null||split<0){super.setText(text,type);return}
+            val styled=android.text.SpannableString(plain)
+            styled.setSpan(android.text.style.RelativeSizeSpan(.8f),0,split,0);styled.setSpan(android.text.style.ForegroundColorSpan(NativeUi.muted),0,split,0)
+            styled.setSpan(android.text.style.RelativeSizeSpan(1.3f),split+1,plain.length,0)
+            super.setText(styled,BufferType.SPANNABLE)
+        }
+    }
+    private fun metres(value:Double)=String.format(java.util.Locale.ROOT,"%,d m",value.roundToInt())
     private var drawer:View?=null
     private var drawerList:LinearLayout?=null
     private var drawerStamp:Any?=null
-    private data class Card(val view:LinearLayout,val check:CheckBox,val thumb:RouteThumbnailView,val summary:TextView,val open:Button,val close:Button,val order:Button)
+    private data class Card(val view:LinearLayout,val check:CheckBox,val thumb:RouteThumbnailView,val summary:TextView,val open:TextView,val close:TextView,val order:TextView)
     private val drawerCards=linkedMapOf<String,Card>()
     private var updatingCards=false
-    private var combineButton:Button?=null
+    private var combineButton:TextView?=null
     private val combineSelection=linkedMapOf<String,Boolean>()
     var onOffline:()->Unit={}
     var onProfilePoint:(Coordinate?)->Unit={}
@@ -61,12 +78,14 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
     private var combiningPending=false
     private fun dp(value:Int)=(value*activity.resources.displayMetrics.density+.5f).toInt()
     private fun button(text:String,action:()->Unit)=NativeUi.button(activity,text,action=action)
+    /** Capacitor drawer actions: orange text links. */
+    private fun link(text:String,action:()->Unit)=TextView(activity).apply{this.text=text;textSize=15f;setTextColor(android.graphics.Color.rgb(196,104,46));gravity=Gravity.CENTER_VERTICAL;setPadding(0,0,dp(18),0);isClickable=true;isFocusable=true;background=NativeUi.pressable(activity,null);setOnClickListener{action()}}
     private fun toast(message:String){Toast.makeText(activity,message,Toast.LENGTH_LONG).show()}
     init {
         val heading=LinearLayout(activity)
         heading.addView(title,LinearLayout.LayoutParams(0,dp(38),1f));heading.addView(button("⋮"){routeMenu()},LinearLayout.LayoutParams(dp(44),dp(38)));heading.addView(button("×"){controller.unload()},LinearLayout.LayoutParams(dp(44),dp(38)))
         panel.addView(heading)
-        panel.addView(LinearLayout(activity).apply{for(v in stats)addView(v,LinearLayout.LayoutParams(0,dp(43),1f))})
+        panel.addView(LinearLayout(activity).apply{for(v in stats)addView(v,LinearLayout.LayoutParams(0,dp(52),1f))})
         panel.addView(chart,LinearLayout.LayoutParams(-1,dp(165)));panel.addView(caption)
         for(view in listOf(edit,undo,button("Export GPX"){exportGpx()},delete))tools.addView(view,LinearLayout.LayoutParams(0,dp(42),1f))
         panel.addView(tools);panel.addView(summary)
@@ -122,16 +141,36 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
                 for(i in 1..3)stats[i].text=listOf("","Ascent","Descent","Highest")[i]+"\n—"
                 caption.text=if(state.points.size>=2)"Loading elevation profile…"else"Tap to add · tap a line to insert · drag a point to move it."
                 loader.cancelProfile()
-                if(state.points.size>=2)loader.profile(state.points){values->
-                    if(closed||profilePoints!=state.points)return@profile
-                    profileValues=values;chart.data(values);val totals=NativeGeo.totals(values.map{it.height})
-                    val measured=values.count{it.height!=null}>=2
-                    stats[1].text="Ascent\n"+if(measured)"${totals.ascent.roundToInt()} m"else"—";stats[2].text="Descent\n"+if(measured)"${totals.descent.roundToInt()} m"else"—";stats[3].text="Highest\n${totals.high?.roundToInt()?:"—"} m"
-                    caption.text=profileCaption();chart.refreshInspection()
-                }
+                if(state.points.size>=2)requestProfile(state.points,!state.drawing,true)
+            }else if(!state.drawing&&!profileDetail&&state.points.size>=2){
+                // Capacitor: drawing shows the quick preview; finishing refines it.
+                requestProfile(state.points,true,false)
             }
             if(drawer!=null)renderDrawer()
         }
+    }
+    private fun focusBounds()=RouteProfile.focusBounds(terrain.cameraPose,(terrain.width/terrain.pixelScale).roundToInt(),(terrain.height/terrain.pixelScale).roundToInt())
+    private fun requestProfile(points:List<Coordinate>,detail:Boolean,previewFirst:Boolean){
+        val focus=if(detail)focusBounds()else null
+        profileDetail=detail;profileFocus=focus?.stamp()?:"overview"
+        loader.profile(points,detail,focus,previewFirst){values,_->
+            if(closed||profilePoints!=points)return@profile
+            profileValues=values;chart.data(values);val totals=NativeGeo.totals(values.map{it.height})
+            val measured=values.count{it.height!=null}>=2
+            stats[1].text="Ascent\n"+if(measured&&totals.complete)metres(totals.ascent)else"—";stats[2].text="Descent\n"+if(measured&&totals.complete)metres(totals.descent)else"—";stats[3].text="Highest\n${totals.high?.let(::metres)?:"—"}"
+            caption.text=profileCaption();chart.refreshInspection()
+        }
+    }
+    /** Camera moved: once it settles, refine the in-view part of the route at
+     * 2 m spacing (Capacitor re-samples when its zoom-15+ view bounds change). */
+    fun cameraChanged(){main.removeCallbacks(settle);main.postDelayed(settle,400)}
+    private fun cameraSettled(){
+        if(closed)return
+        if(terrain.gestureInProgress){main.postDelayed(settle,400);return}
+        val state=controller.state
+        if(state.drawing||state.dragging||state.points.size<2||state.points!=profilePoints||!profileDetail)return
+        val stamp=focusBounds()?.stamp()?:"overview"
+        if(stamp!=profileFocus)requestProfile(state.points,true,false)
     }
     private fun profileCaption():String{val totals=NativeGeo.totals(profileValues.map{it.height});return if(profileValues.isEmpty())"Elevation unavailable"else"${profileValues.size} samples${if(totals.complete)""else" · incomplete coverage"} · Drag the chart for section statistics"}
     private fun routeMenu(){AlertDialog.Builder(activity).setItems(arrayOf("Fit route","New route","Close route","Share GPX")){_,index->when(index){0->terrain.focus(controller.state.points);1->controller.newRoute();2->controller.unload();3->shareGpx()}}.show()}
@@ -168,13 +207,16 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         if(drawer!=null){dismissDrawer();return}
         val overlay=FrameLayout(activity);overlay.addView(View(activity).apply{setBackgroundColor(Color.argb(40,16,40,35));setOnClickListener{dismissDrawer()}},FrameLayout.LayoutParams(-1,-1))
         val sidebar=NativeUi.column(activity).apply{setPadding(dp(16),dp(8),dp(16),dp(12));setBackgroundColor(NativeUi.paper);elevation=dp(12).toFloat();isClickable=true}
-        val heading=LinearLayout(activity);heading.addView(NativeUi.heading(activity,"RIDGELINE"),LinearLayout.LayoutParams(0,-2,1f));heading.addView(button("×"){dismissDrawer()},LinearLayout.LayoutParams(dp(44),dp(44)));sidebar.addView(heading)
-        sidebar.addView(NativeUi.text(activity,"New Zealand alpine planner",12f));NativeUi.space(sidebar)
-        sidebar.addView(NativeUi.button(activity,"＋ Create route",true){newRoute()});NativeUi.space(sidebar)
-        sidebar.addView(button("Import GPX"){dismissDrawer();importGpx()})
+        // Capacitor "Saved routes" sidebar.
+        val heading=LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL}
+        heading.addView(NativeUi.text(activity,"Saved routes",22f).apply{setTypeface(null,android.graphics.Typeface.BOLD);setPadding(0,dp(10),0,dp(10))},LinearLayout.LayoutParams(0,-2,1f))
+        heading.addView(TextView(activity).apply{text="✕";textSize=18f;gravity=Gravity.CENTER;setTextColor(NativeUi.muted);contentDescription="Close saved routes";background=NativeUi.pressable(activity,null);isClickable=true;setOnClickListener{dismissDrawer()}},LinearLayout.LayoutParams(dp(44),dp(44)));sidebar.addView(heading)
+        NativeUi.space(sidebar,6)
+        sidebar.addView(button("Import GPX"){dismissDrawer();importGpx()}.apply{textSize=15f},LinearLayout.LayoutParams(-1,dp(48)));NativeUi.space(sidebar)
+        sidebar.addView(button("＋  Create new"){newRoute()}.apply{textSize=15f},LinearLayout.LayoutParams(-1,dp(48)))
         drawerList=NativeUi.column(activity)
         sidebar.addView(ScrollView(activity).apply{addView(drawerList)},LinearLayout.LayoutParams(-1,0,1f))
-        sidebar.addView(button("Download offline region"){dismissDrawer();onOffline()})
+        sidebar.addView(NativeUi.button(activity,"Download offline region",true){dismissDrawer();onOffline()}.apply{textSize=15f},LinearLayout.LayoutParams(-1,dp(50)).apply{topMargin=dp(8)})
         overlay.addView(sidebar,FrameLayout.LayoutParams(minOf(dp(350),activity.resources.displayMetrics.widthPixels-dp(36)),-1,Gravity.START))
         root.addView(overlay,FrameLayout.LayoutParams(-1,-1));drawer=overlay;drawerStamp=null;renderDrawer()
     }
@@ -183,21 +225,24 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         combineSelection.keys.retainAll(state.records.map{it.id}.toSet())
         val stamp=listOf(state.records,state.id,state.opened,combineSelection.toMap())
         if(stamp==drawerStamp)return;drawerStamp=stamp
-        if(list.childCount==0){list.addView(NativeUi.heading(activity,"Saved routes"));combineButton=button("Combine selected"){if(combineSelection.size>=2){val order=combineSelection.map{it.key to it.value};dismissDrawer();combiningPending=true;controller.combine(order)}};list.addView(combineButton);list.addView(button("Close all routes"){controller.closeAll()})}
+        if(list.childCount==0){NativeUi.space(list,8);combineButton=link("Combine selected"){if(combineSelection.size>=2){val order=combineSelection.map{it.key to it.value};dismissDrawer();combiningPending=true;controller.combine(order)}};list.addView(combineButton);list.addView(link("Close all routes"){controller.closeAll()})}
         val ids=state.records.map{it.id}.toSet()
         for(id in drawerCards.keys.toList())if(id !in ids){list.removeView(drawerCards.remove(id)!!.view)}
         updatingCards=true
         for((index,row)in state.records.withIndex()){
             val card=drawerCards.getOrPut(row.id){
-                val view=NativeUi.column(activity);NativeUi.divider(view);val heading=LinearLayout(activity)
-                val thumb=RouteThumbnailView(activity).apply{contentDescription="Route preview for ${row.name}"};heading.addView(thumb,LinearLayout.LayoutParams(dp(64),dp(56)))
-                val check=CheckBox(activity).apply{textSize=13f;setTextColor(NativeUi.ink);setOnCheckedChangeListener{_,checked->if(!updatingCards){if(checked)combineSelection[row.id]=false else combineSelection.remove(row.id);renderDrawer()}}};heading.addView(check,LinearLayout.LayoutParams(0,-2,1f));view.addView(heading)
-                val summary=NativeUi.text(activity,"",11f);view.addView(summary)
-                val actions=LinearLayout(activity)
-                val open=button("Open"){fitOpenedPending=true;controller.open(row.id)}
-                val close=button("Close"){controller.closeOther(row.id)}
-                for(action in listOf(open,button("Rename"){controller.state.records.firstOrNull{it.id==row.id}?.let(::renameRoute)},button("Delete"){controller.state.records.firstOrNull{it.id==row.id}?.let(::deleteRoute)},close))actions.addView(action,LinearLayout.LayoutParams(0,dp(40),1f))
-                view.addView(actions);val order=button(""){combineSelection[row.id]=combineSelection[row.id]!=true;renderDrawer()};view.addView(order)
+                val view=NativeUi.column(activity).apply{setPadding(0,dp(14),0,dp(4))};val heading=LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL}
+                val thumb=RouteThumbnailView(activity).apply{contentDescription="Route preview for ${row.name}";background=NativeUi.background(activity,android.graphics.Color.rgb(237,241,233),8,true)};heading.addView(thumb,LinearLayout.LayoutParams(dp(64),dp(56)))
+                val details=NativeUi.column(activity)
+                val check=CheckBox(activity).apply{textSize=15f;setTypeface(null,android.graphics.Typeface.BOLD);setTextColor(NativeUi.ink);buttonTintList=android.content.res.ColorStateList.valueOf(NativeUi.ink);setOnCheckedChangeListener{_,checked->if(!updatingCards){if(checked)combineSelection[row.id]=false else combineSelection.remove(row.id);renderDrawer()}}};details.addView(check)
+                val summary=NativeUi.text(activity,"",13f).apply{setTextColor(NativeUi.muted);setPadding(dp(6),0,0,0)};details.addView(summary)
+                heading.addView(details,LinearLayout.LayoutParams(0,-2,1f).apply{marginStart=dp(10)});view.addView(heading)
+                val actions=LinearLayout(activity).apply{setPadding(0,dp(6),0,0)}
+                val open=link("Open"){fitOpenedPending=true;controller.open(row.id)}
+                val close=link("Close"){controller.closeOther(row.id)}
+                // Capacitor order: Open/Editing, Close, Rename, Delete.
+                for(action in listOf(open,close,link("Rename"){controller.state.records.firstOrNull{it.id==row.id}?.let(::renameRoute)},link("Delete"){controller.state.records.firstOrNull{it.id==row.id}?.let(::deleteRoute)}))actions.addView(action,LinearLayout.LayoutParams(-2,dp(44)))
+                view.addView(actions);val order=link(""){combineSelection[row.id]=combineSelection[row.id]!=true;renderDrawer()};view.addView(order);NativeUi.divider(view)
                 Card(view,check,thumb,summary,open,close,order)
             }
             if(list.getChildAt(index+1)!==card.view){(card.view.parent as? LinearLayout)?.removeView(card.view);list.addView(card.view,index+1)}
@@ -211,7 +256,7 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
             }}
         }
         updatingCards=false
-        combineButton?.apply{val label="Combine selected (${combineSelection.size})";if(text.toString()!=label)text=label;isEnabled=combineSelection.size>=2}
+        combineButton?.apply{val label="Combine selected (${combineSelection.size})";if(text.toString()!=label)text=label;isEnabled=combineSelection.size>=2;alpha=if(isEnabled)1f else .45f}
     }
     private fun renameRoute(route:RouteSummary){val input=EditText(activity).apply{setSingleLine();setText(route.name);filters=arrayOf(android.text.InputFilter.LengthFilter(80))};AlertDialog.Builder(activity).setTitle("Rename route").setView(input).setPositiveButton("Save name"){_,_->try{controller.rename(route.id,input.text.toString())}catch(e:Exception){toast(e.message?:"Invalid name")}}.setNegativeButton("Cancel",null).show()}
     private fun deleteRoute(route:RouteSummary){AlertDialog.Builder(activity).setMessage("Delete ${route.name}?").setPositiveButton("Delete"){_,_->controller.delete(route.id)}.setNegativeButton("Cancel",null).show()}
@@ -246,6 +291,6 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
     fun back():Boolean{if(dismissDrawer())return true;if(controller.state.drawing){controller.drawing(false);return true};if(controller.state.id!=null||controller.state.points.isNotEmpty()){controller.unload();return true};return false}
     fun pause(){controller.cancelDrag();controller.flush();loader.cancelProfile();profileDirty=true}
     fun resume(){if(profileDirty)controller.drawing(controller.state.drawing)}
-    override fun close(){closed=true;loader.cancelProfile();controller.close();files.shutdown()}
+    override fun close(){closed=true;main.removeCallbacks(settle);loader.cancelProfile();controller.close();files.shutdown()}
     private fun formatDistance(m:Double)=if(m>=1000)String.format(java.util.Locale.ROOT,"%.2f km",m/1000)else"${m.roundToInt()} m"
 }

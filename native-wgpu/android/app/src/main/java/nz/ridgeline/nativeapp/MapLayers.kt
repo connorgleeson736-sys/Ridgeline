@@ -10,13 +10,25 @@ import kotlin.math.*
 
 /** Visible source tiles only; one optional background transfer shares the existing transport. */
 internal class MapLayers(private val view:TerrainView,private val loader:TileLoader):AutoCloseable {
+    private companion object{
+        /** Capacitor's topographic source: maxzoom 14, overzoomed beyond. */
+        const val VECTOR_MAX_ZOOM=14
+        const val PARALLEL_TILES=4
+        const val GESTURE_PUBLISH_MILLIS=300L
+    }
     private data class Tile(val body:TileBody,var mask:Set<String>,var features:List<VectorTile.Feature>)
     private val worker=Executors.newSingleThreadScheduledExecutor{run->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);run.run()},"RidgelineCartography")}
     private val main=Handler(Looper.getMainLooper())
     private val style=TopographyStyle(view.context.assets.open("topography-style.json").bufferedReader().use{it.readText()})
     private val tiles=LinkedHashMap<GpuUploadQueue.Id,Tile>()
     private val retry=HashMap<GpuUploadQueue.Id,Long>()
-    private var current=emptyList<GpuUploadQueue.Id>();@Volatile private var lease:Pair<GpuUploadQueue.Id,TileTransport.Consumer>?=null
+    private var current=emptyList<GpuUploadQueue.Id>()
+    // Like MapLibre's vector source: several visible tiles load in parallel and
+    // keep loading during gestures. (Previously one tile at a time, none while
+    // moving, so tracks could take seconds to appear after stopping.)
+    private val leases=ConcurrentHashMap<GpuUploadQueue.Id,TileTransport.Consumer>()
+    private fun releaseAll(){for((id,owned)in leases.entries.toList())if(leases.remove(id,owned))owned.release(true)}
+    private var lastPublishAt=0L
     private var timer:ScheduledFuture<*>?=null;private var publication:ScheduledFuture<*>?=null;private var retryWake:ScheduledFuture<*>?=null
     @Volatile private var closed=false
     @Volatile private var active=true
@@ -51,53 +63,59 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
     fun refresh(){if(closed)return;runCatching{worker.execute{
         if(closed)return@execute
         timer?.cancel(false);val state=loader.mapSettings.state
-        if(view.gestureInProgress){lease?.let{it.second.release(true)};lease=null}
         if(state!=displayState){displayState=state;lastKey=null;schedulePublication()}
         timer=worker.schedule({try{update()}catch(_:Exception){diagnostics="Topographic view selection failed; imagery and routes remain available."}},if(view.gestureInProgress)180 else 80,TimeUnit.MILLISECONDS)
     }}}
     private fun mask(state:MapSettings.State)=style.sourceLayers(state,view.planningPose.zoom)
-    fun setActive(value:Boolean){active=value;if(value)refresh()else{lease?.second?.release(true);lease=null;timer?.cancel(false);publication?.cancel(false);retryWake?.cancel(false)}}
+    fun setActive(value:Boolean){active=value;if(value)refresh()else{releaseAll();timer?.cancel(false);publication?.cancel(false);retryWake?.cancel(false)}}
     private fun update(){
         if(closed||!active||view.width==0||view.height==0)return
         val state=loader.mapSettings.state;val pose=view.planningPose
-        if(mask(state).isEmpty()&&!(state.borders&&state.base==MapSettings.Base.LINZ&&pose.zoom>=8)){lease?.second?.release(true);lease=null;current=emptyList();tiles.clear();lastKey=null;schedulePublication();return}
-        val flat=if(!state.threeD)FlatSelection.plan((view.width/view.pixelScale).roundToInt(),(view.height/view.pixelScale).roundToInt(),pose,512.0,24,15)else null
+        if(mask(state).isEmpty()&&!(state.borders&&state.base==MapSettings.Base.LINZ&&pose.zoom>=8)){releaseAll();current=emptyList();tiles.clear();lastKey=null;schedulePublication();return}
+        val flat=if(!state.threeD)FlatSelection.plan((view.width/view.pixelScale).roundToInt(),(view.height/view.pixelScale).roundToInt(),pose,512.0,24,VECTOR_MAX_ZOOM)else null
         val wanted=if(flat!=null)flat.map{GpuUploadQueue.Id(it.z,it.x,it.y)}else{
             plan.rewind();val focus=view.surfaceFocusFor(pose)
-            val n=NativeBridge.planFocused((view.width/view.pixelScale).roundToInt().coerceAtLeast(1),(view.height/view.pixelScale).roundToInt().coerceAtLeast(1),pose.longitude,pose.latitude,pose.zoom,pose.bearing,pose.pitch,pose.elevation,24,512.0,15,1.0,focus?.longitude?:Double.NaN,focus?.latitude?:Double.NaN,focus?.range?:Double.NaN,plan)
+            val n=NativeBridge.planFocused((view.width/view.pixelScale).roundToInt().coerceAtLeast(1),(view.height/view.pixelScale).roundToInt().coerceAtLeast(1),pose.longitude,pose.latitude,pose.zoom,pose.bearing,pose.pitch,pose.elevation,24,512.0,VECTOR_MAX_ZOOM,1.0,focus?.longitude?:Double.NaN,focus?.latitude?:Double.NaN,focus?.range?:Double.NaN,plan)
             plan.rewind();List(n){GpuUploadQueue.Id(plan.int,plan.int,plan.int)}
         }
-        if(current.toSet()!=wanted.toSet()){current=wanted;tiles.keys.retainAll(wanted.toSet()+LayerCover.display(wanted,tiles.keys).map{it.source});retry.keys.retainAll(wanted.toSet());lease?.takeIf{it.first !in wanted}?.let{it.second.release(true);lease=null};lastKey=null}
+        if(current.toSet()!=wanted.toSet()){current=wanted;tiles.keys.retainAll(wanted.toSet()+LayerCover.display(wanted,tiles.keys).map{it.source});retry.keys.retainAll(wanted.toSet());for((id,owned)in leases.entries.toList())if(id !in wanted&&leases.remove(id,owned))owned.release(true);lastKey=null}
         current=wanted
-        if(mask(state).isEmpty()){lease?.second?.release(true);lease=null;tiles.clear()}
+        if(mask(state).isEmpty()){releaseAll();tiles.clear()}
         schedulePublication();pump()
     }
     private fun pump(){
-        if(closed||!active||lease!=null||view.gestureInProgress||mask(loader.mapSettings.state).isEmpty())return
-        val now=System.currentTimeMillis();val id=current.firstOrNull{it !in tiles&&(retry[it]?:0)<=now}?:run{
+        if(closed||!active||mask(loader.mapSettings.state).isEmpty())return
+        val now=System.currentTimeMillis()
+        while(leases.size<PARALLEL_TILES){
+            val id=current.firstOrNull{it !in tiles&&!leases.containsKey(it)&&(retry[it]?:0)<=now}?:break
+            val owned=loader.layerConsumer();leases[id]=owned
+            if(closed||!active){leases.remove(id,owned);owned.release(true);return}
+            val bodyFuture=try{loader.layerBody(owned,loader.vectorUrl(id.z,id.x,id.y))}catch(_:IllegalStateException){leases.remove(id,owned);owned.release(true);return}
+            bodyFuture.whenComplete{body,error->runCatching{worker.execute{
+                if(!leases.remove(id,owned)){owned.close();return@execute};owned.close()
+                if(closed||id !in current){pump();return@execute}
+                if(error==null&&body!=null&&body.status in 200..299){
+                    try{val start=System.nanoTime();val enabled=mask(loader.mapSettings.state);val features=VectorTile.decode(body.bytes,id.z,id.x,id.y,enabled);tiles[id]=Tile(body,enabled,features);decoded++;lastDecodeMs=(System.nanoTime()-start)/1_000_000;lastKey=null}
+                    catch(_:Exception){retry[id]=System.currentTimeMillis()+30000;diagnostics="Map layer data could not be decoded; imagery and routes remain available."}
+                }else{retry[id]=System.currentTimeMillis()+15000;diagnostics="Topographic data unavailable · check connection or LINZ access."}
+                // Admit the next bodies before CPU layout/atlas work; never serialize HTTP behind painting.
+                pump();schedulePublication()
+            }}}
+        }
+        if(leases.isEmpty()){
             val wake=current.filter{it !in tiles}.mapNotNull{retry[it]}.minOrNull()
             if(wake!=null&&(retryWake==null||retryWake!!.isDone))retryWake=worker.schedule({retryWake=null;pump()},(wake-now).coerceAtLeast(1),TimeUnit.MILLISECONDS)
-            return
         }
-        val owned=loader.layerConsumer();lease=id to owned
-        if(closed||!active){lease=null;owned.release(true);return}
-        val bodyFuture=try{loader.layerBody(owned,loader.vectorUrl(id.z,id.x,id.y))}catch(_:IllegalStateException){owned.release(true);if(lease?.second===owned)lease=null;return}
-        bodyFuture.whenComplete{body,error->runCatching{worker.execute{
-            if(lease?.second!==owned){owned.close();return@execute};lease=null;owned.close()
-            if(closed||id !in current)return@execute
-            if(error==null&&body!=null&&body.status in 200..299){
-                try{val start=System.nanoTime();val enabled=mask(loader.mapSettings.state);val features=VectorTile.decode(body.bytes,id.z,id.x,id.y,enabled);tiles[id]=Tile(body,enabled,features);decoded++;lastDecodeMs=(System.nanoTime()-start)/1_000_000;lastKey=null}
-                catch(_:Exception){retry[id]=now+30000;diagnostics="Map layer data could not be decoded; imagery and routes remain available."}
-            }else{retry[id]=System.currentTimeMillis()+15000;diagnostics="Topographic data unavailable · check connection or LINZ access."}
-            // Admit the next body before CPU layout/atlas work; never serialize HTTP behind painting.
-            pump();schedulePublication()
-        }}}
     }
-    private fun schedulePublication(){if(closed||publication!=null&&!publication!!.isDone)return;publication=worker.schedule({publication=null;try{publish()}catch(_:Exception){diagnostics="Visible topographic data exceeds the current layer budget or could not be prepared; imagery and routes remain available.";lastKey=null}},60,TimeUnit.MILLISECONDS)}
+    private fun schedulePublication(delay:Long=60){if(closed||publication!=null&&!publication!!.isDone)return;publication=worker.schedule({publication=null;try{publish()}catch(_:Exception){diagnostics="Visible topographic data exceeds the current layer budget or could not be prepared; imagery and routes remain available.";lastKey=null}},delay.coerceAtLeast(1),TimeUnit.MILLISECONDS)}
     private fun publish(){
         if(closed||!active)return
-        // Keep the current map batch during a gesture; publish one latest batch after it settles.
-        if(view.gestureInProgress)return
+        // During gestures, publish newly arrived overlay tiles at a bounded rate
+        // (draping runs on background workers), instead of freezing until the
+        // camera stops as before.
+        val now=android.os.SystemClock.uptimeMillis()
+        if(view.gestureInProgress&&now-lastPublishAt<GESTURE_PUBLISH_MILLIS){schedulePublication(GESTURE_PUBLISH_MILLIS-(now-lastPublishAt));return}
+        lastPublishAt=now
         val state=loader.mapSettings.state;val pose=view.planningPose;val zoom=floor(pose.zoom*4)/4
         val ordered=current.sortedWith(compareBy<GpuUploadQueue.Id>{it.z}.thenBy{it.x}.thenBy{it.y})
         val key=listOf(state,ordered,tiles.mapValues{it.value.body.stamp?.fingerprint?:it.value.body.bytes.hashCode()},zoom)
@@ -107,7 +125,9 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         tiles.keys.retainAll(current.toSet()+patches.map{it.source})
         if(state.overlays())for(patch in patches){val id=patch.source;val tile=tiles[id]?:continue
             if(tile.mask!=enabled){tile.features=VectorTile.decode(tile.body.bytes,id.z,id.x,id.y,enabled);tile.mask=enabled;decoded++}
-            val output=styled.getOrPut(id){style.build(tile.features,state,zoom)};val b=patch.clip.bounds
+            // MapLibre evaluates ["zoom"] in filters at the tile's own zoom, layer
+            // ranges and paint at the camera zoom.
+            val output=styled.getOrPut(id){style.build(tile.features,state,zoom,id.z.toDouble())};val b=patch.clip.bounds
             for(line in output.lines)for(path in clip(line.points,b))lines.add(line.copy(points=path))
             labels.addAll(output.labels.filter{it.point.x>=b[0]&&it.point.x<b[2]&&it.point.y>=b[1]&&it.point.y<b[3]})
         }
@@ -140,5 +160,5 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         return ByteBuffer.allocateDirect(4+lines.size*20+total*16).order(ByteOrder.LITTLE_ENDIAN).apply{putInt(lines.size);for(line in lines){putInt(line.points.size);putInt(line.color);putFloat(line.width);putFloat(line.dash);putFloat(line.gap);for(p in line.points){putDouble(p.x);putDouble(p.y)}};rewind()}
     }
     private fun clip(path:List<VectorTile.Point>,box:DoubleArray)=BoundaryIndex.clip(path,box)
-    override fun close(){closed=true;timer?.cancel(false);publication?.cancel(false);retryWake?.cancel(false);lease?.second?.release(true);lease=null;worker.shutdownNow();view.onLayerProjection={_,_->}}
+    override fun close(){closed=true;timer?.cancel(false);publication?.cancel(false);retryWake?.cancel(false);releaseAll();worker.shutdownNow();view.onLayerProjection={_,_->}}
 }

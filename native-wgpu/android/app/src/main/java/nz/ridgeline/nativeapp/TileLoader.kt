@@ -147,7 +147,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     @Volatile private var dead = false
     @Volatile private var active = true
     @Volatile private var wanted = emptySet<Source>()
-    private var timer: ScheduledFuture<*>? = null
+    @Volatile private var timer: ScheduledFuture<*>? = null
     private val planCadence=PlanCadence()
     private val scheduler = Executors.newSingleThreadScheduledExecutor()
     @Volatile private var warmWanted=emptySet<Source>()
@@ -278,13 +278,20 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             }
         }
     }
-    fun cameraChanged() = synchronized(this) {
+    private val planPending=java.util.concurrent.atomic.AtomicBoolean(false)
+    /** Called on the UI thread for every camera change. Lock-free: it never waits
+     * behind demand cancellation (clearWarm/cancelPredictions hold the loader
+     * monitor), so taps on map controls are never delayed by tile bookkeeping. */
+    fun cameraChanged() {
         // Throttle using the latest immutable camera; a continuous drag must not
         // indefinitely postpone source selection, as a cancel/reschedule debounce did.
-        if(!dead&&active&&timer==null)timer=scheduler.schedule({
-            synchronized(this){timer=null;planCadence.started(android.os.SystemClock.elapsedRealtime())}
-            loadView()
-        },planCadence.delay(android.os.SystemClock.elapsedRealtime()),TimeUnit.MILLISECONDS)
+        if(dead||!active||!planPending.compareAndSet(false,true))return
+        try{
+            timer=scheduler.schedule({
+                planPending.set(false);planCadence.started(android.os.SystemClock.elapsedRealtime())
+                loadView()
+            },planCadence.delay(android.os.SystemClock.elapsedRealtime()),TimeUnit.MILLISECONDS)
+        }catch(_:java.util.concurrent.RejectedExecutionException){planPending.set(false)}
     }
     private fun sourcePlan(geometry:Boolean,key:DemandPlanKey):List<Id> {
         val pose=key.pose
@@ -436,7 +443,9 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         cacheThreadFactory=ThreadFactory{work->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);work.run()},"RidgelineHttpCache")},
         metrics=httpMetrics,offlineRead=offline::read)}
     private val transport by lazy{TileTransport(backend,ramBudget.encoded,initialLimits=downloadLimits)}
-    internal fun layerConsumer()=transport.consumer(800,true,cacheDeadline=true)
+    // Visible map-layer tiles are ordinary visible work (as in the Capacitor app),
+    // not background speculation: foreground transfer slots, ranked after imagery.
+    internal fun layerConsumer()=transport.consumer(800,false,cacheDeadline=true)
     internal fun layerBody(consumer:TileTransport.Consumer,url:String)=consumer.acquire(ResourceKey(url,offlineOnly))
     internal fun vectorUrl(z:Int,x:Int,y:Int)="https://basemaps.linz.govt.nz/v1/tiles/topographic-v2/3857/$z/$x/$y.pbf?api=$key"
     internal fun changeMapStyle(before:MapSettings.State,after:MapSettings.State){
@@ -559,7 +568,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
                 for(y in 0..255)for(x in 0..255)if(!pixels[y*256+x].isFinite())pixels[y*256+x]=sample(coarse,id.x*256.0+x,id.y*256.0+y,id.z)}
             Dem(id.gpu(),pixels)
         }
-        return Decoded(raster,dependencies.values.toList()).also{synchronized(decoded){decoded[id]=it;trimDecoded()}}
+        return Decoded(raster,dependencies.values.toList()).also{if(profileContext.get()!=true)synchronized(decoded){decoded[id]=it;trimDecoded()}}
     }
     private val centreHaloSamples=java.util.concurrent.atomic.AtomicLong()
     private val centreHaloNanos=java.util.concurrent.atomic.AtomicLong()
@@ -717,27 +726,37 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             if(changed)view.post{if(!dead&&old.revision==profileRevision.get())old.callback(values)}
         },150,TimeUnit.MILLISECONDS)}
     }
-    fun profile(points:List<Coordinate>,callback:(List<NativeGeo.ProfilePoint>)->Unit){
+    private val profileFetches=Executors.newFixedThreadPool(4){Thread(it,"ridgeline-profile").apply{isDaemon=true}}
+    /** Capacitor's profile engine: a quick preview, then 5 m samples from z17
+     * LINZ elevation (2 m in view at zoom 15+). [detail] false stops after the
+     * preview (while drawing); [previewFirst] false keeps the current chart
+     * until the refined result arrives. */
+    fun profile(points:List<Coordinate>,detail:Boolean,focus:RouteProfile.Bounds?,previewFirst:Boolean=true,callback:(List<NativeGeo.ProfilePoint>,Boolean)->Unit){
         cancelProfile();val revision=profileRevision.get()
-        val samples=NativeGeo.samples(points)
+        val route=points.toList()
         profileJob=profileJobs.schedule({
-            profileContext.set(true)
-            try{
-            val result=ArrayList<NativeGeo.ProfilePoint>(samples.size);val qualities=IntArray(samples.size){-1}
-            for((index,p) in samples.withIndex()){
-                if(dead||revision!=profileRevision.get()||Thread.currentThread().isInterrupted)return@schedule
-                val mx=(p.point.longitude+180)/360
-                val my=(1-asinh(tan(Math.toRadians(p.point.latitude)))/PI)/2
-                var sourceZoom=14
-                val height=try{DemSampling.point(14,mx,my){raw(Id(it.z,it.x,it.y)).also{record->sourceZoom=minOf(sourceZoom,record.id.z)}}?.toDouble()}catch(_:Exception){null}
-                qualities[index]=if(height==null)-1 else sourceZoom;result.add(p.copy(height=height))
+            val stale={dead||revision!=profileRevision.get()||Thread.currentThread().isInterrupted}
+            fun stage(fine:Boolean):Boolean{
+                val plan=RouteProfile.plan(route,fine,if(fine)focus else null)
+                val futures=plan.tiles.associateWith{id->profileFetches.submit<Dem?>{
+                    if(dead||revision!=profileRevision.get())null
+                    else{profileContext.set(true);try{raw(Id(id.z,id.x,id.y))}catch(_:Exception){null}finally{profileContext.remove()}}
+                }}
+                val fetched=HashMap<GpuUploadQueue.Id,Dem?>()
+                try{for((id,future) in futures){if(stale())return false;fetched[id]=try{future.get()}catch(e:java.util.concurrent.ExecutionException){null}}}
+                catch(_:InterruptedException){return false}
+                finally{if(stale())futures.values.forEach{it.cancel(true)}}
+                val result=RouteProfile.sample(plan,fetched,{id->profileContext.set(true);try{raw(Id(id.z,id.x,id.y))}catch(_:Exception){null}finally{profileContext.remove()}},stale)
+                if(stale())return false
+                val final=fine||!detail
+                profileDelivery=ProfileDelivery(revision,result.values,result.zooms,{values->callback(values,final)})
+                view.post{if(!dead&&revision==profileRevision.get())callback(result.values,final)}
+                refineProfileSoon()
+                return true
             }
-            if(dead||revision!=profileRevision.get())return@schedule
-            profileDelivery=ProfileDelivery(revision,result,qualities,callback)
-            view.post{if(!dead&&revision==profileRevision.get())callback(result)}
-            refineProfileSoon()
-            }finally{profileContext.remove()}
-        },350,TimeUnit.MILLISECONDS)
+            if(previewFirst||!detail){if(!stage(false))return@schedule}
+            if(detail)stage(true)
+        },if(detail)220 else 350,TimeUnit.MILLISECONDS)
     }
     fun memoryPressure(){
         pipelinePauseUntil=System.nanoTime()+TimeUnit.SECONDS.toNanos(30)
@@ -751,7 +770,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         runCatching{connectivity?.unregisterNetworkCallback(networkCallback)}
         escapedWrites.shutdown()
         derivedReads.close()
-        dead = true;transport.batchDemand{for(task in jobs.values)task.cancel();clearWarm();transport.close()};localImages.close();preparedWrites.shutdownNow();attachmentJobs.shutdown();downloadCancel.set(true);downloadJobs.shutdown();offlineQueries.shutdownNow(); profileRevision.incrementAndGet();profileJob?.cancel(true);profileJobs.shutdownNow();timer?.cancel(true); scheduler.shutdownNow(); geometryWorkers.shutdownNow();imageWorkers.shutdownNow()
+        dead = true;transport.batchDemand{for(task in jobs.values)task.cancel();clearWarm();transport.close()};localImages.close();preparedWrites.shutdownNow();attachmentJobs.shutdown();downloadCancel.set(true);downloadJobs.shutdown();offlineQueries.shutdownNow(); profileRevision.incrementAndGet();profileJob?.cancel(true);profileJobs.shutdownNow();profileFetches.shutdownNow();timer?.cancel(true); scheduler.shutdownNow(); geometryWorkers.shutdownNow();imageWorkers.shutdownNow()
         client.dispatcher.cancelAll(); client.connectionPool.evictAll(); client.dispatcher.executorService.shutdown(); synchronized(ready) { ready.clear(); readyBytes=0 }; synchronized(decoded) { decoded.clear() }
         Thread({downloadJobs.awaitTermination(60,TimeUnit.SECONDS);offlineQueries.awaitTermination(5,TimeUnit.SECONDS);profileJobs.awaitTermination(60,TimeUnit.SECONDS);geometryWorkers.awaitTermination(60,TimeUnit.SECONDS);imageWorkers.awaitTermination(60,TimeUnit.SECONDS);attachmentJobs.awaitTermination(60,TimeUnit.SECONDS);localImages.awaitClosed();transport.awaitClosed();runCatching{overviews.close()};runCatching{offline.close()};runCatching{client.cache?.close()}},"ridgeline-offline-close").start()
     }

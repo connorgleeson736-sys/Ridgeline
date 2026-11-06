@@ -14,7 +14,8 @@ import android.widget.*
 class LocationUi(private val activity:Activity,root:FrameLayout,private val terrain:TerrainView,attachLauncher:Boolean=true):LocationListener{
     private val manager=activity.getSystemService(LocationManager::class.java)
     private val main=Handler(Looper.getMainLooper());private var waiting=false;private var firstFix=true
-    val button=NativeUi.button(activity,"◎"){if(waiting)stop()else locate()}.apply{textSize=22f;contentDescription="Show GPS location"}
+    private val icon=MapControls.LocateIcon(activity)
+    val button=MapControls.iconButton(activity,icon,"Show GPS location"){if(waiting)stop()else locate()}
     private val timeout=Runnable{stop();Toast.makeText(activity,"No location fix yet. Check location services and try again.",Toast.LENGTH_LONG).show()}
     init{if(attachLauncher){val scale=activity.resources.displayMetrics.density;root.addView(button,FrameLayout.LayoutParams((44*scale).toInt(),(44*scale).toInt(),Gravity.TOP or Gravity.END).apply{marginEnd=(10*scale).toInt();topMargin=(230*scale).toInt()})}}
     private fun locate(){
@@ -23,10 +24,9 @@ class LocationUi(private val activity:Activity,root:FrameLayout,private val terr
             val fine=activity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED
             val providers=manager.getProviders(true).filter{it==LocationManager.NETWORK_PROVIDER||(fine&&it==LocationManager.GPS_PROVIDER)}
             if(providers.isEmpty()){Toast.makeText(activity,if(fine)"Enable location services to locate yourself."else"Allow precise location or enable network location.",Toast.LENGTH_LONG).show();return}
-            waiting=true;firstFix=true;button.setTextColor(0xff277ad4.toInt());button.isSelected=true
+            waiting=true;firstFix=true;icon.color=0xff277ad4.toInt();button.isSelected=true
             val recent=providers.mapNotNull{manager.getLastKnownLocation(it)}.filter{System.currentTimeMillis()-it.time<60000&&it.accuracy<100}.minByOrNull{it.accuracy}
             if(recent!=null)onLocationChanged(recent)
-            button.text="◎"
             for(provider in providers)manager.requestLocationUpdates(provider,1000,2f,this,Looper.getMainLooper())
             if(firstFix)main.postDelayed(timeout,30000)
         }catch(_:SecurityException){stop();Toast.makeText(activity,"Location permission is needed.",Toast.LENGTH_LONG).show()}
@@ -40,5 +40,5 @@ class LocationUi(private val activity:Activity,root:FrameLayout,private val terr
     override fun onProviderDisabled(provider:String){}
     override fun onProviderEnabled(provider:String){}
     override fun onStatusChanged(provider:String?,status:Int,extras:Bundle?){}
-    fun stop(){waiting=false;firstFix=true;button.text="◎";button.setTextColor(NativeUi.ink);button.isSelected=false;button.contentDescription="Show GPS location";terrain.locationPoint(null);main.removeCallbacks(timeout);runCatching{manager.removeUpdates(this)}}
+    fun stop(){waiting=false;firstFix=true;icon.color=NativeUi.ink;button.isSelected=false;button.contentDescription="Show GPS location";terrain.locationPoint(null);main.removeCallbacks(timeout);runCatching{manager.removeUpdates(this)}}
 }
