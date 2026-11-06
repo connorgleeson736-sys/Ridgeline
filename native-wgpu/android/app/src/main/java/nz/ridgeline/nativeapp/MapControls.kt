@@ -103,24 +103,29 @@ internal object MapControls {
         }
     }
 
-    /** MapLibre ScaleControl (max 100 CSS px, metric) measured at the map centre. */
-    class Scale(context:Context):TextView(context){
+    /** MapLibre ScaleControl (max 100 CSS px, metric) measured at the map centre.
+     * Fixed size: the bar is drawn inside, so camera changes only redraw it and
+     * never re-lay-out the map screen. */
+    class Scale(context:Context):View(context){
         private val border=Paint().apply{color=Color.WHITE;style=Paint.Style.STROKE}
-        init{textSize=12f;setTextColor(Color.WHITE);setShadowLayer(2f,0f,0f,0x99000000.toInt());setPadding(dp(context,6),0,dp(context,6),dp(context,1));gravity=Gravity.CENTER_VERTICAL;setBackgroundColor(0x33000000)}
+        private val fill=Paint().apply{color=0x33000000}
+        private val text=Paint(Paint.ANTI_ALIAS_FLAG).apply{color=Color.WHITE;textSize=12*context.resources.displayMetrics.scaledDensity;setShadowLayer(2f,0f,0f,0x99000000.toInt())}
+        private var label="";private var bar=0f
         fun update(pose:CameraPose){
             val ppm=CameraMath.pixelsPerMeter(pose,1.0)
-            if(!ppm.isFinite()||ppm<=0){visibility=View.INVISIBLE;return}
+            if(!ppm.isFinite()||ppm<=0){if(bar!=0f){bar=0f;invalidate()};return}
             val max=100/ppm;val rounded=round(max)
-            val label=if(rounded>=1000)"${fmt(rounded/1000)} km" else "${fmt(rounded)} m"
-            val width=(rounded/max*100*resources.displayMetrics.density).roundToInt()
-            if(text.toString()!=label)text=label
-            if(layoutParams!=null&&layoutParams.width!=width){layoutParams=layoutParams.apply{this.width=width}}
-            visibility=View.VISIBLE
+            val next=if(rounded>=1000)"${fmt(rounded/1000)} km" else "${fmt(rounded)} m"
+            val width=(rounded/max*100*resources.displayMetrics.density).toFloat()
+            if(next!=label||abs(width-bar)>=.5f){label=next;bar=width;contentDescription="Scale $next";invalidate()}
         }
         private fun fmt(v:Double)=if(v==floor(v))v.toLong().toString()else String.format(java.util.Locale.ROOT,"%.1f",v)
         override fun onDraw(canvas:Canvas){
-            super.onDraw(canvas);val w=dp(context,2).toFloat();border.strokeWidth=w
-            canvas.drawLines(floatArrayOf(w/2,0f,w/2,height-w/2f, w/2,height-w/2,width-w/2,height-w/2, width-w/2,height-w/2,width-w/2,0f),border)
+            if(bar<=0f)return
+            val w=dp(context,2).toFloat();border.strokeWidth=w;val right=min(bar,width.toFloat())
+            canvas.drawRect(0f,0f,right,height.toFloat(),fill)
+            canvas.drawLines(floatArrayOf(w/2,0f,w/2,height-w/2f, w/2,height-w/2,right-w/2,height-w/2, right-w/2,height-w/2,right-w/2,0f),border)
+            canvas.drawText(label,dp(context,6).toFloat(),height/2f+text.textSize/2.8f,text)
         }
         companion object{
             /** MapLibre getRoundNum: 1, 2, 3 or 5 times a power of ten. */

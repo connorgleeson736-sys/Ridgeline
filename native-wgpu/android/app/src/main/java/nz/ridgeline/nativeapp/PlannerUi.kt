@@ -79,6 +79,8 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
     var onOffline:()->Unit={}
     var onProfilePoint:(Coordinate?)->Unit={}
     var onDrawing:(Boolean)->Unit={}
+    /** Bottom map controls move above the route sheet's overlapping edge. */
+    var onMapCover:(Int)->Unit={}
     private var fitOpenedPending=false
     private var combiningPending=false
     private fun dp(value:Int)=(value*activity.resources.displayMetrics.density+.5f).toInt()
@@ -103,6 +105,7 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         for((i,view) in listOf(edit,undo,export,delete).withIndex())tools.addView(view,LinearLayout.LayoutParams(0,dp(44),1f).apply{if(i>0)marginStart=dp(8)})
         panel.addView(tools,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(8)});panel.addView(summary)
         sheet.onClose={controller.unload()}
+        sheet.onCover={onMapCover(it)}
         sheet.onSnap={expanded->chart.visibility=if(expanded)View.VISIBLE else View.GONE;heading.visibility=if(expanded)View.VISIBLE else View.GONE;summary.visibility=if(expanded&&controller.state.drawing)View.VISIBLE else View.GONE;if(!expanded)chart.clearInspection()}
         for(badge in rangeBadges)mapHost.addView(badge,1,android.widget.FrameLayout.LayoutParams(dp(22),dp(22)))
         terrain.onRangeMarkers={points,positions->
@@ -227,18 +230,19 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
     fun showRoutes(){
         if(drawer!=null){dismissDrawer();return}
         val overlay=FrameLayout(activity);overlay.addView(View(activity).apply{setBackgroundColor(Color.argb(40,16,40,35));setOnClickListener{dismissDrawer()}},FrameLayout.LayoutParams(-1,-1))
-        val sidebar=NativeUi.column(activity).apply{setPadding(dp(16),dp(8),dp(16),dp(12));setBackgroundColor(NativeUi.paper);elevation=dp(12).toFloat();isClickable=true}
+        // Compact floating card, as Capacitor's mobile sidebar.
+        val sidebar=NativeUi.column(activity).apply{setPadding(dp(14),dp(4),dp(14),dp(10));background=NativeUi.background(activity,NativeUi.paper,14,true);elevation=dp(12).toFloat();isClickable=true;clipToOutline=true}
         // Capacitor "Saved routes" sidebar.
         val heading=LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL}
-        heading.addView(NativeUi.text(activity,"Saved routes",22f).apply{setTypeface(null,android.graphics.Typeface.BOLD);setPadding(0,dp(10),0,dp(10))},LinearLayout.LayoutParams(0,-2,1f))
+        heading.addView(NativeUi.text(activity,"Saved routes",19f).apply{setTypeface(null,android.graphics.Typeface.BOLD);setPadding(0,dp(10),0,dp(10))},LinearLayout.LayoutParams(0,-2,1f))
         heading.addView(TextView(activity).apply{text="✕";textSize=18f;gravity=Gravity.CENTER;setTextColor(NativeUi.muted);contentDescription="Close saved routes";background=NativeUi.pressable(activity,null);isClickable=true;setOnClickListener{dismissDrawer()}},LinearLayout.LayoutParams(dp(44),dp(44)));sidebar.addView(heading)
         NativeUi.space(sidebar,6)
-        sidebar.addView(button("Import GPX"){dismissDrawer();importGpx()}.apply{textSize=15f},LinearLayout.LayoutParams(-1,dp(48)));NativeUi.space(sidebar)
-        sidebar.addView(button("＋  Create new"){newRoute()}.apply{textSize=15f},LinearLayout.LayoutParams(-1,dp(48)))
+        sidebar.addView(button("Import GPX"){dismissDrawer();importGpx()}.apply{textSize=14f},LinearLayout.LayoutParams(-1,dp(42)));NativeUi.space(sidebar,8)
+        sidebar.addView(button("＋  Create new"){newRoute()}.apply{textSize=14f},LinearLayout.LayoutParams(-1,dp(42)))
         drawerList=NativeUi.column(activity)
         sidebar.addView(ScrollView(activity).apply{addView(drawerList)},LinearLayout.LayoutParams(-1,0,1f))
-        sidebar.addView(NativeUi.button(activity,"Download offline region",true){dismissDrawer();onOffline()}.apply{textSize=15f},LinearLayout.LayoutParams(-1,dp(50)).apply{topMargin=dp(8)})
-        overlay.addView(sidebar,FrameLayout.LayoutParams(minOf(dp(350),activity.resources.displayMetrics.widthPixels-dp(36)),-1,Gravity.START))
+        sidebar.addView(NativeUi.button(activity,"Download offline region",true){dismissDrawer();onOffline()}.apply{textSize=14f},LinearLayout.LayoutParams(-1,dp(44)).apply{topMargin=dp(8)})
+        overlay.addView(sidebar,FrameLayout.LayoutParams(minOf(dp(300),activity.resources.displayMetrics.widthPixels-dp(64)),-1,Gravity.START).apply{setMargins(dp(10),dp(10),0,dp(10))})
         root.addView(overlay,FrameLayout.LayoutParams(-1,-1));drawer=overlay;drawerStamp=null;renderDrawer()
     }
     private fun renderDrawer(){
@@ -259,7 +263,8 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
                 val summary=NativeUi.text(activity,"",13f).apply{setTextColor(NativeUi.muted);setPadding(dp(6),0,0,0)};details.addView(summary)
                 heading.addView(details,LinearLayout.LayoutParams(0,-2,1f).apply{marginStart=dp(10)});view.addView(heading)
                 val actions=LinearLayout(activity).apply{setPadding(0,dp(6),0,0)}
-                val open=link("Open"){fitOpenedPending=true;controller.open(row.id)}
+                // Opening a route closes the sidebar so the route is visible (Capacitor).
+                val open=link("Open"){fitOpenedPending=true;controller.open(row.id);dismissDrawer()}
                 val close=link("Close"){controller.closeOther(row.id)}
                 // Capacitor order: Open/Editing, Close, Rename, Delete.
                 for(action in listOf(open,close,link("Rename"){controller.state.records.firstOrNull{it.id==row.id}?.let(::renameRoute)},link("Delete"){controller.state.records.firstOrNull{it.id==row.id}?.let(::deleteRoute)}))actions.addView(action,LinearLayout.LayoutParams(-2,dp(44)))
