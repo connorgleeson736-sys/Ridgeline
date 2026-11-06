@@ -379,3 +379,80 @@ runs pass. The full JVM suite passes: 159 tests, 0 failures.
 - **Elevation bytes** dominate and are fixed by LINZ's format. Reducing them
   needs pre-built meshes or an edge bundle service, the larger ideas recorded
   earlier in this report.
+
+## 0.1.17 Capacitor parity
+
+Reported problems: overlays switching on and off differently from Capacitor,
+routes missing when zoomed close, peak names occasionally inside peaks,
+unreliable top buttons, a UI unlike Capacitor's, and coarse route elevation
+graphs.
+
+### Overlays and routes
+
+Native `topography-style.json` is generated from Capacitor's own
+`topographic-overlays.js` layer list, so the layer zoom ranges already
+matched. Three differences remained:
+
+- **Source zoom.** Capacitor's vector source has `maxzoom: 14` and over-zooms
+  z14 tiles beyond it. Native requested z15, which has different generalisation.
+  It now stops at 14 (`MapLayers.VECTOR_MAX_ZOOM`).
+- **Filter zoom.** MapLibre evaluates `["zoom"]` in a filter at the tile's zoom
+  and layer min/max zoom at the camera zoom. Native evaluated filters at the
+  camera zoom, so features with zoom-gated filters (minor roads, local tracks,
+  lesser names) appeared at different zooms than in Capacitor.
+- **Loading.** Vector tiles loaded one at a time as speculative background work
+  and paused during gestures, so a close zoom could leave route/track tiles
+  unloaded for a long time. Up to four visible tiles now load in parallel as
+  foreground requests, and publication continues (throttled to 300 ms) during
+  gestures. Test: `OverlayRulesTest`.
+
+### Peak labels
+
+Line of sight from the eye to each label anchor used 48 samples per ray and
+exempted the last 2% of the ray. On a long ray that is hundreds of metres, so a
+subsidiary ridge just in front of a summit was skipped. It now samples every
+25 m of ground (48–512 samples) and exempts a fixed 30 m. GPU test
+(`overlay_parity`): a 75–240 m ridge beside the summit and a single-row
+(~150 m) ridge now hide the label; the old code fails the first case. Labels
+are still hidden whole, never clipped.
+
+### Route elevation profiles
+
+Native sampled 240 points at up to 100 m spacing from zoom 14 elevation, then
+upgraded points only where render terrain happened to be resident. Capacitor
+(`terrain-core.js`) samples every 5 m (up to 1,600 points) from zoom 17,
+lowering the zoom only to stay within 64 tiles. In view at zoom 15+ it adds 2 m
+samples at zoom 17. Native now uses the same plan:
+
+- a z13 preview (40 m), then the detail pass; while drawing only the preview runs;
+- tiles fetched four at a time and kept out of the terrain DEM cache;
+- pixel-centre bilinear heights, reading the neighbouring tile across an edge;
+- an unavailable tile falls back to up to four coarser ancestors;
+- the in-view refinement reruns when the camera settles;
+- the chart keeps first/last/low/high per column, as Capacitor's does.
+
+A 2 km route now has 401 samples from z17 tiles (about 0.9 m pixels at
+Aoraki's latitude), versus 21 from z14 tiles (about 7 m pixels). Where LINZ has
+no LiDAR, z17 pixels are interpolated from coarser source data. Tests:
+`RouteProfileTest` (9), including exact reproduction of a sloping plane, edge
+reads, fallback and budget.
+
+### UI and top buttons
+
+The map UI now follows Capacitor: kea launcher (Saved routes), locate, a 2D/3D
+switch, compass, layers button, scale bar and compact attribution. The zoom
+buttons and the coordinate readout are gone. The Map layers panel and Saved
+routes drawer use Capacitor's layout and wording.
+
+Two causes of buttons that "only work sometimes":
+
+1. The Layers panel had a full-screen cover that consumed the first tap
+   anywhere outside it, including on the launcher or 2D/3D. The tap now closes
+   the panel and continues to the control underneath.
+2. `TileLoader.cameraChanged()` runs on the UI thread on every camera change and
+   took the loader monitor, which demand cancellation (`clearWarm`) holds while
+   cancelling many tasks. It is now lock-free.
+
+Buttons also show a pressed ripple. None of this was observed on a device; no
+emulator is available in this environment.
+
