@@ -77,22 +77,31 @@ internal object NativeLabels {
         return rows.take(4).ifEmpty{listOf(text.take(60))}
     }
     /** Uniform screen grid avoids pairwise collision checks over every map label. */
+    /** Labels shown by the previous placement and their anchors. */
+    private var shown=HashMap<String,String>()
+    /** Collision placement with hysteresis: labels already on screen are placed
+     * first, in their previous anchor, so moving the map does not reshuffle
+     * which names are visible (MapLibre keeps placements stable and fades). */
     fun place(atlas:NativeLabelAtlas,projected:FloatArray,width:Int,height:Int,scale:Float):ByteBuffer{
         val cells=HashMap<Long,MutableList<RectF>>();val selected=ArrayList<Triple<Int,Float,Float>>()
+        val next=HashMap<String,String>()
         val cell=64*scale;val padding=5*scale
         fun keys(rect:RectF):List<Long>{val result=ArrayList<Long>();for(y in floor(rect.top/cell).toInt()..floor(rect.bottom/cell).toInt())for(x in floor(rect.left/cell).toInt()..floor(rect.right/cell).toInt())result.add((x.toLong() shl 32)or(y.toLong() and 0xffffffffL));return result}
-        for((i,row)in atlas.labels.withIndex()){
+        val order=atlas.labels.indices.sortedBy{if(atlas.labels[it].label.key in shown)0 else 1}
+        for(i in order){val row=atlas.labels[i]
             if(i*3+2>=projected.size||projected[i*3+2]==0f)continue
             val px=projected[i*3];val py=projected[i*3+1];if(px<0||py<0||px>width||py>height)continue
-            if(row.label.circle){selected.add(Triple(i,-row.width/2,-row.height/2));continue}
-            val anchors=if(row.label.variable)listOf("top","bottom","left","right")else listOf(row.label.anchor)
+            if(row.label.circle){selected.add(Triple(i,-row.width/2,-row.height/2));next[row.label.key]="circle";continue}
+            val previous=shown[row.label.key]
+            val anchors=if(row.label.variable)listOf("top","bottom","left","right").sortedBy{if(it==previous)0 else 1}else listOf(row.label.anchor)
             for(anchor in anchors){val ox=when(anchor){"left"->row.label.size*.7f;"right"->-row.width-row.label.size*.7f;else->-row.width/2};val oy=when(anchor){"top"->row.label.size*.5f;"bottom"->-row.height-row.label.size*.5f;else->-row.height/2}
                 val rect=RectF(px+ox*scale-padding,py+oy*scale-padding,px+(ox+row.width)*scale+padding,py+(oy+row.height)*scale+padding)
                 if(rect.left<0||rect.top<0||rect.right>width||rect.bottom>height)continue
                 val indexes=keys(rect);if(indexes.any{k->cells[k]?.any{RectF.intersects(it,rect)}==true})continue
-                selected.add(Triple(i,ox,oy));for(k in indexes)cells.getOrPut(k){ArrayList()}.add(rect);break
+                selected.add(Triple(i,ox,oy));next[row.label.key]=anchor;for(k in indexes)cells.getOrPut(k){ArrayList()}.add(rect);break
             }
         }
+        shown=next
         return ByteBuffer.allocateDirect(4+selected.size*12).order(ByteOrder.LITTLE_ENDIAN).apply{putInt(selected.size);for((i,x,y)in selected){putInt(i);putFloat(x);putFloat(y)};rewind()}
     }
 }

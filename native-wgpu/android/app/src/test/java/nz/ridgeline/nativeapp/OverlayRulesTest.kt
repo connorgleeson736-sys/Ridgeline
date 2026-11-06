@@ -29,4 +29,17 @@ class OverlayRulesTest {
         assertTrue(names(style.build(features,MapSettings.State(peaks=false),15.0,15.0)).isEmpty())
         assertFalse(MapSettings.State(base=MapSettings.Base.TOPO).overlays())
     }
+    private fun river(name:String,id:Long)=VectorTile.Feature("water_lines",id,2,mapOf("kind" to "river","name" to name),listOf(listOf(VectorTile.Point(.1,.1+id*.01),VectorTile.Point(.4,.1+id*.01))))
+    private fun track(name:String,id:Long)=VectorTile.Feature("streets",id,2,mapOf("kind" to "track","track_use" to "foot","name" to name),listOf(listOf(VectorTile.Point(.2,.5+id*.01),VectorTile.Point(.6,.5+id*.01))))
+    @Test fun riverAndTrackNamesComeLaterAndOncePerTile(){
+        val s=MapSettings.State()
+        val rivers=listOf(river("Hooker River",1),river("Hooker River",2),river("Tasman River",3))
+        assertTrue("rivers wait for 15.5",names(style.build(rivers,s,15.0,14.0)).isEmpty())
+        val shown=style.build(rivers,s,15.6,14.0).labels.map{it.text}
+        assertEquals(listOf("Hooker River","Tasman River"),shown.sorted())
+        val tracks=listOf(track("Hooker Valley Track",1),track("Local Spur Track",2))
+        assertTrue("no track names before 13.5",names(style.build(tracks,s,13.2,13.0)).isEmpty())
+        assertEquals(setOf("Hooker Valley Track"),names(style.build(tracks,s,14.0,14.0)))
+        assertEquals(setOf("Hooker Valley Track","Local Spur Track"),names(style.build(tracks,s,15.6,14.0)))
+    }
 }

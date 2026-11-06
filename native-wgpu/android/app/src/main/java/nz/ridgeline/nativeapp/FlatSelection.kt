@@ -3,12 +3,14 @@ import kotlin.math.*
 
 /** MapLibre-style plane coverage; no height envelope, terrain raycast or JNI selection. */
 internal object FlatSelection {
-    fun plan(width:Int,height:Int,pose:CameraPose,target:Double,budget:Int,maxZoom:Int):List<GpuUploadQueue.Id>?{
+    /** [roundZoom]: MapLibre raster sources round the tile zoom rather than
+     * flooring it, so a tile is never shown more than ~1.41x enlarged. */
+    fun plan(width:Int,height:Int,pose:CameraPose,target:Double,budget:Int,maxZoom:Int,roundZoom:Boolean=false):List<GpuUploadQueue.Id>?{
         if(width<=0||height<=0||pose.pitch>5f||target<=0)return null
         val corners=listOf(0.0 to 0.0,width.toDouble() to 0.0,0.0 to height.toDouble(),width.toDouble() to height.toDouble()).map{(x,y)->CameraMath.anchor(pose,width,height,1.0,x,y,0.0)?:return null}
         val box=doubleArrayOf(max((165.0+180)/360,corners.minOf{it.mx}),max(CameraMath.mercatorY(-33.0),corners.minOf{it.my}),min(1.0,corners.maxOf{it.mx}),min(CameraMath.mercatorY(-49.0),corners.maxOf{it.my}))
         if(box[0]>=box[2]||box[1]>=box[3])return emptyList()
-        val cap=max(1,budget);val desired=floor(pose.zoom+log2(512.0/target)).toInt().coerceIn(0,maxZoom)
+        val cap=max(1,budget);val desired=(if(roundZoom)round(pose.zoom+log2(512.0/target))else floor(pose.zoom+log2(512.0/target))).toInt().coerceIn(0,maxZoom)
         fun cover(z:Int):List<GpuUploadQueue.Id>{val n=1 shl z;val x0=floor(box[0]*n).toInt().coerceIn(0,n-1);val x1=floor(box[2]*n).toInt().coerceIn(0,n-1);val y0=floor(box[1]*n).toInt().coerceIn(0,n-1);val y1=floor(box[3]*n).toInt().coerceIn(0,n-1);if((x1-x0+1).toLong()*(y1-y0+1)>cap)return emptyList();return buildList{for(y in y0..y1)for(x in x0..x1)add(GpuUploadQueue.Id(z,x,y))}}
         var z=desired;var rows=cover(z);while(rows.isEmpty()&&z>0){rows=cover(--z)}
         val mx=(pose.longitude+180)/360;val my=CameraMath.mercatorY(pose.latitude)

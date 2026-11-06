@@ -9,7 +9,18 @@ internal class TopographyStyle(json:String){
     data class Line(val points:List<VectorTile.Point>,val color:Int,val width:Float,val dash:Float=0f,val gap:Float=0f,val order:Int=Int.MAX_VALUE)
     data class Label(val point:VectorTile.Point,val text:String,val size:Float,val color:Int,val priority:Double,val bold:Boolean=false,val circle:Boolean=false,val key:String="",val anchor:String="center",val variable:Boolean=false)
     data class Output(val lines:List<Line>,val labels:List<Label>)
-    private val specs=JSONArray(json).let{rows->List(rows.length()){rows.getJSONObject(it)}}
+    private val specs=JSONArray(json).let{rows->List(rows.length()){rows.getJSONObject(it)}}.onEach{spec->
+        // Performance: river and track names start later than in Capacitor
+        // (1.5 zooms for rivers, major tracks and lake-river polygons).
+        LATER_NAMES[spec.optString("id")]?.let{spec.put("minzoom",it)}
+    }
+    companion object{
+        val LATER_NAMES=mapOf("nz-rivers" to 15.5,"nz-river-polygons" to 14.5,"nz-tracks-label" to 13.5)
+        /** Minor (unlisted) track names need this camera zoom. */
+        const val MINOR_TRACK_NAMES=15.5
+        /** Line-placed river and track names: one label per name per tile. */
+        val ONE_PER_NAME=setOf("nz-rivers","nz-river-polygons","nz-tracks-label")
+    }
     private fun truth(value:Any?):Boolean=when(value){null,JSONObject.NULL->false;is Boolean->value;is Number->value.toDouble()!=0.0;is String->value.isNotEmpty();else->true}
     private fun number(value:Any?,fallback:Double=0.0)=(value as? Number)?.toDouble()?:value?.toString()?.toDoubleOrNull()?:fallback
     private fun eval(value:Any?,p:Map<String,Any>,zoom:Double,vars:Map<String,Any?> = emptyMap()):Any?{
@@ -43,7 +54,7 @@ internal class TopographyStyle(json:String){
      * ["zoom"] inside filters per tile, so distant coarser tiles in a pitched
      * view omit minor peaks, huts and track names exactly as the Capacitor app does. */
     fun build(features:List<VectorTile.Feature>,state:MapSettings.State,zoom:Double,tileZoom:Double=floor(zoom)):Output{
-        val lines=ArrayList<Line>();val labels=ArrayList<Label>();val grouped=features.groupBy{it.layer}
+        val lines=ArrayList<Line>();val labels=ArrayList<Label>();val grouped=features.groupBy{it.layer};val named=HashSet<String>()
         for((order,spec) in specs.withIndex()){val id=spec.getString("id");val group=group(id)
             if(!state.enabled(group)||zoom<spec.optDouble("minzoom",0.0)||zoom>=spec.optDouble("maxzoom",30.0))continue
             val kind=spec.getString("type");val paint=spec.getJSONObject("paint");val layout=spec.optJSONObject("layout")?:JSONObject()
@@ -55,10 +66,14 @@ internal class TopographyStyle(json:String){
                     val width=number(eval(paint.opt("line-width")?:1,f.properties,zoom),1.0).toFloat();val dash=paint.optJSONArray("line-dasharray")
                     for(path in f.paths)if(path.size>=2)lines.add(Line(path,rgba,width,if(dash!=null)dash.optDouble(0).toFloat()*width else 0f,if(dash!=null)dash.optDouble(1).toFloat()*width else 0f,order))
                 }else{
-                    val path=f.paths.maxByOrNull{it.size}?:continue;val point=(if(f.type==3)polygonAnchor(f.paths)else anchor(path))?:continue
+                    val path=f.paths.maxByOrNull{it.size}?:continue
                     val text=if(kind=="circle")""else eval(layout.opt("text-field"),f.properties,zoom)?.toString()?.replace("\\n","\n")?.trim().orEmpty()
                     if(kind!="circle"&&text.isBlank())continue
                     val size=if(kind=="circle")number(paint.opt("circle-radius"),4.0).toFloat()else number(eval(layout.opt("text-size")?:12,f.properties,zoom),12.0).toFloat()
+                    // Minor track names (11 px in the style; named major tracks are 12 px) wait longer.
+                    if(id=="nz-tracks-label"&&size<12f&&zoom<MINOR_TRACK_NAMES)continue
+                    if(id in ONE_PER_NAME&&!named.add(id+"\u0000"+text))continue
+                    val point=(if(f.type==3)polygonAnchor(f.paths)else anchor(path))?:continue
                     val c=color(eval(paint.opt(if(kind=="circle")"circle-color"else"text-color"),f.properties,zoom))
                     val priority=number(eval(layout.opt("symbol-sort-key")?:100,f.properties,zoom),100.0)
                     val bold=layout.optJSONArray("text-font")?.toString()?.contains("Bold")==true
