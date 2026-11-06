@@ -14,7 +14,9 @@ internal class MapSettings(context:Context){
         base=runCatching{Base.valueOf(prefs.getString("base","LINZ")!!)}.getOrDefault(Base.LINZ),natural=prefs.getBoolean("natural",true),
         names=prefs.getBoolean("names",true),peaks=prefs.getBoolean("peaks",true),roads=prefs.getBoolean("roads",true),tracks=prefs.getBoolean("tracks",true),huts=prefs.getBoolean("huts",true),contours=prefs.getBoolean("contours",false),borders=prefs.getBoolean("borders",true),hillshade=prefs.getBoolean("hillshade",false),relief=prefs.getFloat("relief",1f).takeIf{it.isFinite()}?.coerceIn(1f,2f)?:1f,sky=prefs.getInt("sky",0xffbdcbd0.toInt()),threeD=prefs.getBoolean("threeD",context.getSharedPreferences("camera",0).getFloat("pitch",58f)>1),lastPhoto=runCatching{Base.valueOf(prefs.getString("lastPhoto","LINZ")!!)}.getOrDefault(Base.LINZ).takeUnless{it==Base.TOPO}?:Base.LINZ
     ).let{if(it.base==Base.TOPO)it.copy(threeD=false)else it};private set
-    @Volatile var progressiveTerrain=prefs.getBoolean("progressiveTerrain",false)
+    // On by default: nearby terrain shows from its own elevation while the
+    // neighbouring rim elevation is still downloading. Users can turn it off.
+    @Volatile var progressiveTerrain=prefs.getBoolean("progressiveTerrain",true)
         private set
     fun progressiveTerrain(enabled:Boolean){progressiveTerrain=enabled;prefs.edit().putBoolean("progressiveTerrain",enabled).apply()}
     var onChange:(State,State)->Unit={_,_->}

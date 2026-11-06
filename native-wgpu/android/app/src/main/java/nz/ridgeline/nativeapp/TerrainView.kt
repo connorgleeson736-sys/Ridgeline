@@ -146,9 +146,9 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     internal var onInvalidUpload:(GpuUploadQueue.Tile)->Unit={}
     var onStatus:(String)->Unit={}
     private data class InteriorPacket(val id:GpuUploadQueue.Id,val token:Long,val data:ByteBuffer,val valid:()->Boolean)
-    @Volatile private var interiorPacket:InteriorPacket?=null
-    internal fun offerInterior(id:GpuUploadQueue.Id,token:Long,data:ByteBuffer,valid:()->Boolean){interiorPacket=InteriorPacket(id,token,data,valid);requestFrame()}
-    internal fun clearInterior(id:GpuUploadQueue.Id,token:Long){if(interiorPacket?.let{it.id==id&&it.token==token}==true)interiorPacket=null;gpu.post{if(handle!=0L)NativeBridge.clearInterior(handle,id.z,id.x,id.y,token);requestFrame()}}
+    private val interiorPackets=java.util.concurrent.ConcurrentHashMap<GpuUploadQueue.Id,InteriorPacket>()
+    internal fun offerInterior(id:GpuUploadQueue.Id,token:Long,data:ByteBuffer,valid:()->Boolean){interiorPackets[id]=InteriorPacket(id,token,data,valid);requestFrame()}
+    internal fun clearInterior(id:GpuUploadQueue.Id,token:Long){interiorPackets[id]?.let{if(it.token==token)interiorPackets.remove(id,it)};gpu.post{if(handle!=0L)NativeBridge.clearInterior(handle,id.z,id.x,id.y,token);requestFrame()}}
     private val uploads=GpuUploadQueue(192)
     private data class Residency(val geometry:LongArray,val images:LongArray,
         val geometryIds:Set<GpuUploadQueue.Id> = ids(geometry),val imageIds:Set<GpuUploadQueue.Id> = ids(images),
@@ -264,8 +264,20 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             count++;bytes+=tile.bytes;accepted=accepted||ok;geometryChanged=geometryChanged||(ok&&tile.kind!=GpuUploadQueue.Kind.IMAGE)
         }
         if(deviceUnavailable){recoverGpu();return}
-        val interior=interiorPacket
-        if(interior!=null){if(!cameraFirst&&allowance>0&&System.nanoTime()-started+1_000_000<=allowance){interiorPacket=null;if(interior.valid()&&NativeBridge.uploadInterior(handle,interior.id.z,interior.id.x,interior.id.y,interior.token,interior.data)){geometryChanged=true;accepted=true}}else deferredOptional=true}
+        // Provisional terrain interiors are terrain uploads: same per-frame
+        // allowance when still, same bounded minimum while moving.
+        for(interior in interiorPackets.values.sortedBy{it.token}){
+            val now=System.nanoTime();val elapsed=now-started
+            val admitted=backlog<2&&count<4&&(if(stationary)(allowance>0&&elapsed+1_000_000<=allowance||geometryThisFrame==0)
+                else (!cameraFirst&&allowance>0&&elapsed+1_000_000<=allowance||uploadAdmission.movementMinimum(GpuUploadQueue.Kind.GEOMETRY,elapsed,count,bytes,interior.data.capacity(),backlog,geometryThisFrame,imagesThisFrame,now)))
+            if(!admitted){deferredOptional=true;break}
+            if(!interiorPackets.remove(interior.id,interior))continue
+            val uploadStarted=System.nanoTime()
+            if(interior.valid()&&NativeBridge.uploadInterior(handle,interior.id.z,interior.id.x,interior.id.y,interior.token,interior.data)){geometryChanged=true;accepted=true}
+            uploadAdmission.uploaded(GpuUploadQueue.Kind.GEOMETRY,System.nanoTime()-uploadStarted)
+            geometryThisFrame++;count++;bytes+=interior.data.capacity()
+            if(!stationary)uploadAdmission.movementUploaded(GpuUploadQueue.Kind.GEOMETRY,System.nanoTime())
+        }
 
         if(count>0)refreshResidency()
         focusCoverDirty=focusCoverDirty||accepted

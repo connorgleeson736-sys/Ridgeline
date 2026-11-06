@@ -180,8 +180,10 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         else view.uploadImage(id.z,id.x,id.y,data)
     }
     private fun resident(source:Source)=view.isResident(source.id.gpu(),source.geometry)
-    private val interiorOwner=java.util.concurrent.atomic.AtomicReference<Task?>()
-    fun progressiveTerrain(enabled:Boolean){mapSettings.progressiveTerrain(enabled);if(!enabled)interiorOwner.getAndSet(null)?.let{view.clearInterior(it.source.id.gpu(),it.stageToken)}}
+    // Provisional terrain interiors currently staged, one owner task per tile.
+    private val interiorOwners=ConcurrentHashMap<Source,Task>()
+    private companion object{const val PARK_MILLIS=1500L}
+    fun progressiveTerrain(enabled:Boolean){mapSettings.progressiveTerrain(enabled);if(!enabled)for(task in interiorOwners.values.toList())if(interiorOwners.remove(task.source,task))view.clearInterior(task.source.id.gpu(),task.stageToken)}
     private inner class Task(val source:Source,@Volatile var priority:Int,@Volatile var speculative:Boolean=false):Runnable,Comparable<Task>{
         private val order=sequence.getAndIncrement()
         val stageToken=order
@@ -208,7 +210,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             return shortcut.ready().also{checkPreparation()}
         }
         val inputs=GeometryInputPipeline<Id,Decoded>(retain={pipelineEligible()})
-        fun pipelineEligible()=source.geometry&&!speculative&&priority<=2&&parkedUntil==0L&&!finished.get()&&
+        fun pipelineEligible()=source.geometry&&!speculative&&ProgressiveTerrain.eligibleRank(priority)&&parkedUntil==0L&&!finished.get()&&
             (pipelinePauseUntil==0L||System.nanoTime()-pipelinePauseUntil>=0)
         @Volatile var started=false;private set
         @Volatile private var parkedUntil=0L
@@ -216,9 +218,13 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         override fun compareTo(other:Task)=compareValuesBy(this,other,{it.priority+(if(it.speculative||it.parkedUntil!=0L)10000 else 0)},{it.order})
         fun enqueue(){if(!finished.get()&&!dead&&queued.compareAndSet(false,true))try{workers(source).execute(this)}catch(_:RejectedExecutionException){queued.set(false);cancel()}}
         fun promote(rank:Int){if(priority==rank&&!speculative&&parkedUntil==0L)return;priority=rank;speculative=false;parkedUntil=0;consumer.promote(rank);local.promote(rank);if(!pipelineEligible())inputs.clear();if(workers(source).remove(this)){queued.set(false);enqueue()}}
-        fun park(){if(parkedUntil!=0L)return;inputs.clear();if(!consumer.park()){cancel();return};local.promote(priority+10000);parkedUntil=System.currentTimeMillis()+600;
-            if(workers(source).remove(this)){queued.set(false);enqueue()};scheduler.schedule({if(source !in wanted)cancel()},600,TimeUnit.MILLISECONDS)}
-        fun cancel(preserveInterior:Boolean=false){if(finished.compareAndSet(false,true)){if(interiorOwner.compareAndSet(this,null)&&!preserveInterior)view.clearInterior(source.id.gpu(),stageToken);workers(source).remove(this);jobs.remove(source,this);consumer.release(true);local.close();inputs.clear();decodeWait.clear();derivedRead?.close()}}
+        // Started work that leaves the plan may finish for PARK_MILLIS in a
+        // background transfer slot (never a foreground one; the transport refuses
+        // parking beyond its background cap), so tiles just passed over complete
+        // instead of being discarded and downloaded again.
+        fun park(){if(parkedUntil!=0L)return;inputs.clear();if(!consumer.park()){cancel();return};local.promote(priority+10000);parkedUntil=System.currentTimeMillis()+PARK_MILLIS;
+            if(workers(source).remove(this)){queued.set(false);enqueue()};scheduler.schedule({if(source !in wanted)cancel()},PARK_MILLIS,TimeUnit.MILLISECONDS)}
+        fun cancel(preserveInterior:Boolean=false){if(finished.compareAndSet(false,true)){if(interiorOwners.remove(source,this)&&!preserveInterior)view.clearInterior(source.id.gpu(),stageToken);workers(source).remove(this);jobs.remove(source,this);consumer.release(true);local.close();inputs.clear();decodeWait.clear();derivedRead?.close()}}
         override fun run(){
             queued.set(false);if(!eligible()){cancel();return}
             var waiting:CompletableFuture<*>?=null
@@ -295,6 +301,8 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             val original=SourceDemand.bounded(ids.map{it.gpu()},limit)
             val demand=if(bootstrap!=null&&(!geometry||!view.hasResidentCoverage(focus!!.gpu(),true)))SourceDemand.bootstrap(original,bootstrap,limit)else original
             for((id,priority)in demand)next[Source(Id(id.z,id.x,id.y),geometry)]=priority
+            // Coarse backdrop first: new ground never waits on fine terrain to show.
+            for(id in SourceDemand.backdrop(original))next.putIfAbsent(Source(Id(id.z,id.x,id.y),geometry),0)
           }
           Plan(next.toMap())
         }
@@ -328,7 +336,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             if(view.gestureInProgress&&!lastGesture){predictionCount=0;cancelPredictions()}
             lastGesture=view.gestureInProgress
             transport.movement(view.gestureInProgress)
-            val returning=jobs.values.filter{it.source !in wanted&&!it.speculative&&it.started}.sortedBy{it.priority}.take(2).toSet()
+            val returning=jobs.values.filter{it.source !in wanted&&!it.speculative&&it.started}.sortedBy{it.priority}.take(downloadLimits.background.coerceAtLeast(2)).toSet()
             for(task in jobs.values){if(task.source in wanted)task.promote(ranked[task.source]?:0)else if(task.source in warmWanted&&prepareAhead&&!view.gestureInProgress){}else if(task !in returning)task.cancel()else task.park()}
             for((source,priority)in ranked.entries.sortedBy{it.value}){
                 if(resident(source))continue
@@ -547,14 +555,15 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         if(main.raster.id!=source.gpu())return
         val now=System.nanoTime();if(task.centreReadyAt==0L)task.centreReadyAt=now
         if(pending==0){if(task.haloRecorded)return;task.haloRecorded=true;val elapsed=now-task.centreReadyAt;centreHaloSamples.incrementAndGet();centreHaloNanos.addAndGet(elapsed);centreHaloMax.accumulateAndGet(elapsed,::maxOf);return}
-        if(!mapSettings.progressiveTerrain||task.interiorOffered||!task.eligible()||!mapSettings.state.threeD||id.z !in 1..19||task.priority>2||id.z-source.z!=1)return
+        // Any nearby wanted terrain tile whose own elevation has arrived may show
+        // its measured interior while the neighbouring rim elevation is pending.
+        // The renderer keeps the rim with complete parent terrain and declines
+        // joins its skirt cannot cover; otherwise the complete mesh path applies.
+        if(!mapSettings.progressiveTerrain||task.interiorOffered||!task.eligible()||!mapSettings.state.threeD||id.z !in 1..19||!ProgressiveTerrain.eligibleRank(task.priority)||id.z-source.z!=1)return
         if(!view.hasResidentCoverage(id.gpu(),true)||!view.hasResidentCoverage(id.gpu(),false))return
-        val focus=view.surfaceFocusFor(view.planningPose)?:return
-        val n=1 shl id.z;val x=(focus.longitude+180)/360*n-id.x;val y=CameraMath.mercatorY(focus.latitude)*n-id.y
-        if(x !in 0.0..1.0||y !in 0.0..1.0)return
-        if(!main.dependencies.all(::dependencyFresh)||!interiorOwner.compareAndSet(null,task))return
+        if(!main.dependencies.all(::dependencyFresh)||interiorOwners.size>=ProgressiveTerrain.MAX_STAGED||interiorOwners.putIfAbsent(task.source,task)!=null)return
         val patch=MeasuredInterior.sample(id.z,id.x,id.y,main.raster)
-        if(patch==null){interiorOwner.compareAndSet(task,null);return}
+        if(patch==null){interiorOwners.remove(task.source,task);return}
         task.interiorOffered=true
         view.offerInterior(id.gpu(),task.stageToken,patch.packet){mapSettings.progressiveTerrain&&task.eligible()}
     }

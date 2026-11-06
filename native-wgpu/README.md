@@ -5,7 +5,12 @@
 the audited APK was 0.1.5. Main next candidates are raw local-I/O isolation,
 GPU upload acknowledgement, classified recovery and per-tile critical-path tracing.
 
-Latest APK: **[0.1.14 Motion and Overlays Base](checkpoints/README.md)** — updates
+Latest APK: **[0.1.15 Fast Coverage Base](checkpoints/README.md)** — updates
+0.1.13/0.1.14 in place. Coarse backdrop under every view, imagery drapes before
+fine terrain, multi-tile progressive terrain on by default, longer-lived parked
+transfers. [Details](research/FULL-AUDIT-2026-11-06.md#0115-fast-coverage).
+
+Previous APK: **[0.1.14 Motion and Overlays Base](checkpoints/README.md)** — updates
 0.1.13 in place. Terrain and imagery keep sharpening during movement; labels are
 drawn whole over terrain with line-of-sight hiding; dashes stay fixed to the
 ground while zooming. [Details](research/FULL-AUDIT-2026-11-06.md#0114-movement-and-overlays).

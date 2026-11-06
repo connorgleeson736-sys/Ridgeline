@@ -24,6 +24,21 @@ internal object SourceDemand {
         next[coarse]=0
         return next
     }
+    /** A few coarse ancestors covering every planned tile, about four levels
+     * above the focus leaf (zoom 5-10, at most [maxTiles]). After a fast move
+     * they load first and stay drawable underneath, so new ground shows coarse
+     * terrain and imagery instead of blanks while detail arrives. They never
+     * become drawing targets: finer sources always win where resident. */
+    fun backdrop(rows:Map<GpuUploadQueue.Id,Int>,maxTiles:Int=6):List<GpuUploadQueue.Id> {
+        if(rows.isEmpty())return emptyList()
+        val focus=rows.entries.filter{it.value in 1..4}.minByOrNull{it.value}?.key?:rows.keys.maxBy{it.z}
+        var level=(focus.z-4).coerceIn(5,10)
+        while(true){
+            val ancestors=rows.keys.filter{it.z>level}.map{GpuUploadQueue.Id(level,it.x shr(it.z-level),it.y shr(it.z-level))}.distinct()
+            if(ancestors.size<=maxTiles||level<=3)return ancestors.filter{it !in rows}
+            level--
+        }
+    }
     fun bounded(input:List<GpuUploadQueue.Id>,budget:Int):Map<GpuUploadQueue.Id,Int> {
         require(budget>=16)
         val leaves=input.distinct().toMutableList()

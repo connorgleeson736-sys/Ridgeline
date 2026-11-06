@@ -1,6 +1,32 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.14 Motion and Overlays Base APK — 32.6 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Motion-Overlays-0.1.14-Base.apk)**.
+Latest: **[Download 0.1.15 Fast Coverage Base APK — 32.6 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Fast-Coverage-0.1.15-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 16:
+**updates 0.1.13/0.1.14 in place, keeping its data.**
+
+Aimed at blank or slow-loading ground after moving quickly over terrain:
+
+- **Coarse backdrop under every view.** A few zoom 5–10 terrain and imagery
+  tiles are planned first, so new ground shows coarse terrain immediately.
+- **Imagery no longer waits for fine terrain.** Arrived photos drape on the
+  backdrop (or any resident coarser terrain) until the fine mesh is ready.
+- **Terrain from its own elevation first.** Progressive terrain is on by default
+  and now covers up to 16 nearby tiles at once (was one). The rim that needs
+  neighbouring elevation keeps the complete parent until it arrives; unsafe
+  joins fall back to normal loading. Turn off under Layers → Progressive terrain.
+- **Less wasted work.** Started downloads that leave the view may finish for
+  1.5 s in background transfer slots, never taking foreground slots.
+
+GPU checks pass on Vulkan and GLES (multi-tile progressive terrain fails on the
+previous renderer). All 623 original assets identical; signature, 16 KiB
+alignment and non-debuggable build verified. No phone measurement.
+[Audit and limits](../research/FULL-AUDIT-2026-11-06.md#0115-fast-coverage) ·
+[Exact release record](../validation/fast-coverage-2026-11-06/release.json) ·
+[SHA-256](Ridgeline-Native-Fast-Coverage-0.1.15-Base.apk.sha256).
+
+## Previous 0.1.14 motion and overlays checkpoint
+
+**[Download 0.1.14 Motion and Overlays Base APK — 32.6 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Motion-Overlays-0.1.14-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer as 0.1.13, version code 15:
 **updates 0.1.13 in place, keeping its data.**
 

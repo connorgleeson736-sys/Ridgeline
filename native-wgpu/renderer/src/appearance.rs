@@ -76,7 +76,7 @@ impl crate::Renderer {
     }
     pub fn clear_geometry(&mut self) {
         self.tiles.clear();
-        self.interior = None;
+        self.interiors.clear();
         self.plane = None;
         if let Some(pool) = &mut self.height_arrays {
             pool.trim_empty();

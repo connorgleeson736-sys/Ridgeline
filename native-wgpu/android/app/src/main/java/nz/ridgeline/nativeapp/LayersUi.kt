@@ -68,7 +68,7 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
         NativeUi.divider(parent)
         slider(parent,"Combined RAM tile cache",1000,loader.ramCacheMiB,{"$it MiB"}){loader.ramCacheMiB(it)}
         slider(parent,"Automatic disk cache",1000,loader.automaticCacheMiB,{"$it MiB · applies after restart"}){loader.automaticCacheMiB(it)}
-        check(parent,"Progressive focus terrain · experimental",settings.progressiveTerrain){loader.progressiveTerrain(it)}
+        check(parent,"Progressive terrain",settings.progressiveTerrain){loader.progressiveTerrain(it)}
         check(parent,"Prepare nearby terrain while idle",loader.prepareAhead){loader.prepareAhead(it)}
         check(parent,"Downloaded maps only",loader.offlineOnly){loader.offlineOnly(it)}
         parent.addView(NativeUi.button(activity,"Offline maps, imagery ZIPs & diagnostics"){dismiss();offline.show()})
