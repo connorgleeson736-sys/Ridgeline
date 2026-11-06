@@ -1,6 +1,11 @@
-//! Experimental exact measured interior. Quadtree cells give every consumer the
-//! same fine/parent owner, without an invented height in the missing L-shaped rim.
+//! Exact measured interiors: a terrain tile drawn from its own elevation before
+//! the neighbouring elevation for its outer rim has arrived. Quadtree cells give
+//! every consumer the same fine/parent owner, without an invented height in the
+//! missing L-shaped rim, which stays with the complete parent. Several disjoint
+//! interiors may be staged; each keeps its own parent and skirt checks.
 use crate::*;
+/// Bound on simultaneously staged provisional interiors.
+pub(crate) const MAX_INTERIORS: usize = 16;
 pub(crate) struct Interior {
     pub id: TileId,
     pub parent: TileId,
@@ -46,9 +51,9 @@ impl Renderer {
         if self.tiles.get(&id).is_some_and(|t| t.field.complete()) {
             return id;
         }
-        self.interior
-            .as_ref()
-            .filter(|p| p.regions.contains(&id))
+        self.interiors
+            .values()
+            .find(|p| p.regions.contains(&id))
             .map_or(id, |p| p.id)
     }
     pub(crate) fn physical_sources(&self, sources: Vec<TileId>) -> Vec<TileId> {
@@ -67,9 +72,12 @@ impl Renderer {
             .filter(|(_, t)| t.field.complete())
             .map(|(id, _)| *id)
             .collect();
-        if let Some(p) = &self.interior {
+        let complete = ids.len();
+        for p in self.interiors.values() {
             if self.tiles.contains_key(&p.id)
-                && ids.iter().any(|id| *id != p.id && id.contains(p.id))
+                && ids[..complete]
+                    .iter()
+                    .any(|id| *id != p.id && id.contains(p.id))
             {
                 ids.extend(p.regions.iter().copied());
             }
@@ -78,11 +86,11 @@ impl Renderer {
     }
     pub fn clear_interior(&mut self, id: TileId, token: u64) {
         if self
-            .interior
-            .as_ref()
-            .is_some_and(|p| p.id == id && p.token == token)
+            .interiors
+            .get(&id)
+            .is_some_and(|p| p.token == token)
         {
-            self.interior = None;
+            self.interiors.remove(&id);
             if self.tiles.get(&id).is_some_and(|t| !t.field.complete()) {
                 self.tiles.remove(&id);
             }
@@ -175,12 +183,23 @@ impl Renderer {
                 max_drop = max_drop.max(drop);
             }
         }
-        if let Some(old) = self.interior.as_ref() {
-            let (id, token) = (old.id, old.token);
+        // Interiors stay disjoint, so each keeps an unambiguous rim owner.
+        if self
+            .interiors
+            .values()
+            .any(|p| p.id != id && (p.id.contains(id) || id.contains(p.id)))
+        {
+            return Err(UploadError::Capacity);
+        }
+        if let Some(old) = self.interiors.get(&id) {
+            let token = old.token;
             self.clear_interior(id, token);
         }
+        if self.interiors.len() >= MAX_INTERIORS {
+            return Err(UploadError::Capacity);
+        }
         self.upload_geometry_region(id, heights, rect)?;
-        self.interior = Some(Interior {
+        self.interiors.insert(id, Interior {
             id,
             parent,
             parent_generation,
@@ -193,16 +212,20 @@ impl Renderer {
         Ok(())
     }
     pub(crate) fn validate_interior(&mut self, logical: f64) {
-        if let Some(p) = &self.interior {
-            if self
-                .tiles
-                .get(&p.parent)
-                .is_none_or(|t| t.generation != p.parent_generation)
-                || p.max_drop > ridgeline_core::surface::skirt_length(logical)
-            {
-                let (id, token) = (p.id, p.token);
-                self.clear_interior(id, token);
-            }
+        let skirt = ridgeline_core::surface::skirt_length(logical);
+        let invalid: Vec<_> = self
+            .interiors
+            .values()
+            .filter(|p| {
+                self.tiles
+                    .get(&p.parent)
+                    .is_none_or(|t| t.generation != p.parent_generation)
+                    || p.max_drop > skirt
+            })
+            .map(|p| (p.id, p.token))
+            .collect();
+        for (id, token) in invalid {
+            self.clear_interior(id, token);
         }
     }
     pub(crate) fn draw_mask(&self, row: &ridgeline_core::surface::SurfacePatch) -> u8 {
@@ -238,8 +261,15 @@ impl Renderer {
     /// CPU ownership stays exact; rectangular GPU clips avoid hundreds of tiny
     /// quadtree draws for a one-cell-wide L-shaped parent rim.
     pub(crate) fn coalesce_interior_draws(&mut self, images: &[TileId]) {
+        let mut ids: Vec<_> = self.interiors.keys().copied().collect();
+        ids.sort_unstable_by_key(|id| (id.z, id.x, id.y));
+        for id in ids {
+            self.coalesce_one_interior(id, images);
+        }
+    }
+    fn coalesce_one_interior(&mut self, id: TileId, images: &[TileId]) {
         use ridgeline_core::surface::SurfacePatch;
-        let Some(p) = &self.interior else {
+        let Some(p) = self.interiors.get(&id) else {
             return;
         };
         if !self.cover.iter().any(|row| row.source == p.id) {

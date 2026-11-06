@@ -81,7 +81,8 @@ struct ImageTile {
 }
 pub struct Renderer {
     plane: Option<planar::Plane>,
-    interior: Option<progressive::Interior>,
+    /// Provisional measured interiors, keyed by tile. Disjoint; bounded.
+    interiors: std::collections::HashMap<TileId, progressive::Interior>,
     submitted_pick: Option<Arc<picking_snapshot::PickingSnapshot>>,
     pub device: wgpu::Device,
     pub queue: wgpu::Queue,
@@ -503,7 +504,7 @@ impl Renderer {
         let labels_gpu = labels::LabelGpu::new(&device, &queue, format);
         let mut renderer = Self {
             plane: None,
-            interior: None,
+            interiors: Default::default(),
             submitted_pick: None,
             device,
             queue,
@@ -724,11 +725,14 @@ impl Renderer {
             return Err(UploadError::InvalidGeometry);
         }
         if valid == [0, 0, 128, 128] {
-            if let Some(p) = &self.interior {
-                if p.id != id && p.id.contains(id) {
-                    let (old, token) = (p.id, p.token);
-                    self.clear_interior(old, token);
-                }
+            let containing: Vec<_> = self
+                .interiors
+                .values()
+                .filter(|p| p.id != id && p.id.contains(id))
+                .map(|p| (p.id, p.token))
+                .collect();
+            for (old, token) in containing {
+                self.clear_interior(old, token);
             }
         }
         if valid == [0, 0, 128, 128] && self.touch_geometry(id) {
@@ -848,8 +852,8 @@ impl Renderer {
             self.terrain_overlays_changed();
         }
         self.cover_dirty = true;
-        if valid == [0, 0, 128, 128] && self.interior.as_ref().is_some_and(|p| p.id == id) {
-            self.interior = None;
+        if valid == [0, 0, 128, 128] {
+            self.interiors.remove(&id);
         }
         Ok(())
     }
@@ -1679,7 +1683,7 @@ impl Renderer {
                 px_meter,
                 now,
                 self.exact_route_sources.contains(&id)
-                    || self.interior.as_ref().is_some_and(|p| p.parent == id)
+                    || self.interiors.values().any(|p| p.parent == id)
                     || (!self.map_style.three_d
                         && self.map_style.hillshade
                         && self.map_style.basemap != 2),
