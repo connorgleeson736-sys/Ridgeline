@@ -1,0 +1,20 @@
+{
+  "JPEG": {
+    "images": 20,
+    "nonOpaqueImages": 0,
+    "zeroAlphaPixels": 0,
+    "pixels": 1310720
+  },
+  "WEBP": {
+    "images": 59,
+    "nonOpaqueImages": 0,
+    "zeroAlphaPixels": 0,
+    "pixels": 3866624
+  },
+  "PNG": {
+    "images": 142,
+    "nonOpaqueImages": 24,
+    "zeroAlphaPixels": 962169,
+    "pixels": 9306112
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "sourceCommit": "d258866d31509174c01aa0022094015d687566c2",
+  "nativeBuildSourceCommit": "d258866d31509174c01aa0022094015d687566c2",
+  "artifact": "Ridgeline-Native-UI-Layers-0.1.9-Base.apk",
+  "bytes": 32513845,
+  "sha256": "6faf1d0b4f0466834048859781aeb3fb05aaff236404935d2bfdf1102ebedf23",
+  "versionName": "0.1.9-ui-layers",
+  "versionCode": 10,
+  "applicationId": "nz.ridgeline.nativeapp.performance",
+  "signerSha256": "03ef64214daee8c59cad6571ce5036579237d553c040837ce996f80efa898ae7",
+  "updates018InPlace": true,
+  "originalAssetsByteIdenticalTo018": 619,
+  "originalSourceAssets": 618,
+  "unchangedSdkAsset": "assets/PublicSuffixDatabase.list",
+  "additionalAssets": [
+    "assets/imagery-boundary.geojson",
+    "assets/topography-style.json"
+  ],
+  "noSessionCa": true,
+  "signatureV2Verified": true,
+  "zip16KiBAlignmentVerified": true,
+  "nativeLibraries": [
+    {
+      "path": "lib/arm64-v8a/libridgeline_renderer.so",
+      "bytes": 4611808,
+      "sha256": "60c8e5b5910720f146a60e48535f9968215467053c139d69a344a58b5613b4f2",
+      "loadSegmentAlignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "profile": "release opt-level=3 thin-LTO, stripped",
+      "allNativeBridgeExportsVerified": 33,
+      "byteIdenticalTo018": false
+    },
+    {
+      "path": "lib/armeabi-v7a/libridgeline_renderer.so",
+      "bytes": 3172800,
+      "sha256": "235f97a148d5820935ef6296bce06f0e035c72606903e395b6ad60d2d1cb0f03",
+      "loadSegmentAlignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "profile": "release opt-level=3 thin-LTO, stripped",
+      "allNativeBridgeExportsVerified": 33,
+      "byteIdenticalTo018": false
+    },
+    {
+      "path": "lib/x86_64/libridgeline_renderer.so",
+      "bytes": 5234816,
+      "sha256": "a2ba7d0e3be19803d5d17ddd0e6081c3917ce7f06135f813291b25badfbb1b1f",
+      "loadSegmentAlignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "profile": "release opt-level=3 thin-LTO, stripped",
+      "allNativeBridgeExportsVerified": 33,
+      "byteIdenticalTo018": false
+    }
+  ],
+  "targetedJVMChecksPassed": 11,
+  "graphicsFixturesPassed": [
+    "Vulkan software ICD",
+    "GLES surfaceless software driver"
+  ],
+  "fullSuiteOrLintRun": false,
+  "physicalDeviceRun": false,
+  "phoneSpeedupMeasured": false,
+  "packagingRecreatedWithoutIncrementalUnusedBodies": true,
+  "mapLibreReferenceSource": "d880143418ac46ece98adff0b3b2fbaedf044d46",
+  "controlledHostResults": {
+    "lineUploadBytes": {
+      "expanded": 29952,
+      "instanced": 4992,
+      "pixelsIdentical": true
+    },
+    "disabledLayerDecodeMedianMs": {
+      "all": 2.413637,
+      "namesOnly": 0.0633849,
+      "enabledLabelOutputIdentical": true
+    }
+  },
+  "limitations": [
+    "No Android interaction, GPS, sharing, font appearance or device latency acceptance run.",
+    "Native font atlas and horizontal midpoint line labels approximate MapLibre placement.",
+    "Igor gradients come from native mesh rather than separate Sobel preparation.",
+    "Dense 3D cartography still rebuilds on terrain cover/data changes, with bounded geometry/label budgets.",
+    "Native offline forms retained; Capacitor paper-frame/Topo PDF workflows outside route/layer checkpoint."
+  ],
+  "report": "../../research/UI-LAYERS-MIGRATION-2026-11-02.md"
+}

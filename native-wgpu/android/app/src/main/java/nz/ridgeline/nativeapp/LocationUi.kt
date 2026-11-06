@@ -1,0 +1,44 @@
+package nz.ridgeline.nativeapp
+import android.Manifest
+import android.app.Activity
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.Gravity
+import android.widget.*
+/** Capacitor-style foreground location toggle. One initial recenter; later fixes move the dot. */
+class LocationUi(private val activity:Activity,root:FrameLayout,private val terrain:TerrainView,attachLauncher:Boolean=true):LocationListener{
+    private val manager=activity.getSystemService(LocationManager::class.java)
+    private val main=Handler(Looper.getMainLooper());private var waiting=false;private var firstFix=true
+    val button=NativeUi.button(activity,"◎"){if(waiting)stop()else locate()}.apply{textSize=22f;contentDescription="Show GPS location"}
+    private val timeout=Runnable{stop();Toast.makeText(activity,"No location fix yet. Check location services and try again.",Toast.LENGTH_LONG).show()}
+    init{if(attachLauncher){val scale=activity.resources.displayMetrics.density;root.addView(button,FrameLayout.LayoutParams((44*scale).toInt(),(44*scale).toInt(),Gravity.TOP or Gravity.END).apply{marginEnd=(10*scale).toInt();topMargin=(230*scale).toInt()})}}
+    private fun locate(){
+        if(activity.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED){activity.requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION),4201);return}
+        try{
+            val fine=activity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED
+            val providers=manager.getProviders(true).filter{it==LocationManager.NETWORK_PROVIDER||(fine&&it==LocationManager.GPS_PROVIDER)}
+            if(providers.isEmpty()){Toast.makeText(activity,if(fine)"Enable location services to locate yourself."else"Allow precise location or enable network location.",Toast.LENGTH_LONG).show();return}
+            waiting=true;firstFix=true;button.setTextColor(0xff277ad4.toInt());button.isSelected=true
+            val recent=providers.mapNotNull{manager.getLastKnownLocation(it)}.filter{System.currentTimeMillis()-it.time<60000&&it.accuracy<100}.minByOrNull{it.accuracy}
+            if(recent!=null)onLocationChanged(recent)
+            button.text="◎"
+            for(provider in providers)manager.requestLocationUpdates(provider,1000,2f,this,Looper.getMainLooper())
+            if(firstFix)main.postDelayed(timeout,30000)
+        }catch(_:SecurityException){stop();Toast.makeText(activity,"Location permission is needed.",Toast.LENGTH_LONG).show()}
+    }
+    fun permission(request:Int){if(request==4201)locate()}
+    override fun onLocationChanged(location:Location){
+        if(!waiting)return;main.removeCallbacks(timeout);val p=runCatching{Coordinate(location.longitude,location.latitude)}.getOrNull()?:return
+        if(p.inNewZealand()){terrain.locationPoint(p);if(firstFix){firstFix=false;terrain.goTo(p,13.0)};button.contentDescription="Stop GPS location · accuracy about ${location.accuracy.toInt()} m"}
+        else {stop();Toast.makeText(activity,"Your location is outside the New Zealand map area.",Toast.LENGTH_LONG).show()}
+    }
+    override fun onProviderDisabled(provider:String){}
+    override fun onProviderEnabled(provider:String){}
+    override fun onStatusChanged(provider:String?,status:Int,extras:Bundle?){}
+    fun stop(){waiting=false;firstFix=true;button.text="◎";button.setTextColor(NativeUi.ink);button.isSelected=false;button.contentDescription="Show GPS location";terrain.locationPoint(null);main.removeCallbacks(timeout);runCatching{manager.removeUpdates(this)}}
+}

@@ -1,0 +1,4 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running `native-wgpu/target/debug/examples/live_terrain /workspace/native-provider-fixtures/independent-proof --independent-images --render-mips`
+Visible triangles: surface=32768 skirts=1024
+Live LINZ GPU draw, 129 exact shared edge samples, full 256px imagery, center pick height=1087.000m expected=1087.000m: PASS. Not visual parity or Android execution.

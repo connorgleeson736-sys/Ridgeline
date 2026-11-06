@@ -1,0 +1,25 @@
+{
+  "scope": "Targeted production selector and Kotlin focus-state checks. The ray fixture is a synthetic 3000m heightfield intersected with the production CPU heightfield algorithm, not a phone benchmark.",
+  "rustTestsPassed": 2,
+  "kotlinTestsPassed": 2,
+  "visibleSurfaceFixture": {
+    "oldRequestRank": 33,
+    "newRequestRank": 0,
+    "oldSourceZoom": 15,
+    "newSourceZoom": 16,
+    "oldSourceCount": 72,
+    "newSourceCount": 72,
+    "sourceBudget": 72,
+    "surfaceHeightMetres": 3000
+  },
+  "missingOrInvalidFocus": "Exact previous ordered plans verified over 24 varied views",
+  "kotlinChecks": [
+    "surface focus changes plan key without changing camera",
+    "recent visible hits survive small motion",
+    "off-screen/stale/resize hits fall back",
+    "missing/nonfinite hit clears focus",
+    "gesture sampling cadence and stable-plan reuse"
+  ],
+  "noBroadSuiteOrLint": true,
+  "physicalDeviceRun": false
+}

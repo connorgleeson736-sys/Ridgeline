@@ -1,0 +1,93 @@
+{
+  "scope": "Controlled host/JVM and Mesa software-GPU fixtures; no Android phone or FPS measurement.",
+  "date": "2026-11-01",
+  "timezone": "Australia/Melbourne",
+  "reference": {
+    "native": "0.1.6-download-controls",
+    "source": "f6f5ea0682945d3e42fc73f392b298e57ea2c37d",
+    "capacitor": "0.18.0-performance",
+    "capacitorSource": "d880143418ac46ece98adff0b3b2fbaedf044d46"
+  },
+  "jvmTestsPassed": 11,
+  "fullSuiteOrLintRun": false,
+  "changedPathChecks": [
+    "original local I/O isolation/latency",
+    "shared ownership, priority, cancellation and actual I/O permit lifetime",
+    "GPU upload retry ownership, bounded delays, head skipping and stale acknowledgements",
+    "existing live upload rank ordering",
+    "existing prepared-buffer coalescing",
+    "offline lookahead, cancellation closure, bounded background admission and zero-RAM reuse",
+    "late prepared hit versus a 350ms source fallback using an actual lossless cache file",
+    "current validity rechecked at late adoption, rejected hits cannot cause a busy wake loop, cancellation retains actual reader permits",
+    "legacy deadline-only cache read behavior remains compatible",
+    "published reader handles bypass a held helper monitor by more than 200ms in the fixture; read-only fallback is not cached; clear/reopen and writer publication preserve ownership",
+    "extended GPU retry check: a class-specific capacity wake eliminates a pending 512ms backoff without waking the other source class"
+  ],
+  "gpu": {
+    "fixture": "upload_batch_bench",
+    "actualInput": "Existing genuine LINZ RGBA/heights fixture; four distinct diagnostic image tags and height offsets. Warm draw and mip pipelines before each measured sample; evict warm tiles and perform four new uploads. Three alternating trials per mode, sequential backend runs.",
+    "drivers": [
+      "Mesa25.0.7 Lavapipe Vulkan",
+      "Mesa software GLES"
+    ],
+    "paths": [
+      "Vulkan arrays",
+      "Vulkan separate textures",
+      "GLES separate textures"
+    ],
+    "modes": {
+      "1": "four standalone mip submissions, then frame",
+      "2": "one mip batch submission, then frame",
+      "3": "mip batch and frame in one submission"
+    },
+    "allFrameBytesIdenticalWithinEachBackend": true,
+    "allNineMipCheckerLevelsVerified": true,
+    "twoLayerAllNineMipProbeVerified": true,
+    "invalidPayloadOutcomesVerified": true,
+    "selectedPolicy": "Merged mip/frame submission on Vulkan only; keep GLES default because software timing results varied/regressed between measurement rounds. CPU mip fallback stays unchanged.",
+    "phoneBenchmark": false
+  },
+  "research": [
+    {
+      "title": "wgpu best practices: limit submissions and resource churn",
+      "url": "https://wgpu.rs/doc/wgpu/documentation/best_practices/dos_and_donts/index.html"
+    },
+    {
+      "title": "wgpu30 queue writes and submission ordering",
+      "url": "https://docs.rs/wgpu/30.0.1/wgpu/struct.Queue.html"
+    },
+    {
+      "title": "SQLite WAL readers/writers",
+      "url": "https://www.sqlite.org/wal.html"
+    },
+    {
+      "title": "Cesium Native selection/load/render separation",
+      "url": "https://cesium.com/learn/cesium-native/ref-doc/selection-algorithm-details.html"
+    }
+  ],
+  "latePreparedCache": {
+    "deadlineMs": 12,
+    "readerThreads": 2,
+    "unchangedOutstandingCapacity": 16,
+    "validateOnAdoption": [
+      "current operation eligibility",
+      "current imagery attachment generation when applicable",
+      "current dependency fingerprint and expiry"
+    ],
+    "cancelsOnlyThisConsumersSourceLeases": true,
+    "cpuCheckpointsCanAdoptDuringRebuild": true,
+    "firstReadyFallbackWaitCanWakeOnLateHit": true,
+    "over200msFixtureSaved": 321.23701700000004
+  },
+  "savedMapReadHandle": {
+    "initializedWritableReadBypassesApplicationMonitor": true,
+    "writerMayPublishEstablishedWritableHandle": true,
+    "readOnlyHandleNotRetained": true,
+    "availabilityPublishedAfterCommit": true,
+    "initialAvailabilityCASCannotOverwriteCommittedState": true,
+    "androidSourceEvidence": "sqlite-helper-evidence.json",
+    "physicalAndroidDatabaseBenchmark": false
+  },
+  "savedRegionUIQueriesShareLongDownloadExecutor": false,
+  "httpDiskCacheCloseOnUIThread": false
+}

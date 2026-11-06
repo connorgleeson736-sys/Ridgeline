@@ -1,0 +1,10 @@
+   Compiling ridgeline-core v0.1.0 (/workspace/Ridgeline/native-wgpu/core)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.41s
+     Running unittests src/lib.rs (native-wgpu/target/debug/deps/ridgeline_core-dd3d7f541af8d3f4)
+
+running 2 tests
+test adaptive::tests::residual_bound_preserves_planes_and_detects_small_sharp_features ... ok
+test adaptive::tests::adaptive_boundaries_keep_every_edge_and_exact_coverage ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 23 filtered out; finished in 0.02s
+

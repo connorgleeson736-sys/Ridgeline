@@ -1,0 +1,23 @@
+{
+  "rustHostTests": 22,
+  "androidUnitTests": {
+    "tests": 25,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "lintErrors": 0,
+  "lintWarnings": 16,
+  "surfaceTrianglesBefore": 32768,
+  "surfaceTrianglesAfter": 32768,
+  "skirtTrianglesBefore": 2048,
+  "skirtTrianglesAfter": 1024,
+  "pixelEqualityTopdown": true,
+  "pixelEqualityOblique": false,
+  "obliqueChangedPixels": 1,
+  "forced24ByteIndexCache": "pixel/triangle identical to normal cache",
+  "signatureVerified": true,
+  "zipalign16KiB": true,
+  "nativeAppAndroid30": "installed; instrumentation pending",
+  "visualParity": "unverified"
+}

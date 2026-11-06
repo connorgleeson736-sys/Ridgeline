@@ -1,0 +1,41 @@
+{
+  "sourceCheckpoint": "eef2ba7b594782174d2e05cb2dc15430582b3b09",
+  "sha256": "1fc293176f5180d4445e78a9ce4143af55bf93e7d6225dd6298b9877a20672c9",
+  "bytes": 31866304,
+  "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86_64"
+  ],
+  "focusedJvmTests": 8,
+  "failures": 0,
+  "lint": true,
+  "signatureVerified": true,
+  "alignment16KiBVerified": true,
+  "nativeLibrariesByteIdenticalTo": "033bec62c340fd05ba95a316b01604e6ce8c9062",
+  "phoneTested": false,
+  "largeOverviewPacks": 0,
+  "managedSessionCa": false,
+  "ramTileCache": {
+    "rangeMiB": [
+      0,
+      1000
+    ],
+    "stepMiB": 1,
+    "applies": "immediately",
+    "zero": "no retained encoded/decoded/prepared tile payloads",
+    "partitionPercent": {
+      "encoded": 25,
+      "decoded": 25,
+      "prepared": 50
+    },
+    "default": "32 MiB low-RAM; otherwise memoryClass/4 clamped 32-96 MiB",
+    "excludes": [
+      "active loading/queued uploads",
+      "object and metadata overhead",
+      "renderer CPU working sets",
+      "GPU resources"
+    ],
+    "highBudgetWarning": true
+  }
+}

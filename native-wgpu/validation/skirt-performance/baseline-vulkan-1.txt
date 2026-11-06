@@ -1,0 +1,3 @@
+pitch=0 elapsedUs8Frames=1488383 draws=16 binds=22 triangles=528384 hash=5c284a5bdf09608d
+pitch=60 elapsedUs8Frames=1509545 draws=15 binds=22 triangles=495104 hash=172a7ea6737c2c14
+pitch=75 elapsedUs8Frames=1492039 draws=15 binds=22 triangles=495104 hash=4e9d51026314e05a

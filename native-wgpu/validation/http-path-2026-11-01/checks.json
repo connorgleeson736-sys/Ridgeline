@@ -1,0 +1,81 @@
+{
+  "scope": "HTTP source/queue/cache/connection fixtures on host JVM. No physical phone, Wi-Fi, DNS-provider or live imagery-provider latency benchmark.",
+  "date": "2026-11-01",
+  "timezone": "Etc/UTC",
+  "baseline": "0.1.7-async-pipeline",
+  "okhttpBefore": "4.12.0",
+  "okhttpAfter": "5.3.2",
+  "compatibleSdk": 36,
+  "whyNotNewest": "5.5.1 Android variant requires compileSdk37; kept the existing SDK36/AGP toolchain.",
+  "focusedJvmTestsPassed": 8,
+  "additionalBurstRegressionRerun": true,
+  "fullSuiteOrLintRun": false,
+  "covered": [
+    "real HTTP cache journal blockage after headers",
+    "real fast-fallback route planner with unresponsive first TCP address",
+    "persistent gzip/Vary/ETag/no-cache/304/no-store/Vary* and redirects",
+    "OkHttp4.12 disk cache read by5.3.2",
+    "50-download cache publication burst with cache held and zero transport RAM; all50persist across reopen",
+    "retired canceled-call queue isolation",
+    "50 real simultaneous HTTP downloads on both existing paths",
+    "phase probe identifies non-wire cache wait; cache hits do not count as wire bytes; diagnostics omit query credentials",
+    "pending handoff uses SDK freshness; offline max-stale cannot override must-revalidate/no-cache/no-store",
+    "chunked gzip response persists dechunked/decompressed with consistent stored headers"
+  ],
+  "cache": {
+    "sameOriginalAutomaticHttpCacheBudget": true,
+    "newPerBackendPublicationPayloadCapBytes": 8388608,
+    "maxQueuedPublicationJobs": 512,
+    "writerThreads": 1,
+    "nativeWriterPriority": "Android background",
+    "pendingBodiesReusableBeforeCommit": true,
+    "staleValidation": "Standard OkHttp conditional path retained; it can still perform synchronous cache updates. The new spans expose this path.",
+    "cacheFormatVersion": 201105
+  },
+  "primarySources": [
+    {
+      "url": "https://repo.maven.apache.org/maven2/com/squareup/okhttp3/okhttp-jvm/5.3.2/okhttp-jvm-5.3.2-sources.jar",
+      "sourceFiles": [
+        {
+          "file": "Cache.kt",
+          "sha256": "0c16dd8a317ad931a96729b3cf69dba28d3492ce7e64dc6ddb4a32673a72577d"
+        },
+        {
+          "file": "CacheInterceptor.kt",
+          "sha256": "13366e9d15aa209bfe78f5a96f03e3bcef50ffff43473ba6130792db658499d0"
+        },
+        {
+          "file": "CacheStrategy.kt",
+          "sha256": "360e0edd1ee022ac74d76f975b36e54d0152df88b2f636a2e47f9fd597aab5f9"
+        },
+        {
+          "file": "FastFallbackExchangeFinder.kt",
+          "sha256": "8bb177b0b814d3a2b9f3f3aa2121a9f1fce792301bfe2b1c967e5e5286ba87ec"
+        },
+        {
+          "file": "OkHttpClient.kt",
+          "sha256": "8ac93a9a4545696ab7afac6098830d8f6d56f34182e6bad7819d52eefedc653e"
+        },
+        {
+          "file": "ConnectionPool.kt",
+          "sha256": "b3ae8cd4d79338e3def08e73c45bec3d3acc3398e5f40b7608f3c2f38a4fb768"
+        }
+      ]
+    },
+    {
+      "url": "https://datatracker.ietf.org/doc/html/rfc6555"
+    },
+    {
+      "url": "https://www.rfc-editor.org/rfc/rfc9111.html"
+    }
+  ],
+  "legacyProducer": {
+    "version": "4.12.0",
+    "jarSha256": "b1050081b14bb7a3a7e55a4d3ef01b5dcfabc453b4573a4fc019767191d5f4e0",
+    "source": "LegacyCacheFixture.java"
+  },
+  "quality": "No renderer/source-selection/detail/assets/native-library changes.",
+  "implementationGuards": [
+    "Buffered cache-write failures abort the editor instead of closing and committing a partial body; source-reviewed guard, not fault-injection tested."
+  ]
+}
