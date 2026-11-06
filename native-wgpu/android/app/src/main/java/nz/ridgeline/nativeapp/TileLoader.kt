@@ -436,7 +436,9 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         cacheThreadFactory=ThreadFactory{work->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);work.run()},"RidgelineHttpCache")},
         metrics=httpMetrics,offlineRead=offline::read)}
     private val transport by lazy{TileTransport(backend,ramBudget.encoded,initialLimits=downloadLimits)}
-    internal fun layerConsumer()=transport.consumer(800,true,cacheDeadline=true)
+    // Visible map-layer tiles are ordinary visible work (as in the Capacitor app),
+    // not background speculation: foreground transfer slots, ranked after imagery.
+    internal fun layerConsumer()=transport.consumer(800,false,cacheDeadline=true)
     internal fun layerBody(consumer:TileTransport.Consumer,url:String)=consumer.acquire(ResourceKey(url,offlineOnly))
     internal fun vectorUrl(z:Int,x:Int,y:Int)="https://basemaps.linz.govt.nz/v1/tiles/topographic-v2/3857/$z/$x/$y.pbf?api=$key"
     internal fun changeMapStyle(before:MapSettings.State,after:MapSettings.State){

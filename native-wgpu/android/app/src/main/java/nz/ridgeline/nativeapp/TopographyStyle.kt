@@ -38,13 +38,17 @@ internal class TopographyStyle(json:String){
     }
     private fun group(id:String)=when{ id.startsWith("nz-peaks")->"peaks";"roads" in id->"roads";"tracks" in id->"tracks";"huts" in id->"huts";"contours" in id->"contours";else->"names" }
     fun sourceLayers(state:MapSettings.State,zoom:Double):Set<String> = specs.filter{state.enabled(group(it.getString("id")))&&zoom>=it.optDouble("minzoom",0.0)&&zoom<it.optDouble("maxzoom",30.0)}.map{it.getString("source-layer")}.toSet()
-    fun build(features:List<VectorTile.Feature>,state:MapSettings.State,zoom:Double):Output{
+    /** [zoom] is the camera zoom: layer min/max zoom, paint and layout, as in
+     * MapLibre. [tileZoom] is the source tile's zoom: MapLibre evaluates
+     * ["zoom"] inside filters per tile, so distant coarser tiles in a pitched
+     * view omit minor peaks, huts and track names exactly as the Capacitor app does. */
+    fun build(features:List<VectorTile.Feature>,state:MapSettings.State,zoom:Double,tileZoom:Double=floor(zoom)):Output{
         val lines=ArrayList<Line>();val labels=ArrayList<Label>();val grouped=features.groupBy{it.layer}
         for((order,spec) in specs.withIndex()){val id=spec.getString("id");val group=group(id)
             if(!state.enabled(group)||zoom<spec.optDouble("minzoom",0.0)||zoom>=spec.optDouble("maxzoom",30.0))continue
             val kind=spec.getString("type");val paint=spec.getJSONObject("paint");val layout=spec.optJSONObject("layout")?:JSONObject()
             for(f in grouped[spec.getString("source-layer")].orEmpty()){
-                if(!truth(eval(spec.opt("filter")?:true,f.properties,zoom)))continue
+                if(!truth(eval(spec.opt("filter")?:true,f.properties,tileZoom)))continue
                 if(kind=="line"){
                     val c=color(eval(paint.opt("line-color"),f.properties,zoom));val opacity=number(eval(paint.opt("line-opacity")?:1.0,f.properties,zoom),1.0)
                     val rgba=(c and 0x00ffffff) or (((c ushr 24)*opacity).roundToInt().coerceIn(0,255) shl 24)
