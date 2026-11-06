@@ -10,7 +10,19 @@ fn build(start:vec3<f32>,end:vec3<f32>,corner:vec3<f32>,color:vec4<f32>,style:ve
  var p=mix(a,b,corner.x);var offset:vec2<f32>;
  if(corner.z>0.){o.uv=vec2<f32>(corner.x*2.-1.,corner.y)*extent;offset=o.uv;}
  else {let delta=(b.xy/b.w-a.xy/a.w)*scene.size.yz*0.5;let len=max(length(delta),0.00001);let direction=delta/len;let norm=vec2<f32>(-direction.y,direction.x);o.length=len;o.uv=vec2<f32>((corner.x-0.5)*(len+2.*extent),corner.y*extent);offset=norm*corner.y*extent+direction*(corner.x*2.-1.)*extent;o.dash=vec3<f32>(style.xy*scene.size.w,style.z);}
- p=vec4<f32>(p.xy+offset*2./scene.size.yz*p.w,p.zw);o.position=p;o.uv*=p.w;return o;
+ p=vec4<f32>(p.xy+offset*2./scene.size.yz*p.w,p.zw);
+ if(corner.z>0.){
+  // Waypoint dots face the screen, so their lower half covers ground that is
+  // nearer the camera than the point they mark and failed the depth test (half
+  // dots). Test the whole dot at the depth of its point raised by six dot radii
+  // of ground distance (scaled with distance), drawn at the same screen place:
+  // the slope just in front no longer cuts it; a real ridge still hides it.
+  let centre=(scene.matrix*vec4<f32>(0.,0.,0.,1.)).w;
+  let lift=6.*abs(corner.z)/max(scene.anchor.w,1e-6)*clamp(a.w/max(centre,1e-6),0.25,8.);
+  let raised=project(start+vec3<f32>(0.,0.,lift));
+  if(raised.w>0.){p.z=clamp(raised.z/raised.w,0.,1.)*p.w;}
+ }
+ o.position=p;o.uv*=p.w;return o;
 }
 // Coverage of one dash cycle at a reference scale; [pixel] is one screen pixel
 // in reference units, so the antialiased edge stays one screen pixel wide.
