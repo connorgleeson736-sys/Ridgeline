@@ -5,6 +5,7 @@ use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 mod adaptive;
+mod resolution;
 mod appearance;
 mod cartography;
 pub mod overlay;
@@ -122,6 +123,12 @@ pub struct Renderer {
     depth_previous: wgpu::Texture,
     depth_previous_stored: bool,
     depth_slot: usize,
+    /// Dynamic resolution: the scale in use, its offscreen target (below
+    /// 1.0) and the other scale's textures kept ready.
+    render_scale: f32,
+    offscreen: Option<resolution::Offscreen>,
+    parked: Option<resolution::Parked>,
+    blit: resolution::Blit,
     width: u32,
     height: u32,
     route_gpu: routes::RouteGpu,
@@ -265,7 +272,7 @@ impl Renderer {
             .replace("@location(2) @interpolate(flat) image: vec4<f32>","@location(2) @interpolate(flat) image: vec4<f32>, @location(3) @interpolate(flat) layer:f32")
             .replace("@location(3) image: vec4<f32>)","@location(3) image: vec4<f32>, @location(4) layers:vec2<f32>)")
             .replace("round(vertex*128.)),0)","round(vertex*128.)),i32(layers.y),0)")
-            .replace("textureLoad(photo,coord,lod)","textureLoad(photo,coord,i32(i.layer),lod)")
+            .replace("textureSampleLevel(photo,photo_sampler,uv,lod)","textureSampleLevel(photo,photo_sampler,uv,i32(i.layer),lod)")
             .replace("o.image=image;return","o.image=image;o.layer=layers.x;return")
             .replace("vec2<f32>(1.)),dx,dy)","vec2<f32>(1.)),i32(i.layer),dx,dy)")
         } else {
@@ -508,6 +515,7 @@ impl Renderer {
         let route_gpu = routes::RouteGpu::new(&device, format);
         let inspection_gpu = route_gpu.fork(&device);
         let labels_gpu = labels::LabelGpu::new(&device, &queue, format);
+        let blit = resolution::Blit::new(&device, format);
         let mut renderer = Self {
             plane: None,
             interiors: Default::default(),
@@ -549,6 +557,10 @@ impl Renderer {
             depth_previous,
             depth_previous_stored: false,
             depth_slot: 0,
+            render_scale: 1.,
+            offscreen: None,
+            parked: None,
+            blit,
             depth,
             width,
             height,
@@ -676,11 +688,63 @@ impl Renderer {
     pub fn resize(&mut self, w: u32, h: u32) {
         self.width = w.max(1);
         self.height = h.max(1);
-        self.depth = Self::depth(&self.device, self.width, self.height);
-        self.depth_previous = Self::depth(&self.device, self.width, self.height);
+        let prepared = self.parked.take().map(|p| p.scale);
+        let size = resolution::scaled(self.width, self.height, self.render_scale);
+        self.depth = Self::depth(&self.device, size.0, size.1);
+        self.depth_previous = Self::depth(&self.device, size.0, size.1);
+        self.offscreen = (self.render_scale < 1.).then(|| self.blit.offscreen(&self.device, size));
+        if let Some(scale) = prepared {
+            self.parked = Some(self.build_scale(scale));
+        }
         self.depth_previous_stored = false;
         self.depth_slot = 0;
         self.labels_gpu.set_depths(&self.device, &[self.depth.clone(), self.depth_previous.clone()]);
+    }
+    fn build_scale(&self, scale: f32) -> resolution::Parked {
+        let size = resolution::scaled(self.width, self.height, scale);
+        resolution::Parked {
+            scale,
+            size,
+            depth: Self::depth(&self.device, size.0, size.1),
+            depth_previous: Self::depth(&self.device, size.0, size.1),
+            offscreen: (scale < 1.).then(|| self.blit.offscreen(&self.device, size)),
+        }
+    }
+    /// Render at `scale` (1 = full resolution) and keep `prepare`'s textures
+    /// ready, so switching between the two at a gesture's start and end
+    /// allocates nothing. Labels skip one frame of occlusion at a switch.
+    pub fn set_render_scales(&mut self, scale: f32, prepare: f32) {
+        let scale = resolution::quantise(scale);
+        let prepare = resolution::quantise(prepare);
+        if scale != self.render_scale {
+            let size = resolution::scaled(self.width, self.height, scale);
+            let next = match self.parked.take() {
+                Some(p) if p.scale == scale && p.size == size => p,
+                _ => self.build_scale(scale),
+            };
+            let old = resolution::Parked {
+                scale: self.render_scale,
+                size: resolution::scaled(self.width, self.height, self.render_scale),
+                depth: std::mem::replace(&mut self.depth, next.depth),
+                depth_previous: std::mem::replace(&mut self.depth_previous, next.depth_previous),
+                offscreen: std::mem::replace(&mut self.offscreen, next.offscreen),
+            };
+            self.render_scale = scale;
+            self.parked = Some(old);
+            self.depth_previous_stored = false;
+            self.depth_slot = 0;
+            self.labels_gpu
+                .set_depths(&self.device, &[self.depth.clone(), self.depth_previous.clone()]);
+        }
+        if prepare == self.render_scale {
+            return;
+        }
+        if self.parked.as_ref().is_none_or(|p| p.scale != prepare) {
+            self.parked = Some(self.build_scale(prepare));
+        }
+    }
+    pub fn render_scale(&self) -> f32 {
+        self.render_scale
     }
     pub fn touch_geometry(&mut self, id: TileId) -> bool {
         if let Some(tile) = self.tiles.get_mut(&id) {
@@ -1845,11 +1909,15 @@ impl Renderer {
         let labels_visible = self.labels_gpu.visible();
         self.labels_gpu.begin_frame(1 - self.depth_slot, self.depth_previous_stored);
         let depth = self.depth.create_view(&Default::default());
+        let scene_target = self
+            .offscreen
+            .as_ref()
+            .map(|o| o.texture.create_view(&Default::default()));
         {
             let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("terrain"),
                 color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-                    view: target,
+                    view: scene_target.as_ref().unwrap_or(target),
                     depth_slice: None,
                     resolve_target: None,
                     ops: wgpu::Operations {
@@ -1945,6 +2013,9 @@ impl Renderer {
             self.route_gpu.draw(&mut pass);
             self.labels_gpu.draw(&mut pass);
             self.inspection_gpu.draw(&mut pass);
+        }
+        if let Some(offscreen) = &self.offscreen {
+            self.blit.draw(&mut encoder, offscreen, target);
         }
         std::mem::swap(&mut self.depth, &mut self.depth_previous);
         self.depth_slot = 1 - self.depth_slot;

@@ -1,6 +1,30 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.23 Steady Lines Base APK — 32.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Steady-Lines-0.1.23-Base.apk)**.
+Latest: **[Download 0.1.24 Sharp Topo Base APK — 32.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Sharp-Topo-0.1.24-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 25:
+**updates 0.1.13–0.1.23 in place, keeping its data.**
+
+- **NZ Topo is drawn like MapLibre.** Shrunk tiles were point-sampled, which
+  dropped up to a third of the map's pixel rows: broken contours, jagged text
+  and shimmer while panning. They are now smoothed from the nearest mip level;
+  enlarged tiles keep crisp pixel edges, antialiased over one screen pixel.
+- **NZ Topo stops at z17.** LINZ's z18 printed-map tiles are its own 2x
+  upscale of z17 (checked at Aoraki, Wellington, Queenstown and Ruapehu), so
+  the closest zooms now enlarge z17 on the GPU: about 4x fewer downloads per
+  area, no detail lost.
+- **Lower resolution while moving** (Layers › Advanced; on by default for
+  phones with up to 4 GB RAM): 0.75x scale (44% fewer pixels) while you pan,
+  zoom or rotate, then an exact full-resolution frame when the map stops.
+
+175 JVM tests, Rust tests and GPU checks pass, including a new NZ Topo
+filtering and resolution test on Vulkan and GLES; lint 0 errors; 623 original
+assets identical. Not run on a phone.
+[Exact release record](../validation/sharp-topo-2026-11-07/release.json) ·
+[SHA-256](Ridgeline-Native-Sharp-Topo-0.1.24-Base.apk.sha256).
+
+## Previous 0.1.23 steady lines checkpoint
+
+**[Download 0.1.23 Steady Lines Base APK — 32.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Steady-Lines-0.1.23-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 24:
 **updates 0.1.13–0.1.22 in place, keeping its data.**
 

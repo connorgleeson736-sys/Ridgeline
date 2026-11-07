@@ -19,6 +19,9 @@ import kotlin.math.floor
 import kotlin.math.pow
 
 /** Data-only port of the reference source chain. No JavaScript at runtime. */
+/** LINZ topo-raster's finest real detail (z18 tiles are upscaled z17). */
+internal const val TOPO_MAX_ZOOM=17
+
 internal class NativeImagery(
     private val context: Context,
     private val fetch: (String) -> ByteArray,
@@ -163,7 +166,7 @@ internal class NativeImagery(
     private fun <T> produce(z:Int,x:Int,y:Int,fromBitmap:(Bitmap)->T,fromPixels:(IntArray)->T):T {
         require(z in 0..19 && x in 0 until (1 shl z) && y in 0 until (1 shl z))
         checkPreparation()
-        alternate(z,x,y)?.let{url->return bitmap(fetch(url)).using{source->if(z<=18)fromBitmap(source)else crop(source,x,y,1 shl(z-18)).using(fromBitmap)}}
+        alternate(z,x,y)?.let{url->val ez=alternateZoom(z);return bitmap(fetch(url)).using{source->if(z<=ez)fromBitmap(source)else crop(source,x,y,1 shl(z-ez)).using(fromBitmap)}}
         val selected=plan(z,x,y);val factor=selected.factor;val coarse=selected.coarse;val entry=selected.entry;val mode=selected.mode
         if(mode=="linz") return base(z,x,y).using(fromBitmap)
         val ez=minOf(z,18); val f=1 shl(z-ez)
@@ -196,9 +199,12 @@ internal class NativeImagery(
             }
         }
     }
+    /** Finest source zoom: NZ Topo's printed maps carry no detail beyond z17
+     * (LINZ's z18 is its own 2x upscale of z17); Esri imagery stops at z18. */
+    private fun alternateZoom(z:Int)=minOf(z,if(settings().base==MapSettings.Base.TOPO)TOPO_MAX_ZOOM else 18)
     private fun alternate(z:Int,x:Int,y:Int):String?{
         val mode=settings().base;if(mode==MapSettings.Base.LINZ)return null
-        val ez=minOf(z,18);val factor=1 shl(z-ez)
+        val ez=alternateZoom(z);val factor=1 shl(z-ez)
         return if(mode==MapSettings.Base.TOPO)linz(ez,x/factor,y/factor).replace("/aerial/","/topo-raster/")else"https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/$ez/${y/factor}/${x/factor}"
     }
     private fun vetoFine(mask:BooleanArray,fine:JSONArray,z:Int,x:Int,y:Int) {
