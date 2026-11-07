@@ -42,6 +42,13 @@ impl Renderer {
     pub fn overlay_coverage(&self) -> (usize, usize) {
         (self.overlay.shown, self.overlay.missing)
     }
+    pub fn set_overlay_group_inputs(&mut self, groups: Vec<crate::overlay::GroupInput>) -> bool {
+        let changed = self.overlay.set_group_inputs(groups);
+        if changed {
+            self.overlay.pending = !self.overlay.is_empty();
+        }
+        changed
+    }
     pub fn set_overlay_layers(&mut self, layers: usize) {
         self.overlay.set_layers(layers);
     }

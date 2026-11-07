@@ -1407,10 +1407,10 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_cartograp
     _class: jni::sys::jclass,
     handle: i64,
     input: jni::sys::jobject,
-) -> u8 {
+) -> i32 {
     let mut env = unsafe { jni::EnvUnowned::from_raw(env) };
     match env
-        .with_env(|env| -> Result<u8, jni::errors::Error> {
+        .with_env(|env| -> Result<i32, jni::errors::Error> {
             let buffer = unsafe { jni::objects::JByteBuffer::from_raw(env, input) };
             let size = env.get_direct_buffer_capacity(&buffer)?;
             if !(4..=24_000_000).contains(&size) {
@@ -1421,10 +1421,14 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_cartograp
             };
             // Lines grouped by source vector tile, parsed before the renderer
             // lock: [groups] then per group z,x,y, clip[4] (f64), line count,
-            // and per line n, ARGB, width, dash, gap, order, n x (f64 x, f64 y).
+            // a 64-bit content id, a body length and the body: per line n, ARGB,
+            // width, dash, gap, order, n x (f64 x, f64 y). A body length of 0
+            // refers to a group the renderer already holds (same key and id), so
+            // unchanged tiles are neither re-sent nor re-parsed.
             let int = |at: usize| u32::from_le_bytes(bytes[at..at + 4].try_into().unwrap());
             let float = |at: usize| f32::from_le_bytes(bytes[at..at + 4].try_into().unwrap());
             let double = |at: usize| f64::from_le_bytes(bytes[at..at + 8].try_into().unwrap());
+            let long = |at: usize| u64::from_le_bytes(bytes[at..at + 8].try_into().unwrap());
             let count = int(0) as usize;
             if count > 4096 {
                 return Ok(0);
@@ -1433,20 +1437,27 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_cartograp
             let mut total = 0usize;
             let mut groups = Vec::with_capacity(count);
             for _ in 0..count {
-                if at + 48 > size {
+                if at + 60 > size {
                     return Ok(0);
                 }
-                let group_start = at;
                 let (z, x, y) = (int(at), int(at + 4), int(at + 8));
                 let clip = [double(at + 12), double(at + 20), double(at + 28), double(at + 36)];
                 let lines_count = int(at + 44) as usize;
-                at += 48;
-                if lines_count > 65536 || clip.iter().any(|v| !v.is_finite()) {
+                let id = long(at + 48);
+                let body = int(at + 56) as usize;
+                at += 60;
+                if lines_count > 65536 || clip.iter().any(|v| !v.is_finite()) || at + body > size {
                     return Ok(0);
                 }
+                let key = crate::overlay::GroupKey { z, x, y, clip: clip.map(f64::to_bits) };
+                if body == 0 {
+                    groups.push(crate::overlay::GroupInput::Existing(key, id));
+                    continue;
+                }
+                let end = at + body;
                 let mut lines = Vec::with_capacity(lines_count);
                 for _ in 0..lines_count {
-                    if at + 24 > size {
+                    if at + 24 > end {
                         return Ok(0);
                     }
                     let n = int(at) as usize;
@@ -1458,7 +1469,7 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_cartograp
                     total += n;
                     if n > 262144
                         || total > 2_000_000
-                        || at + n * 16 > size
+                        || at + n * 16 > end
                         || !width.is_finite()
                         || width <= 0.
                         || width > 40.
@@ -1484,13 +1495,14 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_cartograp
                     ];
                     lines.extend(crate::overlay::Line::new(points, rgba, width, dash, order));
                 }
-                use std::hash::Hasher;
-                let mut hasher = std::collections::hash_map::DefaultHasher::new();
-                hasher.write(&bytes[group_start..at]);
-                let key = crate::overlay::GroupKey { z, x, y, clip: clip.map(f64::to_bits) };
-                if !lines.is_empty() {
-                    groups.push(crate::overlay::Group::new(key, hasher.finish(), lines));
+                if at != end {
+                    return Ok(0);
                 }
+                groups.push(if lines.is_empty() {
+                    crate::overlay::GroupInput::Empty(key, id)
+                } else {
+                    crate::overlay::GroupInput::New(crate::overlay::Group::new(key, id, lines))
+                });
             }
             if at != size {
                 return Ok(0);
@@ -1501,8 +1513,8 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_cartograp
             let Some(state) = all.get_mut(&(handle as u64)) else {
                 return Ok(0);
             };
-            state.renderer.set_overlay_groups(groups);
-            Ok(1)
+            // 2: a referenced group is gone; the caller re-sends every body.
+            Ok(if state.renderer.set_overlay_group_inputs(groups) { 1 } else { 2 })
         })
         .into_outcome()
     {
@@ -1680,6 +1692,86 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_labelAtla
                 .renderer
                 .set_label_atlas(width as u32, height as u32, pixels, sprites);
             Ok(1)
+        })
+        .into_outcome()
+    {
+        jni::Outcome::Ok(v) => v,
+        _ => 0,
+    }
+}
+/// Newly drawn label rows only: [rgba] holds rows y0.. of an atlas of the
+/// same size as the renderer's. Returns 1, 2 if the sizes differ, 0 if invalid.
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_labelAtlasRows(
+    env: *mut jni::sys::JNIEnv,
+    _class: jni::sys::jclass,
+    handle: i64,
+    width: i32,
+    height: i32,
+    y0: i32,
+    rgba: jni::sys::jobject,
+    metadata: jni::sys::jobject,
+) -> u8 {
+    let mut env = unsafe { jni::EnvUnowned::from_raw(env) };
+    match env
+        .with_env(|env| -> Result<u8, jni::errors::Error> {
+            if !(1..=2048).contains(&width) || !(1..=2048).contains(&height) {
+                return Ok(0);
+            }
+            let rgba = unsafe { jni::objects::JByteBuffer::from_raw(env, rgba) };
+            let metadata = unsafe { jni::objects::JByteBuffer::from_raw(env, metadata) };
+            let size = env.get_direct_buffer_capacity(&metadata)?;
+            if !(4..=4 + 512 * 40).contains(&size)
+                || y0 < 0
+                || y0 >= height
+                || env.get_direct_buffer_capacity(&rgba)? == 0
+                || env.get_direct_buffer_capacity(&rgba)? % (width * 4) as usize != 0
+                || env.get_direct_buffer_capacity(&rgba)? / (width * 4) as usize + y0 as usize > height as usize
+            {
+                return Ok(0);
+            }
+            let bytes = unsafe {
+                std::slice::from_raw_parts(env.get_direct_buffer_address(&metadata)?, size)
+            };
+            let count = u32::from_le_bytes(bytes[..4].try_into().unwrap()) as usize;
+            if count > 512 || size != 4 + count * 40 {
+                return Ok(0);
+            }
+            let mut sprites = Vec::with_capacity(count);
+            for row in bytes[4..].chunks_exact(40) {
+                let point = [
+                    f64::from_le_bytes(row[..8].try_into().unwrap()),
+                    f64::from_le_bytes(row[8..16].try_into().unwrap()),
+                ];
+                let f = |i| f32::from_le_bytes(row[i..i + 4].try_into().unwrap());
+                let uv = [f(16), f(20), f(24), f(28)];
+                let size = [f(32), f(36)];
+                if point
+                    .iter()
+                    .any(|v| !v.is_finite() || !(0. ..=1.).contains(v))
+                    || uv.iter().any(|v| !v.is_finite() || !(0. ..=1.).contains(v))
+                    || size
+                        .iter()
+                        .any(|v| !v.is_finite() || *v <= 0. || *v > 2048.)
+                {
+                    return Ok(0);
+                }
+                sprites.push(crate::LabelSprite { point, uv, size });
+            }
+            let pixels = unsafe {
+                std::slice::from_raw_parts(
+                    env.get_direct_buffer_address(&rgba)?,
+                    env.get_direct_buffer_capacity(&rgba)?,
+                )
+            };
+            let Ok(mut all) = states().lock() else {
+                return Ok(0);
+            };
+            let Some(state) = all.get_mut(&(handle as u64)) else {
+                return Ok(0);
+            };
+            // 2: the renderer's atlas has another size; send the whole atlas.
+            Ok(if state.renderer.set_label_atlas_rows(width as u32, height as u32, y0 as u32, pixels, sprites) { 1 } else { 2 })
         })
         .into_outcome()
     {

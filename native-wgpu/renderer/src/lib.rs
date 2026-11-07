@@ -165,6 +165,9 @@ pub struct Renderer {
     inspection_anchor: [f64; 2],
     inspection_dirty: bool,
     route_paths: Arc<[RoutePath]>,
+    /// Terrain under the routes at the last rebuild (sources, clips, height
+    /// fields, relief): cover changes elsewhere do not re-drape the routes.
+    route_terrain: Option<u64>,
     route_pending: bool,
     route_dirty: bool,
     route_worker: Option<latest_worker::LatestWorker<routes::RouteJob, routes::RouteOutput>>,
@@ -603,6 +606,7 @@ impl Renderer {
             inspection_anchor: [0.5, 0.5],
             inspection_dirty: false,
             route_paths: vec![].into(),
+            route_terrain: None,
             route_pending: false,
             route_dirty: true,
             route_worker: None,

@@ -86,7 +86,17 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     @Volatile private var appliedStyle:StylePacket?=null
     @Volatile private var layerBatch:NativeLayerBatch?=null
     private var appliedLayers:NativeLayerBatch?=null
-    @Volatile private var parsedLines:Pair<Long,ByteBuffer>?=null
+    @Volatile private var parsedLines:Pair<Long,List<LineGroup>>?=null
+    /** Line group ids the renderer [handle] holds (line parser thread only). */
+    private var heldLines:Pair<Long,Set<Long>>?=null
+    /** Packet for [groups]: bodies only for groups the renderer does not hold. */
+    private fun linePacket(groups:List<LineGroup>,held:Set<Long>):ByteBuffer{
+        val out=ByteBuffer.allocateDirect(4+groups.sumOf{60+if(it.id in held)0 else it.bytes.size-48}).order(ByteOrder.LITTLE_ENDIAN)
+        out.putInt(groups.size)
+        for(g in groups){val body=if(g.id in held)0 else g.bytes.size-48
+            out.put(g.bytes,0,48).putLong(g.id).putInt(body);if(body>0)out.put(g.bytes,48,body)}
+        out.rewind();return out
+    }
     private val parsingLines=AtomicBoolean()
     private val lineParser=java.util.concurrent.Executors.newSingleThreadExecutor{run->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);run.run()},"RidgelineLinePackets")}
     private var deferredLayer:NativeLayerBatch?=null
@@ -99,7 +109,11 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
                 if(scene==0L||parsedLines?.let{it.first==scene&&it.second===packet}==true)break
                 // Parsing happens before the renderer mutex inside JNI. Never
                 // hold the camera or GPU HandlerThread behind a large packet.
-                if(!NativeBridge.cartography(scene,packet))break
+                val held=heldLines?.takeIf{it.first==scene}?.second?:emptySet()
+                var result=NativeBridge.cartography(scene,linePacket(packet,held))
+                if(result==2)result=NativeBridge.cartography(scene,linePacket(packet,emptySet()))
+                if(result!=1){heldLines=null;break}
+                heldLines=scene to packet.mapTo(HashSet()){it.id}
                 if(scene==handle&&live){parsedLines=scene to packet;requestFrame()}
             }}finally{parsingLines.set(false)}
         }}catch(_:java.util.concurrent.RejectedExecutionException){parsingLines.set(false)}
@@ -305,13 +319,29 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         if(layers!=null&&layers!==appliedLayers){
             prepareMapLines()
             if(deferredLayer!==layers){deferredLayer=layers;deferredLayerSince=nowAdmission}
-            val changedAtlas=layers.atlas!==appliedLayers?.atlas
-            val pixelsChanged=layers.atlas.rgba!==appliedLayers?.atlas?.rgba
-            val predicted=250_000L+if(changedAtlas&&pixelsChanged)layers.atlas.rgba.capacity().toLong()*4 else 0
+            val atlas=layers.atlas;val old=appliedLayers?.atlas
+            val changedAtlas=atlas!==old
+            // Newly drawn names change a few rows of the shared atlas buffer: send
+            // only those. The whole atlas goes only when it is new or resized.
+            val band=if(changedAtlas&&old!=null&&atlas.rgba===old.rgba&&atlas.height==old.height)NativeLabels.changedRows(old.revision,atlas.revision)else null
+            val full=changedAtlas&&band==null
+            val bandBytes=if(band!=null&&band.size==2)(band[1]-band[0])*atlas.width*4 else 0
+            // Lines are already in the renderer (parsed off this thread); a few
+            // atlas rows are cheap, so names update during gestures too (they
+            // used to wait until the map had been still for 250 ms).
+            val cheap=!full&&bandBytes<=1_048_576
+            val predicted=if(full)250_000L+atlas.rgba.capacity().toLong()*4 else 50_000L
             val starvedIdle=!moved&&!gestureActive&&nowAdmission-deferredLayerSince>=250
             val lineReady=parsedLines?.let{it.first==handle&&it.second===layers.lines}==true
-            if(!cameraFirst&&lineReady&&(System.nanoTime()-started+predicted<=allowance||starvedIdle)){
-                val atlasReady=!changedAtlas||if(!pixelsChanged)NativeBridge.labelMetadata(handle,layers.atlas.metadata)else NativeBridge.labelAtlas(handle,layers.atlas.width,layers.atlas.height,layers.atlas.rgba,layers.atlas.metadata)
+            if(!cameraFirst&&lineReady&&(cheap||System.nanoTime()-started+predicted<=allowance||starvedIdle)){
+                fun whole()=NativeBridge.labelAtlas(handle,atlas.width,atlas.height,atlas.rgba,atlas.metadata)
+                val atlasReady=when{
+                    !changedAtlas->true
+                    full->whole()
+                    band!!.isEmpty()->NativeBridge.labelMetadata(handle,atlas.metadata)
+                    else->{val rows=atlas.rgba.duplicate().apply{position(band[0]*atlas.width*4);limit(band[1]*atlas.width*4)}.slice()
+                        when(NativeBridge.labelAtlasRows(handle,atlas.width,atlas.height,band[0],rows,atlas.metadata)){1->true;2->whole();else->false}}
+                }
                 if(atlasReady){appliedLayers=layers;deferredLayer=null;if(changedAtlas){labelPose=null;appliedPlacement=null}}
             }else deferredOptional=true
         }

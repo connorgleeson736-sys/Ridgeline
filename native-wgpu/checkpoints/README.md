@@ -1,6 +1,29 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.26 Quick Tracks Base APK — 32.9 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Quick-Tracks-0.1.26-Base.apk)**.
+Latest: **[Download 0.1.27 Lean Updates Base APK — 32.9 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Lean-Updates-0.1.27-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 28:
+**updates 0.1.13–0.1.26 in place, keeping its data.**
+
+- **Names update while you move.** A new name used to copy and convert the
+  whole label image (4–16 MB) and wait until the map had been still for
+  250 ms. Now only the few new rows are converted and uploaded, during gestures.
+- **Track and road updates send only what changed.** Each update re-sent and
+  re-read every visible tile's lines (often megabytes); unchanged tiles are now
+  referenced by id instead.
+- **Prepared track tiles are kept.** Panning back or zooming out and in reuses
+  them: no download, decoding or styling (24 tiles on a 3 GB phone).
+- **Drawn routes rebuild only when the terrain under them changes**, not every
+  time terrain arrives anywhere on screen.
+
+178 JVM tests, Rust tests and GPU checks pass on Vulkan and GLES, including a
+new route rebuild check that fails on 0.1.26; lint 0 errors; 623 original
+assets identical. Not run on a phone.
+[Exact release record](../validation/lean-updates-2026-11-07/release.json) ·
+[SHA-256](Ridgeline-Native-Lean-Updates-0.1.27-Base.apk.sha256).
+
+## Previous 0.1.26 quick tracks checkpoint
+
+**[Download 0.1.26 Quick Tracks Base APK — 32.9 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Quick-Tracks-0.1.26-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 27:
 **updates 0.1.13–0.1.25 in place, keeping its data.**
 

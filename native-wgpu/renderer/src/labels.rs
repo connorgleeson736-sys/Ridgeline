@@ -148,6 +148,39 @@ impl LabelGpu {
         self.read_slot = read_slot;
         self.previous_valid = valid;
     }
+    fn update_rows(&mut self, queue: &wgpu::Queue, width: u32, height: u32, y0: u32, rows: &[u8]) -> bool {
+        let stride = width as usize * 4;
+        if width != self.width
+            || height != self.height
+            || rows.is_empty()
+            || rows.len() % stride != 0
+            || y0 as usize + rows.len() / stride > height as usize
+        {
+            return false;
+        }
+        let n = (rows.len() / stride) as u32;
+        queue.write_texture(
+            wgpu::TexelCopyTextureInfo {
+                texture: &self._atlas,
+                mip_level: 0,
+                origin: wgpu::Origin3d { x: 0, y: y0, z: 0 },
+                aspect: wgpu::TextureAspect::All,
+            },
+            rows,
+            wgpu::TexelCopyBufferLayout {
+                offset: 0,
+                bytes_per_row: Some(width * 4),
+                rows_per_image: Some(n),
+            },
+            wgpu::Extent3d { width, height: n, depth_or_array_layers: 1 },
+        );
+        let start = y0 as usize * stride;
+        if self.pixels.len() == height as usize * stride {
+            self.pixels[start..start + rows.len()].copy_from_slice(rows);
+        }
+        self.uploaded_bytes += rows.len() as u64;
+        true
+    }
     fn depth_bind(&self, device: &wgpu::Device, depth: &wgpu::Texture) -> wgpu::BindGroup {
         // Passes (1.0) when the reference depth is <= the terrain depth, i.e.
         // nothing nearer than the raised anchor covers it.
@@ -371,6 +404,22 @@ impl LabelGpu {
     }
 }
 impl crate::Renderer {
+    /// Only rows [y0, y0 + n) of an atlas of unchanged size changed (newly drawn
+    /// names). False, changing nothing, if the size differs: send the whole atlas.
+    pub fn set_label_atlas_rows(
+        &mut self,
+        width: u32,
+        height: u32,
+        y0: u32,
+        rows: &[u8],
+        sprites: Vec<LabelSprite>,
+    ) -> bool {
+        if !self.labels_gpu.update_rows(&self.queue, width, height, y0, rows) {
+            return false;
+        }
+        self.set_label_metadata(sprites);
+        true
+    }
     pub fn set_label_atlas(
         &mut self,
         width: u32,

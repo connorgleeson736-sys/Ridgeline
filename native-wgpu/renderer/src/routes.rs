@@ -716,10 +716,20 @@ fn build_routes(job: RouteJob, valid: &dyn Fn() -> bool) -> Option<RouteOutput> 
             if !valid() {
                 return None;
             }
+            let reach = [
+                segment[0][0].min(segment[1][0]),
+                segment[0][1].min(segment[1][1]),
+                segment[0][0].max(segment[1][0]),
+                segment[0][1].max(segment[1][1]),
+            ];
             for row in &job.patches {
+                let c = row.clip;
+                // Only patches the segment can touch are draped.
+                if c[0] > reach[2] || c[2] < reach[0] || c[1] > reach[3] || c[3] < reach[1] {
+                    continue;
+                }
                 let bounds = row.bounds;
                 let span = bounds[2] - bounds[0];
-                let c = row.clip;
                 let convert = |p: [f64; 2]| [(p[0] - bounds[0]) / span, (p[1] - bounds[1]) / span];
                 let clip = [
                     (c[0] - bounds[0]) / span,
@@ -824,6 +834,7 @@ impl crate::Renderer {
     pub fn set_routes(&mut self, paths: Vec<RoutePath>) {
         if self.route_paths.as_ref() != paths.as_slice() {
             self.route_paths = paths.into();
+            self.route_terrain = None;
             self.route_dirty = true;
         }
     }
@@ -885,9 +896,20 @@ impl crate::Renderer {
         let Some(worker) = &self.route_worker else {
             return;
         };
-        let patches = self
+        // Only terrain under the routes matters. If it is unchanged since the
+        // last rebuild (the cover changed elsewhere, as it does constantly while
+        // moving or loading), keep the current route geometry.
+        let mut area = [f64::INFINITY, f64::INFINITY, f64::NEG_INFINITY, f64::NEG_INFINITY];
+        for p in self.route_paths.iter().flat_map(|p| p.points.iter()) {
+            area = [area[0].min(p[0]), area[1].min(p[1]), area[2].max(p[0]), area[3].max(p[1])];
+        }
+        let patches: Vec<RoutePatch> = self
             .cover
             .iter()
+            .filter(|row| {
+                let c = row.region.bounds();
+                c[0] <= area[2] && c[2] >= area[0] && c[1] <= area[3] && c[3] >= area[1]
+            })
             .filter_map(|row| {
                 Some(RoutePatch {
                     source: row.source,
@@ -897,6 +919,20 @@ impl crate::Renderer {
                 })
             })
             .collect();
+        let terrain = {
+            use std::hash::{Hash, Hasher};
+            let mut h = std::collections::hash_map::DefaultHasher::new();
+            (self.map_style.height_scale().to_bits(), self.map_style.three_d).hash(&mut h);
+            for p in &patches {
+                (p.source, p.clip.map(f64::to_bits), Arc::as_ptr(&p.field) as usize).hash(&mut h);
+            }
+            h.finish()
+        };
+        if self.route_terrain == Some(terrain) && !self.route_pending {
+            self.route_dirty = false;
+            return;
+        }
+        self.route_terrain = Some(terrain);
         worker.submit(RouteJob {
             paths: self.route_paths.clone(),
             patches,
