@@ -62,6 +62,13 @@ impl Line {
         Some(Self { color, width, dash, order, bbox, points: clean, along })
     }
 }
+/// A line group sent by value, or by reference to one already held.
+pub enum GroupInput {
+    New(Group),
+    Existing(GroupKey, u64),
+    /// Sent, but with no drawable lines: remembered so references stay valid.
+    Empty(GroupKey, u64),
+}
 pub struct Group {
     pub key: GroupKey,
     /// Content hash of the group's packed bytes; equal hash, equal lines.
@@ -165,6 +172,8 @@ struct Slot {
 }
 pub(crate) struct Overlay {
     groups: Vec<Arc<Group>>,
+    /// Groups sent without drawable lines, by key and id.
+    empty_groups: std::collections::HashSet<(GroupKey, u64)>,
     layout: wgpu::BindGroupLayout,
     sampler: wgpu::Sampler,
     pipeline: Option<wgpu::RenderPipeline>,
@@ -239,6 +248,7 @@ impl Overlay {
         let empty = Self::bind(device, &layout, [&texture, &texture], &sampler);
         let mut overlay = Self {
             groups: Vec::new(),
+            empty_groups: std::collections::HashSet::new(),
             layout,
             sampler,
             pipeline: None,
@@ -315,6 +325,39 @@ impl Overlay {
     }
     /// Replace the line data. Groups whose key and hash are unchanged keep their
     /// parsed lines, so their tiles' textures stay valid.
+    /// Groups by reference or by value. Returns false, changing nothing, if a
+    /// referenced group is not held (the caller then sends every group).
+    pub fn set_group_inputs(&mut self, groups: Vec<GroupInput>) -> bool {
+        let held: HashMap<(GroupKey, u64), Arc<Group>> =
+            self.groups.iter().map(|g| ((g.key, g.hash), g.clone())).collect();
+        let mut next = Vec::with_capacity(groups.len());
+        let mut empty = std::collections::HashSet::new();
+        for g in groups {
+            match g {
+                GroupInput::Existing(key, id) => match held.get(&(key, id)) {
+                    Some(g) => next.push(g.clone()),
+                    None if self.empty_groups.contains(&(key, id)) => {
+                        empty.insert((key, id));
+                    }
+                    None => return false,
+                },
+                GroupInput::New(g) => next.push(Arc::new(g)),
+                GroupInput::Empty(key, id) => {
+                    empty.insert((key, id));
+                }
+            }
+        }
+        self.groups = next;
+        self.empty_groups = empty;
+        self.revision += 1;
+        if self.groups.is_empty() {
+            self.gpu = None;
+            self.slots.clear();
+            self.by_tile.clear();
+            self.pending = false;
+        }
+        true
+    }
     pub fn set_groups(&mut self, groups: Vec<Group>) {
         let old: HashMap<(GroupKey, u64), Arc<Group>> =
             self.groups.drain(..).map(|g| ((g.key, g.hash), g)).collect();

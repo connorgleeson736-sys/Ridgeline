@@ -29,11 +29,14 @@ object NativeBridge {
  @JvmStatic external fun waypoints(handle:Long,output:ByteBuffer):Int
  @JvmStatic external fun location(handle:Long,longitude:Double,latitude:Double,enabled:Boolean):Boolean
  @JvmStatic external fun inspect(handle:Long,longitude:Double,latitude:Double,enabled:Boolean):Boolean
- @JvmStatic external fun cartography(handle:Long,input:ByteBuffer):Boolean
+ /** 1 applied, 2 a referenced group is gone (re-send every body), 0 rejected. */
+ @JvmStatic external fun cartography(handle:Long,input:ByteBuffer):Int
  @JvmStatic external fun project(handle:Long,input:ByteBuffer,output:ByteBuffer):Int
  @JvmStatic external fun labelVisibility(handle:Long,output:ByteBuffer,count:Int):Long
  @JvmStatic external fun labelMetadata(handle:Long,metadata:ByteBuffer):Boolean
  @JvmStatic external fun labelAtlas(handle:Long,width:Int,height:Int,rgba:ByteBuffer,metadata:ByteBuffer):Boolean
+ /** Rows y0.. of an atlas the renderer already holds at this size: 1 done, 2 send the whole atlas, 0 invalid. */
+ @JvmStatic external fun labelAtlasRows(handle:Long,width:Int,height:Int,y0:Int,rows:ByteBuffer,metadata:ByteBuffer):Int
  @JvmStatic external fun placeLabels(handle:Long,input:ByteBuffer):Boolean
  @JvmStatic external fun configure(handle:Long,input:ByteBuffer):Boolean
  @JvmStatic external fun clearGeometry(handle:Long)

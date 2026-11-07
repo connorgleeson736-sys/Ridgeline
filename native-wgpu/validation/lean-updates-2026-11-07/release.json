@@ -1,0 +1,31 @@
+{
+  "artifact": "Ridgeline-Native-Lean-Updates-0.1.27-Base.apk",
+  "bytes": 32886995,
+  "sha256": "7651519a186666837b5f04538a9a32c1da274e7f7c3698f8caccf3be2ea293f9",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.27-lean-updates",
+  "versionCode": 28,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.26 Full Audit (same package and signer)",
+  "changes": [
+    "label atlas: newly drawn names convert and upload only their rows (labelAtlasRows) from a persistent pixel buffer with a revision log; small updates bypass the frame-time gate, so names update during gestures (previously the whole 4-16 MB atlas was copied and converted per change and new names waited until the map had been still for 250 ms)",
+    "line groups carry a 64-bit content id; the renderer keeps groups by id and the packet carries bodies only for groups it does not hold (unchanged tiles referenced, not re-sent, re-parsed or re-hashed); a missing reference falls back to a full send",
+    "prepared topographic vector tiles kept in an LRU cache after leaving the view (24 tiles at <=3.2 GB RAM, 40 at <=4.2 GB, 64 above; 8 on low-RAM devices)",
+    "routes re-drape only when the terrain under them changes (fingerprint of the intersecting cover); only intersecting patches are sent to the worker and draped per segment"
+  ],
+  "tests": {
+    "kotlinJvm": "178 tests, 0 failures (new PixelPackingTest)",
+    "rust": "cargo test --workspace: all pass",
+    "gpu": "overlay_drape with group references (Vulkan and GLES); route_smoke with terrain-elsewhere and terrain-under-route checks (fails on 0.1.26); label_occlusion, waypoint_occlusion, topo_filter, overlay_pool, overlay_parity pass on Vulkan and GLES"
+  },
+  "lintErrors": 0,
+  "originalAssetsIdentical": 623,
+  "jniExportsPerAbi": 47,
+  "loadAlignment": "0x4000",
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

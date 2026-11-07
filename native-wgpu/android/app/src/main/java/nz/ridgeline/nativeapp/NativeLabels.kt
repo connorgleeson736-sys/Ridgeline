@@ -5,13 +5,21 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import kotlin.math.*
 
-internal data class NativeLabelAtlas(val labels:List<Row>,val width:Int,val height:Int,val rgba:ByteBuffer,val metadata:ByteBuffer,val points:ByteBuffer){
+internal data class NativeLabelAtlas(val labels:List<Row>,val width:Int,val height:Int,val rgba:ByteBuffer,val metadata:ByteBuffer,val points:ByteBuffer,
+    /** Pixel revision of the shared [rgba] buffer (see NativeLabels.changedRows). */
+    val revision:Long=0){
     data class Row(val label:TopographyStyle.Label,val width:Float,val height:Float)
     companion object {
         fun empty()=NativeLabelAtlas(emptyList(),1,1,ByteBuffer.allocateDirect(4),ByteBuffer.allocateDirect(4).order(ByteOrder.LITTLE_ENDIAN).apply{putInt(0);rewind()},ByteBuffer.allocateDirect(0))
     }
 }
-internal data class NativeLayerBatch(val lines:ByteBuffer,val atlas:NativeLabelAtlas)
+/** One source tile's clipped lines in the renderer's packet layout (48-byte
+ * header, then the lines). [id] is unique per content: the renderer keeps
+ * groups by id, so unchanged tiles are referenced, not re-sent or re-parsed. */
+internal class LineGroup(val id:Long,val bytes:ByteArray,val lines:Int){
+    companion object{private val ids=java.util.concurrent.atomic.AtomicLong(1);fun nextId()=ids.getAndIncrement()}
+}
+internal data class NativeLayerBatch(val lines:List<LineGroup>,val atlas:NativeLabelAtlas)
 
 /** Rasterize native fonts only for changed label data. GPU moves/depth-tests every glyph quad. */
 internal object NativeLabels {
@@ -23,6 +31,22 @@ internal object NativeLabels {
     private var bitmap:Bitmap?=null
     private var nextX=2;private var nextY=2;private var rowHeight=0
     private var pixels:ByteBuffer?=null
+    /** Atlas pixel revisions: [revision, firstRow, endRow], firstRow -1 for a
+     * whole new buffer. Newly drawn names change only a few rows, so only
+     * those rows are converted and uploaded (was the whole 4-16 MB atlas). */
+    private var revision=0L
+    private val changes=ArrayDeque<IntArray>()
+    private val changeRevisions=ArrayDeque<Long>()
+    private fun log(first:Int,end:Int){revision++;changes.addLast(intArrayOf(first,end));changeRevisions.addLast(revision);while(changes.size>64){changes.removeFirst();changeRevisions.removeFirst()}}
+    /** Rows of the shared pixel buffer changed between two revisions, as
+     * [first, end); empty if none; null if the whole atlas must be sent. */
+    @Synchronized fun changedRows(from:Long,to:Long):IntArray?{
+        if(to==from)return IntArray(0)
+        if(to<from||changeRevisions.isEmpty()||changeRevisions.first()>from+1||changeRevisions.last()<to)return null
+        var first=Int.MAX_VALUE;var end=0
+        for(i in changes.indices){val r=changeRevisions[i];if(r<=from||r>to)continue;val c=changes[i];if(c[0]<0)return null;first=min(first,c[0]);end=max(end,c[1])}
+        return if(end<=first)IntArray(0)else intArrayOf(first,end)
+    }
     private var regular:Typeface?=null
     private var bold:Typeface?=null
     @Synchronized fun atlas(input:List<TopographyStyle.Label>,assets:android.content.res.AssetManager):NativeLabelAtlas {
@@ -32,6 +56,7 @@ internal object NativeLabels {
     private fun buildAtlas(input:List<TopographyStyle.Label>,canReset:Boolean):NativeLabelAtlas{
         if(input.isEmpty())return NativeLabelAtlas.empty()
         val paint=Paint(Paint.ANTI_ALIAS_FLAG);val packed=ArrayList<Pair<TopographyStyle.Label,Packed>>();var dirty=false
+        var grew=false;var top=Int.MAX_VALUE;var bottom=0
         for(label in input.take(512)){
             val key=SpriteKey(label.text,label.size,label.color,label.bold,label.circle)
             var slot=sprites[key]
@@ -50,9 +75,10 @@ internal object NativeLabels {
                 if(bitmap==null||bitmap!!.height<required){
                     val height=Integer.highestOneBit(max(128,required)-1)*2
                     val grown=Bitmap.createBitmap(WIDTH,height,Bitmap.Config.ARGB_8888)
-                    bitmap?.let{Canvas(grown).drawBitmap(it,0f,0f,null);it.recycle()};bitmap=grown
+                    bitmap?.let{Canvas(grown).drawBitmap(it,0f,0f,null);it.recycle()};bitmap=grown;grew=true
                 }
                 slot=Packed(label,lines,nextX,nextY,w,h);sprites[key]=slot;nextX+=w+2;rowHeight=max(rowHeight,h);dirty=true
+                top=min(top,slot.y);bottom=max(bottom,slot.y+h)
                 val canvas=Canvas(bitmap!!);val p=slot
                 if(label.circle){paint.style=Paint.Style.FILL;paint.color=0xff233d34.toInt();canvas.drawCircle(p.x+p.width/2f,p.y+p.height/2f,label.size*SCALE+1.5f*SCALE,paint);paint.color=label.color;canvas.drawCircle(p.x+p.width/2f,p.y+p.height/2f,label.size*SCALE,paint)}
                 else for((i,text)in p.text.withIndex()){
@@ -65,11 +91,12 @@ internal object NativeLabels {
         }
         if(packed.isEmpty())return NativeLabelAtlas.empty()
         val h=bitmap!!.height
-        if(dirty||pixels==null){val rgba=IntArray(WIDTH*h);bitmap!!.getPixels(rgba,0,WIDTH,0,0,WIDTH,h);pixels=PixelPacking.rgbaOwned(rgba)}
+        if(pixels==null||grew||pixels!!.capacity()!=WIDTH*h*4){val rgba=IntArray(WIDTH*h);bitmap!!.getPixels(rgba,0,WIDTH,0,0,WIDTH,h);pixels=PixelPacking.rgbaOwned(rgba);log(-1,-1)}
+        else if(dirty&&bottom>top){val n=bottom-top;val rgba=IntArray(WIDTH*n);bitmap!!.getPixels(rgba,0,WIDTH,0,top,WIDTH,n);PixelPacking.rgbaInto(rgba,pixels!!,top*WIDTH*4);log(top,bottom)}
         val metadata=ByteBuffer.allocateDirect(4+packed.size*40).order(ByteOrder.LITTLE_ENDIAN).apply{putInt(packed.size)}
         val points=ByteBuffer.allocateDirect(packed.size*16).order(ByteOrder.LITTLE_ENDIAN);val rows=ArrayList<NativeLabelAtlas.Row>()
         for((label,p)in packed){metadata.putDouble(label.point.x).putDouble(label.point.y).putFloat(p.x.toFloat()/WIDTH).putFloat(p.y.toFloat()/h).putFloat(p.width.toFloat()/WIDTH).putFloat(p.height.toFloat()/h).putFloat(p.width/SCALE).putFloat(p.height/SCALE);points.putDouble(label.point.x).putDouble(label.point.y);rows.add(NativeLabelAtlas.Row(label,p.width/SCALE,p.height/SCALE))}
-        metadata.rewind();points.rewind();return NativeLabelAtlas(rows,WIDTH,h,pixels!!,metadata,points)
+        metadata.rewind();points.rewind();return NativeLabelAtlas(rows,WIDTH,h,pixels!!,metadata,points,revision)
     }
     private fun wrap(text:String,paint:Paint,maxWidth:Float):List<String>{
         val rows=ArrayList<String>()

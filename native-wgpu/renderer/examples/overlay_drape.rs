@@ -129,6 +129,22 @@ async fn run() {
     settle(&mut r, &target, center, 60.);
     assert!(r.cartography_jobs() > base, "changed data repaints the tiles it touches");
 
+    // 3b. Groups sent by reference (unchanged tiles are not re-sent or
+    // re-parsed): a held group is reused without repainting; an unknown
+    // reference is refused and changes nothing.
+    {
+        use ridgeline_renderer::overlay::GroupInput;
+        let key = |x: u32| GroupKey { z: 14, x, y: 1, clip: [0; 4] };
+        let jobs = r.cartography_jobs();
+        assert!(!r.set_overlay_group_inputs(vec![GroupInput::Existing(key(99), 12345)]), "unknown reference refused");
+        assert!(r.set_overlay_group_inputs(vec![GroupInput::Existing(key(0), 8)]), "held group referenced");
+        settle(&mut r, &target, center, 60.);
+        assert_eq!(r.cartography_jobs(), jobs, "a referenced group repaints nothing");
+        assert!(green(&read(&r, &output)) > 100, "referenced group still drawn");
+        assert!(r.set_overlay_group_inputs(vec![GroupInput::Empty(key(5), 77)]), "empty group remembered");
+        assert!(r.set_overlay_group_inputs(vec![GroupInput::Existing(key(5), 77)]), "empty group referenced");
+    }
+
     // 4. Overlays off: nothing drawn, nothing painted afterwards.
     r.set_overlay_groups(vec![]);
     settle(&mut r, &target, center, 60.);

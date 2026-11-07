@@ -133,6 +133,23 @@ async fn run() {
         r.route_uploads(),
         "camera movement must not retessellate routes"
     );
+    // Terrain arriving away from the route (the cover changes constantly while
+    // loading) must not re-drape it; new terrain under it must.
+    let far = TileId { z: 11, x: 1991 + 3, y: 1300 };
+    r.upload(far, &vec![700.; 129 * 129], &[90, 90, 90, 255].repeat(256 * 256)).unwrap();
+    for _ in 0..5 {
+        r.render(&target, center, 11., 0., 0., 500.);
+        std::thread::sleep(std::time::Duration::from_millis(5));
+    }
+    assert_eq!(uploads, r.route_uploads(), "terrain elsewhere does not rebuild routes");
+    let child = TileId { z: 12, x: 1991 * 2, y: 1300 * 2 + 1 };
+    r.upload(child, &vec![650.; 129 * 129], &[160, 160, 160, 255].repeat(256 * 256)).unwrap();
+    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
+    while r.route_uploads() == uploads {
+        assert!(std::time::Instant::now() < deadline, "new terrain under the route rebuilds it");
+        std::thread::sleep(std::time::Duration::from_millis(5));
+        r.render(&target, center, 11., 0., 0., 500.);
+    }
     println!(
         "PASS native route GPU: {changed} affected pixels, visible draped line/waypoints, unchanged geometry uploads on idle/pan. Synthetic height fixture; not phone performance."
     );
