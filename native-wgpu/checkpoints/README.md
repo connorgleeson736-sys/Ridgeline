@@ -1,6 +1,30 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.27 Lean Updates Base APK — 32.9 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Lean-Updates-0.1.27-Base.apk)**.
+Latest: **[Download 0.1.28 Search and Offline Base APK — 33.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Search-Offline-0.1.28-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 29:
+**updates 0.1.13–0.1.27 in place, keeping its data.**
+
+- **Search**, above the saved routes: 48,000 places, peaks, passes, lakes,
+  rivers, huts, campsites and DOC tracks, offline. Macrons, case, word order,
+  "Mt" and small typos don't matter. Tap a result to fly there.
+- **Smaller saved-route cards.**
+- **Offline downloads like the Capacitor app:** a page-shaped frame over a 2D
+  map (paper size and orientation, resizable corners), then name, detail,
+  map content, NZ Topo and overlays, size estimate, and saved regions with
+  View, Resume and Remove.
+- **Show stored map detail** (Layers › Advanced): tints the 3D terrain red →
+  yellow → green by how detailed the imagery stored on the phone is.
+
+185 JVM tests, Rust tests and GPU checks pass on Vulkan and GLES, including
+new search, coverage and region frame tests; lint 0 errors; 623 original
+assets identical. Not run on a phone. Search data: NZ Gazetteer (LINZ,
+CC BY 4.0) and DOC open data.
+[Exact release record](../validation/search-offline-2026-11-07/release.json) ·
+[SHA-256](Ridgeline-Native-Search-Offline-0.1.28-Base.apk.sha256).
+
+## Previous 0.1.27 lean updates checkpoint
+
+**[Download 0.1.27 Lean Updates Base APK — 32.9 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Lean-Updates-0.1.27-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 28:
 **updates 0.1.13–0.1.26 in place, keeping its data.**
 

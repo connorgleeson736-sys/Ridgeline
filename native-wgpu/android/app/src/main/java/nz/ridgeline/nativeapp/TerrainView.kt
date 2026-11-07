@@ -398,6 +398,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         val renderStarted=System.nanoTime()
         val scale=if(motionResolution&&gestureActive)MOTION_SCALE else 1f;val prepare=if(motionResolution)MOTION_SCALE else 1f
         if(scale!=appliedScale||prepare!=appliedPrepare){NativeBridge.renderScale(handle,scale,prepare);appliedScale=scale;appliedPrepare=prepare}
+        coveragePacket?.let{c->if(c!==appliedCoverage){val b=c.second;if(NativeBridge.coverage(handle,c.first,b?.get(0)?:0.0,b?.get(1)?:0.0,b?.get(2)?:0.0,b?.get(3)?:0.0))appliedCoverage=c}}
         val shown=NativeBridge.render(handle,frameWidth,frameHeight,pose.longitude,pose.latitude,pose.zoom+ln(pixelScale)/ln(2.0),pose.zoom,pose.bearing,pose.pitch,pose.elevation,latched.revision,latched.inputNanos,latchedAt)
         NativeBridge.frameStats(handle,frameStats)
         for(i in 0 until 14)frameTimings.set(i,frameStats.getLong(i*8))
@@ -489,7 +490,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         if(!live||!active)return
         if(handle!=0L)NativeBridge.destroy(handle)
         NativeBridge.textureBackend(context.getSharedPreferences("display",0).getInt("textureBackend",0))
-        handle=NativeBridge.create(holder.surface,width,height);appliedScale=-1f;appliedPrepare=-1f
+        handle=NativeBridge.create(holder.surface,width,height);appliedScale=-1f;appliedPrepare=-1f;appliedCoverage=null
         residency=Residency(LongArray(0),LongArray(0));safetyPose=null;safetyValid=false;appliedRoutes=null;appliedDemand=null;appliedLayers=null;appliedPlacement=null;appliedStyle=null;appliedInspection=null;appliedGps=null;labelPose=null
         if(handle!=0L){
             registerFrameWake()
@@ -522,7 +523,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             NativeBridge.textureBackend(context.getSharedPreferences("display",0).getInt("textureBackend",0))
             val created=NativeBridge.create(surface,width,height)
             if(!live||generation.get()!=token){if(created!=0L)NativeBridge.destroy(created);return@post}
-            handle=created;appliedScale=-1f;appliedPrepare=-1f;safetyPose=null;safetyValid=false;appliedRoutes=null;appliedDemand=null;appliedLayers=null;appliedPlacement=null;appliedStyle=null;appliedInspection=null;appliedGps=null;labelPose=null;presentationFailures=0
+            handle=created;appliedScale=-1f;appliedPrepare=-1f;appliedCoverage=null;safetyPose=null;safetyValid=false;appliedRoutes=null;appliedDemand=null;appliedLayers=null;appliedPlacement=null;appliedStyle=null;appliedInspection=null;appliedGps=null;labelPose=null;presentationFailures=0
             if(handle!=0L){registerFrameWake();val am=context.getSystemService(android.app.ActivityManager::class.java);NativeBridge.tileBudget(handle,if(am.isLowRamDevice)32 else (am.memoryClass/2).coerceIn(64,128));NativeBridge.overlayBudget(handle,overlayLayers(am))}
             post{onStatus(if(created==0L)"Native GPU initialization failed"else "Loading terrain and imagery…")};requestFrame()
         }
@@ -588,6 +589,10 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         am.isLowRamDevice||info.totalMem<=(4.2*(1L shl 30)).toLong()})
         set(value){field=value;displayPreferences.edit().putBoolean("motionResolution",value).apply();requestFrame()}
     private var appliedScale=-1f;private var appliedPrepare=-1f
+    /** Pending disk-cache coverage grid (null grid hides it), applied on the GPU thread. */
+    @Volatile private var coveragePacket:Pair<ByteBuffer?,DoubleArray?>?=null
+    private var appliedCoverage:Pair<ByteBuffer?,DoubleArray?>?=null
+    internal fun coverage(grid:ByteArray?,bounds:DoubleArray?){coveragePacket=(grid?.let{ByteBuffer.allocateDirect(it.size).put(it).apply{rewind()}}) to bounds;requestFrame()}
     @Volatile private var gestureHeldElevation=3724f
     @Volatile private var recenterPending=true
     // Used by controlled fixtures and explicit initialization, never terrain-follow.

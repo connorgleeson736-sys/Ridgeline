@@ -5,6 +5,8 @@ use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 mod adaptive;
+/// Disk-cache coverage grid size (texels per side).
+pub const COVERAGE_SIZE: u32 = 256;
 mod label_probe;
 mod resolution;
 mod appearance;
@@ -52,7 +54,11 @@ struct Scene {
     matrix: [f32; 16],
     grade: [f32; 4],
     metrics: [f32; 4],
+    /// x hillshade, y world size, z NZ Topo sampling, w disk-cache coverage tint.
     style: [f32; 4],
+    /// Coverage texture mapping from local ground position: u = (x - ox) * sx,
+    /// v = (oy - y) * sy, as [ox, oy, sx, sy].
+    coverage: [f32; 4],
 }
 #[repr(C)]
 #[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]
@@ -99,6 +105,9 @@ pub struct Renderer {
     pub scene_uploads: u64,
     pub instance_uploads: u64,
     scene_bind: wgpu::BindGroup,
+    coverage_texture: wgpu::Texture,
+    /// Mercator bounds [west, north, east, south] of the coverage texture, when shown.
+    coverage_bounds: Option<[f64; 4]>,
     texture_layout: wgpu::BindGroupLayout,
     height_layout: wgpu::BindGroupLayout,
     image_arrays: Option<texture_arrays::TextureArrays>,
@@ -304,6 +313,7 @@ impl Renderer {
                 grade: [0.058, 1., 0.25, 1. / 0.74],
                 metrics: [1., 0., 0., 1.],
                 style: [0., 512., 0., 0.],
+                coverage: [0.; 4],
             }),
             usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
         });
@@ -357,16 +367,35 @@ impl Renderer {
         let overlay_state = overlay::Overlay::new(&device);
         let scene_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
             label: Some("terrain scene"),
-            entries: &[wgpu::BindGroupLayoutEntry {
-                binding: 0,
-                visibility: wgpu::ShaderStages::VERTEX_FRAGMENT,
-                ty: wgpu::BindingType::Buffer {
-                    ty: wgpu::BufferBindingType::Uniform,
-                    has_dynamic_offset: false,
-                    min_binding_size: wgpu::BufferSize::new(std::mem::size_of::<Scene>() as u64),
+            entries: &[
+                wgpu::BindGroupLayoutEntry {
+                    binding: 0,
+                    visibility: wgpu::ShaderStages::VERTEX_FRAGMENT,
+                    ty: wgpu::BindingType::Buffer {
+                        ty: wgpu::BufferBindingType::Uniform,
+                        has_dynamic_offset: false,
+                        min_binding_size: wgpu::BufferSize::new(std::mem::size_of::<Scene>() as u64),
+                    },
+                    count: None,
                 },
-                count: None,
-            }],
+                // Disk-cache coverage colours (Advanced view; transparent otherwise).
+                wgpu::BindGroupLayoutEntry {
+                    binding: 1,
+                    visibility: wgpu::ShaderStages::FRAGMENT,
+                    ty: wgpu::BindingType::Texture {
+                        sample_type: wgpu::TextureSampleType::Float { filterable: true },
+                        view_dimension: wgpu::TextureViewDimension::D2,
+                        multisampled: false,
+                    },
+                    count: None,
+                },
+                wgpu::BindGroupLayoutEntry {
+                    binding: 2,
+                    visibility: wgpu::ShaderStages::FRAGMENT,
+                    ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Filtering),
+                    count: None,
+                },
+            ],
         });
         let texture_entry = |visibility, filterable| wgpu::BindGroupLayoutEntry {
             binding: 0,
@@ -411,13 +440,38 @@ impl Renderer {
         });
         let pipeline = create_pipeline("fs", Some(&shared_layout));
         let unclipped_pipeline = create_pipeline("fs_unclipped", Some(&shared_layout));
+        let coverage_texture = device.create_texture(&wgpu::TextureDescriptor {
+            label: Some("disk cache coverage"),
+            size: wgpu::Extent3d { width: COVERAGE_SIZE, height: COVERAGE_SIZE, depth_or_array_layers: 1 },
+            mip_level_count: 1,
+            sample_count: 1,
+            dimension: wgpu::TextureDimension::D2,
+            format: wgpu::TextureFormat::Rgba8Unorm,
+            usage: wgpu::TextureUsages::TEXTURE_BINDING | wgpu::TextureUsages::COPY_DST,
+            view_formats: &[],
+        });
+        let coverage_sampler = device.create_sampler(&wgpu::SamplerDescriptor {
+            mag_filter: wgpu::FilterMode::Linear,
+            min_filter: wgpu::FilterMode::Linear,
+            ..Default::default()
+        });
         let scene_bind = device.create_bind_group(&wgpu::BindGroupDescriptor {
             label: None,
             layout: &pipeline.get_bind_group_layout(0),
-            entries: &[wgpu::BindGroupEntry {
-                binding: 0,
-                resource: scene.as_entire_binding(),
-            }],
+            entries: &[
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: scene.as_entire_binding(),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 1,
+                    resource: wgpu::BindingResource::TextureView(&coverage_texture.create_view(&Default::default())),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 2,
+                    resource: wgpu::BindingResource::Sampler(&coverage_sampler),
+                },
+            ],
         });
         let texture_layout = pipeline.get_bind_group_layout(1);
         let height_layout = pipeline.get_bind_group_layout(2);
@@ -548,6 +602,8 @@ impl Renderer {
             scene_uploads: 0,
             instance_uploads: 0,
             scene_bind,
+            coverage_texture,
+            coverage_bounds: None,
             texture_layout,
             height_layout,
             image_arrays,
@@ -763,6 +819,27 @@ impl Renderer {
         }
         if self.parked.as_ref().is_none_or(|p| p.scale != prepare) {
             self.parked = Some(self.build_scale(prepare));
+        }
+    }
+    /// Advanced view: tint the terrain with disk-cache coverage colours, a
+    /// COVERAGE_SIZE square RGBA grid over Mercator [west, north, east, south];
+    /// None hides it.
+    pub fn set_coverage(&mut self, grid: Option<(&[u8], [f64; 4])>) {
+        match grid {
+            Some((rgba, bounds)) if rgba.len() == (COVERAGE_SIZE * COVERAGE_SIZE * 4) as usize && bounds[0] < bounds[2] && bounds[1] < bounds[3] => {
+                self.queue.write_texture(
+                    self.coverage_texture.as_image_copy(),
+                    rgba,
+                    wgpu::TexelCopyBufferLayout {
+                        offset: 0,
+                        bytes_per_row: Some(COVERAGE_SIZE * 4),
+                        rows_per_image: Some(COVERAGE_SIZE),
+                    },
+                    wgpu::Extent3d { width: COVERAGE_SIZE, height: COVERAGE_SIZE, depth_or_array_layers: 1 },
+                );
+                self.coverage_bounds = Some(bounds);
+            }
+            _ => self.coverage_bounds = None,
         }
     }
     pub fn render_scale(&self) -> f32 {
@@ -1747,8 +1824,16 @@ impl Renderer {
                 },
                 world as f32,
                 if self.map_style.basemap == 2 { 1. } else { 0. },
-                0.,
+                if self.coverage_bounds.is_some() { 1. } else { 0. },
             ],
+            coverage: self.coverage_bounds.map_or([0.; 4], |b| {
+                [
+                    ((b[0] - center[0]) * world) as f32,
+                    ((center[1] - b[1]) * world) as f32,
+                    (1. / ((b[2] - b[0]) * world)) as f32,
+                    (1. / ((b[3] - b[1]) * world)) as f32,
+                ]
+            }),
             metrics: [
                 px_meter,
                 elevation,

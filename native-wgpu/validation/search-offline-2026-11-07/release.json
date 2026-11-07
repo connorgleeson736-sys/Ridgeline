@@ -1,0 +1,36 @@
+{
+  "artifact": "Ridgeline-Native-Search-Offline-0.1.28-Base.apk",
+  "bytes": 33749306,
+  "sha256": "c7023ed2072143b39bc354563796f944caebbb7e32ae4b8796f73e0506fd54df",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.28-search-offline",
+  "versionCode": 29,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.27 Full Audit (same package and signer)",
+  "changes": [
+    "offline place search above the saved routes: 48,272 entries from the NZ Gazetteer (LINZ, CC BY 4.0) and DOC huts, campsites and walking and tramping tracks (DOC open data); macron and case insensitive, word prefixes in any order, Mt/Mount, one typo per longer word; ranked by match, importance and distance; tapping flies the camera there with a marker; DOC page links for huts, campsites and tracks",
+    "smaller saved-route cards (thumbnail 50x42 dp, 13.5/11.5 sp text, 13 sp actions)",
+    "offline downloads follow the Capacitor flow: 2D north-up map with a page-shaped frame (A5-Legal, portrait/landscape, resizable corners), Save current view, then Download region with name, advanced coordinates, detail zoom 13-17, map content (LINZ aerial, Satellite, NZ Topo only), Include NZ Topo and mapped overlays, Estimate size, saved regions with View, Resume and Remove, Use downloaded maps only and included imagery",
+    "Advanced 'Show stored map detail': terrain tinted on a continuous red-yellow-green scale by the finest imagery zoom stored in the disk cache and saved regions (256x256 grid around the camera, recomputed as the view moves; no work when off)"
+  ],
+  "dataSources": {
+    "gazetteer": "https://gazetteer.linz.govt.nz/gaz.csv (CC BY 4.0)",
+    "doc": "DOC_Huts, DOC_Campsites, DOC_Walking_Experiences ArcGIS FeatureServer layers (DOC open data; licence to be confirmed)"
+  },
+  "tests": {
+    "kotlinJvm": "185 tests, 0 failures (new PlaceSearchTest, CacheCoverageTest, RegionFrameTest)",
+    "rust": "cargo test --workspace: all pass",
+    "gpu": "coverage_tint (new; Vulkan and GLES); route_smoke, waypoint_occlusion, label_occlusion, topo_filter, overlay_drape, overlay_pool, overlay_parity pass on Vulkan and GLES"
+  },
+  "lintErrors": 0,
+  "originalAssetsIdentical": 623,
+  "addedAssets": ["search/places.tsv", "licenses/search-data.txt"],
+  "jniExportsPerAbi": 48,
+  "loadAlignment": "0x4000",
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

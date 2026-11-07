@@ -5,12 +5,16 @@
 the audited APK was 0.1.5. Main next candidates are raw local-I/O isolation,
 GPU upload acknowledgement, classified recovery and per-tile critical-path tracing.
 
-Latest APK: **[0.1.27 Lean Updates Base](checkpoints/README.md)** — updates
+Latest APK: **[0.1.28 Search and Offline Base](checkpoints/README.md)** — updates
+0.1.13–0.1.27 in place. Offline place, hut and track search; smaller route
+cards; Capacitor-style offline downloads; and a stored-detail colour view.
+
+Previous APK: **[0.1.27 Lean Updates Base](checkpoints/README.md)** — updates
 0.1.13–0.1.26 in place. Names update during gestures, track updates send only
 changed tiles, prepared track tiles are cached, and routes re-drape only when
 the terrain under them changes.
 
-Previous APK: **[0.1.26 Quick Tracks Base](checkpoints/README.md)** — updates
+Older APK: **[0.1.26 Quick Tracks Base](checkpoints/README.md)** — updates
 0.1.13–0.1.25 in place. Track and road data downloads with visible imagery
 instead of last, and road and river names are no longer repeated on every piece.
 

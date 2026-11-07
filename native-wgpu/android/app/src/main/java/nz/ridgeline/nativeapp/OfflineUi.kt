@@ -2,10 +2,11 @@ package nz.ridgeline.nativeapp
 import android.app.Activity
 import android.app.AlertDialog
 import android.view.Gravity
+import android.view.View
 import android.widget.*
 import kotlin.math.*
 
-class OfflineUi(private val activity:Activity,root:FrameLayout,private val terrain:TerrainView,private val loader:TileLoader,attachLauncher:Boolean=true){
+class OfflineUi(private val activity:Activity,private val root:FrameLayout,private val terrain:TerrainView,private val loader:TileLoader,attachLauncher:Boolean=true){
     private var downloading=false
     private var attaching=false
     private val attachRequest=4301
@@ -114,8 +115,8 @@ class OfflineUi(private val activity:Activity,root:FrameLayout,private val terra
         content.addView(TextView(activity).apply{text="Overview imagery: ${loader.overviews.list().size}/6 packs attached. Keep the ZIPs at their selected location. Overviews contain imagery; terrain needs a connection or a saved region.";textSize=12f})
         for(pack in loader.overviews.list())content.addView(button("Detach ${pack.name}"){loader.detachOverview(pack.payload){dialog.dismiss();show()}})
         content.addView(TextView(activity).apply{text="Aerial and Satellite regions include terrain and available topographic overlays. NZ Topo regions contain printed cartography. Saved data stays until you delete it.";textSize=12f})
-        content.addView(button("Download around map center"){if(downloading)Toast.makeText(activity,"A region is already downloading.",Toast.LENGTH_SHORT).show()else{dialog.dismiss();newRegion()}})
-        if(downloading)content.addView(button("Cancel current download"){loader.cancelDownload()})
+        content.addView(button("Download a region"){dialog.dismiss();startRegion()})
+        if(downloading)content.addView(button("Stop current download"){loader.cancelDownload()})
         content.addView(status);content.addView(list)
         fun refresh(){loader.regions{rows->if(dialog.isShowing){list.removeAllViews();status.text=if(rows.isEmpty())"No saved regions"else"${rows.size} saved regions";for(region in rows){
             val line=LinearLayout(activity)
@@ -129,27 +130,141 @@ class OfflineUi(private val activity:Activity,root:FrameLayout,private val terra
         }}}}
         dialog.show();refresh()
     }
-    private fun newRegion(){
-        val pose=terrain.cameraPose
-        val content=LinearLayout(activity).apply{orientation=LinearLayout.VERTICAL;setPadding(dp(16),dp(8),dp(16),dp(8))}
-        val name=EditText(activity).apply{hint="Region name";setSingleLine();setText("Saved region")}
-        val radius=EditText(activity).apply{hint="Radius in km";inputType=android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL;setText("1")}
-        val detail=SeekBar(activity).apply{max=11;progress=7}
-        val estimate=TextView(activity)
-        content.addView(name);content.addView(TextView(activity).apply{text="Area around current map center: radius (km)"});content.addView(radius)
-        content.addView(TextView(activity).apply{text="Offline detail: higher levels retain finer imagery and need more storage.";textSize=12f});content.addView(detail);content.addView(estimate)
-        fun bounds():TileLoader.Bounds{val km=radius.text.toString().toDouble();require(km in .1..50.0){"Choose a radius from 0.1 to 50 km."};val dy=km/111.195;val dx=dy/cos(Math.toRadians(pose.latitude));return TileLoader.Bounds(max(165.0,pose.longitude-dx),max(-49.0,pose.latitude-dy),min(180.0,pose.longitude+dx),min(-33.0,pose.latitude+dy))}
-        fun update(){estimate.text=try{"Detail ${detail.progress+8} · ${loader.regionEstimate(bounds(),detail.progress+8)} image tiles, plus terrain"}catch(e:Exception){e.message?:"Enter a valid region"}}
-        radius.addTextChangedListener(object:android.text.TextWatcher{override fun beforeTextChanged(s:CharSequence?,a:Int,b:Int,c:Int){};override fun onTextChanged(s:CharSequence?,a:Int,b:Int,c:Int){update()};override fun afterTextChanged(s:android.text.Editable?){} })
-        detail.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener{override fun onProgressChanged(s:SeekBar?,p:Int,user:Boolean){update()};override fun onStartTrackingTouch(s:SeekBar?){};override fun onStopTrackingTouch(s:SeekBar?){} });update()
-        val dialog=AlertDialog.Builder(activity).setTitle("Save region").setView(content).setPositiveButton("Download",null).setNegativeButton("Cancel",null).create()
-        dialog.setOnShowListener{dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener{
+    // ---- Capacitor's offline region flow: choose a page-shaped area, then
+    // the "Download region" settings, progress and saved regions. ----
+    private var frame:RegionFrame?=null
+    private var chooser:View?=null
+    private var pageSize="A4";private var landscape=false
+    private var chosen:TileLoader.Bounds?=null
+    private var progressText=""
+    private var settingsDialog:AlertDialog?=null
+    private val pageNames=RegionFrame.PAPER.keys.toList()
+    private fun spinner(items:List<String>,selected:Int,changed:(Int)->Unit)=Spinner(activity).apply{
+        adapter=ArrayAdapter(activity,android.R.layout.simple_spinner_dropdown_item,items);setSelection(selected)
+        onItemSelectedListener=object:AdapterView.OnItemSelectedListener{override fun onItemSelected(p:AdapterView<*>?,v:android.view.View?,i:Int,id:Long){changed(i)};override fun onNothingSelected(p:AdapterView<*>?){}}
+    }
+    private fun labelled(label:String,view:android.view.View)=NativeUi.column(activity).apply{addView(NativeUi.text(activity,label,12f).apply{setTextColor(NativeUi.muted)});addView(view)}
+    /** Back closes the region chooser. */
+    fun back():Boolean{if(chooser==null)return false;closeChooser();return true}
+    private fun closeChooser(){frame?.let{root.removeView(it)};chooser?.let{root.removeView(it)};frame=null;chooser=null}
+    /** Step 1: 2D north-up map, a page-shaped frame and "Choose region". */
+    fun startRegion(){
+        closeChooser();settingsDialog?.dismiss()
+        if(loader.mapSettings.state.threeD)loader.mapSettings.change{it.copy(threeD=false)}
+        terrain.northUp()
+        val overlay=RegionFrame(activity);frame=overlay
+        root.addView(overlay,FrameLayout.LayoutParams(-1,-1))
+        val panel=NativeUi.column(activity).apply{
+            setPadding(dp(16),dp(4),dp(16),dp(14));isClickable=true;elevation=dp(12).toFloat()
+            background=android.graphics.drawable.GradientDrawable().apply{setColor(NativeUi.paper);val r=dp(20).toFloat();cornerRadii=floatArrayOf(r,r,r,r,0f,0f,0f,0f)}
+        }
+        val heading=LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL}
+        heading.addView(NativeUi.text(activity,"Choose region",17f).apply{setTypeface(null,android.graphics.Typeface.BOLD)},LinearLayout.LayoutParams(0,-2,1f))
+        heading.addView(TextView(activity).apply{text="✕";textSize=18f;gravity=Gravity.CENTER;setTextColor(NativeUi.muted);contentDescription="Close offline regions";background=NativeUi.pressable(activity,null);isClickable=true;setOnClickListener{closeChooser()}},LinearLayout.LayoutParams(dp(44),dp(44)))
+        panel.addView(heading)
+        val row=LinearLayout(activity)
+        row.addView(labelled("Page size",spinner(pageNames,pageNames.indexOf(pageSize).coerceAtLeast(0)){pageSize=pageNames[it];overlay.page(pageSize,landscape)}),LinearLayout.LayoutParams(0,-2,1f).apply{marginEnd=dp(8)})
+        row.addView(labelled("Orientation",spinner(listOf("Portrait","Landscape"),if(landscape)1 else 0){landscape=it==1;overlay.page(pageSize,landscape)}),LinearLayout.LayoutParams(0,-2,1f))
+        panel.addView(row)
+        panel.addView(NativeUi.text(activity,"Move and zoom the map to fit the area inside the frame, or drag its corners.",12f).apply{setTextColor(NativeUi.muted);setPadding(0,dp(6),0,dp(8))})
+        panel.addView(NativeUi.button(activity,"Save current view",true){
+            val bounds=frameBounds()
+            if(bounds==null)Toast.makeText(activity,"Move the frame over New Zealand.",Toast.LENGTH_LONG).show()
+            else{chosen=bounds;closeChooser();showSettings()}
+        },LinearLayout.LayoutParams(-1,dp(44)))
+        root.addView(panel,FrameLayout.LayoutParams(-1,-2,Gravity.BOTTOM));chooser=panel
+        panel.post{overlay.bottomInset=panel.height;overlay.page(pageSize,landscape)}
+    }
+    /** The frame's corners on the 2D map, clamped to New Zealand. */
+    private fun frameBounds():TileLoader.Bounds?{
+        val view=frame?:return null;val c=view.corners();val scale=terrain.pixelScale
+        val pose=terrain.cameraPose;val w=(terrain.width/scale).roundToInt();val h=(terrain.height/scale).roundToInt()
+        fun at(x:Float,y:Float)=CameraMath.anchor(pose,w,h,1.0,x/scale,y/scale,0.0)
+        val sw=at(c[0],c[3])?:return null;val ne=at(c[2],c[1])?:return null
+        val west=max(165.0,sw.mx*360-180);val east=min(180.0,ne.mx*360-180)
+        val south=max(-49.0,CameraMath.latitude(sw.my));val north=min(-33.0,CameraMath.latitude(ne.my))
+        return if(west<east&&south<north)TileLoader.Bounds(west,south,east,north)else null
+    }
+    private val zooms=listOf(13,14,15,16,17)
+    private val zoomNames=listOf("Overview · zoom 13","Standard · zoom 14","Detailed · zoom 15","Very detailed · zoom 16","Maximum imagery · zoom 17")
+    private val bases=listOf(MapSettings.Base.LINZ,MapSettings.Base.SATELLITE,MapSettings.Base.TOPO)
+    private var zoomChoice=2;private var baseChoice=0;private var includeTopo=true;private var regionName="My region"
+    /** Step 2: Capacitor's "Download region" settings, progress and saved regions. */
+    private fun showSettings(){
+        val content=LinearLayout(activity).apply{orientation=LinearLayout.VERTICAL;setPadding(dp(18),dp(4),dp(18),dp(8))}
+        content.addView(button("Change area"){settingsDialog?.dismiss();startRegion()},LinearLayout.LayoutParams(-2,dp(42)))
+        val name=EditText(activity).apply{setSingleLine();setText(regionName);textSize=14f;filters=arrayOf(android.text.InputFilter.LengthFilter(60))}
+        content.addView(labelled("Region name",name))
+        val coords=listOf("West","South","East","North").map{EditText(activity).apply{hint=it;textSize=13f;inputType=android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL or android.text.InputType.TYPE_NUMBER_FLAG_SIGNED}}
+        chosen?.let{b->listOf(b.west,b.south,b.east,b.north).forEachIndexed{i,v->coords[i].setText(String.format(java.util.Locale.ROOT,"%.5f",v))}}
+        val grid=GridLayout(activity).apply{columnCount=2;visibility=android.view.View.GONE}
+        coords.forEachIndexed{i,field->grid.addView(labelled(listOf("west","south","east","north")[i],field),GridLayout.LayoutParams().apply{width=0;columnSpec=GridLayout.spec(i%2,1f)})}
+        val advanced=TextView(activity).apply{text="Advanced ▸";textSize=13f;setTextColor(NativeUi.ink);setPadding(0,dp(10),0,dp(6));isClickable=true;background=NativeUi.pressable(activity,null)}
+        advanced.setOnClickListener{val open=grid.visibility!=android.view.View.VISIBLE;grid.visibility=if(open)android.view.View.VISIBLE else android.view.View.GONE;advanced.text=if(open)"Advanced ▾" else "Advanced ▸"}
+        content.addView(advanced);content.addView(grid)
+        val detail=labelled("Download detail",spinner(zoomNames,zoomChoice){zoomChoice=it})
+        content.addView(detail)
+        val include=CheckBox(activity).apply{text="Include NZ Topo and mapped overlays";isChecked=includeTopo;textSize=13f;setOnCheckedChangeListener{_,c->includeTopo=c}}
+        fun topoOnly(){val topo=bases[baseChoice]==MapSettings.Base.TOPO;detail.visibility=if(topo)android.view.View.GONE else android.view.View.VISIBLE;include.isEnabled=!topo;if(topo)include.isChecked=true}
+        content.addView(labelled("Map content",spinner(listOf("LINZ aerial","Satellite","NZ Topo only · maximum detail"),baseChoice){baseChoice=it;topoOnly()}))
+        content.addView(include);topoOnly()
+        val estimate=NativeUi.text(activity,"",12.5f).apply{setTextColor(NativeUi.ink);setPadding(0,dp(6),0,dp(6))}
+        fun bounds():TileLoader.Bounds{
+            if(grid.visibility==android.view.View.VISIBLE){
+                val v=coords.map{it.text.toString().toDoubleOrNull()?:error("Enter valid region coordinates.")}
+                val b=TileLoader.Bounds(v[0],v[1],v[2],v[3]);require(b.west>=165&&b.east<=180&&b.south>=-49&&b.north<=-33&&b.west<b.east&&b.south<b.north){"Enter valid region coordinates."};return b
+            }
+            return chosen?:error("Choose an area first.")
+        }
+        fun zoom()=if(bases[baseChoice]==MapSettings.Base.TOPO)TOPO_MAX_ZOOM else zooms[zoomChoice]
+        fun estimateText():String{val e=loader.regionEstimate(bounds(),zoom(),bases[baseChoice],includeTopo)
+            return String.format(java.util.Locale.ROOT,"About %.0f MB · %,d files (%,d image tiles). Allow %.0f MB of space. Sizes are typical, not measured.",e.mib,e.files,e.images,e.mib*1.5)}
+        val actions=LinearLayout(activity)
+        actions.addView(button("Estimate size"){estimate.text=try{estimateText()}catch(e:Exception){e.message?:"Region could not be estimated."}},LinearLayout.LayoutParams(0,dp(44),1f).apply{marginEnd=dp(8)})
+        val list=NativeUi.column(activity)
+        lateinit var refresh:()->Unit
+        actions.addView(NativeUi.button(activity,"Download region",true){
+            if(downloading){Toast.makeText(activity,"A region is already downloading.",Toast.LENGTH_SHORT).show();return@button}
             try{
-                val area=bounds();loader.regionEstimate(area,detail.progress+8);downloading=true;dialog.dismiss()
-                val progress=TextView(activity).apply{text="Preparing download…";setPadding(dp(16),dp(12),dp(16),dp(12))}
-                val current=AlertDialog.Builder(activity).setTitle(name.text.toString().ifBlank{"Saved region"}).setView(progress).setNegativeButton("Cancel"){_,_->loader.cancelDownload()}.create();current.setCancelable(false);current.show()
-                loader.downloadRegion(name.text.toString().ifBlank{"Saved region"},area,detail.progress+8,{progress.text=it}){downloading=false;current.dismiss();loader.cameraChanged();show()}
-            }catch(e:Exception){downloading=false;Toast.makeText(activity,e.message?:"Region could not be started",Toast.LENGTH_LONG).show()}
-        }};dialog.show()
+                estimate.text=estimateText();regionName=name.text.toString().ifBlank{"My region"}
+                downloading=true;progressText="Preparing download…";refresh()
+                loader.downloadRegion(regionName,bounds(),zoom(),bases[baseChoice],includeTopo,progress={progressText=it;refresh()}){downloading=false;progressText="";loader.cameraChanged();refresh()}
+                Toast.makeText(activity,"Region queued. Download progress appears below.",Toast.LENGTH_SHORT).show()
+            }catch(e:Exception){downloading=false;estimate.text=e.message?:"Region could not be started."}
+        },LinearLayout.LayoutParams(0,dp(44),1f))
+        content.addView(actions);content.addView(estimate)
+        content.addView(CheckBox(activity).apply{text="Use downloaded maps only";isChecked=loader.offlineOnly;textSize=13f;setOnCheckedChangeListener{_,c->loader.offlineOnly(c)}})
+        content.addView(list)
+        val imagery=TextView(activity).apply{text="Included imagery ▸";textSize=13f;setTextColor(NativeUi.ink);setPadding(0,dp(10),0,dp(6));isClickable=true;background=NativeUi.pressable(activity,null)}
+        val packs=NativeUi.column(activity).apply{visibility=android.view.View.GONE
+            addView(NativeUi.text(activity,"Overview imagery: ${loader.overviews.list().size}/6 packs attached. Zooms 0–8 are included in the app.",12f).apply{setTextColor(NativeUi.muted)})
+            addView(button("Add imagery ZIPs"){settingsDialog?.dismiss();addImagery()})}
+        imagery.setOnClickListener{val open=packs.visibility!=android.view.View.VISIBLE;packs.visibility=if(open)android.view.View.VISIBLE else android.view.View.GONE;imagery.text=if(open)"Included imagery ▾" else "Included imagery ▸"}
+        content.addView(imagery);content.addView(packs)
+        val dialog=AlertDialog.Builder(activity).setTitle("Download region").setView(ScrollView(activity).apply{addView(content)}).setNegativeButton("Close",null).create()
+        settingsDialog=dialog
+        refresh={loader.regions{rows->if(!dialog.isShowing)return@regions
+            list.removeAllViews()
+            if(downloading)list.addView(LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL
+                addView(NativeUi.text(activity,"Downloading · $progressText",12.5f),LinearLayout.LayoutParams(0,-2,1f))
+                addView(button("Stop"){loader.cancelDownload()})})
+            list.addView(NativeUi.text(activity,if(rows.isEmpty())"No regions downloaded yet." else "Saved regions",13f).apply{setTypeface(null,android.graphics.Typeface.BOLD);setPadding(0,dp(10),0,dp(4))})
+            for(region in rows){
+                val item=NativeUi.column(activity).apply{setPadding(0,dp(6),0,dp(6))}
+                item.addView(NativeUi.text(activity,region.name,14f).apply{setTypeface(null,android.graphics.Typeface.BOLD)})
+                item.addView(NativeUi.text(activity,String.format(java.util.Locale.ROOT,"%s · %,d files · %.1f MB",region.status,region.resources,region.bytes/1048576.0),12f).apply{setTextColor(NativeUi.muted)})
+                val buttons=LinearLayout(activity)
+                val meta=region.metadata
+                if(meta!=null)buttons.addView(button("View"){dialog.dismiss();val base=runCatching{MapSettings.Base.valueOf(meta.basemap)}.getOrDefault(MapSettings.Base.LINZ);loader.mapSettings.change{it.copy(base=base)};terrain.focus(listOf(Coordinate(meta.bounds.west,meta.bounds.south),Coordinate(meta.bounds.east,meta.bounds.north)))})
+                if(meta!=null&&!downloading&&region.status.startsWith("Partial"))buttons.addView(button("Resume"){
+                    val base=runCatching{MapSettings.Base.valueOf(meta.basemap)}.getOrDefault(MapSettings.Base.LINZ)
+                    downloading=true;progressText="Resuming…";refresh()
+                    loader.downloadRegion(region.name,meta.bounds,meta.zoom,base,includeTopo,resume=region.id,progress={progressText=it;refresh()}){downloading=false;progressText="";loader.cameraChanged();refresh()}
+                })
+                buttons.addView(button("Remove"){AlertDialog.Builder(activity).setMessage("Delete ${region.name} from this device?").setPositiveButton("Delete"){_,_->loader.removeRegion(region.id){refresh()}}.setNegativeButton("Cancel",null).show()})
+                item.addView(buttons);list.addView(item)
+            }
+        }}
+        dialog.show();refresh()
     }
 }

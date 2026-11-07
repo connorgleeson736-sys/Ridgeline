@@ -60,7 +60,7 @@ class MainActivity:Activity(){
         terrain.onCamera={loader.cameraChanged();mapLayers.refresh()};terrain.onData={loader.cameraChanged();mapLayers.refresh()}
         planner=PlannerUi(this,root,terrain,loader,mapHost)
         offlineUi=OfflineUi(this,root,terrain,loader,false)
-        planner.onOffline={offlineUi.show()}
+        planner.onOffline={layersUi.dismiss();offlineUi.startRegion()}
         planner.onProfilePoint={terrain.inspect(it)}
         layersUi=LayersUi(this,root,terrain,loader,offlineUi){planner.newRoute()}
         location=LocationUi(this,mapHost,terrain,false)
@@ -103,7 +103,7 @@ class MainActivity:Activity(){
         if(!loader.mapSettings.state.threeD)terrain.dimension(false)
         if(loader.mapSettings.state.base==MapSettings.Base.TOPO)terrain.maxZoom=16.0
         terrain.configure(loader.mapSettings.state)
-        if(android.os.Build.VERSION.SDK_INT>=33)onBackInvokedDispatcher.registerOnBackInvokedCallback(android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT){if(!layersUi.dismiss()&&!planner.back())finish()}
+        if(android.os.Build.VERSION.SDK_INT>=33)onBackInvokedDispatcher.registerOnBackInvokedCallback(android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT){if(!layersUi.dismiss()&&!offlineUi.back()&&!planner.back())finish()}
     }
     override fun dispatchTouchEvent(event:android.view.MotionEvent):Boolean{
         if(event.actionMasked==android.view.MotionEvent.ACTION_DOWN&&::layersUi.isInitialized)layersUi.touchDown(event.rawX,event.rawY)
@@ -113,7 +113,7 @@ class MainActivity:Activity(){
     @Deprecated("Legacy Android back dispatch")
     // API 33+ uses the OnBackInvokedDispatcher registered in onCreate above.
     @android.annotation.SuppressLint("GestureBackNavigation")
-    override fun onBackPressed(){if((!::layersUi.isInitialized||!layersUi.dismiss())&&(!::planner.isInitialized||!planner.back()))super.onBackPressed()}
+    override fun onBackPressed(){if((!::layersUi.isInitialized||!layersUi.dismiss())&&(!::offlineUi.isInitialized||!offlineUi.back())&&(!::planner.isInitialized||!planner.back()))super.onBackPressed()}
     override fun onRequestPermissionsResult(request:Int,permissions:Array<out String>,grants:IntArray){super.onRequestPermissionsResult(request,permissions,grants);if(::location.isInitialized&&grants.any{it==android.content.pm.PackageManager.PERMISSION_GRANTED})location.permission(request)}
     override fun onActivityResult(request:Int,result:Int,data:android.content.Intent?){super.onActivityResult(request,result,data);if(::planner.isInitialized)planner.result(request,result,data);if(::offlineUi.isInitialized)offlineUi.result(request,result,data)}
     override fun onPause(){if(::mapLayers.isInitialized)mapLayers.setActive(false);if(::location.isInitialized)location.stop();if(::planner.isInitialized)planner.pause();if(::terrain.isInitialized)terrain.setActive(false);if(::loader.isInitialized)loader.setActive(false);super.onPause()}

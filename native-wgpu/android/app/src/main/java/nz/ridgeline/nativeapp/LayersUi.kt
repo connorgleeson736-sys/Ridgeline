@@ -148,6 +148,13 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
         parent.addView(NativeUi.text(activity,"After the view loads, keeps lower-detail terrain and imagery for the surrounding area ready, so moving stays smooth while sharp tiles load.",12f).apply{setTextColor(NativeUi.muted)})
         check(parent,"Lower resolution while moving",terrain.motionResolution){terrain.motionResolution=it}
         parent.addView(NativeUi.text(activity,"Draws fewer pixels while you pan, zoom or rotate, then a full-resolution frame as soon as the map stops. Smoother movement on slower phones.",12f).apply{setTextColor(NativeUi.muted)})
+        check(parent,"Show stored map detail",loader.cacheCoverage){loader.cacheCoverage(it)}
+        parent.addView(LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL
+            addView(NativeUi.text(activity,"Little",11f).apply{setTextColor(NativeUi.muted)})
+            addView(View(activity).apply{background=android.graphics.drawable.GradientDrawable(android.graphics.drawable.GradientDrawable.Orientation.LEFT_RIGHT,(intArrayOf(-1)+(10..17).toList().toIntArray()).map{CacheCoverage.color(it) or (0xff shl 24)}.toIntArray()).apply{cornerRadius=dp(3).toFloat()}},LinearLayout.LayoutParams(0,dp(10),1f).apply{setMargins(dp(8),0,dp(8),0)})
+            addView(NativeUi.text(activity,"Detailed",11f).apply{setTextColor(NativeUi.muted)})
+        })
+        parent.addView(NativeUi.text(activity,"Tints the terrain by how detailed the imagery stored on this phone is (automatic cache and saved regions): red little or none, through yellow, to green detailed. Shows what will be sharp offline.",12f).apply{setTextColor(NativeUi.muted)})
         check(parent,"Downloaded maps only",loader.offlineOnly){loader.offlineOnly(it)}
         parent.addView(NativeUi.button(activity,"Offline maps, imagery ZIPs & diagnostics"){dismiss();offline.show()})
         parent.addView(NativeUi.button(activity,"About & licences"){
