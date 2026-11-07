@@ -43,25 +43,30 @@ function createPool({bytes=128*1048576,pendingLimit=8,types=['raster'],priority=
    const ordered=ids.slice().sort((a,b)=>(scores.get(a.key)??0)-(scores.get(b.key)??0)||(type==='raster-dem'&&Number.isFinite(scores.get(a.key))&&Number.isFinite(scores.get(b.key))?a.canonical.z-b.canonical.z:0));
    const retained=original.retain.call(this,ordered,zoom);
    const usable=tile=>!!tile&&!tile.aborted&&tile.state!=='unloaded'&&(type==='raster-dem'?!!tile.dem:!!tile.texture);
-   const loaded=Object.values(retained).filter(id=>usable(this.getTile(id))),covers=new Map();
+   let loaded;const covers=new Map(),missingParents=new Map();let checkedRevision=manager._ridgeResidencyRevision;
    for(const id of ordered){
     if(usable(this.getTile(id)))continue;
     const z=id.canonical.z;
     // A complete sharper child cover already meets this request.
-    if(!covers.has(z))covers.set(z,root.RidgeTerrainStreaming?.completeCoverage?.(loaded.filter(q=>q.canonical.z>=z)));
+    if(!covers.has(z))covers.set(z,root.RidgeTerrainStreaming?.completeCoverage?.((loaded??=Object.values(retained).filter(id=>usable(this.getTile(id)))).filter(q=>q.canonical.z>=z)));
     if(covers.get(z)?.(id))continue;
     let savedOverview=null,found=false;
     for(let level=z-1;level>=Math.max(0,source.minzoom||0);level--){
-     const parent=id.scaledTo(level);let tile=this.getTile(parent);
+     const parent=id.scaledTo(level);
+     // Siblings share failed ancestor probes. Recheck after any residency
+     // mutation, and after explicitly adding an overview below.
+     if(checkedRevision!==manager._ridgeResidencyRevision){missingParents.clear();checkedRevision=manager._ridgeResidencyRevision;}
+     if(missingParents.has(parent.key)){if(!savedOverview&&missingParents.get(parent.key))savedOverview=parent;continue;}
+     let tile=this.getTile(parent);
      if(!usable(tile)){
       const cached=cache.data?.[parent.wrapped().key]?.[0]?.value;
-      if(!usable(cached)){if(!savedOverview&&source.tiles?.[0]&&root.RidgeNZOverview?.hasTile(source.tiles[0],parent))savedOverview=parent;continue;}
+      if(!usable(cached)){const overview=!!(source.tiles?.[0]&&root.RidgeNZOverview?.hasTile(source.tiles[0],parent));missingParents.set(parent.key,overview);if(!savedOverview&&overview)savedOverview=parent;continue;}
       // Only restore resident decoded data; never start a parent download here.
       tile=this._addTile(parent);ancestorRestores++;
      }
      if(usable(tile)){retained[parent.key]=parent;found=true;break;}
     }
-    if(!found&&savedOverview){this._addTile(savedOverview);retained[savedOverview.key]=savedOverview;}
+    if(!found&&savedOverview){this._addTile(savedOverview);missingParents.clear();retained[savedOverview.key]=savedOverview;}
    }
    return retained;
   };

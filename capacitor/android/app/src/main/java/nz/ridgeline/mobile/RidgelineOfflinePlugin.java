@@ -245,8 +245,22 @@ public final class RidgelineOfflinePlugin extends Plugin {
         () -> {
           JSObject r = new JSObject();
           r.put("offlineOnly", archive().offlineOnly());
+          r.put("diskCacheMB", TileNetwork.diskCacheMB(getContext()));
+          r.put("diskCacheBytes", TileNetwork.activeCacheBytes(getContext()));
+          r.put("diskCacheRestartRequired", TileNetwork.cacheRestartRequired(getContext()));
           return r;
         });
+  }
+
+  @PluginMethod
+  public void setDiskCache(PluginCall c) {
+    async(c, () -> {
+      TileNetwork.diskCacheMB(getContext(), c.getInt("megabytes", DiskCacheBudget.DEFAULT_MB));
+      JSObject r = new JSObject();
+      r.put("diskCacheMB", TileNetwork.diskCacheMB(getContext()));
+      r.put("diskCacheRestartRequired", TileNetwork.cacheRestartRequired(getContext()));
+      return r;
+    });
   }
 
   @PluginMethod

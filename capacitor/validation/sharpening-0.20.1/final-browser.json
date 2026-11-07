@@ -1,0 +1,15 @@
+{
+  "sourceCommit": "a2a71cd4365c5d528ef62d2b3474c8cb095119f3",
+  "drawnNativeDesiredTileSetsMatch": true,
+  "drawnTerrainTiles": 13,
+  "waitingCovers": 0,
+  "qualityHolds": 0,
+  "deferredRefreshes": 0,
+  "activeRequests": 0,
+  "queuedRequests": 0,
+  "loadedImages": 47,
+  "loadedDEMs": 19,
+  "pageErrors": [],
+  "consoleErrors": [],
+  "physicalDeviceRun": false
+}

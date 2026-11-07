@@ -1,0 +1,86 @@
+Starting a Gradle Daemon (subsequent builds will be faster)
+
+> Configure project :app
+WARNING: BuildType(latencyAudit): resValue 'string/app_name' value is being replaced.
+WARNING: BuildType(latencyAudit): resValue 'string/title_activity_main' value is being replaced.
+WARNING: Using flatDir should be avoided because it doesn't support any meta-data formats.
+
+> Configure project :capacitor-cordova-android-plugins
+WARNING: Using flatDir should be avoided because it doesn't support any meta-data formats.
+
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preLatencyAuditBuild UP-TO-DATE
+> Task :app:javaPreCompileLatencyAudit UP-TO-DATE
+> Task :capacitor-android:preBuild UP-TO-DATE
+> Task :capacitor-android:preReleaseBuild UP-TO-DATE
+> Task :capacitor-android:writeReleaseAarMetadata UP-TO-DATE
+> Task :capacitor-cordova-android-plugins:preBuild UP-TO-DATE
+> Task :capacitor-cordova-android-plugins:preReleaseBuild UP-TO-DATE
+> Task :capacitor-android:processReleaseNavigationResources UP-TO-DATE
+> Task :capacitor-cordova-android-plugins:writeReleaseAarMetadata
+> Task :capacitor-cordova-android-plugins:processReleaseNavigationResources
+> Task :app:checkLatencyAuditAarMetadata UP-TO-DATE
+> Task :app:processLatencyAuditNavigationResources UP-TO-DATE
+> Task :app:compileLatencyAuditNavigationResources UP-TO-DATE
+> Task :app:generateLatencyAuditResValues UP-TO-DATE
+> Task :capacitor-android:generateReleaseResValues UP-TO-DATE
+> Task :capacitor-android:generateReleaseResources UP-TO-DATE
+> Task :capacitor-android:packageReleaseResources UP-TO-DATE
+> Task :capacitor-cordova-android-plugins:generateReleaseResValues
+> Task :capacitor-cordova-android-plugins:generateReleaseResources
+> Task :capacitor-cordova-android-plugins:packageReleaseResources
+> Task :app:mapLatencyAuditSourceSetPaths UP-TO-DATE
+> Task :app:generateLatencyAuditResources UP-TO-DATE
+> Task :app:mergeLatencyAuditResources UP-TO-DATE
+> Task :app:packageLatencyAuditResources UP-TO-DATE
+> Task :app:parseLatencyAuditLocalResources UP-TO-DATE
+> Task :app:createLatencyAuditCompatibleScreenManifests
+> Task :app:extractDeepLinksLatencyAudit UP-TO-DATE
+> Task :capacitor-android:extractDeepLinksRelease UP-TO-DATE
+> Task :capacitor-android:processReleaseManifest UP-TO-DATE
+> Task :capacitor-cordova-android-plugins:extractDeepLinksRelease
+> Task :capacitor-android:compileReleaseLibraryResources UP-TO-DATE
+> Task :capacitor-android:parseReleaseLocalResources UP-TO-DATE
+> Task :capacitor-android:generateReleaseRFile UP-TO-DATE
+> Task :capacitor-cordova-android-plugins:compileReleaseLibraryResources
+> Task :capacitor-cordova-android-plugins:processReleaseManifest
+> Task :capacitor-cordova-android-plugins:parseReleaseLocalResources
+> Task :app:processLatencyAuditMainManifest
+> Task :app:processLatencyAuditManifest
+> Task :app:processLatencyAuditManifestForPackage
+> Task :capacitor-android:javaPreCompileRelease UP-TO-DATE
+> Task :capacitor-cordova-android-plugins:generateReleaseRFile
+> Task :capacitor-android:compileReleaseJavaWithJavac UP-TO-DATE
+> Task :capacitor-android:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :capacitor-cordova-android-plugins:javaPreCompileRelease
+> Task :capacitor-cordova-android-plugins:compileReleaseJavaWithJavac NO-SOURCE
+> Task :capacitor-cordova-android-plugins:bundleLibCompileToJarRelease
+> Task :app:preLatencyAuditUnitTestBuild UP-TO-DATE
+> Task :app:javaPreCompileLatencyAuditUnitTest UP-TO-DATE
+> Task :app:processLatencyAuditJavaRes NO-SOURCE
+> Task :app:processLatencyAuditUnitTestJavaRes NO-SOURCE
+> Task :capacitor-android:bundleLibRuntimeToJarRelease UP-TO-DATE
+> Task :capacitor-android:processReleaseJavaRes NO-SOURCE
+> Task :capacitor-cordova-android-plugins:bundleLibRuntimeToJarRelease
+> Task :capacitor-cordova-android-plugins:processReleaseJavaRes NO-SOURCE
+> Task :app:processLatencyAuditResources
+
+> Task :app:compileLatencyAuditJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :app:bundleLatencyAuditClassesToCompileJar
+> Task :app:bundleLatencyAuditClassesToRuntimeJar
+> Task :app:compileLatencyAuditUnitTestJavaWithJavac
+> Task :app:testLatencyAuditUnitTest
+
+[Incubating] Problems report is available at: file:///workspace/Ridgeline-capacitor/capacitor/android/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 35s
+49 actionable tasks: 23 executed, 26 up-to-date

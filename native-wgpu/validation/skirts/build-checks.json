@@ -1,0 +1,19 @@
+{
+  "rustHostTests": 19,
+  "androidTests": {
+    "tests": 20,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "lintErrors": 0,
+  "lintWarnings": 16,
+  "mixedLodBackgroundPixelsClosed": 36092,
+  "geometrySurfaceResolution": 128,
+  "imagerySourcePixels": 256,
+  "geometryVertexBytesPerSource": 399384,
+  "signatureVerified": true,
+  "zipalign16KiB": true,
+  "liveAndroidExecution": "unverified: emulator package/activity services disappear before app installation",
+  "visualParity": "unverified"
+}

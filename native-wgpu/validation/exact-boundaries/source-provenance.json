@@ -1,0 +1,108 @@
+{
+  "independentChildPhotos": true,
+  "provider": "basemaps.linz.govt.nz",
+  "z": 11,
+  "x": 1991,
+  "y": 1300,
+  "sharedEdgeSamples": 129,
+  "sharedEdgeMaxErrorMetres": 0,
+  "minimumMetres": 450.8000000000011,
+  "maximumMetres": 3671.200000000001,
+  "imagerySize": [
+    256,
+    256
+  ],
+  "records": [
+    {
+      "file": "elevation-11-1990-1299.png",
+      "bytes": 77544,
+      "sha256": "46464593657b30ce6edff53e7e775508fd97e5ece0d3b61f9b52af7b81a42da7"
+    },
+    {
+      "file": "elevation-11-1991-1299.png",
+      "bytes": 112851,
+      "sha256": "18c52664f83a44034e9e777e7214a58121db17004e4ae3909440b3e2b1432c27"
+    },
+    {
+      "file": "elevation-11-1992-1299.png",
+      "bytes": 114118,
+      "sha256": "bfa478bb8495d08d4c8efc4c4947ac3b28a2b6db22027af1f09ef682fc74d9e4"
+    },
+    {
+      "file": "elevation-11-1993-1299.png",
+      "bytes": 110575,
+      "sha256": "08e4dac97f0a67d5d722dd9ce4a14d1557e4c8be90a558924b894f7a49cf40cc"
+    },
+    {
+      "file": "elevation-11-1990-1300.png",
+      "bytes": 113667,
+      "sha256": "99342fead2a3762028e751db66d2153de7ce8af409e874b7727961cebe56493c"
+    },
+    {
+      "file": "elevation-11-1991-1300.png",
+      "bytes": 117952,
+      "sha256": "1e76b737ce62f42bcf1e74250d57aaf5d196d029714fd7e039fe3ba9b227d8e7"
+    },
+    {
+      "file": "elevation-11-1992-1300.png",
+      "bytes": 107269,
+      "sha256": "8f6e0a6865d487a1d4234aae392ce1560d2a01819acfa9802ca5ea1505d37e49"
+    },
+    {
+      "file": "elevation-11-1993-1300.png",
+      "bytes": 105871,
+      "sha256": "37a8730ca565f909fb77ba399d0e1b90ac5b0f5446ba88c4f09f27bd7f3d5ab8"
+    },
+    {
+      "file": "elevation-11-1990-1301.png",
+      "bytes": 115145,
+      "sha256": "d02f81475c10bdc75959480287ccae9468bbc2fe94c5eec579ae4f6e4297934b"
+    },
+    {
+      "file": "elevation-11-1991-1301.png",
+      "bytes": 102520,
+      "sha256": "1f5190ba45cf011b834f17f027befe827ada1426d6b4270d7512a071b51ccf40"
+    },
+    {
+      "file": "elevation-11-1992-1301.png",
+      "bytes": 111446,
+      "sha256": "e8d6b4c543d8c7aeda6ef546b695acb2742092151f41fe16a964bcda005e26c7"
+    },
+    {
+      "file": "elevation-11-1993-1301.png",
+      "bytes": 107051,
+      "sha256": "598a52ea6b232573ab1ce2234881e4918da7547ea253e6b8774fa55a3ae77a6b"
+    },
+    {
+      "file": "aerial-11-1991-1300.webp",
+      "bytes": 23626,
+      "sha256": "f023363960aee9417a7244887bc3a4dcabc801682081b87a0b97f54a6cc8d511"
+    },
+    {
+      "file": "aerial-11-1992-1300.webp",
+      "bytes": 25128,
+      "sha256": "ee0698ca1fc28667dc94bc610e064186bf9d36f92454cfd0e24f11462c43bf2e"
+    },
+    {
+      "file": "aerial-12-3982-2600.webp",
+      "bytes": 23202,
+      "sha256": "0b70ad97f0fbf588bfd7a7b97ee790810190704b9a82541abc54afac4f1eb5a5"
+    },
+    {
+      "file": "aerial-12-3983-2600.webp",
+      "bytes": 17984,
+      "sha256": "b27a39d4d8a95e67984343f8164a45ad84b636f2cb7df6fdc4f7f4936572f6d5"
+    },
+    {
+      "file": "aerial-12-3982-2601.webp",
+      "bytes": 18856,
+      "sha256": "004059c8e169042f08cda080edc3003a4f2673376cb2e997be89ff44dd733b65"
+    },
+    {
+      "file": "aerial-12-3983-2601.webp",
+      "bytes": 23818,
+      "sha256": "76795c92664d32eb3a1edc70371a4f42fd5e40b69447ec467e94a4faffbc4b93"
+    }
+  ],
+  "limitation": "Host fixture preparation; Android loader execution, cross-LOD stitching and visual parity remain unverified."
+}

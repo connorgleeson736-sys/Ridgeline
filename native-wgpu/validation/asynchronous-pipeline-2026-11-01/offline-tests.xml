@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="nz.ridgeline.nativeapp.OfflinePrefetchTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-11-01T05:41:34.059Z" hostname="bc071fb25b4a" time="1.556">
+  <properties/>
+  <testcase name="twoTileWindowOverlapsSourcesWithoutDuplicateDownloadsWithZeroRam" classname="nz.ridgeline.nativeapp.OfflinePrefetchTest" time="1.556"/>
+  <system-out><![CDATA[{"scope":"Production OfflinePrefetch and TileTransport, four tiles with three independent original sources each, injected 25 ms response service, two background slots, zero encoded RAM. Not phone/offline-disk throughput.","beforeMs":[349.46358, 312.376406, 311.172887],"afterMs":[160.588753, 166.869261, 156.201306],"beforeMedianMs":312.376406,"afterMedianMs":160.588753,"requestsEach":12,"backgroundMaximum":2,"sameBytes":true}
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

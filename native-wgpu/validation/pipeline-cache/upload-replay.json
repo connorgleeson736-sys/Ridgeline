@@ -1,0 +1,59 @@
+{
+  "fixedTwo": {
+    "framesOver4ms": 0,
+    "totalUploadCpuMs": 4.379795,
+    "frames": 20,
+    "maxUploadCpuMs": 0.302686,
+    "frameUploadNanos": [
+      282877,
+      200442,
+      223476,
+      197186,
+      242845,
+      200232,
+      210757,
+      200312,
+      302686,
+      213642,
+      223306,
+      245940,
+      202275,
+      192099,
+      194874,
+      227132,
+      235715,
+      195164,
+      194082,
+      194753
+    ]
+  },
+  "costAware": {
+    "framesOver4ms": 0,
+    "totalUploadCpuMs": 4.379795,
+    "frames": 20,
+    "maxUploadCpuMs": 0.302686,
+    "frameUploadNanos": [
+      282877,
+      200442,
+      223476,
+      197186,
+      242845,
+      200232,
+      210757,
+      200312,
+      302686,
+      213642,
+      223306,
+      245940,
+      202275,
+      192099,
+      194874,
+      227132,
+      235715,
+      195164,
+      194082,
+      194753
+    ]
+  },
+  "scope": "Production admission policy replay of actual host GPU upload CPU durations; no GPU/frame/phone timing claim. Same uploads, same total CPU cost; changes scheduling only."
+}

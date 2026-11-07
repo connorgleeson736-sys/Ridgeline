@@ -1,0 +1,168 @@
+{
+  "vulkan": {
+    "baseline": {
+      "0": {
+        "medianEightFramesUs": 1700435,
+        "draws": 16,
+        "binds": 22,
+        "pixelHash": "5c284a5bdf09608d",
+        "trials": 3
+      },
+      "60": {
+        "medianEightFramesUs": 1509545,
+        "draws": 15,
+        "binds": 22,
+        "pixelHash": "172a7ea6737c2c14",
+        "trials": 3
+      },
+      "75": {
+        "medianEightFramesUs": 1542713,
+        "draws": 15,
+        "binds": 22,
+        "pixelHash": "4e9d51026314e05a",
+        "trials": 3
+      }
+    },
+    "shader": {
+      "0": {
+        "medianEightFramesUs": 1422539,
+        "draws": 16,
+        "binds": 22,
+        "pixelHash": "4c6d00e4582100bb",
+        "trials": 3
+      },
+      "60": {
+        "medianEightFramesUs": 1391532,
+        "draws": 15,
+        "binds": 22,
+        "pixelHash": "dec1dca5c5b2884e",
+        "trials": 3
+      },
+      "75": {
+        "medianEightFramesUs": 1505716,
+        "draws": 15,
+        "binds": 22,
+        "pixelHash": "7253eedcf1b20405",
+        "trials": 3
+      }
+    },
+    "batch": {
+      "0": {
+        "medianEightFramesUs": 1434799,
+        "draws": 12,
+        "binds": 4,
+        "pixelHash": "5c284a5bdf09608d",
+        "trials": 3
+      },
+      "60": {
+        "medianEightFramesUs": 1616817,
+        "draws": 11,
+        "binds": 4,
+        "pixelHash": "172a7ea6737c2c14",
+        "trials": 3
+      },
+      "75": {
+        "medianEightFramesUs": 1554620,
+        "draws": 11,
+        "binds": 4,
+        "pixelHash": "4e9d51026314e05a",
+        "trials": 3
+      }
+    },
+    "full": {
+      "0": {
+        "medianEightFramesUs": 1432073,
+        "draws": 12,
+        "binds": 4,
+        "pixelHash": "4c6d00e4582100bb",
+        "trials": 3
+      },
+      "60": {
+        "medianEightFramesUs": 1483603,
+        "draws": 11,
+        "binds": 4,
+        "pixelHash": "dec1dca5c5b2884e",
+        "trials": 3
+      },
+      "75": {
+        "medianEightFramesUs": 1510172,
+        "draws": 11,
+        "binds": 4,
+        "pixelHash": "7253eedcf1b20405",
+        "trials": 3
+      }
+    }
+  },
+  "gles": {
+    "baseline": {
+      "0": {
+        "medianEightFramesUs": 532925,
+        "draws": 16,
+        "binds": 32,
+        "pixelHash": "911d4d8c46ffc27c",
+        "trials": 3
+      },
+      "60": {
+        "medianEightFramesUs": 580390,
+        "draws": 15,
+        "binds": 30,
+        "pixelHash": "9d59b206ba03e81b",
+        "trials": 3
+      },
+      "75": {
+        "medianEightFramesUs": 643066,
+        "draws": 15,
+        "binds": 30,
+        "pixelHash": "c7183e37cbd57e4e",
+        "trials": 3
+      }
+    },
+    "shader": {
+      "0": {
+        "medianEightFramesUs": 453596,
+        "draws": 16,
+        "binds": 32,
+        "pixelHash": "047fb702593f7eae",
+        "trials": 3
+      },
+      "60": {
+        "medianEightFramesUs": 533525,
+        "draws": 15,
+        "binds": 30,
+        "pixelHash": "b32e35843f3445d2",
+        "trials": 3
+      },
+      "75": {
+        "medianEightFramesUs": 578638,
+        "draws": 15,
+        "binds": 30,
+        "pixelHash": "c7183e37cbd57e4e",
+        "trials": 3
+      }
+    },
+    "full": {
+      "0": {
+        "medianEightFramesUs": 482304,
+        "draws": 16,
+        "binds": 32,
+        "pixelHash": "047fb702593f7eae",
+        "trials": 3
+      },
+      "60": {
+        "medianEightFramesUs": 562999,
+        "draws": 15,
+        "binds": 30,
+        "pixelHash": "b32e35843f3445d2",
+        "trials": 3
+      },
+      "75": {
+        "medianEightFramesUs": 581774,
+        "draws": 15,
+        "binds": 30,
+        "pixelHash": "c7183e37cbd57e4e",
+        "trials": 3
+      }
+    }
+  },
+  "scope": "Debug host builds; SwiftShader Vulkan arrays / Mesa GLES separate textures; 16 synthetic full-detail tiles, 8 drained frames per angle, 3 alternating trials. Includes CPU submission and GPU completion; not isolated GPU timestamps, download speed, or A20 frame time. High host timing variance."
+}

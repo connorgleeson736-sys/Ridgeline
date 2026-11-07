@@ -1,0 +1,50 @@
+{
+  "apk": "Ridgeline-Capacitor-Border-Recovery-0.20.3-Base.apk",
+  "files": [
+    {
+      "file": "assets/maplibre-gl.mjs",
+      "sha256": "418e23a87cf64cbbd02a29a1edd77a8f43ced39184b32d032eec2613762bc5e9",
+      "matchesPublishedApk": true
+    },
+    {
+      "file": "performance.js",
+      "sha256": "0ca7181d2088282f568a45c67c9fa75fc35f3734ee96665a60c90f3867866fc2",
+      "matchesPublishedApk": true
+    },
+    {
+      "file": "surface-focus.js",
+      "sha256": "ded11e7e1fdf9bec85afc124da9cae2370c939225ed8164e4e21ec5d28c729e8",
+      "matchesPublishedApk": true
+    },
+    {
+      "file": "adaptive-terrain.js",
+      "sha256": "502b819c0b56083b521fd16871e0af73cbba8b871d3ac9592373436ce62d7f95",
+      "matchesPublishedApk": true
+    },
+    {
+      "file": "raster-residency.js",
+      "sha256": "64466829083241422e919bc2944491f58a8425503e9103baeba4468b17353e9a",
+      "matchesPublishedApk": true
+    },
+    {
+      "file": "motion-detail.js",
+      "sha256": "e67c3b7def9e0578dfa915e05b9b5048ecdc6bbe43fac1d9734620ab639e452c",
+      "matchesPublishedApk": true
+    },
+    {
+      "file": "regional-blend.js",
+      "sha256": "7ef526cacff7cbe5ad84807cc01b71aa69271f352c334f47a5119b88783b14a4",
+      "matchesPublishedApk": true
+    },
+    {
+      "file": "gap-imagery.js",
+      "sha256": "d31d0d6081c17551ee2dd5430ef1ed6bc15fcf4e659c951da49a62d17bc5dd1b",
+      "matchesPublishedApk": true
+    },
+    {
+      "file": "native-residency.js",
+      "sha256": "78dc33934f477110c132ff8d9f3f110ecfc75252b086606110505657f720e940",
+      "matchesPublishedApk": true
+    }
+  ]
+}

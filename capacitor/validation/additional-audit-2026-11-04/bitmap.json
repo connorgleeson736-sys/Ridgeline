@@ -1,0 +1,102 @@
+{
+  "pairs": [
+    {
+      "premultiply": true,
+      "different": 0,
+      "bytes": {
+        "bitmap": false,
+        "premultiply": true,
+        "worker": {
+          "inputs": 2,
+          "encodes": 1,
+          "transfers": 0,
+          "copies": 0
+        },
+        "outputDecodes": 1,
+        "closedOutput": true,
+        "byteCacheItems": 1,
+        "failures": 0,
+        "mainThreadJobs": 0
+      },
+      "bitmap": {
+        "bitmap": true,
+        "premultiply": true,
+        "worker": {
+          "inputs": 2,
+          "encodes": 0,
+          "transfers": 1,
+          "copies": 0
+        },
+        "outputDecodes": 0,
+        "closedOutput": true,
+        "byteCacheItems": 0,
+        "failures": 0,
+        "mainThreadJobs": 0
+      }
+    },
+    {
+      "premultiply": false,
+      "different": 0,
+      "bytes": {
+        "bitmap": false,
+        "premultiply": false,
+        "worker": {
+          "inputs": 2,
+          "encodes": 1,
+          "transfers": 0,
+          "copies": 0
+        },
+        "outputDecodes": 1,
+        "closedOutput": true,
+        "byteCacheItems": 1,
+        "failures": 0,
+        "mainThreadJobs": 0
+      },
+      "bitmap": {
+        "bitmap": true,
+        "premultiply": false,
+        "worker": {
+          "inputs": 2,
+          "encodes": 1,
+          "transfers": 0,
+          "copies": 0
+        },
+        "outputDecodes": 1,
+        "closedOutput": true,
+        "byteCacheItems": 1,
+        "failures": 0,
+        "mainThreadJobs": 0
+      }
+    }
+  ],
+  "distinct": true,
+  "otherAlive": true,
+  "lateClosed": true,
+  "canceledWorkerClosed": true,
+  "bitmapContext": true,
+  "recovered": {
+    "bitmap": true,
+    "premultiply": true,
+    "outputDecodes": 2,
+    "closedOutput": true,
+    "byteCacheItems": 0,
+    "failures": 1,
+    "mainThreadJobs": 1
+  },
+  "recoveredDifferent": 0,
+  "lost": {
+    "bitmap": true,
+    "premultiply": true,
+    "worker": {
+      "inputs": 2,
+      "encodes": 0,
+      "transfers": 1,
+      "copies": 0
+    },
+    "outputDecodes": 0,
+    "closedOutput": true,
+    "byteCacheItems": 0,
+    "failures": 1,
+    "mainThreadJobs": 0
+  }
+}

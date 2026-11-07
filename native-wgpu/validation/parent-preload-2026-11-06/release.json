@@ -1,0 +1,32 @@
+{
+  "artifact": "Ridgeline-Native-Parent-Preload-0.1.20-Base.apk",
+  "bytes": 32736911,
+  "sha256": "b249e6a287260ae68e2cf98b9746224d252628dbe370c63cdadf88113233d7d9",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.20-parent-preload",
+  "versionCode": 21,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.19 Full Audit (same package and signer)",
+  "changes": [
+    "idle parent-tile preloading (2 and 3 levels up, one ring, 12 terrain + 12 imagery per batch), Advanced checkbox, default on",
+    "NZ Topo: loaded ideal tile drawn over resident finer tiles (render_sources_ideal_first) and fetched even when children are resident; camera zoom max 16",
+    "Map layers dismissed from Activity.dispatchTouchEvent on any outside touch-down",
+    "Capacitor-style saved route cards; smaller route stats and buttons; larger sheet close X"
+  ],
+  "tests": {
+    "kotlinJvm": "173 tests, 0 failures (incl. ParentPreloadTest)",
+    "rust": "cargo test --workspace: all pass (incl. ideal-first source test)",
+    "gpuVulkanLavapipe": "overlay_drape, progressive_multi, waypoint_occlusion pass"
+  },
+  "lintErrors": 0,
+  "originalAssetsIdentical": 623,
+  "jniExportsPerAbi": 43,
+  "loadAlignment": "0x4000",
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false,
+  "uiSeenOnDevice": false
+}

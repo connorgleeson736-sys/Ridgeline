@@ -1,0 +1,19 @@
+{
+  "engineSha256": "418e23a87cf64cbbd02a29a1edd77a8f43ced39184b32d032eec2613762bc5e9",
+  "exactExpectedEnginePatch": true,
+  "provenanceMatches": true,
+  "originalShadersUnmodified": true,
+  "patchIds": [
+    "RIDGE_DIRECT_SAMPLING_V1",
+    "RIDGE_TEXTURE_FILTERING_V1",
+    "RIDGE_TEXTURE_STATE_V1",
+    "RIDGE_ADAPTIVE_TERRAIN_V1",
+    "RIDGE_DESCENDANT_INDEX_V1",
+    "RIDGE_LOD_INVARIANTS_V1",
+    "RIDGE_TERRAIN_MATRICES_V1",
+    "RIDGE_DEM_PARENT_KEYS_V1",
+    "RIDGE_SCHEDULER_V2",
+    "RIDGE_LATENCY_AUDIT_V1",
+    "RIDGE_ADDITIONAL_LATENCY_V1"
+  ]
+}

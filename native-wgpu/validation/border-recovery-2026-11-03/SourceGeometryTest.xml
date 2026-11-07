@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="nz.ridgeline.nativeapp.SourceGeometryTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-03T05:18:43.464Z" hostname="ac7dde5028c2" time="1.37">
+  <properties/>
+  <testcase name="holesKeepOriginalImagery" classname="nz.ridgeline.nativeapp.SourceGeometryTest" time="0.009"/>
+  <testcase name="mountCookBorderSelectsTheActualSeam" classname="nz.ridgeline.nativeapp.SourceGeometryTest" time="0.255"/>
+  <testcase name="authoritativeGeographicSelectionAndMasks" classname="nz.ridgeline.nativeapp.SourceGeometryTest" time="1.104"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

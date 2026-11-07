@@ -1,0 +1,7 @@
+JUnit version 4.13.2
+...............ACTUAL_HTTP_CACHE: cached return 2.144303ms while 8 network transfers remain gated; identical bytes
+...................
+Time: 0.617
+
+OK (34 tests)
+

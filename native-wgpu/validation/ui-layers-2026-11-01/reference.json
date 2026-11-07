@@ -1,0 +1,16 @@
+{
+  "sourceCommit": "d880143418ac46ece98adff0b3b2fbaedf044d46",
+  "referenceBranch": "android-preview-download",
+  "version": "0.18.0-performance",
+  "baseApkSha256": "0c452e427e7d4fda13950ebae61be06d8f93c804ede644d0a8c496d72ab2fa14",
+  "styleSource": "public/topographic-overlays.js",
+  "boundarySource": "public/assets/imagery-boundary-v4/335bcd9378652dfa88919f3b.geojson",
+  "nativeBaseline": "91aaa7b",
+  "routeEditingReference": [
+    "public/route-interactions.js",
+    "capacitor/mobile/routes.js",
+    "capacitor/mobile/mobile.js",
+    "capacitor/mobile/bottom-sheet.js",
+    "public/elevation-chart.js"
+  ]
+}

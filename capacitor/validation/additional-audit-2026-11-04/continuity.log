@@ -1,0 +1,7 @@
+{
+  "zeroRttWarmRestoresOwner": true,
+  "measuredParentHeldForUnreadyChild": true,
+  "fineHandoff": true,
+  "metadataCountBound": 128,
+  "zeroRttAllocations": 0
+}

@@ -1,0 +1,90 @@
+{
+  "sourceCommit": "60520651aed447bd862b6e47b2ab8948875eb2e9",
+  "nativeBuildSourceCommit": "60520651aed447bd862b6e47b2ab8948875eb2e9",
+  "artifact": "Ridgeline-Native-Additional-Audit-0.1.12-Base.apk",
+  "bytes": 33192122,
+  "sha256": "085fff49995826f07da20d451c63a968c3afc15b8a4ce3390f7bf486f57f61ce",
+  "versionName": "0.1.12-latency-overlays",
+  "versionCode": 13,
+  "applicationId": "nz.ridgeline.nativeapp.performance",
+  "signerSha256": "03ef64214daee8c59cad6571ce5036579237d553c040837ce996f80efa898ae7",
+  "updatesPreviousNativePerformanceInPlace": true,
+  "originalAssetsByteIdenticalTo011": 621,
+  "additionalAssets": [
+    "assets/fonts/OpenSans.ttf",
+    "assets/licenses/OpenSans-OFL.txt"
+  ],
+  "noSessionCa": true,
+  "signatureV2Verified": true,
+  "zip16KiBAlignmentVerified": true,
+  "nativeLibraries": [
+    {
+      "path": "lib/arm64-v8a/libridgeline_renderer.so",
+      "bytes": 4716920,
+      "sha256": "203f53a3d757087cb8148e02712f7eb4d6478cb8a033955b0c80f2923bf98858",
+      "loadSegmentAlignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "profile": "release opt-level=3 thin-LTO, stripped",
+      "allNativeBridgeExportsVerified": 43,
+      "rebuiltForThisRelease": true
+    },
+    {
+      "path": "lib/armeabi-v7a/libridgeline_renderer.so",
+      "bytes": 3251752,
+      "sha256": "f6c673b1e3a19bdd51771c593ee148db7f1d379596ca4b2b176a815b2dee4aab",
+      "loadSegmentAlignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "profile": "release opt-level=3 thin-LTO, stripped",
+      "allNativeBridgeExportsVerified": 43,
+      "rebuiltForThisRelease": true
+    },
+    {
+      "path": "lib/x86_64/libridgeline_renderer.so",
+      "bytes": 5357192,
+      "sha256": "ac55e4fbd01eeb94bedc0f9293c4d98297d119c8fa93e0c6f8874ad35cff2562",
+      "loadSegmentAlignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "profile": "release opt-level=3 thin-LTO, stripped",
+      "allNativeBridgeExportsVerified": 43,
+      "rebuiltForThisRelease": true
+    }
+  ],
+  "targetedJVMChecksPassed": 4,
+  "rendererChecksPassed": 16,
+  "ignoredBenchmarks": 3,
+  "fullSuiteOrLintRun": false,
+  "physicalDeviceRun": false,
+  "phoneSpeedupMeasured": false,
+  "rustOrGpuCodeChanged": true,
+  "controlledResults": {
+    "backends": [
+      "Vulkan llvmpipe",
+      "GLES llvmpipe"
+    ],
+    "overlayFullHostUploadBytes": 20480000,
+    "overlayOnePatchHostUploadBytes": 640000,
+    "hostUploadReductionPercent": 96.875,
+    "overlayTwoPatchHostUploadBytes": 1280000,
+    "overlayTwoPatchDeviceCopyBytes": 20480000,
+    "orderedGpuReadbackByteIdentical": true,
+    "zeroBudgetAndCancellationChecked": true,
+    "routeExactCentreRgb": "#e87944",
+    "noRepeatedRouteGeometryUploadOnIdleOrPan": true
+  },
+  "limitations": [
+    "Synthetic host GPU checks, not handset latency.",
+    "Actual presentation timing requires supported Vulkan extension; unavailable on GLES.",
+    "Variable-length overlay changes use coherent bounded full replacement.",
+    "Overlay appearance aligned to Capacitor, not full MapLibre pixel parity."
+  ],
+  "report": "../../research/ADDITIONAL-AUDIT-2026-11-05.md"
+}

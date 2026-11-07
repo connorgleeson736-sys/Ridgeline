@@ -1,0 +1,36 @@
+{
+  "artifact": "Ridgeline-Native-Connection-Recovery-0.1.16-Base.apk",
+  "bytes": 32632718,
+  "sha256": "4a8135a2fc39931a99c4614e5a3f49e67ad10a4785e8816e301bd294bf5f81a3",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.16-connection-recovery",
+  "versionCode": 17,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.15 Full Audit (same package and signer)",
+  "rendererLibrariesIdenticalTo0115": true,
+  "providerFindings": {
+    "linz": "HTTP/2 via CloudFront; no Alt-Svc / HTTP/3; query parameter order does not affect CloudFront hits (25/30 vs 28/30); elevation only as terrain-RGB PNG (WebP 400); Mount Cook z13 elevation tile 150,045 bytes",
+    "esri": "services.arcgisonline.com and server.arcgisonline.com both HTTP/1.1, identical bytes"
+  },
+  "changes": [
+    "requests without response headers after 2.5 s are hedged on a separate connection pool; first answer wins",
+    "after a hedge wins, cache-free requests move to the proven pool (HTTP/2 dead-connection case)",
+    "Android default-network change: evict pooled connections, hedge stalled requests immediately, re-warm",
+    "LINZ and Esri connections warmed at start"
+  ],
+  "tests": {
+    "kotlinJvm": "159 tests, 0 failures (incl. 7 real-socket hedged transport tests, HTTP/1.1 and HTTP/2)",
+    "stallRecovery": "blackholed pooled connection: recovered in ~0.3 s with a 300 ms test hedge, versus the full read timeout without it",
+    "networkChange": "stalled request recovered 0.17 s after networkChanged()",
+    "http2DeadConnection": "new request served without its own hedge; fails (307 ms, extra hedge) without the proven-pool switch",
+    "testFix": "PipelineWaitTest escape-path assertion made deterministic (async publish since 0.1.8 cd9b82d)"
+  },
+  "lintErrors": 0,
+  "originalAssetsIdentical": 623,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

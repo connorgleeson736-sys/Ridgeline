@@ -4,7 +4,7 @@
 'use strict';
 const listeners=new Set(),ids=new Map(),epochs=new Map(),attemptEpochs=new Map();let serial=0,moving=false,generation=0;
 const sources=new Set(['linz','satellite','topo','terrain','terrain-fallback','shade-dem','terrain-rtt']);
-const stages=new Set(['native-image-queued','native-image-admitted','decode-start','decode-finished','request-queued','byte-hit','fetch-start','network-start','network-headers','network-body-ready','body-ready','request-error','transform-queued','transform-start','transform-finished','source-load-start','source-ready-upload-submitted','source-adopted','rtt-adopted','rtt-invalidated','rtt-repaint-submitted','rtt-draw-submitted']);
+const stages=new Set(['decode-queued','image-delivery-start','image-delivery-finished','native-image-queued','native-image-admitted','decode-start','decode-finished','request-queued','byte-hit','fetch-start','network-start','network-headers','network-body-ready','body-ready','request-error','transform-queued','transform-start','transform-finished','source-load-start','source-ready-upload-submitted','source-adopted','rtt-adopted','rtt-invalidated','rtt-repaint-submitted','rtt-draw-submitted']);
 function emit(stage,source,q,details={}){
  if(!listeners.size||!stages.has(stage)||!sources.has(source)||!q||![q.z,q.x,q.y].every(Number.isInteger))return;
  const key=source+'/'+q.z+'/'+q.x+'/'+q.y;let id=details.attempt||ids.get(key);

@@ -1,0 +1,581 @@
+{
+  "date": "2026-11-01",
+  "timezone": "Australia/Melbourne",
+  "auditedPublicationCommit": "8c06ca6",
+  "auditedApplicationSource": "b0d76de4d551ee5ae68a18ce02e9bc210196ca84",
+  "apk": "Ridgeline-Native-Surface-Focus-0.1.5-Base.apk",
+  "apkSha256": "8530a2bb0f871226621be3db06c55b49cac966174081723ba10e7f4dbdf82122",
+  "scope": "Application-wide source and literature performance audit; no new app implementation, test suite or physical-device timing. Route-planning algorithm optimization excluded.",
+  "findings": [
+    {
+      "id": "F00",
+      "priority": "P0",
+      "area": "Observability",
+      "title": "Correlate every visible tile through first draw",
+      "evidenceStatus": "Verified measurement gap",
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/TileLoader.kt",
+      "line": 362,
+      "sourceUrl": "https://github.com/connorgleeson736-sys/Ridgeline/blob/8c06ca6/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/TileLoader.kt#L362",
+      "nextAction": "Capture stage events, dependency IDs, retry reasons, upload outcome and presentation evidence."
+    },
+    {
+      "id": "F01",
+      "priority": "P0",
+      "area": "Loading",
+      "title": "Move raw imagery ZIP/asset I/O off decode workers",
+      "evidenceStatus": "Verified blocking call path; device cost unmeasured",
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/NativeImagery.kt",
+      "line": 50,
+      "sourceUrl": "https://github.com/connorgleeson736-sys/Ridgeline/blob/8c06ca6/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/NativeImagery.kt#L50",
+      "nextAction": "Use shared asynchronous local-source futures with cancellable provider access."
+    },
+    {
+      "id": "F02",
+      "priority": "P0",
+      "area": "GPU admission",
+      "title": "Keep retryable uploads pending until accepted",
+      "evidenceStatus": "Verified queue-removal behavior; failure occurrence unmeasured",
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/TerrainView.kt",
+      "line": 156,
+      "sourceUrl": "https://github.com/connorgleeson736-sys/Ridgeline/blob/8c06ca6/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/TerrainView.kt#L156",
+      "nextAction": "Return typed upload outcomes and retry capacity failures on a bounded wake."
+    },
+    {
+      "id": "F03",
+      "priority": "P1",
+      "area": "Recovery",
+      "title": "Replace generic retry/backoff with classified errors",
+      "evidenceStatus": "Verified 1/4/15 second policy",
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/TileLoader.kt",
+      "line": 201,
+      "sourceUrl": "https://github.com/connorgleeson736-sys/Ridgeline/blob/8c06ca6/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/TileLoader.kt#L201",
+      "nextAction": "Record provider/decode/storage errors; retry only transient failures with bounded metadata-aware timing."
+    },
+    {
+      "id": "F04",
+      "priority": "P1",
+      "area": "Selection",
+      "title": "Use versioned measured terrain extrema for covering",
+      "evidenceStatus": "Verified broad height bounds",
+      "file": "native-wgpu/renderer/src/selection.rs",
+      "line": 153,
+      "sourceUrl": "https://github.com/connorgleeson736-sys/Ridgeline/blob/8c06ca6/native-wgpu/renderer/src/selection.rs#L153",
+      "nextAction": "Use complete conservative known bounds; keep current broad bounds for unknown coverage."
+    },
+    {
+      "id": "F05",
+      "priority": "P1",
+      "area": "Scheduling",
+      "title": "Prioritize work by visible benefit and dependency cost",
+      "evidenceStatus": "Architecture proposal",
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/SourceDemand.kt",
+      "line": 27,
+      "sourceUrl": "https://github.com/connorgleeson736-sys/Ridgeline/blob/8c06ca6/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/SourceDemand.kt#L27",
+      "nextAction": "Maintain a tile/dependency DAG with relevance epochs and GPU-admission acknowledgement."
+    },
+    {
+      "id": "F06",
+      "priority": "P1",
+      "area": "Caching",
+      "title": "Allow a late valid prepared result to win",
+      "evidenceStatus": "Verified irreversible timeout miss",
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/DerivedReadGate.kt",
+      "line": 38,
+      "sourceUrl": "https://github.com/connorgleeson736-sys/Ridgeline/blob/8c06ca6/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/DerivedReadGate.kt#L38",
+      "nextAction": "Deadline starts fallback work; preserve late cache completion until a version-valid winner is chosen."
+    },
+    {
+      "id": "F07",
+      "priority": "P1",
+      "area": "Storage",
+      "title": "Remove saved-reader monitor contention and memoize misses",
+      "evidenceStatus": "Verified common monitor",
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/OfflineStore.kt",
+      "line": 15,
+      "sourceUrl": "https://github.com/connorgleeson736-sys/Ridgeline/blob/8c06ca6/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/OfflineStore.kt#L15",
+      "nextAction": "Use initialized volatile fast path, WAL readers, bounded epoch-invalidated misses and batched writes."
+    },
+    {
+      "id": "F08",
+      "priority": "P0",
+      "area": "Coverage",
+      "title": "Establish actual Base/Full and attachment parity",
+      "evidenceStatus": "Artifact fact; phone attachment state unknown",
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/OfflineUi.kt",
+      "line": 98,
+      "sourceUrl": "https://github.com/connorgleeson736-sys/Ridgeline/blob/8c06ca6/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/OfflineUi.kt#L98",
+      "nextAction": "Compare same packs/regions; expose actionable coverage and reattachment state."
+    },
+    {
+      "id": "F09",
+      "priority": "P1",
+      "area": "Memory",
+      "title": "Budget active work and actual page allocations",
+      "evidenceStatus": "Verified split accounting; device pressure unmeasured",
+      "file": "native-wgpu/renderer/src/residency.rs",
+      "line": 7,
+      "sourceUrl": "https://github.com/connorgleeson736-sys/Ridgeline/blob/8c06ca6/native-wgpu/renderer/src/residency.rs#L7",
+      "nextAction": "Retain existing GPU byte budgeting; add unique active-payload/page accounting and upstream backpressure."
+    },
+    {
+      "id": "F10",
+      "priority": "P1",
+      "area": "GPU throughput",
+      "title": "Batch GPU mip/upload submissions and evaluate staging reuse",
+      "evidenceStatus": "Verified submit sites; benefit unmeasured",
+      "file": "native-wgpu/renderer/src/mipmaps.rs",
+      "line": 412,
+      "sourceUrl": "https://github.com/connorgleeson736-sys/Ridgeline/blob/8c06ca6/native-wgpu/renderer/src/mipmaps.rs#L412",
+      "nextAction": "Encode bounded image mip jobs together; benchmark imagery staging rings with fence-safe reuse."
+    },
+    {
+      "id": "F11",
+      "priority": "P1",
+      "area": "Cache policy",
+      "title": "Measure and coordinate escape-cache persistence",
+      "evidenceStatus": "Verified 16MiB-or-smaller tier",
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/TileLoader.kt",
+      "line": 46,
+      "sourceUrl": "https://github.com/connorgleeson736-sys/Ridgeline/blob/8c06ca6/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/TileLoader.kt#L46",
+      "nextAction": "Track route reasons, writes/drops, hits and evictions before reallocating the total cache allowance."
+    },
+    {
+      "id": "F12",
+      "priority": "P1",
+      "area": "Offline downloads",
+      "title": "Use raw dependency planning and batched durable commits",
+      "evidenceStatus": "Verified decode/composition discarded",
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/TileLoader.kt",
+      "line": 545,
+      "sourceUrl": "https://github.com/connorgleeson736-sys/Ridgeline/blob/8c06ca6/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/TileLoader.kt#L545",
+      "nextAction": "Plan exact source resources, validate DEM fallback needs and commit bounded resumable batches."
+    },
+    {
+      "id": "F13",
+      "priority": "P1",
+      "area": "Startup",
+      "title": "Bound startup validation waits and evaluate pipeline caching",
+      "evidenceStatus": "Verified indefinite diagnostic waits; device cost unmeasured",
+      "file": "native-wgpu/renderer/src/diagnostics.rs",
+      "line": 85,
+      "sourceUrl": "https://github.com/connorgleeson736-sys/Ridgeline/blob/8c06ca6/native-wgpu/renderer/src/diagnostics.rs#L85",
+      "nextAction": "Bound supported validation waits and preserve checks; separately evaluate supported Vulkan pipeline caches."
+    },
+    {
+      "id": "F14",
+      "priority": "P2",
+      "area": "Metadata",
+      "title": "Pre-index static catalogs and avoid cold JSON parse barriers",
+      "evidenceStatus": "Verified 2,034,357 JSON bytes",
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/NativeImagery.kt",
+      "line": 28,
+      "sourceUrl": "https://github.com/connorgleeson736-sys/Ridgeline/blob/8c06ca6/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/NativeImagery.kt#L28",
+      "nextAction": "Build compact checked read-only indexes while preserving original source assets and mask behavior."
+    },
+    {
+      "id": "F15",
+      "priority": "P2",
+      "area": "CPU rendering",
+      "title": "Cache or reuse frame index/rectangle scratch",
+      "evidenceStatus": "Verified per-frame allocations",
+      "file": "native-wgpu/renderer/src/lib.rs",
+      "line": 1496,
+      "sourceUrl": "https://github.com/connorgleeson736-sys/Ridgeline/blob/8c06ca6/native-wgpu/renderer/src/lib.rs#L1496",
+      "nextAction": "Key reusable topology by cover, seam and adaptive-step revisions; preserve exact order and indices."
+    },
+    {
+      "id": "F16",
+      "priority": "P1",
+      "area": "Lifecycle",
+      "title": "Bound surface-stop acknowledgement separately from cleanup",
+      "evidenceStatus": "Verified up-to-five-second UI wait",
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/TerrainView.kt",
+      "line": 290,
+      "sourceUrl": "https://github.com/connorgleeson736-sys/Ridgeline/blob/8c06ca6/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/TerrainView.kt#L290",
+      "nextAction": "Ensure render owner stops touching the Surface before callback returns; defer safe non-surface destruction."
+    },
+    {
+      "id": "F17",
+      "priority": "P2",
+      "area": "Pacing",
+      "title": "Measure real display deadlines and compositor latency",
+      "evidenceStatus": "Verified fixed 60Hz allowance",
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/UploadAdmission.kt",
+      "line": 8,
+      "sourceUrl": "https://github.com/connorgleeson736-sys/Ridgeline/blob/8c06ca6/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/UploadAdmission.kt#L8",
+      "nextAction": "Use refresh/deadline data and supported present signals; evaluate latency settings without double-pacing."
+    },
+    {
+      "id": "F18",
+      "priority": "P2",
+      "area": "Build/runtime",
+      "title": "Evaluate optimized nondebuggable ART profile and Rust PGO",
+      "evidenceStatus": "Candidate; Rust already optimized",
+      "file": "native-wgpu/android/app/build.gradle.kts",
+      "line": 12,
+      "sourceUrl": "https://github.com/connorgleeson736-sys/Ridgeline/blob/8c06ca6/native-wgpu/android/app/build.gradle.kts#L12",
+      "nextAction": "Separate startup/ART and Rust CPU measurements; retain installed-app signing/package continuity."
+    },
+    {
+      "id": "F19",
+      "priority": "P2",
+      "area": "Decode",
+      "title": "Reduce proven-safe pixel copies and conversions",
+      "evidenceStatus": "Verified multiple CPU representations",
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/PixelPacking.kt",
+      "line": 8,
+      "sourceUrl": "https://github.com/connorgleeson736-sys/Ridgeline/blob/8c06ca6/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/PixelPacking.kt#L8",
+      "nextAction": "Evaluate opaque-only/native pixel access with exact alpha, channel order, stride and color checks."
+    },
+    {
+      "id": "F20",
+      "priority": "P1",
+      "area": "Cache correctness",
+      "title": "Carry freshness/version through ready buffers and resident GPU tiles",
+      "evidenceStatus": "Verified retention lacks explicit ready-buffer version",
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/TileLoader.kt",
+      "line": 106,
+      "sourceUrl": "https://github.com/connorgleeson736-sys/Ridgeline/blob/8c06ca6/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/TileLoader.kt#L106",
+      "nextAction": "Use immutable payload/version ownership so improved reuse does not display superseded data forever."
+    },
+    {
+      "id": "F21",
+      "priority": "P2",
+      "area": "CPU scheduling",
+      "title": "Separate background OS priority and thermal policy",
+      "evidenceStatus": "Verified default-priority work pools",
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/TileLoader.kt",
+      "line": 74,
+      "sourceUrl": "https://github.com/connorgleeson736-sys/Ridgeline/blob/8c06ca6/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/TileLoader.kt#L74",
+      "nextAction": "Defer speculation/download preparation under pressure; capability-gate thermal and performance hints."
+    },
+    {
+      "id": "F22",
+      "priority": "P1",
+      "area": "Networking",
+      "title": "Record byte progress and set appropriate whole-operation deadlines",
+      "evidenceStatus": "Verified no configured total call timeout",
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/TileLoader.kt",
+      "line": 55,
+      "sourceUrl": "https://github.com/connorgleeson736-sys/Ridgeline/blob/8c06ca6/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/TileLoader.kt#L55",
+      "nextAction": "Distinguish DNS/connect/headers/body and read inactivity from total duration before choosing deadlines or HTTP/3."
+    }
+  ],
+  "sourceInventory": [
+    {
+      "file": "native-wgpu/android/app/src/main/AndroidManifest.xml",
+      "sha256": "6b368a756b3428069860233cfed3f81ce569c517ee9b3d14b57eaf13ebff00f2",
+      "bytes": 856
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/AutomaticCacheBudget.kt",
+      "sha256": "d5fce1673510af32221c71eaa4cabaf9f4977ca718d6f3cedf055f9e152f303d",
+      "bytes": 304
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/CachedFallback.kt",
+      "sha256": "80cdbde7b7e41aeaa44bc6c6901aee1cc82f36efa8e3689795bf511c81b724c5",
+      "bytes": 444
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/CameraMath.kt",
+      "sha256": "c05010fea482840c13341195bae97631c514140846bf558202de87e009626adb",
+      "bytes": 5079
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/DemSampling.kt",
+      "sha256": "f124e75180fd5cfc3b51e6a87593483bb42c49b210e4c9ea3a54b51faa487fde",
+      "bytes": 5468
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/DemandPlanCache.kt",
+      "sha256": "b13bacacf7450730add3f213d27a1c2cdbe0bc0a7ad8774315c3d3eb8bfa896b",
+      "bytes": 644
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/DerivedReadGate.kt",
+      "sha256": "0bccde01e2b576616ccced7101369800444169658f29fd7af1154b2a4cff6273",
+      "bytes": 2817
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/DetailPolicy.kt",
+      "sha256": "2c7ee9f7559069f4798568fddfd83962398b0c40952897d7e3e6c67423dbf157",
+      "bytes": 522
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/ElevationProfileView.kt",
+      "sha256": "063e759e45b0ebcf38b460455cb0a5ba0a1bb3339e615e49541673ebe933ff99",
+      "bytes": 2547
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/GeometryInputPipeline.kt",
+      "sha256": "51ba242911b754e2a27b2e72f0778b64bbea042cbfba95f8d5dbf70b38e3ef78",
+      "bytes": 1350
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/GestureMotion.kt",
+      "sha256": "4f5b09c7abbab94036854832a9f59783534c4d5ef7f0874b72b2f3fdba8f9b06",
+      "bytes": 4309
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/GpuUploadQueue.kt",
+      "sha256": "4fece903222124973485f107462fc14278e704fb061f456471e0b2b97e7e8dfb",
+      "bytes": 5199
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/GpxCodec.kt",
+      "sha256": "8d880b846459e6004625b06ad91d7868319adb5dae7df0e70146ef366e91fdf3",
+      "bytes": 4330
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/HedgedBodyCache.kt",
+      "sha256": "571a0b87c762787f738283003f2a171018b3c419cd99fc6ba30fa1376b660d0f",
+      "bytes": 2615
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/HttpFreshness.kt",
+      "sha256": "3ba74c2391731b0c85b93d777496bd487d014a5c21913a22bf24032ccfdc9266",
+      "bytes": 1226
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/HttpTileBackend.kt",
+      "sha256": "2fd352cf248faf300e0f61779f516fdca53ce5070e4fbc3cb72e7a6ee65740f7",
+      "bytes": 4368
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/LocationUi.kt",
+      "sha256": "132c3f9f958e0816f377edbc39cb23cbc498a858e7ef3c1345985d76de3f99a3",
+      "bytes": 3359
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/MainActivity.kt",
+      "sha256": "343bca30d05d4592deaf1ae9820913a9109b76bf232a4695aa1e930c1185d567",
+      "bytes": 5317
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/NativeBridge.kt",
+      "sha256": "ede917a0f7f06eac88dd712903a40895040d5eb769c557a2fcc20e833a91d9e3",
+      "bytes": 2206
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/NativeImagery.kt",
+      "sha256": "3f28db999004113632054d4f83a9546cc3677c8b624b61d25b6cd33cee1932a6",
+      "bytes": 11766
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/OfflineStore.kt",
+      "sha256": "51f12194361e59e7c9b0149215b07b97435acc33e21952ef4b35e8bff6454276",
+      "bytes": 3798
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/OfflineUi.kt",
+      "sha256": "fec170172eba7993650e1a36468230f985c4437c4e2118d9c97319b99d7d46fc",
+      "bytes": 13364
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/OverviewAttachments.kt",
+      "sha256": "64e2510b73103a8bd4368f770f8dc4709fb3640c72d3d76d484d2d1cccd7b2e6",
+      "bytes": 6027
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/PixelPacking.kt",
+      "sha256": "cf93763256e300e044d152f16750b1ffd4577f7692a6247a8ee9456b3037bc4a",
+      "bytes": 977
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/PlanCadence.kt",
+      "sha256": "9b3915f250423b2f856ad64fb7b7400cfeab02a00f37ae1f4ab114a2bf8b4c09",
+      "bytes": 349
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/PlannerUi.kt",
+      "sha256": "c3f41063af79ce01654753dc0ea0677e1cfd53aa1b2132eb36105aa64f26fb15",
+      "bytes": 13810
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/PreparationControl.kt",
+      "sha256": "3b236b5005c40de7611a50c61a7aeaaa6c1aa70d58334df7b45e6d29466ee440",
+      "bytes": 478
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/PreparedTerrainCache.kt",
+      "sha256": "2fc854181007c35e19f3b507aacb0f812a047d9a336f9b1c3e11836d22052be1",
+      "bytes": 4626
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/RamCacheBudget.kt",
+      "sha256": "8c91ad5853a454228ee018215c1d30a7610f3f12b9ef2021b6333b3f8779e005",
+      "bytes": 577
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/ResidentCoverage.kt",
+      "sha256": "00e5e156271feceb21497eeb29b2d249656304dfa20561e7d508114227fd752f",
+      "bytes": 1397
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/RouteController.kt",
+      "sha256": "675e9d43408839b7a3fa1eac1ea427d9f00eb36d22ca36e214e5e3864cd802c1",
+      "bytes": 9302
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/RouteDatabase.kt",
+      "sha256": "afd78636ca00851677adad1e2a304427406e179e5dea59a74dcd5f845bd3bcb6",
+      "bytes": 4991
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/RouteDomain.kt",
+      "sha256": "2d6f1f8853501970386a0bf9bfe3b7887258c74a1d4af1d8592b65c298d4ec12",
+      "bytes": 7069
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/SharedDecode.kt",
+      "sha256": "9eabe1ed7c2c4a0817a1a5090cf698b69d5cca2c77f3ae4929b4c53d1ac38e37",
+      "bytes": 1963
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/SourceDemand.kt",
+      "sha256": "80535d6313fe0e4ca56882618e85bfeb73a240ecef3bf4ccc8ec29cdf899a68e",
+      "bytes": 2774
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/SourceGeometry.kt",
+      "sha256": "9c410b99ba0e35d32971db5b8b4ef50d9a7f52212bcba81d5e3b2c6c6bda1668",
+      "bytes": 2860
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/SurfaceFocus.kt",
+      "sha256": "f5fd0401d478008704746cd7bc13f27540d45e77b7c78e1c2c87fc89f03bc77c",
+      "bytes": 4312
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/TerrainView.kt",
+      "sha256": "5f06d74f3f6ee8bd04f2c64eaa943a333af0646238adb749351a74d10280df96",
+      "bytes": 33671
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/TileLoader.kt",
+      "sha256": "222240f9ebaac9bee3fb6d054133caa49ae3fd3c0c1e7344300844aef7c972f5",
+      "bytes": 42726
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/TileTransport.kt",
+      "sha256": "d687c0a6b5a3cdfbe6164e6ac370044affaae51c7db005e4244ed48a74c32df6",
+      "bytes": 20757
+    },
+    {
+      "file": "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/UploadAdmission.kt",
+      "sha256": "4cb5beb750ac40f1c57af698cc32899f1c999b7c5cdf7db827da977d6a060fe8",
+      "bytes": 945
+    },
+    {
+      "file": "native-wgpu/renderer/src/adaptive.rs",
+      "sha256": "79b9ae2e75819e38641a5307b69c727a6d4dc83ee312946026a76857839fe3fd",
+      "bytes": 4220
+    },
+    {
+      "file": "native-wgpu/renderer/src/android.rs",
+      "sha256": "be0cd11acf12034811e3502a7b701edbcca682c11a5848e738edecdaebbaaaae",
+      "bytes": 37873
+    },
+    {
+      "file": "native-wgpu/renderer/src/camera_safety.rs",
+      "sha256": "1aaa944ae38ca77f80612eeb2894f43a615c1757226b9297278fd877e5162909",
+      "bytes": 2403
+    },
+    {
+      "file": "native-wgpu/renderer/src/cover_plans.rs",
+      "sha256": "82f36ca425700f19901a2bf4426f27f516b103d4dceaa0d0860dd9d41df9a855",
+      "bytes": 1120
+    },
+    {
+      "file": "native-wgpu/renderer/src/diagnostics.rs",
+      "sha256": "a66bd9bc33943bc38a34f2f72ca614d5b311a49f1b9cd895ff9a8e0ec6375c10",
+      "bytes": 10277
+    },
+    {
+      "file": "native-wgpu/renderer/src/index_atlas.rs",
+      "sha256": "4acd32e1637c674df352548d700c27361dca76b6fc775e51694bc11de4744377",
+      "bytes": 6072
+    },
+    {
+      "file": "native-wgpu/renderer/src/lib.rs",
+      "sha256": "1057fc501b25029a3817da6e674246e615896722e1813cdd87d81a869f053985",
+      "bytes": 68634
+    },
+    {
+      "file": "native-wgpu/renderer/src/mipmaps.rs",
+      "sha256": "072a0328511abe9ad1eff286e60546c57216e9631dd140d8d2b074a524e5faa2",
+      "bytes": 21910
+    },
+    {
+      "file": "native-wgpu/renderer/src/residency.rs",
+      "sha256": "07173587ddac9c3e656dd879e8b9e9c8c1aa4de0ed4e27dacc7ee68d64befb27",
+      "bytes": 3750
+    },
+    {
+      "file": "native-wgpu/renderer/src/routes.rs",
+      "sha256": "dfff1e6ab5a320d9569055b8e476f51cfe4e75c71880a0751ecdbee5b4f355f1",
+      "bytes": 10621
+    },
+    {
+      "file": "native-wgpu/renderer/src/routes.wgsl",
+      "sha256": "7fabfecd817f85a85a3ff32fa7edf4b066a746dbcd9b4489224d311ae6997fab",
+      "bytes": 1464
+    },
+    {
+      "file": "native-wgpu/renderer/src/seams.rs",
+      "sha256": "9278bf8b7195acf4b63a2a7aeeaf4f805a27dbc9dbb089cd34c90eff75e6dc83",
+      "bytes": 12536
+    },
+    {
+      "file": "native-wgpu/renderer/src/selection.rs",
+      "sha256": "a2c28ef52a57274c58e86b5411c14594f937bd40f2cf42d14f94f3072f0472ff",
+      "bytes": 18470
+    },
+    {
+      "file": "native-wgpu/renderer/src/terrain.wgsl",
+      "sha256": "1611f29103bdce5dfb4f9ac58b1a4af40cbc920dff988775a5d25b690dbbb4dc",
+      "bytes": 1990
+    },
+    {
+      "file": "native-wgpu/renderer/src/texture_arrays.rs",
+      "sha256": "bd6fe2b8ff5d26932fa4c43ce29e7bb57560a8f43cab0720464d91fd2544e70f",
+      "bytes": 4964
+    },
+    {
+      "file": "native-wgpu/core/src/adaptive.rs",
+      "sha256": "f2139c5e5cb74cfc8dd83efd5079a44de309898ac1beeb7557bfcb3c82f8540d",
+      "bytes": 7698
+    },
+    {
+      "file": "native-wgpu/core/src/heightfield.rs",
+      "sha256": "5929f684d4203d3ff47c5672d4450759bbb6d42bce7a237cbca661a8dc2cfd29",
+      "bytes": 13571
+    },
+    {
+      "file": "native-wgpu/core/src/lib.rs",
+      "sha256": "253afccd7f859d1be5f90f65adbb6f93c137eb4c0cf8859e213d39452ac9e8ad",
+      "bytes": 13927
+    },
+    {
+      "file": "native-wgpu/core/src/mipmap.rs",
+      "sha256": "4800796cf663a53563b299b8221764f3e4ed9be9cd9c6d21e29598e876f23c31",
+      "bytes": 5249
+    },
+    {
+      "file": "native-wgpu/core/src/source_selection_reference.rs",
+      "sha256": "b0607b4c39d4aa821fd44f1694b9db00fd19a4132d2d2cbdae6d64e643b58c02",
+      "bytes": 3703
+    },
+    {
+      "file": "native-wgpu/core/src/source_selection_tests.rs",
+      "sha256": "4338a03f53f95a1ba44d483e1f6a8e69e90e7616135e149286405b9f27d4da56",
+      "bytes": 4929
+    },
+    {
+      "file": "native-wgpu/core/src/surface.rs",
+      "sha256": "0acd09e0621d46a72487621cb268c3313cef71e2fb512f6e1092b2c10649f894",
+      "bytes": 18362
+    }
+  ]
+}

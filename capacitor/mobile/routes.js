@@ -26,7 +26,7 @@ export function attachRoutes(api,{button,el,showError}){
   if(!passive.length&&!map.getSource('other-routes')){overlayStamp=stamp;return;}
   if(map.getSource('other-routes')&&stamp===overlayStamp)return;
   const data={type:'FeatureCollection',features:passive.map(r=>({type:'Feature',properties:{},geometry:{type:'LineString',coordinates:r.points}}))};
-  if(!map.getSource('other-routes')){map.addSource('other-routes',{type:'geojson',data});map.addLayer({id:'other-routes-line',type:'line',source:'other-routes',paint:{'line-color':'#518999','line-width':3,'line-opacity':.9},layout:{visibility:passive.length?'visible':'none','line-cap':'round','line-join':'round'}});}else map.getSource('other-routes').setData(data);
+  if(!map.getSource('other-routes')){map.addSource('other-routes',{type:'geojson',data});map.addLayer({id:'other-routes-line',type:'line',source:'other-routes',paint:{'line-color':'#518999','line-width':3,'line-opacity':.9},layout:{visibility:passive.length?'visible':'none','line-cap':'round','line-join':'round'}},map.getLayer('route-halo')?'route-halo':map.getLayer('route-line')?'route-line':map.getStyle().layers.find(l=>l.type==='symbol'||l.type==='circle')?.id);}else map.getSource('other-routes').setData(data);
   map.setLayoutProperty('other-routes-line','visibility',passive.length?'visible':'none');
   overlayStamp=stamp;
  }

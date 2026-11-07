@@ -1,0 +1,2 @@
+zipalign -c -P 16 -v 4 Ridgeline-Capacitor-Additional-Audit-0.20.0-Base.apk
+Verification succesful

@@ -86,3 +86,9 @@ data={'version':'gap-v4','z':13,'entries':entries,'coarse':coarse,'targets':old[
 report=json.loads((WORK/'verification.json').read_text());report['maskTiles']=len(entries);report['boundary']={'url':'/assets/imagery-boundary-v4/'+name,'bytes':len(bdata),'labelPairs':len(pairs),'nativeLineLabels':True,'layers':2};report['coarseOverlayTiles']=len(coarse)
 (ROOT/'OFFICIAL_IMAGERY_VALIDATION.json').write_text(json.dumps(report,indent=2)+'\n')
 print(json.dumps({'done':True,'maskTiles':len(entries),'coarseTiles':len(coarse),'boundaryBytes':len(bdata)}),flush=True)
+
+# Nominal capture polygons can contain fine-covered slivers and tiny holes.
+# Build the display overlay from the measured, alpha-vetoed masks just emitted.
+import subprocess,sys
+subprocess.run([sys.executable,str(ROOT/'scripts/imagery/build-measured-border.py'),
+ '--report',str(W/'display-border-validation.json'),'--verify'],check=True)

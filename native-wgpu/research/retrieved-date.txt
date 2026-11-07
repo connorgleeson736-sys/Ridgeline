@@ -1,0 +1,1 @@
+2026-10-29 UTC / Australia Melbourne. Official upstream master snapshots plus crates index. Master is research, not a release pin.

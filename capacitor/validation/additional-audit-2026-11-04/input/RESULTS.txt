@@ -1,0 +1,93 @@
+$ check-empty-overlay.cjs
+{
+  "mode": "shipped",
+  "first": {
+    "allocations": 24,
+    "mips": 24,
+    "directDraws": 24,
+    "actualRouteDraws": 0
+  },
+  "afterLineArrival": {
+    "allocations": 25,
+    "mips": 25,
+    "actualRouteDraws": 1
+  },
+  "retainedExistingOverlayWhenCoordinatesMissing": true,
+  "removedConfirmedEmptyOverlay": true,
+  "textureBytesPerPatch": 5600600
+}
+
+$ check-empty-overlay.cjs --candidate
+{
+  "mode": "candidate",
+  "first": {
+    "allocations": 0,
+    "mips": 0,
+    "directDraws": 24,
+    "actualRouteDraws": 0
+  },
+  "afterLineArrival": {
+    "allocations": 1,
+    "mips": 1,
+    "actualRouteDraws": 1
+  },
+  "retainedExistingOverlayWhenCoordinatesMissing": true,
+  "removedConfirmedEmptyOverlay": true,
+  "textureBytesPerPatch": 5600600
+}
+
+$ check-touch-events.mjs
+{
+  "events": 120,
+  "baseline": {
+    "unprojects": 240,
+    "terrainSamples": 10588,
+    "ms": 11.792119000000014
+  },
+  "guarded": {
+    "unprojects": 0,
+    "terrainSamples": 0,
+    "ms": 0.022141999999973905
+  },
+  "medianHostMsPerEvent": 0.01942125833333345,
+  "listenersAndParentPreserved": true
+}
+
+$ check-tile-lifecycle.mjs
+{
+  "ordinaryTileCompletionHasContentTag": false,
+  "selectionUpdatesPer60Frames": {
+    "ordinary": 10,
+    "explicitContent": 60
+  },
+  "parentCrop": {
+    "state": "loaded",
+    "transfers": 1,
+    "uploads": 1,
+    "expiryCalls": 0,
+    "compressedCacheEntries": 0,
+    "retryRecords": 0,
+    "retries": 0
+  }
+}
+
+$ check-composite-stages.mjs
+{
+  "baseline": {
+    "inputDecodes": 2,
+    "pngEncodes": 1,
+    "arrayBufferReads": 1,
+    "outputDecodes": 1,
+    "bitmapTransfers": 0,
+    "closedInputs": 2
+  },
+  "bitmapCandidate": {
+    "inputDecodes": 2,
+    "pngEncodes": 0,
+    "arrayBufferReads": 0,
+    "outputDecodes": 0,
+    "bitmapTransfers": 1,
+    "closedInputs": 2
+  },
+  "note": "Mock Canvas and image decoding, actual compositor control flow and pinned image queue. No pixel or time benchmark; protocol/cache integration remains to implement."
+}

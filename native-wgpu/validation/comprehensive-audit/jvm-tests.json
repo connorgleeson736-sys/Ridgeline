@@ -1,0 +1,132 @@
+{
+  "suites": [
+    {
+      "name": "nz.ridgeline.nativeapp.CameraMathTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "nz.ridgeline.nativeapp.AutomaticCacheBudgetTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "nz.ridgeline.nativeapp.TileTransportTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "nz.ridgeline.nativeapp.PreparedTerrainCacheTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "nz.ridgeline.nativeapp.DemSamplingTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "nz.ridgeline.nativeapp.RouteDomainTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "nz.ridgeline.nativeapp.GpxCodecTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "nz.ridgeline.nativeapp.PixelPackingTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "nz.ridgeline.nativeapp.SourceDemandTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "nz.ridgeline.nativeapp.SourceGeometryTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "nz.ridgeline.nativeapp.RouteControllerTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "nz.ridgeline.nativeapp.GestureMotionTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "nz.ridgeline.nativeapp.DemandPlanCacheTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "nz.ridgeline.nativeapp.ResidentCoverageTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "nz.ridgeline.nativeapp.PipelineBenchmarkTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "2"
+    },
+    {
+      "name": "nz.ridgeline.nativeapp.GpuUploadQueueTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "nz.ridgeline.nativeapp.RouteBlobTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "nz.ridgeline.nativeapp.UploadAdmissionTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ],
+  "tests": 58,
+  "failures": 0
+}

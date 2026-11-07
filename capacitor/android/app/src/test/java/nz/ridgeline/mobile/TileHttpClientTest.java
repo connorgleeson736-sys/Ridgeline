@@ -356,4 +356,51 @@ public class TileHttpClientTest {
     assertArrayEquals(bytes, load("/invalid").data());
     assertEquals(2, requests.get());
   }
+
+  @Test
+  public void interruptedBodyIsNotCachedAndSkipsTheCacheJournalScan() throws Exception {
+    handler =
+        e ->
+            reply(200, "max-age=600", new byte[4096])
+                .setSocketPolicy(okhttp3.mockwebserver.SocketPolicy.DISCONNECT_DURING_RESPONSE_BODY);
+    assertThrows(IOException.class, () -> load("/interrupted"));
+    assertEquals(0L, (long) http.stats().get("httpCacheEvictionScans"));
+    handler = e -> reply(200, "max-age=60", bytes);
+    assertArrayEquals(bytes, load("/interrupted").data());
+    assertEquals(2, requests.get());
+  }
+
+  @Test
+  public void invalidCompleteBodyIsStillEvicted() throws Exception {
+    handler = e -> reply(200, "max-age=600", bytes).setHeader("Content-Type", "text/html");
+    assertThrows(IOException.class, () -> load("/evicted"));
+    assertEquals(1L, (long) http.stats().get("httpCacheEvictionScans"));
+    handler = e -> reply(200, "max-age=60", bytes);
+    assertArrayEquals(bytes, load("/evicted").data());
+    assertEquals(2, requests.get());
+  }
+
+  @Test
+  public void warmUpOpensAPooledConnectionReusedByTheFirstTile() throws Exception {
+    handler =
+        e ->
+            "HEAD".equals(e.getMethod())
+                ? new MockResponse().setResponseCode(404)
+                : reply(200, "max-age=60", bytes);
+    http.warm(url("/"));
+    RecordedRequest head = server.takeRequest(5, TimeUnit.SECONDS);
+    assertNotNull(head);
+    assertEquals("HEAD", head.getMethod());
+    for (int i = 0; i < 100 && http.stats().get("warmedConnections") == 0L; i++) Thread.sleep(20);
+    assertEquals(1L, (long) http.stats().get("warmedConnections"));
+    assertArrayEquals(bytes, load("/first").data());
+    RecordedRequest first = server.takeRequest(5, TimeUnit.SECONDS);
+    assertEquals("GET", first.getMethod());
+    // Sequence numbers count requests on one connection: no new TCP/TLS setup.
+    assertEquals(1, first.getSequenceNumber());
+    // The HEAD probe is never stored; only the tile occupies the disk cache.
+    List<String> stored = new ArrayList<>();
+    for (var it = cache.urls(); it.hasNext(); ) stored.add(it.next());
+    assertEquals(List.of(url("/first")), stored);
+  }
 }

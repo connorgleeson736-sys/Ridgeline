@@ -1,0 +1,15 @@
+
+> ridgeline-capacitor@0.20.1 sync
+> npm run build && cap sync android
+
+
+> ridgeline-capacitor@0.20.1 build
+> node scripts/build-web.mjs
+
+Packaged website Direct 3D renderer and mobile controls.
+✔ Copying web assets from www to android/app/src/main/assets/public in 11.29s
+✔ Creating capacitor.config.json in android/app/src/main/assets in 2.02ms
+✔ copy android in 11.82s
+✔ Updating Android plugins in 896.17μs
+✔ update android in 231.03ms
+[info] Sync finished in 12.105s

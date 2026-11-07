@@ -1,0 +1,2 @@
+Cook survey accepted: true
+Accepted catalogue surveys: 46/46

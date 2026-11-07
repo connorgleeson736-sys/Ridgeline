@@ -1,0 +1,36 @@
+{
+  "sourceCheckpoint": "f104946d1627a01ab3a8248ce58301bbfbb13395",
+  "bytes": 31916688,
+  "sha256": "a1a21c2dfd36ec7bc35262f9f2d903235478b25502ab1a6d43c4b295a68e4f3d",
+  "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86_64"
+  ],
+  "largeOverviewPacks": 0,
+  "managedSessionCa": false,
+  "signatureVerified": true,
+  "alignment16KiBVerified": true,
+  "terrainSkirts": "selective",
+  "syntheticGapPixelsClosed": {
+    "vulkan": 36092,
+    "gles": 36093,
+    "glesArrays": 36093
+  },
+  "focusedDemJvmTests": 7,
+  "rustCoreRendererCliTests": [
+    26,
+    4,
+    1
+  ],
+  "phoneTested": false,
+  "seamProtection": {
+    "terrainSkirts": "selective, cached continuity proof",
+    "depth": "MapLibre mean Earth circumference / 2^logicalZoom / 5",
+    "neighbourDem": "actual shared halo samples at pixel centres, immutable full source heights",
+    "missingTiles": "resident parent and complete finer child coverage",
+    "imagery": "exact UV mapping, explicit ClampToEdge, all nine trilinear mip levels and anisotropy",
+    "surfaceDetailReduced": false,
+    "extraGlobalGridBytes": 133128
+  }
+}

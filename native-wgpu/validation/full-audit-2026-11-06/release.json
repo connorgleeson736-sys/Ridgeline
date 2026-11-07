@@ -1,0 +1,43 @@
+{
+  "artifact": "Ridgeline-Native-Full-Audit-0.1.13-Base.apk",
+  "bytes": 32612014,
+  "sha256": "b4cacab9688e1826bca82780e92842aacac091443233b94eaf6edcb1a4a1cc85",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.13-full-audit",
+  "versionCode": 14,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "newSigningKey": true,
+  "installsAlongside": "nz.ridgeline.nativeapp.performance (0.1.12) and every other Ridgeline app; does not update them",
+  "baseline": {
+    "artifact": "Ridgeline-Native-Additional-Audit-0.1.12-Base.apk",
+    "sha256": "085fff49995826f07da20d451c63a968c3afc15b8a4ce3390f7bf486f57f61ce",
+    "source": "6052065"
+  },
+  "rendererLibrariesByteIdenticalTo0112": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86_64"
+  ],
+  "rendererBuild": "Rust 1.99.1, -C link-arg=-Wl,-z,max-page-size=16384, crate registry path remapped to the 0.1.12 build path; reproduces 0.1.12 libraries byte for byte",
+  "originalAssetsIdentical": 623,
+  "jniExportsPerAbi": 43,
+  "elfLoadAlignment": 16384,
+  "zip16KiBAlignmentVerified": true,
+  "signatureVerified": true,
+  "debuggable": false,
+  "tests": {
+    "rustWorkspace": "all pass incl. lavapipe Vulkan and Mesa GLES renderer tests",
+    "kotlinJvm": "145 tests (5 new mask + 2 new admission tests pass); PipelineWaitTest.realCacheFreeHttpWinnerSurvivesRamEvictionAndRestartWithoutAnotherRequest is intermittent on both baseline 0.1.12 (1/6 alone) and this change; final pre-publish full-suite rerun skipped at the user's request",
+    "lint": "0 errors (earlier run on the same Kotlin sources)"
+  },
+  "surveyMaskQualification": {
+    "tiles": 1064,
+    "surveys": 46,
+    "alphaIdentical": 1064,
+    "pngBytes": 37797239,
+    "webpBytes": 4028922
+  },
+  "physicalDeviceRun": false
+}
