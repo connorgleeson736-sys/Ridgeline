@@ -5,11 +5,15 @@
 the audited APK was 0.1.5. Main next candidates are raw local-I/O isolation,
 GPU upload acknowledgement, classified recovery and per-tile critical-path tracing.
 
-Latest APK: **[0.1.30 Overlays Fixed Base](checkpoints/README.md)** — updates
+Latest APK: **[0.1.31 Overlay Slots Base](checkpoints/README.md)** — updates
+0.1.13–0.1.30 in place. Overlays no longer stop for the rest of the session
+after a busy area fills the download queue.
+
+Previous APK: **[0.1.30 Overlays Fixed Base](checkpoints/README.md)** — updates
 0.1.13–0.1.29 in place. Fixes overlays broken since 0.1.27 (a native return
 type mismatch), with a test covering every native function.
 
-Previous APK: **[0.1.29 Steady Names Base](checkpoints/README.md)** — updates
+Older APK: **[0.1.29 Steady Names Base](checkpoints/README.md)** — updates
 0.1.13–0.1.28 in place. Names no longer stay hidden or shown after the map
 stops, and search loads about 3.5x faster.
 

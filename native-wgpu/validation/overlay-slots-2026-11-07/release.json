@@ -1,0 +1,30 @@
+{
+  "artifact": "Ridgeline-Native-Overlay-Slots-0.1.31-Base.apk",
+  "bytes": 33749726,
+  "sha256": "457c5ed8af823b1a213e3d5fd74b468350cbf353e4c2f2c227ef1cc93319a210",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.31-overlay-slots",
+  "versionCode": 32,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.30 Full Audit (same package and signer)",
+  "changes": [
+    "fix: the tile transport's 512-request guard throws IllegalArgumentException; MapLayers caught only IllegalStateException, so a refused vector tile request leaked one of the four overlay download slots. After four refusals (a busy area such as Wanaka) no topographic tile was downloaded again in that session, so tracks, roads and names stopped appearing. Any refusal now releases the consumer and retries after 750 ms; retries are scheduled whenever a slot is free",
+    "imagery predictions refused by the guard are dropped instead of aborting the rest of the plan (idle work)",
+    "line packet export test covers 93 Wanaka tiles at camera zooms 10-19 with contours on and off, checking every value against the renderer's validation (186 packets, 438,390 lines, none rejected)"
+  ],
+  "rendererUnchangedFrom": "0.1.30 (identical libridgeline_renderer.so)",
+  "tests": {
+    "kotlinJvm": "189 tests, 0 failures (new LayerLeaseTest against the real transport guard)",
+    "rust": "cargo test --workspace: all pass"
+  },
+  "lintErrors": 0,
+  "originalAssetsIdentical": 623,
+  "jniExportsPerAbi": 48,
+  "loadAlignment": "0x4000",
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}
