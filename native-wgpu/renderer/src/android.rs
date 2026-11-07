@@ -1668,10 +1668,10 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_labelAtla
     y0: i32,
     rgba: jni::sys::jobject,
     metadata: jni::sys::jobject,
-) -> u8 {
+) -> i32 {
     let mut env = unsafe { jni::EnvUnowned::from_raw(env) };
     match env
-        .with_env(|env| -> Result<u8, jni::errors::Error> {
+        .with_env(|env| -> Result<i32, jni::errors::Error> {
             if !(1..=2048).contains(&width) || !(1..=2048).contains(&height) {
                 return Ok(0);
             }

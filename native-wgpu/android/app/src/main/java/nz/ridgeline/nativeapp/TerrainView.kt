@@ -334,7 +334,8 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
                     full->whole()
                     band!!.isEmpty()->NativeBridge.labelMetadata(handle,atlas.metadata)
                     else->{val rows=atlas.rgba.duplicate().apply{position(band[0]*atlas.width*4);limit(band[1]*atlas.width*4)}.slice()
-                        when(NativeBridge.labelAtlasRows(handle,atlas.width,atlas.height,band[0],rows,atlas.metadata)){1->true;2->whole();else->false}}
+                        // Anything but "done" sends the whole atlas: never retry rows every frame.
+                        if(NativeBridge.labelAtlasRows(handle,atlas.width,atlas.height,band[0],rows,atlas.metadata)==1)true else whole()}
                 }
                 if(atlasReady){appliedLayers=layers;deferredLayer=null;if(changedAtlas){labelPose=null;appliedPlacement=null}}
             }else deferredOptional=true
