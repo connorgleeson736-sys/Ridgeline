@@ -310,10 +310,10 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         // small 128 px tiles get the full image budget so a screenful never
         // overflows it (which dropped the view a level and refined only a
         // shifting patch near the centre: blurry and jumpy).
-        if(!state.threeD)FlatSelection.plan(key.width,key.height,pose,if(!geometry&&state.base==MapSettings.Base.TOPO)128.0 else DetailPolicy.target(geometry,if(geometry)key.terrainDetail else key.imageryDetail),if(!geometry&&state.base==MapSettings.Base.TOPO)maxOf(budget,imageLimit)else budget,if(geometry)22 else if(state.base==MapSettings.Base.LINZ)19 else 18,roundZoom=!geometry)?.let{return it.map{tile->Id(tile.z,tile.x,tile.y)}}
+        if(!state.threeD)FlatSelection.plan(key.width,key.height,pose,if(!geometry&&state.base==MapSettings.Base.TOPO)128.0 else DetailPolicy.target(geometry,if(geometry)key.terrainDetail else key.imageryDetail),if(!geometry&&state.base==MapSettings.Base.TOPO)maxOf(budget,imageLimit)else budget,if(geometry)22 else when(state.base){MapSettings.Base.LINZ->19;MapSettings.Base.TOPO->TOPO_MAX_ZOOM;else->18},roundZoom=!geometry)?.let{return it.map{tile->Id(tile.z,tile.x,tile.y)}}
         val count=NativeBridge.planFocused(key.width,key.height,pose.longitude,pose.latitude,
             pose.zoom,pose.bearing,pose.pitch,pose.elevation,budget,
-            DetailPolicy.target(geometry,if(geometry)key.terrainDetail else key.imageryDetail)*(if(!geometry&&mapSettings.state.base==MapSettings.Base.TOPO).5 else 1.0),if(geometry)22 else if(mapSettings.state.base!=MapSettings.Base.LINZ)18 else 19,1.0,
+            DetailPolicy.target(geometry,if(geometry)key.terrainDetail else key.imageryDetail)*(if(!geometry&&mapSettings.state.base==MapSettings.Base.TOPO).5 else 1.0),if(geometry)22 else when(mapSettings.state.base){MapSettings.Base.LINZ->19;MapSettings.Base.TOPO->TOPO_MAX_ZOOM;else->18},1.0,
             focus?.longitude?:Double.NaN,focus?.latitude?:Double.NaN,focus?.range?:Double.NaN,output)
         return List(count){Id(output.int,output.int,output.int)}
     }
@@ -677,12 +677,12 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             for(yy in y0..y1)for(xx in x0..x1)result.add(Id(z,xx,yy))
         };return result
     }
-    fun regionEstimate(bounds:Bounds,maxZoom:Int)=regionTiles(bounds,if(mapSettings.state.base==MapSettings.Base.TOPO)minOf(maxZoom,18)else maxZoom).size
+    fun regionEstimate(bounds:Bounds,maxZoom:Int)=regionTiles(bounds,if(mapSettings.state.base==MapSettings.Base.TOPO)minOf(maxZoom,TOPO_MAX_ZOOM)else maxZoom).size
     fun regions(callback:(List<OfflineStore.Region>)->Unit){offlineQueries.execute{val rows=offline.regions();view.post{if(!dead)callback(rows)}}}
     fun removeRegion(id:String,callback:()->Unit){downloadJobs.execute{offline.delete(id);view.post{if(!dead)callback()}}}
     fun cancelDownload(){downloadCancel.set(true);regionPrefetch?.close();downloadLease?.release(true)}
     fun downloadRegion(name:String,bounds:Bounds,maxZoom:Int,progress:(String)->Unit,done:()->Unit){
-        val display=mapSettings.state;val detail=if(display.base==MapSettings.Base.TOPO)minOf(maxZoom,18)else maxZoom;val tiles=regionTiles(bounds,detail);downloadCancel.set(false)
+        val display=mapSettings.state;val detail=if(display.base==MapSettings.Base.TOPO)minOf(maxZoom,TOPO_MAX_ZOOM)else maxZoom;val tiles=regionTiles(bounds,detail);downloadCancel.set(false)
         val downloadImagery=NativeImagery(context,::fetch,{z,x,y->linz("aerial",Id(z,x,y),"webp")},overviews,::checkPreparation,::localImage,{display})
         downloadJobs.execute{
             val region=offline.begin(name,OfflineStore.Metadata(bounds,detail,display.base.name));regionContext.set(region);val demDone=HashSet<Id>()

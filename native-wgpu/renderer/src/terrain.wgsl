@@ -16,14 +16,27 @@ struct Out { @builtin(position) position: vec4<f32>, @location(0) uv: vec2<f32>,
  o.demzoom=min(18.,max(0.,log2(scene.style.y/tile.z)-1.));
  o.overlay=tile.w;o.uv=vertex.xy;o.clip=clip;o.image=image;return o;
 }
-fn shade(i:Out,dx:vec2<f32>,dy:vec2<f32>,normal:vec3<f32>)->vec4<f32>{
- var p=textureSampleGrad(photo,photo_sampler,clamp(i.uv*i.image.xy+i.image.zw,vec2<f32>(0.),vec2<f32>(1.)),dx,dy);
- if(scene.style.z>0.5){
-  let lod=clamp(i32(floor(log2(max(max(length(dx),length(dy))*256.,1.)))),0,8);
-  let dimensions=textureDimensions(photo,lod);
-  let coord=clamp(vec2<i32>(floor((i.uv*i.image.xy+i.image.zw)*vec2<f32>(dimensions))),vec2<i32>(0),vec2<i32>(dimensions)-1);
-  p=textureLoad(photo,coord,lod);
+// NZ Topo (printed maps), as MapLibre draws raster-resampling "nearest":
+// shrunk tiles are bilinear from the nearest mip level (LINEAR_MIPMAP_NEAREST),
+// never point-sampled (which drops texel rows: broken lines, shimmer).
+// Enlarged tiles keep crisp texel edges, antialiased over one screen pixel
+// ("sharp bilinear") instead of blocky nearest pixels.
+fn printed(i:Out,dx:vec2<f32>,dy:vec2<f32>)->vec4<f32>{
+ let uv=clamp(i.uv*i.image.xy+i.image.zw,vec2<f32>(0.),vec2<f32>(1.));
+ let size=vec2<f32>(textureDimensions(photo,0));
+ let rho=max(length(dx*size),length(dy*size));
+ if(rho<1.){
+  let t=uv*size-.5;let cell=floor(t);
+  let g=clamp((t-cell-.5)/max(rho,1e-3)+.5,vec2<f32>(0.),vec2<f32>(1.));
+  return photo_level(i,(cell+g+.5)/size,0.);
  }
+ return photo_level(i,uv,min(floor(log2(rho)+.5),8.));
+}
+fn photo_level(i:Out,uv:vec2<f32>,lod:f32)->vec4<f32>{return textureSampleLevel(photo,photo_sampler,uv,lod);}
+fn shade(i:Out,dx:vec2<f32>,dy:vec2<f32>,normal:vec3<f32>)->vec4<f32>{
+ var p:vec4<f32>;
+ if(scene.style.z>0.5){p=printed(i,dx,dy);}
+ else{p=textureSampleGrad(photo,photo_sampler,clamp(i.uv*i.image.xy+i.image.zw,vec2<f32>(0.),vec2<f32>(1.)),dx,dy);}
  if(p.a>0.){p=vec4<f32>(p.rgb/p.a,p.a);}
  let average=(p.r+p.g+p.b)/3.;
  var rgb=p.rgb+(vec3<f32>(average)-p.rgb)*scene.grade.z;

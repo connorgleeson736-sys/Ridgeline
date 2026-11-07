@@ -146,6 +146,8 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
         check(parent,"Prepare nearby terrain while idle",loader.prepareAhead){loader.prepareAhead(it)}
         check(parent,"Preload coarser surrounding tiles",loader.parentPreload){loader.parentPreload(it)}
         parent.addView(NativeUi.text(activity,"After the view loads, keeps lower-detail terrain and imagery for the surrounding area ready, so moving stays smooth while sharp tiles load.",12f).apply{setTextColor(NativeUi.muted)})
+        check(parent,"Lower resolution while moving",terrain.motionResolution){terrain.motionResolution=it}
+        parent.addView(NativeUi.text(activity,"Draws fewer pixels while you pan, zoom or rotate, then a full-resolution frame as soon as the map stops. Smoother movement on slower phones.",12f).apply{setTextColor(NativeUi.muted)})
         check(parent,"Downloaded maps only",loader.offlineOnly){loader.offlineOnly(it)}
         parent.addView(NativeUi.button(activity,"Offline maps, imagery ZIPs & diagnostics"){dismiss();offline.show()})
         parent.addView(NativeUi.button(activity,"About & licences"){

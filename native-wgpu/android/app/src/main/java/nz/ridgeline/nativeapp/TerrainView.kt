@@ -17,6 +17,9 @@ data class CameraPose(val longitude:Double=170.14219572,val latitude:Double=-43.
 
 /** One GPU owner, coalesced native display-vsync frames and bounded uploads.
  * Camera gesture dynamics are still a prototype; see open parity gates. */
+/** Render scale while moving with "Lower resolution while moving" (44% fewer pixels). */
+private const val MOTION_SCALE=.75f
+
 class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     private val thread=HandlerThread("ridgeline-gpu").apply{start()}
     private val gpu=Handler(thread.looper)
@@ -358,6 +361,8 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             cameraPose=corrected;applyGesture()
         }}
         val renderStarted=System.nanoTime()
+        val scale=if(motionResolution&&gestureActive)MOTION_SCALE else 1f;val prepare=if(motionResolution)MOTION_SCALE else 1f
+        if(scale!=appliedScale||prepare!=appliedPrepare){NativeBridge.renderScale(handle,scale,prepare);appliedScale=scale;appliedPrepare=prepare}
         val shown=NativeBridge.render(handle,frameWidth,frameHeight,pose.longitude,pose.latitude,pose.zoom+ln(pixelScale)/ln(2.0),pose.zoom,pose.bearing,pose.pitch,pose.elevation,latched.revision,latched.inputNanos,latchedAt)
         NativeBridge.frameStats(handle,frameStats)
         for(i in 0 until 14)frameTimings.set(i,frameStats.getLong(i*8))
@@ -440,7 +445,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         if(!live||!active)return
         if(handle!=0L)NativeBridge.destroy(handle)
         NativeBridge.textureBackend(context.getSharedPreferences("display",0).getInt("textureBackend",0))
-        handle=NativeBridge.create(holder.surface,width,height)
+        handle=NativeBridge.create(holder.surface,width,height);appliedScale=-1f;appliedPrepare=-1f
         residency=Residency(LongArray(0),LongArray(0));safetyPose=null;safetyValid=false;appliedRoutes=null;appliedDemand=null;appliedLayers=null;appliedPlacement=null;appliedStyle=null;appliedInspection=null;appliedGps=null;labelPose=null
         if(handle!=0L){
             registerFrameWake()
@@ -473,7 +478,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             NativeBridge.textureBackend(context.getSharedPreferences("display",0).getInt("textureBackend",0))
             val created=NativeBridge.create(surface,width,height)
             if(!live||generation.get()!=token){if(created!=0L)NativeBridge.destroy(created);return@post}
-            handle=created;safetyPose=null;safetyValid=false;appliedRoutes=null;appliedDemand=null;appliedLayers=null;appliedPlacement=null;appliedStyle=null;appliedInspection=null;appliedGps=null;labelPose=null;presentationFailures=0
+            handle=created;appliedScale=-1f;appliedPrepare=-1f;safetyPose=null;safetyValid=false;appliedRoutes=null;appliedDemand=null;appliedLayers=null;appliedPlacement=null;appliedStyle=null;appliedInspection=null;appliedGps=null;labelPose=null;presentationFailures=0
             if(handle!=0L){registerFrameWake();val am=context.getSystemService(android.app.ActivityManager::class.java);NativeBridge.tileBudget(handle,if(am.isLowRamDevice)32 else (am.memoryClass/2).coerceIn(64,128));NativeBridge.overlayBudget(handle,overlayLayers(am))}
             post{onStatus(if(created==0L)"Native GPU initialization failed"else "Loading terrain and imagery…")};requestFrame()
         }
@@ -531,6 +536,14 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         }
     }
     @Volatile private var gestureActive=false
+    private val displayPreferences=context.getSharedPreferences("display",0)
+    /** Lower render resolution while the camera moves; full resolution when
+     * still. On by default for phones with up to 4 GB of RAM (low-end GPUs). */
+    @Volatile var motionResolution=displayPreferences.getBoolean("motionResolution",run{
+        val am=context.getSystemService(android.app.ActivityManager::class.java);val info=android.app.ActivityManager.MemoryInfo();am.getMemoryInfo(info)
+        am.isLowRamDevice||info.totalMem<=(4.2*(1L shl 30)).toLong()})
+        set(value){field=value;displayPreferences.edit().putBoolean("motionResolution",value).apply();requestFrame()}
+    private var appliedScale=-1f;private var appliedPrepare=-1f
     @Volatile private var gestureHeldElevation=3724f
     @Volatile private var recenterPending=true
     // Used by controlled fixtures and explicit initialization, never terrain-follow.
