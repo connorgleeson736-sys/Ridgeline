@@ -1,6 +1,25 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.31 Overlay Slots Base APK — 33.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Overlay-Slots-0.1.31-Base.apk)**.
+Latest: **[Download 0.1.32 Overlay Watchdog Base APK — 33.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Overlay-Watchdog-0.1.32-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 33:
+**updates 0.1.13–0.1.31 in place, keeping its data.**
+
+- **Stuck overlay downloads recover on their own.** Overlays came back after
+  toggling them or moving away, both of which free the four overlay download
+  slots, which points at downloads that never finish. Any overlay download
+  outstanding 20 s is now released and retried.
+- **Loading diagnostics show the overlay pipeline**: tiles in view and
+  prepared, downloads in flight and their age, line packets accepted or
+  rejected, and whether names are applied.
+
+Root cause not yet confirmed on a phone. 190 JVM tests pass; lint 0 errors;
+623 original assets identical. Renderer unchanged from 0.1.30.
+[Exact release record](../validation/overlay-watchdog-2026-11-07/release.json) ·
+[SHA-256](Ridgeline-Native-Overlay-Watchdog-0.1.32-Base.apk.sha256).
+
+## Previous 0.1.31 overlay slots checkpoint
+
+**[Download 0.1.31 Overlay Slots Base APK — 33.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Overlay-Slots-0.1.31-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 32:
 **updates 0.1.13–0.1.30 in place, keeping its data.**
 
