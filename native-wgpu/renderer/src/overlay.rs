@@ -74,7 +74,7 @@ pub struct Group {
     /// Content hash of the group's packed bytes; equal hash, equal lines.
     pub hash: u64,
     bounds: [f64; 4],
-    lines: Vec<Line>,
+    pub lines: Vec<Line>,
 }
 impl Group {
     pub fn new(key: GroupKey, hash: u64, lines: Vec<Line>) -> Self {
@@ -615,4 +615,102 @@ impl Overlay {
     pub fn texture_bytes(&self) -> u64 {
         self.gpu.as_ref().map_or(0, |_| 4 * (SIZE as u64 * SIZE as u64 * self.big as u64 + SMALL as u64 * SMALL as u64 * self.small as u64))
     }
+}
+
+/// Parse a grouped line packet (see the Android cartography JNI): per group
+/// z, x, y, clip[4], line count, 64-bit id, body length, body. None if invalid.
+pub fn parse_line_packet(bytes: &[u8]) -> Option<Vec<GroupInput>> {
+    let size = bytes.len();
+    if size < 4 {
+        return None;
+    }
+    // Lines grouped by source vector tile, parsed before the renderer
+    // lock: [groups] then per group z,x,y, clip[4] (f64), line count,
+    // a 64-bit content id, a body length and the body: per line n, ARGB,
+    // width, dash, gap, order, n x (f64 x, f64 y). A body length of 0
+    // refers to a group the renderer already holds (same key and id), so
+    // unchanged tiles are neither re-sent nor re-parsed.
+    let int = |at: usize| u32::from_le_bytes(bytes[at..at + 4].try_into().unwrap());
+    let float = |at: usize| f32::from_le_bytes(bytes[at..at + 4].try_into().unwrap());
+    let double = |at: usize| f64::from_le_bytes(bytes[at..at + 8].try_into().unwrap());
+    let long = |at: usize| u64::from_le_bytes(bytes[at..at + 8].try_into().unwrap());
+    let count = int(0) as usize;
+    if count > 4096 {
+        return None;
+    }
+    let mut at = 4;
+    let mut total = 0usize;
+    let mut groups = Vec::with_capacity(count);
+    for _ in 0..count {
+        if at + 60 > size {
+            return None;
+        }
+        let (z, x, y) = (int(at), int(at + 4), int(at + 8));
+        let clip = [double(at + 12), double(at + 20), double(at + 28), double(at + 36)];
+        let lines_count = int(at + 44) as usize;
+        let id = long(at + 48);
+        let body = int(at + 56) as usize;
+        at += 60;
+        if lines_count > 65536 || clip.iter().any(|v| !v.is_finite()) || at + body > size {
+            return None;
+        }
+        let key = GroupKey { z, x, y, clip: clip.map(f64::to_bits) };
+        if body == 0 {
+            groups.push(GroupInput::Existing(key, id));
+            continue;
+        }
+        let end = at + body;
+        let mut lines = Vec::with_capacity(lines_count);
+        for _ in 0..lines_count {
+            if at + 24 > end {
+                return None;
+            }
+            let n = int(at) as usize;
+            let color = int(at + 4);
+            let width = float(at + 8);
+            let dash = [float(at + 12), float(at + 16)];
+            let order = int(at + 20) as i32;
+            at += 24;
+            total += n;
+            if n > 262144
+                || total > 2_000_000
+                || at + n * 16 > end
+                || !width.is_finite()
+                || width <= 0.
+                || width > 40.
+                || dash.iter().any(|v| !v.is_finite() || *v < 0. || *v > 400.)
+            {
+                return None;
+            }
+            let mut points = Vec::with_capacity(n);
+            for row in bytes[at..at + n * 16].chunks_exact(16) {
+                let px = f64::from_le_bytes(row[..8].try_into().unwrap());
+                let py = f64::from_le_bytes(row[8..].try_into().unwrap());
+                if !px.is_finite() || !py.is_finite() || !(0. ..=1.).contains(&px) || !(0. ..=1.).contains(&py) {
+                    return None;
+                }
+                points.push([px, py]);
+            }
+            at += n * 16;
+            let rgba = [
+                ((color >> 16) & 255) as f32 / 255.,
+                ((color >> 8) & 255) as f32 / 255.,
+                (color & 255) as f32 / 255.,
+                ((color >> 24) & 255) as f32 / 255.,
+            ];
+            lines.extend(Line::new(points, rgba, width, dash, order));
+        }
+        if at != end {
+            return None;
+        }
+        groups.push(if lines.is_empty() {
+            GroupInput::Empty(key, id)
+        } else {
+            GroupInput::New(Group::new(key, id, lines))
+        });
+    }
+    if at != size {
+        return None;
+    }
+    Some(groups)
 }

@@ -119,6 +119,9 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         }
     }
     private val clearFound=Runnable{terrain.inspect(null)}
+    // Build the search index in the background shortly after launch, so it is
+    // normally ready before the search field is first used.
+    init{main.postDelayed({if(!closed)loadSearch()},4000)}
     private fun hideKeyboard(){(activity.getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager).hideSoftInputFromWindow(root.windowToken,0)}
     private var combiningPending=false
     private fun dp(value:Int)=(value*activity.resources.displayMetrics.density+.5f).toInt()

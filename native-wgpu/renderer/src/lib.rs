@@ -157,6 +157,10 @@ pub struct Renderer {
     /// Camera, labels and terrain of the last probe: a still map probes once.
     label_probe_key: Option<(u64, [u32; 16], u64)>,
     label_visibility_revision: u64,
+    /// The camera, labels or terrain changed since the last probe, which the
+    /// probe's rate limit postponed: keep drawing until it runs (a map that
+    /// stops right after a probe must still get one for its final view).
+    label_probe_wanted: bool,
     /// Bumped when the drawn terrain cover is rebuilt (its depth may change).
     cover_revision: u64,
     label_selection: Vec<(usize, [f32; 2])>,
@@ -647,6 +651,7 @@ impl Renderer {
             label_generation: 0,
             label_probe_key: None,
             label_visibility_revision: 0,
+            label_probe_wanted: false,
             cover_revision: 0,
             label_selection: vec![],
             label_anchor: [0.5, 0.5],
@@ -1181,6 +1186,7 @@ impl Renderer {
             || self.inspection_dirty
             || self.labels_missed
             || self.label_probe.waiting()
+            || self.label_probe_wanted
         {
             Some(self.next_adaptive_frame.map_or(1, |delay| delay.min(1)))
         } else {
@@ -2046,7 +2052,7 @@ impl Renderer {
         // (stored by the previous frame), so labels stay in the main pass.
         let depth = self.depth.create_view(&Default::default());
         // Probe candidate visibility when the camera, labels or terrain changed.
-        let probe_key = (!self.label_sprites.is_empty() && self.label_probe.due())
+        let wanted_key = (!self.label_sprites.is_empty())
             .then(|| {
                 (
                     self.label_generation,
@@ -2055,6 +2061,8 @@ impl Renderer {
                 )
             })
             .filter(|key| Some(*key) != self.label_probe_key);
+        let probe_key = wanted_key.filter(|_| self.label_probe.due());
+        self.label_probe_wanted = wanted_key.is_some() && probe_key.is_none();
         let scene_target = self
             .offscreen
             .as_ref()

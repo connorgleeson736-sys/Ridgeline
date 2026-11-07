@@ -197,13 +197,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         val features=json.getJSONArray("features");for(i in 0 until features.length()){val geo=features.getJSONObject(i).getJSONObject("geometry");val paths=geo.getJSONArray("coordinates");for(j in 0 until paths.length()){val path=paths.getJSONArray(j);result.add(List(path.length()){k->val p=path.getJSONArray(k);VectorTile.Point((p.getDouble(0)+180)/360,(1-asinh(tan(Math.toRadians(p.getDouble(1))))/PI)/2)})}}
         return result
     }
-    private fun group(z:Int,x:Int,y:Int,clip:DoubleArray,lines:List<TopographyStyle.Line>):LineGroup{
-        val total=lines.sumOf{it.points.size};require(lines.size<=65536&&total<=262144*4){"Visible vector geometry exceeds safe upload budget"}
-        val buffer=ByteBuffer.allocate(48+lines.size*24+total*16).order(ByteOrder.LITTLE_ENDIAN)
-        buffer.putInt(z).putInt(x).putInt(y);for(v in clip)buffer.putDouble(v);buffer.putInt(lines.size)
-        for(line in lines){buffer.putInt(line.points.size).putInt(line.color).putFloat(line.width).putFloat(line.dash).putFloat(line.gap).putInt(line.order);for(p in line.points)buffer.putDouble(p.x).putDouble(p.y)}
-        return LineGroup(LineGroup.nextId(),buffer.array(),lines.size)
-    }
+    private fun group(z:Int,x:Int,y:Int,clip:DoubleArray,lines:List<TopographyStyle.Line>)=LineGroup.pack(z,x,y,clip,lines)
     private fun clip(path:List<VectorTile.Point>,box:DoubleArray)=BoundaryIndex.clip(path,box)
     override fun close(){closed=true;timer?.cancel(false);publication?.cancel(false);retryWake?.cancel(false);releaseAll();worker.shutdownNow();view.onLayerProjection={_,_->}}
 }

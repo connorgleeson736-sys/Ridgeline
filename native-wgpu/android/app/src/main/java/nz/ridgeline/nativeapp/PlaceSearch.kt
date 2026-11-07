@@ -16,8 +16,10 @@ internal class PlaceSearch(lines:Sequence<String>){
         val lat=f[3].toDoubleOrNull()?:return@mapNotNull null;val lon=f[4].toDoubleOrNull()?:return@mapNotNull null
         val alts=if(f[2].isEmpty())emptyList()else f[2].split('|')
         val place=Place(f[0],f[1],alts,lat,lon,f[5].toDoubleOrNull()?:5.0,f[6],f[7])
-        val names=listOf(place.name)+alts
-        Entry(place,names.flatMap{words(it)}.distinct().toTypedArray(),names.map{normalize(it)}.toTypedArray())
+        // Each name normalised once; its words come from the same string.
+        val full=Array(1+alts.size){normalize(if(it==0)place.name else alts[it-1])}
+        val words=LinkedHashSet<String>();for(n in full)if(n.isNotEmpty())words.addAll(n.split(' '))
+        Entry(place,words.toTypedArray(),full)
     }.toList()
     val size get()=entries.size
     fun search(query:String,near:Coordinate?,limit:Int=30):List<Result>{
@@ -45,11 +47,27 @@ internal class PlaceSearch(lines:Sequence<String>){
         return out.sortedBy{it.score}.take(limit)
     }
     companion object{
+        /** Lowercase, macrons and other accents removed, anything that is not a
+         * letter or digit as one space, "mt" as "mount" and "st" as "saint".
+         * A plain character loop: no regular expressions (this runs for every
+         * one of ~60,000 names when search loads). */
         fun normalize(s:String):String{
-            val plain=Normalizer.normalize(s.lowercase(),Normalizer.Form.NFD).replace(Regex("\\p{M}+"),"")
-            return plain.replace(Regex("[^a-z0-9]+")," ").trim().replace(Regex("\\bmt\\b"),"mount").replace(Regex("\\bst\\b"),"saint")
+            val ascii=s.all{it.code<128}
+            val text=if(ascii)s else Normalizer.normalize(s,Normalizer.Form.NFD)
+            val out=StringBuilder(text.length);var space=true
+            for(ch in text){
+                val c=if(ch in 'A'..'Z')ch+32 else ch
+                if(c in 'a'..'z'||c in '0'..'9'){out.append(c);space=false}
+                else if(!ascii&&Character.getType(c)==Character.NON_SPACING_MARK.toInt())continue
+                else if(!ascii&&Character.isLetterOrDigit(c)){out.append(c.lowercaseChar());space=false}
+                else if(!space){out.append(' ');space=true}
+            }
+            if(out.isNotEmpty()&&out[out.length-1]==' ')out.setLength(out.length-1)
+            // Whole-word abbreviations.
+            if(out.indexOf("mt")<0&&out.indexOf("st")<0)return out.toString()
+            return out.split(' ').joinToString(" "){when(it){"mt"->"mount";"st"->"saint";else->it}}
         }
-        fun words(s:String)=normalize(s).split(' ').filter{it.isNotEmpty()}
+        fun words(s:String):List<String>{val n=normalize(s);return if(n.isEmpty())emptyList()else n.split(' ')}
         /** A word within one edit of [word]'s length-prefix (a typo while typing). */
         private fun close(candidate:String,word:String):Boolean{
             if(candidate.length<word.length-1)return false

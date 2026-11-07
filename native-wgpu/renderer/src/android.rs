@@ -1461,94 +1461,9 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_cartograp
             let bytes = unsafe {
                 std::slice::from_raw_parts(env.get_direct_buffer_address(&buffer)?, size)
             };
-            // Lines grouped by source vector tile, parsed before the renderer
-            // lock: [groups] then per group z,x,y, clip[4] (f64), line count,
-            // a 64-bit content id, a body length and the body: per line n, ARGB,
-            // width, dash, gap, order, n x (f64 x, f64 y). A body length of 0
-            // refers to a group the renderer already holds (same key and id), so
-            // unchanged tiles are neither re-sent nor re-parsed.
-            let int = |at: usize| u32::from_le_bytes(bytes[at..at + 4].try_into().unwrap());
-            let float = |at: usize| f32::from_le_bytes(bytes[at..at + 4].try_into().unwrap());
-            let double = |at: usize| f64::from_le_bytes(bytes[at..at + 8].try_into().unwrap());
-            let long = |at: usize| u64::from_le_bytes(bytes[at..at + 8].try_into().unwrap());
-            let count = int(0) as usize;
-            if count > 4096 {
+            let Some(groups) = crate::overlay::parse_line_packet(bytes) else {
                 return Ok(0);
-            }
-            let mut at = 4;
-            let mut total = 0usize;
-            let mut groups = Vec::with_capacity(count);
-            for _ in 0..count {
-                if at + 60 > size {
-                    return Ok(0);
-                }
-                let (z, x, y) = (int(at), int(at + 4), int(at + 8));
-                let clip = [double(at + 12), double(at + 20), double(at + 28), double(at + 36)];
-                let lines_count = int(at + 44) as usize;
-                let id = long(at + 48);
-                let body = int(at + 56) as usize;
-                at += 60;
-                if lines_count > 65536 || clip.iter().any(|v| !v.is_finite()) || at + body > size {
-                    return Ok(0);
-                }
-                let key = crate::overlay::GroupKey { z, x, y, clip: clip.map(f64::to_bits) };
-                if body == 0 {
-                    groups.push(crate::overlay::GroupInput::Existing(key, id));
-                    continue;
-                }
-                let end = at + body;
-                let mut lines = Vec::with_capacity(lines_count);
-                for _ in 0..lines_count {
-                    if at + 24 > end {
-                        return Ok(0);
-                    }
-                    let n = int(at) as usize;
-                    let color = int(at + 4);
-                    let width = float(at + 8);
-                    let dash = [float(at + 12), float(at + 16)];
-                    let order = int(at + 20) as i32;
-                    at += 24;
-                    total += n;
-                    if n > 262144
-                        || total > 2_000_000
-                        || at + n * 16 > end
-                        || !width.is_finite()
-                        || width <= 0.
-                        || width > 40.
-                        || dash.iter().any(|v| !v.is_finite() || *v < 0. || *v > 400.)
-                    {
-                        return Ok(0);
-                    }
-                    let mut points = Vec::with_capacity(n);
-                    for row in bytes[at..at + n * 16].chunks_exact(16) {
-                        let px = f64::from_le_bytes(row[..8].try_into().unwrap());
-                        let py = f64::from_le_bytes(row[8..].try_into().unwrap());
-                        if !px.is_finite() || !py.is_finite() || !(0. ..=1.).contains(&px) || !(0. ..=1.).contains(&py) {
-                            return Ok(0);
-                        }
-                        points.push([px, py]);
-                    }
-                    at += n * 16;
-                    let rgba = [
-                        ((color >> 16) & 255) as f32 / 255.,
-                        ((color >> 8) & 255) as f32 / 255.,
-                        (color & 255) as f32 / 255.,
-                        ((color >> 24) & 255) as f32 / 255.,
-                    ];
-                    lines.extend(crate::overlay::Line::new(points, rgba, width, dash, order));
-                }
-                if at != end {
-                    return Ok(0);
-                }
-                groups.push(if lines.is_empty() {
-                    crate::overlay::GroupInput::Empty(key, id)
-                } else {
-                    crate::overlay::GroupInput::New(crate::overlay::Group::new(key, id, lines))
-                });
-            }
-            if at != size {
-                return Ok(0);
-            }
+            };
             let Ok(mut all) = states().lock() else {
                 return Ok(0);
             };

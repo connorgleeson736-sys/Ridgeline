@@ -17,7 +17,24 @@ internal data class NativeLabelAtlas(val labels:List<Row>,val width:Int,val heig
  * header, then the lines). [id] is unique per content: the renderer keeps
  * groups by id, so unchanged tiles are referenced, not re-sent or re-parsed. */
 internal class LineGroup(val id:Long,val bytes:ByteArray,val lines:Int){
-    companion object{private val ids=java.util.concurrent.atomic.AtomicLong(1);fun nextId()=ids.getAndIncrement()}
+    companion object{
+        private val ids=java.util.concurrent.atomic.AtomicLong(1);fun nextId()=ids.getAndIncrement()
+        fun pack(z:Int,x:Int,y:Int,clip:DoubleArray,lines:List<TopographyStyle.Line>):LineGroup{
+            val total=lines.sumOf{it.points.size};require(lines.size<=65536&&total<=262144*4){"Visible vector geometry exceeds safe upload budget"}
+            val buffer=ByteBuffer.allocate(48+lines.size*24+total*16).order(ByteOrder.LITTLE_ENDIAN)
+            buffer.putInt(z).putInt(x).putInt(y);for(v in clip)buffer.putDouble(v);buffer.putInt(lines.size)
+            for(line in lines){buffer.putInt(line.points.size).putInt(line.color).putFloat(line.width).putFloat(line.dash).putFloat(line.gap).putInt(line.order);for(p in line.points)buffer.putDouble(p.x).putDouble(p.y)}
+            return LineGroup(nextId(),buffer.array(),lines.size)
+        }
+        /** Renderer packet for [groups]: bodies only for groups it does not hold ([held] ids). */
+        fun packet(groups:List<LineGroup>,held:Set<Long>):ByteBuffer{
+            val out=ByteBuffer.allocateDirect(4+groups.sumOf{60+if(it.id in held)0 else it.bytes.size-48}).order(ByteOrder.LITTLE_ENDIAN)
+            out.putInt(groups.size)
+            for(g in groups){val body=if(g.id in held)0 else g.bytes.size-48
+                out.put(g.bytes,0,48).putLong(g.id).putInt(body);if(body>0)out.put(g.bytes,48,body)}
+            out.rewind();return out
+        }
+    }
 }
 internal data class NativeLayerBatch(val lines:List<LineGroup>,val atlas:NativeLabelAtlas)
 
