@@ -26,12 +26,15 @@ internal class LineGroup(val id:Long,val bytes:ByteArray,val lines:Int){
             for(line in lines){buffer.putInt(line.points.size).putInt(line.color).putFloat(line.width).putFloat(line.dash).putFloat(line.gap).putInt(line.order);for(p in line.points)buffer.putDouble(p.x).putDouble(p.y)}
             return LineGroup(nextId(),buffer.array(),lines.size)
         }
+        /** Body length marking a group the renderer already holds (overlay::REFERENCE).
+         * Not 0: a tile with no lines has an empty body. */
+        const val REFERENCE=-1
         /** Renderer packet for [groups]: bodies only for groups it does not hold ([held] ids). */
         fun packet(groups:List<LineGroup>,held:Set<Long>):ByteBuffer{
             val out=ByteBuffer.allocateDirect(4+groups.sumOf{60+if(it.id in held)0 else it.bytes.size-48}).order(ByteOrder.LITTLE_ENDIAN)
             out.putInt(groups.size)
-            for(g in groups){val body=if(g.id in held)0 else g.bytes.size-48
-                out.put(g.bytes,0,48).putLong(g.id).putInt(body);if(body>0)out.put(g.bytes,48,body)}
+            for(g in groups){val reference=g.id in held;val body=g.bytes.size-48
+                out.put(g.bytes,0,48).putLong(g.id).putInt(if(reference)REFERENCE else body);if(!reference&&body>0)out.put(g.bytes,48,body)}
             out.rewind();return out
         }
     }
