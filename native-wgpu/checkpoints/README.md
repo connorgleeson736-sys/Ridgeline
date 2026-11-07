@@ -1,6 +1,28 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.24 Sharp Topo Base APK — 32.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Sharp-Topo-0.1.24-Base.apk)**.
+Latest: **[Download 0.1.25 Hut Names Base APK — 32.9 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Hut-Names-0.1.25-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 26:
+**updates 0.1.13–0.1.24 in place, keeping its data.**
+
+- **Hut names show in steep valleys again.** Since 0.1.21, names hidden
+  behind ridges were still given screen space, so in a valley the invisible
+  names on the far side crowded out the hut's name (its dot, which never takes
+  space, still showed). The GPU now reads back which names terrain hides and
+  placement skips them, as MapLibre does.
+- **Important names first.** A named hut outranks a river or track name even
+  if that one was shown first; equally important names still keep their places.
+- **No missing names after a pause.** A name could stay hidden on a slow,
+  still map until the next touch; the renderer now draws the frame it needs.
+
+178 JVM tests, Rust tests and GPU checks pass on Vulkan and GLES, including new
+placement and visibility read-back tests; lint 0 errors; 623 original assets
+identical. Not run on a phone.
+[Exact release record](../validation/hut-names-2026-11-07/release.json) ·
+[SHA-256](Ridgeline-Native-Hut-Names-0.1.25-Base.apk.sha256).
+
+## Previous 0.1.24 sharp topo checkpoint
+
+**[Download 0.1.24 Sharp Topo Base APK — 32.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Sharp-Topo-0.1.24-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 25:
 **updates 0.1.13–0.1.23 in place, keeping its data.**
 

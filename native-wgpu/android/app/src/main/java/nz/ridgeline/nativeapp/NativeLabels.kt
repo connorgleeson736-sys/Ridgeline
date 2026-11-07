@@ -77,17 +77,24 @@ internal object NativeLabels {
         return rows.take(4).ifEmpty{listOf(text.take(60))}
     }
     /** Uniform screen grid avoids pairwise collision checks over every map label. */
+    /** Screen box for collisions (plain floats: no framework object per test). */
+    private class Box(val left:Float,val top:Float,val right:Float,val bottom:Float){
+        fun intersects(o:Box)=left<o.right&&o.left<right&&top<o.bottom&&o.top<bottom
+    }
     /** Labels shown by the previous placement and their anchors. */
     private var shown=HashMap<String,String>()
-    /** Collision placement with hysteresis: labels already on screen are placed
-     * first, in their previous anchor, so moving the map does not reshuffle
-     * which names are visible (MapLibre keeps placements stable and fades). */
+    /** Collision placement by importance, with hysteresis among equals: labels
+     * already on screen go first within their priority, in their previous
+     * anchor, so moving the map does not reshuffle which names are visible.
+     * Labels hidden by terrain arrive unprojected and take no space. */
     fun place(atlas:NativeLabelAtlas,projected:FloatArray,width:Int,height:Int,scale:Float):ByteBuffer{
-        val cells=HashMap<Long,MutableList<RectF>>();val selected=ArrayList<Triple<Int,Float,Float>>()
+        val cells=HashMap<Long,MutableList<Box>>();val selected=ArrayList<Triple<Int,Float,Float>>()
         val next=HashMap<String,String>()
         val cell=64*scale;val padding=5*scale
-        fun keys(rect:RectF):List<Long>{val result=ArrayList<Long>();for(y in floor(rect.top/cell).toInt()..floor(rect.bottom/cell).toInt())for(x in floor(rect.left/cell).toInt()..floor(rect.right/cell).toInt())result.add((x.toLong() shl 32)or(y.toLong() and 0xffffffffL));return result}
-        val order=atlas.labels.indices.sortedBy{if(atlas.labels[it].label.key in shown)0 else 1}
+        fun keys(rect:Box):List<Long>{val result=ArrayList<Long>();for(y in floor(rect.top/cell).toInt()..floor(rect.bottom/cell).toInt())for(x in floor(rect.left/cell).toInt()..floor(rect.right/cell).toInt())result.add((x.toLong() shl 32)or(y.toLong() and 0xffffffffL));return result}
+        // More important names first (MapLibre's symbol-sort-key); among equally
+        // important ones, those already shown keep their place (no reshuffling).
+        val order=atlas.labels.indices.sortedWith(compareBy<Int>{atlas.labels[it].label.priority}.thenBy{if(atlas.labels[it].label.key in shown)0 else 1})
         for(i in order){val row=atlas.labels[i]
             if(i*3+2>=projected.size||projected[i*3+2]==0f)continue
             val px=projected[i*3];val py=projected[i*3+1];if(px<0||py<0||px>width||py>height)continue
@@ -95,9 +102,9 @@ internal object NativeLabels {
             val previous=shown[row.label.key]
             val anchors=if(row.label.variable)listOf("top","bottom","left","right").sortedBy{if(it==previous)0 else 1}else listOf(row.label.anchor)
             for(anchor in anchors){val ox=when(anchor){"left"->row.label.size*.7f;"right"->-row.width-row.label.size*.7f;else->-row.width/2};val oy=when(anchor){"top"->row.label.size*.5f;"bottom"->-row.height-row.label.size*.5f;else->-row.height/2}
-                val rect=RectF(px+ox*scale-padding,py+oy*scale-padding,px+(ox+row.width)*scale+padding,py+(oy+row.height)*scale+padding)
+                val rect=Box(px+ox*scale-padding,py+oy*scale-padding,px+(ox+row.width)*scale+padding,py+(oy+row.height)*scale+padding)
                 if(rect.left<0||rect.top<0||rect.right>width||rect.bottom>height)continue
-                val indexes=keys(rect);if(indexes.any{k->cells[k]?.any{RectF.intersects(it,rect)}==true})continue
+                val indexes=keys(rect);if(indexes.any{k->cells[k]?.any{it.intersects(rect)}==true})continue
                 selected.add(Triple(i,ox,oy));next[row.label.key]=anchor;for(k in indexes)cells.getOrPut(k){ArrayList()}.add(rect);break
             }
         }

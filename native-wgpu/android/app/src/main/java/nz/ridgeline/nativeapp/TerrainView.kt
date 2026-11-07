@@ -120,6 +120,11 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     private var appliedPlacement:Pair<NativeLabelAtlas,ByteBuffer>?=null
     private val labelProjection=ByteBuffer.allocateDirect(512*12).order(ByteOrder.LITTLE_ENDIAN)
     private var labelPose:CameraPose?=null;private var labelSize=0L;private var labelTime=0L
+    /** GPU terrain visibility of every label candidate (read back a few frames
+     * late): hidden names are left out of collision placement, as in MapLibre,
+     * so names behind a ridge no longer take the space of visible ones. */
+    private val labelVisibilityBytes=ByteBuffer.allocateDirect(512)
+    private var labelVisibilityRevision=-1L;private var labelVisible:ByteArray?=null
     internal var onLayerProjection:(NativeLabelAtlas,FloatArray)->Unit={_,_->}
     internal fun mapLayers(batch:NativeLayerBatch){layerBatch=batch;prepareMapLines();requestFrame()}
     internal fun placeMapLabels(atlas:NativeLabelAtlas,buffer:ByteBuffer){if(labelPlacement?.let{it.first===atlas&&it.second==buffer}==true)return;labelPlacement=atlas to buffer;requestFrame()}
@@ -410,8 +415,17 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
                 post{if(rangeMarkers===markers)onRangeMarkers(markers,positions)}
             }
             val atlas=appliedLayers?.atlas;val now=android.os.SystemClock.uptimeMillis()
+            if(atlas!=null&&atlas.labels.isNotEmpty()){
+                val revision=NativeBridge.labelVisibility(handle,labelVisibilityBytes,atlas.labels.size)
+                if(revision!=labelVisibilityRevision){
+                    labelVisibilityRevision=revision
+                    labelVisible=if(revision<0)null else ByteArray(atlas.labels.size).also{labelVisibilityBytes.rewind();labelVisibilityBytes.get(it)}
+                    labelPose=null
+                }
+            }
             if(atlas!=null&&atlas.labels.isNotEmpty()&&(labelPose!=pose||labelSize!=size)&&now-labelTime>=(if(gestureActive)100 else 33)){
                 val n=NativeBridge.project(handle,atlas.points,labelProjection);labelProjection.rewind();val positions=FloatArray(n*3){labelProjection.float}
+                labelVisible?.takeIf{it.size==n}?.let{visible->for(i in 0 until n)if(visible[i].toInt()==0)positions[i*3+2]=0f}
                 labelPose=pose;labelSize=size;labelTime=now
                 post{if(live&&layerBatch?.atlas===atlas)onLayerProjection(atlas,positions)}
             }else if(atlas!=null&&atlas.labels.isNotEmpty()&&(labelPose!=pose||labelSize!=size)){

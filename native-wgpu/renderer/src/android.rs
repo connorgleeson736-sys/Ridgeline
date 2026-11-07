@@ -1572,6 +1572,46 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_project(
         _ => 0,
     }
 }
+/// Terrain visibility of every current label candidate, for collision
+/// placement: writes one byte per label (255 visible, 0 hidden or off screen)
+/// and returns the visibility revision, or -1 before the first readback of
+/// the current candidates (or if [output] is too small).
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_labelVisibility(
+    env: *mut jni::sys::JNIEnv,
+    _class: jni::sys::jclass,
+    handle: i64,
+    output: jni::sys::jobject,
+    count: i32,
+) -> i64 {
+    let mut env = unsafe { jni::EnvUnowned::from_raw(env) };
+    match env
+        .with_env(|env| -> Result<i64, jni::errors::Error> {
+            let output = unsafe { jni::objects::JByteBuffer::from_raw(env, output) };
+            let Ok(all) = states().lock() else {
+                return Ok(-1);
+            };
+            let Some(state) = all.get(&(handle as u64)) else {
+                return Ok(-1);
+            };
+            let Some((revision, bytes)) = state.renderer.label_visibility() else {
+                return Ok(-1);
+            };
+            if count < 0 || bytes.len() != count as usize || env.get_direct_buffer_capacity(&output)? < bytes.len() {
+                return Ok(-1);
+            }
+            let out = unsafe {
+                std::slice::from_raw_parts_mut(env.get_direct_buffer_address(&output)?, bytes.len())
+            };
+            out.copy_from_slice(bytes);
+            Ok(revision as i64)
+        })
+        .into_outcome()
+    {
+        jni::Outcome::Ok(v) => v,
+        _ => -1,
+    }
+}
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_labelAtlas(
     env: *mut jni::sys::JNIEnv,
