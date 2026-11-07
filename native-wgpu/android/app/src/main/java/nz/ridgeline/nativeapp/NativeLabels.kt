@@ -91,6 +91,9 @@ internal object NativeLabels {
         val cells=HashMap<Long,MutableList<Box>>();val selected=ArrayList<Triple<Int,Float,Float>>()
         val next=HashMap<String,String>()
         val cell=64*scale;val padding=5*scale
+        // Placed line labels by name: a road or river name is not repeated
+        // closer than its symbol-spacing on screen (MapLibre spaces them along the line).
+        val named=HashMap<String,ArrayList<Float>>()
         fun keys(rect:Box):List<Long>{val result=ArrayList<Long>();for(y in floor(rect.top/cell).toInt()..floor(rect.bottom/cell).toInt())for(x in floor(rect.left/cell).toInt()..floor(rect.right/cell).toInt())result.add((x.toLong() shl 32)or(y.toLong() and 0xffffffffL));return result}
         // More important names first (MapLibre's symbol-sort-key); among equally
         // important ones, those already shown keep their place (no reshuffling).
@@ -99,13 +102,15 @@ internal object NativeLabels {
             if(i*3+2>=projected.size||projected[i*3+2]==0f)continue
             val px=projected[i*3];val py=projected[i*3+1];if(px<0||py<0||px>width||py>height)continue
             if(row.label.circle){selected.add(Triple(i,-row.width/2,-row.height/2));next[row.label.key]="circle";continue}
+            val spacing=row.label.spacing*scale
+            if(spacing>0f&&named[row.label.text]?.let{p->(p.indices step 2).any{k->val dx=p[k]-px;val dy=p[k+1]-py;dx*dx+dy*dy<spacing*spacing}}==true)continue
             val previous=shown[row.label.key]
             val anchors=if(row.label.variable)listOf("top","bottom","left","right").sortedBy{if(it==previous)0 else 1}else listOf(row.label.anchor)
             for(anchor in anchors){val ox=when(anchor){"left"->row.label.size*.7f;"right"->-row.width-row.label.size*.7f;else->-row.width/2};val oy=when(anchor){"top"->row.label.size*.5f;"bottom"->-row.height-row.label.size*.5f;else->-row.height/2}
                 val rect=Box(px+ox*scale-padding,py+oy*scale-padding,px+(ox+row.width)*scale+padding,py+(oy+row.height)*scale+padding)
                 if(rect.left<0||rect.top<0||rect.right>width||rect.bottom>height)continue
                 val indexes=keys(rect);if(indexes.any{k->cells[k]?.any{it.intersects(rect)}==true})continue
-                selected.add(Triple(i,ox,oy));next[row.label.key]=anchor;for(k in indexes)cells.getOrPut(k){ArrayList()}.add(rect);break
+                selected.add(Triple(i,ox,oy));next[row.label.key]=anchor;if(spacing>0f)named.getOrPut(row.label.text){ArrayList()}.apply{add(px);add(py)};for(k in indexes)cells.getOrPut(k){ArrayList()}.add(rect);break
             }
         }
         shown=next

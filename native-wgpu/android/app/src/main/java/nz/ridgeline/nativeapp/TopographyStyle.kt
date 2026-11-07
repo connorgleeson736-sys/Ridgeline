@@ -7,7 +7,10 @@ import kotlin.math.*
 /** Evaluates the actual pinned Capacitor style, rather than duplicating its zoom/filter tables. */
 internal class TopographyStyle(json:String){
     data class Line(val points:List<VectorTile.Point>,val color:Int,val width:Float,val dash:Float=0f,val gap:Float=0f,val order:Int=Int.MAX_VALUE)
-    data class Label(val point:VectorTile.Point,val text:String,val size:Float,val color:Int,val priority:Double,val bold:Boolean=false,val circle:Boolean=false,val key:String="",val anchor:String="center",val variable:Boolean=false)
+    data class Label(val point:VectorTile.Point,val text:String,val size:Float,val color:Int,val priority:Double,val bold:Boolean=false,val circle:Boolean=false,val key:String="",val anchor:String="center",val variable:Boolean=false,
+        /** Line labels (roads, rivers, tracks): MapLibre's symbol-spacing in px; the
+         * same name is not repeated closer than this on screen. 0 for point labels. */
+        val spacing:Float=0f)
     data class Output(val lines:List<Line>,val labels:List<Label>)
     private val specs=JSONArray(json).let{rows->List(rows.length()){rows.getJSONObject(it)}}.onEach{spec->
         // Performance: river and track names start later than in Capacitor
@@ -72,12 +75,15 @@ internal class TopographyStyle(json:String){
                     val size=if(kind=="circle")number(paint.opt("circle-radius"),4.0).toFloat()else number(eval(layout.opt("text-size")?:12,f.properties,zoom),12.0).toFloat()
                     // Minor track names (11 px in the style; named major tracks are 12 px) wait longer.
                     if(id=="nz-tracks-label"&&size<12f&&zoom<MINOR_TRACK_NAMES)continue
-                    if(id in ONE_PER_NAME&&!named.add(id+"\u0000"+text))continue
+                    // Line labels: one candidate per name per tile, however many
+                    // pieces the road or river is split into.
+                    val spacing=if(layout.optString("symbol-placement")=="line")layout.optDouble("symbol-spacing",250.0).toFloat()else 0f
+                    if((id in ONE_PER_NAME||spacing>0f)&&!named.add(id+"\u0000"+text))continue
                     val point=(if(f.type==3)polygonAnchor(f.paths)else anchor(path))?:continue
                     val c=color(eval(paint.opt(if(kind=="circle")"circle-color"else"text-color"),f.properties,zoom))
                     val priority=number(eval(layout.opt("symbol-sort-key")?:100,f.properties,zoom),100.0)
                     val bold=layout.optJSONArray("text-font")?.toString()?.contains("Bold")==true
-                    labels.add(Label(point,text.take(256),size,c,priority,bold,kind=="circle","$id:${f.id}:${point.x}:${point.y}:$text",layout.optString("text-anchor","center"),layout.has("text-variable-anchor")))
+                    labels.add(Label(point,text.take(256),size,c,priority,bold,kind=="circle","$id:${f.id}:${point.x}:${point.y}:$text",layout.optString("text-anchor","center"),layout.has("text-variable-anchor"),spacing))
                 }
             }
         };return Output(lines,labels)

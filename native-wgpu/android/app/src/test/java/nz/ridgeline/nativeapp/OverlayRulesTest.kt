@@ -42,4 +42,11 @@ class OverlayRulesTest {
         assertEquals(setOf("Hooker Valley Track"),names(style.build(tracks,s,14.0,14.0)))
         assertEquals(setOf("Hooker Valley Track","Local Spur Track"),names(style.build(tracks,s,15.6,14.0)))
     }
+    @Test fun aRoadSplitIntoPiecesGetsOneNamePerTile(){
+        val piece={i:Int->VectorTile.Feature("streets",i.toLong(),2,mapOf("kind" to "primary","hway_num" to 80L,"name" to "Mount Cook Road"),listOf(listOf(VectorTile.Point(.1+i*.1,.5),VectorTile.Point(.15+i*.1,.5))))}
+        val out=style.build((0 until 6).map(piece),MapSettings.State(),13.0,13.0)
+        val names=out.labels.filter{it.text=="SH 80"}
+        assertEquals(1,names.size)
+        assertEquals(850f,names[0].spacing)
+    }
 }

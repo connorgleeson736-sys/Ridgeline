@@ -1,6 +1,26 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.25 Hut Names Base APK — 32.9 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Hut-Names-0.1.25-Base.apk)**.
+Latest: **[Download 0.1.26 Quick Tracks Base APK — 32.9 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Quick-Tracks-0.1.26-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 27:
+**updates 0.1.13–0.1.25 in place, keeping its data.**
+
+- **Tracks and roads arrive sooner.** Their map data was downloaded last,
+  behind every visible imagery and terrain tile (priority 800). It now ranks
+  with visible imagery: the two nearest tiles right after the centre of the
+  view, the rest in view order.
+- **Fewer repeated road and river names.** A highway or river split into many
+  pieces got a name on every piece. Now there is one name per piece of map
+  data, and the same name is not repeated closer than the style's spacing
+  (850 px for highways, 900 px for rivers): about one per name per screen.
+
+Renderer unchanged from 0.1.25. 180 JVM tests pass, including new name
+spacing tests; lint 0 errors; 623 original assets identical. Not run on a phone.
+[Exact release record](../validation/quick-tracks-2026-11-07/release.json) ·
+[SHA-256](Ridgeline-Native-Quick-Tracks-0.1.26-Base.apk.sha256).
+
+## Previous 0.1.25 hut names checkpoint
+
+**[Download 0.1.25 Hut Names Base APK — 32.9 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Hut-Names-0.1.25-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 26:
 **updates 0.1.13–0.1.24 in place, keeping its data.**
 
