@@ -1,6 +1,25 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.29 Steady Names Base APK — 33.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Steady-Names-0.1.29-Base.apk)**.
+Latest: **[Download 0.1.30 Overlays Fixed Base APK — 33.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Overlays-Fixed-0.1.30-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 31:
+**updates 0.1.13–0.1.29 in place, keeping its data.**
+
+- **Overlays fixed (broken since 0.1.27).** A native function added in 0.1.27
+  returned one byte while the app read four; on the phone the extra bytes are
+  undefined, so new names were usually treated as not applied and re-sent
+  every frame, resetting the map's names each time. It now returns the right
+  type, and any unexpected result falls back to a full update.
+- A new test checks every native function's return type against the app's
+  declaration (it fails on 0.1.29).
+
+188 JVM tests, Rust tests and GPU checks pass on Vulkan and GLES; lint 0
+errors; 623 original assets identical. Not run on a phone.
+[Exact release record](../validation/overlays-fixed-2026-11-07/release.json) ·
+[SHA-256](Ridgeline-Native-Overlays-Fixed-0.1.30-Base.apk.sha256).
+
+## Previous 0.1.29 steady names checkpoint
+
+**[Download 0.1.29 Steady Names Base APK — 33.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Steady-Names-0.1.29-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 30:
 **updates 0.1.13–0.1.28 in place, keeping its data.**
 

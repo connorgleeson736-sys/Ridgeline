@@ -5,11 +5,15 @@
 the audited APK was 0.1.5. Main next candidates are raw local-I/O isolation,
 GPU upload acknowledgement, classified recovery and per-tile critical-path tracing.
 
-Latest APK: **[0.1.29 Steady Names Base](checkpoints/README.md)** — updates
+Latest APK: **[0.1.30 Overlays Fixed Base](checkpoints/README.md)** — updates
+0.1.13–0.1.29 in place. Fixes overlays broken since 0.1.27 (a native return
+type mismatch), with a test covering every native function.
+
+Previous APK: **[0.1.29 Steady Names Base](checkpoints/README.md)** — updates
 0.1.13–0.1.28 in place. Names no longer stay hidden or shown after the map
 stops, and search loads about 3.5x faster.
 
-Previous APK: **[0.1.28 Search and Offline Base](checkpoints/README.md)** — updates
+Older APK: **[0.1.28 Search and Offline Base](checkpoints/README.md)** — updates
 0.1.13–0.1.27 in place. Offline place, hut and track search; smaller route
 cards; Capacitor-style offline downloads; and a stored-detail colour view.
 
