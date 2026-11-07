@@ -1,0 +1,30 @@
+{
+  "artifact": "Ridgeline-Native-Overlay-Watchdog-0.1.32-Base.apk",
+  "bytes": 33749734,
+  "sha256": "b41f78a1d826b217a6090933371017c8a1ff4bceb0f14084f53459c0891303f6",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.32-overlay-watchdog",
+  "versionCode": 33,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.31 Full Audit (same package and signer)",
+  "changes": [
+    "overlay download watchdog: a topographic tile download outstanding 20 s or more is released and retried (checked every 5 s while downloads are outstanding), so a request whose result never arrives can no longer hold one of the four overlay slots while its tile stays in view",
+    "diagnostics: overlay tiles prepared and in view, downloads in flight, oldest download age, stale releases and refusals; line packets sent, accepted, rejected and re-sent; groups held by the renderer; whether names are applied"
+  ],
+  "rendererUnchangedFrom": "0.1.30 (identical libridgeline_renderer.so)",
+  "rootCause": "not confirmed on a device: toggling overlays or moving away (both release overlay download slots) restores overlays, which points at downloads that never complete; the new diagnostics will show it",
+  "tests": {
+    "kotlinJvm": "190 tests, 0 failures (new StaleLeaseTest)",
+    "rust": "unchanged since 0.1.31: all pass"
+  },
+  "lintErrors": 0,
+  "originalAssetsIdentical": 623,
+  "jniExportsPerAbi": 48,
+  "loadAlignment": "0x4000",
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

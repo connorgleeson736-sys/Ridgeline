@@ -26,6 +26,13 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         fun <T> startLeased(consumer:TileTransport.Consumer,start:()->T):T?=try{start()}catch(_:Exception){consumer.release(true);null}
         /** Retry a refused request after this long. */
         const val REFUSED_RETRY_MILLIS=750L
+        /** An overlay download outstanding this long is released and retried:
+         * a request whose result never arrives must not hold one of the four
+         * slots while its tile stays in view (overlays then stopped until the
+         * map was moved away or overlays were toggled). */
+        const val STALE_LEASE_MILLIS=20_000L
+        /** Leases older than [limit] at [now], given their start times. */
+        fun staleLeases(started:Map<GpuUploadQueue.Id,Long>,now:Long,limit:Long=STALE_LEASE_MILLIS)=started.filterValues{now-it>=limit}.keys
     }
     private data class Tile(val body:TileBody,var mask:Set<String>,var features:List<VectorTile.Feature>){
         /** Styled output for the last (settings, quarter zoom); reused across publications. */
@@ -59,7 +66,22 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
     // keep loading during gestures. (Previously one tile at a time, none while
     // moving, so tracks could take seconds to appear after stopping.)
     private val leases=ConcurrentHashMap<GpuUploadQueue.Id,TileTransport.Consumer>()
-    private fun releaseAll(){for((id,owned)in leases.entries.toList())if(leases.remove(id,owned))owned.release(true)}
+    private fun releaseAll(){for((id,owned)in leases.entries.toList())if(leases.remove(id,owned))owned.release(true);leaseStarted.clear()}
+    /** When each outstanding overlay download started (worker thread). */
+    private val leaseStarted=ConcurrentHashMap<GpuUploadQueue.Id,Long>()
+    private var staleReleases=0L;private var refused=0L
+    private var leaseWatch:ScheduledFuture<*>?=null
+    /** Release overlay downloads outstanding too long, then refill the slots. */
+    private fun releaseStale(){
+        val now=System.currentTimeMillis()
+        leaseStarted.keys.retainAll(leases.keys)
+        for(id in staleLeases(leaseStarted,now)){val owned=leases[id]?:continue
+            if(leases.remove(id,owned)){owned.release(true);leaseStarted.remove(id);retry.remove(id);staleReleases++}}
+    }
+    private fun watchLeases(){
+        if(closed||leases.isEmpty()||leaseWatch?.isDone==false)return
+        leaseWatch=worker.schedule({leaseWatch=null;releaseStale();pump();watchLeases()},5,TimeUnit.SECONDS)
+    }
     private var lastPublishAt=0L;private var lastSelectionAt=0L
     private var timer:ScheduledFuture<*>?=null;private var publication:ScheduledFuture<*>?=null;private var retryWake:ScheduledFuture<*>?=null
     @Volatile private var closed=false
@@ -130,9 +152,10 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
             val owned=loader.layerConsumer(current.indexOf(id).coerceAtLeast(0));leases[id]=owned
             if(closed||!active){leases.remove(id,owned);owned.release(true);return}
             val bodyFuture=startLeased(owned){loader.layerBody(owned,loader.vectorUrl(id.z,id.x,id.y))}
-            if(bodyFuture==null){leases.remove(id,owned);retry[id]=now+REFUSED_RETRY_MILLIS;break}
+            if(bodyFuture==null){leases.remove(id,owned);retry[id]=now+REFUSED_RETRY_MILLIS;refused++;break}
+            leaseStarted[id]=now;watchLeases()
             bodyFuture.whenComplete{body,error->runCatching{worker.execute{
-                if(!leases.remove(id,owned)){owned.close();return@execute};owned.close()
+                if(!leases.remove(id,owned)){owned.close();return@execute};owned.close();leaseStarted.remove(id)
                 if(closed||id !in current){pump();return@execute}
                 if(error==null&&body!=null&&body.status in 200..299){
                     try{val start=System.nanoTime();val enabled=mask(loader.mapSettings.state);val features=VectorTile.decode(body.bytes,id.z,id.x,id.y,enabled);tiles[id]=Tile(body,enabled,features);decoded++;lastDecodeMs=(System.nanoTime()-start)/1_000_000;lastKey=null}
@@ -199,7 +222,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         lastBuildMs=(System.nanoTime()-start)/1_000_000
         if(chosen!=lastLabels){val a=System.nanoTime();atlas=NativeLabels.atlas(chosen,view.context.assets);lastLabels=chosen;lastAtlasMs=(System.nanoTime()-a)/1_000_000}
         val batch=NativeLayerBatch(lastGroups,atlas)
-        diagnostics="Topography tiles: ${tiles.size}/${current.size} · decoded $decoded · one shared background transfer\nVector decode: $lastDecodeMs ms · layer build: $lastBuildMs ms · font atlas: $lastAtlasMs ms\nLine groups: ${groups.size} · lines ${groups.sumOf{it.lines}} · label candidates ${atlas.labels.size} · atlas ${atlas.width}×${atlas.height}"
+        diagnostics="Topography tiles: ${tiles.size} prepared (${current.count{it in tiles}}/${current.size} in view) · downloading ${leases.size}/$PARALLEL_TILES · oldest ${leaseStarted.values.minOrNull()?.let{(System.currentTimeMillis()-it)/1000}?:0} s · stale releases $staleReleases · refused $refused · decoded $decoded\nVector decode: $lastDecodeMs ms · layer build: $lastBuildMs ms · font atlas: $lastAtlasMs ms\nLine groups: ${groups.size} · lines ${groups.sumOf{it.lines}} · label candidates ${atlas.labels.size} · atlas ${atlas.width}×${atlas.height}"
         main.post{if(!closed)view.mapLayers(batch)}
     }
     private fun readBoundary():List<List<VectorTile.Point>>{

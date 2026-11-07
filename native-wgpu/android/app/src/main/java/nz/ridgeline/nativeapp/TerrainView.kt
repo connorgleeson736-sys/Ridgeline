@@ -50,7 +50,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     private var focusCoverDirty=false
     val gestureInProgress get()=gestureActive
     @Volatile private var lastBacklog=0
-    internal fun loadingSnapshot()=frameReport()+"\nGPU uploads waiting: ${uploads.size()} · outstanding submissions: $lastBacklog\nGPU admission: ${uploads.outcomeStats()}\nResident geometry/images: ${residency.geometry.size}/${residency.images.size}\nNative render CPU/wait last/max: $renderLastMs/$renderMaxMs ms\nDetail focus: "+if(surfaceFocusFor(planningPose)!=null)"measured visible terrain"else"map pivot (no current terrain hit)"
+    internal fun loadingSnapshot()="Overlay lines: packets ${lineCounts[0]} · accepted ${lineCounts[1]} · rejected ${lineCounts[2]} · re-sent in full ${lineCounts[3]} · groups ${layerBatch?.lines?.size?:0} (renderer holds ${heldLines?.second?.size?:0}) · names applied ${if(layerBatch===appliedLayers)"yes" else "waiting"}\n"+frameReport()+"\nGPU uploads waiting: ${uploads.size()} · outstanding submissions: $lastBacklog\nGPU admission: ${uploads.outcomeStats()}\nResident geometry/images: ${residency.geometry.size}/${residency.images.size}\nNative render CPU/wait last/max: $renderLastMs/$renderMaxMs ms\nDetail focus: "+if(surfaceFocusFor(planningPose)!=null)"measured visible terrain"else"map pivot (no current terrain hit)"
     val canPrepareAhead get()=live&&active&&!gestureActive&&lastBacklog==0&&!uploads.isNotEmpty()
     fun checkPreparationRoom(callback:(Boolean)->Unit){gpu.post{
         if(live&&active&&handle!=0L&&!gestureActive&&presentationFailures==0){lastBacklog=NativeBridge.gpuBacklog(handle);callback(canPrepareAhead)}else callback(false)
@@ -89,6 +89,8 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     @Volatile private var parsedLines:Pair<Long,List<LineGroup>>?=null
     /** Line group ids the renderer [handle] holds (line parser thread only). */
     private var heldLines:Pair<Long,Set<Long>>?=null
+    /** Overlay line packets sent / accepted / rejected / re-sent in full (diagnostics). */
+    private val lineCounts=java.util.concurrent.atomic.AtomicLongArray(4)
     /** Packet for [groups]: bodies only for groups the renderer does not hold. */
     private fun linePacket(groups:List<LineGroup>,held:Set<Long>)=LineGroup.packet(groups,held)
     private val parsingLines=AtomicBoolean()
@@ -104,9 +106,11 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
                 // Parsing happens before the renderer mutex inside JNI. Never
                 // hold the camera or GPU HandlerThread behind a large packet.
                 val held=heldLines?.takeIf{it.first==scene}?.second?:emptySet()
+                lineCounts.incrementAndGet(0)
                 var result=NativeBridge.cartography(scene,linePacket(packet,held))
-                if(result==2)result=NativeBridge.cartography(scene,linePacket(packet,emptySet()))
-                if(result!=1){heldLines=null;break}
+                if(result==2){lineCounts.incrementAndGet(3);result=NativeBridge.cartography(scene,linePacket(packet,emptySet()))}
+                if(result!=1){lineCounts.incrementAndGet(2);heldLines=null;break}
+                lineCounts.incrementAndGet(1)
                 heldLines=scene to packet.mapTo(HashSet()){it.id}
                 if(scene==handle&&live){parsedLines=scene to packet;requestFrame()}
             }}finally{parsingLines.set(false)}
