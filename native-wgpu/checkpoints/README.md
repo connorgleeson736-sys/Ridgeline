@@ -1,6 +1,23 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.32 Overlay Watchdog Base APK — 33.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Overlay-Watchdog-0.1.32-Base.apk)**.
+Latest: **[Download 0.1.33 Empty Tiles Base APK — 33.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Empty-Tiles-0.1.33-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 34:
+**updates 0.1.13–0.1.32 in place, keeping its data.**
+
+- **Overlays fixed: root cause found from loading diagnostics** (accepted 0,
+  rejected 844). Since 0.1.27 a tile with no lines was sent in a way the
+  renderer read as "reuse the lines you already have", so any line-free tile
+  in view made it reject every update: no lines anywhere, and names never
+  applied. References now have their own marker.
+
+191 JVM tests and 51 Rust tests pass, including real Wanaka packets; lint 0
+errors; 623 original assets identical. Not run on a phone.
+[Exact release record](../validation/empty-tiles-2026-11-07/release.json) ·
+[SHA-256](Ridgeline-Native-Empty-Tiles-0.1.33-Base.apk.sha256).
+
+## Previous 0.1.32 overlay watchdog checkpoint
+
+**[Download 0.1.32 Overlay Watchdog Base APK — 33.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Overlay-Watchdog-0.1.32-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 33:
 **updates 0.1.13–0.1.31 in place, keeping its data.**
 

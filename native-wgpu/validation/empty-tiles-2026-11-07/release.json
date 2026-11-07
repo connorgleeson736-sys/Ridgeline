@@ -1,0 +1,30 @@
+{
+  "artifact": "Ridgeline-Native-Empty-Tiles-0.1.33-Base.apk",
+  "bytes": 33749722,
+  "sha256": "92b0114f132d37d7ba3347786c4ed9a91e18256517e49fa05c165970898ac60a",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.33-empty-tiles",
+  "versionCode": 34,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.32 Full Audit (same package and signer)",
+  "rootCause": "Found from the user's 0.1.32 loading diagnostics (line packets: accepted 0, rejected 844, re-sent in full 844; 15 groups, 44 lines). Since 0.1.27 a body length of 0 meant 'reference to a group the renderer holds', but a tile with no lines also has a 0-length body. Any line-free tile in view was read as a reference to a group the renderer did not hold, so it rejected the packet; the full re-send carried the same zero lengths and was rejected too. With no packet accepted, no lines were drawn and names (which wait for lines) were never applied. Views where every tile had lines (Wanaka) worked.",
+  "changes": [
+    "references are marked with body length 0xFFFFFFFF (overlay::REFERENCE / LineGroup.REFERENCE); a tile with no lines is an empty body",
+    "Rust unit test: an empty tile parses as Empty, a reference as Existing; Kotlin LinePacketTest: empty tiles are 0-length bodies, held tiles are references"
+  ],
+  "tests": {
+    "kotlinJvm": "191 tests, 0 failures",
+    "rust": "51 tests pass, including 186 real Wanaka packets from the app's Kotlin code",
+    "gpu": "overlay_drape (Vulkan and GLES)"
+  },
+  "lintErrors": 0,
+  "originalAssetsIdentical": 623,
+  "jniExportsPerAbi": 48,
+  "loadAlignment": "0x4000",
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

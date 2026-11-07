@@ -617,8 +617,11 @@ impl Overlay {
     }
 }
 
+/// Body length marking a group sent by reference (the renderer holds it).
+pub const REFERENCE: u32 = u32::MAX;
 /// Parse a grouped line packet (see the Android cartography JNI): per group
-/// z, x, y, clip[4], line count, 64-bit id, body length, body. None if invalid.
+/// z, x, y, clip[4], line count, 64-bit id, body length (REFERENCE for a
+/// group sent by reference), body. None if invalid.
 pub fn parse_line_packet(bytes: &[u8]) -> Option<Vec<GroupInput>> {
     let size = bytes.len();
     if size < 4 {
@@ -651,13 +654,16 @@ pub fn parse_line_packet(bytes: &[u8]) -> Option<Vec<GroupInput>> {
         let id = long(at + 48);
         let body = int(at + 56) as usize;
         at += 60;
-        if lines_count > 65536 || clip.iter().any(|v| !v.is_finite()) || at + body > size {
-            return None;
-        }
         let key = GroupKey { z, x, y, clip: clip.map(f64::to_bits) };
-        if body == 0 {
+        // REFERENCE, not a zero length: a tile with no lines has an empty
+        // body, and reading that as a reference made every packet with an
+        // empty tile in view fail, so no overlays were drawn.
+        if body as u32 == REFERENCE {
             groups.push(GroupInput::Existing(key, id));
             continue;
+        }
+        if lines_count > 65536 || clip.iter().any(|v| !v.is_finite()) || at + body > size {
+            return None;
         }
         let end = at + body;
         let mut lines = Vec::with_capacity(lines_count);
@@ -713,4 +719,47 @@ pub fn parse_line_packet(bytes: &[u8]) -> Option<Vec<GroupInput>> {
         return None;
     }
     Some(groups)
+}
+
+#[cfg(test)]
+mod packet_tests {
+    use super::*;
+    fn group(out: &mut Vec<u8>, id: u64, lines: &[&[[f64; 2]]], reference: bool) {
+        for v in [14u32, 1, 2] {
+            out.extend(v.to_le_bytes());
+        }
+        for v in [0.1f64, 0.1, 0.2, 0.2] {
+            out.extend(v.to_le_bytes());
+        }
+        out.extend((lines.len() as u32).to_le_bytes());
+        out.extend(id.to_le_bytes());
+        let mut body = Vec::new();
+        for line in lines {
+            body.extend((line.len() as u32).to_le_bytes());
+            body.extend(0xff00ff00u32.to_le_bytes());
+            for v in [2f32, 0., 0.] {
+                body.extend(v.to_le_bytes());
+            }
+            body.extend(0i32.to_le_bytes());
+            for p in line.iter() {
+                body.extend(p[0].to_le_bytes());
+                body.extend(p[1].to_le_bytes());
+            }
+        }
+        out.extend((if reference { REFERENCE } else { body.len() as u32 }).to_le_bytes());
+        if !reference {
+            out.extend(body);
+        }
+    }
+    #[test]
+    fn an_empty_tile_is_empty_not_a_reference() {
+        let mut packet = 3u32.to_le_bytes().to_vec();
+        group(&mut packet, 1, &[], false);
+        group(&mut packet, 2, &[&[[0.12, 0.12], [0.18, 0.18]]], false);
+        group(&mut packet, 3, &[], true);
+        let parsed = parse_line_packet(&packet).expect("parses");
+        assert!(matches!(parsed[0], GroupInput::Empty(_, 1)), "a tile without lines is sent by value, empty");
+        assert!(matches!(parsed[1], GroupInput::New(_)));
+        assert!(matches!(parsed[2], GroupInput::Existing(_, 3)));
+    }
 }

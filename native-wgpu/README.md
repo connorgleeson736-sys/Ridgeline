@@ -5,11 +5,15 @@
 the audited APK was 0.1.5. Main next candidates are raw local-I/O isolation,
 GPU upload acknowledgement, classified recovery and per-tile critical-path tracing.
 
-Latest APK: **[0.1.32 Overlay Watchdog Base](checkpoints/README.md)** — updates
+Latest APK: **[0.1.33 Empty Tiles Base](checkpoints/README.md)** — updates
+0.1.13–0.1.32 in place. Fixes overlays: a tile with no lines made the renderer
+reject every overlay update since 0.1.27.
+
+Previous APK: **[0.1.32 Overlay Watchdog Base](checkpoints/README.md)** — updates
 0.1.13–0.1.31 in place. Stuck overlay downloads are released and retried after
 20 s, and loading diagnostics show the overlay pipeline.
 
-Previous APK: **[0.1.31 Overlay Slots Base](checkpoints/README.md)** — updates
+Older APK: **[0.1.31 Overlay Slots Base](checkpoints/README.md)** — updates
 0.1.13–0.1.30 in place. Overlays no longer stop for the rest of the session
 after a busy area fills the download queue.
 
