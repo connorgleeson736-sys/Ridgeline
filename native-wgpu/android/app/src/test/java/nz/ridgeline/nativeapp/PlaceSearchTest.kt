@@ -30,3 +30,11 @@ class PlaceSearchTest {
         assertTrue("$ms ms per search",ms<60)
     }
 }
+class PlaceSearchLoadTimeTest {
+    @Test fun loadTime(){
+        val lines=File("src/main/assets/search/places.tsv").readLines()
+        // Warm: no regular expressions or double normalisation per name (was ~250 ms here).
+        val ms=(0 until 3).map{val start=System.nanoTime();PlaceSearch(lines.asSequence());(System.nanoTime()-start)/1_000_000}.last()
+        assertTrue("$ms ms to build the index",ms<150)
+    }
+}

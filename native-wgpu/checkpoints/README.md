@@ -1,6 +1,26 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.28 Search and Offline Base APK — 33.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Search-Offline-0.1.28-Base.apk)**.
+Latest: **[Download 0.1.29 Steady Names Base APK — 33.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Steady-Names-0.1.29-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 30:
+**updates 0.1.13–0.1.28 in place, keeping its data.**
+
+- **Names no longer come and go after you stop moving.** The check for names
+  hidden by terrain runs at most 15 times a second; if the map stopped just
+  after a check, the final view was never checked and names stayed hidden or
+  shown until the next touch. The renderer now keeps going until it has been.
+- **Search loads about 3.5× faster** and starts loading in the background
+  shortly after launch.
+- Track and road data: real LINZ tiles packed by the app now go through the
+  renderer's parser in a test (all 12,155 lines parse).
+
+187 JVM tests, Rust tests and GPU checks pass on Vulkan and GLES; lint 0
+errors; 623 original assets identical. Not run on a phone.
+[Exact release record](../validation/steady-names-2026-11-07/release.json) ·
+[SHA-256](Ridgeline-Native-Steady-Names-0.1.29-Base.apk.sha256).
+
+## Previous 0.1.28 search and offline checkpoint
+
+**[Download 0.1.28 Search and Offline Base APK — 33.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Search-Offline-0.1.28-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 29:
 **updates 0.1.13–0.1.27 in place, keeping its data.**
 

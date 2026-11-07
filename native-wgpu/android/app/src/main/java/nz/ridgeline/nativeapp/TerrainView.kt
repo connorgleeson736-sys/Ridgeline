@@ -90,13 +90,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     /** Line group ids the renderer [handle] holds (line parser thread only). */
     private var heldLines:Pair<Long,Set<Long>>?=null
     /** Packet for [groups]: bodies only for groups the renderer does not hold. */
-    private fun linePacket(groups:List<LineGroup>,held:Set<Long>):ByteBuffer{
-        val out=ByteBuffer.allocateDirect(4+groups.sumOf{60+if(it.id in held)0 else it.bytes.size-48}).order(ByteOrder.LITTLE_ENDIAN)
-        out.putInt(groups.size)
-        for(g in groups){val body=if(g.id in held)0 else g.bytes.size-48
-            out.put(g.bytes,0,48).putLong(g.id).putInt(body);if(body>0)out.put(g.bytes,48,body)}
-        out.rewind();return out
-    }
+    private fun linePacket(groups:List<LineGroup>,held:Set<Long>)=LineGroup.packet(groups,held)
     private val parsingLines=AtomicBoolean()
     private val lineParser=java.util.concurrent.Executors.newSingleThreadExecutor{run->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);run.run()},"RidgelineLinePackets")}
     private var deferredLayer:NativeLayerBatch?=null

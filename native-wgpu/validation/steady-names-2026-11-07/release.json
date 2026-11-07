@@ -1,0 +1,30 @@
+{
+  "artifact": "Ridgeline-Native-Steady-Names-0.1.29-Base.apk",
+  "bytes": 33749718,
+  "sha256": "e91bac21aadc6b2ca4aad0d24a4bab1fac690ef0c810e079ef10a5cdccadd65c",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.29-steady-names",
+  "versionCode": 30,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.28 Full Audit (same package and signer)",
+  "changes": [
+    "label visibility probe: when the camera, names or terrain changed but the probe's 66 ms rate limit postponed it, the renderer keeps requesting frames until the final view is probed (previously a map that stopped right after a probe kept stale visibility, so names stayed hidden or shown until the next touch)",
+    "line packet parser moved to overlay::parse_line_packet; real LINZ tiles packed by the app's Kotlin code parse in a new renderer test (164 groups, 12,155 lines, half by reference)",
+    "place search index builds about 3.5x faster (no per-name regular expressions or double normalisation) and starts loading in the background 4 s after launch"
+  ],
+  "tests": {
+    "kotlinJvm": "187 tests, 0 failures (search index build time check, line packet export)",
+    "rust": "cargo test --workspace: all pass (new line_packets test with real Kotlin packets)",
+    "gpu": "label_occlusion with a final-view probe check; overlay_drape, route_smoke, waypoint_occlusion, topo_filter, coverage_tint, overlay_pool pass on Vulkan and GLES"
+  },
+  "lintErrors": 0,
+  "originalAssetsIdentical": 623,
+  "jniExportsPerAbi": 48,
+  "loadAlignment": "0x4000",
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

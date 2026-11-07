@@ -156,6 +156,23 @@ async fn probe(instance: &wgpu::Instance, heights: &[f32]) -> Vec<u8> {
                 r.render(&target, center, 11., 0., 60., 500.);
                 extra += 1;
             }
+            // Moving right after a probe (inside its rate limit) and then
+            // stopping: the frames the renderer asks for must still probe the
+            // final view. Shifted a tile east, both candidates are off screen.
+            let moved = [center[0] + (b[2] - b[0]), center[1]];
+            // A probe starts on a slightly moved view; the map then stops at
+            // the final view within the probe's 66 ms rate limit.
+            r.render(&target, [center[0] + (b[2] - b[0]) * 0.002, center[1]], 11., 0., 60., 500.);
+            r.render(&target, moved, 11., 0., 60., 500.);
+            let mut extra = 0;
+            while r.next_adaptive_frame().is_some() && extra < 200 {
+                std::thread::sleep(std::time::Duration::from_millis(10));
+                r.device.poll(wgpu::PollType::wait_indefinitely()).unwrap();
+                r.render(&target, moved, 11., 0., 60., 500.);
+                extra += 1;
+            }
+            let after = r.label_visibility().map(|(_, v)| v.to_vec());
+            assert_eq!(after, Some(vec![0, 0]), "the final view is probed after stopping");
             return v;
         }
         r.device.poll(wgpu::PollType::wait_indefinitely()).unwrap();
