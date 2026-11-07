@@ -39,7 +39,7 @@ pub(crate) struct LabelGpu {
     pixels: Vec<u8>,
     uploaded_bytes: u64,
     pipeline: wgpu::RenderPipeline,
-    uniform: wgpu::Buffer,
+    pub(crate) uniform: wgpu::Buffer,
     bind: wgpu::BindGroup,
     atlas_bind: wgpu::BindGroup,
     _atlas: wgpu::Texture,
@@ -313,6 +313,7 @@ impl LabelGpu {
         ppm: f32,
         scale: f32,
         time: f32,
+        candidates: bool,
     ) {
         let world = 512. * 2f64.powf(view.zoom);
         let frame = Frame {
@@ -337,7 +338,8 @@ impl LabelGpu {
             ),
         );
         let previous_matrix = previous.matrix * a.as_mat4();
-        if self.count == 0 {
+        // Also kept current for unplaced candidates: the visibility probe uses it.
+        if self.count == 0 && !candidates {
             return;
         };
         let scene = Scene {
@@ -384,6 +386,7 @@ impl crate::Renderer {
     /// arrives (select_labels), instead of all vanishing for a round trip.
     pub fn set_label_metadata(&mut self, sprites: Vec<LabelSprite>) {
         self.label_sprites = sprites;
+        self.label_generation += 1;
         self.label_selection.clear();
         self.labels_stale = true;
     }

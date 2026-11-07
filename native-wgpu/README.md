@@ -5,12 +5,16 @@
 the audited APK was 0.1.5. Main next candidates are raw local-I/O isolation,
 GPU upload acknowledgement, classified recovery and per-tile critical-path tracing.
 
-Latest APK: **[0.1.24 Sharp Topo Base](checkpoints/README.md)** — updates
+Latest APK: **[0.1.25 Hut Names Base](checkpoints/README.md)** — updates
+0.1.13–0.1.24 in place. Hut names show in steep valleys again: names hidden by
+terrain no longer take screen space, and important names are placed first.
+
+Previous APK: **[0.1.24 Sharp Topo Base](checkpoints/README.md)** — updates
 0.1.13–0.1.23 in place. NZ Topo drawn like MapLibre (no dropped pixel rows or
 shimmer), capped at its real z17 detail (about 4x fewer downloads close in), and
 lower resolution while moving on slower phones.
 
-Previous APK: **[0.1.23 Steady Lines Base](checkpoints/README.md)** — updates
+Older APK: **[0.1.23 Steady Lines Base](checkpoints/README.md)** — updates
 0.1.13–0.1.22 in place. Route lines no longer flicker against simplified
 terrain, and tracks and roads stay on every visible tile (two-tier overlay pool).
 

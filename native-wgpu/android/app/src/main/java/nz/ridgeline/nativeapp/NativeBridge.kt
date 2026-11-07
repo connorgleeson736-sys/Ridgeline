@@ -31,6 +31,7 @@ object NativeBridge {
  @JvmStatic external fun inspect(handle:Long,longitude:Double,latitude:Double,enabled:Boolean):Boolean
  @JvmStatic external fun cartography(handle:Long,input:ByteBuffer):Boolean
  @JvmStatic external fun project(handle:Long,input:ByteBuffer,output:ByteBuffer):Int
+ @JvmStatic external fun labelVisibility(handle:Long,output:ByteBuffer,count:Int):Long
  @JvmStatic external fun labelMetadata(handle:Long,metadata:ByteBuffer):Boolean
  @JvmStatic external fun labelAtlas(handle:Long,width:Int,height:Int,rgba:ByteBuffer,metadata:ByteBuffer):Boolean
  @JvmStatic external fun placeLabels(handle:Long,input:ByteBuffer):Boolean
