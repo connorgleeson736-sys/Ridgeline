@@ -459,7 +459,11 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private val transport by lazy{TileTransport(backend,ramBudget.encoded,initialLimits=downloadLimits)}
     // Visible map-layer tiles are ordinary visible work (as in the Capacitor app),
     // not background speculation: foreground transfer slots, ranked after imagery.
-    internal fun layerConsumer()=transport.consumer(800,false,cacheDeadline=true)
+    /** Topographic vector tiles rank with visible imagery and terrain (focus
+     * 1-4, the rest 64+), not after them (was 800: behind every visible image,
+     * terrain tile and profile, so tracks waited while panning). [rank] is the
+     * tile's place in the view's nearest-first selection. */
+    internal fun layerConsumer(rank:Int)=transport.consumer(if(rank<2)5+rank else 64+rank,false,cacheDeadline=true)
     internal fun layerBody(consumer:TileTransport.Consumer,url:String)=consumer.acquire(ResourceKey(url,offlineOnly))
     internal fun vectorUrl(z:Int,x:Int,y:Int)="https://basemaps.linz.govt.nz/v1/tiles/topographic-v2/3857/$z/$x/$y.pbf?api=$key"
     internal fun changeMapStyle(before:MapSettings.State,after:MapSettings.State){

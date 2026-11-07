@@ -106,7 +106,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         val now=System.currentTimeMillis()
         while(leases.size<PARALLEL_TILES){
             val id=current.firstOrNull{it !in tiles&&!leases.containsKey(it)&&(retry[it]?:0)<=now}?:break
-            val owned=loader.layerConsumer();leases[id]=owned
+            val owned=loader.layerConsumer(current.indexOf(id).coerceAtLeast(0));leases[id]=owned
             if(closed||!active){leases.remove(id,owned);owned.release(true);return}
             val bodyFuture=try{loader.layerBody(owned,loader.vectorUrl(id.z,id.x,id.y))}catch(_:IllegalStateException){leases.remove(id,owned);owned.release(true);return}
             bodyFuture.whenComplete{body,error->runCatching{worker.execute{
