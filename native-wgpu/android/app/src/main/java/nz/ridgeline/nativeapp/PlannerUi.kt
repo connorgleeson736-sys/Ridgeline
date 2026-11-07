@@ -83,6 +83,43 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
     /** Bottom map controls move above the route sheet's overlapping edge. */
     var onMapCover:(Int)->Unit={}
     private var fitOpenedPending=false
+    /** Offline place search (LINZ Gazetteer, DOC huts, campsites and walks),
+     * loaded on first use off the main thread. */
+    @Volatile private var placeSearch:PlaceSearch?=null
+    private var searchQuery=""
+    private var searchResults:LinearLayout?=null
+    private var routesContent:List<View> = emptyList()
+    private val searchRun=Runnable{runSearch()}
+    private fun loadSearch(){if(placeSearch==null)files.execute{if(placeSearch==null)placeSearch=runCatching{activity.assets.open("search/places.tsv").bufferedReader().use{PlaceSearch(it.lineSequence())}}.getOrNull();main.post{if(searchQuery.isNotBlank())runSearch()}}}
+    private fun runSearch(){
+        val query=searchQuery;val list=searchResults?:return
+        if(query.isBlank()){list.removeAllViews();list.visibility=View.GONE;for(v in routesContent)v.visibility=View.VISIBLE;return}
+        list.visibility=View.VISIBLE;for(v in routesContent)v.visibility=View.GONE
+        val engine=placeSearch
+        if(engine==null){list.removeAllViews();list.addView(NativeUi.text(activity,"Loading place names…",13f).apply{setTextColor(NativeUi.muted);setPadding(0,dp(10),0,dp(10))});loadSearch();return}
+        val near=terrain.cameraPose.let{Coordinate(it.longitude,it.latitude)}
+        files.execute{val results=engine.search(query,near);main.post{if(searchQuery==query&&searchResults===list)showResults(list,results)}}
+    }
+    private fun showResults(list:LinearLayout,results:List<PlaceSearch.Result>){
+        list.removeAllViews()
+        if(results.isEmpty()){list.addView(NativeUi.text(activity,"No places, huts or tracks found.",13f).apply{setTextColor(NativeUi.muted);setPadding(0,dp(10),0,dp(10))});return}
+        for(result in results){val place=result.place
+            val row=NativeUi.column(activity).apply{setPadding(dp(2),dp(8),dp(2),dp(8));background=NativeUi.pressable(activity,null);isClickable=true;contentDescription="${PlaceSearch.label(place.kind)} ${place.name}"}
+            row.addView(NativeUi.text(activity,place.name,14f).apply{setTypeface(null,android.graphics.Typeface.BOLD);setTextColor(NativeUi.ink);maxLines=2})
+            val distance=if(result.distanceKm<1)"${(result.distanceKm*1000).roundToInt()} m away" else if(result.distanceKm<100)String.format(java.util.Locale.ROOT,"%.1f km away",result.distanceKm)else"${result.distanceKm.roundToInt()} km away"
+            row.addView(NativeUi.text(activity,listOf(PlaceSearch.label(place.kind),place.detail,distance).filter{it.isNotBlank()}.joinToString(" · "),11.5f).apply{setTextColor(Color.rgb(120,132,124));maxLines=2})
+            if(place.link.isNotBlank())row.addView(link("DOC page"){runCatching{activity.startActivity(Intent(Intent.ACTION_VIEW,android.net.Uri.parse(place.link)))}.onFailure{toast("No browser is available.")}}.apply{textSize=12.5f},LinearLayout.LayoutParams(-2,dp(30)))
+            row.setOnClickListener{
+                hideKeyboard();dismissDrawer()
+                val point=Coordinate(place.longitude,place.latitude)
+                terrain.focus(listOf(point),PlaceSearch.zoom(place.kind));terrain.inspect(point)
+                main.removeCallbacks(clearFound);main.postDelayed(clearFound,8000)
+            }
+            list.addView(row);NativeUi.divider(list)
+        }
+    }
+    private val clearFound=Runnable{terrain.inspect(null)}
+    private fun hideKeyboard(){(activity.getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager).hideSoftInputFromWindow(root.windowToken,0)}
     private var combiningPending=false
     private fun dp(value:Int)=(value*activity.resources.displayMetrics.density+.5f).toInt()
     private fun button(text:String,action:()->Unit)=NativeUi.button(activity,text,action=action)
@@ -200,7 +237,7 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         if(stamp!=profileFocus)requestProfile(state.points,true,false)
     }
     fun newRoute(){dismissDrawer();controller.newRoute()}
-    fun dismissDrawer():Boolean{val view=drawer?:return false;root.removeView(view);drawer=null;drawerList=null;drawerStamp=null;drawerCards.clear();combineButton=null;closeAllButton=null;return true}
+    fun dismissDrawer():Boolean{val view=drawer?:return false;root.removeView(view);drawer=null;drawerList=null;searchResults=null;routesContent=emptyList();main.removeCallbacks(searchRun);drawerStamp=null;drawerCards.clear();combineButton=null;closeAllButton=null;return true}
     private fun fitOpened(){
         val state=controller.state;val all=ArrayList<Coordinate>();all.addAll(state.points)
         for(id in state.opened)if(id!=state.id)passive[id]?.let(all::addAll)
@@ -234,17 +271,34 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         // Compact floating card, as Capacitor's mobile sidebar.
         val sidebar=NativeUi.column(activity).apply{setPadding(dp(14),dp(4),dp(14),dp(10));background=NativeUi.background(activity,NativeUi.paper,14,true);elevation=dp(12).toFloat();isClickable=true;clipToOutline=true}
         // Capacitor "Saved routes" sidebar.
-        val heading=LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL}
-        heading.addView(NativeUi.text(activity,"Saved routes",19f).apply{setTypeface(null,android.graphics.Typeface.BOLD);setPadding(0,dp(10),0,dp(10))},LinearLayout.LayoutParams(0,-2,1f))
-        heading.addView(TextView(activity).apply{text="✕";textSize=18f;gravity=Gravity.CENTER;setTextColor(NativeUi.muted);contentDescription="Close saved routes";background=NativeUi.pressable(activity,null);isClickable=true;setOnClickListener{dismissDrawer()}},LinearLayout.LayoutParams(dp(44),dp(44)));sidebar.addView(heading)
-        NativeUi.space(sidebar,6)
-        sidebar.addView(button("Import GPX"){dismissDrawer();importGpx()}.apply{textSize=14f},LinearLayout.LayoutParams(-1,dp(42)));NativeUi.space(sidebar,8)
-        sidebar.addView(button("＋  Create new"){newRoute()}.apply{textSize=14f},LinearLayout.LayoutParams(-1,dp(42)))
+        // Search (places, huts, tracks) above the saved routes, with the close button.
+        val top=LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL;setPadding(0,dp(8),0,dp(2))}
+        val field=EditText(activity).apply{
+            hint="Search places, huts, tracks";textSize=14f;setSingleLine();imeOptions=android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH
+            setTextColor(NativeUi.ink);setHintTextColor(Color.rgb(132,142,136));setPadding(dp(12),0,dp(12),0)
+            background=NativeUi.background(activity,Color.rgb(237,241,233),10,true);contentDescription="Search places, huts and tracks"
+            setText(searchQuery);setOnEditorActionListener{_,_,_->hideKeyboard();true}
+            addTextChangedListener(object:android.text.TextWatcher{
+                override fun beforeTextChanged(t:CharSequence?,a:Int,b:Int,c:Int){}
+                override fun onTextChanged(t:CharSequence?,a:Int,b:Int,c:Int){}
+                override fun afterTextChanged(t:android.text.Editable?){searchQuery=t?.toString().orEmpty();main.removeCallbacks(searchRun);main.postDelayed(searchRun,120)}
+            })
+        }
+        top.addView(field,LinearLayout.LayoutParams(0,dp(40),1f))
+        top.addView(TextView(activity).apply{text="✕";textSize=18f;gravity=Gravity.CENTER;setTextColor(NativeUi.muted);contentDescription="Close saved routes";background=NativeUi.pressable(activity,null);isClickable=true;setOnClickListener{hideKeyboard();dismissDrawer()}},LinearLayout.LayoutParams(dp(40),dp(40)).apply{marginStart=dp(4)});sidebar.addView(top)
+        val heading=NativeUi.text(activity,"Saved routes",17f).apply{setTypeface(null,android.graphics.Typeface.BOLD);setPadding(0,dp(10),0,dp(6))};sidebar.addView(heading)
+        val importButton=button("Import GPX"){dismissDrawer();importGpx()}.apply{textSize=13f};sidebar.addView(importButton,LinearLayout.LayoutParams(-1,dp(38)))
+        val gap=View(activity);sidebar.addView(gap,LinearLayout.LayoutParams(-1,dp(6)))
+        val createButton=button("＋  Create new"){newRoute()}.apply{textSize=13f};sidebar.addView(createButton,LinearLayout.LayoutParams(-1,dp(38)))
         drawerList=NativeUi.column(activity)
-        sidebar.addView(ScrollView(activity).apply{addView(drawerList)},LinearLayout.LayoutParams(-1,0,1f))
-        sidebar.addView(NativeUi.button(activity,"Download offline region",true){dismissDrawer();onOffline()}.apply{textSize=14f},LinearLayout.LayoutParams(-1,dp(44)).apply{topMargin=dp(8)})
+        val results=NativeUi.column(activity).apply{visibility=View.GONE};searchResults=results
+        sidebar.addView(ScrollView(activity).apply{addView(NativeUi.column(activity).apply{addView(results);addView(drawerList)})},LinearLayout.LayoutParams(-1,0,1f))
+        val offlineButton=NativeUi.button(activity,"Download offline region",true){dismissDrawer();onOffline()}.apply{textSize=13f}
+        sidebar.addView(offlineButton,LinearLayout.LayoutParams(-1,dp(40)).apply{topMargin=dp(8)})
+        routesContent=listOf(heading,importButton,gap,createButton,drawerList!!,offlineButton)
+        loadSearch()
         overlay.addView(sidebar,FrameLayout.LayoutParams(minOf(dp(300),activity.resources.displayMetrics.widthPixels-dp(64)),-1,Gravity.START).apply{setMargins(dp(10),dp(10),0,dp(10))})
-        root.addView(overlay,FrameLayout.LayoutParams(-1,-1));drawer=overlay;drawerStamp=null;renderDrawer()
+        root.addView(overlay,FrameLayout.LayoutParams(-1,-1));drawer=overlay;drawerStamp=null;renderDrawer();if(searchQuery.isNotBlank())runSearch()
     }
     private fun renderDrawer(){
         val list=drawerList?:return;val state=controller.state
@@ -257,18 +311,18 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         updatingCards=true
         for((index,row)in state.records.withIndex()){
             val card=drawerCards.getOrPut(row.id){
-                val view=NativeUi.column(activity).apply{setPadding(0,dp(14),0,dp(4))};val heading=LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL}
-                val thumb=RouteThumbnailView(activity).apply{contentDescription="Route preview for ${row.name}";background=NativeUi.background(activity,android.graphics.Color.rgb(237,241,233),8,true)};heading.addView(thumb,LinearLayout.LayoutParams(dp(62),dp(54)))
+                val view=NativeUi.column(activity).apply{setPadding(0,dp(10),0,dp(2))};val heading=LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL}
+                val thumb=RouteThumbnailView(activity).apply{contentDescription="Route preview for ${row.name}";background=NativeUi.background(activity,android.graphics.Color.rgb(237,241,233),8,true)};heading.addView(thumb,LinearLayout.LayoutParams(dp(50),dp(42)))
                 val details=NativeUi.column(activity)
-                val check=CheckBox(activity).apply{textSize=15f;setPadding(dp(4),0,0,0);setTypeface(null,android.graphics.Typeface.BOLD);setTextColor(NativeUi.ink);buttonTintList=android.content.res.ColorStateList.valueOf(NativeUi.ink);setOnCheckedChangeListener{_,checked->if(!updatingCards){if(checked)combineSelection[row.id]=false else combineSelection.remove(row.id);renderDrawer()}}};details.addView(check)
-                val summary=NativeUi.text(activity,"",13f).apply{setTextColor(Color.rgb(120,132,124));setPadding(dp(2),0,0,0)};details.addView(summary)
-                heading.addView(details,LinearLayout.LayoutParams(0,-2,1f).apply{marginStart=dp(10)});view.addView(heading)
-                val actions=LinearLayout(activity).apply{setPadding(0,dp(6),0,0)}
+                val check=CheckBox(activity).apply{textSize=13.5f;setPadding(dp(4),0,0,0);setTypeface(null,android.graphics.Typeface.BOLD);setTextColor(NativeUi.ink);buttonTintList=android.content.res.ColorStateList.valueOf(NativeUi.ink);setOnCheckedChangeListener{_,checked->if(!updatingCards){if(checked)combineSelection[row.id]=false else combineSelection.remove(row.id);renderDrawer()}}};details.addView(check)
+                val summary=NativeUi.text(activity,"",11.5f).apply{setTextColor(Color.rgb(120,132,124));setPadding(dp(2),0,0,0)};details.addView(summary)
+                heading.addView(details,LinearLayout.LayoutParams(0,-2,1f).apply{marginStart=dp(8)});view.addView(heading)
+                val actions=LinearLayout(activity).apply{setPadding(0,dp(2),0,0)}
                 // Opening a route closes the sidebar so the route is visible (Capacitor).
                 val open=link("Open"){fitOpenedPending=true;controller.open(row.id);dismissDrawer()}
                 val close=link("Close"){controller.closeOther(row.id)}
                 // Capacitor order: Open/Editing, Close, Rename, Delete.
-                for(action in listOf(open,close,link("Rename"){controller.state.records.firstOrNull{it.id==row.id}?.let(::renameRoute)},link("Delete"){controller.state.records.firstOrNull{it.id==row.id}?.let(::deleteRoute)}))actions.addView(action,LinearLayout.LayoutParams(-2,dp(44)))
+                for(action in listOf(open,close,link("Rename"){controller.state.records.firstOrNull{it.id==row.id}?.let(::renameRoute)},link("Delete"){controller.state.records.firstOrNull{it.id==row.id}?.let(::deleteRoute)})){action.textSize=13f;action.setPadding(0,0,dp(14),0);actions.addView(action,LinearLayout.LayoutParams(-2,dp(36)))}
                 view.addView(actions);val order=link(""){combineSelection[row.id]=combineSelection[row.id]!=true;renderDrawer()};view.addView(order);NativeUi.divider(view)
                 Card(view,check,thumb,summary,open,close,order)
             }

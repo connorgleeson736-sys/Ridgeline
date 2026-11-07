@@ -1,5 +1,7 @@
-struct Scene { matrix: mat4x4<f32>, grade: vec4<f32>, metrics: vec4<f32>, style:vec4<f32> };
+struct Scene { matrix: mat4x4<f32>, grade: vec4<f32>, metrics: vec4<f32>, style:vec4<f32>, coverage:vec4<f32> };
 @group(0) @binding(0) var<uniform> scene: Scene;
+@group(0) @binding(1) var coverage_tex: texture_2d<f32>;
+@group(0) @binding(2) var coverage_sampler: sampler;
 @group(1) @binding(0) var photo: texture_2d<f32>;
 @group(1) @binding(1) var photo_sampler: sampler;
 @group(2) @binding(0) var heights: texture_2d<f32>;
@@ -73,14 +75,23 @@ fn drape(i:Out,c:vec4<f32>,dx:vec2<f32>,dy:vec2<f32>)->vec4<f32>{
 // Fine photo subdivisions can be smaller than one terrain cell. Only those
 // rounded-out rectangles need fragment clipping; exact rectangles allow early
 // depth rejection without a discard instruction, including their skirt faces.
+// Advanced view: disk-cache coverage colours over the terrain (red: little or
+// no detail stored, through yellow, to green: detailed imagery stored).
+fn coverage(i:Out,c:vec4<f32>)->vec4<f32>{
+ if(scene.style.w<0.5){return c;}
+ let uv=vec2<f32>((i.ground.x-scene.coverage.x)*scene.coverage.z,(scene.coverage.y-i.ground.y)*scene.coverage.w);
+ if(any(uv<vec2<f32>(0.))||any(uv>vec2<f32>(1.))){return c;}
+ let t=textureSampleLevel(coverage_tex,coverage_sampler,uv,0.);
+ return vec4<f32>(mix(c.rgb,t.rgb*c.a,t.a),c.a);
+}
 @fragment fn fs(i:Out)->@location(0) vec4<f32>{
  let dx=dpdx(i.uv)*i.image.xy;let dy=dpdy(i.uv)*i.image.xy;
  var normal=vec3<f32>(0.,0.,1.);if(scene.style.x>0.5){normal=cross(dpdx(i.ground),dpdy(i.ground));}
  if(any(i.uv<i.clip.xy)||any(i.uv>i.clip.zw)){discard;}
- return drape(i,shade(i,dx,dy,normal),dx,dy);
+ return coverage(i,drape(i,shade(i,dx,dy,normal),dx,dy));
 }
 @fragment fn fs_unclipped(i:Out)->@location(0) vec4<f32>{
  var normal=vec3<f32>(0.,0.,1.);if(scene.style.x>0.5){normal=cross(dpdx(i.ground),dpdy(i.ground));}
  let dx=dpdx(i.uv)*i.image.xy;let dy=dpdy(i.uv)*i.image.xy;
- return drape(i,shade(i,dx,dy,normal),dx,dy);
+ return coverage(i,drape(i,shade(i,dx,dy,normal),dx,dy));
 }

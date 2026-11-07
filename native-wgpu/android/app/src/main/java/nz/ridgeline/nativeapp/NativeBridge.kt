@@ -5,6 +5,8 @@ object NativeBridge {
  init {System.loadLibrary("ridgeline_renderer")}
  @JvmStatic external fun discardFrame(handle:Long)
  @JvmStatic external fun renderScale(handle:Long,scale:Float,prepare:Float)
+ /** Disk-cache coverage grid (256x256 RGBA) over Mercator bounds; null hides it. */
+ @JvmStatic external fun coverage(handle:Long,rgba:ByteBuffer?,west:Double,north:Double,east:Double,south:Double):Boolean
  @JvmStatic external fun acquire(handle:Long,width:Int,height:Int):Int
  @JvmStatic external fun prepareFrame(handle:Long,remainingNanos:Long,idle:Boolean)
  @JvmStatic external fun frameStats(handle:Long,output:ByteBuffer)

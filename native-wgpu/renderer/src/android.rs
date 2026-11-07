@@ -521,6 +521,48 @@ pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_tileBudget(
     });
 }
 
+/// Advanced view: disk-cache coverage grid (COVERAGE_SIZE squared RGBA) over
+/// Mercator [west, north, east, south]; a null buffer hides it.
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_coverage(
+    env: *mut jni::sys::JNIEnv,
+    _class: jni::sys::jclass,
+    handle: i64,
+    rgba: jni::sys::jobject,
+    west: f64,
+    north: f64,
+    east: f64,
+    south: f64,
+) -> u8 {
+    let mut env = unsafe { jni::EnvUnowned::from_raw(env) };
+    match env
+        .with_env(|env| -> Result<u8, jni::errors::Error> {
+            let Ok(mut all) = states().lock() else {
+                return Ok(0);
+            };
+            let Some(state) = all.get_mut(&(handle as u64)) else {
+                return Ok(0);
+            };
+            if rgba.is_null() {
+                state.renderer.set_coverage(None);
+                return Ok(1);
+            }
+            let buffer = unsafe { jni::objects::JByteBuffer::from_raw(env, rgba) };
+            let size = env.get_direct_buffer_capacity(&buffer)?;
+            let n = crate::COVERAGE_SIZE as usize;
+            if size != n * n * 4 || ![west, north, east, south].iter().all(|v| v.is_finite()) {
+                return Ok(0);
+            }
+            let bytes = unsafe { std::slice::from_raw_parts(env.get_direct_buffer_address(&buffer)?, size) };
+            state.renderer.set_coverage(Some((bytes, [west, north, east, south])));
+            Ok(1)
+        })
+        .into_outcome()
+    {
+        jni::Outcome::Ok(v) => v,
+        _ => 0,
+    }
+}
 /// Dynamic resolution: render at `scale` now, keep `prepare`'s targets ready.
 #[unsafe(no_mangle)]
 pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_renderScale(

@@ -159,6 +159,31 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
      * sharp tiles refine in pauses, as after zooming out and back in. */
     @Volatile var parentPreload=preferences.getBoolean("parentPreload",true);private set
     fun parentPreload(value:Boolean){parentPreload=value;preferences.edit().putBoolean("parentPreload",value).apply();clearWarm();cameraChanged()}
+    /** Advanced view: tint the terrain by how detailed the stored imagery is
+     * (disk cache and saved regions). Off: no work at all. */
+    @Volatile var cacheCoverage=preferences.getBoolean("cacheCoverage",false);private set
+    fun cacheCoverage(value:Boolean){cacheCoverage=value;preferences.edit().putBoolean("cacheCoverage",value).apply();coverageSnapshot=null;coverageArea=null;if(value)updateCoverage()else view.coverage(null,null)}
+    @Volatile private var coverageSnapshot:Pair<Long,CacheCoverage>?=null
+    @Volatile private var coverageArea:DoubleArray?=null
+    private val coverageBusy=java.util.concurrent.atomic.AtomicBoolean()
+    /** Recompute the coverage grid when the camera has moved a quarter of it or
+     * changed zoom by more than one level; re-read the cache every 30 s. */
+    private fun updateCoverage(){
+        if(!cacheCoverage||dead)return
+        val pose=view.planningPose;val cx=(pose.longitude+180)/360;val cy=CameraMath.mercatorY(pose.latitude);val half=8.0/2.0.pow(pose.zoom)
+        val area=coverageArea;val stale=coverageSnapshot?.let{android.os.SystemClock.elapsedRealtime()-it.first>30_000}?:true
+        if(!stale&&area!=null&&abs(area[0]-cx)<area[2]/4&&abs(area[1]-cy)<area[2]/4&&abs(ln(area[2]/half)/ln(2.0))<1)return
+        if(!coverageBusy.compareAndSet(false,true))return
+        try{offlineQueries.execute{
+            try{
+                val snapshot=coverageSnapshot?.takeIf{android.os.SystemClock.elapsedRealtime()-it.first<=30_000}?.second?:CacheCoverage().also{c->
+                    runCatching{val urls=client.cache?.urls();while(urls!=null&&urls.hasNext())c.addUrl(urls.next())}
+                    for(region in offline.regions())region.metadata?.let{c.addRegion(it.bounds,it.zoom)}
+                    coverageSnapshot=android.os.SystemClock.elapsedRealtime() to c}
+                if(cacheCoverage&&!dead){val grid=snapshot.grid(cx,cy,half);coverageArea=doubleArrayOf(cx,cy,half);view.coverage(grid,doubleArrayOf(cx-half,cy-half,cx+half,cy+half))}
+            }finally{coverageBusy.set(false)}
+        }}catch(_:java.util.concurrent.RejectedExecutionException){coverageBusy.set(false)}
+    }
     private val idleWork get()=prepareAhead||parentPreload
     private var previousPose:CameraPose?=null
     private var previousFocus:SurfaceFocus?=null
@@ -290,6 +315,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
      * behind demand cancellation (clearWarm/cancelPredictions hold the loader
      * monitor), so taps on map controls are never delayed by tile bookkeeping. */
     fun cameraChanged() {
+        if(cacheCoverage)updateCoverage()
         // Throttle using the latest immutable camera; a continuous drag must not
         // indefinitely postpone source selection, as a cancel/reschedule debounce did.
         if(dead||!active||!planPending.compareAndSet(false,true))return
@@ -682,19 +708,34 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         };return result
     }
     fun regionEstimate(bounds:Bounds,maxZoom:Int)=regionTiles(bounds,if(mapSettings.state.base==MapSettings.Base.TOPO)minOf(maxZoom,TOPO_MAX_ZOOM)else maxZoom).size
+    /** Files and size of a region download (typical tile sizes: an estimate). */
+    data class RegionEstimate(val images:Int,val files:Int,val mib:Double)
+    internal fun regionEstimate(bounds:Bounds,maxZoom:Int,base:MapSettings.Base,includeTopo:Boolean):RegionEstimate{
+        val tiles=regionTiles(bounds,if(base==MapSettings.Base.TOPO)minOf(maxZoom,TOPO_MAX_ZOOM)else maxZoom)
+        val vectors=if(base!=MapSettings.Base.TOPO&&includeTopo)tiles.count{it.z in 7..15}else 0
+        val topo=if(base!=MapSettings.Base.TOPO&&includeTopo)tiles.filter{it.z<=TOPO_MAX_ZOOM}.size else 0
+        val dem=if(base!=MapSettings.Base.TOPO)tiles.map{val dz=min(it.z,18);Id(dz,it.x shr(it.z-dz),it.y shr(it.z-dz))}.toSet().size*3/2 else 0
+        val imageKb=when(base){MapSettings.Base.LINZ->34.0;MapSettings.Base.SATELLITE->28.0;MapSettings.Base.TOPO->22.0}
+        return RegionEstimate(tiles.size,tiles.size+vectors+topo+dem,(tiles.size*imageKb+vectors*18.0+topo*22.0+dem*40.0)/1024)
+    }
     fun regions(callback:(List<OfflineStore.Region>)->Unit){offlineQueries.execute{val rows=offline.regions();view.post{if(!dead)callback(rows)}}}
     fun removeRegion(id:String,callback:()->Unit){downloadJobs.execute{offline.delete(id);view.post{if(!dead)callback()}}}
     fun cancelDownload(){downloadCancel.set(true);regionPrefetch?.close();downloadLease?.release(true)}
-    fun downloadRegion(name:String,bounds:Bounds,maxZoom:Int,progress:(String)->Unit,done:()->Unit){
-        val display=mapSettings.state;val detail=if(display.base==MapSettings.Base.TOPO)minOf(maxZoom,TOPO_MAX_ZOOM)else maxZoom;val tiles=regionTiles(bounds,detail);downloadCancel.set(false)
+    /** [base]: imagery to download; [includeTopo]: also NZ Topo and the mapped
+     * overlays (Capacitor's option); [resume]: continue that region in place. */
+    internal fun downloadRegion(name:String,bounds:Bounds,maxZoom:Int,base:MapSettings.Base=mapSettings.state.base,includeTopo:Boolean=true,resume:String?=null,progress:(String)->Unit,done:()->Unit){
+        val display=mapSettings.state.copy(base=base);val detail=if(display.base==MapSettings.Base.TOPO)minOf(maxZoom,TOPO_MAX_ZOOM)else maxZoom;val tiles=regionTiles(bounds,detail);downloadCancel.set(false)
+        val overlays=display.base!=MapSettings.Base.TOPO&&includeTopo
+        fun topoUrl(id:Id)=linz("topo-raster",id,"webp")
         val downloadImagery=NativeImagery(context,::fetch,{z,x,y->linz("aerial",Id(z,x,y),"webp")},overviews,::checkPreparation,::localImage,{display})
         downloadJobs.execute{
-            val region=offline.begin(name,OfflineStore.Metadata(bounds,detail,display.base.name));regionContext.set(region);val demDone=HashSet<Id>()
+            val region=resume?.let{offline.reopen(it)}?:offline.begin(name,OfflineStore.Metadata(bounds,detail,display.base.name));regionContext.set(region);val demDone=HashSet<Id>()
             val prefetch=OfflinePrefetch(transport);regionPrefetch=prefetch
             fun checkActive(){check(!dead&&!downloadCancel.get()){ "Download cancelled" }}
             fun inputs(id:Id):List<ResourceKey>{
                 val urls=ArrayList(downloadImagery.inputs(id.z,id.x,id.y))
-                if(display.base!=MapSettings.Base.TOPO&&id.z in 7..15)urls+=vectorUrl(id.z,id.x,id.y)
+                if(overlays&&id.z in 7..15)urls+=vectorUrl(id.z,id.x,id.y)
+                if(overlays&&id.z<=TOPO_MAX_ZOOM)urls+=topoUrl(id)
                 val dz=min(id.z,18);val f=1 shl(id.z-dz);val n=1 shl dz
                 if(display.base!=MapSettings.Base.TOPO)for(dy in -1..1)for(dx in -1..1){val dem=Id(dz,Math.floorMod(id.x/f+dx,n),(id.y/f+dy).coerceIn(0,n-1));if(dem !in demDone)urls+=linz("elevation",dem,"png")}
                 return urls.distinct().map{ResourceKey(it,false)}
@@ -709,10 +750,11 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
                     checkActive()
                     regionSources.set(prefetch.advance(index,tiles.subList(index,minOf(index+2,tiles.size)).map(::inputs)))
                     downloadImagery.load(id.z,id.x,id.y)
-                    if(display.base!=MapSettings.Base.TOPO&&id.z in 7..15)try{fetch(vectorUrl(id.z,id.x,id.y))}catch(e:TileHttpException){if(e.code!=404)throw e}
+                    if(overlays&&id.z in 7..15)try{fetch(vectorUrl(id.z,id.x,id.y))}catch(e:TileHttpException){if(e.code!=404)throw e}
+                    if(overlays&&id.z<=TOPO_MAX_ZOOM)try{fetch(topoUrl(id))}catch(e:TileHttpException){if(e.code!=404)throw e}
                     val dz=min(id.z,18);val f=1 shl(id.z-dz);val n=1 shl dz
                     if(display.base!=MapSettings.Base.TOPO)for(dy in -1..1)for(dx in -1..1)dem(Id(dz,Math.floorMod(id.x/f+dx,n),(id.y/f+dy).coerceIn(0,n-1)))
-                    if(index%5==0||index==tiles.lastIndex)view.post{if(!dead)progress("${index+1}/${tiles.size} "+if(display.base==MapSettings.Base.TOPO)"Topo tiles"else"image tiles · terrain and overlays included")}
+                    if(index%5==0||index==tiles.lastIndex)view.post{if(!dead)progress("${index+1}/${tiles.size} "+if(display.base==MapSettings.Base.TOPO)"Topo tiles"else if(overlays)"image tiles · terrain, NZ Topo and overlays"else"image tiles · terrain")}
                 }
                 offline.status(region,"Ready")
             }catch(e:Exception){offline.status(region,if(downloadCancel.get()||dead)"Partial · cancelled"else"Partial · source unavailable")}
