@@ -450,7 +450,10 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         for(url in urls){if(predictionRecent.size>=60||predictionCount>=24)break
             val resource=resourceKey(url);if(transport.contains(resource)||synchronized(this){resource in predictions})continue
             val consumer=transport.consumer(1000,true,imagery=true);synchronized(this){predictions[resource]=consumer};predictionCount++;predictionRecent.addLast(now)
-            consumer.acquire(resource).whenComplete{_,_->consumer.close();synchronized(this){predictions.remove(resource,consumer)}}
+            // The transport's request guard refuses with an exception: drop the
+            // prediction instead of aborting the rest of this plan.
+            val future=try{consumer.acquire(resource)}catch(_:Exception){consumer.release(true);synchronized(this){predictions.remove(resource,consumer)};break}
+            future.whenComplete{_,_->consumer.close();synchronized(this){predictions.remove(resource,consumer)}}
         }
     }
     private fun scheduleIdle(key:DemandPlanKey,revision:Long){

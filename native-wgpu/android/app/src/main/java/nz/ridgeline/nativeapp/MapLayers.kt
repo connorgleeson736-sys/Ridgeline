@@ -10,7 +10,7 @@ import kotlin.math.*
 
 /** Visible source tiles only; one optional background transfer shares the existing transport. */
 internal class MapLayers(private val view:TerrainView,private val loader:TileLoader):AutoCloseable {
-    private companion object{
+    internal companion object{
         /** Capacitor's topographic source: maxzoom 14, overzoomed beyond. */
         const val VECTOR_MAX_ZOOM=14
         const val PARALLEL_TILES=4
@@ -18,6 +18,14 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         const val GESTURE_PUBLISH_MILLIS=100L
         /** View selection runs at most this often, never postponed by movement. */
         const val SELECTION_MILLIS=50L
+        /** Start a request on a fresh consumer. Any refusal releases the consumer
+         * and returns null: a closed transport throws IllegalStateException, but
+         * its 512-request guard throws IllegalArgumentException, which used to
+         * escape and leak the slot. Four leaks (after a busy area such as
+         * Wanaka) stopped all overlay downloads for the rest of the session. */
+        fun <T> startLeased(consumer:TileTransport.Consumer,start:()->T):T?=try{start()}catch(_:Exception){consumer.release(true);null}
+        /** Retry a refused request after this long. */
+        const val REFUSED_RETRY_MILLIS=750L
     }
     private data class Tile(val body:TileBody,var mask:Set<String>,var features:List<VectorTile.Feature>){
         /** Styled output for the last (settings, quarter zoom); reused across publications. */
@@ -121,7 +129,8 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
             val id=current.firstOrNull{it !in tiles&&!leases.containsKey(it)&&(retry[it]?:0)<=now}?:break
             val owned=loader.layerConsumer(current.indexOf(id).coerceAtLeast(0));leases[id]=owned
             if(closed||!active){leases.remove(id,owned);owned.release(true);return}
-            val bodyFuture=try{loader.layerBody(owned,loader.vectorUrl(id.z,id.x,id.y))}catch(_:IllegalStateException){leases.remove(id,owned);owned.release(true);return}
+            val bodyFuture=startLeased(owned){loader.layerBody(owned,loader.vectorUrl(id.z,id.x,id.y))}
+            if(bodyFuture==null){leases.remove(id,owned);retry[id]=now+REFUSED_RETRY_MILLIS;break}
             bodyFuture.whenComplete{body,error->runCatching{worker.execute{
                 if(!leases.remove(id,owned)){owned.close();return@execute};owned.close()
                 if(closed||id !in current){pump();return@execute}
@@ -133,8 +142,9 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
                 pump();schedulePublication()
             }}}
         }
-        if(leases.isEmpty()){
-            val wake=current.filter{it !in tiles}.mapNotNull{retry[it]}.minOrNull()
+        // A free slot with refused or failed tiles waiting: wake for the earliest retry.
+        if(leases.size<PARALLEL_TILES){
+            val wake=current.filter{it !in tiles&&!leases.containsKey(it)}.mapNotNull{retry[it]}.minOrNull()
             if(wake!=null&&(retryWake==null||retryWake!!.isDone))retryWake=worker.schedule({retryWake=null;pump()},(wake-now).coerceAtLeast(1),TimeUnit.MILLISECONDS)
         }
     }

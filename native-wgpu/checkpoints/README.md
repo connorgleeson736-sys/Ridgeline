@@ -1,6 +1,25 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.30 Overlays Fixed Base APK — 33.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Overlays-Fixed-0.1.30-Base.apk)**.
+Latest: **[Download 0.1.31 Overlay Slots Base APK — 33.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Overlay-Slots-0.1.31-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 32:
+**updates 0.1.13–0.1.30 in place, keeping its data.**
+
+- **Overlays no longer stop after a busy area.** When 512 downloads were
+  queued (e.g. moving over Wanaka), a refused track/road/name download leaked
+  one of the four overlay download slots; after four, no overlay data was
+  downloaded again until the app restarted. Refusals now free the slot and
+  retry shortly.
+
+189 JVM tests (including one against the real download guard) and Rust tests
+pass; Wanaka's map data checked through the app's own packing (438,390 lines,
+none rejected); lint 0 errors; 623 original assets identical. Renderer
+unchanged from 0.1.30. Not run on a phone.
+[Exact release record](../validation/overlay-slots-2026-11-07/release.json) ·
+[SHA-256](Ridgeline-Native-Overlay-Slots-0.1.31-Base.apk.sha256).
+
+## Previous 0.1.30 overlays fixed checkpoint
+
+**[Download 0.1.30 Overlays Fixed Base APK — 33.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Overlays-Fixed-0.1.30-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 31:
 **updates 0.1.13–0.1.29 in place, keeping its data.**
 
