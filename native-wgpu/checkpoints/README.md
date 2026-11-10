@@ -1,6 +1,29 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.34 Disk First Base APK — 33.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Disk-First-0.1.34-Base.apk)**.
+Latest: **[Download 0.1.35 Region Sheet Base APK — 33.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Region-Sheet-0.1.35-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 36:
+**updates 0.1.13–0.1.34 in place, keeping its data.**
+
+- **NZ Topo** switches to finer tiles one zoom level later, so the printed map
+  stays at a readable scale longer. Full detail is still reached at zoom 16.
+- **Hut names (and other new names) appear while moving.** They used to wait
+  until the map stopped when they made the name atlas grow. Names also no
+  longer blink out when the atlas grows, or fade in again when a finer tile
+  replaces a coarser one.
+- **Compact route bar** is smaller (116 dp, was 136 dp).
+- **Choose region** has a **Custom** size: drag any corner freely. The panel
+  shows the area in km.
+- **Download region** is now a bottom panel like the route bar.
+  **Included imagery** is under **Advanced**, with the region coordinates.
+
+197 JVM tests and 51 Rust tests pass; overlay GPU check passes on Vulkan and
+GLES; lint 0 errors; map assets identical to 0.1.34. Not run on a phone.
+[Exact release record](../validation/region-sheet-2026-11-10/release.json) ·
+[SHA-256](Ridgeline-Native-Region-Sheet-0.1.35-Base.apk.sha256).
+
+## Previous 0.1.34 disk first checkpoint
+
+**[Download 0.1.34 Disk First Base APK — 33.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Disk-First-0.1.34-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 35:
 **updates 0.1.13–0.1.33 in place, keeping its data.**
 

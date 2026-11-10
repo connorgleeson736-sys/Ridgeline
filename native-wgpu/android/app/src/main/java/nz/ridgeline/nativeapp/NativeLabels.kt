@@ -93,7 +93,7 @@ internal object NativeLabels {
                 }
                 val required=nextY+h
                 if(bitmap==null||bitmap!!.height<required){
-                    val height=Integer.highestOneBit(max(128,required)-1)*2
+                    val height=Integer.highestOneBit(max(256,required)-1)*2
                     val grown=Bitmap.createBitmap(WIDTH,height,Bitmap.Config.ARGB_8888)
                     bitmap?.let{Canvas(grown).drawBitmap(it,0f,0f,null);it.recycle()};bitmap=grown;grew=true
                 }

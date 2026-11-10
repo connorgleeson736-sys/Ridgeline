@@ -130,50 +130,88 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
         }}}}
         dialog.show();refresh()
     }
-    // ---- Capacitor's offline region flow: choose a page-shaped area, then
-    // the "Download region" settings, progress and saved regions. ----
+    // ---- Capacitor's offline region flow: choose a page-shaped (or custom)
+    // area, then the "Download region" panel: settings, progress and saved
+    // regions, as a bottom panel like the route bar. ----
     private var frame:RegionFrame?=null
     private var chooser:View?=null
+    private var settingsPanel:View?=null
     private var pageSize="A4";private var landscape=false
     private var chosen:TileLoader.Bounds?=null
     private var progressText=""
-    private var settingsDialog:AlertDialog?=null
-    private val pageNames=RegionFrame.PAPER.keys.toList()
+    private val pageNames=RegionFrame.PAPER.keys.toList()+CUSTOM
     private fun spinner(items:List<String>,selected:Int,changed:(Int)->Unit)=Spinner(activity).apply{
         adapter=ArrayAdapter(activity,android.R.layout.simple_spinner_dropdown_item,items);setSelection(selected)
         onItemSelectedListener=object:AdapterView.OnItemSelectedListener{override fun onItemSelected(p:AdapterView<*>?,v:android.view.View?,i:Int,id:Long){changed(i)};override fun onNothingSelected(p:AdapterView<*>?){}}
     }
     private fun labelled(label:String,view:android.view.View)=NativeUi.column(activity).apply{addView(NativeUi.text(activity,label,12f).apply{setTextColor(NativeUi.muted)});addView(view)}
-    /** Back closes the region chooser. */
-    fun back():Boolean{if(chooser==null)return false;closeChooser();return true}
-    private fun closeChooser(){frame?.let{root.removeView(it)};chooser?.let{root.removeView(it)};frame=null;chooser=null}
-    /** Step 1: 2D north-up map, a page-shaped frame and "Choose region". */
+    /** Back closes the region chooser or the download panel. */
+    fun back():Boolean{
+        if(chooser!=null){closeChooser();return true}
+        if(settingsPanel!=null){closeSettings();return true}
+        return false
+    }
+    private val sizeTick=object:Runnable{override fun run(){if(chooser==null)return;updateSize?.invoke();root.postDelayed(this,400)}}
+    private var updateSize:(()->Unit)?=null
+    private fun closeChooser(){frame?.let{root.removeView(it)};chooser?.let{root.removeView(it)};frame=null;chooser=null;updateSize=null;root.removeCallbacks(sizeTick)}
+    private fun closeSettings(){settingsPanel?.let{root.removeView(it)};settingsPanel=null}
+    /** Bottom panel in the route bar's style: paper, rounded top, title and ✕,
+     * scrolling content up to [maxFraction] of the screen. */
+    private fun bottomPanel(title:String,closeLabel:String,maxFraction:Float,close:()->Unit,content:LinearLayout):LinearLayout{
+        val panel=NativeUi.column(activity).apply{
+            setPadding(dp(16),dp(4),dp(16),dp(12));isClickable=true;elevation=dp(12).toFloat()
+            background=android.graphics.drawable.GradientDrawable().apply{setColor(NativeUi.paper);val r=dp(20).toFloat();cornerRadii=floatArrayOf(r,r,r,r,0f,0f,0f,0f)}
+        }
+        val heading=LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL}
+        heading.addView(NativeUi.text(activity,title,17f).apply{setTypeface(null,android.graphics.Typeface.BOLD)},LinearLayout.LayoutParams(0,-2,1f))
+        heading.addView(TextView(activity).apply{text="✕";textSize=18f;gravity=Gravity.CENTER;setTextColor(NativeUi.muted);contentDescription=closeLabel;background=NativeUi.pressable(activity,null);isClickable=true;setOnClickListener{close()}},LinearLayout.LayoutParams(dp(44),dp(44)))
+        panel.addView(heading)
+        val limit={((root.height-root.paddingTop-root.paddingBottom).takeIf{it>0}?:activity.resources.displayMetrics.heightPixels)*maxFraction}
+        panel.addView(object:ScrollView(activity){override fun onMeasure(w:Int,h:Int){super.onMeasure(w,MeasureSpec.makeMeasureSpec(limit().toInt(),MeasureSpec.AT_MOST))}}.apply{addView(content)},LinearLayout.LayoutParams(-1,-2))
+        return panel
+    }
+    /** Step 1: 2D north-up map, a page-shaped or custom frame and "Choose region". */
     fun startRegion(){
-        closeChooser();settingsDialog?.dismiss()
+        closeChooser();closeSettings()
         if(loader.mapSettings.state.threeD)loader.mapSettings.change{it.copy(threeD=false)}
         terrain.northUp()
         val overlay=RegionFrame(activity);frame=overlay
         root.addView(overlay,FrameLayout.LayoutParams(-1,-1))
-        val panel=NativeUi.column(activity).apply{
-            setPadding(dp(16),dp(4),dp(16),dp(14));isClickable=true;elevation=dp(12).toFloat()
-            background=android.graphics.drawable.GradientDrawable().apply{setColor(NativeUi.paper);val r=dp(20).toFloat();cornerRadii=floatArrayOf(r,r,r,r,0f,0f,0f,0f)}
+        val content=NativeUi.column(activity)
+        val size=NativeUi.text(activity,"",12.5f).apply{setPadding(0,dp(6),0,0)}
+        val orientation=labelled("Orientation",spinner(listOf("Portrait","Landscape"),if(landscape)1 else 0){landscape=it==1;if(pageSize!=CUSTOM)overlay.page(pageSize,landscape)})
+        fun applyPage(){
+            if(pageSize==CUSTOM){overlay.custom()}else overlay.page(pageSize,landscape)
+            orientation.alpha=if(pageSize==CUSTOM)0.4f else 1f;orientation.getChildAt(1).isEnabled=pageSize!=CUSTOM
         }
-        val heading=LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL}
-        heading.addView(NativeUi.text(activity,"Choose region",17f).apply{setTypeface(null,android.graphics.Typeface.BOLD)},LinearLayout.LayoutParams(0,-2,1f))
-        heading.addView(TextView(activity).apply{text="✕";textSize=18f;gravity=Gravity.CENTER;setTextColor(NativeUi.muted);contentDescription="Close offline regions";background=NativeUi.pressable(activity,null);isClickable=true;setOnClickListener{closeChooser()}},LinearLayout.LayoutParams(dp(44),dp(44)))
-        panel.addView(heading)
         val row=LinearLayout(activity)
-        row.addView(labelled("Page size",spinner(pageNames,pageNames.indexOf(pageSize).coerceAtLeast(0)){pageSize=pageNames[it];overlay.page(pageSize,landscape)}),LinearLayout.LayoutParams(0,-2,1f).apply{marginEnd=dp(8)})
-        row.addView(labelled("Orientation",spinner(listOf("Portrait","Landscape"),if(landscape)1 else 0){landscape=it==1;overlay.page(pageSize,landscape)}),LinearLayout.LayoutParams(0,-2,1f))
-        panel.addView(row)
-        panel.addView(NativeUi.text(activity,"Move and zoom the map to fit the area inside the frame, or drag its corners.",12f).apply{setTextColor(NativeUi.muted);setPadding(0,dp(6),0,dp(8))})
-        panel.addView(NativeUi.button(activity,"Save current view",true){
+        row.addView(labelled("Page size",spinner(pageNames,pageNames.indexOf(pageSize).coerceAtLeast(0)){pageSize=pageNames[it];applyPage()}),LinearLayout.LayoutParams(0,-2,1f).apply{marginEnd=dp(8)})
+        row.addView(orientation,LinearLayout.LayoutParams(0,-2,1f))
+        content.addView(row)
+        content.addView(size)
+        val hint=NativeUi.text(activity,"",12f).apply{setTextColor(NativeUi.muted);setPadding(0,dp(4),0,dp(8))}
+        content.addView(hint)
+        updateSize={
+            hint.text=if(pageSize==CUSTOM)"Custom size: drag any corner to set the width and height freely. Move and zoom the map to place it."
+                else "Move and zoom the map to fit the area inside the frame, or drag its corners."
+            size.text=frameBounds()?.let{b->val (w,h)=extentKm(b);String.format(java.util.Locale.ROOT,"Area about %s × %s km",km(w),km(h))}?:"Move the frame over New Zealand."
+        }
+        overlay.onChange={updateSize?.invoke()}
+        content.addView(NativeUi.button(activity,"Save current view",true){
             val bounds=frameBounds()
             if(bounds==null)Toast.makeText(activity,"Move the frame over New Zealand.",Toast.LENGTH_LONG).show()
             else{chosen=bounds;closeChooser();showSettings()}
         },LinearLayout.LayoutParams(-1,dp(44)))
+        val panel=bottomPanel("Choose region","Close offline regions",.5f,{closeChooser()},content)
         root.addView(panel,FrameLayout.LayoutParams(-1,-2,Gravity.BOTTOM));chooser=panel
-        panel.post{overlay.bottomInset=panel.height;overlay.page(pageSize,landscape)}
+        panel.post{overlay.bottomInset=panel.height;if(pageSize==CUSTOM)overlay.page("A4",landscape);applyPage();updateSize?.invoke()}
+        root.postDelayed(sizeTick,400)
+    }
+    private fun km(v:Double)=if(v<10)String.format(java.util.Locale.ROOT,"%.1f",v)else String.format(java.util.Locale.ROOT,"%.0f",v)
+    /** Width and height of [b] in kilometres (at its middle latitude). */
+    private fun extentKm(b:TileLoader.Bounds):Pair<Double,Double>{
+        val lat=Math.toRadians((b.south+b.north)/2)
+        return (b.east-b.west)*111.32*cos(lat) to (b.north-b.south)*110.57
     }
     /** The frame's corners on the 2D map, clamped to New Zealand. */
     private fun frameBounds():TileLoader.Bounds?{
@@ -189,32 +227,50 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
     private val zoomNames=listOf("Overview · zoom 13","Standard · zoom 14","Detailed · zoom 15","Very detailed · zoom 16","Maximum imagery · zoom 17")
     private val bases=listOf(MapSettings.Base.LINZ,MapSettings.Base.SATELLITE,MapSettings.Base.TOPO)
     private var zoomChoice=2;private var baseChoice=0;private var includeTopo=true;private var regionName="My region"
-    /** Step 2: Capacitor's "Download region" settings, progress and saved regions. */
+    private fun toggle(label:String,body:View):TextView{
+        val header=TextView(activity).apply{text="$label ▸";textSize=13f;setTextColor(NativeUi.ink);setPadding(0,dp(10),0,dp(6));isClickable=true;background=NativeUi.pressable(activity,null)}
+        body.visibility=View.GONE
+        header.setOnClickListener{val open=body.visibility!=View.VISIBLE;body.visibility=if(open)View.VISIBLE else View.GONE;header.text=if(open)"$label ▾" else "$label ▸"}
+        return header
+    }
+    /** Step 2: "Download region" settings, progress and saved regions, in a
+     * bottom panel over the map (was a dialog). */
     private fun showSettings(){
-        val content=LinearLayout(activity).apply{orientation=LinearLayout.VERTICAL;setPadding(dp(18),dp(4),dp(18),dp(8))}
-        content.addView(button("Change area"){settingsDialog?.dismiss();startRegion()},LinearLayout.LayoutParams(-2,dp(42)))
+        closeSettings()
+        val content=NativeUi.column(activity)
+        content.addView(button("Change area"){closeSettings();startRegion()},LinearLayout.LayoutParams(-2,dp(42)))
         val name=EditText(activity).apply{setSingleLine();setText(regionName);textSize=14f;filters=arrayOf(android.text.InputFilter.LengthFilter(60))}
         content.addView(labelled("Region name",name))
-        val coords=listOf("West","South","East","North").map{EditText(activity).apply{hint=it;textSize=13f;inputType=android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL or android.text.InputType.TYPE_NUMBER_FLAG_SIGNED}}
-        chosen?.let{b->listOf(b.west,b.south,b.east,b.north).forEachIndexed{i,v->coords[i].setText(String.format(java.util.Locale.ROOT,"%.5f",v))}}
-        val grid=GridLayout(activity).apply{columnCount=2;visibility=android.view.View.GONE}
-        coords.forEachIndexed{i,field->grid.addView(labelled(listOf("west","south","east","north")[i],field),GridLayout.LayoutParams().apply{width=0;columnSpec=GridLayout.spec(i%2,1f)})}
-        val advanced=TextView(activity).apply{text="Advanced ▸";textSize=13f;setTextColor(NativeUi.ink);setPadding(0,dp(10),0,dp(6));isClickable=true;background=NativeUi.pressable(activity,null)}
-        advanced.setOnClickListener{val open=grid.visibility!=android.view.View.VISIBLE;grid.visibility=if(open)android.view.View.VISIBLE else android.view.View.GONE;advanced.text=if(open)"Advanced ▾" else "Advanced ▸"}
-        content.addView(advanced);content.addView(grid)
+        chosen?.let{b->val (w,h)=extentKm(b);content.addView(NativeUi.text(activity,String.format(java.util.Locale.ROOT,"Area about %s × %s km",km(w),km(h)),12f).apply{setTextColor(NativeUi.muted);setPadding(0,dp(4),0,0)})}
         val detail=labelled("Download detail",spinner(zoomNames,zoomChoice){zoomChoice=it})
         content.addView(detail)
         val include=CheckBox(activity).apply{text="Include NZ Topo and mapped overlays";isChecked=includeTopo;textSize=13f;setOnCheckedChangeListener{_,c->includeTopo=c}}
-        fun topoOnly(){val topo=bases[baseChoice]==MapSettings.Base.TOPO;detail.visibility=if(topo)android.view.View.GONE else android.view.View.VISIBLE;include.isEnabled=!topo;if(topo)include.isChecked=true}
+        fun topoOnly(){val topo=bases[baseChoice]==MapSettings.Base.TOPO;detail.visibility=if(topo)View.GONE else View.VISIBLE;include.isEnabled=!topo;if(topo)include.isChecked=true}
         content.addView(labelled("Map content",spinner(listOf("LINZ aerial","Satellite","NZ Topo only · maximum detail"),baseChoice){baseChoice=it;topoOnly()}))
         content.addView(include);topoOnly()
+        // Advanced: exact coordinates and the included overview imagery.
+        val coords=listOf("West","South","East","North").map{EditText(activity).apply{hint=it;textSize=13f;inputType=android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL or android.text.InputType.TYPE_NUMBER_FLAG_SIGNED}}
+        chosen?.let{b->listOf(b.west,b.south,b.east,b.north).forEachIndexed{i,v->coords[i].setText(String.format(java.util.Locale.ROOT,"%.5f",v))}}
+        val grid=GridLayout(activity).apply{columnCount=2}
+        coords.forEachIndexed{i,field->grid.addView(labelled(listOf("west","south","east","north")[i],field),GridLayout.LayoutParams().apply{width=0;columnSpec=GridLayout.spec(i%2,1f)})}
+        val advancedBody=NativeUi.column(activity).apply{
+            addView(NativeUi.text(activity,"Region coordinates",13f).apply{setTypeface(null,android.graphics.Typeface.BOLD);setPadding(0,dp(4),0,dp(2))})
+            addView(NativeUi.text(activity,"Edit to download an exact area instead of the chosen frame.",12f).apply{setTextColor(NativeUi.muted)})
+            addView(grid)
+            addView(NativeUi.text(activity,"Included imagery",13f).apply{setTypeface(null,android.graphics.Typeface.BOLD);setPadding(0,dp(12),0,dp(2))})
+            addView(NativeUi.text(activity,"Overview imagery: ${loader.overviews.list().size}/6 packs attached. Zooms 0–8 are included in the app.",12f).apply{setTextColor(NativeUi.muted)})
+            addView(button("Add imagery ZIPs"){closeSettings();addImagery()},LinearLayout.LayoutParams(-2,dp(42)))
+        }
+        var coordsEdited=false
+        val watcher=object:android.text.TextWatcher{override fun beforeTextChanged(a:CharSequence?,b:Int,c:Int,d:Int){};override fun onTextChanged(a:CharSequence?,b:Int,c:Int,d:Int){};override fun afterTextChanged(e:android.text.Editable?){coordsEdited=true}}
+        for(field in coords)field.addTextChangedListener(watcher)
         val estimate=NativeUi.text(activity,"",12.5f).apply{setTextColor(NativeUi.ink);setPadding(0,dp(6),0,dp(6))}
         fun bounds():TileLoader.Bounds{
-            if(grid.visibility==android.view.View.VISIBLE){
+            if(coordsEdited||chosen==null){
                 val v=coords.map{it.text.toString().toDoubleOrNull()?:error("Enter valid region coordinates.")}
                 val b=TileLoader.Bounds(v[0],v[1],v[2],v[3]);require(b.west>=165&&b.east<=180&&b.south>=-49&&b.north<=-33&&b.west<b.east&&b.south<b.north){"Enter valid region coordinates."};return b
             }
-            return chosen?:error("Choose an area first.")
+            return chosen!!
         }
         fun zoom()=if(bases[baseChoice]==MapSettings.Base.TOPO)TOPO_MAX_ZOOM else zooms[zoomChoice]
         fun estimateText():String{val e=loader.regionEstimate(bounds(),zoom(),bases[baseChoice],includeTopo)
@@ -234,16 +290,11 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
         },LinearLayout.LayoutParams(0,dp(44),1f))
         content.addView(actions);content.addView(estimate)
         content.addView(CheckBox(activity).apply{text="Use downloaded maps only";isChecked=loader.offlineOnly;textSize=13f;setOnCheckedChangeListener{_,c->loader.offlineOnly(c)}})
+        content.addView(toggle("Advanced",advancedBody));content.addView(advancedBody)
         content.addView(list)
-        val imagery=TextView(activity).apply{text="Included imagery ▸";textSize=13f;setTextColor(NativeUi.ink);setPadding(0,dp(10),0,dp(6));isClickable=true;background=NativeUi.pressable(activity,null)}
-        val packs=NativeUi.column(activity).apply{visibility=android.view.View.GONE
-            addView(NativeUi.text(activity,"Overview imagery: ${loader.overviews.list().size}/6 packs attached. Zooms 0–8 are included in the app.",12f).apply{setTextColor(NativeUi.muted)})
-            addView(button("Add imagery ZIPs"){settingsDialog?.dismiss();addImagery()})}
-        imagery.setOnClickListener{val open=packs.visibility!=android.view.View.VISIBLE;packs.visibility=if(open)android.view.View.VISIBLE else android.view.View.GONE;imagery.text=if(open)"Included imagery ▾" else "Included imagery ▸"}
-        content.addView(imagery);content.addView(packs)
-        val dialog=AlertDialog.Builder(activity).setTitle("Download region").setView(ScrollView(activity).apply{addView(content)}).setNegativeButton("Close",null).create()
-        settingsDialog=dialog
-        refresh={loader.regions{rows->if(!dialog.isShowing)return@regions
+        val panel=bottomPanel("Download region","Close download region",.62f,{closeSettings()},content)
+        root.addView(panel,FrameLayout.LayoutParams(-1,-2,Gravity.BOTTOM));settingsPanel=panel
+        refresh={loader.regions{rows->if(settingsPanel!==panel)return@regions
             list.removeAllViews()
             if(downloading)list.addView(LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL
                 addView(NativeUi.text(activity,"Downloading · $progressText",12.5f),LinearLayout.LayoutParams(0,-2,1f))
@@ -255,7 +306,7 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
                 item.addView(NativeUi.text(activity,String.format(java.util.Locale.ROOT,"%s · %,d files · %.1f MB",region.status,region.resources,region.bytes/1048576.0),12f).apply{setTextColor(NativeUi.muted)})
                 val buttons=LinearLayout(activity)
                 val meta=region.metadata
-                if(meta!=null)buttons.addView(button("View"){dialog.dismiss();val base=runCatching{MapSettings.Base.valueOf(meta.basemap)}.getOrDefault(MapSettings.Base.LINZ);loader.mapSettings.change{it.copy(base=base)};terrain.focus(listOf(Coordinate(meta.bounds.west,meta.bounds.south),Coordinate(meta.bounds.east,meta.bounds.north)))})
+                if(meta!=null)buttons.addView(button("View"){closeSettings();val base=runCatching{MapSettings.Base.valueOf(meta.basemap)}.getOrDefault(MapSettings.Base.LINZ);loader.mapSettings.change{it.copy(base=base)};terrain.focus(listOf(Coordinate(meta.bounds.west,meta.bounds.south),Coordinate(meta.bounds.east,meta.bounds.north)))})
                 if(meta!=null&&!downloading&&region.status.startsWith("Partial"))buttons.addView(button("Resume"){
                     val base=runCatching{MapSettings.Base.valueOf(meta.basemap)}.getOrDefault(MapSettings.Base.LINZ)
                     downloading=true;progressText="Resuming…";refresh()
@@ -266,6 +317,7 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
                 item.addView(buttons);list.addView(item)
             }
         }}
-        dialog.show();refresh()
+        refresh()
     }
+    private companion object{const val CUSTOM="Custom"}
 }

@@ -8,7 +8,7 @@ import kotlin.math.*
 
 /** Capacitor's offline region frame: a page-shaped box (paper aspect) over a
  * 2D north-up map, dimmed outside, with four corner handles that resize it
- * at a fixed aspect. Touches away from the handles go to the map, so the map
+ * at a fixed aspect, or freely for a custom size. Touches away from the handles go to the map, so the map
  * pans and zooms underneath the frame. */
 internal class RegionFrame(context:Context):View(context){
     /** Paper sizes in millimetres, as the Capacitor app. */
@@ -26,6 +26,8 @@ internal class RegionFrame(context:Context):View(context){
     private val dp=resources.displayMetrics.density
     var box=doubleArrayOf(.15,.16,.85,.82);private set
     private var aspect=0.0
+    /** Called after the frame changes size or shape. */
+    var onChange:()->Unit={}
     /** Height at the bottom covered by the panel (the frame stays above it). */
     var bottomInset=0;set(value){field=value;invalidate()}
     private val shade=Paint().apply{color=Color.argb(70,16,40,35)}
@@ -39,8 +41,11 @@ internal class RegionFrame(context:Context):View(context){
         val b=pageFrame(size,landscape,width.toDouble(),usable.toDouble())
         box=doubleArrayOf(b[0],b[1]*usable/height,b[2],b[3]*usable/height)
         val (w,h)=(PAPER[size]?:PAPER.getValue("A4")).let{if(landscape)it.second to it.first else it}
-        aspect=(w*72/25.4-60)/(h*72/25.4-94);invalidate()
+        aspect=(w*72/25.4-60)/(h*72/25.4-94);invalidate();onChange()
     }
+    /** Custom size: keep the current frame, corners now resize it freely. */
+    fun custom(){aspect=0.0;clampToUsable();invalidate();onChange()}
+    private fun clampToUsable(){if(height<=0)return;val limit=min(.94,usable/height.toDouble());if(box[3]>limit){val shift=box[3]-limit;box[3]=limit;box[1]=max(.06,box[1]-shift)}}
     /** Screen corners in pixels: left, top, right, bottom. */
     fun corners()=floatArrayOf((box[0]*width).toFloat(),(box[1]*height).toFloat(),(box[2]*width).toFloat(),(box[3]*height).toFloat())
     override fun onSizeChanged(w:Int,h:Int,ow:Int,oh:Int){if(ow==0||oh==0)return;val cx=(box[0]+box[2])/2;val cy=(box[1]+box[3])/2;val fw=(box[2]-box[0])*ow;val fh=(box[3]-box[1])*oh
@@ -70,6 +75,6 @@ internal class RegionFrame(context:Context):View(context){
         fw=min(fw,maxW);var fh=if(aspect>0)fw/aspect else max(64*dp.toDouble(),abs(y-ay));if(fh>maxH){fh=maxH;if(aspect>0)fw=fh*aspect}
         if(right)box[2]=(ax+fw)/w else box[0]=(ax-fw)/w
         if(lower)box[3]=(ay+fh)/h else box[1]=(ay-fh)/h
-        invalidate()
+        invalidate();onChange()
     }
 }

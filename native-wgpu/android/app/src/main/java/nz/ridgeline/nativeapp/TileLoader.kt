@@ -338,7 +338,10 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         // small 128 px tiles get the full image budget so a screenful never
         // overflows it (which dropped the view a level and refined only a
         // shifting patch near the centre: blurry and jumpy).
-        if(!state.threeD)FlatSelection.plan(key.width,key.height,pose,if(!geometry&&state.base==MapSettings.Base.TOPO)128.0 else DetailPolicy.target(geometry,if(geometry)key.terrainDetail else key.imageryDetail),if(!geometry&&state.base==MapSettings.Base.TOPO)maxOf(budget,imageLimit)else budget,if(geometry)22 else when(state.base){MapSettings.Base.LINZ->19;MapSettings.Base.TOPO->TOPO_MAX_ZOOM;else->18},roundZoom=!geometry)?.let{return it.map{tile->Id(tile.z,tile.x,tile.y)}}
+        // NZ Topo switches to finer tiles one zoom level later than its 128 px
+        // tiles would (256: tile zoom = round(camera zoom + 1), was + 2), so the
+        // printed map stays at a readable scale longer. Zoom 16 still reaches 17.
+        if(!state.threeD)FlatSelection.plan(key.width,key.height,pose,if(!geometry&&state.base==MapSettings.Base.TOPO)TOPO_TARGET_PX else DetailPolicy.target(geometry,if(geometry)key.terrainDetail else key.imageryDetail),if(!geometry&&state.base==MapSettings.Base.TOPO)maxOf(budget,imageLimit)else budget,if(geometry)22 else when(state.base){MapSettings.Base.LINZ->19;MapSettings.Base.TOPO->TOPO_MAX_ZOOM;else->18},roundZoom=!geometry)?.let{return it.map{tile->Id(tile.z,tile.x,tile.y)}}
         val count=NativeBridge.planFocused(key.width,key.height,pose.longitude,pose.latitude,
             pose.zoom,pose.bearing,pose.pitch,pose.elevation,budget,
             DetailPolicy.target(geometry,if(geometry)key.terrainDetail else key.imageryDetail)*(if(!geometry&&mapSettings.state.base==MapSettings.Base.TOPO).5 else 1.0),if(geometry)22 else when(mapSettings.state.base){MapSettings.Base.LINZ->19;MapSettings.Base.TOPO->TOPO_MAX_ZOOM;else->18},1.0,

@@ -338,9 +338,13 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             // Lines are already in the renderer (parsed off this thread); a few
             // atlas rows are cheap, so names update during gestures too (they
             // used to wait until the map had been still for 250 ms).
-            val cheap=!full&&bandBytes<=1_048_576
+            // A grown atlas (new names such as huts) used to wait until the map
+            // was still: its predicted cost never fitted a gesture frame. Up to
+            // 4 MiB (2048x512) goes during gestures too, and anything waits at
+            // most 200 ms while moving.
+            val cheap=if(full)atlas.rgba.capacity()<=4*1_048_576 else bandBytes<=1_048_576
             val predicted=if(full)250_000L+atlas.rgba.capacity().toLong()*4 else 50_000L
-            val starvedIdle=!moved&&!gestureActive&&nowAdmission-deferredLayerSince>=250
+            val starvedIdle=!moved&&!gestureActive&&nowAdmission-deferredLayerSince>=250||nowAdmission-deferredLayerSince>=200
             val lineReady=parsedLines?.let{it.first==handle&&it.second===layers.lines}==true
             if(!cameraFirst&&lineReady&&(cheap||System.nanoTime()-started+predicted<=allowance||starvedIdle)){
                 fun whole()=NativeBridge.labelAtlas(handle,atlas.width,atlas.height,atlas.rgba,atlas.metadata)

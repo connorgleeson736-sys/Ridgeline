@@ -21,6 +21,8 @@ import kotlin.math.pow
 /** Data-only port of the reference source chain. No JavaScript at runtime. */
 /** LINZ topo-raster's finest real detail (z18 tiles are upscaled z17). */
 internal const val TOPO_MAX_ZOOM=17
+/** Screen pixels per NZ Topo tile when choosing its zoom (2D only). */
+internal const val TOPO_TARGET_PX=256.0
 
 internal class NativeImagery(
     private val context: Context,
