@@ -21,9 +21,11 @@ data class CameraPose(val longitude:Double=170.14219572,val latitude:Double=-43.
 private const val MOTION_SCALE=.75f
 
 class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
-    private val thread=HandlerThread("ridgeline-gpu").apply{start()}
+    // Above the decode workers (default priority): on two fast cores the
+    // frame must not queue behind tile decoding.
+    private val thread=HandlerThread("ridgeline-gpu",android.os.Process.THREAD_PRIORITY_DISPLAY).apply{start()}
     private val gpu=Handler(thread.looper)
-    private val inputThread=HandlerThread("RidgelineInput").apply{start()}
+    private val inputThread=HandlerThread("RidgelineInput",android.os.Process.THREAD_PRIORITY_DISPLAY).apply{start()}
     private val input=Handler(inputThread.looper)
     @Volatile private var handle=0L
     @Volatile private var live=false
@@ -50,7 +52,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     private var focusCoverDirty=false
     val gestureInProgress get()=gestureActive
     @Volatile private var lastBacklog=0
-    internal fun loadingSnapshot()="Overlay lines: packets ${lineCounts[0]} · accepted ${lineCounts[1]} · rejected ${lineCounts[2]} · re-sent in full ${lineCounts[3]} · groups ${layerBatch?.lines?.size?:0} (renderer holds ${heldLines?.second?.size?:0}) · names applied ${if(layerBatch===appliedLayers)"yes" else "waiting"}\n"+frameReport()+"\nGPU uploads waiting: ${uploads.size()} · outstanding submissions: $lastBacklog\nGPU admission: ${uploads.outcomeStats()}\nResident geometry/images: ${residency.geometry.size}/${residency.images.size}\nNative render CPU/wait last/max: $renderLastMs/$renderMaxMs ms\nDetail focus: "+if(surfaceFocusFor(planningPose)!=null)"measured visible terrain"else"map pivot (no current terrain hit)"
+    internal fun loadingSnapshot()="Overlay lines: packets ${lineCounts[0]} · accepted ${lineCounts[1]} · rejected ${lineCounts[2]} · re-sent in full ${lineCounts[3]} · groups ${layerBatch?.lines?.size?:0} (renderer holds ${heldLines?.second?.size?:0}) · names applied ${if(layerBatch===appliedLayers)"yes" else "waiting"}\n"+frameReport()+"\nGPU uploads waiting: ${uploads.size()} · outstanding submissions: $lastBacklog\nGPU admission: ${uploads.outcomeStats()}\nGPU errors recorded: ${runCatching{NativeBridge.gpuErrors()}.getOrDefault(-1L)}\nResident geometry/images: ${residency.geometry.size}/${residency.images.size}\nNative render CPU/wait last/max: $renderLastMs/$renderMaxMs ms\nDetail focus: "+if(surfaceFocusFor(planningPose)!=null)"measured visible terrain"else"map pivot (no current terrain hit)"
     val canPrepareAhead get()=live&&active&&!gestureActive&&lastBacklog==0&&!uploads.isNotEmpty()
     fun checkPreparationRoom(callback:(Boolean)->Unit){gpu.post{
         if(live&&active&&handle!=0L&&!gestureActive&&presentationFailures==0){lastBacklog=NativeBridge.gpuBacklog(handle);callback(canPrepareAhead)}else callback(false)
@@ -94,7 +96,10 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     /** Packet for [groups]: bodies only for groups the renderer does not hold. */
     private fun linePacket(groups:List<LineGroup>,held:Set<Long>)=LineGroup.packet(groups,held)
     private val parsingLines=AtomicBoolean()
-    private val lineParser=java.util.concurrent.Executors.newSingleThreadExecutor{run->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);run.run()},"RidgelineLinePackets")}
+    private val lineParser=java.util.concurrent.Executors.newSingleThreadExecutor{run->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_DEFAULT);run.run()},"RidgelineLinePackets")}
+    /** A packet the renderer refused: not re-sent before its back-off ends
+     * (it was re-sent every frame, 844 times in one session). */
+    private var refusedLines:Triple<Long,List<LineGroup>,Long>?=null;private var lineRefusals=0
     private var deferredLayer:NativeLayerBatch?=null
     private var deferredLayerSince=0L
     private fun prepareMapLines(){
@@ -103,14 +108,20 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             try{while(live&&active){
                 val scene=handle;val packet=layerBatch?.lines?:break
                 if(scene==0L||parsedLines?.let{it.first==scene&&it.second===packet}==true)break
+                val now=android.os.SystemClock.uptimeMillis()
+                if(refusedLines?.let{it.first==scene&&it.second===packet&&now<it.third}==true)break
                 // Parsing happens before the renderer mutex inside JNI. Never
                 // hold the camera or GPU HandlerThread behind a large packet.
                 val held=heldLines?.takeIf{it.first==scene}?.second?:emptySet()
                 lineCounts.incrementAndGet(0)
                 var result=NativeBridge.cartography(scene,linePacket(packet,held))
                 if(result==2){lineCounts.incrementAndGet(3);result=NativeBridge.cartography(scene,linePacket(packet,emptySet()))}
-                if(result!=1){lineCounts.incrementAndGet(2);heldLines=null;break}
-                lineCounts.incrementAndGet(1)
+                if(result!=1){
+                    lineCounts.incrementAndGet(2);heldLines=null
+                    val wait=minOf(30_000L,250L shl minOf(lineRefusals,7));lineRefusals++
+                    refusedLines=Triple(scene,packet,now+wait);gpu.postDelayed({requestFrame()},wait);break
+                }
+                lineCounts.incrementAndGet(1);lineRefusals=0;refusedLines=null
                 heldLines=scene to packet.mapTo(HashSet()){it.id}
                 if(scene==handle&&live){parsedLines=scene to packet;requestFrame()}
             }}finally{parsingLines.set(false)}

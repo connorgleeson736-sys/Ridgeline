@@ -23,6 +23,8 @@ internal class HttpMetrics {
         val start=System.nanoTime();val first=AtomicLong()
         val dnsStart=AtomicLong();val dns=AtomicLong();val connectStart=AtomicLong();val connect=AtomicLong();val tlsStart=AtomicLong();val tls=AtomicLong()
         val sent=AtomicLong();val headers=AtomicLong();val wire=AtomicLong();val processing=AtomicLong();val bytes=AtomicLong();val attempts=AtomicInteger();val reading=AtomicInteger()
+        /** When OkHttp finished the call; a span never delivered is pruned later. */
+        @Volatile var endedAt=0L
         @Volatile var headersAt=0L;@Volatile var protocol="pending";@Volatile var status=0;@Volatile var probe:Probe?=null;@Volatile var cacheBody=false
         fun begin(){first.compareAndSet(0,System.nanoTime())}
         fun phase():String=when{
@@ -70,6 +72,9 @@ internal class HttpMetrics {
             override fun cacheHit(call:Call,response:Response){trace.begin();trace.status=response.code;if(trace.headersAt==0L){trace.cacheBody=true;trace.protocol="cache"}}
             override fun cacheMiss(call:Call){trace.begin()}
             override fun cacheConditionalHit(call:Call,cachedResponse:Response){trace.begin()}
+            override fun callEnd(call:Call){trace.endedAt=System.nanoTime()}
+            override fun callFailed(call:Call,ioe:IOException){trace.endedAt=System.nanoTime()}
+            override fun canceled(call:Call){if(trace.endedAt==0L)trace.endedAt=System.nanoTime()}
         }
     }
     fun intercept(chain:Interceptor.Chain):Response {
@@ -77,6 +82,11 @@ internal class HttpMetrics {
         val original=response.body;val probe=Probe(trace,original);trace.probe=probe;val source=probe.buffer()
         return response.newBuilder().body(object:ResponseBody(){override fun contentType()=original.contentType();override fun contentLength()=original.contentLength();override fun source()=source}).build()
     }
+    /** Drop a span that is not a tile delivery. */
+    fun forget(call:Call){active.remove(call)}
+    /** Spans whose call ended long ago but were never delivered (a bounded
+     * leak, and a misleading "oldest call" in diagnostics). */
+    private fun prune(now:Long){active.entries.removeIf{val ended=it.value.endedAt;ended!=0L&&now-ended>ENDED_RETENTION_NANOS}}
     fun delivered(call:Call,error:Throwable?=null){
         val trace=active.remove(call)?:return
         val record=trace.record(System.nanoTime(),(if(call.isCanceled())"canceled "else"")+(error?.javaClass?.simpleName?:"HTTP ${trace.status}"))
@@ -86,11 +96,13 @@ internal class HttpMetrics {
     fun snapshot():String {
         val now=System.nanoTime();val epoch=now/250_000_000
         val rate=synchronized(meter){bucket.indices.sumOf{if(epochs[it] in epoch-19..epoch)bucket[it]else 0L}/5120}
-        val slow=active.entries.asSequence().filter{!it.key.isCanceled()}.minByOrNull{it.value.start}?.value
+        prune(now)
+        val slow=active.entries.asSequence().filter{!it.key.isCanceled()&&it.value.endedAt==0L}.minByOrNull{it.value.start}?.value
         val retired=active.keys.count{it.isCanceled()}
         val (last,max)=synchronized(history){latest to longest}
         return "Observed HTTP body rate (last 5s): $rate KiB/s\n"+
             "Oldest uncanceled HTTP call: "+(slow?.let{"${it.host} ${it.kind} · ${it.phase()} · ${(now-it.start)/1_000_000} ms"}?:"none")+" · retired $retired\n"+
             "Last HTTP phases: "+(last?.text()?:"none")+"\nLongest HTTP phases: "+(max?.text()?:"none")
     }
+    private companion object{const val ENDED_RETENTION_NANOS=30_000_000_000L}
 }

@@ -23,7 +23,7 @@ internal class ResourcePending(val ready:CompletableFuture<*>):RuntimeException(
  * CPU consumers suspend by continuation instead of occupying a decode worker. */
 internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
     private val clock:()->Long=System::currentTimeMillis,private val graceMs:Long=600,
-    private val localWaitMs:Long=40,private val localCooldownMs:Long=30000,
+    private val localWaitMs:Long=40,private val localQueueMs:Long=250,
     initialLimits:DownloadLimits=DownloadLimits.DEFAULT):AutoCloseable {
     private val lock=Any()
     private var ramLimit=ramLimit.coerceAtLeast(0)
@@ -48,7 +48,9 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
     private fun localNow()=TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-localEpoch)
     private var localWatch:ScheduledFuture<*>?=null
     private var localWatchAt=Long.MAX_VALUE;private var localWatchEpoch=0L;private var localWatchRuns=0L
-    private var localCooldownUntil=0L;private var localTimeouts=0L;private var localErrors=0L;private var bypasses=0L
+    /** Last time a disk read started or finished: the disk is making progress. */
+    private var localProgress=0L
+    private var localTimeouts=0L;private var localErrors=0L;private var bypasses=0L;private var lateLocalWins=0L
     private var ramHits=0L;private var localHits=0L;private var networkStarts=0L;private var shares=0L;private var cancellations=0L
     private var lastNetworkMs=0L;private var maxNetworkMs=0L;private var lastAdmissionMs=0L
     private enum class Phase { LOCAL,QUEUED,NETWORK,DONE }
@@ -62,6 +64,8 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
         var localFinished=false;var localHit=false;var bypassCache=false;var networkTried=false
         var networkError:Throwable?=null
         var localDeadline=Long.MAX_VALUE
+        /** When this job's disk opportunity began, and when its own read started. */
+        var watchFrom=Long.MAX_VALUE;var localStarted=Long.MAX_VALUE
         var expiry:ScheduledFuture<*>?=null
         fun speculative()=users.isNotEmpty()&&users.all{it.speculative}
         fun imagery()=users.any{it.imagery&&!it.speculative}
@@ -70,7 +74,12 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
     private inner class LocalWork(val job:Job):Runnable,Comparable<LocalWork>{
         override fun compareTo(other:LocalWork):Int {val rank=job.localRank.compareTo(other.job.localRank);return if(rank!=0)rank else job.order.compareTo(other.job.order)}
         override fun run(){try{
-            if(synchronized(lock){job.stopped||job.phase==Phase.DONE})return
+            if(synchronized(lock){
+                if(job.stopped||job.phase==Phase.DONE)return@synchronized true
+                val now=localNow();localProgress=now;job.localStarted=now
+                if(watchable(job))scheduleLocalWatch(due(job))
+                false
+            })return
             localDone(job,Result.success(backend.local(job.key)))
         }catch(e:Exception){localDone(job,Result.failure(e))}}
     }
@@ -85,46 +94,51 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
         val epoch=++localWatchEpoch
         localWatch=timers.schedule({pollLocal(epoch)},(at-localNow()).coerceAtLeast(0),TimeUnit.MILLISECONDS)
     }
+    /** Only this job's own late read sends it to the network. A running read
+     * gets [localWaitMs]; a queued read waits while the disk keeps making
+     * progress, up to [localQueueMs]. Its disk read stays queued and can still
+     * win. Earlier versions sent every waiting job to the network and skipped
+     * the disk for 30 s, so one slow eMMC read re-downloaded stored tiles. */
+    private fun due(job:Job):Long{
+        if(job.watchFrom==Long.MAX_VALUE)return Long.MAX_VALUE
+        if(job.localStarted!=Long.MAX_VALUE)return maxOf(job.watchFrom,job.localStarted)+localWaitMs
+        return minOf(job.watchFrom+maxOf(localQueueMs,localWaitMs),maxOf(job.watchFrom,localProgress)+localWaitMs)
+    }
     private fun watchLocal(job:Job){
         if(closed||!watchable(job))return
-        val now=localNow()
-        job.localDeadline=minOf(job.localDeadline,now+if(now<localCooldownUntil)0 else localWaitMs)
+        if(job.watchFrom==Long.MAX_VALUE)job.watchFrom=localNow()
+        job.localDeadline=due(job)
         scheduleLocalWatch(job.localDeadline)
     }
     private fun pollLocal(epoch:Long){
         val escaped=synchronized(lock){
             if(closed||epoch!=localWatchEpoch)return
             localWatch=null;localWatchAt=Long.MAX_VALUE;localWatchRuns++
-            val now=localNow();var next=Long.MAX_VALUE;var escape=now<localCooldownUntil
+            // Deadlines within a small slack share this wake.
+            val now=localNow();val slack=maxOf(2L,localWaitMs/10);var next=Long.MAX_VALUE;var changed=false
             for(job in jobs.values)if(watchable(job)){
-                next=minOf(next,job.localDeadline)
-                if(job.localDeadline<=now)escape=true
+                val due=due(job);job.localDeadline=due
+                if(due<=now+slack){localTimeouts++;job.bypassCache=true;job.phase=Phase.QUEUED;changed=true}
+                else next=minOf(next,due)
             }
-            if(escape){
-                var changed=false
-                for(job in jobs.values)if(watchable(job)){
-                    localTimeouts++;job.bypassCache=true;job.phase=Phase.QUEUED;changed=true
-                }
-                if(changed)localCooldownUntil=now+localCooldownMs
-                changed
-            }else{if(next!=Long.MAX_VALUE)scheduleLocalWatch(next);false}
+            if(next!=Long.MAX_VALUE)scheduleLocalWatch(next)
+            changed
         }
         if(escaped)pump()
     }
     private fun localDone(job:Job,result:Result<TileBody?>){
         var completed:Result<TileBody>?=null
         synchronized(lock){
-            // Progress reopens the disk path even if this particular reader
-            // lost the race. A late body never replaces the selected response.
-            if(result.isSuccess)localCooldownUntil=0
+            // A late body never replaces the selected response.
+            localProgress=localNow()
             if(job.stopped||job.phase==Phase.DONE)return
             job.localFinished=true;job.localDeadline=Long.MAX_VALUE
             val body=result.getOrNull()
-            if(body!=null){job.localHit=true;localHits++;completed=Result.success(body)}
+            if(body!=null){job.localHit=true;localHits++;if(job.phase==Phase.NETWORK)lateLocalWins++;completed=Result.success(body)}
             else if(job.key.offline)completed=Result.failure(result.exceptionOrNull()?:IOException("Offline tile unavailable"))
             else if(job.networkError!=null)completed=Result.failure(job.networkError!!)
             else if(job.phase==Phase.LOCAL){
-                if(result.isFailure){localErrors++;localCooldownUntil=localNow()+localCooldownMs;job.bypassCache=true}
+                if(result.isFailure){localErrors++;job.bypassCache=true}
                 job.phase=Phase.QUEUED
             }
         }
@@ -195,13 +209,8 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
             }
             forward?.let{(job,view)->job.result.whenComplete{body,error->if(error!=null)view.completeExceptionally(error)else view.complete(body)}}
             start?.let{job->synchronized(lock){if(!job.stopped&&!closed&&job.phase==Phase.LOCAL&&!job.networkTried){
-                if(!job.key.offline&&job.users.any{!it.speculative||it.cacheDeadline}&&localNow()<localCooldownUntil){
-                    job.bypassCache=true;job.localFinished=true;job.phase=Phase.QUEUED
-                    job.localDeadline=Long.MAX_VALUE
-                }else{
-                    val work=LocalWork(job);job.localWork=work;job.localRank=job.rank();local.execute(work)
-                    watchLocal(job)
-                }
+                val work=LocalWork(job);job.localWork=work;job.localRank=job.rank();local.execute(work)
+                watchLocal(job)
             }}}
             if(forward!=null)pump();return future
         }
@@ -316,7 +325,7 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
     fun contains(key:ResourceKey)=synchronized(lock){prune();ram[key]?.until?.let{it>clock()}==true}
     fun memoryPressure(){synchronized(lock){ram.clear();bytes=0;nextExpiry=Long.MAX_VALUE}}
     fun invalidate(){synchronized(lock){ram.clear();bytes=0;nextExpiry=Long.MAX_VALUE;for((key,old)in metadata.toMap())metadata[key]=old.copy(fingerprint="invalidated",until=0)}}
-    fun stats():Map<String,Long> = synchronized(lock){prune();mapOf("encodedBytes" to bytes,"ramHits" to ramHits,"localHits" to localHits,"networkStarts" to networkStarts,"shared" to shares,"cancelled" to cancellations,"pending" to jobs.size.toLong(),"networkActive" to networkActive.toLong(),"backgroundActive" to backgroundActive.toLong(),"localQueued" to local.queue.size.toLong(),"networkQueued" to jobs.values.count{it.phase==Phase.QUEUED}.toLong(),"localTimeouts" to localTimeouts,"localWatchRuns" to localWatchRuns,"localErrors" to localErrors,"uncachedStarts" to bypasses,"localCooldownMs" to (localCooldownUntil-localNow()).coerceAtLeast(0))}
+    fun stats():Map<String,Long> = synchronized(lock){prune();mapOf("encodedBytes" to bytes,"ramHits" to ramHits,"localHits" to localHits,"networkStarts" to networkStarts,"shared" to shares,"cancelled" to cancellations,"pending" to jobs.size.toLong(),"networkActive" to networkActive.toLong(),"backgroundActive" to backgroundActive.toLong(),"localQueued" to local.queue.size.toLong(),"networkQueued" to jobs.values.count{it.phase==Phase.QUEUED}.toLong(),"localTimeouts" to localTimeouts,"localWatchRuns" to localWatchRuns,"localErrors" to localErrors,"uncachedStarts" to bypasses,"lateLocalWins" to lateLocalWins)}
     fun latencyStats():Map<String,Long> = synchronized(lock){
         val now=System.nanoTime()
         mapOf("lastHttpMs" to lastNetworkMs,"maxHttpMs" to maxNetworkMs,"lastAdmissionMs" to lastAdmissionMs,

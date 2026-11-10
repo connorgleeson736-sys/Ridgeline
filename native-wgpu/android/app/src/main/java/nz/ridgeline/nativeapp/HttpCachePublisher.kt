@@ -11,7 +11,7 @@ import java.util.concurrent.*
 /** Narrow adapter to the pinned OkHttp 5.3.2 cache. Store the real response's
  * metadata/body in the existing full-size cache, after delivery. No cache-format
  * fork or second smaller cache tier. Internal calls have cache/migration tests. */
-internal class HttpCachePublisher(private val cache:Cache?,private val byteLimit:Long=8L*1024*1024,threadFactory:ThreadFactory=Executors.defaultThreadFactory()):AutoCloseable {
+internal class HttpCachePublisher(private val cache:Cache?,private val byteLimit:Long=24L*1024*1024,threadFactory:ThreadFactory=Executors.defaultThreadFactory()):AutoCloseable {
     private data class Pending(val key:String,val response:Response,val body:TileBody)
     private val lock=Any();private val pending=HashMap<String,Pending>()
     private var bytes=0L;private var writes=0L;private var dropped=0L;private var errors=0L

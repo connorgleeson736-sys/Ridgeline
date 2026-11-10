@@ -1,0 +1,39 @@
+{
+  "artifact": "Ridgeline-Native-Disk-First-0.1.34-Base.apk",
+  "bytes": 33754362,
+  "sha256": "486f8935507cd08a962ad09f83633d6f6e4105c4077fc561f920432d6b33b4ad",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.34-disk-first",
+  "versionCode": 35,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.33 Full Audit (same package and signer)",
+  "basis": "Native app audit of 0.1.33 (source 91cc6eb) and the user's loading diagnostics from the build before 0.1.33: cache escape starts 362 vs disk hits 166; HTTP cache writes dropped 17; late prepared-cache wins 63; vector tiles decoded 260 for 39 tiles; line packets rejected/re-sent 844; oldest uncanceled HTTP call 65 s.",
+  "changes": [
+    "P1 disk first: only a tile whose own disk read is late (40 ms running, or 250 ms queued while the disk makes progress) also starts a cache-free download; its disk read stays queued and can still win. Removed the 30 s cooldown that skipped the disk for every tile after one slow read.",
+    "P3 overlays: each vector-tile layer is decoded once per tile; zooms that enable a layer decode only that layer. The last three styled zoom bands per tile are reused. Overlay styling and line-packet threads run at normal priority instead of background.",
+    "P4 derived caches: source and prepared-terrain/composition writes are bounded by bytes (8 MiB / 24 MiB) instead of 8 jobs; HTTP cache publisher limit 8 to 24 MiB; prepared-cache shortcut waits 40 ms instead of 12 ms (continuation, no worker blocked).",
+    "P5 render thread and input thread at THREAD_PRIORITY_DISPLAY, above the decode workers.",
+    "P7 manifest also handles screenLayout, smallestScreenSize, uiMode, keyboard and navigation changes, so dark-mode or split-screen changes no longer recreate the activity and reload the map.",
+    "B1 uncaptured GPU errors are counted and logged instead of panicking (release builds abort on panic); tile lookups that could panic on a stale cover row (routes terrain_height, progressive interiors, seams, picking, draw rows, adaptive levels) are checked.",
+    "B2 a line packet the renderer refuses is retried with back-off (250 ms doubling to 30 s) instead of every frame.",
+    "B3 resuming a partial offline region uses the region's own overlay choice (now stored in its metadata; older regions default to included).",
+    "B7 connection warm-up HEAD requests no longer stay in HTTP diagnostics; spans of finished calls never delivered are pruned after 30 s.",
+    "Diagnostics: disk-won escapes, late disk reads, derived cache writes written/dropped, GPU errors recorded."
+  ],
+  "tests": {
+    "kotlinJvm": "196 tests, 0 failures (new: BoundedWritesTest x3, IncrementalDecodeTest on a real LINZ tile, per-tile disk escape test)",
+    "rust": "51 tests pass",
+    "gpu": "overlay_drape (Vulkan and GLES)"
+  },
+  "lintErrors": 0,
+  "assetsIdenticalTo0133": "626 of 628; only the generated dexopt baseline profiles differ",
+  "jniExportsPerAbi": 49,
+  "loadAlignment": "0x4000",
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false,
+  "speedMeasured": false
+}

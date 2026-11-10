@@ -56,9 +56,11 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private val escapedBytes=minOf(16L*1024*1024,preparedBytes/4)
     private val compositionBytes=(preparedBytes-escapedBytes)/2
     private val escaped by lazy{HedgedBodyCache(File(context.cacheDir,"native-escaped-v1"),escapedBytes)}
-    private val escapedWrites=ThreadPoolExecutor(1,1,0,TimeUnit.MILLISECONDS,ArrayBlockingQueue<Runnable>(8),ThreadFactory{work->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);work.run()},"RidgelineSourceCache")},ThreadPoolExecutor.DiscardOldestPolicy())
-    private val preparedWrites=ThreadPoolExecutor(1,1,0,TimeUnit.MILLISECONDS,ArrayBlockingQueue<Runnable>(8),ThreadFactory{work->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);work.run()},"RidgelinePreparedCache")},ThreadPoolExecutor.DiscardOldestPolicy())
-    private val derivedReads=DerivedReadGate()
+    private val escapedWrites=BoundedWrites("RidgelineSourceCache",8L*1024*1024)
+    private val preparedWrites=BoundedWrites("RidgelinePreparedCache",24L*1024*1024)
+    // Late shortcuts are adopted by continuation, so waiting longer costs no
+    // worker thread; 12 ms lost most races on slow eMMC (63 late wins).
+    private val derivedReads=DerivedReadGate(waitMs=40)
     private val httpMetrics=HttpMetrics()
     private val client = OkHttpClient.Builder()
         .cache(if(automaticCacheBytes>0)Cache(File(context.cacheDir, "native-http-v1"), automaticCacheBytes-preparedBytes)else null)
@@ -68,7 +70,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         .addNetworkInterceptor{httpMetrics.intercept(it)}
         .connectTimeout(12, TimeUnit.SECONDS).readTimeout(15, TimeUnit.SECONDS).build()
     init {
-        if(automaticCacheBytes==0L)preparedWrites.execute {
+        if(automaticCacheBytes==0L)preparedWrites.submit(1) {
             // No HTTP cache is open and derived stores have a zero write limit.
             for(name in listOf("native-http-v1","native-terrain-v3","native-compositions-v1","native-escaped-v1"))
                 runCatching{File(context.cacheDir,name).deleteRecursively()}
@@ -482,7 +484,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     }
     private val backend by lazy{HttpTileBackend(client,
         escapeRead={escaped.get(it)},
-        escapeWrite={resource,body->if(escapedBytes>0&&!escapedWrites.isShutdown)runCatching{escapedWrites.execute{escaped.put(resource,body)}}},
+        escapeWrite={resource,body->if(escapedBytes>0&&!escapedWrites.isShutdown)escapedWrites.submit(body.bytes.size.toLong()){escaped.put(resource,body)}},
         cacheThreadFactory=ThreadFactory{work->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);work.run()},"RidgelineHttpCache")},
         metrics=httpMetrics,offlineRead=offline::read)}
     private val transport by lazy{TileTransport(backend,ramBudget.encoded,initialLimits=downloadLimits)}
@@ -515,6 +517,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             "Underlying HTTP running/queued: ${http["httpRunning"]}/${http["httpQueued"]} · canceled but still occupying slots: ${http["retiredHttpRunning"]}/${http["retiredHttpQueued"]}\n"+
             "Cache-free HTTP running/queued: ${http["escapeRunning"]}/${http["escapeQueued"]}\n"+
             "Async HTTP cache writes queued: ${http["cacheWritesQueued"]} · pending bytes ${http["pendingCacheBytes"]} · completed/dropped/errors ${http["cacheWrites"]}/${http["cacheWriteDrops"]}/${http["cacheWriteErrors"]}\n"+
+            "Derived cache writes written/dropped: source ${escapedWrites.stats()["written"]}/${escapedWrites.stats()["dropped"]} · prepared ${preparedWrites.stats()["written"]}/${preparedWrites.stats()["dropped"]}\n"+
             "Oldest active HTTP: ${times["oldestActiveHttpMs"]} ms · waiting source: ${times["oldestWaitingMs"]} ms\n"+
             "Last HTTP stage: ${times["lastHttpMs"]} ms · max this session: ${times["maxHttpMs"]} ms\n"+
             "Last local/queue wait before HTTP: ${times["lastAdmissionMs"]} ms\n"+
@@ -524,7 +527,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             "Tiles in progress: ${jobs.size} · retry backoffs: ${failures.size}\n"+
             "Focus centre-to-halo samples: ${centreHaloSamples.get()} · mean/max ${if(centreHaloSamples.get()>0)centreHaloNanos.get()/centreHaloSamples.get()/1_000_000 else 0}/${centreHaloMax.get()/1_000_000} ms\n"+
             "Late prepared-cache wins: ${latePreparedWins.get()}\n"+
-            "RAM/disk hits: ${counts["ramHits"]}/${counts["localHits"]} · cache escape starts: ${counts["uncachedStarts"]}\n"+
+            "RAM/disk hits: ${counts["ramHits"]}/${counts["localHits"]} · cache escape starts: ${counts["uncachedStarts"]} (disk still won ${counts["lateLocalWins"]}) · late disk reads: ${counts["localTimeouts"]}\n"+
             httpMetrics.snapshot()+"\n"+externalDiagnostics()+"\n"+view.loadingSnapshot()+"\nHTTP spans may overlap during route retries. Wire reads are before cache/decompression; processing includes cache and body handling. Body rate excludes headers/TLS/other apps."
     }
     private fun resourceKey(url:String)=ResourceKey(url,offlineOnly&&regionContext.get()==null)
@@ -678,7 +681,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         NativeBridge.terrainProfile(heights)
         checkPreparation()
         val provenance=dependencies.values.toList()
-        if(provenance.all{it.until>System.currentTimeMillis()}&&!preparedWrites.isShutdown)runCatching{preparedWrites.execute{prepared.put(id.gpu(),heights,provenance)}}
+        if(provenance.all{it.until>System.currentTimeMillis()}&&!preparedWrites.isShutdown)preparedWrites.submit(heights.capacity().toLong()){prepared.put(id.gpu(),heights,provenance)}
         return heights
     }
     private fun loadImage(id:Id):ByteBuffer {
@@ -689,12 +692,12 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         val rgba=imagery.loadRgba(id.z, id.x, id.y)
         checkPreparation()
         if(composed){val provenance=sourceRecords.get()?.values?.map{PreparedTerrainCache.Dependency(id.gpu(),it.fingerprint,it.until,it.key)}?:emptyList()
-            if(provenance.all{it.until>System.currentTimeMillis()}&&!preparedWrites.isShutdown)runCatching{preparedWrites.execute{
+            if(provenance.all{it.until>System.currentTimeMillis()}&&!preparedWrites.isShutdown)preparedWrites.submit(rgba.capacity().toLong()){
                 // Store initialization may still be running on a slow reader.
                 // Keep that wait on the cache executor, never a decode worker.
                 val store=synchronized(compositionLock){if(preferences.getLong("imageryGeneration",0)==imageryGeneration)imageStore()else null}
                 store?.put(id.gpu(),rgba,provenance)
-            }}}
+            }}
         return rgba
     }
     data class Bounds(val west:Double,val south:Double,val east:Double,val north:Double)
@@ -732,7 +735,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         fun topoUrl(id:Id)=linz("topo-raster",id,"webp")
         val downloadImagery=NativeImagery(context,::fetch,{z,x,y->linz("aerial",Id(z,x,y),"webp")},overviews,::checkPreparation,::localImage,{display})
         downloadJobs.execute{
-            val region=resume?.let{offline.reopen(it)}?:offline.begin(name,OfflineStore.Metadata(bounds,detail,display.base.name));regionContext.set(region);val demDone=HashSet<Id>()
+            val region=resume?.let{offline.reopen(it)}?:offline.begin(name,OfflineStore.Metadata(bounds,detail,display.base.name,overlays));regionContext.set(region);val demDone=HashSet<Id>()
             val prefetch=OfflinePrefetch(transport);regionPrefetch=prefetch
             fun checkActive(){check(!dead&&!downloadCancel.get()){ "Download cancelled" }}
             fun inputs(id:Id):List<ResourceKey>{
@@ -831,9 +834,9 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     fun setActive(value:Boolean){active=value;if(value)cameraChanged()else{transport.batchDemand{for(task in jobs.values)task.cancel();clearWarm()}}}
     fun close() {
         runCatching{connectivity?.unregisterNetworkCallback(networkCallback)}
-        escapedWrites.shutdown()
+        escapedWrites.drain()
         derivedReads.close()
-        dead = true;transport.batchDemand{for(task in jobs.values)task.cancel();clearWarm();transport.close()};localImages.close();preparedWrites.shutdownNow();attachmentJobs.shutdown();downloadCancel.set(true);downloadJobs.shutdown();offlineQueries.shutdownNow(); profileRevision.incrementAndGet();profileJob?.cancel(true);profileJobs.shutdownNow();profileFetches.shutdownNow();timer?.cancel(true); scheduler.shutdownNow(); geometryWorkers.shutdownNow();imageWorkers.shutdownNow()
+        dead = true;transport.batchDemand{for(task in jobs.values)task.cancel();clearWarm();transport.close()};localImages.close();preparedWrites.close();attachmentJobs.shutdown();downloadCancel.set(true);downloadJobs.shutdown();offlineQueries.shutdownNow(); profileRevision.incrementAndGet();profileJob?.cancel(true);profileJobs.shutdownNow();profileFetches.shutdownNow();timer?.cancel(true); scheduler.shutdownNow(); geometryWorkers.shutdownNow();imageWorkers.shutdownNow()
         client.dispatcher.cancelAll(); client.connectionPool.evictAll(); client.dispatcher.executorService.shutdown(); synchronized(ready) { ready.clear(); readyBytes=0 }; synchronized(decoded) { decoded.clear() }
         Thread({downloadJobs.awaitTermination(60,TimeUnit.SECONDS);offlineQueries.awaitTermination(5,TimeUnit.SECONDS);profileJobs.awaitTermination(60,TimeUnit.SECONDS);geometryWorkers.awaitTermination(60,TimeUnit.SECONDS);imageWorkers.awaitTermination(60,TimeUnit.SECONDS);attachmentJobs.awaitTermination(60,TimeUnit.SECONDS);localImages.awaitClosed();transport.awaitClosed();runCatching{overviews.close()};runCatching{offline.close()};runCatching{client.cache?.close()}},"ridgeline-offline-close").start()
     }

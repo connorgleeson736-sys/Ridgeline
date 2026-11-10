@@ -259,7 +259,8 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
                 if(meta!=null&&!downloading&&region.status.startsWith("Partial"))buttons.addView(button("Resume"){
                     val base=runCatching{MapSettings.Base.valueOf(meta.basemap)}.getOrDefault(MapSettings.Base.LINZ)
                     downloading=true;progressText="Resuming…";refresh()
-                    loader.downloadRegion(region.name,meta.bounds,meta.zoom,base,includeTopo,resume=region.id,progress={progressText=it;refresh()}){downloading=false;progressText="";loader.cameraChanged();refresh()}
+                    // The region's own choice, not the checkbox's current state.
+                    loader.downloadRegion(region.name,meta.bounds,meta.zoom,base,meta.overlays,resume=region.id,progress={progressText=it;refresh()}){downloading=false;progressText="";loader.cameraChanged();refresh()}
                 })
                 buttons.addView(button("Remove"){AlertDialog.Builder(activity).setMessage("Delete ${region.name} from this device?").setPositiveButton("Delete"){_,_->loader.removeRegion(region.id){refresh()}}.setNegativeButton("Cancel",null).show()})
                 item.addView(buttons);list.addView(item)

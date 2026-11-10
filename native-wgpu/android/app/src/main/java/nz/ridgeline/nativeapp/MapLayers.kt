@@ -18,6 +18,8 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         const val GESTURE_PUBLISH_MILLIS=100L
         /** View selection runs at most this often, never postponed by movement. */
         const val SELECTION_MILLIS=50L
+        /** Styled zoom bands kept per tile. */
+        const val STYLES_PER_TILE=3
         /** Start a request on a fresh consumer. Any refusal releases the consumer
          * and returns null: a closed transport throws IllegalStateException, but
          * its 512-request guard throws IllegalArgumentException, which used to
@@ -34,13 +36,17 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         /** Leases older than [limit] at [now], given their start times. */
         fun staleLeases(started:Map<GpuUploadQueue.Id,Long>,now:Long,limit:Long=STALE_LEASE_MILLIS)=started.filterValues{now-it>=limit}.keys
     }
+    /** [mask]: source layers decoded so far. A zoom that enables another layer
+     * decodes only that layer; nothing is decoded twice (previously the whole
+     * tile was decoded again whenever the enabled set changed: 260 decodes for
+     * 39 tiles). Styling filters layers by camera zoom itself. */
     private data class Tile(val body:TileBody,var mask:Set<String>,var features:List<VectorTile.Feature>){
-        /** Styled output for the last (settings, quarter zoom); reused across publications. */
-        var styledKey:Any?=null;var styled:TopographyStyle.Output?=null
-        /** Packed line groups for this tile, per display clip, for the current styling. */
-        val groups=HashMap<List<Double>,LineGroup>()
+        /** Styled output and packed groups (per display clip) for the most recent
+         * (settings, quarter zoom) keys, so pinching back and forth reuses them. */
+        val styles=object:LinkedHashMap<Any,Styled>(4,.75f,true){override fun removeEldestEntry(eldest:MutableMap.MutableEntry<Any,Styled>)=size>STYLES_PER_TILE}
     }
-    private val worker=Executors.newSingleThreadScheduledExecutor{run->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);run.run()},"RidgelineCartography")}
+    private class Styled(val output:TopographyStyle.Output){val groups=HashMap<List<Double>,LineGroup>()}
+    private val worker=Executors.newSingleThreadScheduledExecutor{run->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_DEFAULT);run.run()},"RidgelineCartography")}
     private val main=Handler(Looper.getMainLooper())
     private val style=TopographyStyle(view.context.assets.open("topography-style.json").bufferedReader().use{it.readText()})
     private val tiles=LinkedHashMap<GpuUploadQueue.Id,Tile>()
@@ -191,13 +197,13 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         val patches=LayerCover.display(ordered,tiles.keys)
         trimTiles(current.toSet()+patches.map{it.source})
         if(state.overlays())for(patch in patches){val id=patch.source;val tile=tiles[id]?:continue
-            if(tile.mask!=enabled){tile.features=VectorTile.decode(tile.body.bytes,id.z,id.x,id.y,enabled);tile.mask=enabled;decoded++}
+            val missing=enabled-tile.mask
+            if(missing.isNotEmpty()){tile.features=tile.features+VectorTile.decode(tile.body.bytes,id.z,id.x,id.y,missing);tile.mask=tile.mask+missing;tile.styles.clear();decoded++}
             // MapLibre evaluates ["zoom"] in filters at the tile's own zoom, layer
             // ranges and paint at the camera zoom.
-            val styledKey=listOf(state,zoom,enabled)
-            if(tile.styledKey!=styledKey||tile.styled==null){tile.styled=style.build(tile.features,state,zoom,id.z.toDouble());tile.styledKey=styledKey;tile.groups.clear()}
-            val output=tile.styled!!;val b=patch.clip.bounds
-            groups.add(tile.groups.getOrPut(b.toList()){
+            val styled=tile.styles.getOrPut(listOf(state,zoom)){Styled(style.build(tile.features,state,zoom,id.z.toDouble()))}
+            val output=styled.output;val b=patch.clip.bounds
+            groups.add(styled.groups.getOrPut(b.toList()){
                 val clipped=ArrayList<TopographyStyle.Line>()
                 for(line in output.lines)for(path in clip(line.points,b))if(path.size>=2)clipped.add(line.copy(points=path))
                 group(id.z,id.x,id.y,b,clipped)

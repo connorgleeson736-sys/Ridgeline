@@ -858,10 +858,12 @@ impl crate::Renderer {
             {
                 let b = row.source.bounds();
                 let size = b[2] - b[0];
-                if let Some(h) = self.tiles[&row.source]
-                    .field
-                    .sample((point[0] - b[0]) / size, (point[1] - b[1]) / size)
-                {
+                // A cover row can briefly outlive its tile before the cover is
+                // rebuilt; indexing panicked, which aborts the release app.
+                if let Some(h) = self.tiles.get(&row.source).and_then(|tile| {
+                    tile.field
+                        .sample((point[0] - b[0]) / size, (point[1] - b[1]) / size)
+                }) {
                     return Some(h);
                 }
             }
