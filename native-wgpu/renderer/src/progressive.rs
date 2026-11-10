@@ -277,7 +277,10 @@ impl Renderer {
         }
         let b = p.id.bounds();
         let span = b[2] - b[0];
-        let r = self.tiles[&p.id].field.valid_rect();
+        let Some(tile) = self.tiles.get(&p.id) else {
+            return;
+        };
+        let r = tile.field.valid_rect();
         let fine = [
             b[0] + span * r[0] as f64 / 128.,
             b[1] + span * r[1] as f64 / 128.,

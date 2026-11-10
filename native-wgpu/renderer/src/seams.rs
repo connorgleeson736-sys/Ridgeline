@@ -79,7 +79,7 @@ fn continuous(a: Edge, b: Edge, lo: u32, hi: u32, tiles: &HashMap<TileId, Tile>)
         };
         let bounds = edge.source.bounds();
         let size = bounds[2] - bounds[0];
-        tiles[&edge.source].field.sample(
+        tiles.get(&edge.source)?.field.sample(
             (x as f64 / (1u64 << 36) as f64 - bounds[0]) / size,
             (y as f64 / (1u64 << 36) as f64 - bounds[1]) / size,
         )
@@ -141,8 +141,8 @@ pub(crate) fn masks(
                 b,
                 lo,
                 hi,
-                tiles[&a.source].generation,
-                tiles[&b.source].generation,
+                tiles.get(&a.source).map_or(0, |t| t.generation),
+                tiles.get(&b.source).map_or(0, |t| t.generation),
             );
             proofs.get(key, || continuous(a, b, lo, hi, tiles))
         });

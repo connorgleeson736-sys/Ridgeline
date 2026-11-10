@@ -107,11 +107,28 @@ class CacheDeadlineTest {
   },1024,localWaitMs=15)
   try{
    val key=ResourceKey("first",false);val body=transport.consumer().acquire(key).get(1,TimeUnit.SECONDS)
-   assertEquals("fresh-network",String(body.bytes));assertTrue(transport.stats().getValue("localCooldownMs")>0)
-   release.countDown();waitUntil{transport.stats().getValue("localCooldownMs")==0L}
+   assertEquals("fresh-network",String(body.bytes))
+   release.countDown();waitUntil{transport.stats().getValue("localQueued")==0L}
    assertEquals(body.stamp,transport.consumer().acquire(key).get().stamp)
    assertEquals("old-local",String(transport.consumer().acquire(ResourceKey("healthy",false)).get().bytes))
    assertEquals(2,reads.get());assertEquals(1,requests.get())
+  }finally{release.countDown();transport.close()}
+ }
+ @Test fun oneSlowDiskReadEscapesOnlyItsOwnTileAndLaterTilesStillUseTheDisk(){
+  val release=CountDownLatch(1);val entered=CountDownLatch(1);val uncached=AtomicInteger();val cached=AtomicInteger()
+  val transport=TileTransport(object:TileBackend{
+   override fun local(key:ResourceKey):TileBody?{if(key.url=="slow"){entered.countDown();release.await(3,TimeUnit.SECONDS)};return TileBody("disk-${key.url}".toByteArray(),200,Long.MAX_VALUE)}
+   override fun network(key:ResourceKey,done:(Result<TileBody>)->Unit):()->Unit{cached.incrementAndGet();return{}}
+   override fun uncachedNetwork(key:ResourceKey,done:(Result<TileBody>)->Unit):()->Unit{uncached.incrementAndGet();done(Result.success(TileBody("net-${key.url}".toByteArray(),200,Long.MAX_VALUE)));return{}}
+  },0,localWaitMs=20)
+  try{
+   val slow=transport.consumer().acquire(ResourceKey("slow",false));assertTrue(entered.await(1,TimeUnit.SECONDS))
+   val quick=transport.consumer().acquire(ResourceKey("quick",false))
+   assertEquals("disk-quick",String(quick.get(1,TimeUnit.SECONDS).bytes))
+   assertEquals("net-slow",String(slow.get(1,TimeUnit.SECONDS).bytes))
+   // No cooldown: tiles requested after the escape still read the disk.
+   for(i in 0..9)assertEquals("disk-later$i",String(transport.consumer().acquire(ResourceKey("later$i",false)).get(1,TimeUnit.SECONDS).bytes))
+   assertEquals(1,uncached.get());assertEquals(0,cached.get());assertEquals(1L,transport.stats()["localTimeouts"])
   }finally{release.countDown();transport.close()}
  }
  @Test fun queuedSharedHedgeRemainsCancelableAndWithinExistingLimits(){

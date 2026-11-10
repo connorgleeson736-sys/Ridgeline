@@ -76,8 +76,10 @@ internal class HttpTileBackend(private val client:OkHttpClient,
     fun warm(origins:List<String>){
         for(origin in origins)runCatching{direct.newCall(Request.Builder().url(origin).head().header("User-Agent","Ridgeline-Native/0.1.0")
             .cacheControl(CacheControl.FORCE_NETWORK).build()).enqueue(object:Callback{
-                override fun onFailure(call:Call,e:IOException){}
-                override fun onResponse(call:Call,response:Response){response.close()}
+                // Warm-ups are not tile transfers: drop their spans, which were
+                // never delivered and showed as an ever-older "oldest" call.
+                override fun onFailure(call:Call,e:IOException){metrics?.forget(call)}
+                override fun onResponse(call:Call,response:Response){response.close();metrics?.forget(call)}
             })}
     }
     override fun network(key:ResourceKey,done:(Result<TileBody>)->Unit):()->Unit {

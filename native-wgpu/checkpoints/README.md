@@ -1,6 +1,34 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.33 Empty Tiles Base APK — 33.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Empty-Tiles-0.1.33-Base.apk)**.
+Latest: **[Download 0.1.34 Disk First Base APK — 33.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Disk-First-0.1.34-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 35:
+**updates 0.1.13–0.1.33 in place, keeping its data.**
+
+- **Stored tiles stay on the phone.** One slow disk read used to send every
+  waiting tile to the network and skip the disk for 30 s (362 escapes vs 166
+  disk hits in your diagnostics). Now only the late tile also downloads, and
+  its disk read can still win.
+- **Overlay tiles decoded once** (260 decodes for 39 tiles before); recent zoom
+  bands are reused when pinching back and forth; overlay work no longer runs
+  at background priority.
+- **Finished work is kept:** cache writes are bounded by size, not 8 jobs, and
+  the prepared-terrain cache gets 40 ms instead of 12 ms.
+- **Smoother frames under load:** the render thread runs above tile decoding.
+- **Dark mode or split screen** no longer reloads the map.
+- **Bug fixes:** GPU errors are recorded instead of closing the app, and
+  several tile lookups can no longer crash it; a refused overlay update backs
+  off instead of retrying every frame; resuming an offline region keeps its
+  own overlay choice; the phantom "oldest HTTP call" is gone.
+
+196 JVM tests and 51 Rust tests pass; overlay GPU check passes on Vulkan and
+GLES; lint 0 errors; map assets identical to 0.1.33. Not run on a phone, and
+no speed-up has been measured.
+[Exact release record](../validation/disk-first-2026-11-10/release.json) ·
+[SHA-256](Ridgeline-Native-Disk-First-0.1.34-Base.apk.sha256).
+
+## Previous 0.1.33 empty tiles checkpoint
+
+**[Download 0.1.33 Empty Tiles Base APK — 33.7 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Empty-Tiles-0.1.33-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 34:
 **updates 0.1.13–0.1.32 in place, keeping its data.**
 

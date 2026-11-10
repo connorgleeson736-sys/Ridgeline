@@ -202,6 +202,7 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_create(
 ) -> i64 {
     protect(|| {
         recover_poisoned_state();
+        let _ = crate::GPU_ERROR_REPORT.set(|text| log(&format!("GPU error: {text}")));
         let result = (|| -> Result<i64, String> {
             let window = unsafe { NativeWindow::from_surface(env.cast(), surface.cast()) }
                 .ok_or("No native window")?;
@@ -1385,6 +1386,16 @@ pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_gpuBacklog(
             })
             .unwrap_or(0)
     })
+}
+
+/// Uncaptured GPU errors since launch (diagnostics).
+#[unsafe(no_mangle)]
+pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_gpuErrors(
+    _env: *mut c_void,
+    _class: *mut c_void,
+) -> i64 {
+    let _ = crate::GPU_ERROR_REPORT.set(|text| log(&format!("GPU error: {text}")));
+    crate::GPU_ERRORS.load(Ordering::Relaxed) as i64
 }
 
 #[unsafe(no_mangle)]

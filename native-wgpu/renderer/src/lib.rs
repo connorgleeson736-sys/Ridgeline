@@ -4,6 +4,11 @@ pub use ridgeline_core::{TileId, mercator, terrain_rgb};
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
+/// Uncaptured GPU errors since launch (see the handler in `Renderer::new`).
+pub static GPU_ERRORS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+/// Platform logger for the first uncaptured GPU errors.
+pub static GPU_ERROR_REPORT: std::sync::OnceLock<fn(&str)> = std::sync::OnceLock::new();
+
 mod adaptive;
 /// Disk-cache coverage grid size (texels per side).
 pub const COVERAGE_SIZE: u32 = 256;
@@ -287,6 +292,17 @@ impl Renderer {
             })
             .await
             .map_err(|e| e.to_string())?;
+        // wgpu's default handler panics, and the release build aborts on panic,
+        // so any validation or out-of-memory error closed the app. Count and
+        // report them instead; the failed operation is skipped by wgpu.
+        device.on_uncaptured_error(std::sync::Arc::new(|error: wgpu::Error| {
+            let seen = GPU_ERRORS.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+            if seen < 20 {
+                if let Some(report) = GPU_ERROR_REPORT.get() {
+                    report(&error.to_string());
+                }
+            }
+        }));
         let supported = device.limits().max_texture_array_layers >= 8;
         if backend == TextureBackend::Arrays && !supported {
             return Err("Adapter does not support bounded texture arrays".into());
@@ -1695,7 +1711,7 @@ impl Renderer {
                     direction.z as f64 / ppm as f64 / self.map_style.relief as f64,
                 ],
             };
-            if let Some(hit) = self.tiles[&row.geometry].field.intersect_region(
+            if let Some(hit) = self.tiles.get(&row.geometry).and_then(|tile| tile.field.intersect_region(
                 ray,
                 [
                     (clip[0] - bounds[0]) / span,
@@ -1703,7 +1719,7 @@ impl Renderer {
                     (clip[2] - bounds[0]) / span,
                     (clip[3] - bounds[1]) / span,
                 ],
-            ) {
+            )) {
                 if hit.t <= max_t && best.as_ref().is_none_or(|(t, _)| hit.t < *t) {
                     let mx = bounds[0] + hit.point[0] * span;
                     let my = bounds[1] + hit.point[1] * span;
@@ -1867,20 +1883,25 @@ impl Renderer {
         });
         let mut rows = std::mem::take(&mut self.visible_scratch);
         rows.clear();
+        // Only rows whose geometry and image are resident reach the draw loop,
+        // which indexes both: a missing one panicked and aborted the app.
         rows.extend(self.draws.iter().copied().filter(|row| {
-            Self::visible(
-                &ridgeline_core::CoverRegion {
-                    source: row.geometry,
-                    region: row.region,
-                },
-                &self.tiles[&row.geometry],
-                matrix,
-                center,
-                world,
-                px_meter,
-                elevation,
-                self.map_style.height_scale(),
-            )
+            self.images.contains_key(&row.image)
+                && self.tiles.get(&row.geometry).is_some_and(|tile| {
+                    Self::visible(
+                        &ridgeline_core::CoverRegion {
+                            source: row.geometry,
+                            region: row.region,
+                        },
+                        tile,
+                        matrix,
+                        center,
+                        world,
+                        px_meter,
+                        elevation,
+                        self.map_style.height_scale(),
+                    )
+                })
         }));
         let now = std::time::Instant::now();
         self.adaptive_levels.clear();
@@ -1889,8 +1910,11 @@ impl Renderer {
             if self.adaptive_levels.contains_key(&id) {
                 continue;
             }
+            let Some(tile) = self.tiles.get(&id) else {
+                continue;
+            };
             let (step, wake) = adaptive::choose(
-                &self.tiles[&id],
+                tile,
                 id,
                 matrix,
                 &route_view,
