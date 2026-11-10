@@ -11,7 +11,7 @@ internal class NativeSheet(private val root:FrameLayout,private val map:FrameLay
     val panel=NativeUi.column(context).apply{
         background=android.graphics.drawable.GradientDrawable().apply{setColor(NativeUi.paper);val r=NativeUi.dp(context,20).toFloat();cornerRadii=floatArrayOf(r,r,r,r,0f,0f,0f,0f)};clipToOutline=true;elevation=NativeUi.dp(context,8).toFloat();visibility=View.GONE
     }
-    val content=NativeUi.column(context).apply{setPadding(dp(16),0,dp(16),dp(12))}
+    val content=NativeUi.column(context).apply{setPadding(dp(16),0,dp(16),dp(8))}
     private val grip=FrameLayout(context).apply{contentDescription="Resize route panel";isClickable=true;isFocusable=true}
     private var index=0
     private var startY=0f;private var startHeight=0;private var dragged=false;private var dragging=false
@@ -23,10 +23,10 @@ internal class NativeSheet(private val root:FrameLayout,private val map:FrameLay
     private fun dp(v:Int)=NativeUi.dp(context,v)
     init{
         grip.addView(View(context).apply{background=NativeUi.background(context,0xff8a9691.toInt(),3)},FrameLayout.LayoutParams(dp(32),dp(4),Gravity.CENTER))
-        grip.addView(NativeUi.button(context,"×"){onClose()}.apply{contentDescription="Close route";background=null;textSize=19f;setPadding(0,0,0,0)},FrameLayout.LayoutParams(dp(46),dp(32),Gravity.END))
-        panel.addView(grip,LinearLayout.LayoutParams(-1,dp(32)))
+        grip.addView(NativeUi.button(context,"×"){onClose()}.apply{contentDescription="Close route";background=null;textSize=19f;setPadding(0,0,0,0)},FrameLayout.LayoutParams(dp(46),dp(28),Gravity.END))
+        panel.addView(grip,LinearLayout.LayoutParams(-1,dp(28)))
         panel.addView(ScrollView(context).apply{isFillViewport=true;addView(content)},LinearLayout.LayoutParams(-1,0,1f))
-        root.addView(panel,FrameLayout.LayoutParams(-1,dp(136),Gravity.BOTTOM))
+        root.addView(panel,FrameLayout.LayoutParams(-1,dp(COMPACT_DP),Gravity.BOTTOM))
         root.addOnLayoutChangeListener{_,_,_,_,_,_,_,_,_->if(visible&&!dragging)settle(index)}
         grip.setOnClickListener{settle(1-index)}
         grip.setOnKeyListener{_,key,event->if(event.action==KeyEvent.ACTION_UP&&key in listOf(KeyEvent.KEYCODE_DPAD_UP,KeyEvent.KEYCODE_DPAD_DOWN)){settle(if(key==KeyEvent.KEYCODE_DPAD_UP)1 else 0);true}else false}
@@ -41,7 +41,7 @@ internal class NativeSheet(private val root:FrameLayout,private val map:FrameLay
             };else->true
         }}
     }
-    private fun stops():IntArray{val h=(root.height-root.paddingTop-root.paddingBottom).takeIf{it>0}?:context.resources.displayMetrics.heightPixels;val compact=min(dp(136),(h*.33).toInt());return intArrayOf(compact,min(h-dp(80),max(compact+dp(80),(h*.64).toInt())))}
+    private fun stops():IntArray{val h=(root.height-root.paddingTop-root.paddingBottom).takeIf{it>0}?:context.resources.displayMetrics.heightPixels;val compact=min(dp(COMPACT_DP),(h*.33).toInt());return intArrayOf(compact,min(h-dp(80),max(compact+dp(80),(h*.64).toInt())))}
     fun expanded()=index==1
     fun show(value:Boolean){if(visible==value)return;visible=value;panel.visibility=if(value)View.VISIBLE else View.GONE;settle(index)}
     fun settle(next:Int){
@@ -53,5 +53,9 @@ internal class NativeSheet(private val root:FrameLayout,private val map:FrameLay
         onCover(if(visible&&root.height>0)dp(24)else 0)
         grip.contentDescription="Resize route panel · ${if(index==1)"expanded"else"compact"}"
         onSnap(index==1)
+    }
+    companion object{
+        /** Compact (lowest) stop: grip, stats and tools, a little tighter (was 136 dp). */
+        const val COMPACT_DP=116
     }
 }

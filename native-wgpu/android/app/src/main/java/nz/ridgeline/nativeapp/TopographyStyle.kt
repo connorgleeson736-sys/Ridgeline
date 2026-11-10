@@ -18,6 +18,8 @@ internal class TopographyStyle(json:String){
         LATER_NAMES[spec.optString("id")]?.let{spec.put("minzoom",it)}
     }
     companion object{
+        /** Label identity grid in world units (2^22 cells, ~10 m at the equator). */
+        const val LABEL_GRID=4_194_304.0
         val LATER_NAMES=mapOf("nz-rivers" to 15.5,"nz-river-polygons" to 14.5,"nz-tracks-label" to 13.5)
         /** Minor (unlisted) track names need this camera zoom. */
         const val MINOR_TRACK_NAMES=15.5
@@ -56,6 +58,11 @@ internal class TopographyStyle(json:String){
      * MapLibre. [tileZoom] is the source tile's zoom: MapLibre evaluates
      * ["zoom"] inside filters per tile, so distant coarser tiles in a pitched
      * view omit minor peaks, huts and track names exactly as the Capacitor app does. */
+    /** Same name, layer and place (to ~10 m) is the same label whichever source
+     * tile it came from. With the feature id and exact point in the key, a hut
+     * from the next tile zoom was a new label: it lost its placement and
+     * visibly reloaded while zooming. */
+    internal fun labelKey(layer:String,text:String,point:VectorTile.Point)="$layer:$text:${floor(point.x*LABEL_GRID).toLong()}:${floor(point.y*LABEL_GRID).toLong()}"
     fun build(features:List<VectorTile.Feature>,state:MapSettings.State,zoom:Double,tileZoom:Double=floor(zoom)):Output{
         val lines=ArrayList<Line>();val labels=ArrayList<Label>();val grouped=features.groupBy{it.layer};val named=HashSet<String>()
         for((order,spec) in specs.withIndex()){val id=spec.getString("id");val group=group(id)
@@ -83,7 +90,7 @@ internal class TopographyStyle(json:String){
                     val c=color(eval(paint.opt(if(kind=="circle")"circle-color"else"text-color"),f.properties,zoom))
                     val priority=number(eval(layout.opt("symbol-sort-key")?:100,f.properties,zoom),100.0)
                     val bold=layout.optJSONArray("text-font")?.toString()?.contains("Bold")==true
-                    labels.add(Label(point,text.take(256),size,c,priority,bold,kind=="circle","$id:${f.id}:${point.x}:${point.y}:$text",layout.optString("text-anchor","center"),layout.has("text-variable-anchor"),spacing))
+                    labels.add(Label(point,text.take(256),size,c,priority,bold,kind=="circle",labelKey(id,text,point),layout.optString("text-anchor","center"),layout.has("text-variable-anchor"),spacing))
                 }
             }
         };return Output(lines,labels)

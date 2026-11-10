@@ -1,4 +1,12 @@
 //! One cached native-font atlas and a depth-tested batch, with CPU grid collision selection.
+/// Label continuity grid: 2^22 cells across the world (~10 m at the equator).
+const LABEL_GRID: f64 = 4_194_304.0;
+pub(crate) fn grid_key(p: [f64; 2]) -> (i64, i64) {
+    (
+        (p[0] * LABEL_GRID).round() as i64,
+        (p[1] * LABEL_GRID).round() as i64,
+    )
+}
 #[derive(Clone, Copy)]
 pub struct LabelSprite {
     pub point: [f64; 2],
@@ -42,6 +50,10 @@ pub(crate) struct LabelGpu {
     pub(crate) uniform: wgpu::Buffer,
     bind: wgpu::BindGroup,
     atlas_bind: wgpu::BindGroup,
+    /// The atlas the placed batch was built against. A resized atlas does not
+    /// replace it until the next placement is built, so names stay on screen
+    /// (they all vanished for a round trip whenever new names grew the atlas).
+    draw_bind: wgpu::BindGroup,
     _atlas: wgpu::Texture,
     vertices: wgpu::Buffer,
     count: u32,
@@ -126,6 +138,7 @@ impl LabelGpu {
             pipeline,
             uniform,
             bind,
+            draw_bind: atlas_bind.clone(),
             atlas_bind,
             _atlas: atlas,
             vertices,
@@ -277,9 +290,8 @@ impl LabelGpu {
         rgba: &[u8],
     ) {
         if self.width != width || self.height != height {
-            // Atlas UVs change with its size: drop the placed batch until the
-            // next placement. Otherwise the shown labels stay until replaced.
-            self.count = 0;
+            // Atlas UVs change with its size: the placed batch keeps drawing
+            // from the old atlas (draw_bind) until the next placement.
             let (texture, bind) = Self::atlas(device, queue, &self.pipeline, width, height, rgba);
             self._atlas = texture;
             self.atlas_bind = bind;
@@ -396,7 +408,7 @@ impl LabelGpu {
         if let (true, Some(depth)) = (self.count > 0, self.depth_binds.get(self.read_slot)) {
             pass.set_pipeline(&self.pipeline);
             pass.set_bind_group(0, &self.bind, &[]);
-            pass.set_bind_group(1, &self.atlas_bind, &[]);
+            pass.set_bind_group(1, &self.draw_bind, &[]);
             pass.set_bind_group(2, depth, &[]);
             pass.set_vertex_buffer(0, self.vertices.slice(..));
             pass.draw(0..self.count, 0..1);
@@ -456,7 +468,18 @@ impl crate::Renderer {
             return;
         }
         let now = self.label_clock.elapsed().as_secs_f32();
-        let key = |p: [f64; 2]| (p[0].to_bits(), p[1].to_bits());
+        // The same name from a finer or coarser source tile has a slightly
+        // different point (tile quantization, at most a few metres). Keyed by
+        // exact bits it faded in again, so names visibly reloaded while zooming.
+        // Points within a ~10 m grid cell (or a neighbouring one) match.
+        let key = grid_key;
+        let near = |map: &std::collections::HashMap<(i64, i64), f32>, k: (i64, i64)| {
+            map.get(&k).copied().or_else(|| {
+                (-1..=1)
+                    .flat_map(|dx| (-1..=1).map(move |dy| (k.0 + dx, k.1 + dy)))
+                    .find_map(|n| map.get(&n).copied())
+            })
+        };
         let mut born = std::collections::HashMap::with_capacity(self.label_selection.len());
         self.label_anchor = self
             .label_sprites
@@ -474,12 +497,12 @@ impl crate::Renderer {
             let Some(height) = self
                 .terrain_height(sprite.point)
                 .map(|h| h as f32)
-                .or_else(|| self.label_heights.get(&key(sprite.point)).copied())
+                .or_else(|| near(&self.label_heights, key(sprite.point)))
             else {
                 continue;
             };
             self.label_heights.insert(key(sprite.point), height);
-            let first = *self.label_born.get(&key(sprite.point)).unwrap_or(&now);
+            let first = near(&self.label_born, key(sprite.point)).unwrap_or(now);
             born.insert(key(sprite.point), first);
             let a = [
                 (sprite.point[0] - anchor[0]) as f32,
@@ -508,6 +531,7 @@ impl crate::Renderer {
             self.label_heights.clear();
         }
         self.labels_gpu.count = vertices.len() as u32;
+        self.labels_gpu.draw_bind = self.labels_gpu.atlas_bind.clone();
         if !vertices.is_empty() {
             let bytes = bytemuck::cast_slice(&vertices);
             if self.labels_gpu.vertices.size() < bytes.len() as u64 {

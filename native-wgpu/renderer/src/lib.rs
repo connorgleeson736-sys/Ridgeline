@@ -172,8 +172,8 @@ pub struct Renderer {
     label_anchor: [f64; 2],
     /// New-candidate batches keep the shown labels until their placement arrives.
     labels_stale: bool,
-    label_born: HashMap<(u64, u64), f32>,
-    label_heights: HashMap<(u64, u64), f32>,
+    label_born: HashMap<(i64, i64), f32>,
+    label_heights: HashMap<(i64, i64), f32>,
     label_fade_until: f32,
     label_clock: std::time::Instant,
     labels_dirty: bool,
@@ -2201,7 +2201,7 @@ impl Renderer {
             let scale = self.map_style.height_scale();
             let mut points = Vec::with_capacity(self.label_sprites.len().min(label_probe::MAX));
             for (i, sprite) in self.label_sprites.iter().take(label_probe::MAX).enumerate() {
-                let key = (sprite.point[0].to_bits(), sprite.point[1].to_bits());
+                let key = labels::grid_key(sprite.point);
                 let Some(height) = self
                     .terrain_height(sprite.point)
                     .map(|h| h as f32)
