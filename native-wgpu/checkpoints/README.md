@@ -1,6 +1,25 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.35 Region Sheet Base APK — 33.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Region-Sheet-0.1.35-Base.apk)**.
+Latest: **[Download 0.1.36 Offline Bar Base APK — 33.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Offline-Bar-0.1.36-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 37:
+**updates 0.1.13–0.1.35 in place, keeping its data.**
+
+- **Offline regions in one bottom bar:** frame, page size (or Custom), map,
+  detail, live size estimate, **Save as PDF** and **Download**. Saved regions
+  and Advanced fold away. GPU textures and loading diagnostics moved to
+  Layers > Advanced.
+- **Names clear when zoomed far out** (they could stay on screen in 0.1.35).
+- **Route sheet:** drag it by the route name or stats, not only the grip;
+  stats line up with the buttons below.
+
+199 JVM tests and 51 Rust tests pass; overlay GPU check passes on Vulkan and
+GLES; lint 0 errors; map assets identical to 0.1.35. Not run on a phone.
+[Exact release record](../validation/offline-bar-2026-11-11/release.json) ·
+[SHA-256](Ridgeline-Native-Offline-Bar-0.1.36-Base.apk.sha256).
+
+## Previous 0.1.35 region sheet checkpoint
+
+**[Download 0.1.35 Region Sheet Base APK — 33.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Region-Sheet-0.1.35-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 36:
 **updates 0.1.13–0.1.34 in place, keeping its data.**
 

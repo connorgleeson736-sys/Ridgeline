@@ -446,10 +446,17 @@ impl crate::Renderer {
     /// New candidates. The labels on screen stay until the matching placement
     /// arrives (select_labels), instead of all vanishing for a round trip.
     pub fn set_label_metadata(&mut self, sprites: Vec<LabelSprite>) {
+        // No candidates (zoomed out past every name layer, or names turned
+        // off): no placement will follow, so clear now. Keeping the batch
+        // "until the next placement" left names on screen when zoomed far out.
+        let empty = sprites.is_empty();
         self.label_sprites = sprites;
         self.label_generation += 1;
         self.label_selection.clear();
-        self.labels_stale = true;
+        self.labels_stale = !empty;
+        if empty {
+            self.labels_dirty = true;
+        }
     }
     pub fn label_texture_upload_bytes(&self) -> u64 {
         self.labels_gpu.uploaded_bytes
