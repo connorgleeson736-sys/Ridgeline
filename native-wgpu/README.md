@@ -5,12 +5,16 @@
 the audited APK was 0.1.5. Main next candidates are raw local-I/O isolation,
 GPU upload acknowledgement, classified recovery and per-tile critical-path tracing.
 
-Latest APK: **[0.1.35 Region Sheet Base](checkpoints/README.md)** — updates
+Latest APK: **[0.1.36 Offline Bar Base](checkpoints/README.md)** — updates
+0.1.13–0.1.35 in place. Offline regions in one bottom bar with Save as PDF,
+names clear when zoomed far out, and an easier-to-drag route sheet.
+
+Previous APK: **[0.1.35 Region Sheet Base](checkpoints/README.md)** — updates
 0.1.13–0.1.34 in place. NZ Topo keeps coarser tiles one zoom longer, hut and
 other names appear while moving without reloading, a smaller compact route
 bar, and the region download is a bottom panel with a custom frame size.
 
-Previous APK: **[0.1.34 Disk First Base](checkpoints/README.md)** — updates
+Older APK: **[0.1.34 Disk First Base](checkpoints/README.md)** — updates
 0.1.13–0.1.33 in place. Stored tiles are read from the phone instead of being
 re-downloaded, overlay tiles are decoded once, cache writes are no longer
 dropped in bursts, and GPU errors no longer close the app.

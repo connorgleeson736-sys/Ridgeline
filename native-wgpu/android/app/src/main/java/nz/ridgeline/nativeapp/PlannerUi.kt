@@ -139,7 +139,8 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         title.background=android.graphics.drawable.GradientDrawable().apply{setColor(Color.WHITE);cornerRadius=dp(4).toFloat();setStroke(dp(1),Color.rgb(180,188,182))};title.setPadding(dp(8),0,dp(8),0);title.textSize=16f
         heading.addView(title,LinearLayout.LayoutParams(0,dp(40),1f))
         panel.addView(heading,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(6)})
-        panel.addView(LinearLayout(activity).apply{for(v in stats)addView(v,LinearLayout.LayoutParams(0,dp(40),1f))})
+        // Same columns as the tool buttons below (equal widths, 8 dp gaps), centred.
+        panel.addView(LinearLayout(activity).apply{for((i,v) in stats.withIndex())addView(v.apply{gravity=Gravity.CENTER},LinearLayout.LayoutParams(0,dp(40),1f).apply{if(i>0)marginStart=dp(8)})})
         panel.addView(chart,LinearLayout.LayoutParams(-1,0,1f).apply{topMargin=dp(4)})
         val export=button("Export GPX"){exportGpx()}.apply{setOnLongClickListener{shareGpx();true};contentDescription="Export GPX. Long press to share."}
         delete.setTextColor(android.content.res.ColorStateList(arrayOf(intArrayOf(-android.R.attr.state_enabled),intArrayOf()),intArrayOf(Color.argb(110,186,99,53),Color.rgb(186,99,53))))

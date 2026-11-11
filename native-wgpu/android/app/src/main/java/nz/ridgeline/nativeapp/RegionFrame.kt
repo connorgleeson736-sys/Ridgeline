@@ -43,6 +43,7 @@ internal class RegionFrame(context:Context):View(context){
         val (w,h)=(PAPER[size]?:PAPER.getValue("A4")).let{if(landscape)it.second to it.first else it}
         aspect=(w*72/25.4-60)/(h*72/25.4-94);invalidate();onChange()
     }
+    fun isCustom()=aspect<=0.0
     /** Custom size: keep the current frame, corners now resize it freely. */
     fun custom(){aspect=0.0;clampToUsable();invalidate();onChange()}
     private fun clampToUsable(){if(height<=0)return;val limit=min(.94,usable/height.toDouble());if(box[3]>limit){val shift=box[3]-limit;box[3]=limit;box[1]=max(.06,box[1]-shift)}}

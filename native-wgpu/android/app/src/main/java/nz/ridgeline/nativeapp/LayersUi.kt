@@ -156,7 +156,9 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
         })
         parent.addView(NativeUi.text(activity,"Tints the terrain by how detailed the imagery stored on this phone is (automatic cache and saved regions): red little or none, through yellow, to green detailed. Shows what will be sharp offline.",12f).apply{setTextColor(NativeUi.muted)})
         check(parent,"Downloaded maps only",loader.offlineOnly){loader.offlineOnly(it)}
-        parent.addView(NativeUi.button(activity,"Offline maps, imagery ZIPs & diagnostics"){dismiss();offline.show()})
+        parent.addView(NativeUi.button(activity,"Offline maps"){dismiss();offline.startRegion()})
+        parent.addView(NativeUi.button(activity,"GPU textures: "+arrayOf("Automatic","Compatibility","Texture arrays")[loader.textureBackend.coerceIn(0,2)]){offline.gpuTextures{render()}})
+        parent.addView(NativeUi.button(activity,"Loading diagnostics"){offline.diagnostics()})
         parent.addView(NativeUi.button(activity,"About & licences"){
             val text=NativeUi.text(activity,"Ridgeline Native\nNative map and route planner\n\nLINZ imagery, elevation and topographic data · CC BY 4.0. Esri World Imagery and contributors.\n\nMapLibre adaptation notice:\n"+activity.assets.open("licenses/maplibre-gl-js.txt").bufferedReader().use{it.readText()},12f).apply{setPadding(dp(16),dp(12),dp(16),dp(12));setTextIsSelectable(true)}
             AlertDialog.Builder(activity).setTitle("About Ridgeline").setView(ScrollView(activity).apply{addView(text)}).setPositiveButton("Close",null).show()
