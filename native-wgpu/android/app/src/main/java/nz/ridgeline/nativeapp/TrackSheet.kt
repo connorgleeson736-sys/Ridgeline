@@ -21,8 +21,8 @@ import kotlin.math.*
 internal class TrackSheet(private val activity:Activity,private val root:FrameLayout,private val loader:TileLoader){
     var onLine:(List<Coordinate>?)->Unit={}
     var onPoint:(Coordinate?)->Unit={}
-    /** The map's own geometry for a name, when DOC has none. */
-    var mapPaths:(String,(List<List<Coordinate>>)->Unit)->Unit={_,cb->cb(emptyList())}
+    /** The map's own line for a tapped name (the geometry the map draws). */
+    var mapLine:(String,Coordinate,(List<List<Coordinate>>)->Unit)->Unit={_,_,cb->cb(emptyList())}
     private val main=Handler(Looper.getMainLooper())
     private val parse=Executors.newSingleThreadExecutor{Thread(it,"ridgeline-doc").apply{isDaemon=true}}
     private fun dp(v:Int)=NativeUi.dp(activity,v)
@@ -92,7 +92,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         top.addView(titles,LinearLayout.LayoutParams(0,-2,1f))
         header.addView(top,LinearLayout.LayoutParams(-1,-2))
         header.addView(LinearLayout(activity).apply{for((i,v) in stats.withIndex())addView(v,LinearLayout.LayoutParams(0,dp(40),1f).apply{if(i>0)marginStart=dp(8)})},LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(10)})
-        body.addView(chart,LinearLayout.LayoutParams(-1,dp(170)))
+        body.addView(chart,LinearLayout.LayoutParams(-1,dp(230)))
         body.addView(intro,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(12)})
         body.addView(factsScroll,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(12)})
         body.addView(huts,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(10)})
@@ -113,7 +113,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     private var expanded=false
     private var dragging=false;private var startY=0f;private var startShift=0f
     /** Sheet height when expanded; compact shows the grip, title and stats. */
-    private fun full()=((root.height-root.paddingTop-root.paddingBottom).takeIf{it>0}?:activity.resources.displayMetrics.heightPixels).let{(it*.72f).toInt()}
+    private fun full()=((root.height-root.paddingTop-root.paddingBottom).takeIf{it>0}?:activity.resources.displayMetrics.heightPixels).let{(it*.78f).toInt()}
     private fun compact()=dp(28)+header.height.takeIf{it>0}.let{it?:dp(118)}
     private fun shift(open:Boolean)=if(open)0f else (full()-compact()).coerceAtLeast(0).toFloat()
     private fun place(animate:Boolean){
@@ -151,15 +151,18 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         if(panel.visibility!=View.VISIBLE){panel.visibility=View.VISIBLE;panel.translationY=full().toFloat()}
         panel.post{if(id==request)place(true)}
         var walk:DocTracks.Walk?=null;var track:DocTracks.Track?=null;var walkDone=false;var trackDone=false;var lineStarted=false
+        var mapped:List<Coordinate>?=null
         fun geometry(line:List<Coordinate>){if(id!=request)return;lineFound(id,line)}
         fun decide(){
-            if(!walkDone||!trackDone||lineStarted)return;lineStarted=true
+            val map=mapped
+            if(!walkDone||!trackDone||map==null||lineStarted)return;lineStarted=true
+            // The map's own track first (what is drawn, and finer than DOC's
+            // walk lines, which cut corners on zigzags); DOC's lines only when
+            // the map has none.
+            if(map.size>=2){geometry(map);return}
             val pieces=track?.paths.orEmpty()
             val guid=walk?.guid
-            fun fallback(){
-                if(pieces.isNotEmpty())geometry(DocTracks.chain(pieces,at))
-                else mapPaths(trackName){paths->geometry(DocTracks.chain(paths,at))}
-            }
+            fun fallback(){if(pieces.isNotEmpty())geometry(DocTracks.chain(pieces,at))else geometry(emptyList())}
             if(guid==null)fallback()
             else fetch(DocTracks.lineUrl(guid),{DocTracks.chain(DocTracks.parseLines(text(it)),at)}){found->
                 val line=found.orEmpty()
@@ -167,6 +170,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
                 if(line.size>=2&&line.minOf{DocTracks.meters(it,at)}<2000)geometry(line)else fallback()
             }
         }
+        mapLine(trackName,at){paths->if(id==request){mapped=DocTracks.chain(paths,at,25.0);decide()}}
         fetch(DocTracks.walkUrl(trackName,at.longitude,at.latitude),{DocTracks.nearestWalk(DocTracks.parseWalks(text(it)),at)}){found->
             if(id!=request)return@fetch
             walk=found;walkDone=true;found?.let{showWalk(id,it)};describe(walk,track);decide()
@@ -232,7 +236,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         }
     }
     private fun showHuts(stops:List<DocTracks.Stop>){
-        chart.markers=stops.map{it.along}
+        chart.markers=stops.map{it.along to it.hut.name}
         huts.removeAllViews()
         for(s in stops){val h=s.hut
             val row=LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL;setPadding(0,dp(8),0,dp(8));contentDescription=h.name

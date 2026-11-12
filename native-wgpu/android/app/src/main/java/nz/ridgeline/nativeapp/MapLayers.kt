@@ -22,6 +22,8 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         val HUNTING_LINE=0xF0FF6A13.toInt();val HUNTING_TEXT=0xFFFFA25F.toInt()
         /** Styled zoom bands kept per tile. */
         const val STYLES_PER_TILE=3
+        /** Map tiles followed for a tapped track's line (zoom 14, ~1.7 km in NZ). */
+        const val TRACK_TILES=160
         /** Start a request on a fresh consumer. Any refusal releases the consumer
          * and returns null: a closed transport throws IllegalStateException, but
          * its 512-request guard throws IllegalArgumentException, which used to
@@ -36,6 +38,22 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
          * map was moved away or overlays were toggled). */
         const val STALE_LEASE_MILLIS=20_000L
         /** Leases older than [limit] at [now], given their start times. */
+        /** One tile's pieces of the foot track [name], clipped to the tile, and
+         * the neighbouring tiles the track continues into (a piece ending on an
+         * edge or corner). */
+        fun trackPieces(id:GpuUploadQueue.Id,features:List<VectorTile.Feature>,name:String):Pair<List<List<VectorTile.Point>>,List<GpuUploadQueue.Id>>{
+            val b=id.bounds;val eps=(b[2]-b[0])*1e-6;val n=1 shl id.z
+            val parts=ArrayList<List<VectorTile.Point>>();val next=LinkedHashSet<GpuUploadQueue.Id>()
+            for(f in features)if(f.layer=="streets"&&f.properties["kind"]=="track"&&f.properties["name"]==name)for(path in f.paths)for(part in BoundaryIndex.clip(path,b))if(part.size>=2){
+                parts.add(part)
+                for(end in listOf(part.first(),part.last())){
+                    val dx=when{abs(end.x-b[0])<eps->-1;abs(end.x-b[2])<eps->1;else->0};val dy=when{abs(end.y-b[1])<eps->-1;abs(end.y-b[3])<eps->1;else->0}
+                    for((ox,oy) in listOf(dx to 0,0 to dy,dx to dy))if(ox!=0||oy!=0){
+                        val t=GpuUploadQueue.Id(id.z,id.x+ox,id.y+oy);if(t.x in 0 until n&&t.y in 0 until n)next.add(t)}
+                }
+            }
+            return parts to next.toList()
+        }
         fun staleLeases(started:Map<GpuUploadQueue.Id,Long>,now:Long,limit:Long=STALE_LEASE_MILLIS)=started.filterValues{now-it>=limit}.keys
     }
     /** [mask]: source layers decoded so far. A zoom that enables another layer
@@ -142,17 +160,40 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         return placedTracks.filter{val r=it.box;x>=r[0]-margin&&x<=r[2]+margin&&y>=r[1]-margin&&y<=r[3]+margin}
             .minByOrNull{val r=it.box;hypot((r[0]+r[2])/2-x,(r[1]+r[3])/2-y)}?.label
     }
-    /** The map's own pieces of the track named [name] (finest loaded tiles,
-     * clipped to each tile so neighbours do not overlap), in longitude/latitude. */
-    fun trackPaths(name:String,callback:(List<List<Coordinate>>)->Unit){runCatching{worker.execute{
-        val found=HashMap<GpuUploadQueue.Id,List<List<VectorTile.Point>>>()
-        for((id,tile)in tiles){val pieces=tile.features.filter{it.layer=="streets"&&it.properties["kind"]=="track"&&it.properties["name"]==name}.flatMap{it.paths}
-            if(pieces.isNotEmpty())found[id]=pieces}
-        val z=found.keys.maxOfOrNull{it.z}
-        val out=ArrayList<List<Coordinate>>()
-        if(z!=null)for((id,pieces)in found)if(id.z==z)for(piece in pieces)for(part in clip(piece,id.bounds))if(part.size>=2)
-            out.add(part.map{Coordinate(it.x*360-180,CameraMath.latitude(it.y))})
-        main.post{if(!closed)callback(out)}
+    /** The map's own line for the track named [name] through [at]: the same
+     * LINZ data (zoom 14, about 0.4 m precision) the map draws, followed from
+     * the tapped tile into each neighbour the track leaves through (loaded
+     * tiles reused, others fetched; at most [TRACK_TILES]). Pieces are clipped
+     * to their tiles, in longitude/latitude. */
+    fun trackLine(name:String,at:Coordinate,callback:(List<List<Coordinate>>)->Unit){runCatching{worker.execute{
+        val z=VECTOR_MAX_ZOOM;val n=1 shl z
+        val start=GpuUploadQueue.Id(z,floor((at.longitude+180)/360*n).toInt().coerceIn(0,n-1),floor(CameraMath.mercatorY(at.latitude)*n).toInt().coerceIn(0,n-1))
+        val queued=LinkedHashSet(listOf(start));val pending=ArrayDeque(listOf(start));val pieces=ArrayList<List<VectorTile.Point>>()
+        var inFlight=0;var done=false
+        fun finish(){if(done)return;done=true;val out=pieces.map{p->p.map{Coordinate(it.x*360-180,CameraMath.latitude(it.y))}};main.post{if(!closed)callback(out)}}
+        fun take(id:GpuUploadQueue.Id,features:List<VectorTile.Feature>){
+            val (parts,next)=trackPieces(id,features,name);pieces.addAll(parts)
+            for(t in next)if(queued.size<TRACK_TILES&&queued.add(t))pending.addLast(t)
+        }
+        fun pumpLine(){
+            if(done)return
+            while(inFlight<3&&pending.isNotEmpty()){val id=pending.removeFirst()
+                val cached=tiles[id]
+                if(cached!=null&&"streets" in cached.mask){take(id,cached.features);continue}
+                val owned=loader.layerConsumer(1)
+                val body=startLeased(owned){loader.layerBody(owned,loader.vectorUrl(id.z,id.x,id.y))}?:continue
+                inFlight++
+                body.whenComplete{r,e->runCatching{worker.execute{
+                    owned.close();inFlight--
+                    if(!done&&e==null&&r!=null&&r.status in 200..299)runCatching{take(id,VectorTile.decode(r.bytes,id.z,id.x,id.y,setOf("streets")))}
+                    pumpLine()
+                }}.onFailure{owned.close()}}
+            }
+            if(inFlight==0&&pending.isEmpty())finish()
+        }
+        pumpLine()
+        // A request that never answers must not hold the summary back.
+        worker.schedule({finish()},15,TimeUnit.SECONDS)
     }}.onFailure{callback(emptyList())}}
     fun refresh(){if(closed)return;runCatching{worker.execute{
         if(closed)return@execute

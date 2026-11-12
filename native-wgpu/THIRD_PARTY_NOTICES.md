@@ -45,3 +45,6 @@ pages (DOC_Huts: bookable, page link). All are licensed CC BY 4.0 and credited
 to the Department of Conservation in the map credits and About text. Nothing
 is bundled; responses are cached for a day. The walk photo is DOC's thumbnail,
 loaded from doc.govt.nz as DOC links it.
+
+Nine LINZ topographic vector tiles around Roys Peak (CC BY 4.0, LINZ) are
+test fixtures in `android/app/src/test/fixtures/tracks/`.

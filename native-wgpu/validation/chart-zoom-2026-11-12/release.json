@@ -1,0 +1,28 @@
+{
+  "artifact": "Ridgeline-Native-Chart-Zoom-0.1.44-Base.apk",
+  "bytes": 33936162,
+  "sha256": "6bb6d6cf2dbe810fffa189e8fc5dfd53d756aa840c4865e35860f05d1a54ad02",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.44-chart-zoom",
+  "versionCode": 45,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.43 Full Audit (same package and signer)",
+  "changes": [
+    "Elevation charts (routes and tracks) zoom: pinch to zoom the distance axis, two fingers to pan, double-tap to show the whole line. The elevation axis rescales to the visible section; distance ticks follow the window. One-finger tap and A-B drag work as before inside the zoomed view.",
+    "Hut marks on the track chart are tappable: the hut's name appears in a bubble above it, the mark turns orange and the map marks the hut's place on the track.",
+    "Track chart taller (230 dp, was 170); the expanded track sheet is 78% of the screen (was 72%).",
+    "The tapped track's highlight, distance, elevation profile and huts now use the map's own LINZ track line (zoom-14 vector data, the geometry the map draws), followed from the tapped tile into each neighbouring tile the track continues into (up to 160 tiles; loaded tiles reused). DOC's walk line is only a fallback. On Roys Peak Track DOC's line (100 points, 6.93 km) was a median 7 m and up to 83 m off the map's track and cut its zigzags; the map's line is 232 points, 7.58 km.",
+    "DOC lookups also try 'Mt'/'Mount' spellings (the map's 'Mt Iron Track' is DOC's 'Mount Iron Track')."
+  ],
+  "tests": {
+    "kotlinJvm": "232 tests, 0 failures (new: TrackFollowTest x2 on nine real LINZ tiles in src/test/fixtures/tracks; DocTracksTest name spellings)",
+    "rust": "unchanged (native libraries byte-identical to 0.1.43)"
+  },
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

@@ -1,6 +1,24 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.43 Track Summary Base APK — 33.9 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Track-Summary-0.1.43-Base.apk)**.
+Latest: **[Download 0.1.44 Chart Zoom Base APK — 33.9 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Chart-Zoom-0.1.44-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 45:
+**updates 0.1.13–0.1.43 in place, keeping its data.**
+
+- **Zoomable elevation charts** (routes and tracks): pinch to zoom, two
+  fingers to pan, double-tap for the whole line.
+- **Tap a hut** on the track chart for its name.
+- **Taller track chart.**
+- **Track summaries follow the map's own track line** (finer than DOC's
+  walk lines), so the highlight sits on the drawn track.
+
+232 JVM tests pass; lint 0 errors; native libraries identical to 0.1.43.
+Not run on a phone.
+[Exact release record](../validation/chart-zoom-2026-11-12/release.json) ·
+[SHA-256](Ridgeline-Native-Chart-Zoom-0.1.44-Base.apk.sha256).
+
+## Previous 0.1.43 track summary checkpoint
+
+**[Download 0.1.43 Track Summary Base APK — 33.9 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Track-Summary-0.1.43-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 44:
 **updates 0.1.13–0.1.42 in place, keeping its data.**
 

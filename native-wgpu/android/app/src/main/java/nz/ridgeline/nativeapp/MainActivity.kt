@@ -68,7 +68,7 @@ class MainActivity:Activity(){
         trackSheet=TrackSheet(this,root,loader)
         trackSheet.onLine={planner.highlightTrack(it)}
         trackSheet.onPoint={terrain.inspect(it)}
-        trackSheet.mapPaths={name,callback->mapLayers.trackPaths(name,callback)}
+        trackSheet.mapLine={name,at,callback->mapLayers.trackLine(name,at,callback)}
         planner.onIdleTap={x,y->
             val track=mapLayers.trackLabelAt(x,y)
             if(track!=null)trackSheet.show(track.text.removeSuffix(" (mapped closed)"),Coordinate(track.point.x*360-180,CameraMath.latitude(track.point.y)))

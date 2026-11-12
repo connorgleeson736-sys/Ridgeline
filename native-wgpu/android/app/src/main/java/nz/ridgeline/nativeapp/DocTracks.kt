@@ -40,9 +40,17 @@ internal object DocTracks {
     private fun query(service:String,where:String,fields:String,geometry:Boolean,extra:String="")=
         ORG+service+"/FeatureServer/0/query?where="+enc(where)+"&outFields="+enc(fields)+"&returnGeometry=$geometry&outSR=4326$extra&f=json"
     private fun near(lon:Double,lat:Double,r:Double)="&geometry=${f(lon-r)},${f(lat-r)},${f(lon+r)},${f(lat+r)}&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects"
-    /** Names as on the map; DOC sometimes differs only in case. */
-    fun walkUrl(name:String,lon:Double,lat:Double)=query(WALKS,"UPPER(name)=UPPER(${quote(name)})","name,introduction,difficulty,completionTime,introductionThumbnail,walkingAndTrampingWebPage",true,near(lon,lat,SEARCH))
-    fun trackUrl(name:String,lon:Double,lat:Double)=query(TRACKS,"UPPER(TechObjectName)=UPPER(${quote(name)})","*",true,near(lon,lat,SEARCH)+"&maxAllowableOffset=0.00002")
+    /** The map's name and DOC's spellings of it: case, and "Mt"/"Mount" (the
+     * map's "Mt Iron Track" is DOC's "Mount Iron Track"). */
+    fun names(name:String):List<String>{
+        val n=name.trim().replace(Regex("\\s+")," ")
+        val out=linkedSetOf(n)
+        out.add(n.replace(Regex("\\bMt\\.?(?= )"),"Mount"));out.add(n.replace(Regex("\\bMount(?= )"),"Mt"))
+        return out.toList()
+    }
+    private fun anyOf(field:String,name:String)="UPPER($field) IN (${names(name).joinToString(","){quote(it.uppercase(java.util.Locale.ROOT))}})"
+    fun walkUrl(name:String,lon:Double,lat:Double)=query(WALKS,anyOf("name",name),"name,introduction,difficulty,completionTime,introductionThumbnail,walkingAndTrampingWebPage",true,near(lon,lat,SEARCH))
+    fun trackUrl(name:String,lon:Double,lat:Double)=query(TRACKS,anyOf("TechObjectName",name),"*",true,near(lon,lat,SEARCH)+"&maxAllowableOffset=0.00002")
     fun lineUrl(guid:String)=query(LINES,"EPISERVERGUID=${quote(guid)}","EPISERVERGUID",true,"&maxAllowableOffset=0.00002")
     fun hutsUrl(b:DoubleArray)=query(HUTS,"1=1","*",true,"&geometry=${f(b[0])},${f(b[1])},${f(b[2])},${f(b[3])}&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects")
     fun hutPagesUrl(b:DoubleArray)=query(HUT_PAGES,"1=1","name,bookable,staticLink",true,"&geometry=${f(b[0])},${f(b[1])},${f(b[2])},${f(b[3])}&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects")
