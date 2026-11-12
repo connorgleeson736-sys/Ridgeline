@@ -61,6 +61,8 @@ class OfflineStore(context:Context,name:String="offline-v1.sqlite"):SQLiteOpenHe
     /** Continue an existing region in place (its stored files are reused). */
     @Synchronized fun reopen(id:String):String{status(id,"Downloading");return id}
     @Synchronized fun status(id:String,status:String){writableDatabase.update("regions",ContentValues().apply{put("status",status)},"id=?",arrayOf(id))}
+    /** Saved regions' metadata only (no size sums over every stored tile). */
+    fun metadata():List<Metadata> = readHandle.get().rawQuery("SELECT metadata FROM regions",null).use{c->buildList{while(c.moveToNext())decode(c.getString(0))?.let{add(it)}}}
     fun regions():List<Region> = readHandle.get().rawQuery("SELECT r.id,r.name,r.status,COALESCE(SUM(length(b.body)),0),COUNT(m.key),r.metadata FROM regions r LEFT JOIN membership m ON m.region=r.id LEFT JOIN resources b ON b.key=m.key GROUP BY r.id ORDER BY r.rowid DESC",null).use{c->buildList{while(c.moveToNext())add(Region(c.getString(0),c.getString(1),c.getString(2),c.getLong(3),c.getInt(4),decode(c.getString(5))))}}
     @Synchronized fun delete(id:String){val db=writableDatabase;db.beginTransaction();try{db.delete("membership","region=?",arrayOf(id));db.delete("regions","id=?",arrayOf(id));db.execSQL("DELETE FROM resources WHERE NOT EXISTS(SELECT 1 FROM membership m WHERE m.key=resources.key)");db.setTransactionSuccessful()}finally{db.endTransaction()}}
     @Synchronized override fun close(){readHandle.clear();super.close()}

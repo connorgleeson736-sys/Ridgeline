@@ -72,7 +72,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     init {
         if(automaticCacheBytes==0L)preparedWrites.submit(1) {
             // No HTTP cache is open and derived stores have a zero write limit.
-            for(name in listOf("native-http-v1","native-terrain-v3","native-compositions-v1","native-escaped-v1"))
+            for(name in listOf("native-http-v1","native-terrain-v3","native-compositions-v1","native-escaped-v1","native-stored-tiles-v1.bin"))
                 runCatching{File(context.cacheDir,name).deleteRecursively()}
         }
     }
@@ -172,12 +172,15 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     internal fun storedCoverage(callback:(CacheCoverage)->Unit){
         try{offlineQueries.execute{val c=buildCoverage();coverageSnapshot=android.os.SystemClock.elapsedRealtime() to c;view.post{if(!dead)callback(c)}}}catch(_:java.util.concurrent.RejectedExecutionException){}
     }
+    /** Fast: the stored-tile index and saved regions' metadata, no cache scan. */
     private fun buildCoverage()=CacheCoverage().also{c->
-        runCatching{val urls=client.cache?.urls();while(urls!=null&&urls.hasNext())c.addUrl(urls.next())}
-        for(region in offline.regions())region.metadata?.let{meta->
+        storedReady.await(5,TimeUnit.SECONDS)
+        if(client.cache!=null)storedTiles.copyInto(c)
+        for(meta in offline.metadata()){
             val cells=meta.cells?.let{PaintedArea.decode(it)}
             if(cells!=null)c.addCells(cells)else c.addRegion(meta.bounds,meta.zoom)
         }
+        checkStoredIndex()
     }
     @Volatile private var coverageSnapshot:Pair<Long,CacheCoverage>?=null
     @Volatile private var coverageArea:DoubleArray?=null
@@ -504,7 +507,25 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         escapeWrite={resource,body->if(escapedBytes>0&&!escapedWrites.isShutdown)escapedWrites.submit(body.bytes.size.toLong()){escaped.put(resource,body)}},
         cacheThreadFactory=ThreadFactory{work->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);work.run()},"RidgelineHttpCache")},
         metrics=httpMetrics,offlineRead=offline::read)}
-    private val transport by lazy{TileTransport(backend,ramBudget.encoded,initialLimits=downloadLimits)}
+    private val transport by lazy{TileTransport(backend,ramBudget.encoded,initialLimits=downloadLimits){key->if(client.cache!=null&&!key.offline)storedTiles.add(key.url)}}
+    /** Imagery tiles in the disk cache (see StoredTileIndex); loaded off the UI thread. */
+    private val storedTiles=StoredTileIndex(File(context.cacheDir,"native-stored-tiles-v1.bin"))
+    private val storedReady=java.util.concurrent.CountDownLatch(1)
+    private val storedWork=Executors.newSingleThreadScheduledExecutor{r->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);r.run()},"RidgelineStoredIndex").apply{isDaemon=true}}.also{w->
+        w.execute{storedTiles.load();storedReady.countDown()}
+        w.scheduleWithFixedDelay({storedTiles.save()},60,60,TimeUnit.SECONDS)
+    }
+    private val storedChecked=java.util.concurrent.atomic.AtomicBoolean()
+    /** Once per session, check the index against the cache itself, in the
+     * background (evictions, writes that were dropped), then refresh the tint. */
+    private fun checkStoredIndex(){
+        if(client.cache==null||!storedChecked.compareAndSet(false,true))return
+        runCatching{storedWork.execute{
+            runCatching{client.cache?.urls()?.let{storedTiles.replace(it)};storedTiles.save()}
+            coverageSnapshot=null;coverageArea=null
+            view.post{if(!dead&&cacheCoverage&&!coverageOverride)updateCoverage()}
+        }}
+    }
     // Visible map-layer tiles are ordinary visible work (as in the Capacitor app),
     // not background speculation: foreground transfer slots, ranked after imagery.
     /** Topographic vector tiles rank with visible imagery and terrain (focus
@@ -574,6 +595,17 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             return body
         }finally{if(current==null&&regionLease==null)owned.close();if(downloading&&downloadLease===owned)downloadLease=null}
     }
+    /** Finest tiles worth printing for [base]. */
+    internal fun printMaxZoom(base:MapSettings.Base)=when(base){MapSettings.Base.TOPO->TOPO_MAX_ZOOM;MapSettings.Base.SATELLITE->18;else->19}
+    /** One map tile's bytes for a printed map (memory, disk, saved regions or
+     * network), or null if unavailable. Blocking: call off the UI thread. */
+    internal fun printTile(base:MapSettings.Base,z:Int,x:Int,y:Int):ByteArray?=runCatching{
+        fetch(when(base){
+            MapSettings.Base.TOPO->linz("topo-raster",Id(z,x,y),"webp")
+            MapSettings.Base.SATELLITE->"https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/$z/$y/$x"
+            else->linz("aerial",Id(z,x,y),"webp")
+        })
+    }.getOrNull()
     private fun fetch(url:String):ByteArray{
         val body=fetchRecord(url);if(body.status !in 200..299)throw TileHttpException(body.status)
         regionContext.get()?.let{offline.keep(it,url,body.bytes)};return body.bytes
@@ -859,6 +891,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     fun close() {
         runCatching{connectivity?.unregisterNetworkCallback(networkCallback)}
         escapedWrites.drain()
+        runCatching{storedWork.execute{storedTiles.save()};storedWork.shutdown()}
         derivedReads.close()
         dead = true;transport.batchDemand{for(task in jobs.values)task.cancel();clearWarm();transport.close()};localImages.close();preparedWrites.close();attachmentJobs.shutdown();downloadCancel.set(true);downloadJobs.shutdown();offlineQueries.shutdownNow(); profileRevision.incrementAndGet();profileJob?.cancel(true);profileJobs.shutdownNow();profileFetches.shutdownNow();timer?.cancel(true); scheduler.shutdownNow(); geometryWorkers.shutdownNow();imageWorkers.shutdownNow()
         client.dispatcher.cancelAll(); client.connectionPool.evictAll(); client.dispatcher.executorService.shutdown(); synchronized(ready) { ready.clear(); readyBytes=0 }; synchronized(decoded) { decoded.clear() }

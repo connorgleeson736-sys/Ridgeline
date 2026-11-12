@@ -104,11 +104,12 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
         tick?.let{root.removeCallbacks(it)};tick=null
         restoreStyle();loader.coverageOverride=false
     }
-    private fun restoreStyle(){styleBefore?.let{before->styleBefore=null;loader.mapSettings.change{it.copy(base=before.base,threeD=before.threeD)}}}
+    private fun restoreStyle(){styleBefore?.let{before->styleBefore=null;loader.mapSettings.change{it.copy(threeD=before.threeD)}}}
     private fun removeFrame(){frame?.let{root.removeView(it)};frame=null}
     /** Opens the offline bar. */
     fun startRegion(){
         closeBar()
+        paintMode=false
         val content=NativeUi.column(activity)
         val paintPane=paintPane()
         val topoPane=NativeUi.column(activity)
@@ -133,7 +134,7 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
         content.addView(advancedView!!)
         // Tabs in the heading.
         val tabs=LinearLayout(activity).apply{background=NativeUi.background(activity,android.graphics.Color.rgb(232,236,229),9);setPadding(dp(3),dp(3),dp(3),dp(3))}
-        val tabViews=listOf("Paint","Topo map").map{label->TextView(activity).apply{text=label;textSize=13f;gravity=Gravity.CENTER;isClickable=true;setPadding(dp(14),0,dp(14),0)}}
+        val tabViews=listOf("Paint","Region").map{label->TextView(activity).apply{text=label;textSize=13f;gravity=Gravity.CENTER;isClickable=true;setPadding(dp(14),0,dp(14),0)}}
         fun select(topo:Boolean){
             topoTab=topo
             for((i,v)in tabViews.withIndex()){val on=(i==1)==topo
@@ -219,13 +220,34 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
     private var eraseChip:TextView?=null
     private var cursor:BrushCursor?=null
     private val brushDp=26f
+    /** Move: one finger moves the map as usual. Paint: one finger paints.
+     * Two fingers always move the map. Choosing a colour or Erase switches to
+     * Paint; the bar opens in Move. */
+    private var paintMode=false
+    private var paintTabOn=false
+    private var modeViews:List<TextView> = emptyList()
+    private fun setPaintMode(on:Boolean){
+        if(paintMode&&!on)finishStroke(true)
+        paintMode=on
+        terrain.paintTouch=if(on&&paintTabOn){phase,x,y->paintTouch(phase,x,y)}else null
+        for((i,v)in modeViews.withIndex()){val active=(i==1)==on
+            v.setTextColor(if(active)android.graphics.Color.WHITE else NativeUi.ink);v.setTypeface(null,if(active)android.graphics.Typeface.BOLD else android.graphics.Typeface.NORMAL)
+            v.background=if(active)NativeUi.background(activity,NativeUi.ink,7)else NativeUi.pressable(activity,null)}
+        showBrush();updatePaintInfo()
+    }
     private fun paintPane():LinearLayout{
         val pane=NativeUi.column(activity)
+        // Move / Paint switch.
+        val modes=LinearLayout(activity).apply{background=NativeUi.background(activity,android.graphics.Color.rgb(232,236,229),9);setPadding(dp(3),dp(3),dp(3),dp(3))}
+        modeViews=listOf("✋  Move" to "Move the map with one finger","🖌  Paint" to "Paint with one finger").mapIndexed{i,(label,description)->TextView(activity).apply{
+            text=label;textSize=13f;gravity=Gravity.CENTER;isClickable=true;contentDescription=description;setOnClickListener{setPaintMode(i==1)}}}
+        for(v in modeViews)modes.addView(v,LinearLayout.LayoutParams(0,dp(34),1f))
+        pane.addView(modes,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(8)})
         // Brush colours (detail) and the eraser.
         val chips=LinearLayout(activity)
-        swatches=PaintedArea.NAMES.indices.map{i->swatch(i).also{v->v.setOnClickListener{brush=i;erasing=false;prefs.edit().putInt("brush",i).apply();showBrush()}}}
+        swatches=PaintedArea.NAMES.indices.map{i->swatch(i).also{v->v.setOnClickListener{brush=i;erasing=false;prefs.edit().putInt("brush",i).apply();setPaintMode(true)}}}
         for((i,v)in swatches.withIndex())chips.addView(v,LinearLayout.LayoutParams(0,dp(52),1f).apply{if(i>0)marginStart=dp(4)})
-        val eraser=TextView(activity).apply{text="Erase";textSize=12f;gravity=Gravity.CENTER;isClickable=true;setTextColor(NativeUi.ink);setOnClickListener{erasing=true;showBrush()};contentDescription="Eraser"}
+        val eraser=TextView(activity).apply{text="Erase";textSize=12f;gravity=Gravity.CENTER;isClickable=true;setTextColor(NativeUi.ink);setOnClickListener{erasing=true;setPaintMode(true)};contentDescription="Eraser"}
         eraseChip=eraser
         chips.addView(eraser,LinearLayout.LayoutParams(0,dp(52),1f).apply{marginStart=dp(4)})
         pane.addView(chips)
@@ -241,7 +263,7 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
         val download=NativeUi.button(activity,"Download",true){downloadPainted(name.text.toString())}
         pane.addView(LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL
             addView(name,LinearLayout.LayoutParams(0,-2,1f));addView(download,LinearLayout.LayoutParams(dp(116),dp(44)).apply{marginStart=dp(8)})})
-        showBrush();updatePaintInfo()
+        setPaintMode(false)
         return pane
     }
     /** A detail colour: dot and name; outlined when it is the brush. */
@@ -251,21 +273,22 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
         addView(NativeUi.text(activity,PaintedArea.NAMES[i],11f).apply{gravity=Gravity.CENTER;setPadding(0,dp(3),0,0)})
     }
     private fun showBrush(){
-        for((i,v)in swatches.withIndex())v.background=chipBackground(!erasing&&i==brush)
-        eraseChip?.background=chipBackground(erasing)
+        // The brush is outlined while painting; in Move it is only marked.
+        for((i,v)in swatches.withIndex()){v.background=chipBackground(!erasing&&i==brush,paintMode);v.alpha=if(paintMode||(!erasing&&i==brush))1f else .75f}
+        eraseChip?.background=chipBackground(erasing,paintMode)
         cursor?.color=if(erasing)android.graphics.Color.WHITE else PaintedArea.COLORS[brush]
     }
-    private fun chipBackground(selected:Boolean)=android.graphics.drawable.GradientDrawable().apply{
+    private fun chipBackground(selected:Boolean,strong:Boolean=true)=android.graphics.drawable.GradientDrawable().apply{
         cornerRadius=dp(9).toFloat();setColor(if(selected)android.graphics.Color.WHITE else android.graphics.Color.TRANSPARENT)
-        setStroke(dp(if(selected)2 else 1),if(selected)NativeUi.ink else NativeUi.line)
+        setStroke(dp(if(selected&&strong)2 else 1),if(selected)(if(strong)NativeUi.ink else NativeUi.muted)else NativeUi.line)
     }
     private fun startPainting(){
         if(cursor==null){val c=BrushCursor(activity);cursor=c;root.addView(c,root.indexOfChild(terrain)+1,FrameLayout.LayoutParams(-1,-1));showBrush()}
-        terrain.paintTouch={phase,x,y->paintTouch(phase,x,y)}
+        paintTabOn=true;setPaintMode(paintMode)
         refreshOverlay(true)
     }
     private fun stopPainting(){
-        terrain.paintTouch=null;finishStroke(false)
+        paintTabOn=false;terrain.paintTouch=null;finishStroke(false)
         cursor?.let{root.removeView(it)};cursor=null
         terrain.coverage(null,null);overlayArea=null
     }
@@ -330,7 +353,7 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
         val line=info?:return
         line.setTextColor(NativeUi.ink)
         line.text=when{
-            area.isEmpty()->"Paint with one finger · move the map with two"
+            area.isEmpty()->if(paintMode)"One finger paints · two fingers move the map" else "Choose a detail colour, then paint the area you want"
             estimateRevision!=area.revision&&estimate==null->"Estimating…"
             estimateTiles>TileLoader.MAX_PAINTED_TILES->{line.setTextColor(NativeUi.orange);"Too large: paint a smaller area or a lower detail"}
             else->estimate?.let{String.format(java.util.Locale.ROOT,"About %.0f MB · %,d files",it.mib,it.files)}?:""
@@ -367,7 +390,7 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
     private val overlayWorker=java.util.concurrent.Executors.newSingleThreadExecutor()
     private var overlayArea:DoubleArray?=null;private var overlayRevision=-1L;private var overlayBusy=false;private var overlayAgain=false
     private fun refreshOverlay(force:Boolean){
-        if(terrain.paintTouch==null)return
+        if(!paintTabOn)return
         val pose=terrain.planningPose;val cx=(pose.longitude+180)/360;val cy=CameraMath.mercatorY(pose.latitude);val half=4.0/2.0.pow(pose.zoom)
         val a=overlayArea
         val moved=a==null||abs(a[0]-cx)>a[2]/4||abs(a[1]-cy)>a[2]/4||abs(ln(a[2]/half)/ln(2.0))>=.5
@@ -388,7 +411,7 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
                 }}
             root.post{
                 overlayBusy=false
-                if(terrain.paintTouch!=null){terrain.coverage(out,doubleArrayOf(cx-half,cy-half,cx+half,cy+half));overlayArea=doubleArrayOf(cx,cy,half);overlayRevision=revision}
+                if(paintTabOn){terrain.coverage(out,doubleArrayOf(cx-half,cy-half,cx+half,cy+half));overlayArea=doubleArrayOf(cx,cy,half);overlayRevision=revision}
                 if(overlayAgain){overlayAgain=false;refreshOverlay(true)}
             }
         }}.onFailure{overlayBusy=false}
@@ -398,11 +421,17 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
     // and Save as PDF. ----
     private var topoInfo:TextView?=null
     private var refreshTopoInfo:()->Unit={}
+    private val zooms=listOf(13,14,15,16,17)
+    private val zoomNames=listOf("Zoom 13 · overview","Zoom 14 · standard","Zoom 15 · detailed","Zoom 16 · very detailed","Zoom 17 · maximum")
+    private val regionBases=listOf(MapSettings.Base.LINZ,MapSettings.Base.SATELLITE,MapSettings.Base.TOPO)
+    private var zoomChoice=prefs.getInt("regionZoom",2).coerceIn(0,4);private var baseChoice=prefs.getInt("regionBase",0).coerceIn(0,2);private var regionOverlays=prefs.getBoolean("regionOverlays",true)
+    /** The 0.1.36 region download: a page-shaped (or custom) frame over the 2D
+     * north-up map; map content and detail; Save as PDF and Download. */
     private fun openTopo(pane:LinearLayout){
         pane.removeAllViews()
         val state=loader.mapSettings.state
-        if(styleBefore==null&&(state.base!=MapSettings.Base.TOPO||state.threeD))styleBefore=state
-        loader.mapSettings.change{it.copy(base=MapSettings.Base.TOPO,threeD=false)}
+        if(styleBefore==null&&state.threeD)styleBefore=state
+        if(state.threeD)loader.mapSettings.change{it.copy(threeD=false)}
         terrain.northUp()
         terrain.coverage(null,null)
         val overlay=RegionFrame(activity);frame=overlay
@@ -413,33 +442,56 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
             orientation.isEnabled=pageSize!=CUSTOM;orientation.alpha=if(pageSize==CUSTOM).4f else 1f
         }
         pane.addView(row(spinner(pageNames,pageNames.indexOf(pageSize).coerceAtLeast(0)){pageSize=pageNames[it];applyPage()},orientation))
+        val name=EditText(activity).apply{setSingleLine();hint="Region name";setText(regionName);textSize=14f;filters=arrayOf(android.text.InputFilter.LengthFilter(60))}
+        pane.addView(name,LinearLayout.LayoutParams(-1,-2))
+        val detail=spinner(zoomNames,zoomChoice){zoomChoice=it;prefs.edit().putInt("regionZoom",it).apply();refreshTopoInfo()}
+        val include=CheckBox(activity).apply{text="NZ Topo & overlays";isChecked=regionOverlays;textSize=13f;setOnCheckedChangeListener{_,c->regionOverlays=c;prefs.edit().putBoolean("regionOverlays",c).apply();refreshTopoInfo()}}
+        fun topoOnly(){val topo=regionBases[baseChoice]==MapSettings.Base.TOPO;detail.visibility=if(topo)View.INVISIBLE else View.VISIBLE;include.visibility=if(topo)View.GONE else View.VISIBLE}
+        pane.addView(row(spinner(listOf("LINZ aerial","Satellite","NZ Topo"),baseChoice){baseChoice=it;prefs.edit().putInt("regionBase",it).apply();topoOnly();refreshTopoInfo()},detail))
+        pane.addView(include);topoOnly()
         val line=NativeUi.text(activity,"",12.5f).apply{setPadding(0,dp(4),0,dp(4))};topoInfo=line
         pane.addView(line)
-        val name=EditText(activity).apply{setSingleLine();hint="Name (optional)";setText(regionName);textSize=14f;filters=arrayOf(android.text.InputFilter.LengthFilter(60))}
-        pane.addView(name,LinearLayout.LayoutParams(-1,-2))
+        // Exact coordinates, folded away.
+        val coords=listOf("West","South","East","North").map{EditText(activity).apply{hint=it;textSize=13f;inputType=android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL or android.text.InputType.TYPE_NUMBER_FLAG_SIGNED}}
+        var coordsEdited=false
+        fun showCoords(b:TileLoader.Bounds){listOf(b.west,b.south,b.east,b.north).forEachIndexed{i,v->coords[i].setText(String.format(java.util.Locale.ROOT,"%.5f",v))};coordsEdited=false}
+        for(field in coords)field.addTextChangedListener(object:android.text.TextWatcher{override fun beforeTextChanged(a:CharSequence?,b:Int,c:Int,d:Int){};override fun onTextChanged(a:CharSequence?,b:Int,c:Int,d:Int){if(field.hasFocus())coordsEdited=true};override fun afterTextChanged(e:android.text.Editable?){if(field.hasFocus())refreshTopoInfo()}})
+        val grid=GridLayout(activity).apply{columnCount=2}
+        coords.forEachIndexed{i,field->grid.addView(field,GridLayout.LayoutParams().apply{width=0;columnSpec=GridLayout.spec(i%2,1f)})}
+        fun bounds():TileLoader.Bounds{
+            if(coordsEdited){
+                val v=coords.map{it.text.toString().toDoubleOrNull()?:error("Enter valid coordinates.")}
+                val b=TileLoader.Bounds(v[0],v[1],v[2],v[3]);require(b.west>=165&&b.east<=180&&b.south>=-49&&b.north<=-33&&b.west<b.east&&b.south<b.north){"Enter valid coordinates."};return b
+            }
+            return frameBounds()?:error("Move the frame over New Zealand.")
+        }
+        fun zoom()=if(regionBases[baseChoice]==MapSettings.Base.TOPO)TOPO_MAX_ZOOM else zooms[zoomChoice]
+        var lastBounds:TileLoader.Bounds?=null
         refreshTopoInfo={
             line.setTextColor(NativeUi.ink)
             line.text=try{
-                val b=frameBounds()?:error("Move the frame over New Zealand.");val (w,h)=extentKm(b)
-                val e=loader.regionEstimate(b,TOPO_MAX_ZOOM,MapSettings.Base.TOPO,false)
+                val b=bounds();val (w,h)=extentKm(b)
+                if(!coordsEdited&&b!=lastBounds)showCoords(b);lastBounds=b
+                val e=loader.regionEstimate(b,zoom(),regionBases[baseChoice],regionOverlays)
                 String.format(java.util.Locale.ROOT,"%s × %s km · about %.0f MB · %,d files",km(w),km(h),e.mib,e.files)
             }catch(e:Exception){line.setTextColor(NativeUi.orange);e.message?:"Choose a smaller area."}
         }
         overlay.onChange={refreshTopoInfo()}
         val pdf=button("Save as PDF"){
             regionName=name.text.toString()
-            try{savePdf(frameBounds()?:error("Move the frame over New Zealand."),regionName.ifBlank{"Ridgeline map"})}catch(e:Exception){Toast.makeText(activity,e.message?:"Could not save the PDF.",Toast.LENGTH_LONG).show()}
+            try{savePdf(bounds(),regionName.ifBlank{"Ridgeline map"})}catch(e:Exception){Toast.makeText(activity,e.message?:"Could not save the PDF.",Toast.LENGTH_LONG).show()}
         }
         val download=NativeUi.button(activity,"Download",true){
             if(downloading){Toast.makeText(activity,"A region is already downloading.",Toast.LENGTH_SHORT).show();return@button}
             try{
-                val b=frameBounds()?:error("Move the frame over New Zealand.");loader.regionEstimate(b,TOPO_MAX_ZOOM,MapSettings.Base.TOPO,false)
-                regionName=name.text.toString();val title=regionName.ifBlank{"NZ Topo "+java.text.SimpleDateFormat("d MMM",java.util.Locale.getDefault()).format(java.util.Date())}
+                val b=bounds();loader.regionEstimate(b,zoom(),regionBases[baseChoice],regionOverlays)
+                regionName=name.text.toString();val title=regionName.ifBlank{"Region "+java.text.SimpleDateFormat("d MMM HH:mm",java.util.Locale.getDefault()).format(java.util.Date())}
                 downloading=true;progressText="Preparing…";showProgress()
-                loader.downloadRegion(title,b,TOPO_MAX_ZOOM,MapSettings.Base.TOPO,false,progress={progressText=it;showProgress()}){downloadDone()}
+                loader.downloadRegion(title,b,zoom(),regionBases[baseChoice],regionOverlays,progress={progressText=it;showProgress()}){downloadDone()}
             }catch(e:Exception){downloading=false;showProgress();line.setTextColor(NativeUi.orange);line.text=e.message?:"Region could not be started."}
         }
         pane.addView(LinearLayout(activity).apply{setPadding(0,dp(6),0,0);addView(pdf,LinearLayout.LayoutParams(0,dp(44),1f).apply{marginEnd=dp(8)});addView(download,LinearLayout.LayoutParams(0,dp(44),1f))})
+        pane.addView(toggle("Coordinates",grid));pane.addView(grid)
         overlay.post{bar?.height?.takeIf{it>0}?.let{overlay.bottomInset=it};if(pageSize==CUSTOM){overlay.page("A4",landscape);overlay.custom()}else overlay.page(pageSize,landscape);orientation.isEnabled=pageSize!=CUSTOM;orientation.alpha=if(pageSize==CUSTOM).4f else 1f;refreshTopoInfo()}
     }
     /** The frame's corners on the 2D map, clamped to New Zealand. */
@@ -465,25 +517,36 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
         override fun onTouchEvent(event:android.view.MotionEvent)=false
     }
 
-    // ---- Save as PDF: the framed map on the chosen page size. ----
+    // ---- Save as PDF: the framed area on the chosen page, from map tiles at print resolution. ----
     private val pdfRequest=4302
     private class PendingPdf(val map:android.graphics.Bitmap,val title:String,val paper:String,val landscape:Boolean,val widthKm:Double,val base:MapSettings.Base)
     private var pendingPdf:PendingPdf?=null
     private fun savePdf(bounds:TileLoader.Bounds,title:String){
-        val view=frame?:return;val c=view.corners()
-        val rect=android.graphics.Rect(c[0].roundToInt(),c[1].roundToInt(),c[2].roundToInt(),c[3].roundToInt())
-        if(!rect.intersect(0,0,terrain.width,terrain.height)||rect.width()<16||rect.height()<16)error("Move the frame over the map.")
-        val bitmap=android.graphics.Bitmap.createBitmap(rect.width(),rect.height(),android.graphics.Bitmap.Config.ARGB_8888)
         val paper=if(pageSize==CUSTOM)"A4" else pageSize
-        val wide=if(pageSize==CUSTOM)rect.width()>rect.height()else landscape
-        val (widthKm,_)=extentKm(bounds);val base=loader.mapSettings.state.base
-        // The renderer's own pixels (map, routes and names; not the frame or buttons).
-        android.view.PixelCopy.request(terrain,rect,bitmap,{result->
-            if(result!=android.view.PixelCopy.SUCCESS){bitmap.recycle();Toast.makeText(activity,"Could not capture the map. Try again once it has loaded.",Toast.LENGTH_LONG).show();return@request}
-            pendingPdf?.map?.recycle();pendingPdf=PendingPdf(bitmap,title,paper,wide,widthKm,base)
-            val intent=android.content.Intent(android.content.Intent.ACTION_CREATE_DOCUMENT).apply{addCategory(android.content.Intent.CATEGORY_OPENABLE);type="application/pdf";putExtra(android.content.Intent.EXTRA_TITLE,title.replace(Regex("[\\\\/:*?\"<>|]"),"_")+".pdf")}
-            runCatching{activity.startActivityForResult(intent,pdfRequest)}.onFailure{Toast.makeText(activity,"No file picker is available.",Toast.LENGTH_LONG).show()}
-        },android.os.Handler(android.os.Looper.getMainLooper()))
+        val (widthKm,heightKm)=extentKm(bounds)
+        val wide=if(pageSize==CUSTOM)widthKm>heightKm else landscape
+        val base=loader.mapSettings.state.base
+        // Plan at print resolution for the map area on the chosen page.
+        val (pw,ph)=PdfLayout.pageSize(paper,wide)
+        val aspect=(CameraMath.mercatorY(bounds.south)-CameraMath.mercatorY(bounds.north))/((bounds.east-bounds.west)/360)
+        val area=min((pw-2*PdfLayout.SIDE).toDouble(),(ph-PdfLayout.TOP-PdfLayout.BOTTOM)/aspect)
+        val plan=PrintMap.plan(bounds,area,loader.printMaxZoom(base))
+        val route=routes?.state?.points.orEmpty()
+        val cancelled=java.util.concurrent.atomic.AtomicBoolean()
+        val status=TextView(activity).apply{setPadding(dp(20),dp(14),dp(20),dp(6));text="Preparing the map…"}
+        val dialog=AlertDialog.Builder(activity).setTitle("Save as PDF").setView(status).setNegativeButton("Cancel"){_,_->cancelled.set(true)}.create().apply{setCancelable(false);show()}
+        Thread{
+            val map=runCatching{PrintMap.render(plan,{z,x,y->if(cancelled.get())null else loader.printTile(base,z,x,y)},route,(plan.width/area*2.2).toFloat()){i,n->
+                if(i%4==0)activity.runOnUiThread{status.text=String.format(java.util.Locale.ROOT,"Preparing the map · %d%%",i*100/max(1,n))}
+                !cancelled.get()}}.getOrNull()
+            activity.runOnUiThread{
+                dialog.dismiss()
+                if(map==null){if(!cancelled.get())Toast.makeText(activity,"Could not prepare the map.",Toast.LENGTH_LONG).show();return@runOnUiThread}
+                pendingPdf?.map?.recycle();pendingPdf=PendingPdf(map,title,paper,wide,widthKm,base)
+                val intent=android.content.Intent(android.content.Intent.ACTION_CREATE_DOCUMENT).apply{addCategory(android.content.Intent.CATEGORY_OPENABLE);type="application/pdf";putExtra(android.content.Intent.EXTRA_TITLE,title.replace(Regex("[\\\\/:*?\"<>|]"),"_")+".pdf")}
+                runCatching{activity.startActivityForResult(intent,pdfRequest)}.onFailure{Toast.makeText(activity,"No file picker is available.",Toast.LENGTH_LONG).show()}
+            }
+        }.apply{name="RidgelinePdf"}.start()
     }
     private fun writePdf(uri:android.net.Uri){
         val job=pendingPdf?:return;pendingPdf=null
