@@ -740,30 +740,53 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         for(i in 0 until event.pointerCount)if(i!=skip){x+=event.getX(i);y+=event.getY(i);count++}
         return x/count to y/count
     }
-    /** While set, one finger paints and two fingers move the map: called with
-     * [PAINT_START], [PAINT_MOVE], [PAINT_END] or [PAINT_CANCEL] and the touch
-     * position in pixels. A second finger cancels a just-started stroke. */
+    /** While set, the map moves as usual and pressing and holding (then
+     * dragging) paints: called with [PAINT_START], [PAINT_MOVE], [PAINT_END]
+     * or [PAINT_CANCEL] and the touch position in pixels. A second finger
+     * ends the stroke and moves the map. */
     internal var paintTouch:((Int,Float,Float)->Unit)?=null
     private var painting=false
+    private var holdArmed=false;private var holdX=0f;private var holdY=0f;private var holdLastX=0f;private var holdLastY=0f
+    private val touchSlop=android.view.ViewConfiguration.get(context).scaledTouchSlop
+    private val holdStart=Runnable{
+        val paint=paintTouch
+        if(!holdArmed||paint==null)return@Runnable
+        holdArmed=false;painting=true
+        // End the map gesture the hold began, then paint from here.
+        val now=android.os.SystemClock.uptimeMillis()
+        val cancel=MotionEvent.obtain(now,now,MotionEvent.ACTION_CANCEL,holdLastX,holdLastY,0)
+        try{mapTouch(cancel)}finally{cancel.recycle()}
+        parent?.requestDisallowInterceptTouchEvent(true)
+        performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
+        paint(PAINT_START,holdLastX,holdLastY)
+    }
+    private fun disarmHold(){if(holdArmed){holdArmed=false;removeCallbacks(holdStart)}}
     override fun onTouchEvent(event:MotionEvent):Boolean {
         val paint=paintTouch
-        if(paint!=null||painting){
+        if(paint!=null||painting||holdArmed){
             when(event.actionMasked){
-                MotionEvent.ACTION_DOWN->if(paint!=null){painting=true;stopMotion();parent?.requestDisallowInterceptTouchEvent(true);paint(PAINT_START,event.x,event.y);return true}
-                MotionEvent.ACTION_MOVE->if(painting){
-                    if(paint!=null){for(h in 0 until event.historySize)paint(PAINT_MOVE,event.getHistoricalX(0,h),event.getHistoricalY(0,h));paint(PAINT_MOVE,event.x,event.y)}
-                    return true
+                MotionEvent.ACTION_DOWN->if(paint!=null){holdArmed=true;holdX=event.x;holdY=event.y;holdLastX=event.x;holdLastY=event.y;removeCallbacks(holdStart);postDelayed(holdStart,HOLD_TO_PAINT_MS)}
+                MotionEvent.ACTION_MOVE->{
+                    if(painting){
+                        if(paint!=null){for(h in 0 until event.historySize)paint(PAINT_MOVE,event.getHistoricalX(0,h),event.getHistoricalY(0,h));paint(PAINT_MOVE,event.x,event.y)}
+                        return true
+                    }
+                    holdLastX=event.x;holdLastY=event.y
+                    if(holdArmed&&hypot(event.x-holdX,event.y-holdY)>touchSlop)disarmHold()
                 }
-                MotionEvent.ACTION_POINTER_DOWN->if(painting){
-                    // A second finger: this is a map gesture. Start it as if the
-                    // first finger had only just gone down, then add this one.
-                    painting=false;paint?.invoke(PAINT_CANCEL,event.x,event.y)
-                    val down=MotionEvent.obtain(event.downTime,event.eventTime,MotionEvent.ACTION_DOWN,event.getX(0),event.getY(0),0)
-                    try{mapTouch(down)}finally{down.recycle()}
-                    return mapTouch(event)
+                MotionEvent.ACTION_POINTER_DOWN->{
+                    disarmHold()
+                    if(painting){
+                        // A second finger: keep the stroke, then move the map as if
+                        // the first finger had only just gone down.
+                        painting=false;paint?.invoke(PAINT_END,event.getX(0),event.getY(0))
+                        val down=MotionEvent.obtain(event.downTime,event.eventTime,MotionEvent.ACTION_DOWN,event.getX(0),event.getY(0),0)
+                        try{mapTouch(down)}finally{down.recycle()}
+                        return mapTouch(event)
+                    }
                 }
-                MotionEvent.ACTION_UP->if(painting){painting=false;paint?.invoke(PAINT_END,event.x,event.y);parent?.requestDisallowInterceptTouchEvent(false);return true}
-                MotionEvent.ACTION_CANCEL->if(painting){painting=false;paint?.invoke(PAINT_CANCEL,event.x,event.y);parent?.requestDisallowInterceptTouchEvent(false);return true}
+                MotionEvent.ACTION_UP->{disarmHold();if(painting){painting=false;paint?.invoke(PAINT_END,event.x,event.y);parent?.requestDisallowInterceptTouchEvent(false);return true}}
+                MotionEvent.ACTION_CANCEL->{disarmHold();if(painting){painting=false;paint?.invoke(PAINT_CANCEL,event.x,event.y);parent?.requestDisallowInterceptTouchEvent(false);return true}}
             }
         }
         return mapTouch(event)
@@ -829,5 +852,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             endGesture();parent?.requestDisallowInterceptTouchEvent(false)}
         return true
     }
-    internal companion object{const val PAINT_START=0;const val PAINT_MOVE=1;const val PAINT_END=2;const val PAINT_CANCEL=3}
+    internal companion object{const val PAINT_START=0;const val PAINT_MOVE=1;const val PAINT_END=2;const val PAINT_CANCEL=3
+        /** Press and hold this long (without moving) to start painting. */
+        const val HOLD_TO_PAINT_MS=280L}
 }

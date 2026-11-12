@@ -1,6 +1,25 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.38 Paint Switch Base APK — 33.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Paint-Switch-0.1.38-Base.apk)**.
+Latest: **[Download 0.1.39 Hold To Paint Base APK — 33.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Hold-To-Paint-0.1.39-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 40:
+**updates 0.1.13–0.1.38 in place, keeping its data.**
+
+- **Hold to paint:** the map moves normally; press and hold, then drag, to
+  paint. A note at the top of the map says so.
+- **Regions up to 30,000 tiles** (was 2,000), paced to stay under LINZ's
+  limits and pausing if the server says "too many requests".
+- **The region frame shows again** (it was hidden under the map in 0.1.37–0.1.38).
+- **Saved regions** with an overview image, Rename and Delete are in the
+  routes drawer; the offline bar is simpler.
+
+209 JVM tests pass; lint 0 errors; native libraries and map assets identical
+to 0.1.38. Not run on a phone.
+[Exact release record](../validation/hold-to-paint-2026-11-12/release.json) ·
+[SHA-256](Ridgeline-Native-Hold-To-Paint-0.1.39-Base.apk.sha256).
+
+## Previous 0.1.38 paint switch checkpoint
+
+**[Download 0.1.38 Paint Switch Base APK — 33.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Paint-Switch-0.1.38-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 39:
 **updates 0.1.13–0.1.37 in place, keeping its data.**
 

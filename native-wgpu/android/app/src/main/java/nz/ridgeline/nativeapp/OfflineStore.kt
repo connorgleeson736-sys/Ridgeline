@@ -58,6 +58,19 @@ class OfflineStore(context:Context,name:String="offline-v1.sqlite"):SQLiteOpenHe
         }finally{db.endTransaction()}
         resourceState.set(1) // Publish only after the durable transaction has committed.
     }
+    /** Several downloaded files in one transaction (far fewer commits on slow storage). */
+    @Synchronized fun keepAll(region:String,rows:List<Pair<String,ByteArray>>){
+        if(rows.isEmpty())return
+        val db=writableDatabase;readHandle.publish(db);db.beginTransaction()
+        try{
+            for((url,body)in rows){val key=key(url)
+                db.insertWithOnConflict("resources",null,ContentValues().apply{put("key",key);put("body",body)},SQLiteDatabase.CONFLICT_IGNORE)
+                db.insertWithOnConflict("membership",null,ContentValues().apply{put("region",region);put("key",key)},SQLiteDatabase.CONFLICT_IGNORE)}
+            db.setTransactionSuccessful()
+        }finally{db.endTransaction()}
+        resourceState.set(1)
+    }
+    @Synchronized fun rename(id:String,name:String){writableDatabase.update("regions",ContentValues().apply{put("name",name)},"id=?",arrayOf(id))}
     /** Continue an existing region in place (its stored files are reused). */
     @Synchronized fun reopen(id:String):String{status(id,"Downloading");return id}
     @Synchronized fun status(id:String,status:String){writableDatabase.update("regions",ContentValues().apply{put("status",status)},"id=?",arrayOf(id))}

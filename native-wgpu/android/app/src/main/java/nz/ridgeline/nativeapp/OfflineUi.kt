@@ -70,9 +70,9 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
     private var progressView:TextView?=null
     private var progressRow:View?=null
     private val pageNames=RegionFrame.PAPER.keys.toList()+CUSTOM
-    private val imageryBases=listOf(MapSettings.Base.LINZ,MapSettings.Base.SATELLITE)
     private val prefs=activity.getSharedPreferences("offline-paint",0)
-    private var imageryChoice=prefs.getInt("imagery",0).coerceIn(0,1);private var includeTopo=prefs.getBoolean("overlays",true)
+    /** Painted areas download the imagery shown on the map, with NZ Topo and overlays. */
+    private val paintBase get()=loader.mapSettings.state.base
     private var regionName=""
     private var topoTab=false
     /** Map style before the Topo tab switched to NZ Topo in 2D; restored after. */
@@ -99,7 +99,7 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
     fun back():Boolean{if(bar==null)return false;closeBar();return true}
     private var tick:Runnable?=null
     private fun closeBar(){
-        stopPainting();removeFrame()
+        stopPainting();removeFrame();root.removeCallbacks(hideHint);hintView?.let{root.removeView(it)};hintView=null
         bar?.let{root.removeView(it)};bar=null;progressView=null;progressRow=null
         tick?.let{root.removeCallbacks(it)};tick=null
         restoreStyle();loader.coverageOverride=false
@@ -109,7 +109,6 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
     /** Opens the offline bar. */
     fun startRegion(){
         closeBar()
-        paintMode=false
         val content=NativeUi.column(activity)
         val paintPane=paintPane()
         val topoPane=NativeUi.column(activity)
@@ -119,19 +118,6 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
         val progressLabel=NativeUi.text(activity,"",12.5f);progressView=progressLabel
         progress.addView(progressLabel,LinearLayout.LayoutParams(0,-2,1f));progress.addView(button("Stop"){loader.cancelDownload()},LinearLayout.LayoutParams(-2,dp(40)))
         progressRow=progress;content.addView(progress);showProgress()
-        // Saved regions.
-        val saved=NativeUi.column(activity)
-        val savedHeader=toggle("Saved regions",saved)
-        refreshRegions={loader.regions{rows->if(bar==null)return@regions
-            savedHeader.text=(if(saved.visibility==View.VISIBLE)"Saved regions (${rows.size}) ▾" else "Saved regions (${rows.size}) ▸")
-            saved.removeAllViews()
-            if(rows.isEmpty())saved.addView(NativeUi.text(activity,"None yet",12.5f).apply{setTextColor(NativeUi.muted)})
-            for(region in rows)saved.addView(regionRow(region))
-        }}
-        savedHeader.setOnClickListener{val open=saved.visibility!=View.VISIBLE;saved.visibility=if(open)View.VISIBLE else View.GONE;refreshRegions()}
-        content.addView(savedHeader);content.addView(saved)
-        content.addView(toggle("Advanced",advancedPane()))
-        content.addView(advancedView!!)
         // Tabs in the heading.
         val tabs=LinearLayout(activity).apply{background=NativeUi.background(activity,android.graphics.Color.rgb(232,236,229),9);setPadding(dp(3),dp(3),dp(3),dp(3))}
         val tabViews=listOf("Paint","Region").map{label->TextView(activity).apply{text=label;textSize=13f;gravity=Gravity.CENTER;isClickable=true;setPadding(dp(14),0,dp(14),0)}}
@@ -151,47 +137,114 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
         select(topoTab)
         val poll=object:Runnable{override fun run(){if(bar!==panel)return;if(topoTab)refreshTopoInfo()else refreshOverlay(false);root.postDelayed(this,300)}}
         tick=poll;root.postDelayed(poll,300)
-        refreshRegions()
         loader.storedCoverage{stored=it;refreshOverlay(true)}
+        if(!topoTab)hint("Press and hold, then drag to paint")
     }
+    /** Saved regions, refreshed after downloads and edits (the drawer's list). */
     private var refreshRegions:()->Unit={}
-    private fun regionRow(region:OfflineStore.Region):View{
-        val item=NativeUi.column(activity).apply{setPadding(0,dp(4),0,dp(4))}
-        item.addView(NativeUi.text(activity,region.name,14f).apply{setTypeface(null,android.graphics.Typeface.BOLD)})
-        item.addView(NativeUi.text(activity,String.format(java.util.Locale.ROOT,"%s · %.1f MB",region.status,region.bytes/1048576.0),12f).apply{setTextColor(NativeUi.muted)})
-        val buttons=LinearLayout(activity)
+    private val thumbs=java.util.concurrent.Executors.newSingleThreadExecutor{r->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);r.run()},"RidgelineRegionThumbs").apply{isDaemon=true}}
+    private val thumbCache=object:LinkedHashMap<String,android.graphics.Bitmap>(16,.75f,true){override fun removeEldestEntry(e:MutableMap.MutableEntry<String,android.graphics.Bitmap>)=size>24}
+    /** Fills [list] with saved-region cards for the routes drawer: an overview
+     * image, name, status and size; View, Resume, Rename and Delete. [close]
+     * closes the drawer (before View). */
+    fun fillSavedRegions(list:LinearLayout,close:()->Unit){
+        refreshRegions={fillSavedRegions(list,close)}
+        loader.regions{rows->
+            if(!list.isAttachedToWindow&&list.parent==null)return@regions
+            list.removeAllViews()
+            if(rows.isEmpty())return@regions
+            list.addView(NativeUi.text(activity,"Saved regions",17f).apply{setTypeface(null,android.graphics.Typeface.BOLD);setPadding(0,dp(14),0,dp(2))})
+            for(region in rows)list.addView(regionCard(region,close))
+        }
+    }
+    private fun link(text:String,action:()->Unit)=TextView(activity).apply{this.text=text;textSize=13f;setTextColor(android.graphics.Color.rgb(196,104,46));gravity=Gravity.CENTER_VERTICAL;setPadding(0,0,dp(14),0);isClickable=true;isFocusable=true;background=NativeUi.pressable(activity,null);setOnClickListener{action()}}
+    private fun regionCard(region:OfflineStore.Region,close:()->Unit):View{
+        val view=NativeUi.column(activity).apply{setPadding(0,dp(10),0,dp(2))}
+        val heading=LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL}
+        val image=ImageView(activity).apply{scaleType=ImageView.ScaleType.CENTER_CROP;clipToOutline=true;contentDescription="Overview of ${region.name}";background=NativeUi.background(activity,android.graphics.Color.rgb(237,241,233),8,true)}
+        heading.addView(image,LinearLayout.LayoutParams(dp(50),dp(42)))
+        val details=NativeUi.column(activity)
+        details.addView(NativeUi.text(activity,region.name,13.5f).apply{setTypeface(null,android.graphics.Typeface.BOLD);maxLines=2})
         val meta=region.metadata
-        if(meta!=null)buttons.addView(button("View"){closeBar();val base=runCatching{MapSettings.Base.valueOf(meta.basemap)}.getOrDefault(MapSettings.Base.LINZ);if(base==MapSettings.Base.TOPO)loader.mapSettings.change{it.copy(base=base)};terrain.focus(listOf(Coordinate(meta.bounds.west,meta.bounds.south),Coordinate(meta.bounds.east,meta.bounds.north)))})
-        if(meta!=null&&!downloading&&region.status.startsWith("Partial"))buttons.addView(button("Resume"){
-            val base=runCatching{MapSettings.Base.valueOf(meta.basemap)}.getOrDefault(MapSettings.Base.LINZ)
-            val cells=meta.cells?.let{PaintedArea.decode(it)}
-            if(meta.cells!=null&&cells==null){Toast.makeText(activity,"This region can't be resumed.",Toast.LENGTH_LONG).show();return@button}
-            downloading=true;progressText="Resuming…";showProgress()
-            // The region's own choices, not the panel's current ones.
-            runCatching{loader.downloadRegion(region.name,meta.bounds,meta.zoom,base,meta.overlays,resume=region.id,painted=cells,progress={progressText=it;showProgress()}){downloadDone()}}
-                .onFailure{downloading=false;showProgress();Toast.makeText(activity,it.message?:"Could not resume.",Toast.LENGTH_LONG).show()}
+        val kind=when{meta==null->"";meta.cells!=null->"Painted";else->when(meta.basemap){"TOPO"->"NZ Topo";"SATELLITE"->"Satellite";else->"Aerial"}+" · z${meta.zoom}"}
+        details.addView(NativeUi.text(activity,listOf(kind,region.status.substringBefore(" ·"),String.format(java.util.Locale.ROOT,"%.1f MB",region.bytes/1048576.0)).filter{it.isNotBlank()}.joinToString(" · "),11.5f).apply{setTextColor(android.graphics.Color.rgb(120,132,124))})
+        heading.addView(details,LinearLayout.LayoutParams(0,-2,1f).apply{marginStart=dp(8)});view.addView(heading)
+        val actions=LinearLayout(activity).apply{setPadding(0,dp(4),0,0)}
+        if(meta!=null)actions.addView(link("View"){close();terrain.focus(listOf(Coordinate(meta.bounds.west,meta.bounds.south),Coordinate(meta.bounds.east,meta.bounds.north)))})
+        if(meta!=null&&!downloading&&region.status.startsWith("Partial"))actions.addView(link("Resume"){resume(region,meta)})
+        actions.addView(link("Rename"){
+            val input=EditText(activity).apply{setSingleLine();setText(region.name);filters=arrayOf(android.text.InputFilter.LengthFilter(60))}
+            AlertDialog.Builder(activity).setTitle("Rename region").setView(input).setPositiveButton("Save"){_,_->val name=input.text.toString().trim();if(name.isNotEmpty())loader.renameRegion(region.id,name){refreshRegions()}}.setNegativeButton("Cancel",null).show()
         })
-        buttons.addView(button("Remove"){AlertDialog.Builder(activity).setMessage("Delete ${region.name} from this device?").setPositiveButton("Delete"){_,_->loader.removeRegion(region.id){refreshRegions();loader.storedCoverage{stored=it;refreshOverlay(true)}}}.setNegativeButton("Cancel",null).show()})
-        item.addView(buttons);return item
+        actions.addView(link("Delete"){AlertDialog.Builder(activity).setMessage("Delete ${region.name} from this device?").setPositiveButton("Delete"){_,_->loader.removeRegion(region.id){refreshRegions();loader.storedCoverage{stored=it;refreshOverlay(true)}}}.setNegativeButton("Cancel",null).show()})
+        view.addView(actions);NativeUi.divider(view)
+        if(meta!=null)thumbnail(region.id,meta){image.setImageBitmap(it)}
+        return view
+    }
+    /** A small overview: the region's imagery (from its own saved tiles) with
+     * the painted cells or the region's outline on top. */
+    private fun thumbnail(id:String,meta:OfflineStore.Metadata,show:(android.graphics.Bitmap)->Unit){
+        thumbCache[id]?.let{show(it);return}
+        runCatching{thumbs.execute{
+            val bitmap=runCatching{
+                val b=meta.bounds;val padX=(b.east-b.west)*.08;val padY=(b.north-b.south)*.08
+                val area=TileLoader.Bounds(max(165.0,b.west-padX),max(-49.0,b.south-padY),min(180.0,b.east+padX),min(-33.0,b.north+padY))
+                val base=runCatching{MapSettings.Base.valueOf(meta.basemap)}.getOrDefault(MapSettings.Base.LINZ)
+                val plan=PrintMap.plan(area,160/PrintMap.DPI*72,minOf(loader.printMaxZoom(base),meta.zoom),maxTiles=6,maxPixels=40_000)
+                val out=PrintMap.render(plan,{z,x,y->loader.printTile(base,z,x,y)},emptyList(),0f){_,_->true}?:return@runCatching null
+                val canvas=android.graphics.Canvas(out)
+                fun px(mx:Double)=((mx-plan.x0)/(plan.x1-plan.x0)*plan.width).toFloat()
+                fun py(my:Double)=((my-plan.y0)/(plan.y1-plan.y0)*plan.height).toFloat()
+                val cells=meta.cells?.let{PaintedArea.decode(it)}
+                if(cells!=null){
+                    val fill=android.graphics.Paint();val n=PaintedArea.GRID.toDouble()
+                    for((k,d)in cells){val x=(k and 0xffff)/n;val y=(k ushr 16)/n
+                        fill.color=(PaintedArea.COLORS[d] and 0x00ffffff) or (0x88 shl 24)
+                        canvas.drawRect(px(x),py(y),max(px(x+1/n),px(x)+1f),max(py(y+1/n),py(y)+1f),fill)}
+                }else{
+                    val line=android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply{style=android.graphics.Paint.Style.STROKE;strokeWidth=2.5f;color=android.graphics.Color.rgb(214,88,37)}
+                    canvas.drawRect(px((b.west+180)/360),py(CameraMath.mercatorY(b.north)),px((b.east+180)/360),py(CameraMath.mercatorY(b.south)),line)
+                }
+                out
+            }.getOrNull()?:return@execute
+            root.post{thumbCache[id]=bitmap;show(bitmap)}
+        }}
+    }
+    private fun resume(region:OfflineStore.Region,meta:OfflineStore.Metadata){
+        val base=runCatching{MapSettings.Base.valueOf(meta.basemap)}.getOrDefault(MapSettings.Base.LINZ)
+        val cells=meta.cells?.let{PaintedArea.decode(it)}
+        if(meta.cells!=null&&cells==null){Toast.makeText(activity,"This region can't be resumed.",Toast.LENGTH_LONG).show();return}
+        downloading=true;progressText="Resuming…";showProgress()
+        // The region's own choices, not the panel's current ones.
+        runCatching{loader.downloadRegion(region.name,meta.bounds,meta.zoom,base,meta.overlays,resume=region.id,painted=cells,progress={progressText=it;showProgress()}){downloadDone()}}
+            .onFailure{downloading=false;showProgress();Toast.makeText(activity,it.message?:"Could not resume.",Toast.LENGTH_LONG).show()}
+        refreshRegions()
+        Toast.makeText(activity,"Resuming ${region.name}",Toast.LENGTH_SHORT).show()
     }
     private fun downloadDone(){downloading=false;progressText="";showProgress();loader.cameraChanged();refreshRegions();loader.storedCoverage{stored=it;refreshOverlay(true)}}
-    private var advancedView:View?=null
-    private fun advancedPane():View{
-        val packs=NativeUi.column(activity)
-        fun showPacks(){packs.removeAllViews()
-            packs.addView(NativeUi.text(activity,"Overview imagery: ${loader.overviews.list().size}/6 packs",12.5f).apply{setTextColor(NativeUi.muted)})
-            for(pack in loader.overviews.list())packs.addView(button("Detach ${pack.name}"){loader.detachOverview(pack.payload){showPacks()}},LinearLayout.LayoutParams(-2,dp(40)))
-            packs.addView(button("Add imagery ZIPs"){closeBar();addImagery()},LinearLayout.LayoutParams(-2,dp(40)))}
-        showPacks()
-        val view=NativeUi.column(activity).apply{
-            addView(bold("Painted downloads"))
-            addView(spinner(listOf("LINZ aerial imagery","Satellite imagery"),imageryChoice){imageryChoice=it;prefs.edit().putInt("imagery",it).apply();scheduleEstimate()},LinearLayout.LayoutParams(-1,-2))
-            addView(CheckBox(activity).apply{text="Include NZ Topo & overlays";isChecked=includeTopo;textSize=13f;setOnCheckedChangeListener{_,c->includeTopo=c;prefs.edit().putBoolean("overlays",c).apply();scheduleEstimate()}})
-            addView(CheckBox(activity).apply{text="Use downloaded maps only";isChecked=loader.offlineOnly;textSize=13f;setOnCheckedChangeListener{_,c->loader.offlineOnly(c)}})
-            addView(bold("Included imagery"));addView(packs)
-        }
-        advancedView=view;return view
+    /** Overview imagery ZIPs: attached packs (detach) and Add (Layers > Advanced). */
+    fun imageryPacks(){
+        val packs=loader.overviews.list()
+        val names=packs.map{"Detach ${it.name}"}.toTypedArray()
+        AlertDialog.Builder(activity).setTitle("Overview imagery · ${packs.size}/6 packs")
+            .setItems(names){_,i->loader.detachOverview(packs[i].payload){Toast.makeText(activity,"Detached ${packs[i].name}",Toast.LENGTH_SHORT).show()}}
+            .setPositiveButton("Add ZIPs"){_,_->closeBar();addImagery()}.setNegativeButton("Close",null).show()
     }
+    /** A short note at the top of the map, styled like the map status ("Terrain load failed…"). */
+    private var hintView:TextView?=null
+    private val hideHint=Runnable{hintView?.animate()?.alpha(0f)?.setDuration(250)?.withEndAction{hintView?.let{root.removeView(it)};hintView=null}?.start()}
+    private fun hint(text:String){
+        root.removeCallbacks(hideHint)
+        val view=hintView?:TextView(activity).apply{
+            textSize=12f;setPadding(dp(10),dp(6),dp(10),dp(6));setTextColor(android.graphics.Color.rgb(40,55,48));elevation=dp(4).toFloat()
+            background=NativeUi.background(activity,android.graphics.Color.argb(240,255,255,255),14)
+            root.addView(this,FrameLayout.LayoutParams(-2,-2,Gravity.TOP or Gravity.CENTER_HORIZONTAL).apply{topMargin=dp(62)})
+        }.also{hintView=it}
+        view.text=text;view.animate().cancel();view.alpha=0f;view.animate().alpha(1f).setDuration(200).start()
+        root.postDelayed(hideHint,4000)
+    }
+    /** Adds [view] above the map but under the offline bar. */
+    private fun addOverMap(view:View){root.addView(view,bar?.let{root.indexOfChild(it)}?.takeIf{it>=0}?:root.childCount,FrameLayout.LayoutParams(-1,-1))}
     private fun showProgress(){progressRow?.visibility=if(downloading)View.VISIBLE else View.GONE;progressView?.text=if(downloading)"Downloading · $progressText" else ""}
     /** Bottom bar in the route bar's style: paper, rounded top, [heading] and ✕,
      * scrolling content up to [maxFraction] of the screen. */
@@ -220,34 +273,14 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
     private var eraseChip:TextView?=null
     private var cursor:BrushCursor?=null
     private val brushDp=26f
-    /** Move: one finger moves the map as usual. Paint: one finger paints.
-     * Two fingers always move the map. Choosing a colour or Erase switches to
-     * Paint; the bar opens in Move. */
-    private var paintMode=false
     private var paintTabOn=false
-    private var modeViews:List<TextView> = emptyList()
-    private fun setPaintMode(on:Boolean){
-        if(paintMode&&!on)finishStroke(true)
-        paintMode=on
-        terrain.paintTouch=if(on&&paintTabOn){phase,x,y->paintTouch(phase,x,y)}else null
-        for((i,v)in modeViews.withIndex()){val active=(i==1)==on
-            v.setTextColor(if(active)android.graphics.Color.WHITE else NativeUi.ink);v.setTypeface(null,if(active)android.graphics.Typeface.BOLD else android.graphics.Typeface.NORMAL)
-            v.background=if(active)NativeUi.background(activity,NativeUi.ink,7)else NativeUi.pressable(activity,null)}
-        showBrush();updatePaintInfo()
-    }
     private fun paintPane():LinearLayout{
         val pane=NativeUi.column(activity)
-        // Move / Paint switch.
-        val modes=LinearLayout(activity).apply{background=NativeUi.background(activity,android.graphics.Color.rgb(232,236,229),9);setPadding(dp(3),dp(3),dp(3),dp(3))}
-        modeViews=listOf("✋  Move" to "Move the map with one finger","🖌  Paint" to "Paint with one finger").mapIndexed{i,(label,description)->TextView(activity).apply{
-            text=label;textSize=13f;gravity=Gravity.CENTER;isClickable=true;contentDescription=description;setOnClickListener{setPaintMode(i==1)}}}
-        for(v in modeViews)modes.addView(v,LinearLayout.LayoutParams(0,dp(34),1f))
-        pane.addView(modes,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(8)})
         // Brush colours (detail) and the eraser.
         val chips=LinearLayout(activity)
-        swatches=PaintedArea.NAMES.indices.map{i->swatch(i).also{v->v.setOnClickListener{brush=i;erasing=false;prefs.edit().putInt("brush",i).apply();setPaintMode(true)}}}
+        swatches=PaintedArea.NAMES.indices.map{i->swatch(i).also{v->v.setOnClickListener{brush=i;erasing=false;prefs.edit().putInt("brush",i).apply();showBrush();hint("Hold, then drag to paint ${PaintedArea.NAMES[i]} detail")}}}
         for((i,v)in swatches.withIndex())chips.addView(v,LinearLayout.LayoutParams(0,dp(52),1f).apply{if(i>0)marginStart=dp(4)})
-        val eraser=TextView(activity).apply{text="Erase";textSize=12f;gravity=Gravity.CENTER;isClickable=true;setTextColor(NativeUi.ink);setOnClickListener{erasing=true;setPaintMode(true)};contentDescription="Eraser"}
+        val eraser=TextView(activity).apply{text="Erase";textSize=12f;gravity=Gravity.CENTER;isClickable=true;setTextColor(NativeUi.ink);setOnClickListener{erasing=true;showBrush();hint("Hold, then drag to erase")};contentDescription="Eraser"}
         eraseChip=eraser
         chips.addView(eraser,LinearLayout.LayoutParams(0,dp(52),1f).apply{marginStart=dp(4)})
         pane.addView(chips)
@@ -263,7 +296,7 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
         val download=NativeUi.button(activity,"Download",true){downloadPainted(name.text.toString())}
         pane.addView(LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL
             addView(name,LinearLayout.LayoutParams(0,-2,1f));addView(download,LinearLayout.LayoutParams(dp(116),dp(44)).apply{marginStart=dp(8)})})
-        setPaintMode(false)
+        showBrush();updatePaintInfo()
         return pane
     }
     /** A detail colour: dot and name; outlined when it is the brush. */
@@ -273,18 +306,17 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
         addView(NativeUi.text(activity,PaintedArea.NAMES[i],11f).apply{gravity=Gravity.CENTER;setPadding(0,dp(3),0,0)})
     }
     private fun showBrush(){
-        // The brush is outlined while painting; in Move it is only marked.
-        for((i,v)in swatches.withIndex()){v.background=chipBackground(!erasing&&i==brush,paintMode);v.alpha=if(paintMode||(!erasing&&i==brush))1f else .75f}
-        eraseChip?.background=chipBackground(erasing,paintMode)
+        for((i,v)in swatches.withIndex())v.background=chipBackground(!erasing&&i==brush)
+        eraseChip?.background=chipBackground(erasing)
         cursor?.color=if(erasing)android.graphics.Color.WHITE else PaintedArea.COLORS[brush]
     }
-    private fun chipBackground(selected:Boolean,strong:Boolean=true)=android.graphics.drawable.GradientDrawable().apply{
+    private fun chipBackground(selected:Boolean)=android.graphics.drawable.GradientDrawable().apply{
         cornerRadius=dp(9).toFloat();setColor(if(selected)android.graphics.Color.WHITE else android.graphics.Color.TRANSPARENT)
-        setStroke(dp(if(selected&&strong)2 else 1),if(selected)(if(strong)NativeUi.ink else NativeUi.muted)else NativeUi.line)
+        setStroke(dp(if(selected)2 else 1),if(selected)NativeUi.ink else NativeUi.line)
     }
     private fun startPainting(){
-        if(cursor==null){val c=BrushCursor(activity);cursor=c;root.addView(c,root.indexOfChild(terrain)+1,FrameLayout.LayoutParams(-1,-1));showBrush()}
-        paintTabOn=true;setPaintMode(paintMode)
+        if(cursor==null){val c=BrushCursor(activity);cursor=c;addOverMap(c);showBrush()}
+        paintTabOn=true;terrain.paintTouch={phase,x,y->paintTouch(phase,x,y)}
         refreshOverlay(true)
     }
     private fun stopPainting(){
@@ -303,10 +335,7 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
             TerrainView.PAINT_MOVE->{strokeTravel+=hypot(x-lastX,y-lastY);lastX=x;lastY=y;cursor?.show(x,y,brushDp*activity.resources.displayMetrics.density)
                 if(hypot(x-lastPickX,y-lastPickY)>=dp(6))pick(x,y)}
             TerrainView.PAINT_END->{cursor?.hide();pick(x,y);finishStroke(true)}
-            TerrainView.PAINT_CANCEL->{cursor?.hide()
-                // A second finger soon after the first: a map gesture, not a stroke.
-                val brief=android.os.SystemClock.uptimeMillis()-strokeStart<350||strokeTravel<dp(24)
-                finishStroke(!brief)}
+            TerrainView.PAINT_CANCEL->{cursor?.hide();finishStroke(true)}
         }
     }
     private fun pick(x:Float,y:Float){
@@ -342,7 +371,7 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
     private val estimator=java.util.concurrent.Executors.newSingleThreadExecutor()
     private var estimate:TileLoader.RegionEstimate?=null;private var estimateTiles=0;private var estimateRevision=-1L
     private fun scheduleEstimate(){
-        val revision=area.revision;val cells=area.snapshot();val base=imageryBases[imageryChoice];val topo=includeTopo
+        val revision=area.revision;val cells=area.snapshot();val base=paintBase;val topo=true
         runCatching{estimator.execute{
             val tiles=PaintedArea.tilesOf(cells)
             val e=if(tiles.size<=TileLoader.MAX_PAINTED_TILES)loader.estimateTiles(tiles,base,topo)else null
@@ -353,7 +382,7 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
         val line=info?:return
         line.setTextColor(NativeUi.ink)
         line.text=when{
-            area.isEmpty()->if(paintMode)"One finger paints · two fingers move the map" else "Choose a detail colour, then paint the area you want"
+            area.isEmpty()->"Press and hold, then drag to paint"
             estimateRevision!=area.revision&&estimate==null->"Estimating…"
             estimateTiles>TileLoader.MAX_PAINTED_TILES->{line.setTextColor(NativeUi.orange);"Too large: paint a smaller area or a lower detail"}
             else->estimate?.let{String.format(java.util.Locale.ROOT,"About %.0f MB · %,d files",it.mib,it.files)}?:""
@@ -368,7 +397,7 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
         val title=name.ifBlank{"Painted area "+java.text.SimpleDateFormat("d MMM",java.util.Locale.getDefault()).format(java.util.Date())}
         try{
             downloading=true;progressText="Preparing…";showProgress()
-            loader.downloadRegion(title,bounds,cells.values.maxOf{PaintedArea.DETAILS[it]},imageryBases[imageryChoice],includeTopo,painted=cells,progress={progressText=it;showProgress()}){downloadDone()}
+            loader.downloadRegion(title,bounds,cells.values.maxOf{PaintedArea.DETAILS[it]},paintBase,true,painted=cells,progress={progressText=it;showProgress()}){downloadDone()}
             // The painting is now a saved region: clear it (Undo brings it back).
             area.clear();areaChanged(true)
         }catch(e:Exception){downloading=false;showProgress();info?.let{it.setTextColor(NativeUi.orange);it.text=e.message?:"Could not start the download."}}
@@ -435,7 +464,7 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
         terrain.northUp()
         terrain.coverage(null,null)
         val overlay=RegionFrame(activity);frame=overlay
-        root.addView(overlay,root.indexOfChild(terrain)+1,FrameLayout.LayoutParams(-1,-1))
+        addOverMap(overlay)
         val orientation=spinner(listOf("Portrait","Landscape"),if(landscape)1 else 0){landscape=it==1;if(pageSize!=CUSTOM)overlay.page(pageSize,landscape)}
         fun applyPage(){
             if(pageSize==CUSTOM)overlay.custom()else overlay.page(pageSize,landscape)
