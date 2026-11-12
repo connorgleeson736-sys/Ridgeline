@@ -24,7 +24,9 @@ internal class ResourcePending(val ready:CompletableFuture<*>):RuntimeException(
 internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
     private val clock:()->Long=System::currentTimeMillis,private val graceMs:Long=600,
     private val localWaitMs:Long=40,private val localQueueMs:Long=250,
-    initialLimits:DownloadLimits=DownloadLimits.DEFAULT):AutoCloseable {
+    initialLimits:DownloadLimits=DownloadLimits.DEFAULT,
+    /** Each delivered 200 body (cache or network), e.g. to index stored tiles. */
+    private val onBody:(ResourceKey)->Unit={}):AutoCloseable {
     private val lock=Any()
     private var ramLimit=ramLimit.coerceAtLeast(0)
     fun setRamLimit(limit:Long){synchronized(lock){
@@ -316,6 +318,7 @@ internal class TileTransport(private val backend:TileBackend,ramLimit:Long,
             }
         }
         cancelNetwork?.invoke()
+        stamped.getOrNull()?.let{if(it.status==200)runCatching{onBody(job.key)}}
         stamped.fold({job.result.complete(it)},{job.result.completeExceptionally(it)});pump()
     }
     fun fresh(stamp:SourceStamp):Boolean=synchronized(lock){

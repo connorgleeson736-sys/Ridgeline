@@ -5,11 +5,15 @@
 the audited APK was 0.1.5. Main next candidates are raw local-I/O isolation,
 GPU upload acknowledgement, classified recovery and per-tile critical-path tracing.
 
-Latest APK: **[0.1.37 Paint Offline Base](checkpoints/README.md)** — updates
+Latest APK: **[0.1.38 Paint Switch Base](checkpoints/README.md)** — updates
+0.1.13–0.1.37 in place. Move/Paint switch for painting, the region download
+as in 0.1.36, sharp print-resolution PDFs and a fast stored-detail view.
+
+Previous APK: **[0.1.37 Paint Offline Base](checkpoints/README.md)** — updates
 0.1.13–0.1.36 in place. Paint the detail you want offline onto the 2D or 3D
 map; NZ Topo regions and PDFs keep their page frame in a second tab.
 
-Previous APK: **[0.1.36 Offline Bar Base](checkpoints/README.md)** — updates
+Older APK: **[0.1.36 Offline Bar Base](checkpoints/README.md)** — updates
 0.1.13–0.1.35 in place. Offline regions in one bottom bar with Save as PDF,
 names clear when zoomed far out, and an easier-to-drag route sheet.
 

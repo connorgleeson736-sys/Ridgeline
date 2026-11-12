@@ -1,6 +1,25 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.37 Paint Offline Base APK — 33.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Paint-Offline-0.1.37-Base.apk)**.
+Latest: **[Download 0.1.38 Paint Switch Base APK — 33.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Paint-Switch-0.1.38-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 39:
+**updates 0.1.13–0.1.37 in place, keeping its data.**
+
+- **Move / Paint switch:** the map moves normally until you choose Paint (or
+  a colour); two fingers always move the map.
+- **Region tab** is the 0.1.36 region download again (map, detail, overlays,
+  coordinates, PDF and Download).
+- **Sharp PDFs** at about 200 dpi, built from the map's own tiles.
+- **Show stored map detail** turns on quickly (a saved index instead of
+  reading every cache file).
+
+209 JVM tests pass; lint 0 errors; native libraries and map assets identical
+to 0.1.37. Not run on a phone.
+[Exact release record](../validation/paint-switch-2026-11-12/release.json) ·
+[SHA-256](Ridgeline-Native-Paint-Switch-0.1.38-Base.apk.sha256).
+
+## Previous 0.1.37 paint offline checkpoint
+
+**[Download 0.1.37 Paint Offline Base APK — 33.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Paint-Offline-0.1.37-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 38:
 **updates 0.1.13–0.1.36 in place, keeping its data.**
 
