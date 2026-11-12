@@ -71,7 +71,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         // DOC's hunting areas change rarely but are served with a 30 s lifetime:
         // keep each tile a day (revalidated by ETag after that).
         .addNetworkInterceptor{chain->val response=chain.proceed(chain.request())
-            if(response.isSuccessful&&HuntingAreas.isUrl(chain.request().url.toString()))response.newBuilder().header("Cache-Control","public, max-age=86400").removeHeader("Pragma").build()else response}
+            if(response.isSuccessful&&chain.request().url.toString().let{HuntingAreas.isUrl(it)||DocTracks.isUrl(it)})response.newBuilder().header("Cache-Control","public, max-age=86400").removeHeader("Pragma").build()else response}
         .connectTimeout(12, TimeUnit.SECONDS).readTimeout(15, TimeUnit.SECONDS).build()
     init {
         if(automaticCacheBytes==0L)preparedWrites.submit(1) {
@@ -901,17 +901,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         profileJob=profileJobs.schedule({
             val stale={dead||revision!=profileRevision.get()||Thread.currentThread().isInterrupted}
             fun stage(fine:Boolean):Boolean{
-                val plan=RouteProfile.plan(route,fine,if(fine)focus else null)
-                val futures=plan.tiles.associateWith{id->profileFetches.submit<Dem?>{
-                    if(dead||revision!=profileRevision.get())null
-                    else{profileContext.set(true);try{raw(Id(id.z,id.x,id.y))}catch(_:Exception){null}finally{profileContext.remove()}}
-                }}
-                val fetched=HashMap<GpuUploadQueue.Id,Dem?>()
-                try{for((id,future) in futures){if(stale())return false;fetched[id]=try{future.get()}catch(e:java.util.concurrent.ExecutionException){null}}}
-                catch(_:InterruptedException){return false}
-                finally{if(stale())futures.values.forEach{it.cancel(true)}}
-                val result=RouteProfile.sample(plan,fetched,{id->profileContext.set(true);try{raw(Id(id.z,id.x,id.y))}catch(_:Exception){null}finally{profileContext.remove()}},stale)
-                if(stale())return false
+                val result=sampleProfile(route,fine,if(fine)focus else null,stale)?:return false
                 val final=fine||!detail
                 profileDelivery=ProfileDelivery(revision,result.values,result.zooms,{values->callback(values,final)})
                 view.post{if(!dead&&revision==profileRevision.get())callback(result.values,final)}
@@ -922,6 +912,34 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             if(detail)stage(true)
         },if(detail)220 else 350,TimeUnit.MILLISECONDS)
     }
+    /** Elevation samples along [route] (a quick pass, or 5 m samples from z17
+     * with [fine]); null when [stale] turns true. */
+    private fun sampleProfile(route:List<Coordinate>,fine:Boolean,focus:RouteProfile.Bounds?,stale:()->Boolean):RouteProfile.Result?{
+        val plan=RouteProfile.plan(route,fine,focus)
+        val futures=plan.tiles.associateWith{id->profileFetches.submit<Dem?>{
+            if(stale())null
+            else{profileContext.set(true);try{raw(Id(id.z,id.x,id.y))}catch(_:Exception){null}finally{profileContext.remove()}}
+        }}
+        val fetched=HashMap<GpuUploadQueue.Id,Dem?>()
+        try{for((id,future) in futures){if(stale())return null;fetched[id]=try{future.get()}catch(e:java.util.concurrent.ExecutionException){null}}}
+        catch(_:InterruptedException){return null}
+        finally{if(stale())futures.values.forEach{it.cancel(true)}}
+        val result=RouteProfile.sample(plan,fetched,{id->profileContext.set(true);try{raw(Id(id.z,id.x,id.y))}catch(_:Exception){null}finally{profileContext.remove()}},stale)
+        return if(stale())null else result
+    }
+    private val trackJobs=Executors.newSingleThreadExecutor{Thread(it,"ridgeline-track-profile").apply{isDaemon=true}}
+    private val trackRevision=AtomicLong()
+    /** A DOC track's elevation, apart from the route profile (neither cancels
+     * the other): a quick pass, then 5 m samples ([callback]'s flag: final). */
+    fun trackProfile(points:List<Coordinate>,callback:(List<NativeGeo.ProfilePoint>,Boolean)->Unit){
+        val revision=trackRevision.incrementAndGet();val route=points.toList()
+        runCatching{trackJobs.execute{
+            val stale={dead||revision!=trackRevision.get()}
+            for(fine in listOf(false,true)){val result=sampleProfile(route,fine,null,stale)?:return@execute
+                view.post{if(!dead&&revision==trackRevision.get())callback(result.values,fine)}}
+        }}
+    }
+    fun cancelTrackProfile(){trackRevision.incrementAndGet()}
     fun memoryPressure(){
         pipelinePauseUntil=System.nanoTime()+TimeUnit.SECONDS.toNanos(30)
         for(task in jobs.values){task.inputs.clear();task.decodeWait.clear()}
@@ -935,9 +953,9 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         escapedWrites.drain()
         runCatching{storedWork.execute{storedTiles.save()};storedWork.shutdown()}
         derivedReads.close()
-        dead = true;transport.batchDemand{for(task in jobs.values)task.cancel();clearWarm();transport.close()};localImages.close();preparedWrites.close();attachmentJobs.shutdown();downloadCancel.set(true);downloadJobs.shutdown();offlineQueries.shutdownNow(); profileRevision.incrementAndGet();profileJob?.cancel(true);profileJobs.shutdownNow();profileFetches.shutdownNow();timer?.cancel(true); scheduler.shutdownNow(); geometryWorkers.shutdownNow();imageWorkers.shutdownNow()
+        dead = true;transport.batchDemand{for(task in jobs.values)task.cancel();clearWarm();transport.close()};localImages.close();preparedWrites.close();attachmentJobs.shutdown();downloadCancel.set(true);downloadJobs.shutdown();offlineQueries.shutdownNow(); profileRevision.incrementAndGet();profileJob?.cancel(true);profileJobs.shutdownNow();trackJobs.shutdownNow();profileFetches.shutdownNow();timer?.cancel(true); scheduler.shutdownNow(); geometryWorkers.shutdownNow();imageWorkers.shutdownNow()
         client.dispatcher.cancelAll(); client.connectionPool.evictAll(); client.dispatcher.executorService.shutdown(); synchronized(ready) { ready.clear(); readyBytes=0 }; synchronized(decoded) { decoded.clear() }
-        Thread({downloadJobs.awaitTermination(60,TimeUnit.SECONDS);offlineQueries.awaitTermination(5,TimeUnit.SECONDS);profileJobs.awaitTermination(60,TimeUnit.SECONDS);geometryWorkers.awaitTermination(60,TimeUnit.SECONDS);imageWorkers.awaitTermination(60,TimeUnit.SECONDS);attachmentJobs.awaitTermination(60,TimeUnit.SECONDS);localImages.awaitClosed();transport.awaitClosed();runCatching{overviews.close()};runCatching{offline.close()};runCatching{client.cache?.close()}},"ridgeline-offline-close").start()
+        Thread({downloadJobs.awaitTermination(60,TimeUnit.SECONDS);offlineQueries.awaitTermination(5,TimeUnit.SECONDS);profileJobs.awaitTermination(60,TimeUnit.SECONDS);trackJobs.awaitTermination(60,TimeUnit.SECONDS);geometryWorkers.awaitTermination(60,TimeUnit.SECONDS);imageWorkers.awaitTermination(60,TimeUnit.SECONDS);attachmentJobs.awaitTermination(60,TimeUnit.SECONDS);localImages.awaitClosed();transport.awaitClosed();runCatching{overviews.close()};runCatching{offline.close()};runCatching{client.cache?.close()}},"ridgeline-offline-close").start()
     }
     init{
         runCatching{connectivity?.registerDefaultNetworkCallback(networkCallback)}

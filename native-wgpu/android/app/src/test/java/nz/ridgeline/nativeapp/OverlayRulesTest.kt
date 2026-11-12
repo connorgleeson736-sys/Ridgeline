@@ -31,16 +31,17 @@ class OverlayRulesTest {
     }
     private fun river(name:String,id:Long)=VectorTile.Feature("water_lines",id,2,mapOf("kind" to "river","name" to name),listOf(listOf(VectorTile.Point(.1,.1+id*.01),VectorTile.Point(.4,.1+id*.01))))
     private fun track(name:String,id:Long)=VectorTile.Feature("streets",id,2,mapOf("kind" to "track","track_use" to "foot","name" to name),listOf(listOf(VectorTile.Point(.2,.5+id*.01),VectorTile.Point(.6,.5+id*.01))))
-    @Test fun riverAndTrackNamesComeLaterAndOncePerTile(){
+    @Test fun riverNamesComeLaterAndOncePerTileTrackNamesAtCapacitorZooms(){
         val s=MapSettings.State()
         val rivers=listOf(river("Hooker River",1),river("Hooker River",2),river("Tasman River",3))
         assertTrue("rivers wait for 15.5",names(style.build(rivers,s,15.0,14.0)).isEmpty())
         val shown=style.build(rivers,s,15.6,14.0).labels.map{it.text}
         assertEquals(listOf("Hooker River","Tasman River"),shown.sorted())
         val tracks=listOf(track("Hooker Valley Track",1),track("Local Spur Track",2))
-        assertTrue("no track names before 13.5",names(style.build(tracks,s,13.2,13.0)).isEmpty())
-        assertEquals(setOf("Hooker Valley Track"),names(style.build(tracks,s,14.0,14.0)))
-        assertEquals(setOf("Hooker Valley Track","Local Spur Track"),names(style.build(tracks,s,15.6,14.0)))
+        // As Capacitor: listed Great Walks from tile zoom 12, other named tracks from 14.
+        assertEquals(setOf("Hooker Valley Track"),names(style.build(tracks,s,12.2,12.0)))
+        assertEquals(setOf("Hooker Valley Track"),names(style.build(tracks,s,13.2,13.0)))
+        assertEquals(setOf("Hooker Valley Track","Local Spur Track"),names(style.build(tracks,s,14.0,14.0)))
     }
     @Test fun aRoadSplitIntoPiecesGetsOneNamePerTile(){
         val piece={i:Int->VectorTile.Feature("streets",i.toLong(),2,mapOf("kind" to "primary","hway_num" to 80L,"name" to "Mount Cook Road"),listOf(listOf(VectorTile.Point(.1+i*.1,.5),VectorTile.Point(.15+i*.1,.5))))}

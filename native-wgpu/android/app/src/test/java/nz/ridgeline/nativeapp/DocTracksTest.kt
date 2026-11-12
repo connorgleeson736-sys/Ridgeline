@@ -1,0 +1,57 @@
+package nz.ridgeline.nativeapp
+
+import org.junit.Assert.*
+import org.junit.Test
+
+/** DOC track summary data: response parsing (shapes as DOC's ArcGIS services
+ * return them), line chaining and huts along a track. */
+class DocTracksTest {
+    @Test fun walkPageLinksKeyTheirLine(){
+        assertEquals("c073dc44-e9aa-4c36-9b8a-75cb8365f047",DocTracks.guidOf("https://www.doc.govt.nz/link/c073dc44e9aa4c369b8a75cb8365f047.aspx"))
+        assertNull(DocTracks.guidOf("https://www.doc.govt.nz/parks-and-recreation/"))
+    }
+    @Test fun queriesEscapeNamesAndStayOnDocsOrg(){
+        val url=DocTracks.walkUrl("Mt O'Leary Track",169.1,-44.7)
+        assertTrue(DocTracks.isUrl(url));assertTrue(url.contains("O%27%27Leary"));assertTrue(url.endsWith("f=json"))
+    }
+    @Test fun parsesWalks(){
+        val json="""{"features":[{"attributes":{"name":"Roys Peak Track","introduction":"Views over the lake.","difficulty":"Easy","completionTime":"5-6 hr return","introductionThumbnail":"https://www.doc.govt.nz/thumbs/large/link/07e89eec10bb41ccb52bd0efe8e86659.aspx","walkingAndTrampingWebPage":"https://www.doc.govt.nz/link/c073dc44e9aa4c369b8a75cb8365f047.aspx"},"geometry":{"x":169.0594,"y":-44.6829}},
+            {"attributes":{"name":"Roys Peak Track","introduction":null,"difficulty":"Easy","completionTime":"1 hr","introductionThumbnail":null,"walkingAndTrampingWebPage":"https://www.doc.govt.nz/link/00000000000000000000000000000000.aspx"},"geometry":{"x":172.0,"y":-41.0}}]}"""
+        val walks=DocTracks.parseWalks(json);assertEquals(2,walks.size);assertEquals("",walks[1].introduction)
+        val w=DocTracks.nearestWalk(walks,Coordinate(169.07,-44.67))!!
+        assertEquals("5-6 hr return",w.time);assertEquals("c073dc44-e9aa-4c36-9b8a-75cb8365f047",w.guid)
+        assertTrue(DocTracks.parseWalks("{\"error\":{\"code\":400}}").isEmpty());assertTrue(DocTracks.parseWalks("not json").isEmpty())
+    }
+    @Test fun parsesTrackCharacteristics(){
+        val json="""{"features":[{"attributes":{"TechObjectName":"Roys Peak Track","CharName2":"USER_STATUS","CharValue2":"OPEN","CharName3":"WEB_CATEGORY_TRACK","CharValue3":"Walking track","CharName6":"WEB_DOGS_ALLOWED","CharValue6":"No Dogs","CharName7":"WEB_TRACK_TYPE","CharValue7":"One way","CharName8":"WEB_MTB_DURATION","CharValue8":null,"Shape__Length":6928.4},
+            "geometry":{"paths":[[[169.07,-44.67],[169.06,-44.68],[169.05,-44.69]]]}}]}"""
+        val t=DocTracks.parseTracks(json).single()
+        assertEquals("Walking track",t.category);assertEquals("No Dogs",t.dogs);assertEquals("One way",t.type);assertFalse(t.closed)
+        assertEquals(3,t.paths.single().size);assertEquals("No dogs",DocTracks.tidy(t.dogs))
+    }
+    @Test fun parsesOpenHutsAndJoinsPages(){
+        val json="""{"features":[
+            {"attributes":{"TechObjectName":"Routeburn Flats Hut","SubObjectType":"Great Walk Hut","CharName2":"USER_STATUS","CharValue2":"OPEN","CharName3":"WEB_FACILITIES_HUT","CharValue3":"Cooking","CharName4":"WEB_HUT_BUNKS","CharValue4":"20 each"},"geometry":{"x":168.2,"y":-44.75}},
+            {"attributes":{"TechObjectName":"Old Hut","SubObjectType":"Standard Hut","CharName2":"USER_STATUS","CharValue2":"CLOSED"},"geometry":{"x":168.21,"y":-44.75}}]}"""
+        val huts=DocTracks.parseHuts(json);assertEquals(listOf("Routeburn Flats Hut"),huts.map{it.name});assertEquals("20 each",huts[0].bunks)
+        DocTracks.joinHutPages(huts,"""{"features":[{"attributes":{"name":"routeburn flats hut","bookable":"Yes","staticLink":"https://www.doc.govt.nz/link/abc.aspx"}}]}""")
+        assertTrue(huts[0].bookable);assertEquals("https://www.doc.govt.nz/link/abc.aspx",huts[0].page)
+    }
+    @Test fun chainsPiecesInOrderAndLeavesDistantOnesOut(){
+        val a=listOf(Coordinate(170.0,-44.0),Coordinate(170.01,-44.0))
+        val b=listOf(Coordinate(170.02,-44.0),Coordinate(170.01,-44.0)) // reversed, joins a's end
+        val c=listOf(Coordinate(169.99,-44.0),Coordinate(170.0,-44.0))  // joins a's start
+        val far=listOf(Coordinate(171.0,-44.0),Coordinate(171.01,-44.0))
+        val line=DocTracks.chain(listOf(b,far,a,c),Coordinate(170.005,-44.0))
+        assertEquals(listOf(169.99,170.0,170.01,170.02),line.map{it.longitude})
+        assertTrue(DocTracks.chain(emptyList(),Coordinate(0.0,0.0)).isEmpty())
+    }
+    @Test fun hutsAlongTheTrackInOrder(){
+        val line=(0..10).map{Coordinate(170.0+it*.01,-44.0)}
+        fun hut(name:String,lon:Double,lat:Double)=DocTracks.Hut(name,"Standard Hut","8 each","",Coordinate(lon,lat))
+        val stops=DocTracks.stops(listOf(hut("End",170.099,-44.001),hut("Start",170.001,-44.0005),hut("Far",170.05,-44.05)),line)
+        assertEquals(listOf("Start","End"),stops.map{it.hut.name})
+        assertEquals(DocTracks.length(line),stops[1].along,200.0)
+        val b=DocTracks.bounds(line)!!;assertTrue(b[0]<170.0&&b[2]>170.1&&b[1]< -44.0&&b[3]> -44.0)
+    }
+}

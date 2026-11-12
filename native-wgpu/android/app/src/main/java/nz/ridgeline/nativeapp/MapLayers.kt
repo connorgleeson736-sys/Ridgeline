@@ -115,6 +115,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
             try{
                 val next=projection.getAndSet(null)
                 if(next!=null&&!closed&&active){val start=System.nanoTime();val selection=NativeLabels.place(next.atlas,next.positions,next.width,next.height,next.scale)
+                    placedTracks=trackRects(next,selection)
                     main.post{if(!closed&&active&&projectionRevision.get()==next.revision)view.placeMapLabels(next.atlas,selection)}
                     diagnostics=diagnostics.substringBefore("\nLabel placement:")+"\nLabel placement: ${selection.getInt(0)}/${next.atlas.labels.size} · ${(System.nanoTime()-start)/1_000_000} ms · background"
                 }
@@ -122,6 +123,37 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         }}.onFailure{placementQueued.set(false)}
     }
     fun snapshot()=diagnostics
+    /** Screen boxes (left, top, right, bottom in view pixels) of the track
+     * names last placed, for taps. */
+    private class Placed(val box:FloatArray,val label:TopographyStyle.Label)
+    @Volatile private var placedTracks=emptyList<Placed>()
+    private fun trackRects(p:Projection,selection:ByteBuffer):List<Placed>{
+        val out=ArrayList<Placed>();val b=selection.duplicate().order(ByteOrder.LITTLE_ENDIAN);val n=b.getInt(0)
+        for(k in 0 until n){val i=b.getInt(4+k*12);val ox=b.getFloat(8+k*12);val oy=b.getFloat(12+k*12)
+            val row=p.atlas.labels.getOrNull(i)?:continue
+            if(!row.label.key.startsWith(TopographyStyle.TRACK_LABELS+":")||i*3+1>=p.positions.size)continue
+            val x=p.positions[i*3]+ox*p.scale;val y=p.positions[i*3+1]+oy*p.scale
+            out.add(Placed(floatArrayOf(x,y,x+row.width*p.scale,y+row.height*p.scale),row.label))}
+        return out
+    }
+    /** The track name under a tap (with a finger's margin), nearest first. */
+    fun trackLabelAt(x:Double,y:Double):TopographyStyle.Label?{
+        val margin=10*view.pixelScale
+        return placedTracks.filter{val r=it.box;x>=r[0]-margin&&x<=r[2]+margin&&y>=r[1]-margin&&y<=r[3]+margin}
+            .minByOrNull{val r=it.box;hypot((r[0]+r[2])/2-x,(r[1]+r[3])/2-y)}?.label
+    }
+    /** The map's own pieces of the track named [name] (finest loaded tiles,
+     * clipped to each tile so neighbours do not overlap), in longitude/latitude. */
+    fun trackPaths(name:String,callback:(List<List<Coordinate>>)->Unit){runCatching{worker.execute{
+        val found=HashMap<GpuUploadQueue.Id,List<List<VectorTile.Point>>>()
+        for((id,tile)in tiles){val pieces=tile.features.filter{it.layer=="streets"&&it.properties["kind"]=="track"&&it.properties["name"]==name}.flatMap{it.paths}
+            if(pieces.isNotEmpty())found[id]=pieces}
+        val z=found.keys.maxOfOrNull{it.z}
+        val out=ArrayList<List<Coordinate>>()
+        if(z!=null)for((id,pieces)in found)if(id.z==z)for(piece in pieces)for(part in clip(piece,id.bounds))if(part.size>=2)
+            out.add(part.map{Coordinate(it.x*360-180,CameraMath.latitude(it.y))})
+        main.post{if(!closed)callback(out)}
+    }}.onFailure{callback(emptyList())}}
     fun refresh(){if(closed)return;runCatching{worker.execute{
         if(closed)return@execute
         val state=loader.mapSettings.state

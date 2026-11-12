@@ -1,6 +1,23 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.42 Hunting Areas Base APK — 33.9 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Hunting-Areas-0.1.42-Base.apk)**.
+Latest: **[Download 0.1.43 Track Summary Base APK — 33.9 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Track-Summary-0.1.43-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 44:
+**updates 0.1.13–0.1.42 in place, keeping its data.**
+
+- **Track names as in Capacitor:** Great Walks from zoom 12, other named
+  tracks from zoom 14, repeated along long tracks.
+- **Tap a track name** for its summary from DOC: photo, difficulty and time,
+  distance, ascent, descent, highest point, elevation profile with huts,
+  DOC's introduction, track facts, huts along the way and DOC's page.
+
+229 JVM tests pass; lint 0 errors; native libraries identical to 0.1.42.
+Not run on a phone.
+[Exact release record](../validation/track-summary-2026-11-12/release.json) ·
+[SHA-256](Ridgeline-Native-Track-Summary-0.1.43-Base.apk.sha256).
+
+## Previous 0.1.42 hunting areas checkpoint
+
+**[Download 0.1.42 Hunting Areas Base APK — 33.9 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Hunting-Areas-0.1.42-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 43:
 **updates 0.1.13–0.1.41 in place, keeping its data.**
 

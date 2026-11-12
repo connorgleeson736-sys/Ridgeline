@@ -1,0 +1,29 @@
+{
+  "artifact": "Ridgeline-Native-Track-Summary-0.1.43-Base.apk",
+  "bytes": 33936166,
+  "sha256": "418a6e76bda3f3233f4079410b5cbebec7c81d9bf473693e1420042ca6f7c7fe",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.43-track-summary",
+  "versionCode": 44,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.42 Full Audit (same package and signer)",
+  "changes": [
+    "Track names at Capacitor's zooms: the native-only delays (13.5 for listed Great Walks, 15.5 for other tracks) are gone; the pinned style's own filter applies (listed Great Walks from tile zoom 12, other named foot tracks from tile zoom 14).",
+    "Track names repeat along long tracks: a name at each track's middle per tile plus candidates where the track crosses the zoom's 512 px world grid (at most 24 per name per tile). Keys name each grid line at its coarsest zoom, so names already shown keep their identity as the camera zooms. Placement keeps the style's 650 px symbol-spacing between the same name on screen.",
+    "Tap a track name for a summary sheet (compact over the map; tap or drag to expand, drag down or tap the map to close): DOC photo, name, difficulty and time, Closed badge when DOC marks it closed, distance/ascent/descent/highest, the elevation profile (5 m samples from z17 LINZ elevation, its own job so a route's profile is not cancelled) with huts marked, DOC's introduction, track type and dog access, huts within 350 m in order along the track (type, bunks, bookable, distance; tap for DOC's hut page), and DOC's page. The tapped track is drawn in yellow on the map; the chart cursor marks the map.",
+    "Data is requested live from DOC's ArcGIS Online services (CC BY 4.0) only on a tap: DOC_Walking_Experiences (exact name, nearest within about 35 km), DOC_Tracks_Open_Data (exact name), DOC_WebsiteWalkingandTrampingLns_DTO (the walk's line, keyed by the GUID in DOC's page link), DOC_Huts_Open_Data and DOC_Huts. Geometry falls back to DOC's track pieces, then to the map's own LINZ track pieces from loaded tiles. Responses go through the map transport and are cached for a day.",
+    "Credits: 'Hunting areas, tracks & huts: Department of Conservation · CC BY 4.0' in the map credits; About text and THIRD_PARTY_NOTICES updated."
+  ],
+  "dataChecks": "The app's exact query URLs (printed from DocTracks) return from DOC: Roys Peak Track walk, track asset and its 100-point walk line; four huts and five hut pages for a Routeburn envelope. Real Wanaka LINZ tiles: 7 track names; 36/53/75/119 name candidates at camera zoom 14/15/16/17.",
+  "tests": {
+    "kotlinJvm": "229 tests, 0 failures (new: TrackLabelsTest x7, DocTracksTest x7; OverlayRulesTest updated for Capacitor track-name zooms)",
+    "rust": "unchanged (native libraries byte-identical to 0.1.42)"
+  },
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

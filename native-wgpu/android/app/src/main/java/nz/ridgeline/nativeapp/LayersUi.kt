@@ -169,7 +169,7 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
         parent.addView(NativeUi.button(activity,"Overview imagery ZIPs (${loader.overviews.list().size}/6)"){dismiss();offline.imageryPacks()})
         parent.addView(NativeUi.button(activity,"Loading diagnostics"){offline.diagnostics()})
         parent.addView(NativeUi.button(activity,"About & licences"){
-            val text=NativeUi.text(activity,"Ridgeline Native\nNative map and route planner\n\nLINZ imagery, elevation and topographic data · CC BY 4.0. Esri World Imagery and contributors. Hunting permit areas: Department of Conservation · CC BY 4.0, shown live from DOC; a guide only.\n\nMapLibre adaptation notice:\n"+activity.assets.open("licenses/maplibre-gl-js.txt").bufferedReader().use{it.readText()},12f).apply{setPadding(dp(16),dp(12),dp(16),dp(12));setTextIsSelectable(true)}
+            val text=NativeUi.text(activity,"Ridgeline Native\nNative map and route planner\n\nLINZ imagery, elevation and topographic data · CC BY 4.0. Esri World Imagery and contributors. Hunting permit areas, track summaries and huts: Department of Conservation · CC BY 4.0, shown live from DOC; a guide only.\n\nMapLibre adaptation notice:\n"+activity.assets.open("licenses/maplibre-gl-js.txt").bufferedReader().use{it.readText()},12f).apply{setPadding(dp(16),dp(12),dp(16),dp(12));setTextIsSelectable(true)}
             AlertDialog.Builder(activity).setTitle("About Ridgeline").setView(ScrollView(activity).apply{addView(text)}).setPositiveButton("Close",null).show()
         })
         parent.addView(NativeUi.text(activity,"LINZ topographic data · CC BY 4.0. Mapped tracks and huts are not a condition or availability report.",11f))
