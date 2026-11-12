@@ -129,9 +129,9 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
         check(parent,"Natural imagery colour",state.natural){v->settings.change{it.copy(natural=v)}}
         check(parent,"Soft terrain shading",state.hillshade){v->settings.change{it.copy(hillshade=v)}}
         legend(parent,"Sky colour")
-        val names=arrayOf("Mist","Alpine blue","Clear blue","Warm haze","Slate","Night","Custom colour")
-        val colors=intArrayOf(0xffbdcbd0.toInt(),0xffadc9db.toInt(),0xff88c6fc.toInt(),0xffe8d9c4.toInt(),0xff697b89.toInt(),0xff17242f.toInt())
-        parent.addView(NativeUi.button(activity,names[colors.indexOf(state.sky).takeIf{it>=0}?:6]){
+        val names=arrayOf("Clear sky","Mist","Alpine blue","Clear blue","Warm haze","Slate","Night","Custom colour")
+        val colors=intArrayOf(CLEAR_SKY,0xffbdcbd0.toInt(),0xffadc9db.toInt(),0xff88c6fc.toInt(),0xffe8d9c4.toInt(),0xff697b89.toInt(),0xff17242f.toInt())
+        parent.addView(NativeUi.button(activity,names[colors.indexOf(state.sky).takeIf{it>=0}?:7]){
             AlertDialog.Builder(activity).setTitle("Sky colour").setItems(names){_,i->if(i<colors.size){settings.change{it.copy(sky=colors[i])};render()}else{val input=EditText(activity).apply{setSingleLine();hint="#bdcbd0";setText(String.format("#%06x",state.sky and 0xffffff))};val dialog=AlertDialog.Builder(activity).setTitle("Custom sky colour").setView(input).setPositiveButton("Apply",null).setNegativeButton("Cancel",null).create();dialog.setOnShowListener{dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener{try{val color=Color.parseColor(input.text.toString());settings.change{it.copy(sky=color)};dialog.dismiss();render()}catch(_:Exception){input.error="Enter a colour such as #bdcbd0"}}};dialog.show()}}.show()
         })
         legend(parent,"Terrain relief");slider(parent,"Terrain relief",10,((state.relief-1)*10).toInt(),{String.format(java.util.Locale.ROOT,"%.1f×",1+it/10f)}){v->settings.change{it.copy(relief=1+v/10f)}}

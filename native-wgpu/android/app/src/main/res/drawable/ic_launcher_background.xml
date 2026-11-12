@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Sky behind the kea: the 3D map's clear sky, deep blue above to pale haze at the horizon. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <gradient android:angle="270" android:type="linear"
+        android:startColor="#FF78B5FE" android:centerColor="#FF8FC4FE" android:endColor="#FFD9F2FF"/>
+</shape>

@@ -1,6 +1,22 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.40 Print Grid Base APK — 33.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Print-Grid-0.1.40-Base.apk)**.
+Latest: **[Download 0.1.41 Kea Sky Base APK — 33.9 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Kea-Sky-0.1.41-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 42:
+**updates 0.1.13–0.1.40 in place, keeping its data.**
+
+- **New logo:** the flying kea in a clear sky, as the launcher icon and the
+  top-bar button. Brand files are in [branding](../branding).
+- **Clear sky in 3D:** deep blue overhead fading to pale haze at the horizon.
+  It is the new default; flat colours remain under Layers > Advanced.
+
+211 JVM tests and 51 Rust tests pass; sky and overlay GPU checks pass on
+Vulkan and GLES; lint 0 errors. Not run on a phone.
+[Exact release record](../validation/kea-sky-2026-11-12/release.json) ·
+[SHA-256](Ridgeline-Native-Kea-Sky-0.1.41-Base.apk.sha256).
+
+## Previous 0.1.40 print grid checkpoint
+
+**[Download 0.1.40 Print Grid Base APK — 33.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Print-Grid-0.1.40-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 41:
 **updates 0.1.13–0.1.39 in place, keeping its data.**
 

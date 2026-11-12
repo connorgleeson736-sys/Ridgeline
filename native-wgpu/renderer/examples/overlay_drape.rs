@@ -55,7 +55,8 @@ fn settle(r: &mut Renderer, target: &wgpu::TextureView, center: [f64; 2], pitch:
     }
 }
 fn green(pixels: &[u8]) -> usize {
-    pixels.chunks_exact(4).filter(|p| p[1] > p[0] + 60 && p[1] > p[2] + 60).count()
+    // Widened: bright sky pixels (e.g. 217 + 60) wrapped as bytes and counted as green.
+    pixels.chunks_exact(4).filter(|p| p[1] as u16 > p[0] as u16 + 60 && p[1] as u16 > p[2] as u16 + 60).count()
 }
 async fn scene(instance: &wgpu::Instance, heights: &[f32]) -> (Renderer, wgpu::Texture, [f64; 4]) {
     let mut r = Renderer::new(instance, None, Some(wgpu::TextureFormat::Rgba8Unorm), 256, 256)
