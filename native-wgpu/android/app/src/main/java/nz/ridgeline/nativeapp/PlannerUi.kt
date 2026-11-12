@@ -78,6 +78,8 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
     private var closeAllButton:TextView?=null
     private val combineSelection=linkedMapOf<String,Boolean>()
     var onOffline:()->Unit={}
+    /** A tap on the map while not drawing a route (e.g. hunting area details). */
+    var onIdleTap:(Double,Double)->Unit={_,_->}
     /** Fills the drawer's saved-regions section under the routes (OfflineUi). */
     var savedRegions:(LinearLayout,()->Unit)->Unit={_,_->}
     var onProfilePoint:(Coordinate?)->Unit={}
@@ -184,6 +186,7 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
                     }
                 }
             }
+            else onIdleTap(x,y)
         }
         terrain.onWaypointDragStart={controller.beginDrag(it)}
         terrain.onWaypointDrag={controller.previewDrag(it)}

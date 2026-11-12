@@ -21,3 +21,14 @@ ncei.noaa.gov. The WMM is a product of the US and UK governments and is
 public domain in the United States. It is used to draw the optional magnetic
 grid on exported PDFs; `MagneticModelTest` checks the implementation against
 NOAA's published WMM2025 test values.
+
+## DOC recreational hunting permit areas
+
+The optional "Hunting permit areas" layer is requested live from the
+Department of Conservation's ArcGIS service "DOC Recreational Hunting Areas"
+(item 2142c60984cb4a4887ed189662bec148), licensed CC BY 4.0 and credited to
+the Department of Conservation in the map credits and About text. Only
+permitted areas are requested, as DOC asks for external distribution. Nothing
+is bundled with the app; tiles are cached for a day. DOC makes no warranty of
+accuracy; the app labels the layer a guide only. Two small DOC responses are
+test fixtures in `android/app/src/test/fixtures/hunting/`.

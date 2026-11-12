@@ -18,6 +18,8 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         const val GESTURE_PUBLISH_MILLIS=100L
         /** View selection runs at most this often, never postponed by movement. */
         const val SELECTION_MILLIS=50L
+        /** Hunting permit area outline and name colours (blaze orange). */
+        val HUNTING_LINE=0xF0FF6A13.toInt();val HUNTING_TEXT=0xFFFFA25F.toInt()
         /** Styled zoom bands kept per tile. */
         const val STYLES_PER_TILE=3
         /** Start a request on a fresh consumer. Any refusal releases the consumer
@@ -72,7 +74,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
     // keep loading during gestures. (Previously one tile at a time, none while
     // moving, so tracks could take seconds to appear after stopping.)
     private val leases=ConcurrentHashMap<GpuUploadQueue.Id,TileTransport.Consumer>()
-    private fun releaseAll(){for((id,owned)in leases.entries.toList())if(leases.remove(id,owned))owned.release(true);leaseStarted.clear()}
+    private fun releaseAll(){for((id,owned)in leases.entries.toList())if(leases.remove(id,owned))owned.release(true);leaseStarted.clear();releaseHunting()}
     /** When each outstanding overlay download started (worker thread). */
     private val leaseStarted=ConcurrentHashMap<GpuUploadQueue.Id,Long>()
     private var staleReleases=0L;private var refused=0L
@@ -125,7 +127,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         val state=loader.mapSettings.state
         if(state!=displayState){displayState=state;lastKey=null;schedulePublication()}
         // Overlays off and already cleared: no selection, fetching or publishing.
-        if(current.isEmpty()&&tiles.isEmpty()&&leases.isEmpty()&&mask(state).isEmpty()&&!(state.borders&&state.base==MapSettings.Base.LINZ))return@execute
+        if(current.isEmpty()&&tiles.isEmpty()&&leases.isEmpty()&&mask(state).isEmpty()&&!(state.borders&&state.base==MapSettings.Base.LINZ)&&!state.hunting&&huntingTiles.isEmpty())return@execute
         // Leading-edge throttle (was a 180 ms debounce that every camera frame
         // restarted, so tiles for new ground were not even selected until the
         // finger paused). A pending selection already reads the latest camera.
@@ -138,7 +140,8 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
     private fun update(){
         if(closed||!active||view.width==0||view.height==0)return
         val state=loader.mapSettings.state;val pose=view.planningPose
-        if(mask(state).isEmpty()&&!(state.borders&&state.base==MapSettings.Base.LINZ&&pose.zoom>=8)){releaseAll();current=emptyList();tiles.clear();lastKey=null;schedulePublication();return}
+        val hunting=state.hunting&&pose.zoom>=HuntingAreas.MIN_ZOOM
+        if(mask(state).isEmpty()&&!(state.borders&&state.base==MapSettings.Base.LINZ&&pose.zoom>=8)&&!hunting){releaseAll();current=emptyList();tiles.clear();huntingWanted=emptyList();lastKey=null;schedulePublication();return}
         val flat=if(!state.threeD)FlatSelection.plan((view.width/view.pixelScale).roundToInt(),(view.height/view.pixelScale).roundToInt(),pose,512.0,24,VECTOR_MAX_ZOOM)else null
         val wanted=if(flat!=null)flat.map{GpuUploadQueue.Id(it.z,it.x,it.y)}else{
             plan.rewind();val focus=view.surfaceFocusFor(pose)
@@ -147,9 +150,54 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         }
         if(current.toSet()!=wanted.toSet()){current=wanted;trimTiles(wanted.toSet()+LayerCover.display(wanted,tiles.keys).map{it.source});retry.keys.retainAll(wanted.toSet());for((id,owned)in leases.entries.toList())if(id !in wanted&&leases.remove(id,owned))owned.release(true);lastKey=null}
         current=wanted
-        if(mask(state).isEmpty()){releaseAll();tiles.clear()}
+        if(mask(state).isEmpty()){for((id,owned)in leases.entries.toList())if(leases.remove(id,owned))owned.release(true);leaseStarted.clear();tiles.clear()}
+        updateHunting(if(hunting)HuntingAreas.dataZoom(pose.zoom)else -1,wanted)
         schedulePublication();pump()
     }
+    // ---- DOC hunting permit areas: served live by DOC (HuntingAreas), one
+    // query per data tile, cached by the map transport like other tiles. ----
+    private val huntingTiles=object:LinkedHashMap<GpuUploadQueue.Id,List<HuntingAreas.Area>>(16,.75f,true){override fun removeEldestEntry(e:MutableMap.MutableEntry<GpuUploadQueue.Id,List<HuntingAreas.Area>>)=size>48}
+    private val huntingLeases=HashMap<GpuUploadQueue.Id,TileTransport.Consumer>()
+    private val huntingRetry=HashMap<GpuUploadQueue.Id,Long>()
+    private var huntingWanted=emptyList<GpuUploadQueue.Id>()
+    private val huntingGroups=HashMap<GpuUploadQueue.Id,LineGroup>()
+    private var huntingRevision=0L;private var huntingFailures=0L
+    private fun releaseHunting(){for((_,owned)in huntingLeases)owned.release(true);huntingLeases.clear()}
+    /** The data tiles (at [dataZoom], or none) covering the visible [view] tiles. */
+    private fun updateHunting(dataZoom:Int,view:List<GpuUploadQueue.Id>){
+        val wanted=if(dataZoom<0)emptyList() else view.flatMap{id->
+            if(id.z>=dataZoom)listOf(GpuUploadQueue.Id(dataZoom,id.x shr(id.z-dataZoom),id.y shr(id.z-dataZoom)))
+            else{val f=1 shl(dataZoom-id.z);buildList{for(dy in 0 until f)for(dx in 0 until f)add(GpuUploadQueue.Id(dataZoom,id.x*f+dx,id.y*f+dy))}}
+        }.distinct().take(32)
+        if(wanted!=huntingWanted){huntingWanted=wanted;lastKey=null
+            for((id,owned)in huntingLeases.entries.toList())if(id !in wanted){huntingLeases.remove(id);owned.release(true)}}
+        pumpHunting()
+    }
+    private fun pumpHunting(){
+        if(closed||!active)return
+        val now=System.currentTimeMillis()
+        for((rank,id)in huntingWanted.withIndex()){
+            if(huntingLeases.size>=3)break
+            if(id in huntingTiles||id in huntingLeases||(huntingRetry[id]?:0)>now)continue
+            val owned=loader.layerConsumer(8+rank)
+            val body=startLeased(owned){loader.layerBody(owned,HuntingAreas.url(id.z,id.x,id.y))}?:run{huntingRetry[id]=now+REFUSED_RETRY_MILLIS;null}?:continue
+            huntingLeases[id]=owned
+            body.whenComplete{result,error->runCatching{worker.execute{
+                if(huntingLeases[id]!==owned){owned.close();return@execute};huntingLeases.remove(id);owned.close()
+                if(error==null&&result!=null&&result.status in 200..299){
+                    try{huntingTiles[id]=HuntingAreas.decode(result.bytes);huntingRevision++;lastKey=null;schedulePublication()}
+                    catch(_:Exception){huntingFailures++;huntingRetry[id]=System.currentTimeMillis()+60_000}
+                }else{huntingFailures++;huntingRetry[id]=System.currentTimeMillis()+30_000}
+                pumpHunting()
+            }}}
+        }
+    }
+    /** Areas containing a place (from the tiles loaded), for the tap details. */
+    fun huntingAt(longitude:Double,latitude:Double,callback:(List<HuntingAreas.Area>)->Unit){runCatching{worker.execute{
+        val x=(longitude+180)/360;val y=CameraMath.mercatorY(latitude)
+        val found=huntingTiles.values.asSequence().flatten().filter{it.contains(x,y)}.distinctBy{it.id}.sortedBy{it.hectares}.toList()
+        main.post{if(!closed)callback(found)}
+    }}}
     private fun pump(){
         if(closed||!active||mask(loader.mapSettings.state).isEmpty())return
         val now=System.currentTimeMillis()
@@ -188,7 +236,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         lastPublishAt=now
         val state=loader.mapSettings.state;val pose=view.planningPose;val zoom=floor(pose.zoom*4)/4
         val ordered=current.sortedWith(compareBy<GpuUploadQueue.Id>{it.z}.thenBy{it.x}.thenBy{it.y})
-        val key=listOf(state,ordered,tiles.mapValues{it.value.body.stamp?.fingerprint?:it.value.body.bytes.hashCode()},zoom)
+        val key=listOf(state,ordered,tiles.mapValues{it.value.body.stamp?.fingerprint?:it.value.body.bytes.hashCode()},zoom,huntingRevision,huntingWanted)
         if(key==lastKey)return;lastKey=key
         // Like MapLibre's buckets: each source tile is decoded, styled, clipped and
         // packed once per styling; a publication only concatenates cached groups,
@@ -221,6 +269,19 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
                 if(zoom>=11)for(clipped in fragments)if(clipped.size>1){val p=clipped[clipped.size/2];labels.add(TopographyStyle.Label(p,"LINZ imagery | Esri World Imagery",10f,0xffdddddd.toInt(),85.0,key="boundary:${p.x}:${p.y}"))}
             }
         }else borderGroups.clear()
+        // Hunting permit areas: dashed blaze-orange outlines, names when closer.
+        if(state.hunting&&zoom>=HuntingAreas.MIN_ZOOM){
+            huntingGroups.keys.retainAll(huntingWanted.toSet());val named=HashSet<Long>()
+            for(id in huntingWanted){val areas=huntingTiles[id]?:continue
+                groups.add(huntingGroups.getOrPut(id){
+                    val b=id.bounds;val lines=ArrayList<TopographyStyle.Line>()
+                    for(area in areas)for(ring in area.rings)for(part in clip(ring,b))if(part.size>=2)lines.add(TopographyStyle.Line(part,HUNTING_LINE,2.2f,7f,4f))
+                    group(id.z+128,id.x,id.y,b,lines)
+                })
+                if(zoom>=HuntingAreas.NAME_ZOOM)for(area in areas)if(area.name.isNotBlank()&&named.add(area.id))area.anchor?.let{p->
+                    labels.add(TopographyStyle.Label(p,area.name,11f,HUNTING_TEXT,140.0,key=style.labelKey("hunting",area.name,p)))}
+            }
+        }else huntingGroups.clear()
         // A camera-dependent atlas order repainted/reuploaded the same strings on pans.
         // Fixed priority/key order keeps atlas slots stable; screen placement still follows camera.
         val chosen=labels.distinctBy{it.key}.sortedWith(compareBy<TopographyStyle.Label>{it.priority}.thenBy{it.key}).take(512)
@@ -228,7 +289,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         lastBuildMs=(System.nanoTime()-start)/1_000_000
         if(chosen!=lastLabels){val a=System.nanoTime();atlas=NativeLabels.atlas(chosen,view.context.assets);lastLabels=chosen;lastAtlasMs=(System.nanoTime()-a)/1_000_000}
         val batch=NativeLayerBatch(lastGroups,atlas)
-        diagnostics="Topography tiles: ${tiles.size} prepared (${current.count{it in tiles}}/${current.size} in view) · downloading ${leases.size}/$PARALLEL_TILES · oldest ${leaseStarted.values.minOrNull()?.let{(System.currentTimeMillis()-it)/1000}?:0} s · stale releases $staleReleases · refused $refused · decoded $decoded\nVector decode: $lastDecodeMs ms · layer build: $lastBuildMs ms · font atlas: $lastAtlasMs ms\nLine groups: ${groups.size} · lines ${groups.sumOf{it.lines}} · label candidates ${atlas.labels.size} · atlas ${atlas.width}×${atlas.height}"
+        diagnostics="Topography tiles: ${tiles.size} prepared (${current.count{it in tiles}}/${current.size} in view) · downloading ${leases.size}/$PARALLEL_TILES · oldest ${leaseStarted.values.minOrNull()?.let{(System.currentTimeMillis()-it)/1000}?:0} s · stale releases $staleReleases · refused $refused · decoded $decoded · hunting ${huntingTiles.size}/${huntingWanted.size} tiles, ${huntingLeases.size} loading, $huntingFailures failed\nVector decode: $lastDecodeMs ms · layer build: $lastBuildMs ms · font atlas: $lastAtlasMs ms\nLine groups: ${groups.size} · lines ${groups.sumOf{it.lines}} · label candidates ${atlas.labels.size} · atlas ${atlas.width}×${atlas.height}"
         main.post{if(!closed)view.mapLayers(batch)}
     }
     private fun readBoundary():List<List<VectorTile.Point>>{

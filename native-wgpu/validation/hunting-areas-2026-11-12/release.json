@@ -1,0 +1,29 @@
+{
+  "artifact": "Ridgeline-Native-Hunting-Areas-0.1.42-Base.apk",
+  "bytes": 33903398,
+  "sha256": "8fd1eb6e8a135c38a5e598c739a98084b938be4e4e52f787a047825eaf06ba2f",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.42-hunting-areas",
+  "versionCode": 43,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.41 Full Audit (same package and signer)",
+  "changes": [
+    "Layers > Topographic overlays: 'Hunting permit areas' checkbox (off by default) with a dashed blaze-orange key.",
+    "Served live from DOC, nothing bundled: each data tile (zoom 8, 11 or 13 by camera zoom) is one query to DOC's ArcGIS service 'DOC Recreational Hunting Areas' (item 2142c60984cb4a4887ed189662bec148) in tile mode, PBF, generalised to 1/1024 of the tile width; only HuntStatus = 'Permitted' (DOC asks that external distribution be of permitted areas only). Typically 2-30 KB per tile. Requests go through the map transport and HTTP cache; DOC's 30 s cache lifetime is extended to a day for these tiles only.",
+    "Drawn with the existing overlay pipeline (draped on 3D terrain, in PDFs only via the map tiles they are not): dashed blaze-orange outlines from zoom 7, area names from zoom 11.",
+    "Tap inside an area (when not drawing a route): its name, type, permit area, size and a link to DOC's permit and conditions page, with DOC's caveat (guide only, not legal boundaries, a DOC permit is needed). Overlapping areas (e.g. a roar block inside a permit area) are all listed.",
+    "Credit: 'Hunting permit areas: Department of Conservation · CC BY 4.0' in the map credits and About text; THIRD_PARTY_NOTICES updated."
+  ],
+  "dataChecks": "Decoder checked against DOC's full-detail GeoJSON: decoded vertices within about 6 m of DOC's outline at a 9.6 m generalisation; the app's exact request URL returns HTTP 200 application/x-protobuf from DOC.",
+  "tests": {
+    "kotlinJvm": "215 tests, 0 failures (new: HuntingAreasTest x4 on real DOC tile responses)",
+    "rust": "unchanged (native libraries byte-identical to 0.1.41)"
+  },
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

@@ -41,7 +41,8 @@ class MainActivity:Activity(){
         val attribution=TextView(this).apply{
             text=Html.fromHtml(
                 "<a href=\"https://www.linz.govt.nz/data/linz-data/linz-basemaps/data-attribution\">LINZ imagery, elevation &amp; topography · CC BY 4.0 &amp; contributors</a><br>"+
-                "Imagery gaps: <a href=\"https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9\">Esri World Imagery &amp; contributors</a>",
+                "Imagery gaps: <a href=\"https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9\">Esri World Imagery &amp; contributors</a><br>"+
+                "Hunting permit areas: <a href=\"https://www.doc.govt.nz/parks-and-recreation/things-to-do/hunting/\">Department of Conservation · CC BY 4.0</a>",
                 Html.FROM_HTML_MODE_LEGACY)
             textSize=10f;movementMethod=LinkMovementMethod.getInstance()
             setTextColor(Color.rgb(40,55,48));setLinkTextColor(Color.rgb(40,55,48))
@@ -62,6 +63,8 @@ class MainActivity:Activity(){
         offlineUi=OfflineUi(this,root,terrain,loader,false).also{it.routes=planner.controller}
         planner.onOffline={layersUi.dismiss();offlineUi.startRegion()}
         planner.savedRegions={list,close->offlineUi.fillSavedRegions(list,close)}
+        // Tap inside a hunting permit area for its details.
+        planner.onIdleTap={x,y->if(loader.mapSettings.state.hunting)terrain.pick(x,y){hit->if(hit!=null)mapLayers.huntingAt(hit[0],hit[1]){areas->HuntingDetails.show(this,areas)}}}
         planner.onProfilePoint={terrain.inspect(it)}
         layersUi=LayersUi(this,root,terrain,loader,offlineUi){planner.newRoute()}
         location=LocationUi(this,mapHost,terrain,false)
