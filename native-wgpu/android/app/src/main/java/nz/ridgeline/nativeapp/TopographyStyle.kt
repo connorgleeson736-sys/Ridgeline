@@ -13,18 +13,44 @@ internal class TopographyStyle(json:String){
         val spacing:Float=0f)
     data class Output(val lines:List<Line>,val labels:List<Label>)
     private val specs=JSONArray(json).let{rows->List(rows.length()){rows.getJSONObject(it)}}.onEach{spec->
-        // Performance: river and track names start later than in Capacitor
-        // (1.5 zooms for rivers, major tracks and lake-river polygons).
+        // Performance: river names start later than in Capacitor (1.5 zooms for
+        // rivers, 1.5 for lake-river polygons). Track names follow Capacitor.
         LATER_NAMES[spec.optString("id")]?.let{spec.put("minzoom",it)}
     }
     companion object{
         /** Label identity grid in world units (2^22 cells, ~10 m at the equator). */
         const val LABEL_GRID=4_194_304.0
-        val LATER_NAMES=mapOf("nz-rivers" to 15.5,"nz-river-polygons" to 14.5,"nz-tracks-label" to 13.5)
-        /** Minor (unlisted) track names need this camera zoom. */
-        const val MINOR_TRACK_NAMES=15.5
-        /** Line-placed river and track names: one label per name per tile. */
-        val ONE_PER_NAME=setOf("nz-rivers","nz-river-polygons","nz-tracks-label")
+        val LATER_NAMES=mapOf("nz-rivers" to 15.5,"nz-river-polygons" to 14.5)
+        /** Line-placed river names: one label per name per tile. */
+        val ONE_PER_NAME=setOf("nz-rivers","nz-river-polygons")
+        /** Track names repeat along the track (MapLibre's symbol-spacing). */
+        const val TRACK_LABELS="nz-tracks-label"
+        /** At most this many candidates per track name per tile. */
+        const val MAX_REPEATS=24
+        /** Grid for the across-line coordinate in repeat keys (~0.9 km in NZ). */
+        private const val CROSS_GRID=32_768.0
+        /** Where [path] crosses the world grid lines of zoom [g] (cells of 512
+         * px at camera zoom g), with a key that names the line at its coarsest
+         * zoom. Crossings of zoom g's lines are also crossings at g+1, with the
+         * same key, so zooming in only adds names and those already placed keep
+         * their identity (no reloading) whichever source tile they come from. */
+        fun crossings(path:List<VectorTile.Point>,g:Int,limit:Int=MAX_REPEATS):List<Pair<VectorTile.Point,String>>{
+            val n=(1L shl g.coerceIn(0,30)).toDouble();val out=ArrayList<Pair<VectorTile.Point,String>>()
+            fun line(k:Long):String{var kk=k;var gg=g;while(gg>0&&kk%2==0L){kk/=2;gg--};return "$gg/$kk"}
+            for(i in 1 until path.size){val a=path[i-1];val b=path[i]
+                for(vertical in booleanArrayOf(true,false)){
+                    val a0=if(vertical)a.x else a.y;val b0=if(vertical)b.x else b.y
+                    val ka=floor(a0*n).toLong();val kb=floor(b0*n).toLong();if(ka==kb)continue
+                    for(k in min(ka,kb)+1..max(ka,kb)){
+                        val t=(k/n-a0)/(b0-a0);val p=VectorTile.Point(a.x+(b.x-a.x)*t,a.y+(b.y-a.y)*t)
+                        val across=floor((if(vertical)p.y else p.x)*CROSS_GRID).toLong()
+                        out.add(p to "${if(vertical)"v" else "h"}${line(k)}:$across")
+                        if(out.size>=limit)return out
+                    }
+                }
+            }
+            return out
+        }
     }
     private fun truth(value:Any?):Boolean=when(value){null,JSONObject.NULL->false;is Boolean->value;is Number->value.toDouble()!=0.0;is String->value.isNotEmpty();else->true}
     private fun number(value:Any?,fallback:Double=0.0)=(value as? Number)?.toDouble()?:value?.toString()?.toDoubleOrNull()?:fallback
@@ -65,6 +91,9 @@ internal class TopographyStyle(json:String){
     internal fun labelKey(layer:String,text:String,point:VectorTile.Point)="$layer:$text:${floor(point.x*LABEL_GRID).toLong()}:${floor(point.y*LABEL_GRID).toLong()}"
     fun build(features:List<VectorTile.Feature>,state:MapSettings.State,zoom:Double,tileZoom:Double=floor(zoom)):Output{
         val lines=ArrayList<Line>();val labels=ArrayList<Label>();val grouped=features.groupBy{it.layer};val named=HashSet<String>()
+        // Track names: one at the middle of each named track per tile (kept at
+        // every camera zoom), plus candidates where it crosses the grid.
+        val repeats=HashMap<String,Int>();val single=LinkedHashMap<String,Label>()
         for((order,spec) in specs.withIndex()){val id=spec.getString("id");val group=group(id)
             if(!state.enabled(group)||zoom<spec.optDouble("minzoom",0.0)||zoom>=spec.optDouble("maxzoom",30.0))continue
             val kind=spec.getString("type");val paint=spec.getJSONObject("paint");val layout=spec.optJSONObject("layout")?:JSONObject()
@@ -80,20 +109,32 @@ internal class TopographyStyle(json:String){
                     val text=if(kind=="circle")""else eval(layout.opt("text-field"),f.properties,zoom)?.toString()?.replace("\\n","\n")?.trim().orEmpty()
                     if(kind!="circle"&&text.isBlank())continue
                     val size=if(kind=="circle")number(paint.opt("circle-radius"),4.0).toFloat()else number(eval(layout.opt("text-size")?:12,f.properties,zoom),12.0).toFloat()
-                    // Minor track names (11 px in the style; named major tracks are 12 px) wait longer.
-                    if(id=="nz-tracks-label"&&size<12f&&zoom<MINOR_TRACK_NAMES)continue
-                    // Line labels: one candidate per name per tile, however many
-                    // pieces the road or river is split into.
                     val spacing=if(layout.optString("symbol-placement")=="line")layout.optDouble("symbol-spacing",250.0).toFloat()else 0f
-                    if((id in ONE_PER_NAME||spacing>0f)&&!named.add(id+"\u0000"+text))continue
-                    val point=(if(f.type==3)polygonAnchor(f.paths)else anchor(path))?:continue
                     val c=color(eval(paint.opt(if(kind=="circle")"circle-color"else"text-color"),f.properties,zoom))
                     val priority=number(eval(layout.opt("symbol-sort-key")?:100,f.properties,zoom),100.0)
                     val bold=layout.optJSONArray("text-font")?.toString()?.contains("Bold")==true
+                    if(id==TRACK_LABELS&&f.type!=3){
+                        for(p in f.paths){if(repeats.getOrDefault(text,0)>=MAX_REPEATS)break
+                            for((point,where) in crossings(p,floor(zoom).toInt(),MAX_REPEATS-repeats.getOrDefault(text,0))){
+                                if(!named.add(id+"\u0000"+text+"\u0000"+where))continue
+                                labels.add(Label(point,text.take(256),size,c,priority,bold,false,"$id:$text:$where",layout.optString("text-anchor","center"),false,spacing))
+                                repeats[text]=repeats.getOrDefault(text,0)+1
+                            }
+                        }
+                        if(text !in single)anchor(path)?.let{point->
+                            single[text]=Label(point,text.take(256),size,c,priority,bold,false,labelKey(id,text,point),layout.optString("text-anchor","center"),false,spacing)}
+                        continue
+                    }
+                    // Line labels: one candidate per name per tile, however many
+                    // pieces the road or river is split into.
+                    if((id in ONE_PER_NAME||spacing>0f)&&!named.add(id+"\u0000"+text))continue
+                    val point=(if(f.type==3)polygonAnchor(f.paths)else anchor(path))?:continue
                     labels.add(Label(point,text.take(256),size,c,priority,bold,kind=="circle",labelKey(id,text,point),layout.optString("text-anchor","center"),layout.has("text-variable-anchor"),spacing))
                 }
             }
-        };return Output(lines,labels)
+        }
+        labels.addAll(single.values)
+        return Output(lines,labels)
     }
     private fun polygonAnchor(paths:List<List<VectorTile.Point>>):VectorTile.Point?{
         val all=paths.flatten();if(all.isEmpty())return null

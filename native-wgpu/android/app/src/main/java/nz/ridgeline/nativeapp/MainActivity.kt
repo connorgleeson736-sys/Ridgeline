@@ -16,6 +16,7 @@ class MainActivity:Activity(){
     private lateinit var terrain:TerrainView
     private lateinit var loader:TileLoader
     private lateinit var planner:PlannerUi
+    private lateinit var trackSheet:TrackSheet
     private lateinit var location:LocationUi
     private lateinit var offlineUi:OfflineUi
     private lateinit var layersUi:LayersUi
@@ -42,7 +43,7 @@ class MainActivity:Activity(){
             text=Html.fromHtml(
                 "<a href=\"https://www.linz.govt.nz/data/linz-data/linz-basemaps/data-attribution\">LINZ imagery, elevation &amp; topography · CC BY 4.0 &amp; contributors</a><br>"+
                 "Imagery gaps: <a href=\"https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9\">Esri World Imagery &amp; contributors</a><br>"+
-                "Hunting permit areas: <a href=\"https://www.doc.govt.nz/parks-and-recreation/things-to-do/hunting/\">Department of Conservation · CC BY 4.0</a>",
+                "Hunting areas, tracks &amp; huts: <a href=\"https://www.doc.govt.nz/about-us/our-policies-and-profile/copyright/\">Department of Conservation · CC BY 4.0</a>",
                 Html.FROM_HTML_MODE_LEGACY)
             textSize=10f;movementMethod=LinkMovementMethod.getInstance()
             setTextColor(Color.rgb(40,55,48));setLinkTextColor(Color.rgb(40,55,48))
@@ -63,8 +64,17 @@ class MainActivity:Activity(){
         offlineUi=OfflineUi(this,root,terrain,loader,false).also{it.routes=planner.controller}
         planner.onOffline={layersUi.dismiss();offlineUi.startRegion()}
         planner.savedRegions={list,close->offlineUi.fillSavedRegions(list,close)}
-        // Tap inside a hunting permit area for its details.
-        planner.onIdleTap={x,y->if(loader.mapSettings.state.hunting)terrain.pick(x,y){hit->if(hit!=null)mapLayers.huntingAt(hit[0],hit[1]){areas->HuntingDetails.show(this,areas)}}}
+        // Tap a track name for its summary; tap inside a hunting permit area for its details.
+        trackSheet=TrackSheet(this,root,loader)
+        trackSheet.onLine={planner.highlightTrack(it)}
+        trackSheet.onPoint={terrain.inspect(it)}
+        trackSheet.mapPaths={name,callback->mapLayers.trackPaths(name,callback)}
+        planner.onIdleTap={x,y->
+            val track=mapLayers.trackLabelAt(x,y)
+            if(track!=null)trackSheet.show(track.text.removeSuffix(" (mapped closed)"),Coordinate(track.point.x*360-180,CameraMath.latitude(track.point.y)))
+            else if(trackSheet.visible)trackSheet.hide()
+            else if(loader.mapSettings.state.hunting)terrain.pick(x,y){hit->if(hit!=null)mapLayers.huntingAt(hit[0],hit[1]){areas->HuntingDetails.show(this,areas)}}
+        }
         planner.onProfilePoint={terrain.inspect(it)}
         layersUi=LayersUi(this,root,terrain,loader,offlineUi){planner.newRoute()}
         location=LocationUi(this,mapHost,terrain,false)
@@ -107,7 +117,7 @@ class MainActivity:Activity(){
         if(!loader.mapSettings.state.threeD)terrain.dimension(false)
         if(loader.mapSettings.state.base==MapSettings.Base.TOPO)terrain.maxZoom=16.0
         terrain.configure(loader.mapSettings.state)
-        if(android.os.Build.VERSION.SDK_INT>=33)onBackInvokedDispatcher.registerOnBackInvokedCallback(android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT){if(!layersUi.dismiss()&&!offlineUi.back()&&!planner.back())finish()}
+        if(android.os.Build.VERSION.SDK_INT>=33)onBackInvokedDispatcher.registerOnBackInvokedCallback(android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT){if(!layersUi.dismiss()&&!trackSheet.back()&&!offlineUi.back()&&!planner.back())finish()}
     }
     override fun dispatchTouchEvent(event:android.view.MotionEvent):Boolean{
         if(event.actionMasked==android.view.MotionEvent.ACTION_DOWN&&::layersUi.isInitialized)layersUi.touchDown(event.rawX,event.rawY)
@@ -117,7 +127,7 @@ class MainActivity:Activity(){
     @Deprecated("Legacy Android back dispatch")
     // API 33+ uses the OnBackInvokedDispatcher registered in onCreate above.
     @android.annotation.SuppressLint("GestureBackNavigation")
-    override fun onBackPressed(){if((!::layersUi.isInitialized||!layersUi.dismiss())&&(!::offlineUi.isInitialized||!offlineUi.back())&&(!::planner.isInitialized||!planner.back()))super.onBackPressed()}
+    override fun onBackPressed(){if((!::layersUi.isInitialized||!layersUi.dismiss())&&(!::trackSheet.isInitialized||!trackSheet.back())&&(!::offlineUi.isInitialized||!offlineUi.back())&&(!::planner.isInitialized||!planner.back()))super.onBackPressed()}
     override fun onRequestPermissionsResult(request:Int,permissions:Array<out String>,grants:IntArray){super.onRequestPermissionsResult(request,permissions,grants);if(::location.isInitialized&&grants.any{it==android.content.pm.PackageManager.PERMISSION_GRANTED})location.permission(request)}
     override fun onActivityResult(request:Int,result:Int,data:android.content.Intent?){super.onActivityResult(request,result,data);if(::planner.isInitialized)planner.result(request,result,data);if(::offlineUi.isInitialized)offlineUi.result(request,result,data)}
     override fun onPause(){if(::mapLayers.isInitialized)mapLayers.setActive(false);if(::location.isInitialized)location.stop();if(::planner.isInitialized)planner.pause();if(::terrain.isInitialized)terrain.setActive(false);if(::loader.isInitialized)loader.setActive(false);super.onPause()}
@@ -127,5 +137,5 @@ class MainActivity:Activity(){
             if(::loader.isInitialized)loader.memoryPressure();if(::terrain.isInitialized)terrain.memoryPressure()
         }
     }
-    override fun onDestroy(){if(::mapLayers.isInitialized)mapLayers.close();if(::planner.isInitialized)planner.close();if(::loader.isInitialized)loader.close();if(::terrain.isInitialized)terrain.close();super.onDestroy()}
+    override fun onDestroy(){if(::trackSheet.isInitialized)trackSheet.close();if(::mapLayers.isInitialized)mapLayers.close();if(::planner.isInitialized)planner.close();if(::loader.isInitialized)loader.close();if(::terrain.isInitialized)terrain.close();super.onDestroy()}
 }

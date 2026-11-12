@@ -272,8 +272,13 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
             if(points!=null)paths.add(Triple(points,Color.argb(230,81,137,153),-1))
             else if(loading.add(key))controller.loadOther(key){route->loading.remove(key);if(!closed&&route!=null&&key in controller.state.opened){passive[key]=route.points;syncRoutes();if(fitOpenedPending)fitOpened()}}
         }
+        trackLine?.let{paths.add(Triple(it,trackColor,-1))}
         if(paths!=lastPaths){lastPaths=paths;terrain.routes(paths)}
     }
+    /** A tapped DOC track drawn over the map while its summary is open. */
+    private var trackLine:List<Coordinate>?=null
+    private val trackColor=Color.rgb(255,201,74)
+    fun highlightTrack(points:List<Coordinate>?){if(trackLine==points)return;trackLine=points?.takeIf{it.size>=2};syncRoutes()}
     fun showRoutes(){
         if(drawer!=null){dismissDrawer();return}
         val overlay=FrameLayout(activity);overlay.addView(View(activity).apply{setBackgroundColor(Color.argb(40,16,40,35));setOnClickListener{dismissDrawer()}},FrameLayout.LayoutParams(-1,-1))

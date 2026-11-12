@@ -72,6 +72,8 @@ class ElevationProfileView(context:Context):View(context){
     private val bottom get()=max(top+1,height-30*density)
     /** Shown in place of the chart while there is no elevation to draw. */
     var message="Elevation will appear here";set(value){if(field!=value){field=value;dirty=true;invalidate()}}
+    /** Distances of huts along the line, drawn as small hut marks on the profile. */
+    var markers:List<Double> = emptyList();set(value){if(field!=value){field=value;dirty=true;invalidate()}}
     var onInspect:(NativeGeo.ProfilePoint,Boolean)->Unit={_,_->}
     var onRange:(NativeGeo.Section?)->Unit={}
     var onLeave:()->Unit={}
@@ -119,6 +121,11 @@ class ElevationProfileView(context:Context):View(context){
         paint.color=Color.rgb(167,178,168);canvas.drawLine(left,bottom,right,bottom,paint);canvas.drawLine(left,top,left,bottom,paint)
         paint.style=Paint.Style.FILL;paint.color=0x22e87944;canvas.drawPath(fill,paint)
         paint.style=Paint.Style.STROKE;paint.strokeWidth=2*density;paint.color=Color.rgb(186,99,53);paint.strokeJoin=Paint.Join.ROUND;canvas.drawPath(path,paint)
+        for(d in markers){val p=NativeGeo.profileAt(samples,d)?:continue;val h=p.height?:continue
+            val mx=x(d);val my=y(h)-7*density;val r=4.5f*density
+            val hut=Path().apply{moveTo(mx-r,my);lineTo(mx,my-r);lineTo(mx+r,my);lineTo(mx+r*.75f,my);lineTo(mx+r*.75f,my+r);lineTo(mx-r*.75f,my+r);lineTo(mx-r*.75f,my);close()}
+            paint.style=Paint.Style.FILL;paint.color=NativeUi.ink;canvas.drawPath(hut,paint)
+            paint.style=Paint.Style.STROKE;paint.strokeWidth=density;paint.color=NativeUi.paper;canvas.drawPath(hut,paint)}
         // The selected-section fill, cut to the range at draw time.
         val h=highlight?.takeIf{it.width==width&&it.height==height}?:Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888).also{highlight?.recycle();highlight=it}
         h.eraseColor(Color.TRANSPARENT);paint.style=Paint.Style.FILL;paint.color=0x52587d62;Canvas(h).drawPath(fill,paint)
