@@ -1,0 +1,27 @@
+{
+  "artifact": "Ridgeline-Native-DOC-Descriptions-0.1.45-Base.apk",
+  "bytes": 33952550,
+  "sha256": "daecbae98bdcef6efa393c86b969b47583345180b663dd0f83b88cd7e3939835",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.45-doc-descriptions",
+  "versionCode": 46,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.44 Full Audit (same package and signer)",
+  "changes": [
+    "DOC walks found by place when names differ: if no DOC walk has the tapped track's name, the app asks DOC for walk lines (DOC_WebsiteWalkingandTrampingLns_DTO, generalised to ~10 m) crossing the track's bounds, samples the map's track line every ~50 m and picks the walk line within 120 m of the largest share of it (at least half the track or 1 km; near-equal shares go to the shorter walk), then the walk whose page link carries that line's id. The walk's name is shown above its introduction when it differs from the track's.",
+    "Full DOC descriptions: the walk's doc.govt.nz page is read (text blocks only) into collapsible sections as DOC titles them: Description, Getting there, Know before you go, with DOC's subheadings, paragraphs and bullets. Loaded after the rest of the summary; photos, videos and hut tiles on the page are not used (some gallery photos are 'DOC use only'). DOC pages and redirects are cached for a day.",
+    "Measured (from a cloud server): DOC page about 0.7-1.2 s and 23 KB compressed; place matching two queries of about 0.45-0.5 s each."
+  ],
+  "dataChecks": "Rabbit Pass Route (map name; 11 LINZ tiles, 16.5 km followed) matches DOC's 'Wilkin Valley - East Matukituki Traverse' line (276d1bde-...), whose id finds the walk (Expert, 7 - 10 hr). Roys Peak Track and the traverse pages parse into Description/Getting there/Know before you go with the expected text.",
+  "tests": {
+    "kotlinJvm": "237 tests, 0 failures (new: DocMatchingTest x5 on real fixtures in src/test/fixtures/rabbit and docpages)",
+    "rust": "unchanged (native libraries byte-identical to 0.1.44)"
+  },
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

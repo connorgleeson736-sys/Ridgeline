@@ -51,6 +51,11 @@ internal object DocTracks {
     private fun anyOf(field:String,name:String)="UPPER($field) IN (${names(name).joinToString(","){quote(it.uppercase(java.util.Locale.ROOT))}})"
     fun walkUrl(name:String,lon:Double,lat:Double)=query(WALKS,anyOf("name",name),"name,introduction,difficulty,completionTime,introductionThumbnail,walkingAndTrampingWebPage",true,near(lon,lat,SEARCH))
     fun trackUrl(name:String,lon:Double,lat:Double)=query(TRACKS,anyOf("TechObjectName",name),"*",true,near(lon,lat,SEARCH)+"&maxAllowableOffset=0.00002")
+    /** DOC's walk lines crossing [b] (generalised to ~10 m), to find the walk a
+     * track belongs to whatever either is called. */
+    fun linesNearUrl(b:DoubleArray)=query(LINES,"1=1","EPISERVERGUID,Shape__Length",true,"&geometry=${f(b[0])},${f(b[1])},${f(b[2])},${f(b[3])}&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&maxAllowableOffset=0.0001")
+    /** The walk whose DOC page link carries [guid]. */
+    fun walkByGuidUrl(guid:String)=query(WALKS,"walkingAndTrampingWebPage LIKE ${quote("%"+guid.replace("-","").lowercase()+"%")}","name,introduction,difficulty,completionTime,introductionThumbnail,walkingAndTrampingWebPage",true)
     fun lineUrl(guid:String)=query(LINES,"EPISERVERGUID=${quote(guid)}","EPISERVERGUID",true,"&maxAllowableOffset=0.00002")
     fun hutsUrl(b:DoubleArray)=query(HUTS,"1=1","*",true,"&geometry=${f(b[0])},${f(b[1])},${f(b[2])},${f(b[3])}&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects")
     fun hutPagesUrl(b:DoubleArray)=query(HUT_PAGES,"1=1","name,bookable,staticLink",true,"&geometry=${f(b[0])},${f(b[1])},${f(b[2])},${f(b[3])}&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects")
@@ -85,6 +90,40 @@ internal object DocTracks {
         Walk(a.text("name"),a.text("introduction"),a.text("difficulty"),a.text("completionTime"),a.text("introductionThumbnail"),a.text("walkingAndTrampingWebPage"),point(f.optJSONObject("geometry")))}
     fun parseTracks(json:String)=features(json).map{f->val a=f.getJSONObject("attributes");val c=characteristics(a)
         Track(a.text("TechObjectName"),c["USER_STATUS"].orEmpty(),c["WEB_CATEGORY_TRACK"].orEmpty(),c["WEB_DOGS_ALLOWED"].orEmpty(),c["WEB_TRACK_TYPE"].orEmpty(),a.optDouble("Shape__Length",0.0).takeIf{it.isFinite()}?:0.0,paths(f.optJSONObject("geometry")))}
+    class WalkLine(val guid:String,val meters:Double,val paths:List<List<Coordinate>>)
+    fun parseWalkLines(json:String)=features(json).mapNotNull{f->val a=f.getJSONObject("attributes")
+        val guid=a.text("EPISERVERGUID").lowercase();if(guid.isEmpty())return@mapNotNull null
+        WalkLine(guid,a.optDouble("Shape__Length",0.0).takeIf{it.isFinite()}?:0.0,paths(f.optJSONObject("geometry")))}
+    /** The DOC walk line that runs along [track]: the one within [near] metres
+     * of the largest share of it (sampled every ~50 m). A walk must cover half
+     * the track or 1 km of it; between near-equal shares the shorter, more
+     * specific walk wins (a side trip rather than a whole valley's tracks). */
+    fun alongTrack(lines:List<WalkLine>,track:List<Coordinate>,near:Double=120.0):WalkLine?{
+        val samples=resample(track,50.0,400);if(samples.size<2)return null
+        val step=length(track)/(samples.size-1)
+        var best:WalkLine?=null;var bestShare=0.0
+        for(l in lines){
+            val segs=l.paths.filter{it.size>=2};if(segs.isEmpty())continue
+            val box=bounds(segs.flatten(),near)!!
+            var covered=0
+            for(p in samples){if(p.longitude<box[0]||p.longitude>box[2]||p.latitude<box[1]||p.latitude>box[3])continue
+                if(segs.any{s->(1 until s.size).any{i->segment(p,s[i-1],s[i]).first<=near}})covered++}
+            val share=covered.toDouble()/samples.size
+            if(share<.5&&covered*step<1000)continue
+            if(best==null||share>bestShare+.05||(share>bestShare-.05&&l.meters<best.meters)){if(share>bestShare)bestShare=share;best=l}
+        }
+        return best
+    }
+    /** Points every [spacing] metres along [line] (at most [limit]). */
+    fun resample(line:List<Coordinate>,spacing:Double,limit:Int):List<Coordinate>{
+        if(line.size<2)return line
+        val total=length(line);val step=max(spacing,total/(limit-1));val out=ArrayList<Coordinate>();var next=0.0;var walked=0.0
+        for(i in 1 until line.size){val a=line[i-1];val b=line[i];val len=meters(a,b)
+            while(next<=walked+len&&len>0){val t=(next-walked)/len;out.add(Coordinate(a.longitude+(b.longitude-a.longitude)*t,a.latitude+(b.latitude-a.latitude)*t));next+=step}
+            walked+=len}
+        if(out.isEmpty()||out.last()!=line.last())out.add(line.last())
+        return out
+    }
     fun parseLines(json:String)=features(json).flatMap{paths(it.optJSONObject("geometry"))}
     fun parseHuts(json:String)=features(json).mapNotNull{f->val a=f.getJSONObject("attributes");val c=characteristics(a)
         val p=point(f.optJSONObject("geometry"))?:return@mapNotNull null
