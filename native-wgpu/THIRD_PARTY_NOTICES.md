@@ -44,7 +44,15 @@ profile), "DOC Huts" (DOC_Huts_Open_Data: type, bunks, facilities) and the hut
 pages (DOC_Huts: bookable, page link). All are licensed CC BY 4.0 and credited
 to the Department of Conservation in the map credits and About text. Nothing
 is bundled; responses are cached for a day. The walk photo is DOC's thumbnail,
-loaded from doc.govt.nz as DOC links it.
+loaded from doc.govt.nz as DOC links it. When a track's name matches no DOC
+walk, the walk whose line runs along the track is used instead.
+
+The walk's full description is read from its doc.govt.nz page (text only:
+the "Description", "Getting there" and "Know before you go" sections; DOC
+website content is CC BY 4.0, credited to the Department of Conservation).
+Photos, videos and hut tiles on the page are not used. Two page excerpts
+are test fixtures in `android/app/src/test/fixtures/docpages/`, and DOC walk
+lines and LINZ tiles around Rabbit Pass in `android/app/src/test/fixtures/rabbit/`.
 
 Nine LINZ topographic vector tiles around Roys Peak (CC BY 4.0, LINZ) are
 test fixtures in `android/app/src/test/fixtures/tracks/`.

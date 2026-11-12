@@ -68,10 +68,10 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         .fastFallback(true)
         .eventListenerFactory{httpMetrics.listener(it)}
         .addNetworkInterceptor{httpMetrics.intercept(it)}
-        // DOC's hunting areas change rarely but are served with a 30 s lifetime:
-        // keep each tile a day (revalidated by ETag after that).
+        // DOC's hunting areas, track data and pages change rarely but are served
+        // with short lifetimes: keep each a day (revalidated by ETag after that).
         .addNetworkInterceptor{chain->val response=chain.proceed(chain.request())
-            if(response.isSuccessful&&chain.request().url.toString().let{HuntingAreas.isUrl(it)||DocTracks.isUrl(it)})response.newBuilder().header("Cache-Control","public, max-age=86400").removeHeader("Pragma").build()else response}
+            if((response.isSuccessful||response.isRedirect)&&chain.request().url.toString().let{HuntingAreas.isUrl(it)||DocTracks.isUrl(it)||DocPages.isUrl(it)})response.newBuilder().header("Cache-Control","public, max-age=86400").removeHeader("Pragma").build()else response}
         .connectTimeout(12, TimeUnit.SECONDS).readTimeout(15, TimeUnit.SECONDS).build()
     init {
         if(automaticCacheBytes==0L)preparedWrites.submit(1) {
