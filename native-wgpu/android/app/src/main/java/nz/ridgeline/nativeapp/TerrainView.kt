@@ -740,7 +740,35 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         for(i in 0 until event.pointerCount)if(i!=skip){x+=event.getX(i);y+=event.getY(i);count++}
         return x/count to y/count
     }
+    /** While set, one finger paints and two fingers move the map: called with
+     * [PAINT_START], [PAINT_MOVE], [PAINT_END] or [PAINT_CANCEL] and the touch
+     * position in pixels. A second finger cancels a just-started stroke. */
+    internal var paintTouch:((Int,Float,Float)->Unit)?=null
+    private var painting=false
     override fun onTouchEvent(event:MotionEvent):Boolean {
+        val paint=paintTouch
+        if(paint!=null||painting){
+            when(event.actionMasked){
+                MotionEvent.ACTION_DOWN->if(paint!=null){painting=true;stopMotion();parent?.requestDisallowInterceptTouchEvent(true);paint(PAINT_START,event.x,event.y);return true}
+                MotionEvent.ACTION_MOVE->if(painting){
+                    if(paint!=null){for(h in 0 until event.historySize)paint(PAINT_MOVE,event.getHistoricalX(0,h),event.getHistoricalY(0,h));paint(PAINT_MOVE,event.x,event.y)}
+                    return true
+                }
+                MotionEvent.ACTION_POINTER_DOWN->if(painting){
+                    // A second finger: this is a map gesture. Start it as if the
+                    // first finger had only just gone down, then add this one.
+                    painting=false;paint?.invoke(PAINT_CANCEL,event.x,event.y)
+                    val down=MotionEvent.obtain(event.downTime,event.eventTime,MotionEvent.ACTION_DOWN,event.getX(0),event.getY(0),0)
+                    try{mapTouch(down)}finally{down.recycle()}
+                    return mapTouch(event)
+                }
+                MotionEvent.ACTION_UP->if(painting){painting=false;paint?.invoke(PAINT_END,event.x,event.y);parent?.requestDisallowInterceptTouchEvent(false);return true}
+                MotionEvent.ACTION_CANCEL->if(painting){painting=false;paint?.invoke(PAINT_CANCEL,event.x,event.y);parent?.requestDisallowInterceptTouchEvent(false);return true}
+            }
+        }
+        return mapTouch(event)
+    }
+    private fun mapTouch(event:MotionEvent):Boolean {
         if(event.actionMasked==MotionEvent.ACTION_DOWN&&routeEditing){
             val index=nearestWaypoint(event.x.toDouble(),event.y.toDouble())
             if(index>=0&&onWaypointDragStart?.invoke(index)==true){
@@ -801,4 +829,5 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             endGesture();parent?.requestDisallowInterceptTouchEvent(false)}
         return true
     }
+    internal companion object{const val PAINT_START=0;const val PAINT_MOVE=1;const val PAINT_END=2;const val PAINT_CANCEL=3}
 }

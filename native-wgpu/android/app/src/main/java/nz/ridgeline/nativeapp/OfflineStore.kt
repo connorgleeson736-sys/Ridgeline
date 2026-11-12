@@ -12,10 +12,12 @@ import java.util.concurrent.atomic.AtomicInteger
 class OfflineStore(context:Context,name:String="offline-v1.sqlite"):SQLiteOpenHelper(context.applicationContext,name,null,2){
     /** [overlays]: NZ Topo and mapped overlays were included (regions saved before
      * 0.1.34 did not record it; they used the default, included). */
-    data class Metadata(val bounds:TileLoader.Bounds,val zoom:Int,val basemap:String,val overlays:Boolean=true)
+    data class Metadata(val bounds:TileLoader.Bounds,val zoom:Int,val basemap:String,val overlays:Boolean=true,
+        /** Painted cells ([PaintedArea.encode]); null for a rectangular region. */
+        val cells:String?=null)
     data class Region(val id:String,val name:String,val status:String,val bytes:Long,val resources:Int,val metadata:Metadata?=null)
-    private fun encode(meta:Metadata)=org.json.JSONObject().put("west",meta.bounds.west).put("south",meta.bounds.south).put("east",meta.bounds.east).put("north",meta.bounds.north).put("zoom",meta.zoom).put("basemap",meta.basemap).put("overlays",meta.overlays).toString()
-    private fun decode(text:String?):Metadata?=runCatching{val j=org.json.JSONObject(text?:return null);val bounds=TileLoader.Bounds(j.getDouble("west"),j.getDouble("south"),j.getDouble("east"),j.getDouble("north"));require(bounds.west>=165&&bounds.east<=180&&bounds.south>=-49&&bounds.north<=-33&&bounds.west<bounds.east&&bounds.south<bounds.north);Metadata(bounds,j.getInt("zoom").coerceIn(8,19),j.optString("basemap","LINZ"),j.optBoolean("overlays",true))}.getOrNull()
+    private fun encode(meta:Metadata)=org.json.JSONObject().put("west",meta.bounds.west).put("south",meta.bounds.south).put("east",meta.bounds.east).put("north",meta.bounds.north).put("zoom",meta.zoom).put("basemap",meta.basemap).put("overlays",meta.overlays).apply{if(meta.cells!=null)put("cells",meta.cells)}.toString()
+    private fun decode(text:String?):Metadata?=runCatching{val j=org.json.JSONObject(text?:return null);val bounds=TileLoader.Bounds(j.getDouble("west"),j.getDouble("south"),j.getDouble("east"),j.getDouble("north"));require(bounds.west>=165&&bounds.east<=180&&bounds.south>=-49&&bounds.north<=-33&&bounds.west<bounds.east&&bounds.south<bounds.north);Metadata(bounds,j.getInt("zoom").coerceIn(8,19),j.optString("basemap","LINZ"),j.optBoolean("overlays",true),j.optString("cells","").ifEmpty{null})}.getOrNull()
     private val resourceState=AtomicInteger(-1)
     private val readHandle=PublishedReadHandle(this,{readableDatabase},{!it.isReadOnly})
     init{setWriteAheadLoggingEnabled(true)}

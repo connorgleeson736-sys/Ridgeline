@@ -1,6 +1,24 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.36 Offline Bar Base APK — 33.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Offline-Bar-0.1.36-Base.apk)**.
+Latest: **[Download 0.1.37 Paint Offline Base APK — 33.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Paint-Offline-0.1.37-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 38:
+**updates 0.1.13–0.1.36 in place, keeping its data.**
+
+- **Paint what you want offline** onto the 2D or 3D map: one finger paints,
+  two fingers move. Four detail colours (Overview, Standard, Detailed,
+  Maximum) and an eraser; the brush is fixed on screen.
+- **Undo, Clear, Along route** (a 1 km corridor along the open or a saved
+  route), and a live size estimate. Areas already on the phone show faintly.
+- **Topo map tab** keeps the page frame for NZ Topo regions and Save as PDF.
+
+205 JVM tests pass (6 new for painting); lint 0 errors; native libraries and
+map assets identical to 0.1.36. Not run on a phone.
+[Exact release record](../validation/paint-offline-2026-11-12/release.json) ·
+[SHA-256](Ridgeline-Native-Paint-Offline-0.1.37-Base.apk.sha256).
+
+## Previous 0.1.36 offline bar checkpoint
+
+**[Download 0.1.36 Offline Bar Base APK — 33.8 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Offline-Bar-0.1.36-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 37:
 **updates 0.1.13–0.1.35 in place, keeping its data.**
 

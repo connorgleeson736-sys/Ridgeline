@@ -59,7 +59,7 @@ class MainActivity:Activity(){
         mapLayers=MapLayers(terrain,loader)
         terrain.onCamera={loader.cameraChanged();mapLayers.refresh()};terrain.onData={loader.cameraChanged();mapLayers.refresh()}
         planner=PlannerUi(this,root,terrain,loader,mapHost)
-        offlineUi=OfflineUi(this,root,terrain,loader,false)
+        offlineUi=OfflineUi(this,root,terrain,loader,false).also{it.routes=planner.controller}
         planner.onOffline={layersUi.dismiss();offlineUi.startRegion()}
         planner.onProfilePoint={terrain.inspect(it)}
         layersUi=LayersUi(this,root,terrain,loader,offlineUi){planner.newRoute()}
