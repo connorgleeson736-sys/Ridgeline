@@ -476,7 +476,11 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
         val detail=spinner(zoomNames,zoomChoice){zoomChoice=it;prefs.edit().putInt("regionZoom",it).apply();refreshTopoInfo()}
         val include=CheckBox(activity).apply{text="NZ Topo & overlays";isChecked=regionOverlays;textSize=13f;setOnCheckedChangeListener{_,c->regionOverlays=c;prefs.edit().putBoolean("regionOverlays",c).apply();refreshTopoInfo()}}
         fun topoOnly(){val topo=regionBases[baseChoice]==MapSettings.Base.TOPO;detail.visibility=if(topo)View.INVISIBLE else View.VISIBLE;include.visibility=if(topo)View.GONE else View.VISIBLE}
-        pane.addView(row(spinner(listOf("LINZ aerial","Satellite","NZ Topo"),baseChoice){baseChoice=it;prefs.edit().putInt("regionBase",it).apply();topoOnly();refreshTopoInfo()},detail))
+        // The region's map content is the map's layer: choosing one shows it.
+        baseChoice=regionBases.indexOf(loader.mapSettings.state.base).coerceAtLeast(0)
+        pane.addView(row(spinner(listOf("LINZ aerial","Satellite","NZ Topo"),baseChoice){baseChoice=it;prefs.edit().putInt("regionBase",it).apply()
+            if(loader.mapSettings.state.base!=regionBases[it])loader.mapSettings.change{s->s.copy(base=regionBases[it])}
+            topoOnly();refreshTopoInfo()},detail))
         pane.addView(include);topoOnly()
         val line=NativeUi.text(activity,"",12.5f).apply{setPadding(0,dp(4),0,dp(4))};topoInfo=line
         pane.addView(line)
@@ -519,18 +523,24 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
                 loader.downloadRegion(title,b,zoom(),regionBases[baseChoice],regionOverlays,progress={progressText=it;showProgress()}){downloadDone()}
             }catch(e:Exception){downloading=false;showProgress();line.setTextColor(NativeUi.orange);line.text=e.message?:"Region could not be started."}
         }
-        pane.addView(LinearLayout(activity).apply{setPadding(0,dp(6),0,0);addView(pdf,LinearLayout.LayoutParams(0,dp(44),1f).apply{marginEnd=dp(8)});addView(download,LinearLayout.LayoutParams(0,dp(44),1f))})
+        pane.addView(CheckBox(activity).apply{text="Magnetic grid on PDF";isChecked=prefs.getBoolean("magneticGrid",false);textSize=13f;setOnCheckedChangeListener{_,c->prefs.edit().putBoolean("magneticGrid",c).apply()}})
+        pane.addView(LinearLayout(activity).apply{setPadding(0,dp(2),0,0);addView(pdf,LinearLayout.LayoutParams(0,dp(44),1f).apply{marginEnd=dp(8)});addView(download,LinearLayout.LayoutParams(0,dp(44),1f))})
         pane.addView(toggle("Coordinates",grid));pane.addView(grid)
         overlay.post{bar?.height?.takeIf{it>0}?.let{overlay.bottomInset=it};if(pageSize==CUSTOM){overlay.page("A4",landscape);overlay.custom()}else overlay.page(pageSize,landscape);orientation.isEnabled=pageSize!=CUSTOM;orientation.alpha=if(pageSize==CUSTOM).4f else 1f;refreshTopoInfo()}
     }
-    /** The frame's corners on the 2D map, clamped to New Zealand. */
-    private fun frameBounds():TileLoader.Bounds?{
+    /** The frame's four corners on the map (Mercator), clockwise from the top
+     * left as on screen; they need not be north-up (the map may be turned). */
+    private fun frameCorners():List<DoubleArray>?{
         val view=frame?:return null;val c=view.corners();val scale=terrain.pixelScale
         val pose=terrain.cameraPose;val w=(terrain.width/scale).roundToInt();val h=(terrain.height/scale).roundToInt()
-        fun at(x:Float,y:Float)=CameraMath.anchor(pose,w,h,1.0,x/scale,y/scale,0.0)
-        val sw=at(c[0],c[3])?:return null;val ne=at(c[2],c[1])?:return null
-        val west=max(165.0,sw.mx*360-180);val east=min(180.0,ne.mx*360-180)
-        val south=max(-49.0,CameraMath.latitude(sw.my));val north=min(-33.0,CameraMath.latitude(ne.my))
+        fun at(x:Float,y:Float)=CameraMath.anchor(pose,w,h,1.0,x/scale,y/scale,0.0)?.let{doubleArrayOf(it.mx,it.my)}
+        return listOf(at(c[0],c[1])?:return null,at(c[2],c[1])?:return null,at(c[2],c[3])?:return null,at(c[0],c[3])?:return null)
+    }
+    /** The north-up box around the frame, clamped to New Zealand. */
+    private fun frameBounds():TileLoader.Bounds?{
+        val corners=frameCorners()?:return null
+        val west=max(165.0,corners.minOf{it[0]}*360-180);val east=min(180.0,corners.maxOf{it[0]}*360-180)
+        val south=max(-49.0,CameraMath.latitude(corners.maxOf{it[1]}));val north=min(-33.0,CameraMath.latitude(corners.minOf{it[1]}))
         return if(west<east&&south<north)TileLoader.Bounds(west,south,east,north)else null
     }
     /** The brush outline under the finger while painting (draws only; touches pass through). */
@@ -548,30 +558,37 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
 
     // ---- Save as PDF: the framed area on the chosen page, from map tiles at print resolution. ----
     private val pdfRequest=4302
-    private class PendingPdf(val map:android.graphics.Bitmap,val title:String,val paper:String,val landscape:Boolean,val widthKm:Double,val base:MapSettings.Base)
+    private class PendingPdf(val map:android.graphics.Bitmap,val plan:PrintMap.Plan,val frame:PdfLayout.Frame,val title:String,val paper:String,val landscape:Boolean,val base:MapSettings.Base,val declination:Double?)
     private var pendingPdf:PendingPdf?=null
+    private val magnetic by lazy{runCatching{MagneticModel(activity.assets.open("wmm/WMM2025.COF").bufferedReader().use{it.readText()})}.getOrNull()}
     private fun savePdf(bounds:TileLoader.Bounds,title:String){
+        val corners=frameCorners()?:error("Move the frame over New Zealand.")
         val paper=if(pageSize==CUSTOM)"A4" else pageSize
-        val (widthKm,heightKm)=extentKm(bounds)
-        val wide=if(pageSize==CUSTOM)widthKm>heightKm else landscape
+        val view=frame!!;val px=view.corners()
+        val wide=if(pageSize==CUSTOM)px[2]-px[0]>px[3]-px[1] else landscape
         val base=loader.mapSettings.state.base
-        // Plan at print resolution for the map area on the chosen page.
-        val (pw,ph)=PdfLayout.pageSize(paper,wide)
-        val aspect=(CameraMath.mercatorY(bounds.south)-CameraMath.mercatorY(bounds.north))/((bounds.east-bounds.west)/360)
-        val area=min((pw-2*PdfLayout.SIDE).toDouble(),(ph-PdfLayout.TOP-PdfLayout.BOTTOM)/aspect)
-        val plan=PrintMap.plan(bounds,area,loader.printMaxZoom(base))
+        // The frame as on screen: centre, width along its top edge, and the map's turn.
+        val cx=corners.sumOf{it[0]}/4;val cy=corners.sumOf{it[1]}/4
+        val width=hypot(corners[1][0]-corners[0][0],corners[1][1]-corners[0][1]);val height=hypot(corners[3][0]-corners[0][0],corners[3][1]-corners[0][1])
+        val latitude=CameraMath.latitude(cy);val widthMeters=width*40_075_016.686*cos(Math.toRadians(latitude))
+        val bearing=terrain.cameraPose.bearing.toDouble()
+        val (pw,_)=PdfLayout.pageSize(paper,wide)
+        // Tiles for the north-up box around the (possibly turned) frame, at print resolution.
+        val boxWidth=(bounds.east-bounds.west)/360
+        val plan=PrintMap.plan(bounds,boxWidth/width*pw,loader.printMaxZoom(base),maxTiles=720,maxPixels=16_000_000)
+        val declination=if(prefs.getBoolean("magneticGrid",false))magnetic?.declination(latitude,cx*360-180,MagneticModel.year(System.currentTimeMillis())) else null
         val route=routes?.state?.points.orEmpty()
         val cancelled=java.util.concurrent.atomic.AtomicBoolean()
         val status=TextView(activity).apply{setPadding(dp(20),dp(14),dp(20),dp(6));text="Preparing the map…"}
         val dialog=AlertDialog.Builder(activity).setTitle("Save as PDF").setView(status).setNegativeButton("Cancel"){_,_->cancelled.set(true)}.create().apply{setCancelable(false);show()}
         Thread{
-            val map=runCatching{PrintMap.render(plan,{z,x,y->if(cancelled.get())null else loader.printTile(base,z,x,y)},route,(plan.width/area*2.2).toFloat()){i,n->
+            val map=runCatching{PrintMap.render(plan,{z,x,y->if(cancelled.get())null else loader.printTile(base,z,x,y)},route,(plan.width/(boxWidth/width*pw)*2.2).toFloat()){i,n->
                 if(i%4==0)activity.runOnUiThread{status.text=String.format(java.util.Locale.ROOT,"Preparing the map · %d%%",i*100/max(1,n))}
                 !cancelled.get()}}.getOrNull()
             activity.runOnUiThread{
                 dialog.dismiss()
                 if(map==null){if(!cancelled.get())Toast.makeText(activity,"Could not prepare the map.",Toast.LENGTH_LONG).show();return@runOnUiThread}
-                pendingPdf?.map?.recycle();pendingPdf=PendingPdf(map,title,paper,wide,widthKm,base)
+                pendingPdf?.map?.recycle();pendingPdf=PendingPdf(map,plan,PdfLayout.Frame(cx,cy,width,height,bearing,widthMeters),title,paper,wide,base,declination)
                 val intent=android.content.Intent(android.content.Intent.ACTION_CREATE_DOCUMENT).apply{addCategory(android.content.Intent.CATEGORY_OPENABLE);type="application/pdf";putExtra(android.content.Intent.EXTRA_TITLE,title.replace(Regex("[\\\\/:*?\"<>|]"),"_")+".pdf")}
                 runCatching{activity.startActivityForResult(intent,pdfRequest)}.onFailure{Toast.makeText(activity,"No file picker is available.",Toast.LENGTH_LONG).show()}
             }
@@ -581,7 +598,7 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
         val job=pendingPdf?:return;pendingPdf=null
         Thread{
             val ok=runCatching{
-                val doc=PdfLayout.render(job.map,job.title,job.paper,job.landscape,job.widthKm,PdfLayout.attribution(job.base))
+                val doc=PdfLayout.render(job.map,job.plan,job.frame,job.paper,job.landscape,PdfLayout.attribution(job.base),job.declination)
                 try{activity.contentResolver.openOutputStream(uri)!!.use{doc.writeTo(it)}}finally{doc.close()}
             }.isSuccess
             job.map.recycle()

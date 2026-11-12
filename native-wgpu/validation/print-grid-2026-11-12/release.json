@@ -1,0 +1,29 @@
+{
+  "artifact": "Ridgeline-Native-Print-Grid-0.1.40-Base.apk",
+  "bytes": 33823154,
+  "sha256": "635fb529408429b0f04d73625f17fa037188968e37f9d20300498d2607bc3725",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.40-print-grid",
+  "versionCode": 41,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.39 Full Audit (same package and signer)",
+  "changes": [
+    "Region tab: choosing LINZ aerial, Satellite or NZ Topo switches the map to that layer (the list starts at the map's current layer).",
+    "Turned maps: the frame's four corners are found on the map as they are, so a map that does not face north no longer reports 'Move the frame over New Zealand'. Downloads use the north-up box around the frame.",
+    "PDFs print the frame as it was on screen: a turned map prints turned (true north arrow shows the turn). The map fills the whole page; the frame now has the paper's shape. Title, date and paper name removed.",
+    "On the map: a larger north arrow (top right), the scale bar (bottom left, on a white backing) and the source credit the data licence requires (small, bottom right).",
+    "Optional magnetic grid on PDFs (Region tab checkbox): lines to magnetic north and across, one scale-bar length apart, with a magnetic north arrow and the declination. Declination from the World Magnetic Model 2025 (NOAA coefficient file bundled; matches NOAA's published test values to 0.01 degrees)."
+  ],
+  "tests": {
+    "kotlinJvm": "211 tests, 0 failures (new: MagneticModelTest x2 against NOAA's WMM2025 test values; RegionFrameTest and PdfLayoutTest updated for the full-page frame shape)",
+    "rust": "unchanged (native libraries byte-identical to 0.1.39)"
+  },
+  "lintErrors": 0,
+  "assets": "626 of 629 identical to 0.1.39; new assets/wmm/WMM2025.COF; generated dexopt baseline profiles differ",
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

@@ -5,12 +5,17 @@
 the audited APK was 0.1.5. Main next candidates are raw local-I/O isolation,
 GPU upload acknowledgement, classified recovery and per-tile critical-path tracing.
 
-Latest APK: **[0.1.39 Hold To Paint Base](checkpoints/README.md)** — updates
+Latest APK: **[0.1.40 Print Grid Base](checkpoints/README.md)** — updates
+0.1.13–0.1.39 in place. Full-page PDFs that keep the map's orientation, with
+a larger north arrow, scale on the map and an optional magnetic grid; the
+region's map choice switches the map layer.
+
+Previous APK: **[0.1.39 Hold To Paint Base](checkpoints/README.md)** — updates
 0.1.13–0.1.38 in place. Hold to paint, 30,000-tile regions with paced
 downloads, the region frame visible again, and saved regions in the routes
 drawer.
 
-Previous APK: **[0.1.38 Paint Switch Base](checkpoints/README.md)** — updates
+Older APK: **[0.1.38 Paint Switch Base](checkpoints/README.md)** — updates
 0.1.13–0.1.37 in place. Move/Paint switch for painting, the region download
 as in 0.1.36, sharp print-resolution PDFs and a fast stored-detail view.
 
