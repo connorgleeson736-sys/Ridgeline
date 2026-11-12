@@ -101,6 +101,7 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
         check(parent,"Mapped walking tracks",state.tracks,trackKey()){v->settings.change{it.copy(tracks=v)}}
         check(parent,"Huts & bivouacs",state.huts,hutKey()){v->settings.change{it.copy(huts=v)}}
         check(parent,"Contour lines & heights",state.contours){v->settings.change{it.copy(contours=v)}}
+        check(parent,"Hunting permit areas",state.hunting,huntingKey()){v->settings.change{it.copy(hunting=v)}}
         parent.addView(NativeUi.text(activity,"Highways and major names appear first. Zoom in for smaller roads, road names, lesser peaks, local tracks and bivouacs.",14f).apply{setTextColor(NativeUi.muted);setPadding(0,dp(10),0,dp(8))})
         parent.addView(NativeUi.text(activity,"Check DOC alerts ↗",14f).apply{
             paintFlags=paintFlags or android.graphics.Paint.UNDERLINE_TEXT_FLAG;setTextColor(Color.rgb(58,110,76));minHeight=dp(40);gravity=Gravity.CENTER_VERTICAL;isClickable=true
@@ -112,6 +113,13 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
     private fun trackKey()=object:android.graphics.drawable.Drawable(){
         private val paint=android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply{color=Color.rgb(201,122,46);strokeWidth=dp(2).toFloat()}
         override fun draw(canvas:android.graphics.Canvas){val y=bounds.exactCenterY();val w=bounds.width()/5f;canvas.drawLine(bounds.left.toFloat(),y,bounds.left+w*2,y,paint);canvas.drawLine(bounds.left+w*3,y,bounds.left+w*5,y,paint)}
+        override fun setAlpha(alpha:Int){};override fun setColorFilter(filter:android.graphics.ColorFilter?){}
+        @Deprecated("Drawable API") override fun getOpacity()=android.graphics.PixelFormat.TRANSLUCENT
+    }
+    /** Dashed blaze-orange outline, as drawn on the map. */
+    private fun huntingKey()=object:android.graphics.drawable.Drawable(){
+        private val paint=android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply{color=MapLayers.HUNTING_LINE;strokeWidth=dp(2).toFloat();style=android.graphics.Paint.Style.STROKE}
+        override fun draw(canvas:android.graphics.Canvas){val r=android.graphics.RectF(bounds).apply{inset(dp(2).toFloat(),dp(2).toFloat())};paint.pathEffect=android.graphics.DashPathEffect(floatArrayOf(dp(4).toFloat(),dp(2).toFloat()),0f);canvas.drawRoundRect(r,dp(2).toFloat(),dp(2).toFloat(),paint)}
         override fun setAlpha(alpha:Int){};override fun setColorFilter(filter:android.graphics.ColorFilter?){}
         @Deprecated("Drawable API") override fun getOpacity()=android.graphics.PixelFormat.TRANSLUCENT
     }
@@ -161,7 +169,7 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
         parent.addView(NativeUi.button(activity,"Overview imagery ZIPs (${loader.overviews.list().size}/6)"){dismiss();offline.imageryPacks()})
         parent.addView(NativeUi.button(activity,"Loading diagnostics"){offline.diagnostics()})
         parent.addView(NativeUi.button(activity,"About & licences"){
-            val text=NativeUi.text(activity,"Ridgeline Native\nNative map and route planner\n\nLINZ imagery, elevation and topographic data · CC BY 4.0. Esri World Imagery and contributors.\n\nMapLibre adaptation notice:\n"+activity.assets.open("licenses/maplibre-gl-js.txt").bufferedReader().use{it.readText()},12f).apply{setPadding(dp(16),dp(12),dp(16),dp(12));setTextIsSelectable(true)}
+            val text=NativeUi.text(activity,"Ridgeline Native\nNative map and route planner\n\nLINZ imagery, elevation and topographic data · CC BY 4.0. Esri World Imagery and contributors. Hunting permit areas: Department of Conservation · CC BY 4.0, shown live from DOC; a guide only.\n\nMapLibre adaptation notice:\n"+activity.assets.open("licenses/maplibre-gl-js.txt").bufferedReader().use{it.readText()},12f).apply{setPadding(dp(16),dp(12),dp(16),dp(12));setTextIsSelectable(true)}
             AlertDialog.Builder(activity).setTitle("About Ridgeline").setView(ScrollView(activity).apply{addView(text)}).setPositiveButton("Close",null).show()
         })
         parent.addView(NativeUi.text(activity,"LINZ topographic data · CC BY 4.0. Mapped tracks and huts are not a condition or availability report.",11f))

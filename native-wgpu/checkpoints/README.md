@@ -1,6 +1,22 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.41 Kea Sky Base APK — 33.9 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Kea-Sky-0.1.41-Base.apk)**.
+Latest: **[Download 0.1.42 Hunting Areas Base APK — 33.9 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Hunting-Areas-0.1.42-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 43:
+**updates 0.1.13–0.1.41 in place, keeping its data.**
+
+- **Hunting permit areas** (Layers > Topographic overlays): DOC's permitted
+  hunting areas, served live from DOC (nothing bundled). Dashed orange
+  outlines, names when closer; tap inside one for its details and DOC's
+  permit page.
+
+215 JVM tests pass (decoder checked on real DOC tiles); lint 0 errors;
+native libraries identical to 0.1.41. Not run on a phone.
+[Exact release record](../validation/hunting-areas-2026-11-12/release.json) ·
+[SHA-256](Ridgeline-Native-Hunting-Areas-0.1.42-Base.apk.sha256).
+
+## Previous 0.1.41 kea sky checkpoint
+
+**[Download 0.1.41 Kea Sky Base APK — 33.9 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Kea-Sky-0.1.41-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 42:
 **updates 0.1.13–0.1.40 in place, keeping its data.**
 

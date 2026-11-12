@@ -5,11 +5,15 @@
 the audited APK was 0.1.5. Main next candidates are raw local-I/O isolation,
 GPU upload acknowledgement, classified recovery and per-tile critical-path tracing.
 
-Latest APK: **[0.1.41 Kea Sky Base](checkpoints/README.md)** — updates
+Latest APK: **[0.1.42 Hunting Areas Base](checkpoints/README.md)** — updates
+0.1.13–0.1.41 in place. DOC hunting permit areas, served live from DOC, as a
+Topographic overlay with tap-for-details.
+
+Previous APK: **[0.1.41 Kea Sky Base](checkpoints/README.md)** — updates
 0.1.13–0.1.40 in place. The new kea logo (launcher icon and top bar) and a
 clear-sky gradient behind the 3D terrain.
 
-Previous APK: **[0.1.40 Print Grid Base](checkpoints/README.md)** — updates
+Older APK: **[0.1.40 Print Grid Base](checkpoints/README.md)** — updates
 0.1.13–0.1.39 in place. Full-page PDFs that keep the map's orientation, with
 a larger north arrow, scale on the map and an optional magnetic grid; the
 region's map choice switches the map layer.
