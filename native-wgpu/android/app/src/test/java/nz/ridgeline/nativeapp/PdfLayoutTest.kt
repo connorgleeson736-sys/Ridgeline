@@ -4,13 +4,11 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class PdfLayoutTest {
-    @Test fun pageMapAreaHasTheRegionFramesAspect(){
+    @Test fun theFrameHasTheShapeOfTheWholePage(){
         for(paper in RegionFrame.PAPER.keys)for(landscape in listOf(false,true)){
             val (w,h)=PdfLayout.pageSize(paper,landscape)
-            val area=(w-2*PdfLayout.SIDE)/(h-PdfLayout.TOP-PdfLayout.BOTTOM)
             val f=RegionFrame.pageFrame(paper,landscape,1000.0,1000.0)
-            val frame=(f[2]-f[0])/(f[3]-f[1])
-            assertEquals("$paper $landscape",frame,area.toDouble(),0.01)
+            assertEquals("$paper $landscape",w.toDouble()/h,(f[2]-f[0])/(f[3]-f[1]),0.01)
         }
         assertEquals(595 to 842,PdfLayout.pageSize("A4",false));assertEquals(842 to 595,PdfLayout.pageSize("A4",true))
     }

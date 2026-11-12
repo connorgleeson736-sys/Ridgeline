@@ -14,12 +14,12 @@ internal class RegionFrame(context:Context):View(context){
     /** Paper sizes in millimetres, as the Capacitor app. */
     companion object{
         val PAPER=linkedMapOf("A5" to (148.0 to 210.0),"A4" to (210.0 to 297.0),"A3" to (297.0 to 420.0),"Letter" to (215.9 to 279.4),"Legal" to (215.9 to 355.6))
-        /** Capacitor pageFrame(): the printable map area keeps the page aspect,
-         * 84% of the available space. Fractions [left, top, right, bottom]. */
+        /** The page's shape (the PDF map fills the page), 84% of the available
+         * space. Fractions [left, top, right, bottom]. */
         fun pageFrame(size:String,landscape:Boolean,width:Double,height:Double):DoubleArray{
             var (w,h)=(PAPER[size]?:PAPER.getValue("A4")).let{it.first*72/25.4 to it.second*72/25.4}
             if(landscape){val t=w;w=h;h=t}
-            val ratio=(w-60)/(h-94);val frameW=min(width*.84,height*.84*ratio);val frameH=frameW/ratio
+            val ratio=w/h;val frameW=min(width*.84,height*.84*ratio);val frameH=frameW/ratio
             return doubleArrayOf(.5-frameW/width/2,.5-frameH/height/2,.5+frameW/width/2,.5+frameH/height/2)
         }
     }
@@ -41,7 +41,7 @@ internal class RegionFrame(context:Context):View(context){
         val b=pageFrame(size,landscape,width.toDouble(),usable.toDouble())
         box=doubleArrayOf(b[0],b[1]*usable/height,b[2],b[3]*usable/height)
         val (w,h)=(PAPER[size]?:PAPER.getValue("A4")).let{if(landscape)it.second to it.first else it}
-        aspect=(w*72/25.4-60)/(h*72/25.4-94);invalidate();onChange()
+        aspect=w/h;invalidate();onChange()
     }
     fun isCustom()=aspect<=0.0
     /** Custom size: keep the current frame, corners now resize it freely. */

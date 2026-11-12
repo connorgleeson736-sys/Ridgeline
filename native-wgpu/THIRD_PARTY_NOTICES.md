@@ -11,3 +11,13 @@ MapLibre shaders. MapLibre contributors' BSD notice is in MAPLIBRE-LICENSE.txt.
 The native application does not bundle or run the MapLibre JavaScript engine.
 Labels use Android's installed system fonts; no downloaded font distribution is
 added. Existing Rust, Android and OkHttp dependencies retain their own licenses.
+
+## World Magnetic Model (WMM2025)
+
+`android/app/src/main/assets/wmm/WMM2025.COF` is the World Magnetic Model
+2025 coefficient file from NOAA's National Centers for Environmental
+Information and the British Geological Survey, downloaded from
+ncei.noaa.gov. The WMM is a product of the US and UK governments and is
+public domain in the United States. It is used to draw the optional magnetic
+grid on exported PDFs; `MagneticModelTest` checks the implementation against
+NOAA's published WMM2025 test values.
