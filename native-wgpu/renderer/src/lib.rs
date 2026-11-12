@@ -20,6 +20,7 @@ pub mod overlay;
 mod frame_work;
 mod inspection;
 mod labels;
+mod sky;
 mod latest_worker;
 mod planar;
 #[cfg(target_os = "android")]
@@ -155,6 +156,7 @@ pub struct Renderer {
     completion_wake: frame_work::CompletionWake,
     frame_prepared: bool,
     labels_gpu: labels::LabelGpu,
+    sky_gpu: sky::SkyGpu,
     label_sprites: Vec<LabelSprite>,
     /// Every candidate label's terrain visibility, read back for placement.
     label_probe: label_probe::LabelProbe,
@@ -604,6 +606,7 @@ impl Renderer {
         let route_gpu = routes::RouteGpu::new(&device, format);
         let inspection_gpu = route_gpu.fork(&device);
         let labels_gpu = labels::LabelGpu::new(&device, &queue, format);
+        let sky_gpu = sky::SkyGpu::new(&device, format);
         let blit = resolution::Blit::new(&device, format);
         let label_probe = label_probe::LabelProbe::new(&device, &labels_gpu.uniform);
         let mut renderer = Self {
@@ -662,6 +665,7 @@ impl Renderer {
             completion_wake: Default::default(),
             frame_prepared: false,
             labels_gpu,
+            sky_gpu,
             label_sprites: vec![],
             label_probe,
             label_generation: 0,
@@ -2099,11 +2103,17 @@ impl Renderer {
                     depth_slice: None,
                     resolve_target: None,
                     ops: wgpu::Operations {
-                        load: wgpu::LoadOp::Clear(wgpu::Color {
-                            r: ((self.map_style.sky >> 16) & 255) as f64 / 255.,
-                            g: ((self.map_style.sky >> 8) & 255) as f64 / 255.,
-                            b: (self.map_style.sky & 255) as f64 / 255.,
-                            a: 1.,
+                        // The clear sky clears to its horizon colour (seen below the
+                        // horizon where no terrain is drawn); its gradient follows.
+                        load: wgpu::LoadOp::Clear(if sky::gradient(self.map_style.sky) {
+                            wgpu::Color { r: sky::HORIZON[0] as f64 / 255., g: sky::HORIZON[1] as f64 / 255., b: sky::HORIZON[2] as f64 / 255., a: 1. }
+                        } else {
+                            wgpu::Color {
+                                r: ((self.map_style.sky >> 16) & 255) as f64 / 255.,
+                                g: ((self.map_style.sky >> 8) & 255) as f64 / 255.,
+                                b: (self.map_style.sky & 255) as f64 / 255.,
+                                a: 1.,
+                            }
                         }),
                         store: wgpu::StoreOp::Store,
                     },
@@ -2121,6 +2131,9 @@ impl Renderer {
                 occlusion_query_set: None,
                 multiview_mask: None,
             });
+            if sky::gradient(self.map_style.sky) && self.map_style.three_d && sky::SkyGpu::visible(pitch) {
+                self.sky_gpu.draw(&self.queue, &mut pass, pitch);
+            }
             let mut clipped_pipeline = None;
             pass.set_bind_group(0, &self.scene_bind, &[]);
             pass.set_bind_group(3, self.overlay.bind_group(), &[]);

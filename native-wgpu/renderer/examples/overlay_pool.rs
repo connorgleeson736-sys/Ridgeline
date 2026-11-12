@@ -93,7 +93,7 @@ async fn run() {
     let pixels = read(&r, &output);
     // Green rows: each of the five lines should cross the whole view.
     let green_rows = (0..512)
-        .filter(|y| (0..512).filter(|x| { let p = &pixels[(y * 512 + x) * 4..][..4]; p[1] > p[0] + 60 }).count() > 280)
+        .filter(|y| (0..512).filter(|x| { let p = &pixels[(y * 512 + x) * 4..][..4]; p[1] as u16 > p[0] as u16 + 60 }).count() > 280)
         .count();
     assert_eq!(missing, 0, "no visible tile without its lines ({shown} shown)");
     assert!(shown >= 25, "all 25 tiles show their lines ({shown})");

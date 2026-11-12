@@ -15,7 +15,8 @@ impl Default for MapStyle {
             natural: true,
             hillshade: false,
             relief: 1.,
-            sky: 0xffbdcbd0,
+            // Alpha 0: the clear-sky gradient (sky.rs).
+            sky: 0x0078b5fe,
             three_d: true,
         }
     }
