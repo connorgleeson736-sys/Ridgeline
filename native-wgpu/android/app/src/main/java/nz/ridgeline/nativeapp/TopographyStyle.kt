@@ -10,7 +10,9 @@ internal class TopographyStyle(json:String){
     data class Label(val point:VectorTile.Point,val text:String,val size:Float,val color:Int,val priority:Double,val bold:Boolean=false,val circle:Boolean=false,val key:String="",val anchor:String="center",val variable:Boolean=false,
         /** Line labels (roads, rivers, tracks): MapLibre's symbol-spacing in px; the
          * same name is not repeated closer than this on screen. 0 for point labels. */
-        val spacing:Float=0f)
+        val spacing:Float=0f,
+        /** A DOC walk's id for track names shown as their walk's (see DocWalks). */
+        val ref:String="")
     data class Output(val lines:List<Line>,val labels:List<Label>)
     private val specs=JSONArray(json).let{rows->List(rows.length()){rows.getJSONObject(it)}}.onEach{spec->
         // Performance: river names start later than in Capacitor (1.5 zooms for
@@ -25,6 +27,9 @@ internal class TopographyStyle(json:String){
         val ONE_PER_NAME=setOf("nz-rivers","nz-river-polygons")
         /** Track names repeat along the track (MapLibre's symbol-spacing). */
         const val TRACK_LABELS="nz-tracks-label"
+        const val HUT_LABELS="nz-huts-label"
+        /** Large DOC walks rank with the style's Great Walks. */
+        const val WALK_PRIORITY=15.0
         /** At most this many candidates per track name per tile. */
         const val MAX_REPEATS=24
         /** Grid for the across-line coordinate in repeat keys (~0.9 km in NZ). */
@@ -98,7 +103,9 @@ internal class TopographyStyle(json:String){
             if(!state.enabled(group)||zoom<spec.optDouble("minzoom",0.0)||zoom>=spec.optDouble("maxzoom",30.0))continue
             val kind=spec.getString("type");val paint=spec.getJSONObject("paint");val layout=spec.optJSONObject("layout")?:JSONObject()
             for(f in grouped[spec.getString("source-layer")].orEmpty()){
-                if(!truth(eval(spec.opt("filter")?:true,f.properties,tileZoom)))continue
+                // A piece of a large DOC walk is named like a Great Walk (from tile zoom 12).
+                val walk=if(id==TRACK_LABELS)f.properties[DocWalks.WALK] as? String else null
+                if(!truth(eval(spec.opt("filter")?:true,f.properties,if(walk!=null)max(tileZoom,14.0)else tileZoom)))continue
                 if(kind=="line"){
                     val c=color(eval(paint.opt("line-color"),f.properties,zoom));val opacity=number(eval(paint.opt("line-opacity")?:1.0,f.properties,zoom),1.0)
                     val rgba=(c and 0x00ffffff) or (((c ushr 24)*opacity).roundToInt().coerceIn(0,255) shl 24)
@@ -106,23 +113,27 @@ internal class TopographyStyle(json:String){
                     for(path in f.paths)if(path.size>=2)lines.add(Line(path,rgba,width,if(dash!=null)dash.optDouble(0).toFloat()*width else 0f,if(dash!=null)dash.optDouble(1).toFloat()*width else 0f,order))
                 }else{
                     val path=f.paths.maxByOrNull{it.size}?:continue
-                    val text=if(kind=="circle")""else eval(layout.opt("text-field"),f.properties,zoom)?.toString()?.replace("\\n","\n")?.trim().orEmpty()
-                    if(kind!="circle"&&text.isBlank())continue
-                    val size=if(kind=="circle")number(paint.opt("circle-radius"),4.0).toFloat()else number(eval(layout.opt("text-size")?:12,f.properties,zoom),12.0).toFloat()
+                    val own=if(kind=="circle")""else eval(layout.opt("text-field"),f.properties,zoom)?.toString()?.replace("\\n","\n")?.trim().orEmpty()
+                    if(kind!="circle"&&own.isBlank())continue
+                    // Sections show their walk's name until CHILD_NAMES, then their own.
+                    val asWalk=walk!=null&&(zoom<DocWalks.CHILD_NAMES||own==walk)
+                    val text=if(asWalk)walk!! else own
+                    val ref=if(asWalk)(f.properties[DocWalks.WALK_ID] as? String).orEmpty()else""
+                    val size=if(kind=="circle")number(paint.opt("circle-radius"),4.0).toFloat()else if(asWalk)12f else number(eval(layout.opt("text-size")?:12,f.properties,zoom),12.0).toFloat()
                     val spacing=if(layout.optString("symbol-placement")=="line")layout.optDouble("symbol-spacing",250.0).toFloat()else 0f
                     val c=color(eval(paint.opt(if(kind=="circle")"circle-color"else"text-color"),f.properties,zoom))
-                    val priority=number(eval(layout.opt("symbol-sort-key")?:100,f.properties,zoom),100.0)
+                    val priority=if(asWalk)WALK_PRIORITY else number(eval(layout.opt("symbol-sort-key")?:100,f.properties,zoom),100.0)
                     val bold=layout.optJSONArray("text-font")?.toString()?.contains("Bold")==true
                     if(id==TRACK_LABELS&&f.type!=3){
                         for(p in f.paths){if(repeats.getOrDefault(text,0)>=MAX_REPEATS)break
                             for((point,where) in crossings(p,floor(zoom).toInt(),MAX_REPEATS-repeats.getOrDefault(text,0))){
                                 if(!named.add(id+"\u0000"+text+"\u0000"+where))continue
-                                labels.add(Label(point,text.take(256),size,c,priority,bold,false,"$id:$text:$where",layout.optString("text-anchor","center"),false,spacing))
+                                labels.add(Label(point,text.take(256),size,c,priority,bold,false,"$id:$text:$where",layout.optString("text-anchor","center"),false,spacing,ref))
                                 repeats[text]=repeats.getOrDefault(text,0)+1
                             }
                         }
                         if(text !in single)anchor(path)?.let{point->
-                            single[text]=Label(point,text.take(256),size,c,priority,bold,false,labelKey(id,text,point),layout.optString("text-anchor","center"),false,spacing)}
+                            single[text]=Label(point,text.take(256),size,c,priority,bold,false,labelKey(id,text,point),layout.optString("text-anchor","center"),false,spacing,ref)}
                         continue
                     }
                     // Line labels: one candidate per name per tile, however many

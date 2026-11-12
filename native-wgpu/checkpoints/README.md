@@ -1,6 +1,24 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.45 DOC Descriptions Base APK — 34.0 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-DOC-Descriptions-0.1.45-Base.apk)**.
+Latest: **[Download 0.1.46 Huts Circuits Base APK — 34.0 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Huts-Circuits-0.1.46-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 47:
+**updates 0.1.13–0.1.45 in place, keeping its data.**
+
+- **Hut and bivouac cards:** tap a hut name for DOC's photo, bunks,
+  elevation, bookings, walk from the road, facilities and page text.
+- **Circuits first:** sections of large DOC walks carry the walk's name
+  until zoom 15 (Siberia Track reads Gillespie Pass Circuit), then their own.
+- **Search opens summaries** for DOC tracks and huts.
+- **Faster:** DOC lookups in parallel, connections kept warm.
+
+245 JVM tests pass; lint 0 errors; native libraries identical to 0.1.45.
+Not run on a phone.
+[Exact release record](../validation/huts-circuits-2026-11-12/release.json) ·
+[SHA-256](Ridgeline-Native-Huts-Circuits-0.1.46-Base.apk.sha256).
+
+## Previous 0.1.45 DOC descriptions checkpoint
+
+**[Download 0.1.45 DOC Descriptions Base APK — 34.0 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-DOC-Descriptions-0.1.45-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 46:
 **updates 0.1.13–0.1.44 in place, keeping its data.**
 

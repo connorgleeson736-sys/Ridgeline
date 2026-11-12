@@ -24,6 +24,10 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         const val STYLES_PER_TILE=3
         /** Map tiles followed for a tapped track's line (zoom 14, ~1.7 km in NZ). */
         const val TRACK_TILES=160
+        /** Map tiles visited along a large DOC walk (about 200 km of track). */
+        const val WALK_TILES=240
+        /** DOC connections are re-warmed this often while track names are shown. */
+        const val WARM_MILLIS=240_000L
         /** Start a request on a fresh consumer. Any refusal releases the consumer
          * and returns null: a closed transport throws IllegalStateException, but
          * its 512-request guard throws IllegalArgumentException, which used to
@@ -61,6 +65,8 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
      * tile was decoded again whenever the enabled set changed: 260 decodes for
      * 39 tiles). Styling filters layers by camera zoom itself. */
     private data class Tile(val body:TileBody,var mask:Set<String>,var features:List<VectorTile.Feature>){
+        /** [features] with tracks marked by their DOC walk, for [markedRevision]. */
+        var marked:List<VectorTile.Feature>?=null;var markedRevision=-1L
         /** Styled output and packed groups (per display clip) for the most recent
          * (settings, quarter zoom) keys, so pinching back and forth reuses them. */
         val styles=object:LinkedHashMap<Any,Styled>(4,.75f,true){override fun removeEldestEntry(eldest:MutableMap.MutableEntry<Any,Styled>)=size>STYLES_PER_TILE}
@@ -92,7 +98,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
     // keep loading during gestures. (Previously one tile at a time, none while
     // moving, so tracks could take seconds to appear after stopping.)
     private val leases=ConcurrentHashMap<GpuUploadQueue.Id,TileTransport.Consumer>()
-    private fun releaseAll(){for((id,owned)in leases.entries.toList())if(leases.remove(id,owned))owned.release(true);leaseStarted.clear();releaseHunting()}
+    private fun releaseAll(){for((id,owned)in leases.entries.toList())if(leases.remove(id,owned))owned.release(true);leaseStarted.clear();releaseHunting();releaseDoc()}
     /** When each outstanding overlay download started (worker thread). */
     private val leaseStarted=ConcurrentHashMap<GpuUploadQueue.Id,Long>()
     private var staleReleases=0L;private var refused=0L
@@ -149,52 +155,138 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         val out=ArrayList<Placed>();val b=selection.duplicate().order(ByteOrder.LITTLE_ENDIAN);val n=b.getInt(0)
         for(k in 0 until n){val i=b.getInt(4+k*12);val ox=b.getFloat(8+k*12);val oy=b.getFloat(12+k*12)
             val row=p.atlas.labels.getOrNull(i)?:continue
-            if(!row.label.key.startsWith(TopographyStyle.TRACK_LABELS+":")||i*3+1>=p.positions.size)continue
+            if(!(row.label.key.startsWith(TopographyStyle.TRACK_LABELS+":")||row.label.key.startsWith(TopographyStyle.HUT_LABELS+":"))||i*3+1>=p.positions.size)continue
             val x=p.positions[i*3]+ox*p.scale;val y=p.positions[i*3+1]+oy*p.scale
             out.add(Placed(floatArrayOf(x,y,x+row.width*p.scale,y+row.height*p.scale),row.label))}
         return out
     }
     /** The track name under a tap (with a finger's margin), nearest first. */
-    fun trackLabelAt(x:Double,y:Double):TopographyStyle.Label?{
+    /** The track or hut name under a tap (with a finger's margin), nearest first. */
+    fun labelAt(x:Double,y:Double):TopographyStyle.Label?{
         val margin=10*view.pixelScale
         return placedTracks.filter{val r=it.box;x>=r[0]-margin&&x<=r[2]+margin&&y>=r[1]-margin&&y<=r[3]+margin}
             .minByOrNull{val r=it.box;hypot((r[0]+r[2])/2-x,(r[1]+r[3])/2-y)}?.label
     }
-    /** The map's own line for the track named [name] through [at]: the same
-     * LINZ data (zoom 14, about 0.4 m precision) the map draws, followed from
-     * the tapped tile into each neighbour the track leaves through (loaded
-     * tiles reused, others fetched; at most [TRACK_TILES]). Pieces are clipped
-     * to their tiles, in longitude/latitude. */
-    fun trackLine(name:String,at:Coordinate,callback:(List<List<Coordinate>>)->Unit){runCatching{worker.execute{
-        val z=VECTOR_MAX_ZOOM;val n=1 shl z
-        val start=GpuUploadQueue.Id(z,floor((at.longitude+180)/360*n).toInt().coerceIn(0,n-1),floor(CameraMath.mercatorY(at.latitude)*n).toInt().coerceIn(0,n-1))
-        val queued=LinkedHashSet(listOf(start));val pending=ArrayDeque(listOf(start));val pieces=ArrayList<List<VectorTile.Point>>()
-        var inFlight=0;var done=false
-        fun finish(){if(done)return;done=true;val out=pieces.map{p->p.map{Coordinate(it.x*360-180,CameraMath.latitude(it.y))}};main.post{if(!closed)callback(out)}}
-        fun take(id:GpuUploadQueue.Id,features:List<VectorTile.Feature>){
-            val (parts,next)=trackPieces(id,features,name);pieces.addAll(parts)
-            for(t in next)if(queued.size<TRACK_TILES&&queued.add(t))pending.addLast(t)
-        }
-        fun pumpLine(){
-            if(done)return
-            while(inFlight<3&&pending.isNotEmpty()){val id=pending.removeFirst()
+    /** Zoom-14 map tiles visited from [start] (loaded tiles reused, others
+     * fetched six at a time); [take] reads a tile and names more to visit.
+     * [done] runs on the worker once nothing is left, or after 15 s. */
+    private fun visitTiles(start:Collection<GpuUploadQueue.Id>,limit:Int,take:(GpuUploadQueue.Id,List<VectorTile.Feature>)->List<GpuUploadQueue.Id>,done:()->Unit){
+        val queued=LinkedHashSet(start.take(limit));val pending=ArrayDeque(queued)
+        var inFlight=0;var finished=false
+        fun finish(){if(!finished){finished=true;done()}}
+        fun visit(){
+            if(finished)return
+            while(inFlight<6&&pending.isNotEmpty()){val id=pending.removeFirst()
                 val cached=tiles[id]
-                if(cached!=null&&"streets" in cached.mask){take(id,cached.features);continue}
+                if(cached!=null&&"streets" in cached.mask){for(t in take(id,cached.features))if(queued.size<limit&&queued.add(t))pending.addLast(t);continue}
                 val owned=loader.layerConsumer(1)
                 val body=startLeased(owned){loader.layerBody(owned,loader.vectorUrl(id.z,id.x,id.y))}?:continue
                 inFlight++
                 body.whenComplete{r,e->runCatching{worker.execute{
                     owned.close();inFlight--
-                    if(!done&&e==null&&r!=null&&r.status in 200..299)runCatching{take(id,VectorTile.decode(r.bytes,id.z,id.x,id.y,setOf("streets")))}
-                    pumpLine()
+                    if(!finished&&e==null&&r!=null&&r.status in 200..299)runCatching{for(t in take(id,VectorTile.decode(r.bytes,id.z,id.x,id.y,setOf("streets"))))if(queued.size<limit&&queued.add(t))pending.addLast(t)}
+                    visit()
                 }}.onFailure{owned.close()}}
             }
             if(inFlight==0&&pending.isEmpty())finish()
         }
-        pumpLine()
+        visit()
         // A request that never answers must not hold the summary back.
         worker.schedule({finish()},15,TimeUnit.SECONDS)
+    }
+    private fun lonLat(pieces:List<List<VectorTile.Point>>)=pieces.map{p->p.map{Coordinate(it.x*360-180,CameraMath.latitude(it.y))}}
+    /** The map's own line for the track named [name] through [at]: the same
+     * LINZ data (zoom 14, about 0.4 m precision) the map draws, followed from
+     * the tapped tile into each neighbour the track leaves through (at most
+     * [TRACK_TILES]). Pieces are clipped to their tiles, in longitude/latitude. */
+    fun trackLine(name:String,at:Coordinate,callback:(List<List<Coordinate>>)->Unit){runCatching{worker.execute{
+        val z=VECTOR_MAX_ZOOM;val n=1 shl z
+        val start=GpuUploadQueue.Id(z,floor((at.longitude+180)/360*n).toInt().coerceIn(0,n-1),floor(CameraMath.mercatorY(at.latitude)*n).toInt().coerceIn(0,n-1))
+        val pieces=ArrayList<List<VectorTile.Point>>()
+        visitTiles(listOf(start),TRACK_TILES,{id,features->val (parts,next)=trackPieces(id,features,name);pieces.addAll(parts);next}){
+            val out=lonLat(pieces);main.post{if(!closed)callback(out)}}
     }}.onFailure{callback(emptyList())}}
+    /** A large DOC walk's line ([guid], from the walk data already loaded for
+     * the map) and the map's own track pieces along it: every zoom-14 tile the
+     * walk crosses, each track piece mostly within 40 m of the walk. Both in
+     * longitude/latitude; empty when the walk's line is not loaded. */
+    fun walkLine(guid:String,doc:List<List<Coordinate>>?=null,callback:(List<List<Coordinate>>,List<List<Coordinate>>)->Unit){runCatching{worker.execute{
+        // The walk's line from the walk data loaded for the map, else [doc] (fetched by the caller).
+        val line=docTiles.values.asSequence().flatMap{it.lines.asSequence()}.firstOrNull{it.guid==guid}
+            ?:doc?.takeIf{it.isNotEmpty()}?.let{DocWalks.lines(listOf(DocTracks.WalkLine(guid,DocTracks.length(it.flatten()),it))).first()}
+        if(line==null){main.post{if(!closed)callback(emptyList(),emptyList())};return@execute}
+        val z=VECTOR_MAX_ZOOM;val n=(1 shl z).toDouble();val ids=LinkedHashSet<GpuUploadQueue.Id>()
+        for(p in line.paths)for(i in 1 until p.size){val a=p[i-1];val b=p[i];val steps=max(1,ceil(hypot(b.x-a.x,b.y-a.y)*n*4).toInt())
+            for(k in 0..steps){val t=k.toDouble()/steps;ids.add(GpuUploadQueue.Id(z,floor((a.x+(b.x-a.x)*t)*n).toInt(),floor((a.y+(b.y-a.y)*t)*n).toInt()))}}
+        val index=DocWalks.Index(listOf(line));val pieces=ArrayList<List<VectorTile.Point>>()
+        visitTiles(ids,WALK_TILES,{id,features->
+            for(f in features)if(f.layer=="streets"&&f.properties["kind"]=="track")for(path in f.paths)for(part in clip(path,id.bounds))if(part.size>=2){
+                val r=DocWalks.worldMeters(40.0,part[0].y);val hit=HashSet<Int>()
+                val near=part.count{p->hit.clear();index.near(p.x,p.y,r,hit);hit.isNotEmpty()}
+                if(near>=part.size*.6)pieces.add(part)}
+            emptyList()
+        }){val out=lonLat(pieces);val doc=lonLat(line.paths);main.post{if(!closed)callback(out,doc)}}
+    }}.onFailure{callback(emptyList(),emptyList())}}
+    /** The DOC walk (from the walk list loaded for the map) with this id. */
+    fun walkInfo(guid:String):DocWalks.Info?=docInfos[guid]
+
+    // DOC walks for track names (see DocWalks): the walk list once, then walk
+    // lines per zoom-10 data tile in view.
+    @Volatile private var docInfos:Map<String,DocWalks.Info> = emptyMap()
+    private var docListLoading=false;private var docListRetry=0L
+    private val docTiles=object:LinkedHashMap<GpuUploadQueue.Id,DocWalks.Index>(16,.75f,true){override fun removeEldestEntry(e:MutableMap.MutableEntry<GpuUploadQueue.Id,DocWalks.Index>)=size>24}
+    private val docLeases=HashMap<GpuUploadQueue.Id,TileTransport.Consumer>()
+    private val docRetry=HashMap<GpuUploadQueue.Id,Long>()
+    private var docWanted=emptyList<GpuUploadQueue.Id>()
+    private var docRevision=0L
+    private fun releaseDoc(){for((_,owned)in docLeases)owned.release(true);docLeases.clear()}
+    private fun updateDocWalks(on:Boolean,view:List<GpuUploadQueue.Id>){
+        val z=DocWalks.DATA_ZOOM
+        val wanted=if(!on)emptyList()else view.filter{it.z>=z}.map{GpuUploadQueue.Id(z,it.x shr(it.z-z),it.y shr(it.z-z))}.distinct().take(8)
+        if(wanted!=docWanted){docWanted=wanted
+            for((id,owned)in docLeases.entries.toList())if(id !in wanted){docLeases.remove(id);owned.release(true)}}
+        pumpDocWalks()
+    }
+    private var docWarmAt=0L
+    private fun pumpDocWalks(){
+        if(closed||!active||docWanted.isEmpty())return
+        val now=System.currentTimeMillis()
+        // Track and hut names are on screen: keep DOC's connections open (they
+        // idle out after 5 minutes) so a tap's page request skips the handshake.
+        if(now-docWarmAt>WARM_MILLIS){docWarmAt=now;loader.warm(listOf(DocPages.SITE,DocTracks.ORG))}
+        if(docInfos.isEmpty()&&!docListLoading&&docListRetry<=now){
+            val owned=loader.layerConsumer(9)
+            val body=startLeased(owned){loader.layerBody(owned,DocWalks.listUrl())}
+            if(body==null)docListRetry=now+REFUSED_RETRY_MILLIS
+            else{docListLoading=true;body.whenComplete{r,e->runCatching{worker.execute{
+                owned.close();docListLoading=false
+                val list=if(e==null&&r!=null&&r.status in 200..299)runCatching{DocWalks.parseList(String(r.bytes,Charsets.UTF_8))}.getOrNull()else null
+                if(list.isNullOrEmpty())docListRetry=System.currentTimeMillis()+30_000 else{docInfos=list;docRevision++;lastKey=null;schedulePublication()}
+                pumpDocWalks()
+            }}.onFailure{owned.close()}}}
+        }
+        for(id in docWanted){
+            if(docLeases.size>=2)break
+            if(id in docTiles||id in docLeases||(docRetry[id]?:0)>now)continue
+            val owned=loader.layerConsumer(10)
+            val body=startLeased(owned){loader.layerBody(owned,DocWalks.linesUrl(id.z,id.x,id.y))}?:run{docRetry[id]=now+REFUSED_RETRY_MILLIS;null}?:continue
+            docLeases[id]=owned
+            body.whenComplete{r,e->runCatching{worker.execute{
+                if(docLeases[id]!==owned){owned.close();return@execute};docLeases.remove(id);owned.close()
+                val index=if(e==null&&r!=null&&r.status in 200..299)runCatching{DocWalks.Index(DocWalks.lines(DocTracks.parseWalkLines(String(r.bytes,Charsets.UTF_8))))}.getOrNull()else null
+                if(index==null)docRetry[id]=System.currentTimeMillis()+30_000 else{docTiles[id]=index;docRevision++;lastKey=null;schedulePublication()}
+                pumpDocWalks()
+            }}.onFailure{owned.close()}}
+        }
+    }
+    /** A tile's features with tracks marked by their large DOC walk. */
+    private fun marked(id:GpuUploadQueue.Id,tile:Tile):List<VectorTile.Feature>{
+        if(tile.markedRevision==docRevision)tile.marked?.let{return it}
+        val z=DocWalks.DATA_ZOOM
+        val index=if(id.z>=z)docTiles[GpuUploadQueue.Id(z,id.x shr(id.z-z),id.y shr(id.z-z))]else null
+        val out=DocWalks.mark(tile.features,index,docInfos)
+        tile.marked=out;tile.markedRevision=docRevision;return out
+    }
     fun refresh(){if(closed)return;runCatching{worker.execute{
         if(closed)return@execute
         val state=loader.mapSettings.state
@@ -225,6 +317,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         current=wanted
         if(mask(state).isEmpty()){for((id,owned)in leases.entries.toList())if(leases.remove(id,owned))owned.release(true);leaseStarted.clear();tiles.clear()}
         updateHunting(if(hunting)HuntingAreas.dataZoom(pose.zoom)else -1,wanted)
+        updateDocWalks(state.tracks&&state.overlays()&&pose.zoom>=DocWalks.MIN_ZOOM,wanted)
         schedulePublication();pump()
     }
     // ---- DOC hunting permit areas: served live by DOC (HuntingAreas), one
@@ -309,7 +402,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         lastPublishAt=now
         val state=loader.mapSettings.state;val pose=view.planningPose;val zoom=floor(pose.zoom*4)/4
         val ordered=current.sortedWith(compareBy<GpuUploadQueue.Id>{it.z}.thenBy{it.x}.thenBy{it.y})
-        val key=listOf(state,ordered,tiles.mapValues{it.value.body.stamp?.fingerprint?:it.value.body.bytes.hashCode()},zoom,huntingRevision,huntingWanted)
+        val key=listOf(state,ordered,tiles.mapValues{it.value.body.stamp?.fingerprint?:it.value.body.bytes.hashCode()},zoom,huntingRevision,huntingWanted,docRevision)
         if(key==lastKey)return;lastKey=key
         // Like MapLibre's buckets: each source tile is decoded, styled, clipped and
         // packed once per styling; a publication only concatenates cached groups,
@@ -319,10 +412,12 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         trimTiles(current.toSet()+patches.map{it.source})
         if(state.overlays())for(patch in patches){val id=patch.source;val tile=tiles[id]?:continue
             val missing=enabled-tile.mask
-            if(missing.isNotEmpty()){tile.features=tile.features+VectorTile.decode(tile.body.bytes,id.z,id.x,id.y,missing);tile.mask=tile.mask+missing;tile.styles.clear();decoded++}
+            if(missing.isNotEmpty()){tile.features=tile.features+VectorTile.decode(tile.body.bytes,id.z,id.x,id.y,missing);tile.mask=tile.mask+missing;tile.styles.clear();tile.marked=null;tile.markedRevision=-1;decoded++}
             // MapLibre evaluates ["zoom"] in filters at the tile's own zoom, layer
             // ranges and paint at the camera zoom.
-            val styled=tile.styles.getOrPut(listOf(state,zoom)){Styled(style.build(tile.features,state,zoom,id.z.toDouble()))}
+            // Track sections named by their DOC walk (circuits) when the walk data is in.
+            val walks=state.tracks&&zoom>=DocWalks.MIN_ZOOM&&docInfos.isNotEmpty()
+            val styled=tile.styles.getOrPut(listOf(state,zoom,if(walks)docRevision else -1L)){Styled(style.build(if(walks)marked(id,tile)else tile.features,state,zoom,id.z.toDouble()))}
             val output=styled.output;val b=patch.clip.bounds
             groups.add(styled.groups.getOrPut(b.toList()){
                 val clipped=ArrayList<TopographyStyle.Line>()

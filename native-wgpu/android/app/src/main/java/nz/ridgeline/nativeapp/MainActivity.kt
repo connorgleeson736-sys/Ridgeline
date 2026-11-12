@@ -69,11 +69,29 @@ class MainActivity:Activity(){
         trackSheet.onLine={planner.highlightTrack(it)}
         trackSheet.onPoint={terrain.inspect(it)}
         trackSheet.mapLine={name,at,callback->mapLayers.trackLine(name,at,callback)}
+        trackSheet.walkLine={guid,doc,callback->mapLayers.walkLine(guid,doc,callback)}
+        trackSheet.onFit={terrain.focus(it)}
+        // Search: DOC walks (by their page's id) and huts open their summaries.
+        planner.onPlace={place->
+            val at=Coordinate(place.longitude,place.latitude)
+            val guid=DocTracks.guidOf(place.link)
+            when{
+                place.kind=="walk"&&guid!=null->{trackSheet.showWalk(guid,place.name,at,true);true}
+                place.kind=="hut"->{trackSheet.showHut(place.name,at);true}
+                else->false
+            }
+        }
+        trackSheet.walkInfo={mapLayers.walkInfo(it)}
         planner.onIdleTap={x,y->
-            val track=mapLayers.trackLabelAt(x,y)
-            if(track!=null)trackSheet.show(track.text.removeSuffix(" (mapped closed)"),Coordinate(track.point.x*360-180,CameraMath.latitude(track.point.y)))
-            else if(trackSheet.visible)trackSheet.hide()
-            else if(loader.mapSettings.state.hunting)terrain.pick(x,y){hit->if(hit!=null)mapLayers.huntingAt(hit[0],hit[1]){areas->HuntingDetails.show(this,areas)}}
+            val label=mapLayers.labelAt(x,y)
+            val at=label?.let{Coordinate(it.point.x*360-180,CameraMath.latitude(it.point.y))}
+            when{
+                label!=null&&at!=null&&label.key.startsWith(TopographyStyle.HUT_LABELS+":")->trackSheet.showHut(label.text,at)
+                label!=null&&at!=null&&label.ref.isNotEmpty()->trackSheet.showWalk(label.ref,label.text,at)
+                label!=null&&at!=null->trackSheet.show(label.text.removeSuffix(" (mapped closed)"),at)
+                trackSheet.visible->trackSheet.hide()
+                loader.mapSettings.state.hunting->terrain.pick(x,y){hit->if(hit!=null)mapLayers.huntingAt(hit[0],hit[1]){areas->HuntingDetails.show(this,areas)}}
+            }
         }
         planner.onProfilePoint={terrain.inspect(it)}
         layersUi=LayersUi(this,root,terrain,loader,offlineUi){planner.newRoute()}

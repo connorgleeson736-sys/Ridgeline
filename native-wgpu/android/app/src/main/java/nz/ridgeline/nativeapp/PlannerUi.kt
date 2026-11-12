@@ -80,6 +80,8 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
     var onOffline:()->Unit={}
     /** A tap on the map while not drawing a route (e.g. hunting area details). */
     var onIdleTap:(Double,Double)->Unit={_,_->}
+    /** A search result chosen: true if it opened its own summary (tracks, huts). */
+    internal var onPlace:(PlaceSearch.Place)->Boolean={false}
     /** Fills the drawer's saved-regions section under the routes (OfflineUi). */
     var savedRegions:(LinearLayout,()->Unit)->Unit={_,_->}
     var onProfilePoint:(Coordinate?)->Unit={}
@@ -116,8 +118,8 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
             row.setOnClickListener{
                 hideKeyboard();dismissDrawer()
                 val point=Coordinate(place.longitude,place.latitude)
-                terrain.focus(listOf(point),PlaceSearch.zoom(place.kind));terrain.inspect(point)
-                main.removeCallbacks(clearFound);main.postDelayed(clearFound,8000)
+                terrain.focus(listOf(point),PlaceSearch.zoom(place.kind))
+                if(!onPlace(place)){terrain.inspect(point);main.removeCallbacks(clearFound);main.postDelayed(clearFound,8000)}
             }
             list.addView(row);NativeUi.divider(list)
         }

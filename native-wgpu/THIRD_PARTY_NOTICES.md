@@ -56,3 +56,10 @@ lines and LINZ tiles around Rabbit Pass in `android/app/src/test/fixtures/rabbit
 
 Nine LINZ topographic vector tiles around Roys Peak (CC BY 4.0, LINZ) are
 test fixtures in `android/app/src/test/fixtures/tracks/`.
+
+Hut cards use DOC's "DOC Huts" (DOC_Huts_DTO and DOC_Huts, CC BY 4.0) and
+the hut's doc.govt.nz page text. Circuit names on the map use DOC's walk list
+and walk lines (DOC_Walking_Experiences, DOC_WebsiteWalkingandTrampingLns_DTO,
+CC BY 4.0). Real DOC and LINZ data around the Gillespie Pass Circuit are test
+fixtures in `android/app/src/test/fixtures/gillespie/`, and a Siberia Hut page
+excerpt in `android/app/src/test/fixtures/docpages/`.

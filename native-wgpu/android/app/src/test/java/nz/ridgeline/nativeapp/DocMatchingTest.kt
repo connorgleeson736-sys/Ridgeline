@@ -61,3 +61,40 @@ class DocMatchingTest {
         assertEquals("&bogus; &#99999999;",DocPages.decode("&bogus; &#99999999;"))
     }
 }
+
+/** Hut cards: DOC's hut assets and pages, matched to the map's hut. */
+class DocHutsTest {
+    private val assets="""{"features":[
+        {"attributes":{"TechObjectName":"Siberia Hut","SubObjectType":"Serviced Hut","CharName1":"TECHNICAL_OBJECT_NAME","CharValue1":"Siberia Hut","CharName2":"USER_STATUS","CharValue2":"OPEN","CharName3":"WEB_FACILITIES_HUT","CharValue3":"Heating","CharName4":"WEB_HUT_BUNKS","CharValue4":"20 each","CharName5":"WEB_WALK_ROADEND","CharValue5":"Over 4 hours","CharName6":"WEB_CATEGORY_HUT","CharValue6":"Serviced","CharName7":"PUBLIC_USE","CharValue7":"Yes"},"geometry":{"x":169.0617,"y":-44.2048}},
+        {"attributes":{"TechObjectName":"Kerin Forks Hut","SubObjectType":"Standard Hut","CharName2":"USER_STATUS","CharValue2":"CLOSED"},"geometry":{"x":169.07,"y":-44.21}}]}"""
+    private val pages="""{"features":[
+        {"attributes":{"name":"Siberia Hut ","place":"Mount Aspiring National Park","bookable":"Yes","facilities":"Heating, Mattresses, Toilets - non-flush, Water from tap - not treated, boil before use, Water supply","introductionThumbnail":"https://www.doc.govt.nz/thumbs/large/link/aee91e67aceb4e0995f00c3d6fa14016.jpg","staticLink":"https://www.doc.govt.nz/link/3e2405a1da5b419391e9a1d636297ed2.aspx"},"geometry":{"x":169.06166,"y":-44.20482}},
+        {"attributes":{"name":"Siberia Hut","place":"Mount Aspiring National Park","bookable":"Yes","facilities":"Heating","introductionThumbnail":"","staticLink":"https://www.doc.govt.nz/link/3e2405a1da5b419391e9a1d636297ed2.aspx"},"geometry":{"x":169.06166,"y":-44.20482}}]}"""
+    private val at=Coordinate(169.0615,-44.2049)
+    @Test fun readsHutAssets(){
+        val list=DocTracks.parseHutAssets(assets)
+        val siberia=DocTracks.matchHut(list,"Siberia Hut",at,{it.name},{it.point})!!
+        assertEquals("Serviced",siberia.category);assertEquals("20 each",siberia.bunks);assertEquals("Over 4 hours",siberia.roadEnd);assertFalse(siberia.closed)
+        assertTrue(list.single{it.name=="Kerin Forks Hut"}.closed)
+    }
+    @Test fun readsHutPagesOnceWithWholeFacilities(){
+        val list=DocTracks.parseHutPages(pages)
+        assertEquals(1,list.size)
+        val p=list.single();assertTrue(p.bookable);assertEquals("Mount Aspiring National Park",p.place)
+        assertEquals(listOf("Heating","Mattresses","Toilets - non-flush","Water from tap - not treated, boil before use","Water supply"),p.facilities)
+    }
+    @Test fun matchesTheMapsHutNameOrTheNearestHut(){
+        assertEquals(DocTracks.hutKey("Siberia Hut"),DocTracks.hutKey("siberia hut "))
+        assertEquals(DocTracks.hutKey("Brewster Biv"),DocTracks.hutKey("Brewster Bivouac"))
+        val list=DocTracks.parseHutPages(pages)
+        assertNotNull(DocTracks.matchHut(list,"Siberia",at,{it.name},{it.point}))
+        // Differently named on the map, but on the spot: still DOC's hut.
+        assertNotNull(DocTracks.matchHut(list,"Siberia Valley Hut",Coordinate(169.0617,-44.2048),{it.name},{it.point}))
+        assertNull(DocTracks.matchHut(list,"Other Hut",Coordinate(169.10,-44.25),{it.name},{it.point}))
+    }
+    @Test fun readsTheHutPage(){
+        val html=File("src/test/fixtures/docpages/siberia-hut.html").readText()
+        assertTrue(DocPages.intro(html).startsWith("This is a serviced 20-bunk hut in the Wānaka/Makarora area."))
+        assertEquals(listOf("About this hut","Fees and bookings","Getting there","Know before you go"),DocPages.parse(html).map{it.title})
+    }
+}
