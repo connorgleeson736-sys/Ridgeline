@@ -22,9 +22,14 @@ internal class CacheCoverage {
     fun addRegion(bounds:TileLoader.Bounds,zoom:Int){
         regions.add(doubleArrayOf((bounds.west+180)/360,CameraMath.mercatorY(bounds.north),(bounds.east+180)/360,CameraMath.mercatorY(bounds.south)) to zoom)
     }
+    /** A saved painted area: each cell is stored down to its detail zoom. */
+    private val painted=HashMap<Int,Int>()
+    fun addCells(cells:Map<Int,Int>){for((k,d)in cells){val z=PaintedArea.DETAILS[d];if(z>(painted[k]?:-1))painted[k]=z}}
     /** Finest stored imagery zoom at a Mercator point, or -1 if none. */
     fun level(mx:Double,my:Double):Int{
         var best=-1
+        if(painted.isNotEmpty()){val n=PaintedArea.GRID.toDouble();val x=floor(mx*n).toInt();val y=floor(my*n).toInt()
+            if(x in 0 until PaintedArea.GRID&&y in 0 until PaintedArea.GRID)painted[PaintedArea.key(x,y)]?.let{best=it}}
         for((b,z)in regions)if(mx>=b[0]&&mx<=b[2]&&my>=b[1]&&my<=b[3])best=max(best,z)
         for(z in MAX_ZOOM downTo best+1){val n=(1 shl z).toDouble()
             val key=(floor(mx*n).toLong() shl 32) or (floor(my*n).toLong() and 0xffffffffL)
