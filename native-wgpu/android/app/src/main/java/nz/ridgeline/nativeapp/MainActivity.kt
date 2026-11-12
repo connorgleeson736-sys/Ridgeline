@@ -61,6 +61,7 @@ class MainActivity:Activity(){
         planner=PlannerUi(this,root,terrain,loader,mapHost)
         offlineUi=OfflineUi(this,root,terrain,loader,false).also{it.routes=planner.controller}
         planner.onOffline={layersUi.dismiss();offlineUi.startRegion()}
+        planner.savedRegions={list,close->offlineUi.fillSavedRegions(list,close)}
         planner.onProfilePoint={terrain.inspect(it)}
         layersUi=LayersUi(this,root,terrain,loader,offlineUi){planner.newRoute()}
         location=LocationUi(this,mapHost,terrain,false)

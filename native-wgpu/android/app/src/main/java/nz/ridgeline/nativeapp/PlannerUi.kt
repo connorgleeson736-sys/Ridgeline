@@ -78,6 +78,8 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
     private var closeAllButton:TextView?=null
     private val combineSelection=linkedMapOf<String,Boolean>()
     var onOffline:()->Unit={}
+    /** Fills the drawer's saved-regions section under the routes (OfflineUi). */
+    var savedRegions:(LinearLayout,()->Unit)->Unit={_,_->}
     var onProfilePoint:(Coordinate?)->Unit={}
     var onDrawing:(Boolean)->Unit={}
     /** Bottom map controls move above the route sheet's overlapping edge. */
@@ -296,10 +298,13 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         val createButton=button("＋  Create new"){newRoute()}.apply{textSize=13f};sidebar.addView(createButton,LinearLayout.LayoutParams(-1,dp(38)))
         drawerList=NativeUi.column(activity)
         val results=NativeUi.column(activity).apply{visibility=View.GONE};searchResults=results
-        sidebar.addView(ScrollView(activity).apply{addView(NativeUi.column(activity).apply{addView(results);addView(drawerList)})},LinearLayout.LayoutParams(-1,0,1f))
+        // Saved offline regions, under the saved routes.
+        val regions=NativeUi.column(activity)
+        sidebar.addView(ScrollView(activity).apply{addView(NativeUi.column(activity).apply{addView(results);addView(drawerList);addView(regions)})},LinearLayout.LayoutParams(-1,0,1f))
+        savedRegions(regions){dismissDrawer()}
         val offlineButton=NativeUi.button(activity,"Download offline region",true){dismissDrawer();onOffline()}.apply{textSize=13f}
         sidebar.addView(offlineButton,LinearLayout.LayoutParams(-1,dp(40)).apply{topMargin=dp(8)})
-        routesContent=listOf(heading,importButton,gap,createButton,drawerList!!,offlineButton)
+        routesContent=listOf(heading,importButton,gap,createButton,drawerList!!,regions,offlineButton)
         loadSearch()
         overlay.addView(sidebar,FrameLayout.LayoutParams(minOf(dp(300),activity.resources.displayMetrics.widthPixels-dp(64)),-1,Gravity.START).apply{setMargins(dp(10),dp(10),0,dp(10))})
         root.addView(overlay,FrameLayout.LayoutParams(-1,-1));drawer=overlay;drawerStamp=null;renderDrawer();if(searchQuery.isNotBlank())runSearch()

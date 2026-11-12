@@ -232,8 +232,14 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     // Provisional terrain interiors currently staged, one owner task per tile.
     private val interiorOwners=ConcurrentHashMap<Source,Task>()
     companion object{
-        /** Image tiles in one painted download (about 700 MB of aerial imagery). */
-        const val MAX_PAINTED_TILES=20_000
+        /** Image tiles in one painted download (about 1 GB of aerial imagery). */
+        const val MAX_PAINTED_TILES=30_000
+        /** Image tiles in one region (was 2,000). */
+        const val MAX_REGION_TILES=30_000
+        /** Network requests a minute while a region downloads: under LINZ's
+         * standard-key limit (1,000 a minute), shared with the visible map. */
+        private const val DOWNLOAD_REQUESTS_PER_MINUTE=900
+        private const val KEEP_BATCH=48
         private const val PARK_MILLIS=1500L
         private val WARM_ORIGINS=listOf("https://basemaps.linz.govt.nz/","https://services.arcgisonline.com/")
     }
@@ -606,9 +612,16 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             else->linz("aerial",Id(z,x,y),"webp")
         })
     }.getOrNull()
+    /** Downloaded files waiting for one shared transaction (download thread only). */
+    private val regionBatch=ThreadLocal<ArrayList<Pair<String,ByteArray>>?>()
+    private fun flushBatch(region:String){val batch=regionBatch.get()?:return;if(batch.isEmpty())return;offline.keepAll(region,batch);batch.clear()}
     private fun fetch(url:String):ByteArray{
         val body=fetchRecord(url);if(body.status !in 200..299)throw TileHttpException(body.status)
-        regionContext.get()?.let{offline.keep(it,url,body.bytes)};return body.bytes
+        regionContext.get()?.let{region->
+            val batch=regionBatch.get()
+            if(batch==null)offline.keep(region,url,body.bytes)
+            else{batch.add(url to body.bytes);if(batch.size>=KEEP_BATCH)flushBatch(region)}
+        };return body.bytes
     }
     private fun dependencyFresh(dep:PreparedTerrainCache.Dependency)=transport.fresh(SourceStamp(dep.resourceKey,dep.fingerprint,dep.until))
     private fun imageryChanged(){
@@ -758,7 +771,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             fun x(v:Double)=floor((v+180)/360*n).toInt().coerceIn(0,n-1)
             fun y(v:Double)=floor((1-asinh(tan(Math.toRadians(v)))/PI)/2*n).toInt().coerceIn(0,n-1)
             val x0=x(bounds.west);val x1=x(bounds.east);val y0=y(bounds.north);val y1=y(bounds.south)
-            require(result.size.toLong()+(x1-x0+1).toLong()*(y1-y0+1)<=2000){"Choose a smaller region or lower offline detail (2,000 image tiles per region)."}
+            require(result.size.toLong()+(x1-x0+1).toLong()*(y1-y0+1)<=MAX_REGION_TILES){"Too large: choose a smaller area or lower detail (30,000 image tiles per region)."}
             for(yy in y0..y1)for(xx in x0..x1)result.add(Id(z,xx,yy))
         };return result
     }
@@ -777,6 +790,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         return RegionEstimate(tiles.size,tiles.size+vectors+topo+dem,(tiles.size*imageKb+vectors*18.0+topo*22.0+dem*40.0)/1024)
     }
     fun regions(callback:(List<OfflineStore.Region>)->Unit){offlineQueries.execute{val rows=offline.regions();view.post{if(!dead)callback(rows)}}}
+    fun renameRegion(id:String,name:String,callback:()->Unit){offlineQueries.execute{offline.rename(id,name);view.post{if(!dead)callback()}}}
     fun removeRegion(id:String,callback:()->Unit){downloadJobs.execute{offline.delete(id);view.post{if(!dead)callback()}}}
     fun cancelDownload(){downloadCancel.set(true);regionPrefetch?.close();downloadLease?.release(true)}
     /** [base]: imagery to download; [includeTopo]: also NZ Topo and the mapped
@@ -791,7 +805,18 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         fun topoUrl(id:Id)=linz("topo-raster",id,"webp")
         val downloadImagery=NativeImagery(context,::fetch,{z,x,y->linz("aerial",Id(z,x,y),"webp")},overviews,::checkPreparation,::localImage,{display})
         downloadJobs.execute{
-            val region=resume?.let{offline.reopen(it)}?:offline.begin(name,OfflineStore.Metadata(bounds,detail,display.base.name,overlays,encoded));regionContext.set(region);val demDone=HashSet<Id>()
+            val region=resume?.let{offline.reopen(it)}?:offline.begin(name,OfflineStore.Metadata(bounds,detail,display.base.name,overlays,encoded));regionContext.set(region);regionBatch.set(ArrayList());val demDone=HashSet<Id>()
+            // Pacing: network starts in the last minute (all of the app's requests).
+            val starts=java.util.ArrayDeque<Pair<Long,Long>>()
+            fun pace(){
+                while(true){
+                    check(!dead&&!downloadCancel.get()){ "Download cancelled" }
+                    val now=android.os.SystemClock.elapsedRealtime();val total=transport.stats().getValue("networkStarts")
+                    starts.addLast(now to total);while(starts.size>1&&now-starts.first.first>60_000)starts.removeFirst()
+                    if(total-starts.first.second<DOWNLOAD_REQUESTS_PER_MINUTE)return
+                    Thread.sleep(1000)
+                }
+            }
             val prefetch=OfflinePrefetch(transport);regionPrefetch=prefetch
             fun checkActive(){check(!dead&&!downloadCancel.get()){ "Download cancelled" }}
             fun inputs(id:Id):List<ResourceKey>{
@@ -808,19 +833,32 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
                 if((pixels==null||pixels.any{!it.isFinite()})&&id.z>0)dem(id.parent())
             }
             try{
-                for((index,id)in tiles.withIndex()){
-                    checkActive()
+                var index=0;var waits=0
+                while(index<tiles.size){val id=tiles[index]
+                    checkActive();pace()
+                    try{
                     regionSources.set(prefetch.advance(index,tiles.subList(index,minOf(index+2,tiles.size)).map(::inputs)))
                     downloadImagery.load(id.z,id.x,id.y)
                     if(overlays&&id.z in 7..15)try{fetch(vectorUrl(id.z,id.x,id.y))}catch(e:TileHttpException){if(e.code!=404)throw e}
                     if(overlays&&id.z<=TOPO_MAX_ZOOM)try{fetch(topoUrl(id))}catch(e:TileHttpException){if(e.code!=404)throw e}
                     val dz=min(id.z,18);val f=1 shl(id.z-dz);val n=1 shl dz
                     if(display.base!=MapSettings.Base.TOPO)for(dy in -1..1)for(dx in -1..1)dem(Id(dz,Math.floorMod(id.x/f+dx,n),(id.y/f+dy).coerceIn(0,n-1)))
-                    if(index%5==0||index==tiles.lastIndex)view.post{if(!dead)progress(String.format(java.util.Locale.ROOT,"%,d / %,d",index+1,tiles.size))}
+                    val shown=index
+                    if(index%5==0||index==tiles.lastIndex)view.post{if(!dead)progress(String.format(java.util.Locale.ROOT,"%,d / %,d",shown+1,tiles.size))}
+                    index++;waits=0
+                    }catch(e:TileHttpException){
+                        // LINZ (or Esri) says too many requests: wait and retry this tile.
+                        if(e.code!=429||waits>=6)throw e
+                        val seconds=minOf(300,30 shl waits);waits++
+                        view.post{if(!dead)progress("paused by the map server · resuming in $seconds s")}
+                        val until=android.os.SystemClock.elapsedRealtime()+seconds*1000L
+                        while(android.os.SystemClock.elapsedRealtime()<until){checkActive();Thread.sleep(500)}
+                    }
                 }
+                flushBatch(region)
                 offline.status(region,"Ready")
-            }catch(e:Exception){offline.status(region,if(downloadCancel.get()||dead)"Partial · cancelled"else"Partial · source unavailable")}
-            finally{regionSources.remove();prefetch.close();if(regionPrefetch===prefetch)regionPrefetch=null;regionContext.remove();view.post{if(!dead)done()}}
+            }catch(e:Exception){runCatching{flushBatch(region)};offline.status(region,if(downloadCancel.get()||dead)"Partial · cancelled"else"Partial · source unavailable")}
+            finally{regionBatch.remove();regionSources.remove();prefetch.close();if(regionPrefetch===prefetch)regionPrefetch=null;regionContext.remove();view.post{if(!dead)done()}}
         }
     }
     private val profileJobs=Executors.newSingleThreadScheduledExecutor()

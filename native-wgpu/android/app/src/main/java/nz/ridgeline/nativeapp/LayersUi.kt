@@ -158,6 +158,7 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
         check(parent,"Downloaded maps only",loader.offlineOnly){loader.offlineOnly(it)}
         parent.addView(NativeUi.button(activity,"Offline maps"){dismiss();offline.startRegion()})
         parent.addView(NativeUi.button(activity,"GPU textures: "+arrayOf("Automatic","Compatibility","Texture arrays")[loader.textureBackend.coerceIn(0,2)]){offline.gpuTextures{render()}})
+        parent.addView(NativeUi.button(activity,"Overview imagery ZIPs (${loader.overviews.list().size}/6)"){dismiss();offline.imageryPacks()})
         parent.addView(NativeUi.button(activity,"Loading diagnostics"){offline.diagnostics()})
         parent.addView(NativeUi.button(activity,"About & licences"){
             val text=NativeUi.text(activity,"Ridgeline Native\nNative map and route planner\n\nLINZ imagery, elevation and topographic data · CC BY 4.0. Esri World Imagery and contributors.\n\nMapLibre adaptation notice:\n"+activity.assets.open("licenses/maplibre-gl-js.txt").bufferedReader().use{it.readText()},12f).apply{setPadding(dp(16),dp(12),dp(16),dp(12));setTextIsSelectable(true)}
