@@ -69,3 +69,28 @@ class TrackLabelsTest {
         }
     }
 }
+
+/** Following a tapped track through real LINZ tiles (Roys Peak Track, nine
+ * zoom-14 tiles in src/test/fixtures/tracks), as MapLayers.trackLine does. */
+class TrackFollowTest {
+    private val tiles=java.io.File("src/test/fixtures/tracks").listFiles()!!.associate{f->
+        val (z,x,y)=f.name.removeSuffix(".pbf").split("-").map{it.toInt()};GpuUploadQueue.Id(z,x,y) to VectorTile.decode(f.readBytes(),z,x,y,setOf("streets"))}
+    private fun follow(name:String,at:Coordinate):List<Coordinate>{
+        val n=1 shl 14;val start=GpuUploadQueue.Id(14,floor((at.longitude+180)/360*n).toInt(),floor(CameraMath.mercatorY(at.latitude)*n).toInt())
+        val queued=linkedSetOf(start);val pending=ArrayDeque(listOf(start));val pieces=ArrayList<List<VectorTile.Point>>()
+        while(pending.isNotEmpty()){val id=pending.removeFirst();val features=tiles[id]?:continue
+            val (parts,next)=MapLayers.trackPieces(id,features,name);pieces.addAll(parts);for(t in next)if(queued.add(t))pending.addLast(t)}
+        return DocTracks.chain(pieces.map{p->p.map{Coordinate(it.x*360-180,CameraMath.latitude(it.y))}},at,25.0)
+    }
+    @Test fun followsTheTrackAcrossTilesIntoOneLine(){
+        // Tapped near the summit; the track runs down through other tiles to the car park.
+        val line=follow("Roys Peak Track",Coordinate(169.0597,-44.6825))
+        val length=DocTracks.length(line)
+        println("FOLLOW points ${line.size} length $length")
+        assertTrue("one continuous line of $length m",length in 6500.0..9000.0)
+        assertTrue(line.zipWithNext().all{(a,b)->DocTracks.meters(a,b)<200})
+    }
+    @Test fun otherNamesAreNotFollowed(){
+        assertTrue(follow("No Such Track",Coordinate(169.0597,-44.6825)).isEmpty())
+    }
+}

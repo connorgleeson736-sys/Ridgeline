@@ -72,33 +72,49 @@ class ElevationProfileView(context:Context):View(context){
     private val bottom get()=max(top+1,height-30*density)
     /** Shown in place of the chart while there is no elevation to draw. */
     var message="Elevation will appear here";set(value){if(field!=value){field=value;dirty=true;invalidate()}}
-    /** Distances of huts along the line, drawn as small hut marks on the profile. */
-    var markers:List<Double> = emptyList();set(value){if(field!=value){field=value;dirty=true;invalidate()}}
+    /** Huts along the line (distance, name), drawn as small hut marks on the
+     * profile; tap one for its name. */
+    var markers:List<Pair<Double,String>> = emptyList();set(value){if(field!=value){field=value;picked=-1;dirty=true;invalidate()}}
+    private var picked=-1
+    /** Zoomed distance window [v0, v1] (pinch, two-finger pan; double-tap resets); v1 <= v0 is the whole line. */
+    private var v0=0.0;private var v1=0.0
+    private var pinching=false;private var anchorA=0.0;private var anchorB=0.0
+    private var lastTapAt=0L;private var lastTapX=0f
+    private val total get()=samples.lastOrNull()?.distance?:0.0
+    private val zoomed get()=v1>v0
+    private val lo get()=if(zoomed)v0 else 0.0
+    private val hi get()=if(zoomed)v1 else max(1.0,total)
+    private fun distanceAt(px:Float)=lo+((px-left)/(right-left)).coerceIn(0f,1f)*(hi-lo)
+    fun resetZoom(){if(!zoomed)return;v0=0.0;v1=0.0;dirty=true;invalidate()}
     var onInspect:(NativeGeo.ProfilePoint,Boolean)->Unit={_,_->}
     var onRange:(NativeGeo.Section?)->Unit={}
     var onLeave:()->Unit={}
-    init{isFocusable=true;contentDescription="Route elevation profile. Drag for section statistics; arrow keys inspect samples."}
+    init{isFocusable=true;contentDescription="Route elevation profile. Drag for section statistics, pinch to zoom, double-tap to show all; arrow keys inspect samples."}
     fun data(value:List<NativeGeo.ProfilePoint>){
         val sameGeometry=samples.size==value.size&&samples.indices.all{samples[it].point==value[it].point&&samples[it].distance==value[it].distance}
         val distance=cursor?.distance;samples=value;index=ProfileIndex(value);measured=value.count{it.height!=null}>=2
         if(sameGeometry){cursor=distance?.let{NativeGeo.profileAt(value,it)};section=range?.let{directed(it.first,it.second)}}
-        else{cursor=null;range=null;start=null;section=null}
+        else{cursor=null;range=null;start=null;section=null;v0=0.0;v1=0.0;picked=-1}
         dirty=true;invalidate()
     }
     fun clearInspection(){if(cursor==null&&range==null)return;cursor=null;range=null;start=null;section=null;onRange(null);onLeave();invalidate()}
     fun refreshInspection(){cursor?.let{onInspect(it,false)};range?.let{onRange(section)}}
     override fun onSizeChanged(w:Int,h:Int,oldw:Int,oldh:Int){dirty=true}
-    private fun x(d:Double)=(left+d/max(1.0,samples.lastOrNull()?.distance?:1.0)*(right-left)).toFloat()
+    private fun x(d:Double)=(left+(d-lo)/max(1e-6,hi-lo)*(right-left)).toFloat()
     private fun y(h:Double)=(bottom-(h-low)/(high-low)*(bottom-top)).toFloat()
     private fun rebuild(){
         dirty=false
         if(width<=0||height<=0)return
-        val hs=samples.mapNotNull{it.height};val min=hs.minOrNull()?:0.0;val max=hs.maxOrNull()?:1.0
+        // Only the zoomed window (and one sample either side, for the edges).
+        val first=(samples.indexOfFirst{it.distance>=lo}-1).coerceAtLeast(0)
+        val last=(samples.indexOfLast{it.distance<=hi}+1).coerceAtMost(samples.size-1)
+        val visible=if(samples.isEmpty()||last<first)samples else samples.subList(first,last+1)
+        val hs=visible.filter{it.distance in lo..hi}.mapNotNull{it.height}.ifEmpty{visible.mapNotNull{it.height}};val min=hs.minOrNull()?:0.0;val max=hs.maxOrNull()?:1.0
         val pad=max(15.0,(max-min)*.08);low=floor((min-pad)/10)*10;high=ceil((max+pad)/10)*10
         if(high<=low)high=low+30
         path.reset();fill.reset();var pen=false;var lastX=0f
         // Draw at most four samples per chart column; analysis uses every sample.
-        for(p in RouteProfile.chartSamples(samples)){val h=p.height
+        for(p in RouteProfile.chartSamples(visible)){val h=p.height
             if(h==null){if(pen){fill.lineTo(lastX,bottom);fill.close()};pen=false;continue}
             val px=x(p.distance);val py=y(h)
             if(pen){path.lineTo(px,py);fill.lineTo(px,py)}else{path.moveTo(px,py);fill.moveTo(px,bottom);fill.lineTo(px,py)}
@@ -108,7 +124,7 @@ class ElevationProfileView(context:Context):View(context){
         val canvas=Canvas(b);canvas.drawColor(NativeUi.paper)
         text.textSize=10*scaled;text.color=NativeUi.muted;text.textAlign=Paint.Align.LEFT
         canvas.drawText("Elevation (m)",left,13*density,text)
-        val total=samples.lastOrNull()?.distance?:0.0
+        val total=this.total
         text.textAlign=Paint.Align.CENTER
         canvas.drawText(if(total>=1000)"Distance (km)"else"Distance (m)",(left+right)/2,height-3*density,text)
         if(!measured){text.textSize=12*scaled;canvas.drawText(message,width/2f,height/2f,text);return}
@@ -117,18 +133,45 @@ class ElevationProfileView(context:Context):View(context){
         for(i in 0..2){val h=low+(high-low)*i/2;val yy=y(h);paint.color=NativeUi.line;canvas.drawLine(left,yy,right,yy,paint);canvas.drawText(String.format(java.util.Locale.ROOT,"%,d",h.roundToInt()),left-6*density,yy+3.5f*density,text)}
         paint.pathEffect=null
         text.textAlign=Paint.Align.CENTER
-        for(i in 0..2){val d=total*i/2;val label=if(total>=1000)String.format(java.util.Locale.ROOT,if(total>=20000)"%.0f"else"%.1f",d/1000)else"${d.roundToInt()}";canvas.drawText(label,x(d),bottom+16*density,text)}
+        val span=hi-lo
+        for(i in 0..2){val d=lo+span*i/2;val label=if(total>=1000)String.format(java.util.Locale.ROOT,when{span>=20000->"%.0f";span>=2000->"%.1f";else->"%.2f"},d/1000)else"${d.roundToInt()}";canvas.drawText(label,x(d),bottom+16*density,text)}
         paint.color=Color.rgb(167,178,168);canvas.drawLine(left,bottom,right,bottom,paint);canvas.drawLine(left,top,left,bottom,paint)
+        canvas.save();canvas.clipRect(left,0f,right,bottom)
         paint.style=Paint.Style.FILL;paint.color=0x22e87944;canvas.drawPath(fill,paint)
         paint.style=Paint.Style.STROKE;paint.strokeWidth=2*density;paint.color=Color.rgb(186,99,53);paint.strokeJoin=Paint.Join.ROUND;canvas.drawPath(path,paint)
-        for(d in markers){val p=NativeGeo.profileAt(samples,d)?:continue;val h=p.height?:continue
-            val mx=x(d);val my=y(h)-7*density;val r=4.5f*density
-            val hut=Path().apply{moveTo(mx-r,my);lineTo(mx,my-r);lineTo(mx+r,my);lineTo(mx+r*.75f,my);lineTo(mx+r*.75f,my+r);lineTo(mx-r*.75f,my+r);lineTo(mx-r*.75f,my);close()}
-            paint.style=Paint.Style.FILL;paint.color=NativeUi.ink;canvas.drawPath(hut,paint)
-            paint.style=Paint.Style.STROKE;paint.strokeWidth=density;paint.color=NativeUi.paper;canvas.drawPath(hut,paint)}
+        canvas.restore()
         // The selected-section fill, cut to the range at draw time.
         val h=highlight?.takeIf{it.width==width&&it.height==height}?:Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888).also{highlight?.recycle();highlight=it}
-        h.eraseColor(Color.TRANSPARENT);paint.style=Paint.Style.FILL;paint.color=0x52587d62;Canvas(h).drawPath(fill,paint)
+        h.eraseColor(Color.TRANSPARENT);paint.style=Paint.Style.FILL;paint.color=0x52587d62
+        Canvas(h).apply{clipRect(left,0f,right,bottom);drawPath(fill,paint)}
+    }
+    /** Where hut mark [i] is drawn (above the profile), or null if outside the window. */
+    private val at=PointF()
+    private fun markerAt(i:Int):PointF?{
+        val d=markers.getOrNull(i)?.first?:return null;if(d<lo||d>hi)return null
+        val h=NativeGeo.profileAt(samples,d)?.height?:return null
+        at.set(x(d),y(h)-7*density);return at
+    }
+    private val hut=Path()
+    private fun drawMarkers(canvas:Canvas){
+        val r=4.5f*density
+        for(i in markers.indices){val at=markerAt(i)?:continue;val mx=at.x;val my=at.y;val s=if(i==picked)1.35f else 1f
+            hut.reset();hut.moveTo(mx-r*s,my);hut.lineTo(mx,my-r*s);hut.lineTo(mx+r*s,my);hut.lineTo(mx+r*.75f*s,my);hut.lineTo(mx+r*.75f*s,my+r*s);hut.lineTo(mx-r*.75f*s,my+r*s);hut.lineTo(mx-r*.75f*s,my);hut.close()
+            paint.style=Paint.Style.FILL;paint.color=if(i==picked)END else NativeUi.ink;canvas.drawPath(hut,paint)
+            paint.style=Paint.Style.STROKE;paint.strokeWidth=density;paint.color=NativeUi.paper;canvas.drawPath(hut,paint)}
+        val at=markerAt(picked)?:return;val name=markers[picked].second
+        text.textSize=11.5f*scaled;text.textAlign=Paint.Align.CENTER;text.isFakeBoldText=true
+        val w=text.measureText(name)+16*density;val h=21*density
+        val bx=(at.x-w/2).coerceIn(left,max(left,right-w));val by=max(2*density,at.y-r*1.4f-6*density-h)
+        box.set(bx,by,bx+w,by+h);paint.style=Paint.Style.FILL;paint.color=NativeUi.ink;canvas.drawRoundRect(box,h/2,h/2,paint)
+        text.color=Color.WHITE;canvas.drawText(name,bx+w/2,by+h/2+4*scaled,text);text.isFakeBoldText=false
+    }
+    /** The hut mark under a tap, nearest first, or -1. */
+    private fun markerHit(px:Float,py:Float):Int{
+        var best=-1;var bestD=Float.MAX_VALUE
+        for(i in markers.indices){val at=markerAt(i)?:continue;val dx=abs(px-at.x);val dy=abs(py-at.y)
+            if(dx<18*density&&dy<26*density&&dx+dy<bestD){bestD=dx+dy;best=i}}
+        return best
     }
     private val clip=Rect();private val box=RectF()
     override fun onDraw(canvas:Canvas){
@@ -147,6 +190,7 @@ class ElevationProfileView(context:Context):View(context){
                 canvas.drawText(label,px,top+3.5f*density,text);text.isFakeBoldText=false
             }
         }
+        drawMarkers(canvas)
         val p=cursor
         if(p!=null&&selected==null){
             paint.style=Paint.Style.STROKE;paint.strokeWidth=density;paint.color=NativeUi.ink;canvas.drawLine(x(p.distance),top,x(p.distance),bottom,paint)
@@ -182,14 +226,39 @@ class ElevationProfileView(context:Context):View(context){
     private fun select(from:Double,to:Double){range=from to to;section=directed(from,to);cursor=NativeGeo.profileAt(samples,to);onRange(section);invalidate()}
     override fun onTouchEvent(e:MotionEvent):Boolean{
         if(samples.size<2||width==0||!measured)return false
-        val d=((e.x-left)/(right-left)).coerceIn(0f,1f)*samples.last().distance
         when(e.actionMasked){
-            MotionEvent.ACTION_DOWN->{parent.requestDisallowInterceptTouchEvent(true);start=d;downX=e.x;moved=false;range=null;section=null;onRange(null);inspect(d);return true}
-            MotionEvent.ACTION_MOVE->{val from=start?:return false;moved=moved||abs(e.x-downX)>=4*density;if(moved)select(from,d)else inspect(d);return true}
-            MotionEvent.ACTION_UP->{val from=start?:return false
-                if(moved)select(from,d)else{range=null;section=null;onRange(null);inspect(d);performClick()}
-                start=null;parent.requestDisallowInterceptTouchEvent(false);return true}
-            MotionEvent.ACTION_CANCEL->{start=null;cursor=null;range=null;section=null;onRange(null);onLeave();parent.requestDisallowInterceptTouchEvent(false);invalidate();return true}
+            MotionEvent.ACTION_DOWN->{parent.requestDisallowInterceptTouchEvent(true);pinching=false;val d=distanceAt(e.x);start=d;downX=e.x;moved=false;range=null;section=null;onRange(null);inspect(d);return true}
+            // Two fingers zoom and pan the distance axis: the distances under
+            // both fingers stay under them.
+            MotionEvent.ACTION_POINTER_DOWN->if(e.pointerCount==2){
+                pinching=true;start=null;range=null;section=null;cursor=null;picked=-1;onRange(null);onLeave()
+                if(!zoomed){v0=0.0;v1=total}
+                anchorA=distanceAt(e.getX(0));anchorB=distanceAt(e.getX(1));invalidate();return true
+            }
+            MotionEvent.ACTION_MOVE->{
+                if(pinching){
+                    if(e.pointerCount<2)return true
+                    val xa=e.getX(0);val xb=e.getX(1);if(abs(xb-xa)<8*density||anchorA==anchorB)return true
+                    val width=(anchorB-anchorA)*(right-left)/(xb-xa);if(width<=0)return true
+                    val span=width.coerceIn(min(total,MIN_SPAN),total)
+                    if(span>=total*.999){v0=0.0;v1=0.0}
+                    else{v0=(anchorA-(xa-left)/(right-left)*span).coerceIn(0.0,total-span);v1=v0+span}
+                    dirty=true;invalidate();return true
+                }
+                val from=start?:return false;val d=distanceAt(e.x);moved=moved||abs(e.x-downX)>=4*density;if(moved)select(from,d)else inspect(d);return true}
+            MotionEvent.ACTION_UP->{
+                parent.requestDisallowInterceptTouchEvent(false)
+                if(pinching){pinching=false;return true}
+                val from=start?:return false;start=null;val d=distanceAt(e.x)
+                if(moved){picked=-1;select(from,d);return true}
+                // Double-tap: back to the whole line.
+                val now=android.os.SystemClock.uptimeMillis()
+                if(zoomed&&now-lastTapAt<300&&abs(e.x-lastTapX)<30*density){lastTapAt=0;resetZoom();cursor=null;picked=-1;onLeave();invalidate();return true}
+                lastTapAt=now;lastTapX=e.x
+                val hit=markerHit(e.x,e.y)
+                if(hit>=0){picked=hit;cursor=null;range=null;section=null;onRange(null);NativeGeo.profileAt(samples,markers[hit].first)?.let{onInspect(it,false)};invalidate();performClick();return true}
+                picked=-1;range=null;section=null;onRange(null);inspect(d);performClick();return true}
+            MotionEvent.ACTION_CANCEL->{start=null;pinching=false;cursor=null;range=null;section=null;onRange(null);onLeave();parent.requestDisallowInterceptTouchEvent(false);invalidate();return true}
         };return true
     }
     /** Section ends in drag order: A where the drag started, B where it is now. */
@@ -202,5 +271,7 @@ class ElevationProfileView(context:Context):View(context){
         };return super.onKeyDown(key,event)
     }
     override fun onDetachedFromWindow(){super.onDetachedFromWindow();base?.recycle();base=null;highlight?.recycle();highlight=null;dirty=true}
-    internal companion object{val START=Color.rgb(72,115,88);val END=Color.rgb(186,99,53)}
+    internal companion object{val START=Color.rgb(72,115,88);val END=Color.rgb(186,99,53)
+        /** Narrowest zoomed window, in metres. */
+        const val MIN_SPAN=60.0}
 }

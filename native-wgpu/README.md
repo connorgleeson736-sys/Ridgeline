@@ -5,11 +5,15 @@
 the audited APK was 0.1.5. Main next candidates are raw local-I/O isolation,
 GPU upload acknowledgement, classified recovery and per-tile critical-path tracing.
 
-Latest APK: **[0.1.43 Track Summary Base](checkpoints/README.md)** — updates
+Latest APK: **[0.1.44 Chart Zoom Base](checkpoints/README.md)** — updates
+0.1.13–0.1.43 in place. Zoomable elevation charts, hut names on the track
+chart, and track summaries on the map's own track line.
+
+Previous APK: **[0.1.43 Track Summary Base](checkpoints/README.md)** — updates
 0.1.13–0.1.42 in place. Track names at Capacitor's zooms, repeated along long
 tracks; tap a name for a DOC track summary with elevation profile and huts.
 
-Previous APK: **[0.1.42 Hunting Areas Base](checkpoints/README.md)** — updates
+Older APK: **[0.1.42 Hunting Areas Base](checkpoints/README.md)** — updates
 0.1.13–0.1.41 in place. DOC hunting permit areas, served live from DOC, as a
 Topographic overlay with tap-for-details.
 
