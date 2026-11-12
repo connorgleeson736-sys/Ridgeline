@@ -542,6 +542,9 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
      * 1-4, the rest 64+), not after them (was 800: behind every visible image,
      * terrain tile and profile, so tracks waited while panning). [rank] is the
      * tile's place in the view's nearest-first selection. */
+    /** Opens connections ahead of use (DNS, TCP and TLS), e.g. to DOC while
+     * track names are on screen, so a tapped summary's first request is quick. */
+    internal fun warm(origins:List<String>){if(!offlineOnly&&!dead)runCatching{scheduler.execute{if(!dead)backend.warm(origins)}}}
     internal fun layerConsumer(rank:Int)=transport.consumer(if(rank<2)5+rank else 64+rank,false,cacheDeadline=true)
     internal fun layerBody(consumer:TileTransport.Consumer,url:String)=consumer.acquire(ResourceKey(url,offlineOnly))
     internal fun vectorUrl(z:Int,x:Int,y:Int)="https://basemaps.linz.govt.nz/v1/tiles/topographic-v2/3857/$z/$x/$y.pbf?api=$key"

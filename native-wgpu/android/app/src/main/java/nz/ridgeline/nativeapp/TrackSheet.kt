@@ -23,6 +23,13 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     var onPoint:(Coordinate?)->Unit={}
     /** The map's own line for a tapped name (the geometry the map draws). */
     var mapLine:(String,Coordinate,(List<List<Coordinate>>)->Unit)->Unit={_,_,cb->cb(emptyList())}
+    /** A large DOC walk's map track pieces and DOC line (see MapLayers.walkLine). */
+    var walkLine:(String,List<List<Coordinate>>?,(List<List<Coordinate>>,List<List<Coordinate>>)->Unit)->Unit={_,_,cb->cb(emptyList(),emptyList())}
+    /** Frames the map on a line (summaries opened from search). */
+    var onFit:(List<Coordinate>)->Unit={}
+    private var fitNext=false
+    /** The DOC walk list entry for a walk id, if loaded. */
+    var walkInfo:(String)->DocWalks.Info?={null}
     private val main=Handler(Looper.getMainLooper())
     private val parse=Executors.newSingleThreadExecutor{Thread(it,"ridgeline-doc").apply{isDaemon=true}}
     private fun dp(v:Int)=NativeUi.dp(activity,v)
@@ -72,7 +79,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         background=NativeUi.pressable(activity,GradientDrawable().apply{setColor(Color.TRANSPARENT);cornerRadius=dpf(12f);setStroke(dp(1),NativeUi.orange)});isClickable=true;visibility=View.GONE
     }
     /** One stat: small muted label, larger value (as the route sheet). */
-    private inner class Stat(val label:String):TextView(activity){
+    private inner class Stat(var label:String):TextView(activity){
         init{textSize=13f;setTextColor(NativeUi.ink);gravity=Gravity.CENTER;value(null)}
         fun value(v:String?){
             val s=android.text.SpannableString("$label\n${v?:"—"}")
@@ -145,20 +152,27 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
 
     private var request=0L
     private var link=""
-    fun show(trackName:String,at:Coordinate){
+    /** Clears the sheet for a new track or hut and slides it up. */
+    private fun begin(title:String,hut:Boolean):Long{
         val id=++request
         visible=true;expanded=false;link=""
-        name.text=trackName;subtitle.text="";subtitle.visibility=View.GONE;closedBadge.visibility=View.GONE
+        name.text=title;subtitle.text="";subtitle.visibility=View.GONE;closedBadge.visibility=View.GONE
         photo.setImageDrawable(null);photo.visibility=View.GONE
-        for(s in stats)s.value(null)
-        chart.data(emptyList());chart.markers=emptyList();chart.message="";chart.visibility=View.VISIBLE
-        trackTitle=trackName;walkTitle.visibility=View.GONE;sections.removeAllViews();sections.visibility=View.GONE
+        val labels=if(hut)listOf("Bunks","Elevation","Bookings","From road")else listOf("Distance","Ascent","Descent","Highest")
+        for((i,s) in stats.withIndex()){s.label=labels[i];s.value(null)}
+        chart.data(emptyList());chart.markers=emptyList();chart.message="";chart.visibility=if(hut)View.GONE else View.VISIBLE
+        trackTitle=title;walkTitle.visibility=View.GONE;sections.removeAllViews();sections.visibility=View.GONE
         intro.visibility=View.GONE;factsScroll.visibility=View.GONE;facts.removeAllViews();huts.removeAllViews();huts.visibility=View.GONE;page.visibility=View.GONE
         onLine(null);onPoint(null);loader.cancelTrackProfile()
         if(panel.visibility!=View.VISIBLE){panel.visibility=View.VISIBLE;panel.translationY=full().toFloat()}
         panel.post{if(id==request)place(true)}
+        return id
+    }
+    fun show(trackName:String,at:Coordinate){
+        val id=begin(trackName,false);fitNext=false
         var walk:DocTracks.Walk?=null;var track:DocTracks.Track?=null;var walkDone=false;var trackDone=false;var lineStarted=false
         var mapped:List<Coordinate>?=null;var nameDone=false;var placeStarted=false
+        var byName:DocTracks.Walk?=null;var byPlace:DocTracks.Walk?=null;var placeDone=false
         fun geometry(line:List<Coordinate>){if(id!=request)return;lineFound(id,line)}
         fun decide(){
             val map=mapped?:return
@@ -180,27 +194,28 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         }
         fun walkFound(w:DocTracks.Walk?){
             if(id!=request||walkDone)return
-            walk=w;walkDone=true;w?.let{showWalk(id,it)};describe(walk,track);decide()
+            walk=w;walkDone=true;w?.let{applyWalk(id,it)};describe(walk,track);decide()
         }
-        // No walk of this name: the DOC walk whose line runs along the track,
-        // whatever it is called (the map's Rabbit Pass route is part of DOC's
-        // "Wilkin Valley - East Matukituki Traverse").
+        // DOC's walk of this name; else the walk whose line runs along the
+        // track, whatever it is called (the map's Rabbit Pass route is part of
+        // DOC's "Wilkin Valley - East Matukituki Traverse"). Both are asked at
+        // once, so a different name costs no extra wait.
+        fun resolve(){if(!nameDone)return;if(byName!=null)walkFound(byName)else if(placeDone)walkFound(byPlace)}
         fun matchByPlace(){
             val map=mapped?:return
-            if(!nameDone||walkDone||placeStarted)return;placeStarted=true
+            if(placeStarted)return;placeStarted=true
             val b=DocTracks.bounds(map,150.0)
-            if(map.size<2||b==null){walkFound(null);return}
+            if(map.size<2||b==null){placeDone=true;resolve();return}
             fetch(DocTracks.linesNearUrl(b),{DocTracks.alongTrack(DocTracks.parseWalkLines(text(it)),map)}){line->
                 if(id!=request)return@fetch
-                if(line==null){walkFound(null);return@fetch}
-                fetch(DocTracks.walkByGuidUrl(line.guid),{DocTracks.parseWalks(text(it)).firstOrNull()}){w->walkFound(w)}
+                if(line==null){placeDone=true;resolve();return@fetch}
+                fetch(DocTracks.walkByGuidUrl(line.guid),{DocTracks.parseWalks(text(it)).firstOrNull()}){w->byPlace=w;placeDone=true;resolve()}
             }
         }
         mapLine(trackName,at){paths->if(id==request){mapped=DocTracks.chain(paths,at,25.0);decide();matchByPlace()}}
         fetch(DocTracks.walkUrl(trackName,at.longitude,at.latitude),{DocTracks.nearestWalk(DocTracks.parseWalks(text(it)),at)}){found->
             if(id!=request)return@fetch
-            nameDone=true
-            if(found!=null)walkFound(found)else matchByPlace()
+            nameDone=true;byName=found;resolve()
         }
         fetch(DocTracks.trackUrl(trackName,at.longitude,at.latitude),{DocTracks.parseTracks(text(it))}){found->
             if(id!=request)return@fetch
@@ -219,19 +234,91 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     }
     fun back():Boolean{if(!visible)return false;if(expanded)settle(false)else hide();return true}
 
-    private var trackTitle=""
-    private fun showWalk(id:Long,w:DocTracks.Walk){
-        if(w.name.isNotBlank()&&!w.name.equals(trackTitle,true)){walkTitle.text=w.name;walkTitle.visibility=View.VISIBLE}
-        if(w.introduction.isNotBlank()){intro.text=w.introduction;intro.visibility=View.VISIBLE}
-        if(w.page.startsWith("https://")){link=w.page;page.visibility=View.VISIBLE;page.setOnClickListener{open(link)}
-            // DOC's full page text, after everything else (about a second).
-            fetch(w.page,{DocPages.parse(text(it))}){found->if(id==request&&!found.isNullOrEmpty())showSections(found)}}
+    /** A track section named by its large DOC walk (a circuit): the walk's own
+     * details and line, followed on the map's tracks. */
+    fun showWalk(guid:String,label:String,at:Coordinate,fit:Boolean=false){
+        val info=walkInfo(guid)
+        val id=begin(info?.name?:label,false);fitNext=fit
+        if(info!=null){
+            val summary=listOf(info.difficulty,info.time).filter{it.isNotBlank()}.joinToString(" · ")
+            subtitle.text=summary;subtitle.visibility=if(summary.isEmpty())View.GONE else View.VISIBLE
+            pageText(id,info.page)
+        }
+        fetch(DocTracks.walkByGuidUrl(guid),{DocTracks.parseWalks(text(it)).firstOrNull()}){w->if(id==request&&w!=null)applyWalk(id,w,info==null)}
+        fun use(pieces:List<List<Coordinate>>,doc:List<List<Coordinate>>){
+            val mapped=DocTracks.chain(pieces,at,150.0);val docLine=DocTracks.chain(doc,at,150.0)
+            // The map's tracks when they make up the walk; DOC's line where they have gaps.
+            if(mapped.size>=2&&DocTracks.length(mapped)>=.7*DocTracks.length(docLine))lineFound(id,mapped)else lineFound(id,docLine)
+        }
+        walkLine(guid,null){pieces,doc->
+            if(id!=request)return@walkLine
+            if(doc.isNotEmpty()){use(pieces,doc);return@walkLine}
+            // Walk data not loaded here (e.g. opened from search): DOC's line, then the map's tracks along it.
+            fetch(DocTracks.lineUrl(guid),{DocTracks.parseLines(text(it))}){found->
+                if(id!=request)return@fetch
+                val paths=found.orEmpty();if(paths.isEmpty()){lineFound(id,emptyList());return@fetch}
+                walkLine(guid,paths){p2,d2->if(id==request)use(p2,d2.ifEmpty{paths})}
+            }
+        }
+    }
+    /** A hut or bivouac: DOC's category, bunks, bookings, walk from the road
+     * end, facilities, photo, page text, and its elevation. */
+    fun showHut(hutName:String,at:Coordinate){
+        val id=begin(hutName,true);fitNext=false
+        onPoint(at)
+        loader.trackProfile(listOf(at,Coordinate(at.longitude+.00002,at.latitude))){values,_->
+            if(id==request)values.firstOrNull()?.height?.let{stats[1].value(metres(it))}}
+        var asset:DocTracks.HutAsset?=null;var hutPage:DocTracks.HutPage?=null
+        fun describeHut(){
+            // The map names some huts only "Hut" or "Bivouac": DOC's name instead.
+            if(hutName=="Hut"||hutName=="Bivouac")(hutPage?.name?:asset?.name)?.takeIf{it.isNotBlank()}?.let{name.text=it}
+            val category=asset?.category.orEmpty().let{c->if(c.isBlank()||Regex("hut|biv",RegexOption.IGNORE_CASE).containsMatchIn(c))c else "$c hut"}
+            val summary=listOf(category,hutPage?.place.orEmpty()).filter{it.isNotBlank()}.joinToString(" · ")
+            subtitle.text=summary;subtitle.visibility=if(summary.isEmpty())View.GONE else View.VISIBLE
+            closedBadge.visibility=if(asset?.closed==true)View.VISIBLE else View.GONE
+            asset?.let{a->Regex("\\d+").find(a.bunks)?.let{stats[0].value(it.value)};if(a.roadEnd.isNotBlank())stats[3].value(a.roadEnd.replace(" hours"," hr").replace(" hour"," hr"))}
+            hutPage?.let{p->stats[2].value(if(p.bookable)"Required" else "Not needed")}
+            facts.removeAllViews()
+            for(v in (hutPage?.facilities?:listOfNotNull(asset?.facilities?.takeIf{it.isNotBlank()})).map{it.substringBefore(" - ").trim()}.distinct())
+                facts.addView(chip(v),LinearLayout.LayoutParams(-2,-2).apply{marginEnd=dp(6)})
+            factsScroll.visibility=if(facts.childCount>0)View.VISIBLE else View.GONE
+        }
+        fetch(DocTracks.hutAssetsUrl(at.longitude,at.latitude),{DocTracks.matchHut(DocTracks.parseHutAssets(text(it)),hutName,at,{a->a.name},{a->a.point})}){found->
+            if(id!=request)return@fetch;asset=found;describeHut()}
+        fetch(DocTracks.hutPagesNearUrl(at.longitude,at.latitude),{DocTracks.matchHut(DocTracks.parseHutPages(text(it)),hutName,at,{p->p.name},{p->p.point})}){found->
+            if(id!=request||found==null)return@fetch;hutPage=found;describeHut()
+            if(found.page.startsWith("https://")){link=found.page;page.visibility=View.VISIBLE;page.setOnClickListener{open(link)};pageText(id,found.page,true)}
+            thumbnail(id,found.thumbnail)
+        }
+    }
+    private fun chip(v:String)=TextView(activity).apply{text=v;textSize=12f;setTextColor(NativeUi.ink);setPadding(dp(10),dp(5),dp(10),dp(5));background=NativeUi.background(activity,Color.rgb(236,240,232),14)}
+    /** DOC's page text (and, for huts, its lead paragraph as the introduction). */
+    private fun pageText(id:Long,url:String,lead:Boolean=false){
+        if(!url.startsWith("https://"))return
+        fetch(url,{bytes->val html=text(bytes);DocPages.intro(html) to DocPages.parse(html)}){found->
+            if(id!=request||found==null)return@fetch
+            if(lead&&found.first.isNotBlank()&&intro.visibility!=View.VISIBLE){intro.text=found.first;intro.visibility=View.VISIBLE}
+            if(found.second.isNotEmpty())showSections(found.second)
+        }
+    }
+    private fun thumbnail(id:Long,url:String){
         val size=dp(56)
-        if(w.thumbnail.startsWith("https://"))fetch(w.thumbnail,{bytes->
+        if(url.startsWith("https://"))fetch(url,{bytes->
             val bounds=BitmapFactory.Options().apply{inJustDecodeBounds=true};BitmapFactory.decodeByteArray(bytes,0,bytes.size,bounds)
             var sample=1;while(min(bounds.outWidth,bounds.outHeight)/(sample*2)>=size)sample*=2
             BitmapFactory.decodeByteArray(bytes,0,bytes.size,BitmapFactory.Options().apply{inSampleSize=sample})
         }){bitmap->if(id==request&&bitmap!=null){photo.setImageBitmap(bitmap);photo.visibility=View.VISIBLE}}
+    }
+    private var trackTitle=""
+    /** A DOC walk's details; [withPage]: also its page text (not yet asked). */
+    private fun applyWalk(id:Long,w:DocTracks.Walk,withPage:Boolean=true){
+        if(w.name.isNotBlank()&&!w.name.equals(trackTitle,true)){walkTitle.text=w.name;walkTitle.visibility=View.VISIBLE}
+        if(w.introduction.isNotBlank()){intro.text=w.introduction;intro.visibility=View.VISIBLE}
+        if(w.difficulty.isNotBlank()||w.time.isNotBlank()){val summary=listOf(w.difficulty,w.time).filter{it.isNotBlank()}.joinToString(" · ");subtitle.text=summary;subtitle.visibility=View.VISIBLE}
+        if(w.page.startsWith("https://")){link=w.page;page.visibility=View.VISIBLE;page.setOnClickListener{open(link)}
+            // DOC's full page text arrives after everything else (about a second).
+            if(withPage)pageText(id,w.page)}
+        thumbnail(id,w.thumbnail)
     }
     /** Difficulty and time (DOC's walk), else the track's category and time; facts as chips. */
     private fun describe(w:DocTracks.Walk?,t:DocTracks.Track?){
@@ -241,13 +328,12 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         closedBadge.visibility=if(t?.closed==true)View.VISIBLE else View.GONE
         facts.removeAllViews()
         if(t!=null)for(v in listOf(t.type,t.dogs,if(w!=null)t.category else"").filter{it.isNotBlank()}.map(DocTracks::tidy).distinct())
-            facts.addView(TextView(activity).apply{text=v;textSize=12f;setTextColor(NativeUi.ink);setPadding(dp(10),dp(5),dp(10),dp(5));background=NativeUi.background(activity,Color.rgb(236,240,232),14)},
-                LinearLayout.LayoutParams(-2,-2).apply{marginEnd=dp(6)})
+            facts.addView(chip(v),LinearLayout.LayoutParams(-2,-2).apply{marginEnd=dp(6)})
         factsScroll.visibility=if(facts.childCount>0)View.VISIBLE else View.GONE
     }
     private fun lineFound(id:Long,line:List<Coordinate>){
         if(line.size<2){chart.visibility=View.GONE;return}
-        onLine(line)
+        onLine(line);if(fitNext){fitNext=false;onFit(line)}
         stats[0].value(distance(DocTracks.length(line)))
         loader.trackProfile(line){values,_->
             if(id!=request)return@trackProfile
@@ -304,7 +390,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         huts.removeAllViews()
         for(s in stops){val h=s.hut
             val row=LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL;setPadding(0,dp(8),0,dp(8));contentDescription=h.name
-                if(h.page.startsWith("https://")){isClickable=true;background=NativeUi.pressable(activity,null);setOnClickListener{open(h.page)}}}
+                isClickable=true;background=NativeUi.pressable(activity,null);setOnClickListener{showHut(h.name,h.point)}}
             row.addView(HutIcon(),LinearLayout.LayoutParams(dp(30),dp(30)).apply{marginEnd=dp(12)})
             val text=NativeUi.column(activity)
             text.addView(TextView(activity).apply{this.text=h.name;textSize=14f;setTextColor(NativeUi.ink);setTypeface(null,Typeface.BOLD);maxLines=1;ellipsize=TextUtils.TruncateAt.END})

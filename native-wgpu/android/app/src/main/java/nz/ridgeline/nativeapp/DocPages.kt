@@ -21,11 +21,17 @@ internal object DocPages {
     private val tag=Regex("<[^>]+>")
     private val space=Regex("[ \\t\\r\\f\\u00a0]+")
 
+    private val introduction=Regex("""<doc-introduction-text\b[^>]*>(.*?)</doc-introduction-text>""",RegexOption.DOT_MATCHES_ALL)
+    /** The page's lead paragraph (huts have no other introduction in DOC's data). */
+    fun intro(html:String)=introduction.find(html)?.let{text(it.groupValues[1])}.orEmpty()
     fun parse(html:String):List<Section>{
         val out=ArrayList<Section>()
         for(m in item.findAll(html)){
             val title=text(m.groupValues[1]);val blocks=ArrayList<Block>()
-            for(b in textBlock.findAll(m.groupValues[2]))for(e in element.findAll(b.groupValues[1])){
+            // DOC's text blocks; a section written without them (huts' "About
+            // this hut") is read whole: only headings, paragraphs and list items.
+            val body=m.groupValues[2];val texts=textBlock.findAll(body).map{it.groupValues[1]}.toList().ifEmpty{listOf(body)}
+            for(b in texts)for(e in element.findAll(b)){
                 val value=text(e.groupValues[2]).takeIf{it.isNotBlank()}?:continue
                 blocks.add(when(e.groupValues[1].lowercase()){"p"->Paragraph(value);"li"->Bullet(value);else->Heading(value)})
             }

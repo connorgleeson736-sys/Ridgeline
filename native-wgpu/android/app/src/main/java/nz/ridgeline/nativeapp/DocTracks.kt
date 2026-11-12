@@ -50,7 +50,7 @@ internal object DocTracks {
     }
     private fun anyOf(field:String,name:String)="UPPER($field) IN (${names(name).joinToString(","){quote(it.uppercase(java.util.Locale.ROOT))}})"
     fun walkUrl(name:String,lon:Double,lat:Double)=query(WALKS,anyOf("name",name),"name,introduction,difficulty,completionTime,introductionThumbnail,walkingAndTrampingWebPage",true,near(lon,lat,SEARCH))
-    fun trackUrl(name:String,lon:Double,lat:Double)=query(TRACKS,anyOf("TechObjectName",name),"*",true,near(lon,lat,SEARCH)+"&maxAllowableOffset=0.00002")
+    fun trackUrl(name:String,lon:Double,lat:Double)=query(TRACKS,anyOf("TechObjectName",name),"*",true,near(lon,lat,SEARCH)+"&maxAllowableOffset=0.0001")
     /** DOC's walk lines crossing [b] (generalised to ~10 m), to find the walk a
      * track belongs to whatever either is called. */
     fun linesNearUrl(b:DoubleArray)=query(LINES,"1=1","EPISERVERGUID,Shape__Length",true,"&geometry=${f(b[0])},${f(b[1])},${f(b[2])},${f(b[3])}&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&maxAllowableOffset=0.0001")
@@ -60,6 +60,35 @@ internal object DocTracks {
     fun hutsUrl(b:DoubleArray)=query(HUTS,"1=1","*",true,"&geometry=${f(b[0])},${f(b[1])},${f(b[2])},${f(b[3])}&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects")
     fun hutPagesUrl(b:DoubleArray)=query(HUT_PAGES,"1=1","name,bookable,staticLink",true,"&geometry=${f(b[0])},${f(b[1])},${f(b[2])},${f(b[3])}&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects")
 
+    // Hut cards: DOC's hut assets (category, bunks, walk from the road end;
+    // DOC_Huts_DTO) and hut pages (place, bookings, facilities, photo, page;
+    // DOC_Huts), both CC BY 4.0, searched about 1 km around the tapped hut.
+    private const val HUT_ASSETS="DOC_Huts_DTO"
+    fun hutAssetsUrl(lon:Double,lat:Double)=query(HUT_ASSETS,"1=1","TechObjectName,SubObjectType,CharName1,CharValue1,CharName2,CharValue2,CharName3,CharValue3,CharName4,CharValue4,CharName5,CharValue5,CharName6,CharValue6,CharName7,CharValue7,CharName8,CharValue8",true,near(lon,lat,.012))
+    fun hutPagesNearUrl(lon:Double,lat:Double)=query(HUT_PAGES,"1=1","name,place,bookable,facilities,introductionThumbnail,staticLink",true,near(lon,lat,.012))
+    class HutAsset(val name:String,val category:String,val bunks:String,val roadEnd:String,val facilities:String,val status:String,val point:Coordinate){
+        val closed get()=status.isNotBlank()&&!status.equals("OPEN",true)
+    }
+    class HutPage(val name:String,val place:String,val bookable:Boolean,val facilities:List<String>,val thumbnail:String,val page:String,val point:Coordinate)
+    fun parseHutAssets(json:String)=features(json).mapNotNull{f->val a=f.getJSONObject("attributes");val c=characteristics(a)
+        val p=point(f.optJSONObject("geometry"))?:return@mapNotNull null
+        if(c["PUBLIC_USE"]?.equals("No",true)==true)return@mapNotNull null
+        HutAsset(a.text("TechObjectName"),c["WEB_CATEGORY_HUT"]?:a.text("SubObjectType").removeSuffix(" Hut"),c["WEB_HUT_BUNKS"].orEmpty(),c["WEB_WALK_ROADEND"].orEmpty(),c["WEB_FACILITIES_HUT"].orEmpty(),c["USER_STATUS"].orEmpty(),p)}
+    fun parseHutPages(json:String)=features(json).mapNotNull{f->val a=f.getJSONObject("attributes")
+        val p=point(f.optJSONObject("geometry"))?:return@mapNotNull null
+        // "Heating, Water from tap - not treated, boil before use, Toilets": items start with a capital.
+        val facilities=a.text("facilities").split(Regex(",\\s+(?=[A-Z])")).map{it.trim()}.filter{it.isNotEmpty()}
+        HutPage(a.text("name"),a.text("place"),a.text("bookable").equals("Yes",true),facilities,a.text("introductionThumbnail"),a.text("staticLink"),p)}.distinctBy{it.page.ifEmpty{it.name}}
+    /** "Siberia Hut", "Siberia hut " and "Siberia" are one hut; "Biv",
+     * "Bivvy" and "Bivouac" are one word. */
+    fun hutKey(name:String)=name.lowercase().replace(Regex("\\b(bivouac|bivvy|biv)\\b"),"biv").replace(Regex("\\bhut\\b"),"").replace(Regex("[^a-z0-9]+")," ").trim()
+    /** The record for the map's hut [name] at [at]: same name nearest, else the
+     * nearest within [within] metres (the map and DOC sometimes differ). */
+    fun <T> matchHut(items:List<T>,name:String,at:Coordinate,nameOf:(T)->String,pointOf:(T)->Coordinate,within:Double=250.0):T?{
+        val key=hutKey(name)
+        return items.filter{hutKey(nameOf(it))==key&&meters(pointOf(it),at)<3000}.minByOrNull{meters(pointOf(it),at)}
+            ?:items.filter{meters(pointOf(it),at)<within}.minByOrNull{meters(pointOf(it),at)}
+    }
     /** "https://www.doc.govt.nz/link/c073dc44e9aa4c369b8a75cb8365f047.aspx" →
      * "c073dc44-e9aa-4c36-9b8a-75cb8365f047". */
     fun guidOf(link:String):String?{
