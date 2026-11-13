@@ -107,6 +107,23 @@ internal object DocPages {
         }
         return emptyList()
     }
+    private val anticlockwise=Regex("\\b(?:anti-?\\s?clockwise|counter-?\\s?clockwise)\\b",RegexOption.IGNORE_CASE)
+    private val clockwiseWord=Regex("(?<![-\\w])clockwise\\b",RegexOption.IGNORE_CASE)
+    /** The way DOC's description goes round a loop ("Taking the loop clockwise"):
+     * true clockwise, false anticlockwise, null when it does not say (or names
+     * both without saying which it describes). */
+    fun clockwise(sections:List<Section>):Boolean?{
+        val d=sections.firstOrNull{it.title.contains("description",true)}?:return null
+        val sentences=d.blocks.flatMap{it.text.split(Regex("(?<=[.!?])\\s+"))}
+        fun way(t:String):Boolean?{val anti=anticlockwise.containsMatchIn(t);val cw=clockwiseWord.containsMatchIn(anticlockwise.replace(t,""))
+            return if(anti&&!cw)false else if(cw&&!anti)true else null}
+        val all=sentences.joinToString(" ")
+        way(all)?.let{return it}
+        // Both named ("either clockwise or anticlockwise"): the one DOC describes or recommends.
+        // (the words after "described", "recommended"…).
+        val said=Regex("\\b(described|recommended|recommend|best|taking|take the)\\b",RegexOption.IGNORE_CASE)
+        return sentences.firstNotNullOfOrNull{t->said.find(t)?.let{m->way(t.substring(m.range.first))}}
+    }
     fun parse(html:String):List<Section>{
         val out=ArrayList<Section>()
         for(m in item.findAll(html)){

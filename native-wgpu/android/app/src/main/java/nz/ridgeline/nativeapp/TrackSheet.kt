@@ -41,6 +41,11 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     var walkInfo:(String)->DocWalks.Info?={null}
     /** A walk's line continued to its tracks' natural ends; see MapLayers.extendWalk. */
     var extendWalk:(List<Coordinate>,Double,(List<Coordinate>?)->Unit)->Unit={_,_,cb->cb(null)}
+    /** A walk followed as DOC's description tells it; see MapLayers.followWalk. */
+    var followWalk:(List<DocPages.Section>,String,String,String,List<List<Coordinate>>,List<Coordinate>,(WalkDirections.Result?)->Unit)->Unit={_,_,_,_,_,_,cb->cb(null)}
+    /** A loop walk's line closed over the map's tracks; see MapLayers.closeWalk. */
+    var closeWalk:(List<Coordinate>,Double,Boolean?,(List<Coordinate>?)->Unit)->Unit={_,_,_,cb->cb(null)}
+    private val LOOP=Regex("\\b(loop|circuit)\\b",RegexOption.IGNORE_CASE)
     /** A walk's start and end options; see MapLayers.walkOptions. */
     var walkOptions:(String,List<DocPages.Leg>,List<DocPages.Start>,String,String,List<List<Coordinate>>,(WalkOptions.Choice?)->Unit)->Unit={_,_,_,_,_,_,cb->cb(null)}
     private val main=Handler(Looper.getMainLooper())
@@ -344,7 +349,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
                 // DOC's line can stop short (the Ben Lomond Track's, at the saddle).
                 val names=listOf(label,name.text.toString()).filter{it.isNotBlank()&&DocWalks.sameName(it,name.text.toString())}.distinct()
                 val named=ArrayList<Pair<String,List<Coordinate>>>();var waiting=names.size
-                fun finish(line:List<Coordinate>,pieces:List<Pair<String,List<Coordinate>>>){
+                fun finish(line:List<Coordinate>,pieces:List<Pair<String,List<Coordinate>>>,turned:Boolean=false){
                 if(line.size<2){lineFound(id,emptyList());return}
                 val found=ArrayList<Part>()
                 if(byLegs){
@@ -360,7 +365,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
                     }
                 }
                 for((n,spans) in DocTracks.namedSpans(pieces,line))if(!DocWalks.sameName(n,name.text.toString()))found.add(Part(n,"",spans,emptyList()))
-                lineFound(id,line,found,byLegs)
+                lineFound(id,line,found,byLegs||turned)
                 }
                 fun ready(){
                 if(id!=request)return
@@ -377,9 +382,29 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
                 // A line that stops short of the length DOC states (where the map's
                 // track changes name): on to the tracks' natural ends when that fits.
                 val target=WalkRoutes.stated(distance)
-                if(!byLegs&&target!=null&&drawn.size>=2&&DocTracks.length(drawn)<(1-WalkOptions.MATCH)*target){
-                    extendWalk(drawn,target){longer->if(id==request)finish(longer?:drawn,pieces)};return}
-                finish(drawn,pieces)
+                fun asBefore(){
+                fun extendOrFinish(){
+                    if(!byLegs&&target!=null&&drawn.size>=2&&DocTracks.length(drawn)<(1-WalkOptions.MATCH)*target){
+                        extendWalk(drawn,target){longer->if(id==request)finish(longer?:drawn,pieces)};return}
+                    finish(drawn,pieces)
+                }
+                // A loop (DOC: "14 km loop") that does not come back to its start
+                // (the Lake Rere Walk returns on the Greenstone Track): closed over
+                // the map's tracks, the way DOC goes round it.
+                val loop=!byLegs&&LOOP.containsMatchIn(listOf(distance,overview?.time.orEmpty(),info?.time.orEmpty(),name.text).joinToString(" "))
+                val way=DocPages.clockwise(pageSections)
+                if(loop&&drawn.size>=2&&DocTracks.meters(drawn.first(),drawn.last())<=WalkOptions.CLOSED_METERS){
+                    if(way!=null){finish(WalkOptions.turn(drawn,way),pieces,true);return}}
+                else if(loop&&target!=null&&drawn.size>=2){
+                    closeWalk(drawn,target,way){closed->if(id==request){if(closed!=null)finish(closed,pieces,way!=null)else extendOrFinish()}};return}
+                extendOrFinish()
+                }
+                // DOC's description followed first (its places and tracks in order;
+                // a loop back to its start; the way round DOC says).
+                if(!byLegs&&docPaths.isNotEmpty())followWalk(pageSections,name.text.toString(),distance,info?.time?.takeIf{it.isNotBlank()}?:overview?.time.orEmpty(),docPaths,drawn){r->
+                    if(id!=request)return@followWalk
+                    if(r!=null)finish(r.line,r.pieces,true)else asBefore()}
+                else asBefore()
                 }
                 if(waiting==0)ready()
                 for(n in names)mapLine(n,at){paths->named.addAll(paths.map{n to it});waiting--;if(waiting==0)ready()}

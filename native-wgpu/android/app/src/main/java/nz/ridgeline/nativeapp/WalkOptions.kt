@@ -122,13 +122,17 @@ internal object WalkOptions {
             return out
         }
         /** Metres and previous points from [source] (Dijkstra). */
-        fun from(source:Int):Pair<DoubleArray,IntArray>{
+        /** [avoid]: points not to pass through; [walked]: steps already taken
+         * (key [step]), costing [again] times as much (a loop does not retrace itself). */
+        fun from(source:Int,avoid:Set<Int> = emptySet(),walked:Set<Long> = emptySet(),again:Double=1.0):Pair<DoubleArray,IntArray>{
             val dist=DoubleArray(points.size){Double.MAX_VALUE};val prev=IntArray(points.size){-1};dist[source]=0.0
             val queue=java.util.PriorityQueue<Pair<Double,Int>>(compareBy{it.first});queue.add(0.0 to source)
             while(queue.isNotEmpty()){val (d,u)=queue.poll();if(d>dist[u])continue
-                for((v,w,_) in edges[u])if(d+w<dist[v]){dist[v]=d+w;prev[v]=u;queue.add(dist[v] to v)}}
+                for((v,w0,_) in edges[u]){if(v in avoid)continue;val w=if(walked.isNotEmpty()&&step(u,v) in walked)w0*again else w0
+                    if(d+w<dist[v]){dist[v]=d+w;prev[v]=u;queue.add(dist[v] to v)}}}
             return dist to prev
         }
+        fun step(a:Int,b:Int)=(min(a,b).toLong() shl 32) or max(a,b).toLong()
         fun path(prev:IntArray,to:Int):List<Int>{val out=ArrayList<Int>();var v=to;while(v>=0){out.add(v);v=prev[v]};return out.reversed()}
         /** The named tracks a path of points follows. */
         fun trackNames(path:List<Int>):List<Pair<String,List<Coordinate>>>{
@@ -180,6 +184,41 @@ internal object WalkOptions {
 
     /** Why legs were not used in the last [choose] (surveys). */
     val notes=StringBuilder();private fun note(s:String){notes.append(s).append('\n')}
+    /** A loop's line is closed when its ends are this close. */
+    const val CLOSED_METERS=200.0
+    /** [line] turned to go clockwise ([clockwise] true) or anticlockwise, as DOC describes; unchanged when null. */
+    fun turn(line:List<Coordinate>,clockwise:Boolean?):List<Coordinate>{
+        if(clockwise==null||line.size<3)return line
+        val k=cos(Math.toRadians(line[0].latitude));var a=0.0
+        for(i in line.indices){val p=line[i];val q=line[(i+1)%line.size];a+=p.longitude*k*q.latitude-q.longitude*k*p.latitude}
+        // Positive area: anticlockwise (east to the right, north up).
+        return if((a<0)==clockwise)line else line.reversed()
+    }
+    /** A loop walk ([target]: DOC's loop length, metres) whose [line] does not
+     * come back to its start: closed over the map's tracks by the shortest way
+     * back that does not retrace it (the Lake Rere Walk returns along the
+     * Greenstone Track, another DOC walk), when the whole is within [MATCH] of
+     * [target]. It starts at its end nearer a road (the car park) and goes
+     * the way DOC describes ([clockwise]). Null when it cannot be closed so. */
+    fun closeLoop(line:List<Coordinate>,area:Area,target:Double,clockwise:Boolean?):List<Coordinate>?{
+        if(line.size<2||target<=0||area.tracks.isEmpty())return null
+        val have=DocTracks.length(line)
+        if(DocTracks.meters(line.first(),line.last())<=CLOSED_METERS)return null
+        val net=Network(area.tracks)
+        val a=net.nearest(line.first(),30.0)?:return null;val b=net.nearest(line.last(),30.0)?:return null
+        // Not back along the walk itself (its points away from its two ends).
+        val avoid=net.near(line,12.0).filter{DocTracks.meters(net.points[it],line.first())>60&&DocTracks.meters(net.points[it],line.last())>60}.toSet()
+        val (dist,prev)=net.from(b,avoid);if(dist[a]==Double.MAX_VALUE)return null
+        val back=net.path(prev,a).map{net.points[it]}
+        val total=have+DocTracks.length(back)
+        if(abs(total-target)>MATCH*target){note("loop ${total.roundToInt()} m");return null}
+        var loop=line+back.drop(1)
+        // From the end nearer a road: the car park.
+        fun road(c:Coordinate)=area.roads.minOfOrNull{DocTracks.distanceTo(it.second,c)}?:Double.MAX_VALUE
+        // Starting at the line's far end: back to its start, then along it.
+        if(road(line.last())<road(line.first()))loop=back+line.drop(1)
+        return turn(loop,clockwise)
+    }
     /** [line] (a walk's line that stops short of DOC's stated length
      * [target], in metres) continued at one or both ends over the map's tracks
      * to their natural ends: on along each track (whatever it is called next)
@@ -253,7 +292,11 @@ internal object WalkOptions {
             val froms=named.ifEmpty{lineEnds}
             var best:Found?=null;var why="ends not found"
             for(a in froms){
-                val tos=places(leg.to,net.points[a],doc,centre,net,area,locate).ifEmpty{if(named.isEmpty())emptyList()else lineEnds}
+                val namedTos=places(leg.to,net.points[a],doc,centre,net,area,locate)
+                val tos=namedTos.ifEmpty{if(named.isEmpty())emptyList()else lineEnds}
+                // DOC's distances can be well out: loosely when both ends are found
+                // by name; closely when an end is chosen by that distance.
+                val tolerance=if(named.isNotEmpty()&&namedTos.isNotEmpty())WalkDirections.LOOSE else MATCH
                 val (d1,p1)=net.from(a);val (d2,p2)=via?.let{net.from(it)}?:(d1 to p1)
                 for(b in tos){if(b==a)continue
                     // "… to Neill Forks Hut, via Cone Ridge": through that place.
@@ -261,7 +304,7 @@ internal object WalkOptions {
                         else if(d1[b]==Double.MAX_VALUE)null else net.path(p1,b)
                     if(path==null){why="not joined";continue}
                     val meters=DocTracks.length(path.map{net.points[it]})
-                    if(abs(meters-km)>MATCH*km){why="${meters.roundToInt()} m";continue}
+                    if(abs(meters-km)>tolerance*km){why="${meters.roundToInt()} m";continue}
                     // Mostly along DOC's line (it can go beyond: the Tiki Trail to the
                     // saddle): not some other way between the same places.
                     val share=onLine(path.map{net.points[it]},doc)
