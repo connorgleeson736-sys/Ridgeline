@@ -151,6 +151,12 @@ internal object WalkRoutes {
     }
     /** A leg end this close to DOC's line is on it (huts can sit across a river). */
     const val SNAP_METERS=2500.0
+    /** A walk end this close to DOC's line is taken as it is. */
+    const val EXACT_METERS=300.0
+    /** A walk end chosen by distance is not within this of the walk's other end (unless a loop). */
+    const val OTHER_END_METERS=500.0
+    /** Leg ends that are a point on the track (a hut, not a pass, valley or locality). */
+    private val POINT=Regex("\\b(hut|huts|biv|bivvy|bivouac|shelter|lodge|campsite)\\b",RegexOption.IGNORE_CASE)
     /** A route must be within this share of DOC's own leg distances. */
     const val MATCH=.25
     /** Larger gaps between DOC's pieces are bridged only at a cost. */
@@ -174,12 +180,19 @@ internal object WalkRoutes {
         // Middle leg ends: the nearest point of the line (unknown ones are skipped).
         val stops=arrayOfNulls<Int>(names.size)
         for(i in 1 until names.size-1)stops[i]=places[i]?.let{g.nearest(it,SNAP_METERS)}
-        fun end(i:Int,neighbour:Int?,km:Double?):Int?{
+        // A place known precisely (a hut on the line) is the end, whatever DOC's
+        // leg distance says: "Pearl Flat to Liverpool Hut", given as 1 km, climbs
+        // 1.5 km to the hut. Distances only choose between line ends for places
+        // known roughly (a locality: "Makarora") or not at all.
+        fun precise(i:Int)=places[i]?.let{p->g.nearest(p,SNAP_METERS)?.takeIf{POINT.containsMatchIn(plain(names[i]))&&DocTracks.meters(g.points[it],p)<=EXACT_METERS}}
+        // [avoid]: the walk's other end; a walk that is not a loop does not start where it ends.
+        fun end(i:Int,neighbour:Int?,km:Double?,avoid:Int?):Int?{
             val place=places[i]
             // Neither placed nor measured: not guessed (the route starts or ends at the next known place).
             if(place==null&&km==null)return null
             val near=place?.let{g.nearest(it,SNAP_METERS)}
             val candidates=(g.deadEnds.filter{place==null||DocTracks.meters(g.points[it],place)<=END_METERS}+listOfNotNull(near)).distinct()
+                .filter{c->avoid==null||DocTracks.meters(g.points[c],g.points[avoid])>OTHER_END_METERS}
             if(candidates.isEmpty())return near
             val reach=neighbour?.let{g.from(it).first}
             return candidates.minByOrNull{c->
@@ -187,9 +200,11 @@ internal object WalkRoutes {
                 if(reach!=null&&km!=null&&reach[c]<Double.MAX_VALUE)abs(reach[c]-km*1000)+.2*off else off}
         }
         val firstNext=(1 until names.size).firstNotNullOfOrNull{stops.getOrNull(it)}
-        stops[0]=end(0,firstNext,walked.first().km)
-        val lastPrev=(names.size-2 downTo 0).firstNotNullOfOrNull{stops.getOrNull(it)}
-        stops[names.size-1]=end(names.size-1,lastPrev,walked.last().km)
+        val lastPrev=(names.size-2 downTo 1).firstNotNullOfOrNull{stops.getOrNull(it)}
+        val loop=same(names.first(),names.last())
+        stops[0]=precise(0);stops[names.size-1]=precise(names.size-1)
+        if(stops[0]==null)stops[0]=end(0,firstNext,walked.first().km,if(loop)null else stops[names.size-1])
+        if(stops[names.size-1]==null)stops[names.size-1]=end(names.size-1,lastPrev?:stops[0],walked.last().km,if(loop)null else stops[0])
         val order=stops.indices.filter{stops[it]!=null}
         if(order.size<2)return fail("fewer than two places on the line")
         val route=ArrayList<Int>();val along=HashMap<Int,Double>()

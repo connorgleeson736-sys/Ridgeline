@@ -5,11 +5,15 @@
 the audited APK was 0.1.5. Main next candidates are raw local-I/O isolation,
 GPU upload acknowledgement, classified recovery and per-tile critical-path tracing.
 
-Latest APK: **[0.1.49 Walk Fixes Base](checkpoints/README.md)** — updates
+Latest APK: **[0.1.50 Walk Ends Base](checkpoints/README.md)** — updates
+0.1.13–0.1.49 in place. Walks end at their huts when DOC's leg distances are
+short (the Liverpool Track reaches Liverpool Hut).
+
+Previous APK: **[0.1.49 Walk Fixes Base](checkpoints/README.md)** — updates
 0.1.13–0.1.48 in place. General fixes for walks like Greenstone and Caples and
 Ben Lomond; taller middle track sheet; A and B on the map from the chart.
 
-Previous APK: **[0.1.48 DOC Walks Base](checkpoints/README.md)** — updates
+Older APK: **[0.1.48 DOC Walks Base](checkpoints/README.md)** — updates
 0.1.13–0.1.47 in place. Every DOC walk from DOC's lines and pages (Great Walks
 included), whole walks checked against DOC's distances, and general labels.
 
