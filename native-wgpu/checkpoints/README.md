@@ -1,6 +1,22 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.49 Walk Fixes Base APK — 34.0 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Walk-Fixes-0.1.49-Base.apk)**.
+Latest: **[Download 0.1.50 Walk Ends Base APK — 34.0 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Walk-Ends-0.1.50-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 51:
+**updates 0.1.13–0.1.49 in place, keeping its data.**
+
+- **Walks end at their huts:** a hut (or bivouac, shelter, lodge, campsite)
+  on DOC's line is the walk's end even when DOC's leg distance is short (the
+  Liverpool Track now reaches Liverpool Hut).
+
+258 JVM tests pass; lint 0 errors; native libraries identical to 0.1.49.
+Not run on a phone.
+[Exact release record](../validation/walk-ends-2026-11-13/release.json) ·
+[Extent survey](../validation/walk-ends-2026-11-13/extent-survey.txt) ·
+[SHA-256](Ridgeline-Native-Walk-Ends-0.1.50-Base.apk.sha256).
+
+## Previous 0.1.49 walk fixes checkpoint
+
+**[Download 0.1.49 Walk Fixes Base APK — 34.0 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Walk-Fixes-0.1.49-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 50:
 **updates 0.1.13–0.1.48 in place, keeping its data.**
 

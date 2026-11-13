@@ -97,6 +97,22 @@ class WalkRoutesTest {
         val (circuit,legsUsed)=WalkRoutes.extent(route,line,"56 km loop")
         assertTrue(legsUsed);assertTrue(circuit.single().all{it.longitude>169.0})
     }
+    @Test fun aHutOnTheLineEndsTheWalkWhateverTheLegDistance(){
+        // Liverpool Track style: DOC's line in two pieces (the valley, then the climb to
+        // the hut); DOC gives the last leg as 1 km though the climb is 1.5 km.
+        // About 12 km of valley (93 m steps), then 1.7 km of climb.
+        val valley=(0..130).map{Coordinate(168.80-it*.0006,-44.55+it*.00072)}
+        val climb=(0..15).map{Coordinate(valley.last().longitude+.0004-it*.0012,valley.last().latitude+.0004+it*.0006)}
+        val hut=climb.last();val flat=valley[125]
+        fun leg(t:String,km:Double)=t.split(" to ").let{DocPages.Leg(it[0],it[1],t,"",km,emptyList())}
+        val legs=listOf(leg("Raspberry Creek car park to Aspiring Hut",9.0),leg("Aspiring Hut to Pearl Flat",5.0),leg("Pearl Flat to Liverpool Hut",1.0))
+        val places=mapOf("Aspiring Hut" to valley[75],"Pearl Flat" to flat,"Liverpool Hut" to hut)
+        val route=WalkRoutes.route(listOf(valley,climb),legs){n,_->places[n]}
+        assertNotNull(WalkRoutes.lastFailure,route);route!!
+        assertTrue("ends at the hut",DocTracks.meters(route.points.last(),hut)<20)
+        assertTrue("starts at the car park end",DocTracks.meters(route.points.first(),valley.first())<20)
+        // A pass or a locality is not a point: there the leg's distance still chooses the line end.
+    }
     @Test fun noLegsNoRoute(){
         assertNull(WalkRoutes.route(line,emptyList(),::locate))
     }
