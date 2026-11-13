@@ -20,6 +20,13 @@ class DocPhotosTest{
         assertTrue(WalkDirections.sentences(sections).none{it.contains("very steep and unformed")})
         assertTrue(photos.none{it.text.contains("See larger")})
     }
+    /** A photo linking to DOC's larger version ("See larger") uses that. */
+    @Test fun largerVersionWhenLinked(){
+        val html="""<doc-accordion-item header-text="Description"><div class="block textblock x"><p><a href="/contentassets/89f2/cave-stream-medium-1920.jpg"><img src="/contentassets/89f2/cave-stream-medium-flow-390.jpg" alt="" width="390" height="260"></a><br>Medium flow See larger (JPG, 500K)</p></div></doc-accordion-item>"""
+        val photo=DocPages.parse(html).single().blocks.single() as DocPages.Image
+        assertEquals("https://www.doc.govt.nz/contentassets/89f2/cave-stream-medium-1920.jpg",photo.url)
+        assertEquals("Medium flow",photo.text)
+    }
     /** The map's "Mt Iron Track" is DOC's "Mount Iron Track". */
     @Test fun trackFoundUnderDocsName(){
         val id=GpuUploadQueue.Id(14,16081,11753);val b=id.bounds
