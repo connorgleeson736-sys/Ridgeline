@@ -26,6 +26,10 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         const val TRACK_TILES=160
         /** Map tiles visited along a large DOC walk (about 200 km of track). */
         const val WALK_TILES=240
+        /** Map tiles read around a walk for its start and end options (zoom 14, about 1.7 km). */
+        const val AREA_TILES=120
+        /** The map this far around DOC's line is read for a walk's options. */
+        const val AREA_METERS=2000.0
         /** DOC connections are re-warmed this often while track names are shown. */
         const val WARM_MILLIS=240_000L
         /** Start a request on a fresh consumer. Any refusal releases the consumer
@@ -170,7 +174,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
     /** Zoom-14 map tiles visited from [start] (loaded tiles reused, others
      * fetched six at a time); [take] reads a tile and names more to visit.
      * [done] runs on the worker once nothing is left, or after 15 s. */
-    private fun visitTiles(start:Collection<GpuUploadQueue.Id>,limit:Int,take:(GpuUploadQueue.Id,List<VectorTile.Feature>)->List<GpuUploadQueue.Id>,done:()->Unit){
+    private fun visitTiles(start:Collection<GpuUploadQueue.Id>,limit:Int,take:(GpuUploadQueue.Id,List<VectorTile.Feature>)->List<GpuUploadQueue.Id>,layers:Set<String> = setOf("streets"),done:()->Unit){
         val queued=LinkedHashSet(start.take(limit));val pending=ArrayDeque(queued)
         var inFlight=0;var finished=false
         fun finish(){if(!finished){finished=true;done()}}
@@ -178,13 +182,13 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
             if(finished)return
             while(inFlight<6&&pending.isNotEmpty()){val id=pending.removeFirst()
                 val cached=tiles[id]
-                if(cached!=null&&"streets" in cached.mask){for(t in take(id,cached.features))if(queued.size<limit&&queued.add(t))pending.addLast(t);continue}
+                if(cached!=null&&cached.mask.containsAll(layers)){for(t in take(id,cached.features))if(queued.size<limit&&queued.add(t))pending.addLast(t);continue}
                 val owned=loader.layerConsumer(1)
                 val body=startLeased(owned){loader.layerBody(owned,loader.vectorUrl(id.z,id.x,id.y))}?:continue
                 inFlight++
                 body.whenComplete{r,e->runCatching{worker.execute{
                     owned.close();inFlight--
-                    if(!finished&&e==null&&r!=null&&r.status in 200..299)runCatching{for(t in take(id,VectorTile.decode(r.bytes,id.z,id.x,id.y,setOf("streets"))))if(queued.size<limit&&queued.add(t))pending.addLast(t)}
+                    if(!finished&&e==null&&r!=null&&r.status in 200..299)runCatching{for(t in take(id,VectorTile.decode(r.bytes,id.z,id.x,id.y,layers)))if(queued.size<limit&&queued.add(t))pending.addLast(t)}
                     visit()
                 }}.onFailure{owned.close()}}
             }
@@ -222,6 +226,47 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
             emptyList()
         }){val out=pieces.map{(name,p)->name to lonLat(listOf(p)).first()};main.post{if(!closed)callback(out)}}
     }}.onFailure{callback(emptyList())}}
+
+    /** A walk's start and end options (WalkOptions) over the map's tracks
+     * within [AREA_METERS] of DOC's line [doc]: null when DOC's legs give none
+     * or the area is too large. Main thread callback. */
+    fun walkOptions(guid:String,legs:List<DocPages.Leg>,starts:List<DocPages.Start>,walk:String,time:String,doc:List<List<Coordinate>>,callback:(WalkOptions.Choice?)->Unit){runCatching{worker.execute{
+        options[guid]?.let{c->main.post{if(!closed)callback(c)};return@execute}
+        // Not kept when none were found: the map may not have loaded in time.
+        fun finish(c:WalkOptions.Choice?){if(c!=null)options[guid]=c;main.post{if(!closed)callback(c)}}
+        area(doc.flatten(),AREA_METERS){area->
+            if(area==null){finish(null);return@area}
+            val places=PlaceSearch.get(view.context.assets)
+            val locate:(String,Coordinate)->Coordinate?={name,near->places?.locate(name,near,15.0)?.let{Coordinate(it.longitude,it.latitude)}}
+            // DOC's legs; else the starts DOC's description gives.
+            finish(runCatching{WalkOptions.choose(legs,doc,area,locate)?:WalkOptions.fromStarts(starts,walk,time,doc,area,locate)}.getOrNull())
+        }
+    }}.onFailure{callback(null)}}
+    private val options=java.util.concurrent.ConcurrentHashMap<String,WalkOptions.Choice>()
+    /** [line] (a walk's, shorter than DOC states) continued to the natural ends
+     * of the map's tracks (WalkOptions.extend), or null. Main thread callback. */
+    fun extendWalk(line:List<Coordinate>,target:Double,callback:(List<Coordinate>?)->Unit){runCatching{worker.execute{
+        area(line,(target-DocTracks.length(line)).coerceIn(500.0,3000.0)){area->
+            val out=area?.let{runCatching{WalkOptions.extend(line,it,target)}.getOrNull()}
+            main.post{if(!closed)callback(out)}}
+    }}.onFailure{callback(null)}}
+    /** The map's tracks, aerial lifts and named peaks within [margin] metres
+     * of [points] (at most [AREA_TILES] zoom-14 tiles, else null), read on
+     * the walk-route thread: [done] runs there. */
+    private fun area(points:List<Coordinate>,margin:Double,done:(WalkOptions.Area?)->Unit){
+        if(points.isEmpty()){runCatching{routeJobs.execute{done(null)}};return}
+        val lat=points.sumOf{it.latitude}/points.size;val dy=margin/111_320.0;val dx=dy/cos(Math.toRadians(lat))
+        val z=VECTOR_MAX_ZOOM;val n=(1 shl z).toDouble()
+        val x0=floor((points.minOf{it.longitude}-dx+180)/360*n).toInt();val x1=floor((points.maxOf{it.longitude}+dx+180)/360*n).toInt()
+        val y0=floor(CameraMath.mercatorY(points.maxOf{it.latitude}+dy)*n).toInt();val y1=floor(CameraMath.mercatorY(points.minOf{it.latitude}-dy)*n).toInt()
+        if((x1-x0+1)*(y1-y0+1)>AREA_TILES){runCatching{routeJobs.execute{done(null)}};return}
+        val ids=ArrayList<GpuUploadQueue.Id>();for(x in x0..x1)for(y in y0..y1)ids.add(GpuUploadQueue.Id(z,x,y))
+        val box=doubleArrayOf(x0/n*360-180,CameraMath.latitude((y1+1)/n),(x1+1)/n*360-180,CameraMath.latitude(y0/n))
+        val tracks=ArrayList<Pair<String,List<Coordinate>>>();val lifts=ArrayList<List<Coordinate>>();val peaks=ArrayList<Pair<String,Coordinate>>();val roads=ArrayList<Pair<String,List<Coordinate>>>()
+        visitTiles(ids,AREA_TILES,{id,features->WalkOptions.read(id,features,tracks,lifts,peaks,roads);emptyList()},WalkOptions.LAYERS){
+            runCatching{routeJobs.execute{done(WalkOptions.Area(tracks,lifts,peaks,box,roads))}}
+        }
+    }
 
     // Walk routes: each large DOC walk followed leg by leg over its DOC line
     // (WalkRoutes), for track names (only the walk itself, not side trips or

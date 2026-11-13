@@ -74,6 +74,39 @@ internal object DocPages {
         }
         return out
     }
+    /** A place DOC says the walk can start from, and the track it starts on, if named. */
+    data class Start(val place:String,val track:String?)
+    private val startSentence=Regex("^(?:(?:you|visitors|walkers|trampers) can |it can |this (?:track|walk) can )?(?:start|starting|begin|beginning)\\b|\\bcan be (?:started|begun|accessed)\\b|\\b(?:start|starting|begin|beginning) (?:at|from|on|outside)\\b",RegexOption.IGNORE_CASE)
+    private val startVerb=Regex("^.*?\\b(?:start(?:ed|ing)?|begin(?:ning|s)?|begun|accessed)\\b",RegexOption.IGNORE_CASE)
+    private val onTrack=Regex("\\bon the ((?:[A-ZĀĒĪŌŪ][\\p{L}'’/-]*\\s+)+?(?:Track|Walk|Walkway|Trail|Route|Circuit))\\b")
+    private val lead=Regex("^(?:(?:either|at|from|outside|in|near|by|the|this|track|walk|trip|route|trail)\\s+)+",RegexOption.IGNORE_CASE)
+    private val tail=Regex("\\s*(?:,|\\(|\\s[-–—]\\s|\\b(?:to|along|in|on|at the|near|via|and|where|which|then|following|before|after|for)\\b).*$",RegexOption.IGNORE_CASE)
+    /** Places DOC's description says the walk starts from, when it gives a
+     * choice ("Start on the Kea Point Track either outside the … Visitor
+     * Centre or at White Horse Hill car park"; "Starting at either Stirling
+     * Point or Gunpit road"; "Start at the Punchbowl, Bealey Chasm or Temple
+     * Basin car parks"). Empty unless two or more are named. */
+    fun starts(sections:List<Section>):List<Start>{
+        val d=sections.firstOrNull{it.title.contains("description",true)}?:return emptyList()
+        for(b in d.blocks){if(b !is Paragraph)continue
+            for(sentence in b.text.split(Regex("(?<=[.!?])\\s+"))){
+                if(!startSentence.containsMatchIn(sentence)||!Regex("\\bor\\b").containsMatchIn(sentence))continue
+                if(Regex("\\beither (?:end|direction|way)\\b|\\bboth ends\\b",RegexOption.IGNORE_CASE).containsMatchIn(sentence))continue
+                val track=onTrack.find(sentence)?.groupValues?.get(1)?.trim()
+                var rest=sentence.replace(startVerb,"").let{r->if(track!=null)r.replaceFirst(onTrack,"")else r}.trim().trimEnd('.')
+                // "…, B or C, at the end of …": before the last "or" items are separated
+                // by commas; after it, the item ends at the first comma.
+                val i=Regex("\\bor\\b").findAll(rest).lastOrNull()?.range?.first?:continue
+                val items=rest.substring(0,i).split(Regex(",\\s*|\\s+or\\s+"))+rest.substring(i+2)
+                // "the trip to Mt McKerrow from Wainuiomata", "15 min from the Forest Hill
+                // North Picnic Area": the place is what comes after the last "from".
+                val places=items.map{it.trim().let{x->Regex("\\bfrom\\s+",RegexOption.IGNORE_CASE).findAll(x).lastOrNull()?.let{m->x.substring(m.range.last+1)}?:x}
+                        .replace(lead,"").replace(tail,"").trim()}.filter{p->p.isNotEmpty()&&p.length<60&&(p[0].isUpperCase()||p[0].isDigit())}
+                if(places.size>=2)return places.distinct().map{Start(it,track)}
+            }
+        }
+        return emptyList()
+    }
     fun parse(html:String):List<Section>{
         val out=ArrayList<Section>()
         for(m in item.findAll(html)){
