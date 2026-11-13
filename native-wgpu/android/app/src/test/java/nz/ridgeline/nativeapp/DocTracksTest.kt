@@ -15,10 +15,11 @@ class DocTracksTest {
         assertTrue(DocTracks.isUrl(url));assertTrue(url.contains("O%27%27LEARY"));assertTrue(url.endsWith("f=json"))
     }
     @Test fun matchesDocSpellingsOfMountNames(){
-        assertEquals(listOf("Mt Iron Track","Mount Iron Track"),DocTracks.names("Mt Iron Track"))
-        assertEquals(listOf("Mount Iron Track","Mt Iron Track"),DocTracks.names("Mount  Iron Track"))
-        assertEquals(listOf("Roys Peak Track"),DocTracks.names("Roys Peak Track"))
-        assertTrue(java.net.URLDecoder.decode(DocTracks.walkUrl("Mt Iron Track",169.1,-44.7),"UTF-8").contains("UPPER(name) IN ('MT IRON TRACK','MOUNT IRON TRACK')"))
+        assertEquals(listOf("Mt Iron Track","Mount Iron Track","Mt Iron Tracks","Mount Iron Tracks"),DocTracks.names("Mt Iron Track"))
+        assertEquals(listOf("Mount Iron Track","Mt Iron Track","Mount Iron Tracks","Mt Iron Tracks"),DocTracks.names("Mount  Iron Track"))
+        assertEquals(listOf("Roys Peak Track","Roys Peak Tracks"),DocTracks.names("Roys Peak Track"))
+        assertEquals(listOf("Rabbit Pass Route"),DocTracks.names("Rabbit Pass Route"))
+        assertTrue(java.net.URLDecoder.decode(DocTracks.walkUrl("Mt Iron Track",169.1,-44.7),"UTF-8").contains("UPPER(name) IN ('MT IRON TRACK','MOUNT IRON TRACK','MT IRON TRACKS','MOUNT IRON TRACKS')"))
     }
     @Test fun parsesWalks(){
         val json="""{"features":[{"attributes":{"name":"Roys Peak Track","introduction":"Views over the lake.","difficulty":"Easy","completionTime":"5-6 hr return","introductionThumbnail":"https://www.doc.govt.nz/thumbs/large/link/07e89eec10bb41ccb52bd0efe8e86659.aspx","walkingAndTrampingWebPage":"https://www.doc.govt.nz/link/c073dc44e9aa4c369b8a75cb8365f047.aspx"},"geometry":{"x":169.0594,"y":-44.6829}},

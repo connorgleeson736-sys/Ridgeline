@@ -5,11 +5,15 @@
 the audited APK was 0.1.5. Main next candidates are raw local-I/O isolation,
 GPU upload acknowledgement, classified recovery and per-tile critical-path tracing.
 
-Latest APK: **[0.1.46 Huts Circuits Base](checkpoints/README.md)** — updates
+Latest APK: **[0.1.47 Walk Legs Base](checkpoints/README.md)** — updates
+0.1.13–0.1.46 in place. Walks followed by DOC's legs in DOC's direction, with
+sections, and a three-height track sheet that resizes the map.
+
+Previous APK: **[0.1.46 Huts Circuits Base](checkpoints/README.md)** — updates
 0.1.13–0.1.45 in place. Hut and bivouac cards from DOC, circuit names ahead of
 their sections, and search opening track and hut summaries.
 
-Previous APK: **[0.1.45 DOC Descriptions Base](checkpoints/README.md)** — updates
+Older APK: **[0.1.45 DOC Descriptions Base](checkpoints/README.md)** — updates
 0.1.13–0.1.44 in place. Full DOC track descriptions in the track summary, and
 DOC walks found by place when the names differ.
 

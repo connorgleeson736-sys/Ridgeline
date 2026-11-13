@@ -96,7 +96,7 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
     private var searchResults:LinearLayout?=null
     private var routesContent:List<View> = emptyList()
     private val searchRun=Runnable{runSearch()}
-    private fun loadSearch(){if(placeSearch==null)files.execute{if(placeSearch==null)placeSearch=runCatching{activity.assets.open("search/places.tsv").bufferedReader().use{PlaceSearch(it.lineSequence())}}.getOrNull();main.post{if(searchQuery.isNotBlank())runSearch()}}}
+    private fun loadSearch(){if(placeSearch==null)files.execute{if(placeSearch==null)placeSearch=PlaceSearch.get(activity.assets);main.post{if(searchQuery.isNotBlank())runSearch()}}}
     private fun runSearch(){
         val query=searchQuery;val list=searchResults?:return
         if(query.isBlank()){list.removeAllViews();list.visibility=View.GONE;for(v in routesContent)v.visibility=View.VISIBLE;return}
@@ -274,13 +274,21 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
             if(points!=null)paths.add(Triple(points,Color.argb(230,81,137,153),-1))
             else if(loading.add(key))controller.loadOther(key){route->loading.remove(key);if(!closed&&route!=null&&key in controller.state.opened){passive[key]=route.points;syncRoutes();if(fitOpenedPending)fitOpened()}}
         }
-        trackLine?.let{paths.add(Triple(it,trackColor,-1))}
+        trackLine?.let{paths.add(Triple(it,if(trackPart!=null)trackDim else trackColor,-1))}
+        trackPart?.let{paths.add(Triple(it,trackColor,-1))}
         if(paths!=lastPaths){lastPaths=paths;terrain.routes(paths)}
     }
     /** A tapped DOC track drawn over the map while its summary is open. */
     private var trackLine:List<Coordinate>?=null
     private val trackColor=Color.rgb(255,201,74)
-    fun highlightTrack(points:List<Coordinate>?){if(trackLine==points)return;trackLine=points?.takeIf{it.size>=2};syncRoutes()}
+    private var trackPart:List<Coordinate>?=null
+    private val trackDim=Color.argb(150,255,214,120)
+    /** [points] highlighted; [part] (a section of it) brighter, the rest dimmed. */
+    fun highlightTrack(points:List<Coordinate>?,part:List<Coordinate>?=null){
+        val p=part?.takeIf{it.size>=2};if(trackLine==points&&trackPart==p)return
+        trackLine=points?.takeIf{it.size>=2};trackPart=p;syncRoutes()}
+    /** Sizes the map for the route sheet again (after the track sheet closes). */
+    fun relayout()=sheet.refresh()
     fun showRoutes(){
         if(drawer!=null){dismissDrawer();return}
         val overlay=FrameLayout(activity);overlay.addView(View(activity).apply{setBackgroundColor(Color.argb(40,16,40,35));setOnClickListener{dismissDrawer()}},FrameLayout.LayoutParams(-1,-1))

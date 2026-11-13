@@ -22,6 +22,19 @@ internal class PlaceSearch(lines:Sequence<String>){
         Entry(place,words.toTypedArray(),full)
     }.toList()
     val size get()=entries.size
+    /** The place called exactly [name] (macron- and case-insensitive, "Mt" as
+     * "Mount") nearest [near], within [maxKm]: where a DOC walk's leg starts
+     * or ends ("Makarora", "Kerin Forks Hut"). */
+    fun locate(name:String,near:Coordinate,maxKm:Double):Place?{
+        val key=normalize(name);if(key.isEmpty())return null
+        fun nearest(match:(String)->Boolean)=entries.asSequence().filter{e->e.full.any(match)}.map{it.place to distanceKm(near,it.place.latitude,it.place.longitude)}
+            .filter{it.second<=maxKm}.minByOrNull{it.second}?.first
+        // Exact; else a longer name that starts with it ("Anchorage" → "Anchorage Bay");
+        // else without generic words ("Kepler Track carpark", "Lewis Pass picnic area").
+        val bare=key.split(' ').filterNot{it in GENERIC}.joinToString(" ")
+        return nearest{it==key}?:nearest{it.startsWith("$key ")}?:bare.takeIf{it.isNotEmpty()&&it!=key}?.let{b->nearest{it==b}?:nearest{it.startsWith("$b ")}}
+    }
+    private val GENERIC=setOf("carpark","car","park","road","end","roadend","shelter","picnic","area","village","settlement","township","track","entrance","start","the")
     fun search(query:String,near:Coordinate?,limit:Int=30):List<Result>{
         val q=words(query);if(q.isEmpty())return emptyList()
         val phrase=normalize(query)
@@ -47,6 +60,10 @@ internal class PlaceSearch(lines:Sequence<String>){
         return out.sortedBy{it.score}.take(limit)
     }
     companion object{
+        @Volatile private var loaded:PlaceSearch?=null
+        /** The bundled index, read once and shared by search and walk routes (blocking). */
+        fun get(assets:android.content.res.AssetManager):PlaceSearch?=loaded?:synchronized(this){
+            loaded?:runCatching{assets.open("search/places.tsv").bufferedReader().use{PlaceSearch(it.lineSequence())}}.getOrNull()?.also{loaded=it}}
         /** Lowercase, macrons and other accents removed, anything that is not a
          * letter or digit as one space, "mt" as "mount" and "st" as "saint".
          * A plain character loop: no regular expressions (this runs for every

@@ -86,6 +86,17 @@ class ElevationProfileView(context:Context):View(context){
     private val hi get()=if(zoomed)v1 else max(1.0,total)
     private fun distanceAt(px:Float)=lo+((px-left)/(right-left)).coerceIn(0f,1f)*(hi-lo)
     fun resetZoom(){if(!zoomed)return;v0=0.0;v1=0.0;dirty=true;invalidate()}
+    /** Shaded spans (a section of a walk), zoomed to. */
+    private var bands=emptyList<Pair<Double,Double>>()
+    fun focus(spans:List<Pair<Double,Double>>){
+        bands=spans;val a=spans.minOfOrNull{it.first}?:return;val b=spans.maxOf{it.second};val pad=(b-a)*.06
+        v0=max(0.0,a-pad);v1=min(total,b+pad);if(v1-v0>=total*.999||v1<=v0){v0=0.0;v1=0.0}
+        cursor=null;range=null;section=null;picked=-1;dirty=true;invalidate()
+    }
+    fun showAll(){if(bands.isEmpty()&&!zoomed)return;bands=emptyList();v0=0.0;v1=0.0;dirty=true;invalidate()}
+    /** Ascent and descent over a span (null where elevation is missing). */
+    fun sectionStats(a:Double,b:Double)=index.section(a,b)
+    fun highest(a:Double,b:Double)=samples.filter{it.distance in a..b}.mapNotNull{it.height}.maxOrNull()
     var onInspect:(NativeGeo.ProfilePoint,Boolean)->Unit={_,_->}
     var onRange:(NativeGeo.Section?)->Unit={}
     var onLeave:()->Unit={}
@@ -94,7 +105,7 @@ class ElevationProfileView(context:Context):View(context){
         val sameGeometry=samples.size==value.size&&samples.indices.all{samples[it].point==value[it].point&&samples[it].distance==value[it].distance}
         val distance=cursor?.distance;samples=value;index=ProfileIndex(value);measured=value.count{it.height!=null}>=2
         if(sameGeometry){cursor=distance?.let{NativeGeo.profileAt(value,it)};section=range?.let{directed(it.first,it.second)}}
-        else{cursor=null;range=null;start=null;section=null;v0=0.0;v1=0.0;picked=-1}
+        else{cursor=null;range=null;start=null;section=null;v0=0.0;v1=0.0;picked=-1;bands=emptyList()}
         dirty=true;invalidate()
     }
     fun clearInspection(){if(cursor==null&&range==null)return;cursor=null;range=null;start=null;section=null;onRange(null);onLeave();invalidate()}
@@ -137,7 +148,8 @@ class ElevationProfileView(context:Context):View(context){
         for(i in 0..2){val d=lo+span*i/2;val label=if(total>=1000)String.format(java.util.Locale.ROOT,when{span>=20000->"%.0f";span>=2000->"%.1f";else->"%.2f"},d/1000)else"${d.roundToInt()}";canvas.drawText(label,x(d),bottom+16*density,text)}
         paint.color=Color.rgb(167,178,168);canvas.drawLine(left,bottom,right,bottom,paint);canvas.drawLine(left,top,left,bottom,paint)
         canvas.save();canvas.clipRect(left,0f,right,bottom)
-        paint.style=Paint.Style.FILL;paint.color=0x22e87944;canvas.drawPath(fill,paint)
+        paint.style=Paint.Style.FILL;paint.color=0x1F587d62;for((a,b) in bands)canvas.drawRect(x(a),top,x(b),bottom,paint)
+        paint.color=0x22e87944;canvas.drawPath(fill,paint)
         paint.style=Paint.Style.STROKE;paint.strokeWidth=2*density;paint.color=Color.rgb(186,99,53);paint.strokeJoin=Paint.Join.ROUND;canvas.drawPath(path,paint)
         canvas.restore()
         // The selected-section fill, cut to the range at draw time.

@@ -206,28 +206,85 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         visitTiles(listOf(start),TRACK_TILES,{id,features->val (parts,next)=trackPieces(id,features,name);pieces.addAll(parts);next}){
             val out=lonLat(pieces);main.post{if(!closed)callback(out)}}
     }}.onFailure{callback(emptyList())}}
-    /** A large DOC walk's line ([guid], from the walk data already loaded for
-     * the map) and the map's own track pieces along it: every zoom-14 tile the
-     * walk crosses, each track piece mostly within 40 m of the walk. Both in
-     * longitude/latitude; empty when the walk's line is not loaded. */
-    fun walkLine(guid:String,doc:List<List<Coordinate>>?=null,callback:(List<List<Coordinate>>,List<List<Coordinate>>)->Unit){runCatching{worker.execute{
-        // The walk's line from the walk data loaded for the map, else [doc] (fetched by the caller).
-        val line=docTiles.values.asSequence().flatMap{it.lines.asSequence()}.firstOrNull{it.guid==guid}
-            ?:doc?.takeIf{it.isNotEmpty()}?.let{DocWalks.lines(listOf(DocTracks.WalkLine(guid,DocTracks.length(it.flatten()),it))).first()}
-        if(line==null){main.post{if(!closed)callback(emptyList(),emptyList())};return@execute}
+    /** The map's own track pieces (with their names) along [corridor]: every
+     * zoom-14 tile it crosses, each piece mostly within 40 m of it. */
+    fun alongLine(corridor:List<List<Coordinate>>,callback:(List<Pair<String,List<Coordinate>>>)->Unit){runCatching{worker.execute{
+        val line=DocWalks.lines(listOf(DocTracks.WalkLine("",0.0,corridor))).first()
         val z=VECTOR_MAX_ZOOM;val n=(1 shl z).toDouble();val ids=LinkedHashSet<GpuUploadQueue.Id>()
         for(p in line.paths)for(i in 1 until p.size){val a=p[i-1];val b=p[i];val steps=max(1,ceil(hypot(b.x-a.x,b.y-a.y)*n*4).toInt())
             for(k in 0..steps){val t=k.toDouble()/steps;ids.add(GpuUploadQueue.Id(z,floor((a.x+(b.x-a.x)*t)*n).toInt(),floor((a.y+(b.y-a.y)*t)*n).toInt()))}}
-        val index=DocWalks.Index(listOf(line));val pieces=ArrayList<List<VectorTile.Point>>()
+        val index=DocWalks.Index(listOf(line));val pieces=ArrayList<Pair<String,List<VectorTile.Point>>>()
         visitTiles(ids,WALK_TILES,{id,features->
             for(f in features)if(f.layer=="streets"&&f.properties["kind"]=="track")for(path in f.paths)for(part in clip(path,id.bounds))if(part.size>=2){
                 val r=DocWalks.worldMeters(40.0,part[0].y);val hit=HashSet<Int>()
                 val near=part.count{p->hit.clear();index.near(p.x,p.y,r,hit);hit.isNotEmpty()}
-                if(near>=part.size*.6)pieces.add(part)}
+                if(near>=part.size*.6)pieces.add((f.properties["name"] as? String).orEmpty() to part)}
             emptyList()
-        }){val out=lonLat(pieces);val doc=lonLat(line.paths);main.post{if(!closed)callback(out,doc)}}
-    }}.onFailure{callback(emptyList(),emptyList())}}
-    /** The DOC walk (from the walk list loaded for the map) with this id. */
+        }){val out=pieces.map{(name,p)->name to lonLat(listOf(p)).first()};main.post{if(!closed)callback(out)}}
+    }}.onFailure{callback(emptyList())}}
+
+    // Walk routes: each large DOC walk followed leg by leg over its DOC line
+    // (WalkRoutes), for track names (only the walk itself, not side trips or
+    // extensions on DOC's line, carries the walk's name) and for summaries.
+    private class RouteState{var done=false;var route:WalkRoutes.Route?=null;var sections:List<DocPages.Section> = emptyList();var paths:List<List<Coordinate>> = emptyList();val waiting=ArrayList<(WalkRoutes.Route?,List<DocPages.Section>,List<List<Coordinate>>)->Unit>()}
+    private val routes=HashMap<String,RouteState>()
+    private var routeRevision=0L
+    private val routeJobs=Executors.newSingleThreadExecutor{Thread(it,"RidgelineWalkRoutes").apply{isDaemon=true;priority=Thread.MIN_PRIORITY}}
+    private fun docLine(guid:String)=docTiles.values.asSequence().flatMap{it.lines.asSequence()}.firstOrNull{it.guid==guid}?.let{lonLat(it.paths)}
+    /** DOC's walk [guid] as DOC describes it: its route (null when DOC's page
+     * has no legs to follow) and its page sections. [page]: DOC's page link;
+     * [doc]: DOC's line when the map has not loaded it. Main thread callback. */
+    fun walkRoute(guid:String,page:String,doc:List<List<Coordinate>>?=null,callback:(WalkRoutes.Route?,List<DocPages.Section>,List<List<Coordinate>>)->Unit={_,_,_->}){runCatching{worker.execute{
+        val state=routes.getOrPut(guid){RouteState()}
+        if(state.done){val r=state.route;val sec=state.sections;val ps=state.paths;main.post{if(!closed)callback(r,sec,ps)};return@execute}
+        val first=state.waiting.isEmpty();state.waiting.add(callback)
+        if(!first)return@execute
+        var lineUsed=emptyList<List<Coordinate>>()
+        fun finish(route:WalkRoutes.Route?,sections:List<DocPages.Section>){
+            state.paths=lineUsed
+            state.route=route;state.sections=sections;state.done=true;routeRevision++;docRevision++;lastKey=null;schedulePublication()
+            val waiting=state.waiting.toList();state.waiting.clear();val ps=lineUsed;main.post{if(!closed)for(w in waiting)w(route,sections,ps)}
+        }
+        fun get(url:String,done:(ByteArray?)->Unit){
+            val owned=loader.layerConsumer(9)
+            val body=startLeased(owned){loader.layerBody(owned,url)}
+            if(body==null){done(null);return}
+            body.whenComplete{r,e->runCatching{worker.execute{owned.close();done(if(e==null&&r!=null&&r.status in 200..299)r.bytes else null)}}.onFailure{owned.close()}}
+        }
+        fun withLine(paths:List<List<Coordinate>>){
+            lineUsed=paths
+            if(!page.startsWith("https://")){finish(null,emptyList());return}
+            get(page){bytes->
+                val sections=bytes?.let{runCatching{DocPages.parse(String(it,Charsets.UTF_8))}.getOrNull()}.orEmpty()
+                val legs=DocPages.legs(sections)
+                if(legs.isEmpty()||paths.isEmpty()){finish(null,sections);return@get}
+                runCatching{routeJobs.execute{
+                    val places=PlaceSearch.get(view.context.assets)
+                    val route=runCatching{WalkRoutes.route(paths,legs){name,near->places?.locate(name,near,40.0)?.let{Coordinate(it.longitude,it.latitude)}}}.getOrNull()
+                    runCatching{worker.execute{finish(route,sections)}}
+                }}.onFailure{finish(null,sections)}
+            }
+        }
+        val known=docLine(guid)?:doc?.takeIf{it.isNotEmpty()}
+        if(known!=null)withLine(known)
+        else get(DocTracks.lineUrl(guid)){bytes->withLine(bytes?.let{runCatching{DocTracks.parseLines(String(it,Charsets.UTF_8))}.getOrNull()}.orEmpty())}
+    }}}
+    /** The walk-line index used to name tracks: large walks by their route
+     * (pending ones left out until their route is known), others as DOC drew them. */
+    private val markIndexes=HashMap<GpuUploadQueue.Id,Triple<Long,DocWalks.Index,DocWalks.Index>>()
+    private fun markIndex(id:GpuUploadQueue.Id):DocWalks.Index?{
+        val base=docTiles[id]?:return null
+        markIndexes[id]?.let{if(it.first==routeRevision&&it.second===base)return it.third}
+        val lines=base.lines.mapNotNull{l->
+            val info=docInfos[l.guid]
+            if(info==null||!info.large)return@mapNotNull l
+            val state=routes[l.guid]
+            if(state==null){walkRoute(l.guid,info.page);return@mapNotNull null}
+            if(!state.done)return@mapNotNull null
+            state.route?.let{r->DocWalks.lines(listOf(DocTracks.WalkLine(l.guid,l.meters,listOf(r.points)))).first()}?:l
+        }
+        val index=DocWalks.Index(lines);markIndexes[id]=Triple(routeRevision,base,index);return index
+    }
     fun walkInfo(guid:String):DocWalks.Info?=docInfos[guid]
 
     // DOC walks for track names (see DocWalks): the walk list once, then walk
@@ -283,7 +340,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
     private fun marked(id:GpuUploadQueue.Id,tile:Tile):List<VectorTile.Feature>{
         if(tile.markedRevision==docRevision)tile.marked?.let{return it}
         val z=DocWalks.DATA_ZOOM
-        val index=if(id.z>=z)docTiles[GpuUploadQueue.Id(z,id.x shr(id.z-z),id.y shr(id.z-z))]else null
+        val index=if(id.z>=z)markIndex(GpuUploadQueue.Id(z,id.x shr(id.z-z),id.y shr(id.z-z)))else null
         val out=DocWalks.mark(tile.features,index,docInfos)
         tile.marked=out;tile.markedRevision=docRevision;return out
     }
@@ -467,5 +524,5 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
     }
     private fun group(z:Int,x:Int,y:Int,clip:DoubleArray,lines:List<TopographyStyle.Line>)=LineGroup.pack(z,x,y,clip,lines)
     private fun clip(path:List<VectorTile.Point>,box:DoubleArray)=BoundaryIndex.clip(path,box)
-    override fun close(){closed=true;timer?.cancel(false);publication?.cancel(false);retryWake?.cancel(false);releaseAll();worker.shutdownNow();view.onLayerProjection={_,_->}}
+    override fun close(){closed=true;routeJobs.shutdownNow();timer?.cancel(false);publication?.cancel(false);retryWake?.cancel(false);releaseAll();worker.shutdownNow();view.onLayerProjection={_,_->}}
 }

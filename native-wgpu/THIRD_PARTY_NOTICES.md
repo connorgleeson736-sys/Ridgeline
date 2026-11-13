@@ -63,3 +63,8 @@ and walk lines (DOC_Walking_Experiences, DOC_WebsiteWalkingandTrampingLns_DTO,
 CC BY 4.0). Real DOC and LINZ data around the Gillespie Pass Circuit are test
 fixtures in `android/app/src/test/fixtures/gillespie/`, and a Siberia Hut page
 excerpt in `android/app/src/test/fixtures/docpages/`.
+
+Walk routes follow the legs in each walk's DOC page over DOC's walk line;
+the Gillespie Pass Circuit's DOC page excerpt and line are test fixtures
+(`android/app/src/test/fixtures/docpages/gillespie-pass-circuit.html`,
+`android/app/src/test/fixtures/gillespie/doc-walk-line-gillespie-pass-circuit.json`).

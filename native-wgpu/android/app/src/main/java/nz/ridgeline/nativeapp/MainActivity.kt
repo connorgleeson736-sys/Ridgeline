@@ -65,12 +65,15 @@ class MainActivity:Activity(){
         planner.onOffline={layersUi.dismiss();offlineUi.startRegion()}
         planner.savedRegions={list,close->offlineUi.fillSavedRegions(list,close)}
         // Tap a track name for its summary; tap inside a hunting permit area for its details.
-        trackSheet=TrackSheet(this,root,loader)
-        trackSheet.onLine={planner.highlightTrack(it)}
+        trackSheet=TrackSheet(this,root,loader,mapHost)
+        trackSheet.onLine={line,part->planner.highlightTrack(line,part)}
+        trackSheet.onClosed={planner.relayout()}
         trackSheet.onPoint={terrain.inspect(it)}
         trackSheet.mapLine={name,at,callback->mapLayers.trackLine(name,at,callback)}
-        trackSheet.walkLine={guid,doc,callback->mapLayers.walkLine(guid,doc,callback)}
-        trackSheet.onFit={terrain.focus(it)}
+        trackSheet.walkRoute={guid,page,callback->mapLayers.walkRoute(guid,page,null,callback)}
+        trackSheet.alongLine={corridor,callback->mapLayers.alongLine(corridor,callback)}
+        // Frame the track once the map has its new size (the sheet resizes it).
+        trackSheet.onFit={line->mapHost.post{terrain.post{terrain.focus(line)}}}
         // Search: DOC walks (by their page's id) and huts open their summaries.
         planner.onPlace={place->
             val at=Coordinate(place.longitude,place.latitude)
@@ -113,6 +116,7 @@ class MainActivity:Activity(){
         mapHost.addView(compass,FrameLayout.LayoutParams(dp(34),dp(34),Gravity.TOP or Gravity.END).apply{marginEnd=dp(10);topMargin=dp(10)})
         mapHost.addView(MapControls.iconButton(this,MapControls.LayersIcon(this),"Map layers"){planner.dismissDrawer();layersUi.show()},FrameLayout.LayoutParams(dp(34),dp(34),Gravity.TOP or Gravity.END).apply{marginEnd=dp(10);topMargin=dp(52)})
         // Keep the scale bar, "i" and credits clear of the route sheet's top edge.
+        trackSheet.onCover={cover->planner.onMapCover(cover)}
         planner.onMapCover={cover->
             for((view,margin) in listOf(scale to 14,info to 6,attribution to 8)){val lp=view.layoutParams as FrameLayout.LayoutParams;if(lp.bottomMargin!=dp(margin)+cover){lp.bottomMargin=dp(margin)+cover;view.layoutParams=lp}}
         }
