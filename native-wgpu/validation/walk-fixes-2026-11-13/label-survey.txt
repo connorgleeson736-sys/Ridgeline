@@ -1,0 +1,28 @@
+== Greenstone and Caples tracks [4 days · Intermediate tramping track · ] DOC line 58.3 km; legs 6 (route 60.3 km); walk 60.3 km (DOC's legs); summary line 60.3 km; intro true; photo true
+   Greenstone Track (33.7 km on DOC's line): named 'Greenstone and Caples tracks' below z15 33.7 km
+   Caples Track (24.7 km on DOC's line): named 'Greenstone and Caples tracks' below z15 24.7 km
+== Ben Lomond Track [6-8 hr return to Ben Lomond Summit from Queenstown · Advanced tramping track · 11 km return via same track] DOC line 3.6 km; legs 3; walk 3.6 km (DOC's line, end to end); summary line 3.6 km; intro true; photo true
+   beyond DOC's line: Ben Lomond Track: own name, opens 'Ben Lomond Track' 2.0 km
+   Ben Lomond Walkway (3.3 km on DOC's line): own name, opens 'Ben Lomond Track' 3.3 km
+   (unnamed) (0.1 km on DOC's line): own name, no DOC walk 0.1 km
+== Mavora - Greenstone Walkway [4 days · Advanced tramping track · 50 km one way] DOC line 33.7 km; legs 5; walk 33.7 km (DOC's line, end to end); summary line 33.7 km; intro true; photo true
+   Mavora Walkway (20.0 km on DOC's line): named 'Mavora - Greenstone Walkway' below z15 20.0 km
+   Greenstone Track (11.6 km on DOC's line): named 'Greenstone and Caples tracks' below z15 11.6 km
+== Mount Iron Track [1 hr 30 min · Easy to intermediate walking track · 4.5 km loop] DOC line 0.0 km; legs 0; walk 0.0 km (DOC's line, end to end); summary line 0.0 km; intro true; photo true
+== Tekapo Mt John Walkway [3 hr · Advanced tramping track · 8.9 km loop] DOC line 3.1 km; legs 0; walk 3.1 km (DOC's whole line); summary line 3.3 km; intro true; photo true
+   beyond DOC's line: Tekapo Mt John Walkway: named 'Tekapo Mt John Walkway' below z15 1.9 km
+   Tekapo Mt John Walkway (3.2 km on DOC's line): named 'Tekapo Mt John Walkway' below z15 3.2 km
+== White Cliffs Track Walkway [up to 8 hr · Intermediate tramping track · 22 km return via same track] DOC line 6.7 km; legs 2; walk 6.7 km (DOC's line, end to end); summary line 6.7 km; intro true; photo true
+   Whitecliffs Walkway (5.7 km on DOC's line): named 'White Cliffs Walkway Track' below z15 5.7 km
+== Five Mile Loop Track [1 hr 30 min · Easy to intermediate walking track · 3.8 km loop] DOC line 2.0 km; legs 0; walk 2.0 km (DOC's line, end to end); summary line 2.0 km; intro true; photo true
+   Five Mile Loop (1.7 km on DOC's line): own name, opens 'Five Mile Loop Track' 1.7 km
+   (unnamed) (0.4 km on DOC's line): own name, opens 'Five Mile Loop Track' 0.4 km
+== Sefton Ridge Track [2 to 3 hr · Advanced tramping track · 4.3 km loop] DOC line 2.3 km; legs 0; walk 2.3 km (DOC's line, end to end); summary line 2.3 km; intro true; photo true
+   Sefton Ridge Track (2.4 km on DOC's line): own name, opens 'Sefton Ridge Track' 2.4 km
+== M??kara Walkway: not found
+== Hump Ridge Track [3 days/2 nights · Intermediate tramping track · 61.5 km loop] DOC line 44.0 km; legs 0; walk 44.0 km (DOC's whole line); summary line 44.1 km; intro true; photo true
+   South Coast Track (21.0 km on DOC's line): named 'South Coast Track' below z15 21.0 km
+   Hump Ridge Track (12.5 km on DOC's line): named 'Hump Ridge Track' below z15 12.5 km
+   Port Craig Historic Trail (0.0 km on DOC's line): named 'Hump Ridge Track' below z15 0.0 km
+== Motatapu Track [3 - 4 days · Advanced tramping track · 49 km one way] DOC line 32.0 km; legs 4; walk 32.0 km (DOC's line, end to end); summary line 32.0 km; intro true; photo true
+   Motatapu Track (31.0 km on DOC's line): named 'Motatapu Track' below z15 31.0 km

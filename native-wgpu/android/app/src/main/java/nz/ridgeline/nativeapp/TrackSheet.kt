@@ -30,6 +30,8 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     /** The map's track pieces (name, points) along a line; see MapLayers.alongLine. */
     var alongLine:(List<List<Coordinate>>,(List<Pair<String,List<Coordinate>>>)->Unit)->Unit={_,cb->cb(emptyList())}
     var onPoint:(Coordinate?)->Unit={}
+    /** A and B of a section dragged on the chart (empty: none). */
+    var onRange:(List<Coordinate>)->Unit={}
     /** The map's own line for a tapped name (the geometry the map draws). */
     var mapLine:(String,Coordinate,(List<List<Coordinate>>)->Unit)->Unit={_,_,cb->cb(emptyList())}
     /** Frames the map on a line (summaries opened from search). */
@@ -141,8 +143,9 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         // The compact stop follows the header (a subtitle or photo arriving).
         header.addOnLayoutChangeListener{_,_,top,_,bottom,_,oldTop,_,oldBottom->if(visible&&!dragging&&level<2&&bottom-top!=oldBottom-oldTop)place(true)}
         chart.onInspect={p,_->if(chart.rangeEnds()==null)onPoint(p.point)}
-        chart.onRange={_->onPoint(chart.rangeEnds()?.second)}
-        chart.onLeave={onPoint(null)}
+        // As on routes: a dragged section shows A and B on the map (the chart shows its distance, ascent and descent).
+        chart.onRange={_->val ends=chart.rangeEnds();if(ends!=null){onPoint(null);onRange(listOf(ends.first,ends.second))}else onRange(emptyList())}
+        chart.onLeave={onPoint(null);onRange(emptyList())}
     }
 
     var visible=false;private set
@@ -153,7 +156,8 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     private fun inner()=(root.height-root.paddingTop-root.paddingBottom).takeIf{it>0}?:activity.resources.displayMetrics.heightPixels
     private fun full()=(inner()*.86f).toInt()
     private fun compact()=dp(28)+(header.height.takeIf{it>0}?:dp(118))
-    private fun middle()=max(compact()+dp(200),(inner()*.5f).toInt()).coerceAtMost(full())
+    /** Middle: the chart and the section chips below it, with the map still usable above. */
+    private fun middle()=max(compact()+dp(300),(inner()*.55f).toInt()).coerceAtMost(full())
     private fun stop(l:Int)=when(l){0->compact();1->middle();else->full()}
     private fun place(animate:Boolean){
         val lp=panel.layoutParams as FrameLayout.LayoutParams
@@ -191,12 +195,13 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         chart.data(emptyList());chart.markers=emptyList();chart.message="";chart.visibility=if(hut)View.GONE else View.VISIBLE
         trackTitle=title;walkTitle.visibility=View.GONE;sections.removeAllViews();sections.visibility=View.GONE
         intro.visibility=View.GONE;factsScroll.visibility=View.GONE;facts.removeAllViews();huts.removeAllViews();huts.visibility=View.GONE;page.visibility=View.GONE
-        onLine(null,null);onPoint(null);loader.cancelTrackProfile();chart.showAll();lineNow=emptyList()
+        onLine(null,null);onPoint(null);onRange(emptyList());loader.cancelTrackProfile();chart.showAll();lineNow=emptyList()
         if(panel.visibility!=View.VISIBLE){panel.visibility=View.VISIBLE;panel.translationY=full().toFloat()}
         panel.post{if(id==request)place(true)}
         return id
     }
-    fun show(trackName:String,at:Coordinate){
+    /** [walkOf]: the walk the map gives this track (a section of a large walk). */
+    fun show(trackName:String,at:Coordinate,walkOf:String?=null){
         val id=begin(trackName,false);fitNext=false
         var walk:DocTracks.Walk?=null;var track:DocTracks.Track?=null;var walkDone=false;var trackDone=false;var lineStarted=false
         var mapped:List<Coordinate>?=null;var nameDone=false;var placeStarted=false
@@ -242,6 +247,14 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         fun matchByPlace(){
             val map=mapped?:return
             if(placeStarted)return;placeStarted=true
+            if(walkOf!=null){
+                // The map's walk for this section: no search by place.
+                placeMeters=Double.MAX_VALUE
+                fetch(DocTracks.walkByGuidUrl(walkOf),{DocTracks.parseWalks(text(it)).firstOrNull()}){w->
+                    byPlace=w?:DocTracks.Walk(walkInfo(walkOf)?.name.orEmpty(),"","","","","https://www.doc.govt.nz/link/${walkOf.replace("-","")}.aspx",null)
+                    placeDone=true;resolve()}
+                return
+            }
             val b=DocTracks.bounds(map,150.0)
             if(map.size<2||b==null){placeDone=true;resolve();return}
             fetch(DocTracks.linesNearUrl(b),{DocTracks.alongTrack(DocTracks.parseWalkLines(text(it)),map)}){line->
@@ -271,7 +284,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     }
     fun hide(){
         if(!visible)return
-        visible=false;request++;loader.cancelTrackProfile();onLine(null,null);onPoint(null);chart.clearInspection()
+        visible=false;request++;loader.cancelTrackProfile();onLine(null,null);onPoint(null);onRange(emptyList());chart.clearInspection()
         if(map.layoutParams.height!=-1)map.layoutParams=map.layoutParams.apply{height=-1}
         onCover(0);onClosed()
         panel.animate().translationY(full().toFloat()).setDuration(160).withEndAction{if(!visible)panel.visibility=View.GONE}.start()
@@ -306,17 +319,28 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
             val distance=overview?.distance.orEmpty()
             val main=WalkRoutes.walkLine(route,docPaths,distance)
             val byLegs=WalkRoutes.extent(route,docPaths,distance).second
-            if(main.size<2){lineFound(id,emptyList());return@walkRoute}
-            alongLine(listOf(main)){pieces->
-                if(id!=request)return@alongLine
-                var mapped=DocTracks.chain(pieces.map{it.second},main.first(),150.0)
-                if(mapped.size>=2&&DocTracks.meters(mapped.last(),main.first())<DocTracks.meters(mapped.first(),main.first()))mapped=mapped.reversed()
+            // No DOC line (DOC has none for the Mount Iron Track): the map's tracks of the walk's name.
+            val corridor=if(main.size>=2)listOf(main)else emptyList()
+            val withAlong:((List<Pair<String,List<Coordinate>>>)->Unit)->Unit=if(corridor.isEmpty()){cb->cb(emptyList())}else{cb->alongLine(corridor,cb)}
+            withAlong{along->
+                if(id!=request)return@withAlong
+                // The map's tracks named like the walk (or the tapped track) join it:
+                // DOC's line can stop short (the Ben Lomond Track's, at the saddle).
+                val names=listOf(label,name.text.toString()).filter{it.isNotBlank()&&DocWalks.sameName(it,name.text.toString())}.distinct()
+                val named=ArrayList<Pair<String,List<Coordinate>>>();var waiting=names.size
+                fun ready(){
+                if(id!=request)return
+                val pieces=along+named.filter{n->along.none{it.second==n.second}}
+                val start=main.firstOrNull()?:at
+                var mapped=DocTracks.chain(pieces.map{it.second},start,150.0)
+                if(mapped.size>=2&&DocTracks.meters(mapped.last(),start)<DocTracks.meters(mapped.first(),start))mapped=mapped.reversed()
                 if(byLegs&&route!!.sections.size>=2&&mapped.size>=2){
                     // A loop: walk it the way DOC describes.
                     val a=DocTracks.along(mapped,DocTracks.pointAt(route.points,route.sections[0].to));val b=DocTracks.along(mapped,DocTracks.pointAt(route.points,route.sections[1].to))
                     if(b<a)mapped=mapped.reversed()
                 }
                 val line=if(mapped.size>=2&&DocTracks.length(mapped)>=.7*DocTracks.length(main))mapped else main
+                if(line.size<2){lineFound(id,emptyList());return}
                 val found=ArrayList<Part>()
                 if(byLegs){
                     // Each leg on the final line: looked for from about where it is
@@ -332,6 +356,9 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
                 }
                 for((n,spans) in DocTracks.namedSpans(pieces,line))if(!DocWalks.sameName(n,name.text.toString()))found.add(Part(n,"",spans,emptyList()))
                 lineFound(id,line,found,byLegs)
+                }
+                if(waiting==0)ready()
+                for(n in names)mapLine(n,at){paths->named.addAll(paths.map{n to it});waiting--;if(waiting==0)ready()}
             }
         }
     }
@@ -469,7 +496,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
             if(move)onFit(lineNow);return
         }
         val p=parts[selected]
-        chart.focus(p.spans)
+        onRange(emptyList());chart.focus(p.spans)
         val length=p.spans.sumOf{it.second-it.first};var up=0.0;var down=0.0;var complete=true;var high:Double?=null
         for((a,b) in p.spans){val sec=chart.sectionStats(a,b);if(sec==null||!sec.complete)complete=false else{up+=sec.ascent;down+=sec.descent}
             chart.highest(a,b)?.let{h->high=max(high?:h,h)}}

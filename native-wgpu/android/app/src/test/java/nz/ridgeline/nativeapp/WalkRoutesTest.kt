@@ -82,6 +82,9 @@ class WalkRoutesTest {
         assertEquals(53_500.0,WalkRoutes.stated(o.distance)!!,0.1)
         assertEquals(8_000.0,WalkRoutes.stated("16 km return via same track")!!,0.1)
         assertEquals(56_000.0,WalkRoutes.stated("56 km loop")!!,0.1)
+        assertEquals(1_500.0,WalkRoutes.stated("1.5 km one way return via same track")!!,0.1)
+        assertNull(WalkRoutes.stated("10 km | 20 km return via same track"))
+        assertNull(WalkRoutes.stated("Various: 200 m – 11.7 km one way"))
     }
     @Test fun aWalkIsDocsLineWhenItsLegsCoverOnlyPartOfIt(){
         // Rees-Dart style: DOC describes only part (the rest closed by a slip): the walk is DOC's whole line.

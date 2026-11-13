@@ -12,7 +12,9 @@ internal class TopographyStyle(json:String){
          * same name is not repeated closer than this on screen. 0 for point labels. */
         val spacing:Float=0f,
         /** A DOC walk's id for track names shown as their walk's (see DocWalks). */
-        val ref:String="")
+        val ref:String="",
+        /** Shown under its own name but part of the walk [ref] (a section). */
+        val section:Boolean=false)
     data class Output(val lines:List<Line>,val labels:List<Label>)
     private val specs=JSONArray(json).let{rows->List(rows.length()){rows.getJSONObject(it)}}.onEach{spec->
         // Performance: river names start later than in Capacitor (1.5 zooms for
@@ -121,7 +123,8 @@ internal class TopographyStyle(json:String){
                     // A name that is a DOC walk's opens that walk's summary: the walk's
                     // name on a section, or a track that is the walk itself. A section
                     // under its own name opens as a section of the walk.
-                    val ref=if(asWalk||walk==null)(f.properties[DocWalks.WALK_ID] as? String).orEmpty()else""
+                    val ref=(f.properties[DocWalks.WALK_ID] as? String).orEmpty()
+                    val section=walk!=null&&!asWalk
                     val size=if(kind=="circle")number(paint.opt("circle-radius"),4.0).toFloat()else if(asWalk)12f else number(eval(layout.opt("text-size")?:12,f.properties,zoom),12.0).toFloat()
                     val spacing=if(layout.optString("symbol-placement")=="line")layout.optDouble("symbol-spacing",250.0).toFloat()else 0f
                     val c=color(eval(paint.opt(if(kind=="circle")"circle-color"else"text-color"),f.properties,zoom))
@@ -131,12 +134,12 @@ internal class TopographyStyle(json:String){
                         for(p in f.paths){if(repeats.getOrDefault(text,0)>=MAX_REPEATS)break
                             for((point,where) in crossings(p,floor(zoom).toInt(),MAX_REPEATS-repeats.getOrDefault(text,0))){
                                 if(!named.add(id+"\u0000"+text+"\u0000"+where))continue
-                                labels.add(Label(point,text.take(256),size,c,priority,bold,false,"$id:$text:$where",layout.optString("text-anchor","center"),false,spacing,ref))
+                                labels.add(Label(point,text.take(256),size,c,priority,bold,false,"$id:$text:$where",layout.optString("text-anchor","center"),false,spacing,ref,section))
                                 repeats[text]=repeats.getOrDefault(text,0)+1
                             }
                         }
                         if(text !in single)anchor(path)?.let{point->
-                            single[text]=Label(point,text.take(256),size,c,priority,bold,false,labelKey(id,text,point),layout.optString("text-anchor","center"),false,spacing,ref)}
+                            single[text]=Label(point,text.take(256),size,c,priority,bold,false,labelKey(id,text,point),layout.optString("text-anchor","center"),false,spacing,ref,section)}
                         continue
                     }
                     // Line labels: one candidate per name per tile, however many

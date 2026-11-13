@@ -17,6 +17,8 @@ internal object DocWalks {
     /** Walks are matched to map tracks from this camera zoom. */
     const val MIN_ZOOM=11.5
     const val NEAR_METERS=50.0
+    /** A track named like a DOC walk whose line is this close is that walk. */
+    const val NAMED_METERS=3000.0
     /** Share of a map track that must lie along the walk. */
     const val COVER=.7
     /** Feature properties set on map tracks that belong to a walk. */
@@ -26,13 +28,15 @@ internal object DocWalks {
     class Info(val guid:String,val name:String,val difficulty:String,val time:String,val page:String){
         /** A circuit, traverse, crossing or multi-day walk: not a collection
          * ("Wilkin Valley tracks") or a short walk. */
-        val large:Boolean get()=!COLLECTION.containsMatchIn(name)&&(DAYS.containsMatchIn(time)||LARGE.containsMatchIn(name))
+        val large:Boolean get()=!collection(name)&&(DAYS.containsMatchIn(time)||LARGE.containsMatchIn(name))
     }
     private val DAYS=Regex("\\bdays?\\b",RegexOption.IGNORE_CASE)
     private val LARGE=Regex("\\b(circuit|traverse|crossing|walkway|great walk)\\b",RegexOption.IGNORE_CASE)
     private val COLLECTION=Regex("\\b(tracks|routes|walks|trails)\\b",RegexOption.IGNORE_CASE)
     /** A DOC page for several tracks ("Wilkin Valley tracks"), not one walk. */
-    fun collection(name:String)=COLLECTION.containsMatchIn(name)
+    fun collection(name:String)=COLLECTION.containsMatchIn(name)&&!PAIR.containsMatchIn(name)
+    /** "Greenstone and Caples tracks": two tracks walked as one (a loop), not a collection. */
+    private val PAIR=Regex("^[^,]+\\s+and\\s+[^,]+\\s+(tracks|walks|routes)$",RegexOption.IGNORE_CASE)
 
     /** Every DOC walk (about 1,350; ~50 KB compressed), keyed by its line id. */
     fun listUrl()=DocTracks.ORG+"DOC_Walking_Experiences/FeatureServer/0/query?where=1%3D1&outFields=name%2Cdifficulty%2CcompletionTime%2CwalkingAndTrampingWebPage&returnGeometry=false&f=json"
@@ -94,7 +98,7 @@ internal object DocWalks {
     /** World units for [meters] at world y [y]. */
     fun worldMeters(meters:Double,y:Double):Double{val lat=CameraMath.latitude(y);return meters/(40_075_016.686*max(.05,cos(Math.toRadians(lat))))}
 
-    private val generic=setOf("track","tracks","walk","walks","walkway","route","routes","circuit","loop","the","great","trail")
+    private val generic=setOf("track","tracks","walk","walks","walkway","route","routes","circuit","loop","the","great","trail","and")
     private fun words(name:String)=PlaceSearch.normalize(name).split(' ').filter{it.isNotEmpty()&&it !in generic}
     /** The map's name and a DOC walk's name are the same walk: equal without
      * generic words ("Gillespie Pass Circuit Track" and "Gillespie Pass
@@ -115,8 +119,22 @@ internal object DocWalks {
         var i=0
         while(i<path.size){val p=path[i];near.clear();index.near(p.x,p.y,r,near);for(li in near)counts[li]=(counts[li]?:0)+1;samples++;i+=step}
         val along=counts.filter{(_,c)->c>=samples*COVER}.keys.map{index.lines[it]}.filter{infos.containsKey(it.guid)}
-        if(along.isEmpty())return null
+        // DOC's line can stop short of the walk (the Ben Lomond Track's line ends
+        // at the saddle; the map's "Ben Lomond Track" goes on to the summit): a
+        // track with a nearby DOC walk's own name is that walk.
+        if(along.isEmpty()){
+            if(own.isBlank())return null
+            val close=HashSet<Int>();index.near(path[path.size/2].x,path[path.size/2].y,worldMeters(NAMED_METERS,path[0].y),close)
+            return close.map{index.lines[it]}.filter{infos[it.guid]?.let{i->sameName(own,i.name)}==true}.minByOrNull{it.meters}?.let{it to infos[it.guid]!!.large}
+        }
         along.filter{own.isNotBlank()&&sameName(own,infos[it.guid]!!.name)}.minByOrNull{it.meters}?.let{return it to infos[it.guid]!!.large}
+        // Its name is part of a walk's: "Greenstone Track" in "Greenstone and
+        // Caples tracks", "Rees Track" in "Rees-Dart Track" (of two, the walk
+        // naming it first: not the "Mavora - Greenstone Walkway").
+        val ownWords=words(own)
+        if(ownWords.isNotEmpty())along.filter{l->words(infos[l.guid]!!.name).containsAll(ownWords)}
+            .minWithOrNull(compareBy({l->words(infos[l.guid]!!.name).size-ownWords.size},{l->words(infos[l.guid]!!.name).indexOf(ownWords[0])},{l->l.meters}))
+            ?.let{return it to infos[it.guid]!!.large}
         // Large walks take precedence over a track's own section name: a track on
         // a large walk (the walk itself, without its side trips) carries its name;
         // of several, the most specific (the Travers-Sabine Circuit, not the Te
