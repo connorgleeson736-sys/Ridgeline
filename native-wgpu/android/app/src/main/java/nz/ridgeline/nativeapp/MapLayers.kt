@@ -250,6 +250,22 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
             val out=area?.let{runCatching{WalkOptions.extend(line,it,target)}.getOrNull()}
             main.post{if(!closed)callback(out)}}
     }}.onFailure{callback(null)}}
+    /** DOC's walk followed the way its description tells it (WalkDirections),
+     * or null. [doc]: DOC's line. Main thread callback. */
+    fun followWalk(sections:List<DocPages.Section>,walk:String,distance:String,time:String,doc:List<List<Coordinate>>,current:List<Coordinate>,callback:(WalkDirections.Result?)->Unit){runCatching{worker.execute{
+        area(doc.flatten(),AREA_METERS){area->
+            val out=area?.let{a->runCatching{
+                val box=a.box?:return@runCatching null
+                val places=PlaceSearch.get(view.context.assets)?.within(box).orEmpty().map{Triple(it.kind,it.name,Coordinate(it.longitude,it.latitude))}
+                WalkDirections.route(sections,walk,distance,time,doc,a,places,current)}.getOrNull()}
+            main.post{if(!closed)callback(out)}}
+    }}.onFailure{callback(null)}}
+    /** A loop walk's [line] closed over the map's tracks (WalkOptions.closeLoop), or null. Main thread callback. */
+    fun closeWalk(line:List<Coordinate>,target:Double,clockwise:Boolean?,callback:(List<Coordinate>?)->Unit){runCatching{worker.execute{
+        area(line,(target-DocTracks.length(line)).coerceIn(500.0,3000.0)){area->
+            val out=area?.let{runCatching{WalkOptions.closeLoop(line,it,target,clockwise)}.getOrNull()}
+            main.post{if(!closed)callback(out)}}
+    }}.onFailure{callback(null)}}
     /** The map's tracks, aerial lifts and named peaks within [margin] metres
      * of [points] (at most [AREA_TILES] zoom-14 tiles, else null), read on
      * the walk-route thread: [done] runs there. */

@@ -75,6 +75,8 @@ class MainActivity:Activity(){
         trackSheet.alongLine={corridor,callback->mapLayers.alongLine(corridor,callback)}
         trackSheet.walkOptions={guid,legs,starts,walk,time,doc,callback->mapLayers.walkOptions(guid,legs,starts,walk,time,doc,callback)}
         trackSheet.extendWalk={line,target,callback->mapLayers.extendWalk(line,target,callback)}
+        trackSheet.closeWalk={line,target,way,callback->mapLayers.closeWalk(line,target,way,callback)}
+        trackSheet.followWalk={sections,walk,distance,time,doc,current,callback->mapLayers.followWalk(sections,walk,distance,time,doc,current,callback)}
         // Frame the track once the map has its new size (the sheet resizes it).
         trackSheet.onFit={line->mapHost.post{terrain.post{terrain.focus(line)}}}
         // Search: DOC walks (by their page's id) and huts open their summaries.

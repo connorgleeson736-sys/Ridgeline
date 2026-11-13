@@ -34,6 +34,8 @@ internal class PlaceSearch(lines:Sequence<String>){
         val bare=key.split(' ').filterNot{it in GENERIC}.joinToString(" ")
         return nearest{it==key}?:nearest{it.startsWith("$key ")}?:bare.takeIf{it.isNotEmpty()&&it!=key}?.let{b->nearest{it==b}?:nearest{it.startsWith("$b ")}}
     }
+    /** Places within longitude/latitude [box] (west, south, east, north). */
+    fun within(box:DoubleArray):List<Place> = entries.asSequence().map{it.place}.filter{it.longitude>=box[0]&&it.longitude<=box[2]&&it.latitude>=box[1]&&it.latitude<=box[3]}.toList()
     private val GENERIC=setOf("carpark","car","park","road","end","roadend","shelter","picnic","area","village","settlement","township","track","entrance","start","the")
     fun search(query:String,near:Coordinate?,limit:Int=30):List<Result>{
         val q=words(query);if(q.isEmpty())return emptyList()
