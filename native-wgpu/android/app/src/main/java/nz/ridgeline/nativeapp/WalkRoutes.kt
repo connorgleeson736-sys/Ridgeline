@@ -21,9 +21,9 @@ internal object WalkRoutes {
         return if(stops.size<2)heading else plain(stops.first())+" to "+plain(stops.last())
     }
     /** "Kerin Forks to Makarora – SH6" ends at "Makarora". */
-    fun plain(name:String)=name.replace(Regex("\\s+via\\s+.*$",RegexOption.IGNORE_CASE),"").replace(Regex("\\s+[–—-]\\s+.*$"),"").replace(Regex("\\s*\\(.*?\\)"),"").trim()
+    fun plain(name:String)=name.replace(Regex("\\s+via\\s+.*$",RegexOption.IGNORE_CASE),"").replace(Regex("\\s+[–—-]\\s+.*$"),"").replace(Regex("\\s*\\(.*?\\)"),"").trim().trimEnd(',',';',':','.').trim()
     /** "Kerin Forks Hut" and "Kerin Forks" are one leg end. */
-    private fun same(a:String,b:String)=DocTracks.hutKey(PlaceSearch.normalize(plain(a)))==DocTracks.hutKey(PlaceSearch.normalize(plain(b)))
+    fun same(a:String,b:String)=DocTracks.hutKey(PlaceSearch.normalize(plain(a)))==DocTracks.hutKey(PlaceSearch.normalize(plain(b)))
     /** The legs walked, in order: from the first leg, each next leg starts
      * where the last ended, and is the next one DOC lists from there (side
      * legs DOC lists later, "McKellar Hut to Lake Howden", are not taken). A

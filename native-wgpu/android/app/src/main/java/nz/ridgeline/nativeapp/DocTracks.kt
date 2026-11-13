@@ -262,7 +262,7 @@ internal object DocTracks {
         }
     }
     fun length(line:List<Coordinate>)=(1 until line.size).sumOf{meters(line[it-1],line[it])}
-    private fun distanceTo(path:List<Coordinate>,p:Coordinate)=(1 until path.size).minOfOrNull{segment(p,path[it-1],path[it]).first}?:path.firstOrNull()?.let{meters(it,p)}?:Double.MAX_VALUE
+    fun distanceTo(path:List<Coordinate>,p:Coordinate)=(1 until path.size).minOfOrNull{segment(p,path[it-1],path[it]).first}?:path.firstOrNull()?.let{meters(it,p)}?:Double.MAX_VALUE
     /** Distance from [p] to segment [a]-[b] in metres, and the position along it (0..1). */
     private fun segment(p:Coordinate,a:Coordinate,b:Coordinate):Pair<Double,Double>{
         val k=cos(Math.toRadians(p.latitude))*111_320.0;val m=111_320.0
