@@ -1,6 +1,23 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.46 Huts Circuits Base APK — 34.0 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Huts-Circuits-0.1.46-Base.apk)**.
+Latest: **[Download 0.1.47 Walk Legs Base APK — 34.0 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Walk-Legs-0.1.47-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 48:
+**updates 0.1.13–0.1.46 in place, keeping its data.**
+
+- **Walks as DOC describes them:** DOC's legs followed in DOC's order, with
+  DOC's times; side trips and extensions are no longer part of the walk.
+- **Sections:** each leg and each named track of a walk, with its own stats
+  and DOC text; a track that is part of a larger walk shows its DOC leg.
+- **Track sheet:** three heights, the map resizes above it.
+
+251 JVM tests pass; lint 0 errors; native libraries identical to 0.1.46.
+Not run on a phone.
+[Exact release record](../validation/walk-legs-2026-11-13/release.json) ·
+[SHA-256](Ridgeline-Native-Walk-Legs-0.1.47-Base.apk.sha256).
+
+## Previous 0.1.46 huts circuits checkpoint
+
+**[Download 0.1.46 Huts Circuits Base APK — 34.0 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Huts-Circuits-0.1.46-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 47:
 **updates 0.1.13–0.1.45 in place, keeping its data.**
 

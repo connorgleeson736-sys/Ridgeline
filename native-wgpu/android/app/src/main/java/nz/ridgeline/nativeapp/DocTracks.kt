@@ -25,7 +25,7 @@ internal object DocTracks {
         /** DOC's page link carries the walk's id, which keys its line. */
         val guid:String? get()=guidOf(page)
     }
-    class Track(val name:String,val status:String,val category:String,val dogs:String,val type:String,val meters:Double,val paths:List<List<Coordinate>>){
+    class Track(val name:String,val status:String,val category:String,val dogs:String,val type:String,val meters:Double,val paths:List<List<Coordinate>>,val duration:String=""){
         val closed get()=status.isNotBlank()&&!status.equals("OPEN",true)
     }
     class Hut(val name:String,val category:String,val bunks:String,val facilities:String,val point:Coordinate){
@@ -46,6 +46,8 @@ internal object DocTracks {
         val n=name.trim().replace(Regex("\\s+")," ")
         val out=linkedSetOf(n)
         out.add(n.replace(Regex("\\bMt\\.?(?= )"),"Mount"));out.add(n.replace(Regex("\\bMount(?= )"),"Mt"))
+        // DOC groups a valley's tracks as one walk: "Wilkin Valley Track" is DOC's "Wilkin Valley tracks".
+        for(v in out.toList())if(v.endsWith(" Track",true))out.add(v+"s")
         return out.toList()
     }
     private fun anyOf(field:String,name:String)="UPPER($field) IN (${names(name).joinToString(","){quote(it.uppercase(java.util.Locale.ROOT))}})"
@@ -118,7 +120,7 @@ internal object DocTracks {
     fun parseWalks(json:String)=features(json).map{f->val a=f.getJSONObject("attributes")
         Walk(a.text("name"),a.text("introduction"),a.text("difficulty"),a.text("completionTime"),a.text("introductionThumbnail"),a.text("walkingAndTrampingWebPage"),point(f.optJSONObject("geometry")))}
     fun parseTracks(json:String)=features(json).map{f->val a=f.getJSONObject("attributes");val c=characteristics(a)
-        Track(a.text("TechObjectName"),c["USER_STATUS"].orEmpty(),c["WEB_CATEGORY_TRACK"].orEmpty(),c["WEB_DOGS_ALLOWED"].orEmpty(),c["WEB_TRACK_TYPE"].orEmpty(),a.optDouble("Shape__Length",0.0).takeIf{it.isFinite()}?:0.0,paths(f.optJSONObject("geometry")))}
+        Track(a.text("TechObjectName"),c["USER_STATUS"].orEmpty(),c["WEB_CATEGORY_TRACK"].orEmpty(),c["WEB_DOGS_ALLOWED"].orEmpty(),c["WEB_TRACK_TYPE"].orEmpty(),a.optDouble("Shape__Length",0.0).takeIf{it.isFinite()}?:0.0,paths(f.optJSONObject("geometry")),c["WEB_WALKING_DURATION"].orEmpty())}
     class WalkLine(val guid:String,val meters:Double,val paths:List<List<Coordinate>>)
     fun parseWalkLines(json:String)=features(json).mapNotNull{f->val a=f.getJSONObject("attributes")
         val guid=a.text("EPISERVERGUID").lowercase();if(guid.isEmpty())return@mapNotNull null
@@ -201,6 +203,45 @@ internal object DocTracks {
         if(line.isEmpty())return null
         val lat=line.sumOf{it.latitude}/line.size;val dy=meters/111_320.0;val dx=dy/max(.2,cos(Math.toRadians(lat)))
         return doubleArrayOf(line.minOf{it.longitude}-dx,line.minOf{it.latitude}-dy,line.maxOf{it.longitude}+dx,line.maxOf{it.latitude}+dy)
+    }
+    /** Distance along [line] of its point nearest [p], looking only from
+     * [after] metres on (keeps a loop's later legs after its earlier ones). */
+    fun along(line:List<Coordinate>,p:Coordinate,after:Double=0.0):Double{
+        var best=Double.MAX_VALUE;var at=after;var walked=0.0
+        for(i in 1 until line.size){val a=line[i-1];val b=line[i];val len=meters(a,b)
+            if(walked+len>=after){val (d,t)=segment(p,a,b);val pos=max(after,walked+len*t);if(d<best){best=d;at=pos}}
+            walked+=len}
+        return at
+    }
+    /** The point [d] metres along [line]. */
+    fun pointAt(line:List<Coordinate>,d:Double):Coordinate{
+        var walked=0.0
+        for(i in 1 until line.size){val a=line[i-1];val b=line[i];val len=meters(a,b)
+            if(walked+len>=d&&len>0){val t=((d-walked)/len).coerceIn(0.0,1.0);return Coordinate(a.longitude+(b.longitude-a.longitude)*t,a.latitude+(b.latitude-a.latitude)*t)}
+            walked+=len}
+        return line.lastOrNull()?:Coordinate(0.0,0.0)
+    }
+    /** [line] from [from] to [to] metres along it. */
+    fun slice(line:List<Coordinate>,from:Double,to:Double):List<Coordinate>{
+        if(line.size<2||to<=from)return emptyList()
+        val out=arrayListOf(pointAt(line,from));var walked=0.0
+        for(i in 1 until line.size){walked+=meters(line[i-1],line[i]);if(walked>from&&walked<to)out.add(line[i])}
+        out.add(pointAt(line,to));return out
+    }
+    /** Where map tracks with their own names lie along [line]: name to merged
+     * spans (metres), when the line is made of more than one named track. */
+    fun namedSpans(pieces:List<Pair<String,List<Coordinate>>>,line:List<Coordinate>):Map<String,List<Pair<Double,Double>>>{
+        val total=length(line);if(total<=0)return emptyMap()
+        val raw=HashMap<String,MutableList<Pair<Double,Double>>>()
+        for((name,p) in pieces){if(name.isBlank()||p.size<2)continue
+            val a=along(line,p.first());val b=along(line,p.last());val m=along(line,p[p.size/2])
+            val lo=minOf(a,b,m);val hi=maxOf(a,b,m);if(hi-lo<20)continue
+            raw.getOrPut(name){ArrayList()}.add(lo to hi)}
+        val merged=raw.mapValues{(_,spans)->val out=ArrayList<Pair<Double,Double>>()
+            for(s in spans.sortedBy{it.first}){val last=out.lastOrNull();if(last!=null&&s.first<=last.second+300)out[out.size-1]=last.first to max(last.second,s.second)else out.add(s)};out}
+            .filterValues{spans->spans.sumOf{it.second-it.first}>=300}
+        if(merged.size<2&&merged.values.firstOrNull()?.sumOf{it.second-it.first}?.let{it>.9*total}!=false)return emptyMap()
+        return merged
     }
     fun length(line:List<Coordinate>)=(1 until line.size).sumOf{meters(line[it-1],line[it])}
     private fun distanceTo(path:List<Coordinate>,p:Coordinate)=(1 until path.size).minOfOrNull{segment(p,path[it-1],path[it]).first}?:path.firstOrNull()?.let{meters(it,p)}?:Double.MAX_VALUE

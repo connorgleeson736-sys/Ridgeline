@@ -83,6 +83,8 @@ internal class NativeSheet(private val root:FrameLayout,private val map:FrameLay
     }
     private fun stops():IntArray{val h=(root.height-root.paddingTop-root.paddingBottom).takeIf{it>0}?:context.resources.displayMetrics.heightPixels;val compact=min(dp(COMPACT_DP),(h*.33).toInt());return intArrayOf(compact,min(h-dp(80),max(compact+dp(80),(h*.64).toInt())))}
     fun expanded()=index==1
+    /** Applies the current stop again (map size and cover). */
+    fun refresh()=settle(index)
     fun show(value:Boolean){if(visible==value)return;visible=value;panel.visibility=if(value)View.VISIBLE else View.GONE;settle(index)}
     fun settle(next:Int){
         index=next.coerceIn(0,1);map.clipBounds=null;panel.translationY=0f
