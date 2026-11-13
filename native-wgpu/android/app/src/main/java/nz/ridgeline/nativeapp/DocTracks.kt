@@ -198,6 +198,29 @@ internal object DocTracks {
         }
         return out.sortedBy{it.along}
     }
+    /** A hut's name without the codes in DOC's asset data ("T3: South Ohau Hut",
+     * "Mintaro Hut (2021)", "Top Crooked Hut 3PM", "Iron Gate Hut - 2019",
+     * "Field Hut (H)", "Pinnacles Hut (Mt Somers Track)"); "(Historic)",
+     * "(Old 1958)" are kept: another hut. */
+    fun hutName(name:String):String=name.trim()
+        .replace(Regex("^T\\d+\\s*:\\s*"),"")
+        // Notes in brackets ("(H)", "(404823)", "(Mt Somers Track)", "(Rogers)"),
+        // not "(Historic 1949)" or "(Old 1958)": those name an old hut beside the new.
+        .replace(Regex("\\s*\\((?![^)]*\\b(?:historic|old|19\\d\\d)\\b)[^)]*\\)",RegexOption.IGNORE_CASE),"")
+        .replace(Regex("\\s*\\(\\d{6}\\)\\s*\\d{4}$"),"")
+        .replace(Regex("\\s+(?:-\\s*)?(?:19|20)\\d{2}$"),"")
+        .replace(Regex("\\s+\\d+P[MO]$"),"")
+        .trim().ifEmpty{name}
+    private fun hutWords(name:String)=" "+PlaceSearch.normalize(hutName(name)).replace(Regex("\\b(bivouac|bivvy|biv)\\b"),"biv")+" "
+    /** The [stops] DOC's page names in full ([page]: its text): "There are 3 DOC
+     * huts on this track: Mid Caples Hut McKellar Hut Greenstone Hut" leaves out
+     * Slip Flat Hut, near the Greenstone Track but not on it (the page names
+     * only Slip Flat, the clearing). All of them when the page names none. */
+    fun named(stops:List<Stop>,page:String):List<Stop>{
+        if(page.isBlank())return stops
+        val text=hutWords(page)
+        return stops.filter{text.contains(hutWords(it.hut.name))}.ifEmpty{stops}
+    }
     /** Longitude/latitude bounds of [line] grown by [meters]. */
     fun bounds(line:List<Coordinate>,meters:Double=HUT_METERS):DoubleArray?{
         if(line.isEmpty())return null

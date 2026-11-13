@@ -205,7 +205,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     /** Clears the sheet for a new track or hut and slides it up. */
     private fun begin(title:String,hut:Boolean):Long{
         val id=++request
-        visible=true;level=0;link="";sectionOf=false;parts.clear();partRow.removeAllViews();partScroll.visibility=View.GONE;choice=null;optionScroll.visibility=View.GONE;partText.removeAllViews();partText.visibility=View.GONE;walkRef=null
+        visible=true;level=0;link="";sectionOf=false;parts.clear();partRow.removeAllViews();partScroll.visibility=View.GONE;choice=null;optionScroll.visibility=View.GONE;pageWords="";nearHuts=emptyList();partText.removeAllViews();partText.visibility=View.GONE;walkRef=null
         name.text=title;subtitle.text="";subtitle.visibility=View.GONE;wholeSubtitle="";closedBadge.visibility=View.GONE
         photo.setImageDrawable(null);photo.visibility=View.GONE
         val labels=if(hut)listOf("Bunks","Elevation","Bookings","From road")else listOf("Distance","Ascent","Descent","Highest")
@@ -251,7 +251,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
             // along it and is not much longer): the walk's own summary. A DOC
             // collection ("Wilkin Valley tracks") stays on the tapped track.
             val same=w!=null&&guid!=null&&!collection&&(fromName||DocWalks.sameName(trackName,w.name)||DocTracks.length(mapped.orEmpty())>=.6*placeMeters)
-            if(same){showWalk(guid!!,w!!.name.ifBlank{trackName},at);return}
+            if(same){showWalk(guid!!,w!!.name.ifBlank{trackName},at,mapName=trackName);return}
             // Found by place and longer than the track: the track is one section of it.
             val partOf=w!=null&&!fromName
             walk=w;walkDone=true;w?.let{applyWalk(id,it,partOf=partOf)};sectionOf=partOf;describe(walk,track);decide()
@@ -311,7 +311,8 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
 
     /** A track section named by its large DOC walk (a circuit): the walk's own
      * details and line, followed on the map's tracks. */
-    fun showWalk(guid:String,label:String,at:Coordinate,fit:Boolean=false){
+    /** [mapName]: the map's name for the tapped track (it can differ from DOC's: "Mt Iron Track"). */
+    fun showWalk(guid:String,label:String,at:Coordinate,fit:Boolean=false,mapName:String?=null){
         val info=walkInfo(guid)
         val id=begin(info?.name?.takeIf{it.isNotBlank()}?:label,false);fitNext=fit
         if(info!=null)setSubtitle(listOf(info.difficulty,info.time).filter{it.isNotBlank()}.joinToString(" · "))
@@ -347,7 +348,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
                 if(id!=request)return@withAlong
                 // The map's tracks named like the walk (or the tapped track) join it:
                 // DOC's line can stop short (the Ben Lomond Track's, at the saddle).
-                val names=listOf(label,name.text.toString()).filter{it.isNotBlank()&&DocWalks.sameName(it,name.text.toString())}.distinct()
+                val names=(listOf(label,name.text.toString()).filter{it.isNotBlank()&&DocWalks.sameName(it,name.text.toString())}+listOfNotNull(mapName?.takeIf{it.isNotBlank()})).distinct()
                 val named=ArrayList<Pair<String,List<Coordinate>>>();var waiting=names.size
                 fun finish(line:List<Coordinate>,pieces:List<Pair<String,List<Coordinate>>>,turned:Boolean=false){
                 if(line.size<2){lineFound(id,emptyList());return}
@@ -369,7 +370,8 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
                 }
                 fun ready(){
                 if(id!=request)return
-                val pieces=along+named.filter{n->along.none{it.second==n.second}}
+                // (Two names for one track find its pieces twice: once each.)
+                val pieces=along+named.distinctBy{it.second}.filter{n->along.none{it.second==n.second}}
                 val start=main.firstOrNull()?:at
                 var mapped=DocTracks.chain(pieces.map{it.second},start,150.0)
                 if(mapped.size>=2&&DocTracks.meters(mapped.last(),start)<DocTracks.meters(mapped.first(),start))mapped=mapped.reversed()
@@ -613,6 +615,8 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     }
     private fun showSections(list:List<DocPages.Section>){
         sections.removeAllViews()
+        pageWords=list.joinToString(" "){sec->DocPages.words(sec.blocks).joinToString(" "){it.text}}
+        if(nearHuts.isNotEmpty())showHuts(nearHuts)
         for(section in list){
             val content=NativeUi.column(activity).apply{visibility=View.GONE;setPadding(0,0,0,dp(10))}
             val chevron=TextView(activity).apply{text="›";textSize=20f;setTextColor(NativeUi.muted);gravity=Gravity.CENTER;rotation=90f}
@@ -640,19 +644,37 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
                 is DocPages.Heading->{v.text=b.text;v.setTypeface(null,Typeface.BOLD);lp.topMargin=dp(12)}
                 is DocPages.Paragraph->{v.text=b.text;lp.topMargin=dp(6)}
                 is DocPages.Bullet->{v.text=android.text.SpannableString("•  "+b.text).apply{setSpan(android.text.style.LeadingMarginSpan.Standard(0,dp(14)),0,length,0)};lp.topMargin=dp(4)}
+                is DocPages.Image->{photoBlock(content,b);continue}
             }
             content.addView(v,lp)
         }
     }
-    private fun showHuts(stops:List<DocTracks.Stop>){
-        chart.markers=stops.map{it.along to it.hut.name}
+    /** A photo in DOC's text: full width, loaded when shown, with DOC's caption and credit. */
+    private fun photoBlock(content:LinearLayout,b:DocPages.Image){
+        val id=request
+        val view=ImageView(activity).apply{adjustViewBounds=true;scaleType=ImageView.ScaleType.FIT_CENTER;clipToOutline=true;background=NativeUi.background(activity,NativeUi.line,10);visibility=View.GONE;contentDescription=b.text.lineSequence().firstOrNull().orEmpty()}
+        content.addView(view,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(10)})
+        if(b.text.isNotBlank())content.addView(TextView(activity).apply{text=b.text;textSize=11.5f;setTextColor(NativeUi.muted);setLineSpacing(0f,1.1f)},LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(4)})
+        val width=max(1,(content.width.takeIf{it>0}?:activity.resources.displayMetrics.widthPixels))
+        fetch(b.url,{bytes->
+            val bounds=BitmapFactory.Options().apply{inJustDecodeBounds=true};BitmapFactory.decodeByteArray(bytes,0,bytes.size,bounds)
+            var sample=1;while(bounds.outWidth/(sample*2)>=width)sample*=2
+            BitmapFactory.decodeByteArray(bytes,0,bytes.size,BitmapFactory.Options().apply{inSampleSize=sample})
+        }){bitmap->if(id==request&&bitmap!=null){view.setImageBitmap(bitmap);view.visibility=View.VISIBLE}}
+    }
+    /** DOC's page text for the walk in view (which huts it names), and the huts near its line. */
+    private var pageWords="";private var nearHuts=emptyList<DocTracks.Stop>()
+    private fun showHuts(near:List<DocTracks.Stop>){
+        nearHuts=near
+        val stops=DocTracks.named(near,pageWords)
+        chart.markers=stops.map{it.along to DocTracks.hutName(it.hut.name)}
         huts.removeAllViews()
         for(s in stops){val h=s.hut
             val row=LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL;setPadding(0,dp(8),0,dp(8));contentDescription=h.name
                 isClickable=true;background=NativeUi.pressable(activity,null);setOnClickListener{showHut(h.name,h.point)}}
             row.addView(HutIcon(),LinearLayout.LayoutParams(dp(30),dp(30)).apply{marginEnd=dp(12)})
             val text=NativeUi.column(activity)
-            text.addView(TextView(activity).apply{this.text=h.name;textSize=14f;setTextColor(NativeUi.ink);setTypeface(null,Typeface.BOLD);maxLines=1;ellipsize=TextUtils.TruncateAt.END})
+            text.addView(TextView(activity).apply{this.text=DocTracks.hutName(h.name);textSize=14f;setTextColor(NativeUi.ink);setTypeface(null,Typeface.BOLD);maxLines=1;ellipsize=TextUtils.TruncateAt.END})
             val detail=listOf(h.category.removeSuffix(" Hut").let{if(it.isBlank())"" else "$it hut"},bunks(h.bunks),if(h.bookable)"Bookable" else "").filter{it.isNotBlank()}.joinToString(" · ")
             if(detail.isNotEmpty())text.addView(TextView(activity).apply{this.text=detail;textSize=12f;setTextColor(NativeUi.muted);maxLines=1;ellipsize=TextUtils.TruncateAt.END})
             row.addView(text,LinearLayout.LayoutParams(0,-2,1f))

@@ -61,4 +61,25 @@ class DocTracksTest {
         assertEquals(DocTracks.length(line),stops[1].along,200.0)
         val b=DocTracks.bounds(line)!!;assertTrue(b[0]<170.0&&b[2]>170.1&&b[1]< -44.0&&b[3]> -44.0)
     }
+    @Test fun hutNamesWithoutAssetCodes(){
+        assertEquals("South Ohau Hut",DocTracks.hutName("T3: South Ohau Hut"))
+        assertEquals("Mintaro Hut",DocTracks.hutName("Mintaro Hut (2021)"))
+        assertEquals("Top Crooked Hut",DocTracks.hutName("Top Crooked Hut 3PM"))
+        assertEquals("Iron Gate Hut",DocTracks.hutName("Iron Gate Hut - 2019"))
+        assertEquals("Field Hut",DocTracks.hutName("Field Hut (H)"))
+        assertEquals("Pouakai Hut",DocTracks.hutName("Pouakai Hut (404823) 2025"))
+        assertEquals("Pinnacles Hut",DocTracks.hutName("Pinnacles Hut (Mt Somers Track)"))
+        assertEquals("Julia Hut (Old 1958)",DocTracks.hutName("Julia Hut (Old 1958)"))
+        assertEquals("Cedar Flat Hut (Historic)",DocTracks.hutName("Cedar Flat Hut (Historic)"))
+    }
+    /** DOC's Greenstone and Caples page names its huts; Slip Flat Hut (near the
+     * Greenstone Track, on the page only as "Slip Flat") is left out. */
+    @Test fun hutsTheWalksPageNames(){
+        fun stop(n:String,at:Double)=DocTracks.Stop(DocTracks.Hut(n,"","","",Coordinate(168.0,-45.0)),at)
+        val near=listOf(stop("Mid Caples Hut",8900.0),stop("Mckellar Hut",30200.0),stop("Greenstone Hut",48600.0),stop("Slip Flat Hut",52000.0))
+        val page="There are 3 DOC huts on this track: Mid Caples Hut McKellar Hut Greenstone Hut. Slip Flat is a large open area about halfway down the gorge."
+        assertEquals(listOf("Mid Caples Hut","Mckellar Hut","Greenstone Hut"),DocTracks.named(near,page).map{it.hut.name})
+        // A page naming none of them: all.
+        assertEquals(4,DocTracks.named(near,"A walk up the valley.").size)
+    }
 }

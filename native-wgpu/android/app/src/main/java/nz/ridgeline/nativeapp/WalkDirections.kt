@@ -41,7 +41,7 @@ internal object WalkDirections {
     fun sentences(sections:List<DocPages.Section>):List<String>{
         val d=sections.firstOrNull{it.title.contains("description",true)}?:return emptyList()
         val out=ArrayList<String>();var skip=false
-        for(b in d.blocks){
+        for(b in DocPages.words(d.blocks)){
             if(b is DocPages.Heading){skip=SKIP_HEADING.containsMatchIn(b.text);continue}
             if(skip)continue
             for(s in b.text.split(Regex("(?<=[.!?])\\s+")))if(s.isNotBlank()&&!SKIP_SENTENCE.containsMatchIn(s))out.add(s)
