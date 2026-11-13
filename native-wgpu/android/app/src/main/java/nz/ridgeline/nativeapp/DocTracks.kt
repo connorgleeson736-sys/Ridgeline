@@ -243,6 +243,24 @@ internal object DocTracks {
         if(merged.size<2&&merged.values.firstOrNull()?.sumOf{it.second-it.first}?.let{it>.9*total}!=false)return emptyMap()
         return merged
     }
+    /** [line] with at most [max] points for drawing (Douglas-Peucker, the
+     * smallest tolerance from 1 m that fits): the map draws at most 2,000 points
+     * a line; a walk's own line (the Greenstone and Caples tracks: 2,509) can
+     * have more. Measuring and profiles keep every point. */
+    fun simplify(line:List<Coordinate>,max:Int=2000):List<Coordinate>{
+        if(line.size<=max)return line
+        var tolerance=1.0
+        while(true){
+            val keep=BooleanArray(line.size);keep[0]=true;keep[line.size-1]=true
+            val stack=ArrayDeque<Pair<Int,Int>>();stack.add(0 to line.size-1)
+            while(stack.isNotEmpty()){val (a,b)=stack.removeLast();var far=-1;var farD=tolerance
+                for(i in a+1 until b){val d=segment(line[i],line[a],line[b]).first;if(d>farD){farD=d;far=i}}
+                if(far>=0){keep[far]=true;stack.add(a to far);stack.add(far to b)}}
+            val out=line.filterIndexed{i,_->keep[i]}
+            if(out.size<=max)return out
+            tolerance*=1.5
+        }
+    }
     fun length(line:List<Coordinate>)=(1 until line.size).sumOf{meters(line[it-1],line[it])}
     private fun distanceTo(path:List<Coordinate>,p:Coordinate)=(1 until path.size).minOfOrNull{segment(p,path[it-1],path[it]).first}?:path.firstOrNull()?.let{meters(it,p)}?:Double.MAX_VALUE
     /** Distance from [p] to segment [a]-[b] in metres, and the position along it (0..1). */

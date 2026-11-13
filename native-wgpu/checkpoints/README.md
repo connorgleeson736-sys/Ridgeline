@@ -1,6 +1,22 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.50 Walk Ends Base APK — 34.0 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Walk-Ends-0.1.50-Base.apk)**.
+Latest: **[Download 0.1.51 Long Walks Base APK — 34.0 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Long-Walks-0.1.51-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 52:
+**updates 0.1.13–0.1.50 in place, keeping its data.**
+
+- **Long walks drawn:** walks whose line has over 2,000 points (Greenstone
+  and Caples) are simplified for drawing; they drew nothing before.
+- **DOC text:** all HTML 4 character codes decoded ("&bull;" was shown as
+  text on the Liverpool Track); DOC's "•" lines are dot points.
+
+260 JVM tests pass; lint 0 errors; native libraries identical to 0.1.50.
+Not run on a phone.
+[Exact release record](../validation/long-walks-2026-11-13/release.json) ·
+[SHA-256](Ridgeline-Native-Long-Walks-0.1.51-Base.apk.sha256).
+
+## Previous 0.1.50 walk ends checkpoint
+
+**[Download 0.1.50 Walk Ends Base APK — 34.0 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Walk-Ends-0.1.50-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 51:
 **updates 0.1.13–0.1.49 in place, keeping its data.**
 

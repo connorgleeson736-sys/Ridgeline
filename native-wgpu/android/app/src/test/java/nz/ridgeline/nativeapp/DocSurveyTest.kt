@@ -30,7 +30,7 @@ class DocSurveyTest {
             val o=DocPages.overview(html);val (ext,byLegs)=WalkRoutes.extent(route,line,o.distance)
             val extKm=ext.sumOf{DocTracks.length(it)}/1000;val stated=WalkRoutes.stated(o.distance)?.div(1000)
             listOf(info.name,"large=${info.large}","time=${info.time}","sections=${sections.map{it.title}}","intro=$intro","legs=${legs.size}","walked=${WalkRoutes.walked(legs).size}",
-                "lineKm=${"%.1f".format(docKm)}","legKm=${"%.1f".format(legKm)}","routeKm=${routeKm?.let{"%.1f".format(it)}}","routeSections=${route?.sections?.size}","legSpans=$legCheck","stated=${stated?.let{"%.1f".format(it)}}","extentKm=${"%.1f".format(extKm)}","byLegs=$byLegs","distanceText=${o.distance}","why=${if(route==null)WalkRoutes.lastFailure else ""}","wholeKm=${"%.1f".format(line.sumOf{DocTracks.length(it)}/1000)}","mainKm=${"%.1f".format(DocTracks.length(WalkRoutes.mainLine(line))/1000)}").joinToString("\t")
+                "lineKm=${"%.1f".format(docKm)}","legKm=${"%.1f".format(legKm)}","routeKm=${routeKm?.let{"%.1f".format(it)}}","routeSections=${route?.sections?.size}","legSpans=$legCheck","stated=${stated?.let{"%.1f".format(it)}}","extentKm=${"%.1f".format(extKm)}","byLegs=$byLegs","distanceText=${o.distance}","why=${if(route==null)WalkRoutes.lastFailure else ""}","rawEntities=${sections.flatMap{it.blocks}.count{Regex("&[A-Za-z][A-Za-z0-9]*;|&#[0-9]+;").containsMatchIn(it.text)}}","wholeKm=${"%.1f".format(line.sumOf{DocTracks.length(it)}/1000)}","mainKm=${"%.1f".format(DocTracks.length(WalkRoutes.mainLine(line))/1000)}").joinToString("\t")
         }}.map{it.get()}
         pool.shutdown()
         out.writeText(rows.joinToString("\n"))
