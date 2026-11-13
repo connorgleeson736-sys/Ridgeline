@@ -22,6 +22,7 @@ class WalkRoutesTest {
         // The summary leg is not walked twice.
         assertEquals(listOf("Makarora to Young Hut","Young Hut to Siberia Hut","Siberia Hut to Kerin Forks Hut","Kerin Forks to Makarora – SH6"),WalkRoutes.walked(legs).map{it.title})
         assertEquals("Makarora",WalkRoutes.plain("Makarora – SH6"))
+        assertEquals("Heaphy Hut",WalkRoutes.plain("Heaphy Hut via Lewis Shelter"))
         assertEquals("Kerin Forks to Makarora",WalkRoutes.title("Kerin Forks to Makarora – SH6"))
         assertEquals("Lewis Pass to Ada Pass Hut",WalkRoutes.title("Lewis Pass - Cannibal Gorge Hut - Ada Pass Hut"))
     }
@@ -66,6 +67,32 @@ class WalkRoutesTest {
         assertEquals(listOf("Lewis Pass - Cannibal Gorge Hut - Ada Pass Hut","Ada Pass Hut - Christopher Hut"),WalkRoutes.walked(legs).map{it.title})
         // "Track description" (Stewart Island) is a description section too.
         assertEquals(1,DocPages.legs(DocPages.parse(html.replace("header-text=\"Description\"","header-text=\"Track description\""))).size.coerceAtMost(1))
+    }
+    @Test fun readsTheMilfordTracksDocPage(){
+        // Not in DOC's walk list: everything comes from its page.
+        val html=File("src/test/fixtures/docpages/milford-track.html").readText()
+        val o=DocPages.overview(html)
+        assertEquals("Milford Track",o.title);assertEquals("4 days",o.time);assertEquals("Intermediate tramping track",o.difficulty)
+        assertEquals("53.5 km one way",o.distance);assertTrue(o.intro.startsWith("Take a journey through the heart of Fiordland"));assertTrue(o.image.startsWith("https://www.doc.govt.nz/"))
+        assertEquals("No dogs.",o.dogs)
+        // "Day 1 – Glade Wharf to Clinton Hut": days are not places.
+        val legs=DocPages.legs(DocPages.parse(html))
+        assertEquals(listOf("Glade Wharf to Clinton Hut","Clinton Hut to Mintaro Hut","Mintaro Hut to Dumpling Hut","Dumpling Hut to Sandfly Point"),legs.map{it.title})
+        assertEquals(4,WalkRoutes.walked(legs).size)
+        assertEquals(53_500.0,WalkRoutes.stated(o.distance)!!,0.1)
+        assertEquals(8_000.0,WalkRoutes.stated("16 km return via same track")!!,0.1)
+        assertEquals(56_000.0,WalkRoutes.stated("56 km loop")!!,0.1)
+    }
+    @Test fun aWalkIsDocsLineWhenItsLegsCoverOnlyPartOfIt(){
+        // Rees-Dart style: DOC describes only part (the rest closed by a slip): the walk is DOC's whole line.
+        val rees=listOf((0..60).map{Coordinate(168.30+it*.01,-44.60)})
+        val part=WalkRoutes.Route(rees[0].take(20),emptyList())
+        val (walk,byLegs)=WalkRoutes.extent(part,rees,"63 km one way")
+        assertFalse(byLegs);assertEquals(DocTracks.length(rees[0]),walk.sumOf{DocTracks.length(it)},1.0)
+        // Gillespie: DOC's legs (the circuit) rather than DOC's line with its extension up the Wilkin.
+        val route=WalkRoutes.route(line,legs,::locate)!!
+        val (circuit,legsUsed)=WalkRoutes.extent(route,line,"56 km loop")
+        assertTrue(legsUsed);assertTrue(circuit.single().all{it.longitude>169.0})
     }
     @Test fun noLegsNoRoute(){
         assertNull(WalkRoutes.route(line,emptyList(),::locate))

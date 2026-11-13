@@ -68,3 +68,6 @@ Walk routes follow the legs in each walk's DOC page over DOC's walk line;
 the Gillespie Pass Circuit's DOC page excerpt and line are test fixtures
 (`android/app/src/test/fixtures/docpages/gillespie-pass-circuit.html`,
 `android/app/src/test/fixtures/gillespie/doc-walk-line-gillespie-pass-circuit.json`).
+
+A Milford Track DOC page excerpt is a test fixture
+(`android/app/src/test/fixtures/docpages/milford-track.html`).

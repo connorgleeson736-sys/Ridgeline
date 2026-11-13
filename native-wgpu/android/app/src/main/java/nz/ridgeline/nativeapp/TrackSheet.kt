@@ -26,7 +26,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     /** The sheet closed: the route sheet (if open) sizes the map again. */
     var onClosed:()->Unit={}
     /** DOC's walk as DOC describes it (route, page sections, DOC line); see MapLayers.walkRoute. */
-    var walkRoute:(String,String,(WalkRoutes.Route?,List<DocPages.Section>,List<List<Coordinate>>)->Unit)->Unit={_,_,cb->cb(null,emptyList(),emptyList())}
+    var walkRoute:(String,String,(WalkRoutes.Route?,List<DocPages.Section>,List<List<Coordinate>>,DocPages.Overview?)->Unit)->Unit={_,_,cb->cb(null,emptyList(),emptyList(),null)}
     /** The map's track pieces (name, points) along a line; see MapLayers.alongLine. */
     var alongLine:(List<List<Coordinate>>,(List<Pair<String,List<Coordinate>>>)->Unit)->Unit={_,cb->cb(emptyList())}
     var onPoint:(Coordinate?)->Unit={}
@@ -223,11 +223,14 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         fun walkFound(w:DocTracks.Walk?,fromName:Boolean){
             if(id!=request||walkDone)return
             val guid=w?.guid
-            val large=w!=null&&(guid?.let(walkInfo)?:DocWalks.Info(guid.orEmpty(),w.name,w.difficulty,w.time,w.page)).large
-            // The map names the whole walk as DOC does ("Kepler Track"): the walk itself, by DOC's legs.
-            if(fromName&&large&&guid!=null){showWalk(guid,w!!.name,at);return}
-            // Found by place and much longer than the track: the track is one section of it.
-            val partOf=w!=null&&!fromName&&placeMeters>1.5*DocTracks.length(mapped.orEmpty())
+            val collection=w!=null&&DocWalks.collection(w.name)
+            // The track is the DOC walk (DOC's name for it, or the walk's line runs
+            // along it and is not much longer): the walk's own summary. A DOC
+            // collection ("Wilkin Valley tracks") stays on the tapped track.
+            val same=w!=null&&guid!=null&&!collection&&(fromName||DocWalks.sameName(trackName,w.name)||DocTracks.length(mapped.orEmpty())>=.6*placeMeters)
+            if(same){showWalk(guid!!,w!!.name.ifBlank{trackName},at);return}
+            // Found by place and longer than the track: the track is one section of it.
+            val partOf=w!=null&&!fromName
             walk=w;walkDone=true;w?.let{applyWalk(id,it,partOf=partOf)};sectionOf=partOf;describe(walk,track);decide()
             if(partOf&&guid!=null)legOf(id,guid,w!!.page,mapped.orEmpty())
         }
@@ -245,7 +248,10 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
                 if(id!=request)return@fetch
                 if(line==null){placeDone=true;resolve();return@fetch}
                 placeMeters=line.meters
-                fetch(DocTracks.walkByGuidUrl(line.guid),{DocTracks.parseWalks(text(it)).firstOrNull()}){w->byPlace=w;placeDone=true;resolve()}
+                // Not every DOC walk is in DOC's walk list (the Milford Track): then its DOC page.
+                fetch(DocTracks.walkByGuidUrl(line.guid),{DocTracks.parseWalks(text(it)).firstOrNull()}){w->
+                    byPlace=w?:DocTracks.Walk(walkInfo(line.guid)?.name.orEmpty(),"","","","","https://www.doc.govt.nz/link/${line.guid.replace("-","")}.aspx",null)
+                    placeDone=true;resolve()}
             }
         }
         mapLine(trackName,at){paths->if(id==request){mapped=DocTracks.chain(paths,at,25.0);decide();matchByPlace()}}
@@ -276,36 +282,46 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
      * details and line, followed on the map's tracks. */
     fun showWalk(guid:String,label:String,at:Coordinate,fit:Boolean=false){
         val info=walkInfo(guid)
-        val id=begin(info?.name?:label,false);fitNext=fit
-        if(info!=null){
-            val summary=listOf(info.difficulty,info.time).filter{it.isNotBlank()}.joinToString(" · ")
-            setSubtitle(summary)
-        }
-        fetch(DocTracks.walkByGuidUrl(guid),{DocTracks.parseWalks(text(it)).firstOrNull()}){w->if(id==request&&w!=null)applyWalk(id,w,false)}
+        val id=begin(info?.name?.takeIf{it.isNotBlank()}?:label,false);fitNext=fit
+        if(info!=null)setSubtitle(listOf(info.difficulty,info.time).filter{it.isNotBlank()}.joinToString(" · "))
+        var listed=false
+        fetch(DocTracks.walkByGuidUrl(guid),{DocTracks.parseWalks(text(it)).firstOrNull()}){w->if(id==request&&w!=null){listed=true;applyWalk(id,w,false)}}
         val page=info?.page?:"https://www.doc.govt.nz/link/${guid.replace("-","")}.aspx"
-        // DOC's legs followed over DOC's line (in DOC's direction, without side
-        // trips), then the map's own tracks along that route.
-        walkRoute(guid,page){route,pageSections,docPaths->
+        // DOC's line is the walk; DOC's legs give its route and direction when
+        // they cover most of it. The map's own tracks along it are drawn.
+        walkRoute(guid,page){route,pageSections,docPaths,overview->
             if(id!=request)return@walkRoute
+            // DOC's page summary: everything for walks not in DOC's walk list (the Milford Track).
+            overview?.let{o->
+                if(o.title.isNotBlank())name.text=o.title
+                if(wholeSubtitle.isEmpty())setSubtitle(listOf(o.difficulty,o.time).filter{it.isNotBlank()}.joinToString(" · "))
+                if(!listed){
+                    if(o.intro.isNotBlank()&&intro.text.isEmpty()){intro.text=o.intro;intro.visibility=View.VISIBLE}
+                    if(photo.visibility!=View.VISIBLE)thumbnail(id,o.image)
+                }
+                if(o.dogs.isNotBlank()&&facts.childCount==0){facts.addView(chip(DocTracks.tidy(o.dogs.removeSuffix("."))),LinearLayout.LayoutParams(-2,-2).apply{marginEnd=dp(6)});factsScroll.visibility=View.VISIBLE}
+            }
+            if(page.startsWith("https://")){link=page;this.page.visibility=View.VISIBLE;this.page.setOnClickListener{open(link)}}
             if(pageSections.isNotEmpty())showSections(pageSections)
-            val corridor=route?.let{listOf(it.points)}?:docPaths
-            if(corridor.isEmpty()){lineFound(id,emptyList());return@walkRoute}
-            alongLine(corridor){pieces->
+            val distance=overview?.distance.orEmpty()
+            val main=WalkRoutes.walkLine(route,docPaths,distance)
+            val byLegs=WalkRoutes.extent(route,docPaths,distance).second
+            if(main.size<2){lineFound(id,emptyList());return@walkRoute}
+            alongLine(listOf(main)){pieces->
                 if(id!=request)return@alongLine
-                val base=route?.points?:DocTracks.chain(docPaths,at,150.0)
-                var mapped=DocTracks.chain(pieces.map{it.second},base.first(),150.0)
-                if(mapped.size>=2&&DocTracks.meters(mapped.last(),base.first())<DocTracks.meters(mapped.first(),base.first()))mapped=mapped.reversed()
-                if(route!=null&&route.sections.size>=2&&mapped.size>=2){
+                var mapped=DocTracks.chain(pieces.map{it.second},main.first(),150.0)
+                if(mapped.size>=2&&DocTracks.meters(mapped.last(),main.first())<DocTracks.meters(mapped.first(),main.first()))mapped=mapped.reversed()
+                if(byLegs&&route!!.sections.size>=2&&mapped.size>=2){
                     // A loop: walk it the way DOC describes.
                     val a=DocTracks.along(mapped,DocTracks.pointAt(route.points,route.sections[0].to));val b=DocTracks.along(mapped,DocTracks.pointAt(route.points,route.sections[1].to))
                     if(b<a)mapped=mapped.reversed()
                 }
-                val line=if(mapped.size>=2&&DocTracks.length(mapped)>=.7*DocTracks.length(base))mapped else base
+                val line=if(mapped.size>=2&&DocTracks.length(mapped)>=.7*DocTracks.length(main))mapped else main
                 val found=ArrayList<Part>()
-                if(route!=null){
+                if(byLegs){
                     // Each leg on the final line: looked for from about where it is
                     // along DOC's route, so a loop's legs stay in order.
-                    val scale=DocTracks.length(line)/max(1.0,route.meters)
+                    val scale=DocTracks.length(line)/max(1.0,route!!.meters)
                     for(sec in route.sections){
                         val a=DocTracks.along(line,DocTracks.pointAt(route.points,sec.from),max(0.0,sec.from*scale-2000))
                         val b=DocTracks.along(line,DocTracks.pointAt(route.points,sec.to),a)
@@ -314,8 +330,8 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
                             listOfNotNull(sec.time.takeIf{it.isNotBlank()},km).joinToString(" · "),listOf(a to b),sec.blocks))
                     }
                 }
-                for((name,spans) in DocTracks.namedSpans(pieces,line))if(!name.equals(info?.name,true))found.add(Part(name,"",spans,emptyList()))
-                lineFound(id,line,found,route!=null)
+                for((n,spans) in DocTracks.namedSpans(pieces,line))if(!DocWalks.sameName(n,name.text.toString()))found.add(Part(n,"",spans,emptyList()))
+                lineFound(id,line,found,byLegs)
             }
         }
     }
@@ -470,7 +486,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
      * text) instead of the whole walk's introduction. */
     private fun legOf(id:Long,guid:String,page:String,track:List<Coordinate>){
         if(track.size<2)return
-        walkRoute(guid,page){route,_,_->
+        walkRoute(guid,page){route,_,_,_->
             if(id!=request||route==null)return@walkRoute
             val samples=DocTracks.resample(track,50.0,200)
             val leg=route.sections.mapNotNull{sec->

@@ -1,6 +1,25 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.47 Walk Legs Base APK — 34.0 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Walk-Legs-0.1.47-Base.apk)**.
+Latest: **[Download 0.1.48 DOC Walks Base APK — 34.0 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-DOC-Walks-0.1.48-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 49:
+**updates 0.1.13–0.1.47 in place, keeping its data.**
+
+- **Every DOC walk:** walks and their details come from DOC's walk lines and
+  pages, so the Milford, Heaphy and other Great Walks have descriptions.
+- **Whole walks:** a walk is DOC's line, checked against DOC's stated
+  distance (the Rees-Dart is the whole circuit again; side trips are not).
+- **Labels:** the walk a track belongs to, by name, else the most specific
+  circuit or multi-day walk it is part of.
+
+256 JVM tests pass; lint 0 errors; native libraries identical to 0.1.47.
+Not run on a phone.
+[Exact release record](../validation/doc-walks-2026-11-13/release.json) ·
+[Label survey](../validation/doc-walks-2026-11-13/label-survey.txt) ·
+[SHA-256](Ridgeline-Native-DOC-Walks-0.1.48-Base.apk.sha256).
+
+## Previous 0.1.47 walk legs checkpoint
+
+**[Download 0.1.47 Walk Legs Base APK — 34.0 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Walk-Legs-0.1.47-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 48:
 **updates 0.1.13–0.1.46 in place, keeping its data.**
 

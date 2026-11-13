@@ -24,12 +24,27 @@ internal object DocPages {
     private val introduction=Regex("""<doc-introduction-text\b[^>]*>(.*?)</doc-introduction-text>""",RegexOption.DOT_MATCHES_ALL)
     /** The page's lead paragraph (huts have no other introduction in DOC's data). */
     fun intro(html:String)=introduction.find(html)?.let{text(it.groupValues[1])}.orEmpty()
+    /** A DOC page's own summary: name, introduction, photo, distance ("53.5 km
+     * one way"), time ("4 days"), difficulty and dog access, as DOC shows them
+     * above the page. Every DOC walk has a page (the Milford Track is not in
+     * DOC's walk list, but its page has all of this). */
+    data class Overview(val title:String,val intro:String,val image:String,val distance:String,val time:String,val difficulty:String,val dogs:String)
+    private fun meta(html:String,property:String)=Regex("""<meta\s+property="$property"\s+content="([^"]*)"""").find(html)?.groupValues?.get(1)?.let(::decode)?.trim().orEmpty()
+    private fun category(html:String,name:String)=Regex("""category-name="$name"[\s\S]*?<template #description>([\s\S]*?)</template>""").find(html)?.groupValues?.get(1)
+    fun overview(html:String):Overview{
+        val difficulty=category(html,"Difficulty")
+        val time=difficulty?.let{Regex("""<span>([\s\S]*?)</span>""").find(it)?.groupValues?.get(1)}?.let(::text).orEmpty()
+        val level=difficulty?.let{Regex("""<a\b[^>]*>([\s\S]*?)</a>""").find(it)?.groupValues?.get(1)}?.let(::text)?.lines()?.firstOrNull{it.isNotBlank()}?.trim().orEmpty()
+        return Overview(meta(html,"og:title"),intro(html).ifBlank{meta(html,"og:description")},meta(html,"og:image"),
+            category(html,"DistanceType")?.let(::text).orEmpty(),time,level,category(html,"DogsAllowed")?.let(::text)?.substringBefore(" Other pets")?.trim().orEmpty())
+    }
     /** One leg of a walk as DOC describes it ("Young Hut to Siberia Hut",
      * "Time: 6 to 8 hr", "Distance: 12 km") with its own text. [stops]: its
      * places in order ("Lewis Pass - Cannibal Gorge Hut - Ada Pass Hut"). */
     data class Leg(val from:String,val to:String,val title:String,val time:String,val km:Double?,val blocks:List<Block>,val stops:List<String> = listOf(from,to))
     private val legTo=Regex("\\s+to\\s+",RegexOption.IGNORE_CASE)
     private val legDash=Regex("\\s+[-–—]\\s+")
+    private val dayPrefix=Regex("^(day|stage|section|part|leg)\\s*[0-9]+\\s*[:–—-]?\\s*",RegexOption.IGNORE_CASE)
     private val legTime=Regex("Time:\\s*([^\\n]+?)\\s*(?=Distance:|\\n|$)",RegexOption.IGNORE_CASE)
     private val legDistance=Regex("Distance:\\s*([^\\n]+)",RegexOption.IGNORE_CASE)
     private val km=Regex("([0-9]+(?:[.,][0-9]+)?)\\s*km",RegexOption.IGNORE_CASE)
@@ -44,7 +59,9 @@ internal object DocPages {
         while(i<b.size){
             val h=b[i];i++
             if(h !is Heading||notLeg.containsMatchIn(h.text))continue
-            val stops=(if(legTo.containsMatchIn(h.text))h.text.split(legTo)else h.text.split(legDash)).map{it.trim()}.filter{it.isNotEmpty()}
+            // "Day 1 – Glade Wharf to Clinton Hut" (Milford Track): the day is not a place.
+            val heading=h.text.replace(dayPrefix,"")
+            val stops=(if(legTo.containsMatchIn(heading))heading.split(legTo)else heading.split(legDash)).map{it.trim()}.filter{it.isNotEmpty()}
             if(stops.size<2)continue
             val body=ArrayList<Block>();while(i<b.size&&b[i] !is Heading){body.add(b[i]);i++}
             val facts=body.take(3).joinToString("\n"){it.text}
@@ -52,7 +69,7 @@ internal object DocPages {
             // "Distance: 7 km to Cannibal Gorge Hut, 10 km to Ada Pass Hut": the last is to the leg's end.
             val distance=legDistance.find(facts)?.groupValues?.get(1)?.let{km.findAll(it).lastOrNull()}?.groupValues?.get(1)?.replace(',','.')?.toDoubleOrNull()
             if(time.isEmpty()&&distance==null)continue
-            out.add(Leg(stops.first(),stops.last(),h.text,time,distance,body.filterNot{(it.text.startsWith("Time:",true)||it.text.startsWith("Distance:",true))&&it.text.length<160},stops))
+            out.add(Leg(stops.first(),stops.last(),heading,time,distance,body.filterNot{(it.text.startsWith("Time:",true)||it.text.startsWith("Distance:",true))&&it.text.length<160},stops))
         }
         return out
     }
