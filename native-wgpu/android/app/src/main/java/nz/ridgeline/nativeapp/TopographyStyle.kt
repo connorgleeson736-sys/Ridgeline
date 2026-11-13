@@ -118,7 +118,10 @@ internal class TopographyStyle(json:String){
                     // Sections show their walk's name until CHILD_NAMES, then their own.
                     val asWalk=walk!=null&&(zoom<DocWalks.CHILD_NAMES||own==walk)
                     val text=if(asWalk)walk!! else own
-                    val ref=if(asWalk)(f.properties[DocWalks.WALK_ID] as? String).orEmpty()else""
+                    // A name that is a DOC walk's opens that walk's summary: the walk's
+                    // name on a section, or a track that is the walk itself. A section
+                    // under its own name opens as a section of the walk.
+                    val ref=if(asWalk||walk==null)(f.properties[DocWalks.WALK_ID] as? String).orEmpty()else""
                     val size=if(kind=="circle")number(paint.opt("circle-radius"),4.0).toFloat()else if(asWalk)12f else number(eval(layout.opt("text-size")?:12,f.properties,zoom),12.0).toFloat()
                     val spacing=if(layout.optString("symbol-placement")=="line")layout.optDouble("symbol-spacing",250.0).toFloat()else 0f
                     val c=color(eval(paint.opt(if(kind=="circle")"circle-color"else"text-color"),f.properties,zoom))

@@ -44,6 +44,30 @@ class DocWalksTest {
         assertTrue(near.any{it.text=="Siberia Track"&&it.ref.isEmpty()})
         assertTrue(id.z==14)
     }
+    @Test fun namesAreTheSameWalkWithoutGenericWords(){
+        assertTrue(DocWalks.sameName("Gillespie Pass Circuit Track","Gillespie Pass Circuit"))
+        assertTrue(DocWalks.sameName("Wilkin Valley Track","Wilkin Valley tracks"))
+        assertTrue(DocWalks.sameName("Mt Iron Track","Mount Iron Track"))
+        assertFalse(DocWalks.sameName("Siberia Track","Gillespie Pass Circuit"))
+        assertFalse(DocWalks.sameName("Rees Track","Rees-Dart Track"))
+        assertFalse(DocWalks.sameName("Track","Walk"))
+    }
+    @Test fun ownNameThenMostSpecificLargeWalkThenMostSpecificWalk(){
+        fun p(lon:Double)=VectorTile.Point((lon+180)/360,CameraMath.mercatorY(-44.3))
+        val track=(0..20).map{p(169.0+it*.001)}
+        fun line(guid:String,km:Double,whole:Boolean=false)=DocWalks.Line(guid,km*1000,listOf((0..40).map{p(168.99+it*.001)}),whole)
+        val infos=mapOf("circuit" to DocWalks.Info("circuit","Big Pass Circuit","","3 days",""),"trail" to DocWalks.Info("trail","Long Te Araroa Route","","8 days",""),
+            "valley" to DocWalks.Info("valley","Side Valley tracks","","4 days",""),"own" to DocWalks.Info("own","Siberia Track","","2 hr",""))
+        // A section of a circuit carries the circuit's name (not the longer through-trail's).
+        val (a,named)=DocWalks.walkFor(track,"Siberia Track",DocWalks.Index(listOf(line("circuit",50.0),line("trail",120.0))),infos)!!
+        assertEquals("circuit",a.guid);assertTrue(named)
+        // Its own DOC walk wins, under its own name.
+        val (b,namedB)=DocWalks.walkFor(track,"Siberia Track",DocWalks.Index(listOf(line("circuit",50.0),line("own",5.0))),infos)!!
+        assertEquals("own",b.guid);assertFalse(namedB)
+        // DOC's whole line of a large walk (side trips) never renames: a collection opens instead.
+        val (c,namedC)=DocWalks.walkFor(track,"Upper Valley Track",DocWalks.Index(listOf(line("circuit",50.0,whole=true),line("valley",30.0))),infos)!!
+        assertEquals("valley",c.guid);assertFalse(namedC)
+    }
     @Test fun nothingChangesWithoutWalkData(){
         val features=tiles.values.first()
         assertSame(features,DocWalks.mark(features,null,infos))

@@ -31,6 +31,8 @@ internal object DocWalks {
     private val DAYS=Regex("\\bdays?\\b",RegexOption.IGNORE_CASE)
     private val LARGE=Regex("\\b(circuit|traverse|crossing|walkway|great walk)\\b",RegexOption.IGNORE_CASE)
     private val COLLECTION=Regex("\\b(tracks|routes|walks|trails)\\b",RegexOption.IGNORE_CASE)
+    /** A DOC page for several tracks ("Wilkin Valley tracks"), not one walk. */
+    fun collection(name:String)=COLLECTION.containsMatchIn(name)
 
     /** Every DOC walk (about 1,350; ~50 KB compressed), keyed by its line id. */
     fun listUrl()=DocTracks.ORG+"DOC_Walking_Experiences/FeatureServer/0/query?where=1%3D1&outFields=name%2Cdifficulty%2CcompletionTime%2CwalkingAndTrampingWebPage&returnGeometry=false&f=json"
@@ -52,8 +54,10 @@ internal object DocWalks {
     }
 
     /** A walk line in Web Mercator world units (0..1). */
-    class Line(val guid:String,val meters:Double,val paths:List<List<VectorTile.Point>>)
-    fun lines(walkLines:List<DocTracks.WalkLine>)=walkLines.map{w->Line(w.guid,w.meters,w.paths.map{p->p.map{VectorTile.Point((it.longitude+180)/360,CameraMath.mercatorY(it.latitude))}})}
+    /** [whole]: DOC's entire line of a large walk, side trips included: for
+     * matching a track to its walk by name, never for naming others. */
+    class Line(val guid:String,val meters:Double,val paths:List<List<VectorTile.Point>>,val whole:Boolean=false)
+    fun lines(walkLines:List<DocTracks.WalkLine>,whole:Boolean=false)=walkLines.map{w->Line(w.guid,w.meters,w.paths.map{p->p.map{VectorTile.Point((it.longitude+180)/360,CameraMath.mercatorY(it.latitude))}},whole)}
 
     /** Segments of [lines] bucketed on a grid (cells of zoom [GRID_ZOOM], about
      * 440 m in NZ), so "which walks pass within 50 m" checks a few segments. */
@@ -90,26 +94,49 @@ internal object DocWalks {
     /** World units for [meters] at world y [y]. */
     fun worldMeters(meters:Double,y:Double):Double{val lat=CameraMath.latitude(y);return meters/(40_075_016.686*max(.05,cos(Math.toRadians(lat))))}
 
-    /** The largest walk whose line runs along [path] (at least [COVER] of its
-     * points within [NEAR_METERS]), or null. */
-    fun walkFor(path:List<VectorTile.Point>,index:Index,infos:Map<String,Info>):Line?{
+    private val generic=setOf("track","tracks","walk","walks","walkway","route","routes","circuit","loop","the","great","trail")
+    private fun words(name:String)=PlaceSearch.normalize(name).split(' ').filter{it.isNotEmpty()&&it !in generic}
+    /** The map's name and a DOC walk's name are the same walk: equal without
+     * generic words ("Gillespie Pass Circuit Track" and "Gillespie Pass
+     * Circuit", "Wilkin Valley Track" and "Wilkin Valley tracks"). */
+    fun sameName(a:String,b:String):Boolean{val x=words(a);val y=words(b);return x.isNotEmpty()&&x==y}
+    /** The DOC walk a map track belongs to, and whether the track shows that
+     * walk's name until [CHILD_NAMES]. Of the walks along at least [COVER] of
+     * it (within [NEAR_METERS]; large walks by the walk itself, see
+     * WalkRoutes.extent): the one with the track's own name; else the most
+     * specific large walk (circuit, traverse, multi-day), whose name it takes
+     * (the Gillespie Pass Circuit's Siberia Track); else the most specific walk.
+     * Side trips and extensions on DOC's line are not the walk: the Wilkin
+     * Valley Track up to Top Forks Hut keeps its own name. */
+    fun walkFor(path:List<VectorTile.Point>,own:String,index:Index,infos:Map<String,Info>):Pair<Line,Boolean>?{
         if(path.size<2||index.isEmpty)return null
         val step=max(1,path.size/40);val counts=HashMap<Int,Int>();var samples=0;val near=HashSet<Int>()
         val r=worldMeters(NEAR_METERS,path[0].y)
         var i=0
         while(i<path.size){val p=path[i];near.clear();index.near(p.x,p.y,r,near);for(li in near)counts[li]=(counts[li]?:0)+1;samples++;i+=step}
-        return counts.filter{(li,c)->c>=samples*COVER&&infos[index.lines[li].guid]?.large==true}.keys.map{index.lines[it]}.maxByOrNull{it.meters}
+        val along=counts.filter{(_,c)->c>=samples*COVER}.keys.map{index.lines[it]}.filter{infos.containsKey(it.guid)}
+        if(along.isEmpty())return null
+        along.filter{own.isNotBlank()&&sameName(own,infos[it.guid]!!.name)}.minByOrNull{it.meters}?.let{return it to infos[it.guid]!!.large}
+        // Large walks take precedence over a track's own section name: a track on
+        // a large walk (the walk itself, without its side trips) carries its name;
+        // of several, the most specific (the Travers-Sabine Circuit, not the Te
+        // Araroa section that also runs up the Travers valley).
+        along.filter{!it.whole&&infos[it.guid]!!.large}.minByOrNull{it.meters}?.let{return it to true}
+        // Otherwise it opens the most specific DOC walk along it, under its own name.
+        return along.minByOrNull{it.meters}?.let{it to false}
     }
-    /** [features] with each map track that belongs to a large walk marked
-     * ([WALK], [WALK_ID]); unnamed pieces take the walk's name. */
+    /** [features] with each map track marked by its DOC walk ([WALK_ID], for
+     * taps) and, for large walks, the walk's name ([WALK]); unnamed pieces of
+     * a large walk take its name. */
     fun mark(features:List<VectorTile.Feature>,index:Index?,infos:Map<String,Info>):List<VectorTile.Feature>{
         if(index==null||index.isEmpty||infos.isEmpty())return features
         return features.map{f->
             if(f.layer!="streets"||f.properties["kind"]!="track")return@map f
-            val line=f.paths.maxByOrNull{it.size}?.let{walkFor(it,index,infos)}?:return@map f
+            val own=(f.properties["name"] as? String).orEmpty()
+            val (line,named)=f.paths.maxByOrNull{it.size}?.let{walkFor(it,own,index,infos)}?:return@map f
             val info=infos[line.guid]?:return@map f
-            val props=HashMap(f.properties);props[WALK]=info.name;props[WALK_ID]=info.guid
-            if((props["name"] as? String).isNullOrBlank())props["name"]=info.name
+            val props=HashMap(f.properties);props[WALK_ID]=info.guid
+            if(named){props[WALK]=info.name;if(own.isBlank())props["name"]=info.name}
             f.copy(properties=props)
         }
     }
