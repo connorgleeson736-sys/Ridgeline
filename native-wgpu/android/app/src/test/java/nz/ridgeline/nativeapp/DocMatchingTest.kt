@@ -56,6 +56,20 @@ class DocMatchingTest {
         // Photo galleries and hut tiles are not text blocks.
         assertTrue(traverse.flatMap{it.blocks}.none{"David W Noble" in it.text||"16-bunk" in it.text})
     }
+    @Test fun readsDocsBulletLinesAsDotPoints(){
+        // The Liverpool Track page: "<br>&bull; …" lines in one paragraph.
+        val html="""<doc-accordion-item header-text="Know before you go"><div class="block textblock x"><p>This route has:<br>&bull; Steep and slippery terrain where a fall could cause serious injury<br>&bull; Climbing up rocks and tree roots</p></div></doc-accordion-item>"""
+        val b=DocPages.parse(html).single().blocks
+        assertEquals(listOf(DocPages.Paragraph("This route has:"),DocPages.Bullet("Steep and slippery terrain where a fall could cause serious injury"),DocPages.Bullet("Climbing up rocks and tree roots")),b)
+        assertEquals("• é → ½ ā ©",DocPages.decode("&bull; &eacute; &rarr; &frac12; &amacr; &copy;"))
+    }
+    @Test fun longLinesAreSimplifiedForDrawingOnly(){
+        val line=(0 until 2600).map{Coordinate(168.0+it*.0001,-44.9+.00005*kotlin.math.sin(it/7.0))}
+        val drawn=DocTracks.simplify(line)
+        assertTrue(drawn.size<=2000);assertEquals(line.first(),drawn.first());assertEquals(line.last(),drawn.last())
+        assertEquals(DocTracks.length(line),DocTracks.length(drawn),DocTracks.length(line)*.02)
+        val short=line.take(10);assertSame(short,DocTracks.simplify(short))
+    }
     @Test fun decodesEntitiesAndBreaks(){
         assertEquals("A – B’s “c” ā 5°\nnext",DocPages.text("A &ndash; B&rsquo;s &ldquo;c&rdquo; &#257; 5&deg;<br/>next"))
         assertEquals("&bogus; &#99999999;",DocPages.decode("&bogus; &#99999999;"))

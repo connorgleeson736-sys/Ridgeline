@@ -274,8 +274,10 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
             if(points!=null)paths.add(Triple(points,Color.argb(230,81,137,153),-1))
             else if(loading.add(key))controller.loadOther(key){route->loading.remove(key);if(!closed&&route!=null&&key in controller.state.opened){passive[key]=route.points;syncRoutes();if(fitOpenedPending)fitOpened()}}
         }
-        trackLine?.let{paths.add(Triple(it,if(trackPart!=null)trackDim else trackColor,-1))}
-        trackPart?.let{paths.add(Triple(it,trackColor,-1))}
+        // The map draws at most 2,000 points a line (a longer one is refused, and
+        // with it every line): long walks are simplified for drawing only.
+        trackLine?.let{paths.add(Triple(DocTracks.simplify(it),if(trackPart!=null)trackDim else trackColor,-1))}
+        trackPart?.let{paths.add(Triple(DocTracks.simplify(it),trackColor,-1))}
         if(paths!=lastPaths){lastPaths=paths;terrain.routes(paths)}
     }
     /** A tapped DOC track drawn over the map while its summary is open. */
