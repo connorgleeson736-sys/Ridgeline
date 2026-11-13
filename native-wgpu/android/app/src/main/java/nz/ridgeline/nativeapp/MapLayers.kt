@@ -52,7 +52,8 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         fun trackPieces(id:GpuUploadQueue.Id,features:List<VectorTile.Feature>,name:String):Pair<List<List<VectorTile.Point>>,List<GpuUploadQueue.Id>>{
             val b=id.bounds;val eps=(b[2]-b[0])*1e-6;val n=1 shl id.z
             val parts=ArrayList<List<VectorTile.Point>>();val next=LinkedHashSet<GpuUploadQueue.Id>()
-            for(f in features)if(f.layer=="streets"&&f.properties["kind"]=="track"&&f.properties["name"]==name)for(path in f.paths)for(part in BoundaryIndex.clip(path,b))if(part.size>=2){
+            // The same name however written ("Mt Iron Track" on the map, "Mount Iron Track" at DOC).
+            for(f in features)if(f.layer=="streets"&&f.properties["kind"]=="track"&&(f.properties["name"] as? String)?.let{it==name||DocWalks.sameName(it,name)}==true)for(path in f.paths)for(part in BoundaryIndex.clip(path,b))if(part.size>=2){
                 parts.add(part)
                 for(end in listOf(part.first(),part.last())){
                     val dx=when{abs(end.x-b[0])<eps->-1;abs(end.x-b[2])<eps->1;else->0};val dy=when{abs(end.y-b[1])<eps->-1;abs(end.y-b[3])<eps->1;else->0}

@@ -2,8 +2,9 @@ package nz.ridgeline.nativeapp
 
 /** The text of a DOC track page (doc.govt.nz, CC BY 4.0): its sections
  * ("Description", "Getting there", "Know before you go") as headings,
- * paragraphs and bullets. Only DOC's text blocks are read; photos, videos
- * and hut tiles are left out (some gallery photos are "DOC use only").
+ * paragraphs, bullets and the photos in the text (with DOC's captions and
+ * credits). Only DOC's text blocks are read; galleries, videos and hut tiles
+ * are left out (some gallery photos are "DOC use only").
  * Pure Kotlin, so it is unit tested on real pages. */
 internal object DocPages {
     const val SITE="https://www.doc.govt.nz/"
@@ -13,6 +14,12 @@ internal object DocPages {
     data class Heading(override val text:String):Block()
     data class Paragraph(override val text:String):Block()
     data class Bullet(override val text:String):Block()
+    /** A photo in DOC's text, with its caption and credit ([text]). */
+    data class Image(val url:String,override val text:String):Block()
+    /** The words of [blocks] (photos' captions are not the walk's text). */
+    fun words(blocks:List<Block>)=blocks.filter{it !is Image}
+    private val image=Regex("""<img\b[^>]*?\bsrc\s*=\s*"?([^"\s>]+)"?[^>]*?(?:\bwidth\s*=\s*"?(\d+))?[^>]*>""",RegexOption.IGNORE_CASE)
+    private val seeLarger=Regex("""\s*See larger\s*\([^)]*\)\s*""",RegexOption.IGNORE_CASE)
     data class Section(val title:String,val blocks:List<Block>)
 
     private val item=Regex("""<doc-accordion-item\b[^>]*\bheader-text="([^"]*)"[^>]*>(.*?)</doc-accordion-item>""",RegexOption.DOT_MATCHES_ALL)
@@ -64,7 +71,7 @@ internal object DocPages {
             val stops=(if(legTo.containsMatchIn(heading))heading.split(legTo)else heading.split(legDash)).map{it.trim()}.filter{it.isNotEmpty()}
             if(stops.size<2)continue
             val body=ArrayList<Block>();while(i<b.size&&b[i] !is Heading){body.add(b[i]);i++}
-            val facts=body.take(3).joinToString("\n"){it.text}
+            val facts=words(body).take(3).joinToString("\n"){it.text}
             val time=legTime.find(facts)?.groupValues?.get(1)?.trim().orEmpty()
             // "Distance: 7 km to Cannibal Gorge Hut, 10 km to Ada Pass Hut": the last is to the leg's end.
             // Or in the time line: "Time: 2 to 3 hr, 9 km" (Greenstone and Caples).
@@ -114,7 +121,7 @@ internal object DocPages {
      * both without saying which it describes). */
     fun clockwise(sections:List<Section>):Boolean?{
         val d=sections.firstOrNull{it.title.contains("description",true)}?:return null
-        val sentences=d.blocks.flatMap{it.text.split(Regex("(?<=[.!?])\\s+"))}
+        val sentences=words(d.blocks).flatMap{it.text.split(Regex("(?<=[.!?])\\s+"))}
         fun way(t:String):Boolean?{val anti=anticlockwise.containsMatchIn(t);val cw=clockwiseWord.containsMatchIn(anticlockwise.replace(t,""))
             return if(anti&&!cw)false else if(cw&&!anti)true else null}
         val all=sentences.joinToString(" ")
@@ -135,6 +142,15 @@ internal object DocPages {
             val body=m.groupValues[2]
             val texts=body.split(blockStart).filter{it.startsWith("textblock")}.ifEmpty{listOf(body)}
             for(b in texts)for(e in element.findAll(b)){
+                // A photo in the text ("<img …><br>Brewster Track is very steep…<br>Image: …"):
+                // the photo, its caption and credit (not icons or "See larger" links).
+                val img=image.find(e.groupValues[2])
+                if(img!=null&&(img.groupValues[2].toIntOrNull()?:400)>=120){
+                    val src=img.groupValues[1].trim();val url=if(src.startsWith("/"))SITE+src.removePrefix("/")else src
+                    val caption=text(e.groupValues[2]).lines().map{it.replace(seeLarger,"").trim()}.filter{it.isNotEmpty()}.joinToString("\n")
+                    if(url.startsWith("https://"))blocks.add(Image(url,caption))
+                    continue
+                }
                 val value=text(e.groupValues[2]).takeIf{it.isNotBlank()}?:continue
                 when(e.groupValues[1].lowercase()){
                     // A paragraph of "<br>&bull; …" lines is a list (the Liverpool Track's hazards).
