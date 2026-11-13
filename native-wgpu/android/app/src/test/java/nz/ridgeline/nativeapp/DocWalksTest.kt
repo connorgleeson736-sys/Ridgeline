@@ -41,7 +41,7 @@ class DocWalksTest {
         assertTrue(far.none{it.text=="Siberia Track"})
         assertTrue("circuit named from tile zoom 12 like a Great Walk",names(12.5,12.0).any{it.text=="Gillespie Pass Circuit"})
         val near=names(15.5)
-        assertTrue(near.any{it.text=="Siberia Track"&&it.ref.isEmpty()})
+        assertTrue(near.any{it.text=="Siberia Track"&&it.ref==circuit.guid&&it.section})
         assertTrue(id.z==14)
     }
     @Test fun namesAreTheSameWalkWithoutGenericWords(){

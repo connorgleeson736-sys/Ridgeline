@@ -67,7 +67,8 @@ internal object DocPages {
             val facts=body.take(3).joinToString("\n"){it.text}
             val time=legTime.find(facts)?.groupValues?.get(1)?.trim().orEmpty()
             // "Distance: 7 km to Cannibal Gorge Hut, 10 km to Ada Pass Hut": the last is to the leg's end.
-            val distance=legDistance.find(facts)?.groupValues?.get(1)?.let{km.findAll(it).lastOrNull()}?.groupValues?.get(1)?.replace(',','.')?.toDoubleOrNull()
+            // Or in the time line: "Time: 2 to 3 hr, 9 km" (Greenstone and Caples).
+            val distance=(legDistance.find(facts)?.groupValues?.get(1)?:time).let{km.findAll(it).lastOrNull()}?.groupValues?.get(1)?.replace(',','.')?.toDoubleOrNull()
             if(time.isEmpty()&&distance==null)continue
             out.add(Leg(stops.first(),stops.last(),heading,time,distance,body.filterNot{(it.text.startsWith("Time:",true)||it.text.startsWith("Distance:",true))&&it.text.length<160},stops))
         }

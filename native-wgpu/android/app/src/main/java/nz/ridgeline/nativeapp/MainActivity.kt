@@ -69,6 +69,7 @@ class MainActivity:Activity(){
         trackSheet.onLine={line,part->planner.highlightTrack(line,part)}
         trackSheet.onClosed={planner.relayout()}
         trackSheet.onPoint={terrain.inspect(it)}
+        trackSheet.onRange={terrain.rangeMarkers(it)}
         trackSheet.mapLine={name,at,callback->mapLayers.trackLine(name,at,callback)}
         trackSheet.walkRoute={guid,page,callback->mapLayers.walkRoute(guid,page,null,callback)}
         trackSheet.alongLine={corridor,callback->mapLayers.alongLine(corridor,callback)}
@@ -90,8 +91,9 @@ class MainActivity:Activity(){
             val at=label?.let{Coordinate(it.point.x*360-180,CameraMath.latitude(it.point.y))}
             when{
                 label!=null&&at!=null&&label.key.startsWith(TopographyStyle.HUT_LABELS+":")->trackSheet.showHut(label.text,at)
-                label!=null&&at!=null&&label.ref.isNotEmpty()->trackSheet.showWalk(label.ref,label.text,at)
-                label!=null&&at!=null->trackSheet.show(label.text.removeSuffix(" (mapped closed)"),at)
+                label!=null&&at!=null&&label.ref.isNotEmpty()&&!label.section->trackSheet.showWalk(label.ref,label.text,at)
+                // A section under its own name: in the walk the map gives it.
+                label!=null&&at!=null->trackSheet.show(label.text.removeSuffix(" (mapped closed)"),at,label.ref.takeIf{label.section})
                 trackSheet.visible->trackSheet.hide()
                 loader.mapSettings.state.hunting->terrain.pick(x,y){hit->if(hit!=null)mapLayers.huntingAt(hit[0],hit[1]){areas->HuntingDetails.show(this,areas)}}
             }

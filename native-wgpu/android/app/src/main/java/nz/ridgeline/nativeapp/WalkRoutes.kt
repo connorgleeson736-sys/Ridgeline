@@ -25,21 +25,36 @@ internal object WalkRoutes {
     /** "Kerin Forks Hut" and "Kerin Forks" are one leg end. */
     private fun same(a:String,b:String)=DocTracks.hutKey(PlaceSearch.normalize(plain(a)))==DocTracks.hutKey(PlaceSearch.normalize(plain(b)))
     /** The legs walked, in order: from the first leg, each next leg starts
-     * where the last ended. Where DOC describes alternatives from one place
-     * (a summary leg "Siberia Hut to Makarora" and its parts, the coastal
-     * and inland endings of the Abel Tasman), a leg to somewhere not yet
-     * visited is preferred, then the shorter (finer) one. */
+     * where the last ended, and is the next one DOC lists from there (side
+     * legs DOC lists later, "McKellar Hut to Lake Howden", are not taken). A
+     * summary leg is replaced by its parts when DOC lists them ("Siberia Hut
+     * to Makarora" by "Siberia Hut to Kerin Forks Hut" and "Kerin Forks to
+     * Makarora"; the Abel Tasman's "Awaroa to Whariwharangi Bay" by its legs via
+     * Tōtaranui; "Carrington Hut to Park Morpeth Memorial Hut" via Harman Pass). */
     fun walked(legs:List<DocPages.Leg>):List<DocPages.Leg>{
         if(legs.isEmpty())return emptyList()
-        val out=arrayListOf(legs[0]);val visited=HashSet(legs[0].stops.map(::key));var index=0
+        val out=arrayListOf(legs[0]);var index=0
         while(out.size<=legs.size){
             val end=out.last().to
             val next=legs.withIndex().filter{(i,l)->i>index&&same(l.from,end)}
             if(next.isEmpty())break
-            val pick=next.filter{key(it.value.to) !in visited}.ifEmpty{next}.minWith(compareBy({it.value.km?:hours(it.value.time)*4.0},{it.index}))
-            out.add(pick.value);visited.addAll(pick.value.stops.map(::key));index=pick.index
+            val first=next.first()
+            // A summary: a later chain of legs from the same place reaching the same end.
+            val finer=next.drop(1).firstOrNull{c->!same(c.value.to,first.value.to)&&chains(legs,c.index,first.value.to)}
+            val pick=finer?:first
+            out.add(pick.value);index=pick.index
         }
         return out
+    }
+    /** Legs after [start] (from it) reach [to] within a few steps. */
+    private fun chains(legs:List<DocPages.Leg>,start:Int,to:String):Boolean{
+        var at=legs[start];var i=start
+        repeat(6){
+            if(same(at.to,to))return true
+            val n=legs.withIndex().firstOrNull{(k,l)->k>i&&same(l.from,at.to)}?:return false
+            at=n.value;i=n.index
+        }
+        return same(at.to,to)
     }
     private fun key(name:String)=DocTracks.hutKey(PlaceSearch.normalize(plain(name)))
     /** "3 hr 30 min", "9–10 hours one way" → hours (the first figure), for comparing legs without distances. */
@@ -99,8 +114,13 @@ internal object WalkRoutes {
     /** The length DOC gives the walk on its page ("53.5 km one way", "80 km
      * loop", "16 km return via same track": half, the line is walked twice), in metres. */
     fun stated(distance:String):Double?{
-        val km=Regex("([0-9]+(?:[.,][0-9]+)?)\\s*km",RegexOption.IGNORE_CASE).find(distance)?.groupValues?.get(1)?.replace(',','.')?.toDoubleOrNull()?:return null
-        return km*1000/(if(Regex("\\breturn\\b",RegexOption.IGNORE_CASE).containsMatchIn(distance)&&!Regex("\\bloop\\b",RegexOption.IGNORE_CASE).containsMatchIn(distance))2 else 1)
+        // Several lengths ("10 km | 20 km return", "1.2 km to the viewpoint, 1.8 km to the point", "Various…"): none.
+        val all=Regex("([0-9]+(?:[.,][0-9]+)?)\\s*km",RegexOption.IGNORE_CASE).findAll(distance).toList()
+        if(all.size!=1||Regex("\\bvarious\\b",RegexOption.IGNORE_CASE).containsMatchIn(distance))return null
+        val km=all[0].groupValues[1].replace(',','.').toDoubleOrNull()?:return null
+        // "16 km return via same track": the line is walked twice; "1.5 km one way return via same track" is one way.
+        val twice=Regex("\\breturn\\b",RegexOption.IGNORE_CASE).containsMatchIn(distance)&&!Regex("\\b(loop|one way)\\b",RegexOption.IGNORE_CASE).containsMatchIn(distance)
+        return km*1000/(if(twice)2 else 1)
     }
     /** The walk itself, of DOC's line: DOC's legs (when they cover most of the
      * line), the line's longest end-to-end path (no side trips) or the whole
@@ -111,7 +131,12 @@ internal object WalkRoutes {
         val main=mainLine(paths);val whole=paths.filter{it.size>=2}
         val legsOk=route!=null&&route.meters>=ROUTE_SHARE*max(1.0,DocTracks.length(main))
         val target=stated(distance)
-        if(target==null)return if(legsOk)listOf(route!!.points) to true else listOf(main) to false
+        // Without a stated length: DOC's legs, else the end-to-end path unless it
+        // is a small part of DOC's line (pieces that do not join up), then the whole.
+        val wholeM=whole.sumOf{DocTracks.length(it)}
+        // DOC's legs may describe only part of the walk (Aotea Track): without a stated length, at least half of DOC's line.
+        if(target==null)return if(legsOk&&route!!.meters>=.5*wholeM)listOf(route.points) to true
+            else if(DocTracks.length(main)<.5*wholeM)whole to false else listOf(main) to false
         val options=listOfNotNull(route?.let{listOf(it.points) to true},listOf(main) to false,whole to false).filter{(p,_)->p.isNotEmpty()&&p.sumOf{l->DocTracks.length(l)}>0}
         fun error(o:Pair<List<List<Coordinate>>,Boolean>)=abs(o.first.sumOf{DocTracks.length(it)}-target)/target
         // DOC's legs give the direction: kept when about as near as the others.

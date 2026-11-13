@@ -1,6 +1,24 @@
 # Native Android checkpoints — incomplete prototypes
 
-Latest: **[Download 0.1.48 DOC Walks Base APK — 34.0 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-DOC-Walks-0.1.48-Base.apk)**.
+Latest: **[Download 0.1.49 Walk Fixes Base APK — 34.0 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-Walk-Fixes-0.1.49-Base.apk)**.
+Same "Ridgeline Native Full Audit" package and signer, version code 50:
+**updates 0.1.13–0.1.48 in place, keeping its data.**
+
+- **Walk fixes:** Greenstone and Caples, Ben Lomond and walks like them
+  (general rules for leg order, distances, names and short DOC lines).
+- **Track sheet:** taller middle height with the section chips; A and B on
+  the map when dragging on the elevation chart.
+
+257 JVM tests pass; lint 0 errors; native libraries identical to 0.1.48.
+Not run on a phone.
+[Exact release record](../validation/walk-fixes-2026-11-13/release.json) ·
+[Label survey](../validation/walk-fixes-2026-11-13/label-survey.txt) ·
+[Extent survey](../validation/walk-fixes-2026-11-13/extent-survey.txt) ·
+[SHA-256](Ridgeline-Native-Walk-Fixes-0.1.49-Base.apk.sha256).
+
+## Previous 0.1.48 DOC walks checkpoint
+
+**[Download 0.1.48 DOC Walks Base APK — 34.0 MB](https://media.githubusercontent.com/media/connorgleeson736-sys/Ridgeline/claude/youthful-hypatia-lrzouw/native-wgpu/checkpoints/Ridgeline-Native-DOC-Walks-0.1.48-Base.apk)**.
 Same "Ridgeline Native Full Audit" package and signer, version code 49:
 **updates 0.1.13–0.1.47 in place, keeping its data.**
 

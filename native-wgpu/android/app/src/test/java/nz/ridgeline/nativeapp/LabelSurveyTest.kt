@@ -29,6 +29,11 @@ class LabelSurveyTest{
             report.append("== ${o.title} [${o.time} · ${o.difficulty} · ${o.distance}] DOC line ${"%.1f".format(line.sumOf{DocTracks.length(it)}/1000)} km; legs ${legs.size}${route?.let{" (route %.1f km)".format(it.meters/1000)}?:""}; walk ${"%.1f".format(ext.sumOf{DocTracks.length(it)}/1000)} km ${if(byLegs)"(DOC's legs)" else if(ext.size>1)"(DOC's whole line)" else "(DOC's line, end to end)"}; summary line ${"%.1f".format(DocTracks.length(main)/1000)} km; intro ${o.intro.isNotBlank()}; photo ${o.image.isNotBlank()}\n")
             // DOC walk data for the data tiles the walk crosses, with names for unlisted walks from their pages.
             val dataTiles=LinkedHashSet<Triple<Int,Int,Int>>();val z14=LinkedHashSet<Triple<Int,Int,Int>>()
+            // Short DOC lines: also the map around them (2 km), for its tracks named like the walk.
+            val around=LinkedHashSet<Triple<Int,Int,Int>>()
+            if(line.sumOf{DocTracks.length(it)}<15_000&&line.isNotEmpty()){val all=line.flatten()
+                val x0=(all.minOf{it.longitude}-.025+180)/360;val x1=(all.maxOf{it.longitude}+.025+180)/360;val y0=CameraMath.mercatorY(all.maxOf{it.latitude}+.02);val y1=CameraMath.mercatorY(all.minOf{it.latitude}-.02)
+                for(x in floor(x0*16384).toInt()..floor(x1*16384).toInt())for(y in floor(y0*16384).toInt()..floor(y1*16384).toInt()){around.add(Triple(14,x,y));dataTiles.add(Triple(10,x shr 4,y shr 4))}}
             for(p in line)for(i in 1 until p.size){val a=p[i-1];val b=p[i];val steps=max(1,(DocTracks.meters(a,b)/300).toInt())
                 for(k in 0..steps){val t=k.toDouble()/steps;val lon=a.longitude+(b.longitude-a.longitude)*t;val lat=a.latitude+(b.latitude-a.latitude)*t
                     val x=(lon+180)/360;val y=CameraMath.mercatorY(lat)
@@ -65,6 +70,19 @@ class LabelSurveyTest{
                     rows.getOrPut(own){DoubleArray(1)}[0]+=len
                     decisions.getOrPut(own){HashMap()}.merge(decision,len,Double::plus)
                 }}
+            // The map's tracks named like the walk, anywhere around a short DOC line.
+            val namedRows=HashMap<String,MutableMap<String,Double>>()
+            for((z,x,y) in around-z14){var b=bytes("https://basemaps.linz.govt.nz/v1/tiles/topographic-v2/3857/$z/$x/$y.pbf?api=$key")?:continue
+                if(b.size>2&&b[0]==0x1f.toByte()&&b[1]==0x8b.toByte())b=java.util.zip.GZIPInputStream(b.inputStream()).readBytes()
+                val id=GpuUploadQueue.Id(z,x,y);val index=indexes[Triple(10,x shr 4,y shr 4)]
+                for(f in DocWalks.mark(VectorTile.decode(b,z,x,y,setOf("streets")),index,infos)){
+                    val own=(f.properties["name"] as? String)?:continue
+                    if(f.properties["kind"]!="track"||!DocWalks.sameName(own,o.title))continue
+                    val part=f.paths.flatMap{BoundaryIndex.clip(it,id.bounds)}.maxByOrNull{it.size}?:continue
+                    var len=0.0;for(i in 1 until part.size)len+=DocTracks.meters(Coordinate(part[i-1].x*360-180,CameraMath.latitude(part[i-1].y)),Coordinate(part[i].x*360-180,CameraMath.latitude(part[i].y)))
+                    val walk=f.properties[DocWalks.WALK] as? String;val link=(f.properties[DocWalks.WALK_ID] as? String)?.let{infos[it]?.name}
+                    namedRows.getOrPut(own){HashMap()}.merge(if(walk!=null)"named '$walk' below z15" else if(link!=null)"own name, opens '$link'" else "own name, no DOC walk",len,Double::plus)}}
+            for((own,d) in namedRows)report.append("   beyond DOC's line: $own: "+d.entries.joinToString("; "){"${it.key} ${"%.1f".format(it.value/1000)} km"}+"\n")
             for((own,d) in decisions.entries.sortedByDescending{rows[it.key]!![0]})
                 report.append("   ${own} (${(rows[own]!![0]/1000).let{"%.1f".format(it)}} km on DOC's line): "+d.entries.sortedByDescending{it.value}.joinToString("; "){"${it.key} ${(it.value/1000).let{v->"%.1f".format(v)}} km"}+"\n")
         }
