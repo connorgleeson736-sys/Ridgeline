@@ -24,5 +24,8 @@ class WalkRecordsTest{
         assertTrue(r.size>100);assertTrue(r.values.count{it.verified}>50)
         for(w in r.values.filter{it.verified}){assertTrue(w.ways.count{it.main}==1);assertTrue(w.ways.all{it.line.size>=2})}
         assertEquals(setOf("Mid Caples Hut","Mckellar Hut","Greenstone Hut"),r["cb036644-8249-42e1-9485-4614f7cdcc1d"]!!.huts.map{it.name}.toSet())
+        // DOC's hut data lists many huts twice; each named hut must still be found once.
+        assertEquals(setOf("Shelter Rock Hut","Dart Hut","Daleys Flat Hut"),r["e57f2343-e606-41ff-9ccc-9c8cc0df1824"]!!.huts.map{it.name}.toSet())
+        assertEquals(3,r["e57f2343-e606-41ff-9ccc-9c8cc0df1824"]!!.huts.size)
     }
 }
