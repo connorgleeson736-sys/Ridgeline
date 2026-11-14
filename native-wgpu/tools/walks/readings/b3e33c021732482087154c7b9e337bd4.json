@@ -1,0 +1,31 @@
+{
+  "guid": "b3e33c02-1732-4820-8715-4c7b9e337bd4",
+  "kind": "unclear",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Main walk (old dray track) through the settlement",
+      "shape": null,
+      "start": {"name": "main track entrance", "quote": "main track entrance", "ref": null},
+      "end": {"name": "western end", "quote": "western end", "ref": null},
+      "via": [],
+      "direction": null,
+      "time": "At your leisure",
+      "distance": null,
+      "evidence": [
+        "The main walk (old dray track) that runs through the centre of the settlement is suitable for wheelchairs and buggies.",
+        "It begins at the main track entrance and runs through to the western end.",
+        "The Arrowtown Chinese Settlement is near Bush Creek, at the top end of Buckingham Street, Arrowtown’s main street."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [],
+  "huts": [],
+  "not_on_route": [
+    {"name": "Ah Lum’s restored store", "quote": "Ah Lum’s restored store", "ref": null, "why": "nearby"},
+    {"name": "Arrow River", "quote": "Arrow River", "ref": null, "why": "nearby"}
+  ],
+  "doubts": "The page describes a heritage site rather than a route. The main walk runs from 'the main track entrance' to 'the western end' of the settlement, but neither place is located in the text beyond the settlement being at the top end of Buckingham Street; F2 (unnamed track at Buckingham Street) may be the entrance but I am not sure. The text does not say whether you return the same way, so shape is null. Side tracks are mentioned but not named."
+}

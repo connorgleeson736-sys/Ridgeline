@@ -1,0 +1,59 @@
+{
+  "guid": "8e2b7da0-b898-429b-9a7b-87dc5b773202",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Mahaukura Track from Grey Road car park to Pirongia summit viewing tower",
+      "shape": "one_way",
+      "start": {"name": "Grey Road car park", "quote": "Grey Road car park", "ref": "F3"},
+      "end": {"name": "Pirongia summit viewing tower", "quote": "Pirongia summit viewing tower", "ref": null},
+      "via": [
+        {"name": "Wharauroa Lookout", "quote": "Wharauroa Lookout", "ref": "T18"},
+        {"name": "Mahaukura Lookout", "quote": "Mahaukura Lookout (902 m)", "ref": "T9"}
+      ],
+      "direction": null,
+      "time": "4-6 hr one way",
+      "distance": "9 km one way",
+      "evidence": [
+        "From Grey Road car park, follow the track to Wharauroa Lookout then on for another 30 min to Mahaukura.",
+        "From Mahaukura, the track descends steeply before climbing again towards Pirongia summit viewing tower."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "Tirohanga to Mahaukura round trip",
+      "shape": "loop",
+      "start": {"name": "Grey Road car park", "quote": "Grey Road car park", "ref": "F3"},
+      "end": {"name": "Grey Road car park", "quote": "Grey Road car park", "ref": "F3"},
+      "via": [
+        {"name": "Mangakara Nature Walk", "quote": "Mangakara Nature Walk", "ref": "T4"},
+        {"name": "Link Track", "quote": "Link Track", "ref": "T2"},
+        {"name": "Ruapane", "quote": "Ruapane", "ref": "T14"},
+        {"name": "Tirohanga Track", "quote": "Tirohanga Track", "ref": "T7"},
+        {"name": "summit viewing tower", "quote": "summit viewing tower", "ref": null},
+        {"name": "Mahaukura Track", "quote": "Return via Mahaukura Track to Grey Road", "ref": "T3"}
+      ],
+      "direction": null,
+      "time": "8–11 hr return",
+      "distance": "17 km",
+      "evidence": [
+        "Cross from Grey Road car park to Ruapane via the Mangakara Nature Walk and Link Track then follow the Tirohanga Track to the summit viewing tower.",
+        "Return via Mahaukura Track to Grey Road."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "O'Shea Road", "quote": "This track can also be accessed off O’Shea Road via the Wharauroa Track.", "ref": "F2", "onto": "Wharauroa Track"}
+  ],
+  "side_trips": [],
+  "huts": [],
+  "not_on_route": [
+    {"name": "Pāhautea Hut", "quote": "Pāhautea Hut", "ref": "T13", "why": "nearby"},
+    {"name": "Bell Track", "quote": "Bell Track", "ref": "T1", "why": "other walk"},
+    {"name": "Tahuanui Track", "quote": "Tahuanui Track", "ref": "T6", "why": "other walk"}
+  ],
+  "doubts": "The end, 'Pirongia summit viewing tower', is left without a ref: the names list both a peak 'Pirongia' (T10) and 'Pirongia Mountain' (T12) and the text does not say which is the summit. Wharauroa Lookout and Mahaukura Lookout are given the peaks of the same names (T18, T9) on the assumption the lookouts are those peaks. Grey Road car park is given as F3, the only Grey Road road end (where Mangakara Nature Walk meets Grey Road); the text does not name the track at the car park. Pāhautea Hut is mentioned only as where people overnight on the round trip; the text does not say either way passes it."
+}

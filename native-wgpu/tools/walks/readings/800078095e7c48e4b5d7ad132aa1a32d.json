@@ -1,0 +1,52 @@
+{
+  "guid": "80007809-5e7c-48e4-b5d7-ad132aa1a32d",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "The Old Ghost Road from Lyell Campsite to Seddonville",
+      "shape": "one_way",
+      "start": {"name": "Lyell Conservation Campsite", "quote": "starts at the Lyell Conservation Campsite", "ref": "T8"},
+      "end": {"name": "Seddonville", "quote": "finishes at Seddonville", "ref": "F2"},
+      "via": [
+        {"name": "Lyell Saddle", "quote": "the Lyell Saddle (875 m)", "ref": null},
+        {"name": "Lyell Saddle Hut", "quote": "Lyell Saddle Hut", "ref": "T10"},
+        {"name": "Lyell Range", "quote": "the top of the Lyell Range", "ref": "T9"},
+        {"name": "Ghost Lake Hut", "quote": "Ghost Lake Hut", "ref": "T4"},
+        {"name": "Skyline Ridge", "quote": "Skyline Ridge", "ref": null},
+        {"name": "Skyline Steps", "quote": "Skyline Steps", "ref": null},
+        {"name": "Stern Valley Hut", "quote": "Stern Valley Hut", "ref": "T17"},
+        {"name": "Ernest Valley", "quote": "Ernest Valley", "ref": null},
+        {"name": "Goat Creek ford", "quote": "Goat Creek must be forded to reach the hut", "ref": "T5"},
+        {"name": "Goat Creek Hut", "quote": "Goat Creek Hut", "ref": "T6"},
+        {"name": "Mokihinui Forks Hut", "quote": "Mokihinui Forks Hut", "ref": "T11"},
+        {"name": "Mōkihinui River Gorge", "quote": "the head of the Mōkihinui River Gorge", "ref": null},
+        {"name": "Specimen Point Hut", "quote": "Specimen Point Hut", "ref": "T15"}
+      ],
+      "direction": null,
+      "time": "4 - 5 days",
+      "distance": "85 km one way",
+      "evidence": [
+        "The southern end of the Old Ghost Road starts at the Lyell Conservation Campsite (State Highway 6) in the Upper Buller Gorge, a 50 minute drive from Westport.",
+        "The northern end of the Old Ghost Road finishes at Seddonville, 50 km north of Westport on State Highway 67.",
+        "The old miners' road is rejoined for the virtually flat journey out to Seddonville through the spectacular Mokihinui River gorge."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [],
+  "huts": [
+    {"name": "Lyell Saddle Hut", "quote": "Lyell Saddle Hut", "ref": "T10"},
+    {"name": "Ghost Lake Hut", "quote": "Ghost Lake Hut", "ref": "T4"},
+    {"name": "Stern Valley Hut", "quote": "Stern Valley Hut", "ref": "T17"},
+    {"name": "Goat Creek Hut", "quote": "Goat Creek Hut", "ref": "T6"},
+    {"name": "Mokihinui Forks Hut", "quote": "Mokihinui Forks Hut", "ref": "T11"},
+    {"name": "Specimen Point Hut", "quote": "Specimen Point Hut", "ref": "T15"}
+  ],
+  "not_on_route": [
+    {"name": "Croesus stamping battery site", "quote": "The Croesus stamping battery site", "ref": null, "why": "nearby"},
+    {"name": "Westport", "quote": "Westport", "ref": null, "why": "other"}
+  ],
+  "doubts": "The Seddonville end is given as F2 (where The Old Ghost Road meets Mokihinui Road), taken to be the trail's northern road end; the Seddonville place point is some km further west, and the text only says the trail 'finishes at Seddonville'. The Lyell start has no road-end feature, so the Lyell Campsite (T8) is used as the text says the trail starts there."
+}

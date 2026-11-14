@@ -41,6 +41,8 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     var walkInfo:(String)->DocWalks.Info?={null}
     /** A walk's line continued to its tracks' natural ends; see MapLayers.extendWalk. */
     var extendWalk:(List<Coordinate>,Double,(List<Coordinate>?)->Unit)->Unit={_,_,cb->cb(null)}
+    /** The compiled walk for a DOC walk id, if bundled; see WalkRecordStore. */
+    var walkRecord:(String,(WalkRecords.Walk?)->Unit)->Unit={_,cb->cb(null)}
     /** A walk followed as DOC's description tells it; see MapLayers.followWalk. */
     var followWalk:(List<DocPages.Section>,String,String,String,List<List<Coordinate>>,List<Coordinate>,(WalkDirections.Result?)->Unit)->Unit={_,_,_,_,_,_,cb->cb(null)}
     /** A loop walk's line closed over the map's tracks; see MapLayers.closeWalk. */
@@ -205,7 +207,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     /** Clears the sheet for a new track or hut and slides it up. */
     private fun begin(title:String,hut:Boolean):Long{
         val id=++request
-        visible=true;level=0;link="";sectionOf=false;parts.clear();partRow.removeAllViews();partScroll.visibility=View.GONE;choice=null;optionScroll.visibility=View.GONE;pageWords="";nearHuts=emptyList();partText.removeAllViews();partText.visibility=View.GONE;walkRef=null
+        visible=true;level=0;link="";sectionOf=false;parts.clear();partRow.removeAllViews();partScroll.visibility=View.GONE;choice=null;optionScroll.visibility=View.GONE;pageWords="";nearHuts=emptyList();recordHuts=null;pageLegs=emptyList();partText.removeAllViews();partText.visibility=View.GONE;walkRef=null
         name.text=title;subtitle.text="";subtitle.visibility=View.GONE;wholeSubtitle="";closedBadge.visibility=View.GONE
         photo.setImageDrawable(null);photo.visibility=View.GONE
         val labels=if(hut)listOf("Bunks","Elevation","Bookings","From road")else listOf("Distance","Ascent","Descent","Highest")
@@ -412,13 +414,54 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
                 for(n in names)mapLine(n,at){paths->named.addAll(paths.map{n to it});waiting--;if(waiting==0)ready()}
             }
             }
+            val level=info?.difficulty?.takeIf{it.isNotBlank()}?:overview?.difficulty.orEmpty()
+            fun runtime(){
             val legs=DocPages.legs(pageSections);val starts=DocPages.starts(pageSections)
             if((WalkOptions.alternatives(legs)||starts.size>=2)&&docPaths.isNotEmpty())walkOptions(guid,legs,starts,name.text.toString(),info?.time?.takeIf{it.isNotBlank()}?:overview?.time.orEmpty(),docPaths){c->
                 if(id!=request)return@walkOptions
-                if(c!=null)showChoice(id,c,info?.difficulty?.takeIf{it.isNotBlank()}?:overview?.difficulty.orEmpty())else follow()}
+                if(c!=null)showChoice(id,c,level)else follow()}
             else follow()
+            }
+            // The walk as compiled offline from its DOC page (read, followed over the
+            // map's tracks and checked): verified, shown as compiled; flagged, DOC's own
+            // line. Walks DOC has added since are worked out here as before.
+            walkRecord(guid){rec->
+                if(id!=request)return@walkRecord
+                if(rec==null){runtime();return@walkRecord}
+                pageLegs=DocPages.legs(pageSections);recordHuts=rec.huts
+                if(rec.verified&&rec.ways.isNotEmpty())showRecord(id,rec,level)
+                else{
+                    val line=WalkRoutes.walkLine(null,docPaths,overview?.distance.orEmpty())
+                    if(line.size>=2)lineFound(id,line)
+                    else mapLine(name.text.toString(),at){paths->if(id==request)lineFound(id,DocTracks.chain(paths,at))}
+                }
+            }
         }
     }
+    /** A compiled walk's ways as From and To choices (loops have no To). */
+    private fun showRecord(id:Long,rec:WalkRecords.Walk,difficulty:String){
+        val ways=rec.ways.sortedByDescending{it.main}
+        val starts=ways.map{it.from}.distinct();val ends=ways.map{if(it.shape=="loop")"" else it.to}.distinct()
+        val options=ways.map{w->WalkOptions.Option(starts.indexOf(w.from),ends.indexOf(if(w.shape=="loop")"" else w.to),w.line,null,emptyList(),w.time,w.stops)}
+            .distinctBy{it.start to it.end}
+        showChoice(id,WalkOptions.Choice(starts,ends,options),difficulty)
+    }
+    /** DOC's legs ("Mid Caples Hut to McKellar Hut") on a compiled way, from where its named stops are. */
+    private fun legParts(o:WalkOptions.Option):List<Part>{
+        if(o.stops.size<2||pageLegs.isEmpty())return emptyList()
+        val out=ArrayList<Part>();var from=0
+        for(leg in pageLegs){
+            val a=(from until o.stops.size).firstOrNull{WalkRoutes.same(o.stops[it].first,leg.from)}?:continue
+            val b=(a+1 until o.stops.size).firstOrNull{WalkRoutes.same(o.stops[it].first,leg.to)}?:continue
+            val km=leg.km?.let{if(it%1.0==0.0)"${it.toInt()} km" else "$it km"}
+            out.add(Part(WalkRoutes.title(leg.title),listOfNotNull(leg.time.takeIf{it.isNotBlank()},km).joinToString(" · "),listOf(o.stops[a].second to o.stops[b].second),leg.blocks))
+            from=b
+        }
+        return out
+    }
+    private var pageLegs=emptyList<DocPages.Leg>()
+    /** The huts DOC links as on the compiled walk in view (null: not a compiled walk). */
+    private var recordHuts:List<WalkRecords.Hut>?=null
     /** DOC's ways to walk the walk in view (WalkOptions) and the one shown. */
     private var choice:WalkOptions.Choice?=null;private var choiceStart=0;private var choiceEnd=0;private var choiceLevel=""
     private fun showChoice(id:Long,c:WalkOptions.Choice,difficulty:String){
@@ -433,8 +476,8 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         toChip.visibility=if(c.ends[choiceEnd].isBlank())View.GONE else View.VISIBLE
         fromChip.isClickable=starts.size>1;toChip.isClickable=ends.size>1
         optionScroll.visibility=if(c.options.size>1)View.VISIBLE else View.GONE
-        setSubtitle(listOf(choiceLevel,o.leg?.time.orEmpty()).filter{it.isNotBlank()}.joinToString(" · "))
-        val found=DocTracks.namedSpans(o.pieces,o.line).filter{(n,_)->!DocWalks.sameName(n,name.text.toString())}.map{(n,spans)->Part(n,"",spans,emptyList())}
+        setSubtitle(listOf(choiceLevel,o.leg?.time.orEmpty().ifBlank{o.time}).filter{it.isNotBlank()}.joinToString(" · "))
+        val found=legParts(o)+DocTracks.namedSpans(o.pieces,o.line).filter{(n,_)->!DocWalks.sameName(n,name.text.toString())}.map{(n,spans)->Part(n,"",spans,emptyList())}
         onRange(emptyList());chart.showAll();lineFound(id,o.line,found,true)
     }
     private fun pickOption(anchor:View,start:Boolean){
@@ -653,20 +696,30 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     private fun photoBlock(content:LinearLayout,b:DocPages.Image){
         val id=request
         val view=ImageView(activity).apply{adjustViewBounds=true;scaleType=ImageView.ScaleType.FIT_CENTER;clipToOutline=true;background=NativeUi.background(activity,NativeUi.line,10);visibility=View.GONE;contentDescription=b.text.lineSequence().firstOrNull().orEmpty()}
-        content.addView(view,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(10)})
+        val params=LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(10);gravity=Gravity.CENTER_HORIZONTAL}
+        content.addView(view,params)
         if(b.text.isNotBlank())content.addView(TextView(activity).apply{text=b.text;textSize=11.5f;setTextColor(NativeUi.muted);setLineSpacing(0f,1.1f)},LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(4)})
         val width=max(1,(content.width.takeIf{it>0}?:activity.resources.displayMetrics.widthPixels))
         fetch(b.url,{bytes->
             val bounds=BitmapFactory.Options().apply{inJustDecodeBounds=true};BitmapFactory.decodeByteArray(bytes,0,bytes.size,bounds)
             var sample=1;while(bounds.outWidth/(sample*2)>=width)sample*=2
             BitmapFactory.decodeByteArray(bytes,0,bytes.size,BitmapFactory.Options().apply{inSampleSize=sample})
-        }){bitmap->if(id==request&&bitmap!=null){view.setImageBitmap(bitmap);view.visibility=View.VISIBLE}}
+        }){bitmap->if(id==request&&bitmap!=null){
+            // DOC publishes most photos small (390 px): shown at most 1.5 times their
+            // pixels (stretched further they blur), large ones across the width.
+            val shown=min(width,(bitmap.width*1.5f).roundToInt())
+            params.width=if(shown>=width)-1 else shown;view.layoutParams=params
+            view.setImageBitmap(bitmap);view.visibility=View.VISIBLE}}
     }
     /** DOC's page text for the walk in view (which huts it names), and the huts near its line. */
     private var pageWords="";private var nearHuts=emptyList<DocTracks.Stop>()
     private fun showHuts(near:List<DocTracks.Stop>){
         nearHuts=near
-        val stops=DocTracks.named(near,pageWords)
+        // A compiled walk: exactly the huts DOC links as on it (details from DOC's hut
+        // data near the line where it has them).
+        val stops=recordHuts?.let{rh->rh.mapNotNull{h->near.firstOrNull{s->DocTracks.meters(s.hut.point,h.point)<150||DocTracks.hutName(s.hut.name).equals(h.name,true)}
+            ?:lineNow.takeIf{it.size>=2}?.let{l->DocTracks.Stop(DocTracks.Hut(h.name,"","","",h.point),DocTracks.along(l,h.point))}}.sortedBy{it.along}}
+            ?:DocTracks.named(near,pageWords)
         chart.markers=stops.map{it.along to DocTracks.hutName(it.hut.name)}
         huts.removeAllViews()
         for(s in stops){val h=s.hut
@@ -681,7 +734,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
             row.addView(TextView(activity).apply{this.text=distance(s.along);textSize=12.5f;setTextColor(NativeUi.muted)},LinearLayout.LayoutParams(-2,-2).apply{marginStart=dp(8)})
             huts.addView(row,LinearLayout.LayoutParams(-1,-2))
         }
-        huts.visibility=View.VISIBLE
+        huts.visibility=if(stops.isEmpty())View.GONE else View.VISIBLE
     }
     /** "20 each" → "20 bunks". */
     private fun bunks(v:String)=Regex("\\d+").find(v)?.value?.let{"$it bunks"}.orEmpty()

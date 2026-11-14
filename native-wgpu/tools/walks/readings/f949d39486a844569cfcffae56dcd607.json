@@ -1,0 +1,54 @@
+{
+  "guid": "f949d394-86a8-4456-9cfc-ffae56dcd607",
+  "kind": "loop",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Silverpeaks Circuit Track, clockwise from the Silverpeaks Scenic Reserve car park",
+      "shape": "loop",
+      "start": {"name": "Silverpeaks Scenic Reserve car park", "quote": "Start the circuit track from the Silverpeaks Scenic Reserve car park.", "ref": null},
+      "end": {"name": "Silverpeaks Scenic Reserve car park", "quote": "return to the Silverpeaks Scenic Reserve car park", "ref": null},
+      "via": [
+        {"name": "grass clearing at the site of the former Green Hut", "quote": "the site of the former Green Hut", "ref": null},
+        {"name": "Pulpit Rock", "quote": "you will reach Pulpit Rock", "ref": "T6"},
+        {"name": "Paekohu ridgeline", "quote": "Māori named this section Paekohu", "ref": null},
+        {"name": "schist tor or obelisk", "quote": "After passing a prominent schist tor or obelisk", "ref": null},
+        {"name": "Devils Staircase", "quote": "the aptly named Devils Staircase", "ref": null},
+        {"name": "intersection to Jubilee Hut", "quote": "an intersection to Jubilee Hut", "ref": null},
+        {"name": "Jubilee Hut", "quote": "The final walk up to Jubilee Hut is a steep 10 min climb.", "ref": "T4"},
+        {"name": "The Cats Teeth", "quote": "a large rock formation known locally as 'The Cats Teeth'", "ref": null},
+        {"name": "ABC Cave intersection", "quote": "an intersection marking the side trip to ABC Cave", "ref": null},
+        {"name": "Yellow Ridge", "quote": "climbing back up to meet Yellow Ridge", "ref": null},
+        {"name": "Philip J Cox Memorial Hut", "quote": "Philip J Cox Memorial Hut", "ref": "T5"},
+        {"name": "River Track", "quote": "turn right at wooden routed sign named River Track", "ref": null},
+        {"name": "South Branch of the Waikouaiti River", "quote": "The track follows the South Branch of the Waikouaiti River", "ref": null}
+      ],
+      "direction": "clockwise",
+      "time": "12 hr",
+      "distance": "24 km loop",
+      "evidence": [
+        "This track can be walked in either direction.",
+        "This description details a clockwise circuit of the track.",
+        "Start the circuit track from the Silverpeaks Scenic Reserve car park.",
+        "Continue to follow the wooden routed River Track signs to stay on the new track to complete the circuit and return to the Silverpeaks Scenic Reserve car park."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [
+    {"name": "ABC Cave", "quote": "ABC Cave Route", "ref": null, "from": "intersection under the Cats Teeth, about 2.5 km from Jubilee Hut"},
+    {"name": "Possum Hut", "quote": "Possum Hut Route", "ref": "T1", "from": null}
+  ],
+  "huts": [
+    {"name": "Jubilee Hut", "quote": "Jubilee Hut", "ref": "T4"},
+    {"name": "Philip J Cox Memorial Hut", "quote": "Philip J Cox Memorial Hut", "ref": "T5"}
+  ],
+  "not_on_route": [
+    {"name": "Possum Hut", "quote": "the historic Possum Hut", "ref": null, "why": "side trip"},
+    {"name": "ABC Cave", "quote": "ABC Cave", "ref": null, "why": "side trip"},
+    {"name": "Painted Forest", "quote": "you can view the Painted Forest", "ref": "T8", "why": "view"},
+    {"name": "Swampy Ridge Route", "quote": "Swampy Ridge Route", "ref": "T2", "why": "other walk"}
+  ],
+  "doubts": "The car park start/end is left null: the only road-end features are where the Possum Hut Route meets Mountain Track Road, while the text puts the car park on the gravel road Double Hill Road / Semple Road / Steep Hill Road, so neither clearly matches. Jubilee Hut is reached by a 10 min spur from an intersection and the walk returns down the same spur to rejoin the circuit. The page says the circuit can be walked in either direction; the clockwise description is recorded. The Possum Hut side trip's departure point is not stated."
+}

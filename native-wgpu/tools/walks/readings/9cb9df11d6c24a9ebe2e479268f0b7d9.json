@@ -1,0 +1,55 @@
+{
+  "guid": "9cb9df11-d6c2-4a9e-be2e-479268f0b7d9",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Road end to Anatoki Forks Hut, Waingaro Forks Hut and out to Uruwhenua Road",
+      "shape": "one_way",
+      "start": {"name": "Car park at the end of the Anatoki road", "quote": "From the car park follow the markers and ford Go Ahead Creek", "ref": "F1"},
+      "end": {"name": "Uruwhenua Road", "quote": "Uruwhenua Road is reached", "ref": null},
+      "via": [
+        {"name": "Go Ahead Creek", "quote": "ford Go Ahead Creek", "ref": "T7"},
+        {"name": "Anatoki Bend", "quote": "The track then descends in a zigzag fashion to the Anatoki Bend", "ref": null},
+        {"name": "Anatoki Forks Hut", "quote": "Once at the Anatoki Forks Hut", "ref": "T5"},
+        {"name": "Junction, left branch towards Waingaro Forks Hut", "quote": "take the left branch at a junction to head towards Waingaro Forks Hut", "ref": null},
+        {"name": "Saddle", "quote": "a steady climb to the saddle", "ref": null},
+        {"name": "Stanley River", "quote": "descending for 40 minutes to the Stanley River", "ref": null},
+        {"name": "Soper Shelter, western end of Lake Stanley", "quote": "at the western end of Lake Stanley is Soper Shelter", "ref": "T13"},
+        {"name": "Lake Stanley", "quote": "you reach the eastern end of the lake", "ref": "T9"},
+        {"name": "Waingaro Forks Hut", "quote": "the historic Waingaro Forks Hut", "ref": "T18"},
+        {"name": "Swingbridge across the Waingaro River", "quote": "a swingbridge across the rocky gorge of the Waingaro River", "ref": "T19"},
+        {"name": "Lockett Range", "quote": "up the Lockett Range", "ref": "T10"},
+        {"name": "Skeet Creek", "quote": "Skeet Creek is reached", "ref": "T12"},
+        {"name": "Turn-off to Riordans Hut", "quote": "the turn-off to Riordans Hut is reached", "ref": null},
+        {"name": "Kill Devil Ridge", "quote": "down the Kill Devil Ridge to the end of the track", "ref": null}
+      ],
+      "direction": null,
+      "time": "3-5 days",
+      "distance": null,
+      "evidence": [
+        "Road end - Anatoki Forks Hut: 8 hr (17 km)",
+        "Anatoki Forks Hut - Waingaro Forks Hut: 7-10 hr",
+        "Waingaro Forks Hut - road end: 6-7 hr (18 km)",
+        "From the car park follow the markers and ford Go Ahead Creek before sidling up the hill to join onto an old benched gold miner’s track.",
+        "Uruwhenua Road is reached and a further 3 kilometres will take you back to the State Highway near Lindsay’s Bridge."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [
+    {"name": "Riordans Hut", "quote": "From the turnoff it’s a further 30 minutes to Riordans Hut", "ref": "T11", "from": "Turn-off to Riordans Hut"}
+  ],
+  "huts": [
+    {"name": "Anatoki Forks Hut", "quote": "Anatoki Forks Hut (standard hut, 6 bunks)", "ref": "T5"},
+    {"name": "Waingaro Forks Hut", "quote": "Waingaro Forks Hut", "ref": "T18"}
+  ],
+  "not_on_route": [
+    {"name": "Adelaide Tarn Hut", "quote": "The right branch crosses the Anatoki River and climbs steeply towards Adelaide Tarn Hut", "ref": "T4", "why": "other"},
+    {"name": "Riordans Hut", "quote": "Riordans Hut", "ref": "T11", "why": "side trip"},
+    {"name": "Tin Hut", "quote": "the restored Tin Hut, located in bush 60 metres below the track", "ref": null, "why": "view"},
+    {"name": "Lindsay's Bridge", "quote": "the State Highway near Lindsay’s Bridge", "ref": null, "why": "nearby"}
+  ],
+  "doubts": "Start ref F1 (where Anatoki Track meets Anatoki Track Road) is chosen over the adjacent F2 (an unnamed track on the same road); the text names only 'a small car park and intentions shelter' 3 km up the road off Kotinga Road. The end at Uruwhenua Road has no road-end feature; the 'Uruwhenua' place entry (T17) was not used because it is not clearly the track's end. The Stanley River has three entries and none is clearly the point reached after the saddle, so it is left without a ref. Soper Shelter is at the western end of Lake Stanley on the way, but the text does not say it has bunks, so it is not listed as a hut. The page mentions three restored huts from the 1930s without naming them; Tin Hut is 60 m below the track and Riordans Hut 30 min off it."
+}

@@ -1,0 +1,80 @@
+{
+  "guid": "628cc4cc-dd80-42be-95cb-d36b914a7d86",
+  "kind": "network",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Black Hill Walk",
+      "shape": "loop",
+      "start": {"name": "end of Lodge Road, St Arnaud", "quote": "The walk starts at the end of Lodge Road in St Arnaud.", "ref": null},
+      "end": {"name": "end of Lodge Road, St Arnaud", "quote": "follows it back to Lodge Road", "ref": null},
+      "via": [
+        {"name": "Black Hill", "quote": "onto Black Hill", "ref": "T5"},
+        {"name": "clearing near the top", "quote": "Near the top is a clearing", "ref": null},
+        {"name": "the highway", "quote": "The track descends steeply to the highway and follows it back to Lodge Road.", "ref": null}
+      ],
+      "direction": null,
+      "time": "1 hr 30 min return",
+      "distance": null,
+      "evidence": [
+        "Black Hill Walk climbs through beech forest and stands of mānuka and kānuka onto Black Hill.",
+        "The track descends steeply to the highway and follows it back to Lodge Road.",
+        "Getting there: The walk starts at the end of Lodge Road in St Arnaud."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "Moraine Walk",
+      "shape": "out_and_back",
+      "start": {"name": "junction of SH 63 and Lodge Road", "quote": "Start the walk at the junction of SH 63 and Lodge Road in St Arnaud.", "ref": "F1"},
+      "end": {"name": "Buller River", "quote": "on to the Buller River", "ref": null},
+      "via": [
+        {"name": "base of Black Hill", "quote": "Moraine Walk winds around the base of Black Hill", "ref": null},
+        {"name": "kettle ponds", "quote": "past kettle ponds", "ref": null},
+        {"name": "West Bay campground", "quote": "The walk passes through the back of West Bay campground", "ref": null}
+      ],
+      "direction": null,
+      "time": "1 hr 30 min return",
+      "distance": null,
+      "evidence": [
+        "The walk passes through the back of West Bay campground and on to the Buller River.",
+        "Getting there: Start the walk at the junction of SH 63 and Lodge Road in St Arnaud."
+      ]
+    },
+    {
+      "id": "W3",
+      "main": false,
+      "label": "Moraine Walk and Anglers Walk circuit returning along SH 63",
+      "shape": "loop",
+      "start": {"name": "junction of SH 63 and Lodge Road", "quote": "Start the walk at the junction of SH 63 and Lodge Road in St Arnaud.", "ref": "F1"},
+      "end": {"name": "junction of SH 63 and Lodge Road", "quote": "the circuit can be completed by returning along SH 63", "ref": "F1"},
+      "via": [
+        {"name": "Moraine Walk", "quote": "Moraine Walk", "ref": "T3"},
+        {"name": "West Bay campground", "quote": "West Bay campground", "ref": null},
+        {"name": "Buller River", "quote": "on to the Buller River", "ref": null},
+        {"name": "Anglers Walk", "quote": "The track follows the northern river bank", "ref": "T1"},
+        {"name": "SH 63", "quote": "returning along SH 63", "ref": null}
+      ],
+      "direction": null,
+      "time": null,
+      "distance": null,
+      "evidence": [
+        "This walk makes a pleasant extension to Moraine Walk and the circuit can be completed by returning along SH 63."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "Buller Bridge on Mt Robert Road", "quote": "Start at the Buller Bridge on Mt Robert Road near St Arnaud", "ref": null, "onto": "Anglers Walk"}
+  ],
+  "side_trips": [],
+  "huts": [],
+  "not_on_route": [
+    {"name": "St Arnaud Village", "quote": "St Arnaud Village", "ref": null, "why": "view"},
+    {"name": "Big Bush", "quote": "Big Bush", "ref": null, "why": "view"},
+    {"name": "Brunner Peninsula Nature Walk", "quote": "Brunner Peninsula Nature Walk", "ref": "L1", "why": "other walk"},
+    {"name": "Rotoiti/Nelson Lakes Visitor Centre", "quote": "Rotoiti/Nelson Lakes Visitor Centre", "ref": null, "why": "other"}
+  ],
+  "doubts": "A page of three walks. Black Hill Walk: DOC calls it '1 hr 30 min return' but the text describes descending to the highway and following it back to Lodge Road, so recorded as a loop; its start 'end of Lodge Road' could be either of two features where Black Hill Track meets Lodge Road (F2, F4), so null. Moraine Walk start F1 is where Moraine Walk meets the highway, taken as the SH 63 / Lodge Road junction; its end at the Buller River has no entry, and 'return' is read as out and back. Anglers Walk on its own has only a start (Buller Bridge on Mt Robert Road, no matching feature; F7 is on the highway) and no stated end, so it is recorded only within the Moraine/Anglers circuit (W3), whose exact joining points and order are not stated."
+}

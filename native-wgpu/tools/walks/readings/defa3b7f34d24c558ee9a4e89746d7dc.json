@@ -1,0 +1,83 @@
+{
+  "guid": "defa3b7f-34d2-4c55-8ee9-a4e89746d7dc",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Blue Lake Hut over Waiau Pass to Lewis Pass",
+      "shape": "one_way",
+      "start": {"name": "Blue Lake Hut", "quote": "Blue Lake Hut", "ref": "T11"},
+      "end": {"name": "Lewis Pass (state highway)", "quote": "the state highway and Lewis Pass", "ref": "F1"},
+      "via": [
+        {"name": "Rotopohueroa/Lake Constance", "quote": "Rotopohueroa/Lake Constance", "ref": "T23"},
+        {"name": "Waiau Pass", "quote": "Waiau Pass", "ref": "T26"},
+        {"name": "Upper Waiau Forks", "quote": "Upper Waiau Forks", "ref": null},
+        {"name": "Waiau Uwha River", "quote": "Waiau Uwha River", "ref": null},
+        {"name": "Caroline Creek", "quote": "Caroline Creek", "ref": "T14"},
+        {"name": "Waiau Hut", "quote": "Waiau Hut", "ref": "T25"},
+        {"name": "Ada River", "quote": "Ada River", "ref": "T9"},
+        {"name": "Christopher Hut", "quote": "Christopher Hut", "ref": "T16"},
+        {"name": "Christopher (Ada) Cullers Hut", "quote": "Christopher (Ada) Cullers Hut", "ref": "T15"},
+        {"name": "Ada Pass", "quote": "Ada Pass", "ref": "T7"},
+        {"name": "Ada Pass Hut", "quote": "Ada Pass Hut", "ref": "T8"},
+        {"name": "Maruia River", "quote": "Maruia River", "ref": null},
+        {"name": "Cannibal Gorge Hut", "quote": "Cannibal Gorge Hut", "ref": "T13"},
+        {"name": "Cannibal Gorge", "quote": "Cannibal Gorge", "ref": "T12"},
+        {"name": "Alpine Nature Walk", "quote": "Alpine Nature Walk", "ref": "T1"}
+      ],
+      "direction": null,
+      "time": "8-10 days for full trip",
+      "distance": null,
+      "evidence": [
+        "This route begins at Blue Lake Hut in Nelson Lakes National Park.",
+        "From Blue Lake Hut follow the signs, orange triangle makers and orange poled route which lead you south.",
+        "Shortly after the pass you will reach Ada Pass Hut.",
+        "The track leaves the bush and meets the Alpine Nature Walk. This short track leads through an alpine wetland with spectacular views of Gloriana Peak and the Spenser Mountains. It ends at the state highway and Lewis Pass."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "Alternate route via the St James Walkway to Boyle Village",
+      "shape": "one_way",
+      "start": {"name": "Blue Lake Hut", "quote": "Blue Lake Hut", "ref": "T11"},
+      "end": {"name": "Boyle Village", "quote": "Boyle Village", "ref": null},
+      "via": [
+        {"name": "Waiau Pass", "quote": "Waiau Pass", "ref": "T26"},
+        {"name": "Waiau Hut", "quote": "Waiau Hut", "ref": "T25"},
+        {"name": "Ada River", "quote": "Ada River", "ref": "T9"},
+        {"name": "Ada Flat", "quote": "Ada Flat", "ref": "T6"},
+        {"name": "Delta Stream", "quote": "Delta Stream", "ref": "T17"},
+        {"name": "St James Walkway", "quote": "St James Walkway", "ref": "L1"}
+      ],
+      "direction": null,
+      "time": null,
+      "distance": null,
+      "evidence": [
+        "Alternate Route from the junction on Waiau and Ada Rivers: Rather than taking the route to Lewis Pass, you can instead follow the St James Walkway south, walking through to Boyle Village.",
+        "Follow the track downstream from the turnoff to the Ada Valley, crossing various side streams then the Ada River. Cross Ada Flat then Delta Stream, then the track will join the St James Walkway."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "Lewis Pass", "quote": "Lewis Pass", "ref": "F1", "onto": null},
+    {"name": "Boyle Village", "quote": "Boyle Village", "ref": null, "onto": "St James Walkway"}
+  ],
+  "side_trips": [],
+  "huts": [
+    {"name": "Blue Lake Hut", "quote": "Blue Lake Hut", "ref": "T11"},
+    {"name": "Waiau Hut", "quote": "Waiau Hut", "ref": "T25"},
+    {"name": "Christopher Hut", "quote": "Christopher Hut", "ref": "T16"},
+    {"name": "Christopher (Ada) Cullers Hut", "quote": "Christopher (Ada) Cullers Hut", "ref": "T15"},
+    {"name": "Ada Pass Hut", "quote": "Ada Pass Hut", "ref": "T8"},
+    {"name": "Cannibal Gorge Hut", "quote": "Cannibal Gorge Hut", "ref": "T13"}
+  ],
+  "not_on_route": [
+    {"name": "Travers-Sabine Circuit", "quote": "Travers-Sabine Circuit track", "ref": "L2", "why": "other walk"},
+    {"name": "Caroline Creek Bivvy", "quote": "Caroline Creek Bivvy", "ref": null, "why": "other"},
+    {"name": "Gloriana Peak", "quote": "Gloriana Peak", "ref": "T18", "why": "view"},
+    {"name": "Spenser Mountains", "quote": "Spenser Mountains", "ref": "T24", "why": "view"}
+  ],
+  "doubts": "The end is given as 'the state highway and Lewis Pass'; F1 is the road end at Lewis Pass on State Highway 7 but is named for the Lewis Tops Track rather than the Alpine Nature Walk the route ends on. The last section heading says 'Cannibal Gorge Hut to Boyle Village (Lewis Pass)' while its text ends at Lewis Pass; W1's end taken as Lewis Pass. DOC's '8-10 days for full trip' may include the approach to Blue Lake Hut via the Travers-Sabine Circuit. The Boyle Village alternative is only described as far as joining the St James Walkway; the rest is on the St James Walkway page. The Christopher (Ada) Cullers Hut is passed 10-15 min after Christopher Hut, so listed as a hut on the way although it is described as historic. The page says the route can also begin from Lewis Pass or Boyle Village (walking it in reverse); recorded as access points."
+}

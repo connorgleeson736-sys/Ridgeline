@@ -1,0 +1,48 @@
+{
+  "guid": "4a66a7ab-172c-4671-ace9-5cfc2f488f23",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Sabine Hut to Angelus Hut via Mt Cedric",
+      "shape": "one_way",
+      "start": {"name": "Sabine Hut", "quote": "The track begins behind Sabine Hut", "ref": "L1"},
+      "end": {"name": "Angelus Hut", "quote": "Angelus Hut via Mt Cedric Track/Route", "ref": "T7"},
+      "via": [
+        {"name": "bush edge", "quote": "climbs very steeply and steadily to the bush edge", "ref": null},
+        {"name": "high ridge of Mt Cedric", "quote": "a high ridge of Mt Cedric (1,532 m)", "ref": "T12"},
+        {"name": "Rotomaninitua/Lake Angelus", "quote": "Rotomaninitua/Lake Angelus", "ref": "T14"}
+      ],
+      "direction": null,
+      "time": "6 hr",
+      "distance": "6.8 km one way",
+      "evidence": [
+        "The track begins behind Sabine Hut and climbs very steeply and steadily to the bush edge.",
+        "Poles and cairns mark the route from here, which eventually drops off the eastern side of a high ridge of Mt Cedric (1,532 m) and onto Rotomaninitua/Lake Angelus.",
+        "up to 9 hours on the Mt Cedric Track via Sabine Hut"
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [
+    {"name": "Maniniaro/Angelus Peak", "quote": "Maniniaro/Angelus Peak (2,075 m)", "ref": "T11", "from": "Angelus Hut"},
+    {"name": "Sunset Saddle and Travers Range", "quote": "climb to Sunset Saddle and then traverse west for 10 min to the Travers Range", "ref": "T16", "from": "Angelus Hut"}
+  ],
+  "huts": [
+    {"name": "Sabine Hut", "quote": "Sabine Hut", "ref": "L1"},
+    {"name": "Angelus Hut", "quote": "Angelus Hut", "ref": "T7"}
+  ],
+  "not_on_route": [
+    {"name": "Maniniaro/Angelus Peak", "quote": "Maniniaro/Angelus Peak", "ref": "T11", "why": "side trip"},
+    {"name": "Sunset Saddle", "quote": "Sunset Saddle", "ref": "T16", "why": "side trip"},
+    {"name": "Travers Range", "quote": "Travers Range", "ref": "T17", "why": "side trip"},
+    {"name": "Robert Ridge Route", "quote": "Robert Ridge Route", "ref": "T5", "why": "other walk"},
+    {"name": "Travers-Cascade Route", "quote": "Travers-Cascade Route", "ref": null, "why": "other walk"},
+    {"name": "Lakehead Hut", "quote": "Lakehead Hut", "ref": null, "why": "other walk"},
+    {"name": "Coldwater Hut", "quote": "Coldwater Hut", "ref": "T9", "why": "other walk"},
+    {"name": "D'Urville and Sabine rivers", "quote": "D’Urville and Sabine rivers", "ref": null, "why": "view"},
+    {"name": "Lake Rotoroa", "quote": "Lake Rotoroa", "ref": null, "why": "view"}
+  ],
+  "doubts": "The description does not name the end explicitly; it says the route drops onto Rotomaninitua/Lake Angelus, and the walk name and DOC distance '6.8 km one way' put the end at Angelus Hut. The page does not say whether Mt Cedric Track (T4) or Mt Cedric Route (T3) is the map track followed (likely both, track then route), so no track is listed in via."
+}

@@ -1,0 +1,70 @@
+{
+  "guid": "6404b2da-6883-4b0c-920c-0b1296855bc2",
+  "kind": "out_and_back",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Karangahake Gorge Historic Walkway to Waikino Station",
+      "shape": "out_and_back",
+      "start": {"name": "Karangahake Hall", "quote": "Starting at Karangahake Hall", "ref": null},
+      "end": {"name": "Waikino Station", "quote": "terminating at the Waikino Station", "ref": null},
+      "via": [
+        {"name": "Crown Battery", "quote": "the foundations of the Crown Battery", "ref": null},
+        {"name": "Western Portal Bridge", "quote": "Western Portal Bridge", "ref": null},
+        {"name": "rail tunnel", "quote": "The 1100 m former rail tunnel", "ref": null},
+        {"name": "Eastern Portal Bridge", "quote": "Eastern Portal Bridge which takes you back over the Ohinemuri River", "ref": null},
+        {"name": "Ohinemuri River", "quote": "opens out alongside the Ohinemuri River", "ref": "T7"},
+        {"name": "Owharoa Falls", "quote": "before you reach Owharoa Falls", "ref": "T8"},
+        {"name": "Victoria Battery", "quote": "the entrance to the Victoria Battery", "ref": null},
+        {"name": "underpass", "quote": "an underpass which provides access to the Waikino Station", "ref": null}
+      ],
+      "direction": null,
+      "time": "4 hr return",
+      "distance": null,
+      "evidence": [
+        "The walkway follows the railway line through the gorge and then opens out alongside the Ohinemuri River, passing through the huge Victoria Battery complex and terminating at the Waikino Station where a cafe and train rides can be investigated.",
+        "Starting at Karangahake Hall, walk through the foundations of the Crown Battery before climbing up onto the Western Portal Bridge over the river.",
+        "At the Eastern Portal Bridge go upstream, following the bends in the river along the line of the railway.",
+        "Return the same way or have your friends pick you up!"
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "Rail Tunnel Loop",
+      "shape": "loop",
+      "start": {"name": "Karangahake Hall", "quote": "Starting at Karangahake Hall", "ref": null},
+      "end": {"name": "Karangahake Hall", "quote": "completing the loop back to Karangahake", "ref": null},
+      "via": [
+        {"name": "Crown Battery", "quote": "the foundations of the Crown Battery", "ref": null},
+        {"name": "Western Portal Bridge", "quote": "Western Portal Bridge", "ref": null},
+        {"name": "rail tunnel", "quote": "The 1100 m former rail tunnel", "ref": null},
+        {"name": "Eastern Portal Bridge", "quote": "Eastern Portal Bridge which takes you back over the Ohinemuri River", "ref": null},
+        {"name": "Ohinemuri River", "quote": "by walking downstream along the river", "ref": "T7"}
+      ],
+      "direction": null,
+      "time": "45 min return",
+      "distance": "2.5 km",
+      "evidence": [
+        "A shorter loop section can be walked, that includes both the bridges and the 1100 m railway tunnel at Karangahake.",
+        "Starting at Karangahake Hall, walk through the foundations of the Crown Battery before climbing up onto the Western Portal Bridge over the river.",
+        "From here there is a choice of completing the loop back to Karangahake, by walking downstream along the river, or you can choose to continue on the Historic Walkway by going upstream towards Waikino."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "Karangahake Domain Car Park", "quote": "Karangahake Domain Car Park on SH2", "ref": null, "onto": null}
+  ],
+  "side_trips": [],
+  "huts": [],
+  "not_on_route": [
+    {"name": "Dickey Flat Campsite", "quote": "Dickey Flat Campsite", "ref": "T3", "why": "nearby"},
+    {"name": "The Windows Walk", "quote": "the Windows Walk", "ref": "T2", "why": "other walk"},
+    {"name": "Crown Track", "quote": "the Crown Track", "ref": null, "why": "other walk"},
+    {"name": "Paeroa", "quote": "between Paeroa and Waihi", "ref": "T9", "why": "nearby"},
+    {"name": "Waihi", "quote": "between Paeroa and Waihi", "ref": "T10", "why": "nearby"},
+    {"name": "Underground Pumphouse", "quote": "The Underground Pumphouse is closed.", "ref": null, "why": "other"}
+  ],
+  "doubts": "Start Karangahake Hall: no feature is clearly it; the Tunnel Loop Walk meets SH2 at F6, F9 and F11 and I cannot tell which is at the hall, so ref left null. End Waikino Station: possibly F5 (where Hauraki Rail Trail meets Goldfields Railway) or F1, but not certain, so null. The 4 hr return / 4.3 km are given for the 'Historic Walkway to Waikino' section measured from the Eastern Portal Bridge; I put the 4 hr return time on the whole walkway (DOC's summary time is '45 min or 4 hr return') but left distance null. The walkway end may also be one way ('have your friends pick you up'). The Ohinemuri River ref on the loop's return is for the river walked alongside."
+}

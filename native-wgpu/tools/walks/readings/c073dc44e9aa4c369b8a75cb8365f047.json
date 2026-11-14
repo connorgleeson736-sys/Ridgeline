@@ -1,0 +1,36 @@
+{
+  "guid": "c073dc44-e9aa-4c36-9b8a-75cb8365f047",
+  "kind": "out_and_back",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Roys Peak Track to the summit",
+      "shape": "out_and_back",
+      "start": {"name": "Roys Peak car park", "quote": "Roys Peak car park", "ref": "F1"},
+      "end": {"name": "summit of Roys Peak", "quote": "the summit of Roys Peak", "ref": "T6"},
+      "via": [
+        {"name": "Roys Peak photo viewpoints", "quote": "Roys Peak photo viewpoints", "ref": null}
+      ],
+      "direction": null,
+      "time": "5-6 hr return",
+      "distance": "16 km return via same track",
+      "evidence": [
+        "The track starts at Roys Peak car park, on Wānaka – Mount Aspiring Road.",
+        "Roys Peak Track ends at the summit of Roys Peak, at 1,578 metres elevation.",
+        "From the summit, return back the way you came."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "Wānaka (walk or cycle via Waterfall Creek Track and Glendhu Bay Track)", "quote": "Wānaka", "ref": "T8", "onto": "Roys Peak Track entrance"}
+  ],
+  "side_trips": [],
+  "huts": [],
+  "not_on_route": [
+    {"name": "Lake Wānaka", "quote": "Lake Wānaka", "ref": null, "why": "view"},
+    {"name": "Skyline Track", "quote": "Skyline Track", "ref": "L1", "why": "other walk"},
+    {"name": "Isthmus Peak Track", "quote": "Isthmus Peak Track", "ref": "L2", "why": "other walk"}
+  ],
+  "doubts": "The Wānaka access route uses Waterfall Creek Track, Glendhu Bay Track and a section of road (not DOC managed); it is recorded as an access point to the start rather than a separate way."
+}

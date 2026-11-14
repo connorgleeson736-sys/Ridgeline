@@ -1,0 +1,90 @@
+{
+  "guid": "4fa45d10-fe86-49a7-9f32-19a7833251ce",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Triangle Flat to Wharariki Road end",
+      "shape": "one_way",
+      "start": {"name": "Triangle Flat car park", "quote": "the car park at Triangle Flat", "ref": "F1"},
+      "end": {"name": "end of Wharariki Road", "quote": "From the beach, it is a short walk on the Wharariki Beach Track to the end of Wharariki Road", "ref": "F3"},
+      "via": [
+        {"name": "Old Man Range", "quote": "along the Old Man Range", "ref": null},
+        {"name": "Pillar Point Lighthouse", "quote": "to Pillar Point Lighthouse (1–2 hr)", "ref": "T5"},
+        {"name": "Cape Farewell", "quote": "over undulating open farmland to Cape Farewell", "ref": "T4"},
+        {"name": "Wharariki Beach", "quote": "with steep drop offs and panoramic views, to Wharariki Beach", "ref": "T10"},
+        {"name": "Wharariki Beach Track", "quote": "a short walk on the Wharariki Beach Track", "ref": "L1"}
+      ],
+      "direction": null,
+      "time": "3 – 5 hours one way",
+      "distance": "8 km one way",
+      "evidence": [
+        "The full track runs from the car park at Triangle Flat to Wharariki Beach.",
+        "Arrange to be picked up from the Wharariki Road car park, or return via the same track or walk back along Wharariki Road.",
+        "From the beach, it is a short walk on the Wharariki Beach Track to the end of Wharariki Road."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "Triangle Flat to Pillar Point Lighthouse car park",
+      "shape": "one_way",
+      "start": {"name": "Triangle Flat car park", "quote": "The track starts at Triangle Flat", "ref": "F1"},
+      "end": {"name": "Pillar Point Lighthouse car park", "quote": "finishing at the Pillar Point Lighthouse car park", "ref": "F4"},
+      "via": [
+        {"name": "Old Man Range", "quote": "along the Old Man Range", "ref": null},
+        {"name": "Pillar Point Lighthouse", "quote": "to Pillar Point Lighthouse (1–2 hr)", "ref": "T5"}
+      ],
+      "direction": null,
+      "time": null,
+      "distance": null,
+      "evidence": [
+        "It is possible to shorten the walk by finishing at the Pillar Point Lighthouse car park or the Cape Farewell car park."
+      ]
+    },
+    {
+      "id": "W3",
+      "main": false,
+      "label": "Triangle Flat to Cape Farewell car park",
+      "shape": "one_way",
+      "start": {"name": "Triangle Flat car park", "quote": "The track starts at Triangle Flat", "ref": "F1"},
+      "end": {"name": "Cape Farewell car park", "quote": "it is 5 minutes' walk from the Cape Farewell viewing platform to Cape Farewell car park", "ref": null},
+      "via": [
+        {"name": "Pillar Point Lighthouse", "quote": "to Pillar Point Lighthouse (1–2 hr)", "ref": "T5"},
+        {"name": "Cape Farewell viewing platform", "quote": "the Cape Farewell viewing platform", "ref": "T4"}
+      ],
+      "direction": null,
+      "time": null,
+      "distance": null,
+      "evidence": [
+        "It is possible to shorten the walk by finishing at the Pillar Point Lighthouse car park or the Cape Farewell car park.",
+        "If you are finishing at this point, it is 5 minutes' walk from the Cape Farewell viewing platform to Cape Farewell car park."
+      ]
+    },
+    {
+      "id": "W4",
+      "main": false,
+      "label": "Round trip via Pillar Point Lighthouse and Wharariki Road",
+      "shape": "loop",
+      "start": {"name": "Triangle Flat car park", "quote": "The track starts at Triangle Flat", "ref": "F1"},
+      "end": {"name": "Triangle Flat car park", "quote": "return to the car park via Wharariki Road (1 hr)", "ref": "F1"},
+      "via": [
+        {"name": "Pillar Point Lighthouse", "quote": "to Pillar Point Lighthouse (1–2 hr)", "ref": "T5"},
+        {"name": "Pillar Point Lighthouse Track", "quote": "continue on the Pillar Point Lighthouse Track (a 4WD track) to Wharariki Road (30 min)", "ref": "T1"},
+        {"name": "Wharariki Road", "quote": "return to the car park via Wharariki Road (1 hr)", "ref": null}
+      ],
+      "direction": null,
+      "time": null,
+      "distance": null,
+      "evidence": [
+        "For a round trip, continue on the Pillar Point Lighthouse Track (a 4WD track) to Wharariki Road (30 min) and return to the car park via Wharariki Road (1 hr)."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [],
+  "huts": [],
+  "not_on_route": [],
+  "doubts": "Pillar Point Lighthouse is given the coast name Pillar Point (T5). The Pillar Point Lighthouse car park is taken as F4 (where Pillar Point Lighthouse Track meets Wharariki Road), which is inferred rather than stated. Cape Farewell car park has no matching feature. The main way can also be walked back the same track or along Wharariki Road; it is recorded as one way per DOC's 'one way' time and distance."
+}

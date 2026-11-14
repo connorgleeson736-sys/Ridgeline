@@ -1,0 +1,65 @@
+{
+  "guid": "ac783de5-aa39-42a7-9970-8dad80abe9e8",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Lower Hollyford Road end to Martins Bay",
+      "shape": "one_way",
+      "start": {"name": "End of Lower Hollyford Road", "quote": "Lower Hollyford Road", "ref": "F1"},
+      "end": {"name": "Martins Bay Hut, Martins Bay", "quote": "Martins Bay Hut", "ref": "T21"},
+      "via": [
+        {"name": "Humboldt Creek swing bridge", "quote": "Humboldt Creek", "ref": "T10"},
+        {"name": "Swamp Creek", "quote": "Swamp Creek", "ref": "T24"},
+        {"name": "Hollyford River/Whakatipu Kā Tuka", "quote": "Hollyford River/Whakatipu Kā Tuka", "ref": "T9"},
+        {"name": "Hidden Falls Creek", "quote": "Hidden Falls Creek", "ref": "T5"},
+        {"name": "Sunshine Hut (private)", "quote": "Sunshine Hut", "ref": null},
+        {"name": "Hidden Falls Hut", "quote": "Hidden Falls Hut", "ref": "T6"},
+        {"name": "Little Homer Saddle", "quote": "Little Homer Saddle", "ref": "T19"},
+        {"name": "Little Homer Falls", "quote": "Little Homer Falls", "ref": "T18"},
+        {"name": "Pyke River Lodge", "quote": "Pyke River Lodge", "ref": null},
+        {"name": "Lake Alabaster Hut", "quote": "Lake Alabaster Hut", "ref": "T15"},
+        {"name": "Pyke River swing bridge", "quote": "Pyke River swing bridge", "ref": null},
+        {"name": "Lake McKerrow/Whakatipu Waitai", "quote": "Lake McKerrow/Whakatipu Waitai", "ref": "T17"},
+        {"name": "Demon Trail Hut", "quote": "Demon Trail Hut", "ref": "T3"},
+        {"name": "Hokuri Hut", "quote": "Hokuri Hut", "ref": "T7"},
+        {"name": "Hokuri Creek", "quote": "Hokuri Creek", "ref": "T11"},
+        {"name": "Jamestown", "quote": "Jamestown", "ref": "T12"},
+        {"name": "Hollyford Airstrip", "quote": "Hollyford Airstrip", "ref": null},
+        {"name": "Jerusalem Creek", "quote": "Jerusalem Creek", "ref": "T13"}
+      ],
+      "direction": null,
+      "time": "4–5 days",
+      "distance": "56 km one way",
+      "evidence": [
+        "The Hollyford Track begins at the end of the Lower Hollyford Road, off SH 94 Milford Road, and ends at Martins Bay on the west coast.",
+        "The track is suitable for people with good fitness and takes 4–5 days one way.",
+        "You can return on the same track or arrange transport from Martins Bay.",
+        "Martins Bay Hut, situated at the mouth of the Hollyford River/Whakatipu Kā Tuka, is a further 1.5–2 hr from Martins Bay Lodge turn off."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [
+    {"name": "McKerrow Island Hut", "quote": "McKerrow Island Hut", "ref": "T22", "from": null}
+  ],
+  "huts": [
+    {"name": "Sunshine Hut (private)", "quote": "Sunshine Hut", "ref": null},
+    {"name": "Hidden Falls Hut", "quote": "Hidden Falls Hut", "ref": "T6"},
+    {"name": "Pyke River Lodge", "quote": "Pyke River Lodge", "ref": null},
+    {"name": "Lake Alabaster Hut", "quote": "Lake Alabaster Hut", "ref": "T15"},
+    {"name": "Demon Trail Hut", "quote": "Demon Trail Hut", "ref": "T3"},
+    {"name": "Hokuri Hut", "quote": "Hokuri Hut", "ref": "T7"},
+    {"name": "Martins Bay Hut", "quote": "Martins Bay Hut", "ref": "T21"}
+  ],
+  "not_on_route": [
+    {"name": "McKerrow Island Hut", "quote": "McKerrow Island Hut", "ref": "T22", "why": "side trip"},
+    {"name": "Martins Bay Lodge", "quote": "Martins Bay Lodge", "ref": null, "why": "nearby"},
+    {"name": "Long Reef", "quote": "Long Reef", "ref": null, "why": "other"},
+    {"name": "Pyke – Big Bay Route", "quote": "Pyke – Big Bay Route", "ref": "L1", "why": "other walk"},
+    {"name": "Mount Madeline", "quote": "Mount Madeline", "ref": "T23", "why": "view"},
+    {"name": "Mount Tūtoko", "quote": "Mount Tūtoko", "ref": null, "why": "view"}
+  ],
+  "doubts": "The page says the track ends at Martins Bay; the last stage ends at Martins Bay Hut (T21), which I used as the end rather than the Martins Bay coast entry (T20). Start F1 is where the Hollyford Track meets Lower Hollyford Road (F2 is the Humboldt Falls Track). The text offers returning on the same track or by transport; DOC gives '56 km one way', so one_way. The McKerrow Island Hut side trip leaves the Lake Alabaster Hut to Demon Trail Hut section, but the exact turn-off point is not stated. Sunshine Hut (private) and Pyke River Lodge are passed on the way and listed as huts; Martins Bay Lodge is at a turn off and its position relative to the track is unclear. The order of Jerusalem Creek relative to Martins Bay Hut is not fully clear. The track continues beyond the hut to Long Reef and then the Pyke - Big Bay Route; not recorded as part of this walk."
+}

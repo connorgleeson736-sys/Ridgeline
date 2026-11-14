@@ -1,0 +1,67 @@
+{
+  "guid": "515b197a-9138-40e7-b099-03b2cd121941",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Onepoto to Hopuruahine Landing",
+      "shape": "one_way",
+      "start": {"name": "Onepoto Shelter", "quote": "The track starts from the Onepoto Shelter", "ref": "F1"},
+      "end": {"name": "Hopuruahine Landing", "quote": "Hopuruahine Landing (track start/end)", "ref": "T3"},
+      "via": [
+        {"name": "Former Armed Constabulary Redoubt", "quote": "former Armed Constabulary Redoubt", "ref": null},
+        {"name": "Panekire Bluff", "quote": "Panekire Bluff", "ref": null},
+        {"name": "Puketapu Trig", "quote": "Puketapu Trig", "ref": "T13"},
+        {"name": "Panekire Hut", "quote": "Panekire Hut", "ref": "T12"},
+        {"name": "Panekire descent", "quote": "the top of the Panekire descent", "ref": null},
+        {"name": "Waiopaoa Hut", "quote": "Waiopaoa Hut", "ref": "T20"},
+        {"name": "Waiopaoa Stream", "quote": "Waiopaoa Stream", "ref": "T21"},
+        {"name": "Korokoro suspension bridge", "quote": "Korokoro suspension bridge", "ref": null},
+        {"name": "Korokoro Campsite", "quote": "Korokoro Campsite", "ref": "T5"},
+        {"name": "Maraunui Campsite", "quote": "Maraunui Campsite", "ref": "T10"},
+        {"name": "Whakaneke Ridge", "quote": "Whakaneke Ridge", "ref": null},
+        {"name": "Marauiti Hut", "quote": "Marauiti Hut", "ref": "T9"},
+        {"name": "Bridge over the stream into Marauiti Bay", "quote": "the bridge over the stream running into Marauiti Bay", "ref": null},
+        {"name": "Te Totara Bay", "quote": "Te Totara Bay", "ref": "T14"},
+        {"name": "Waiharuru Hut", "quote": "Waiharuru Hut", "ref": "T17"},
+        {"name": "Neck of the Puketukutuku Peninsula", "quote": "the neck of the Puketukutuku Peninsula", "ref": null},
+        {"name": "Whanganui Stream", "quote": "Whanganui Stream", "ref": "T22"},
+        {"name": "Huiarau Stream", "quote": "Huiarau Stream", "ref": "T4"},
+        {"name": "Hopuruahine River flats", "quote": "Hopuruahine River flats", "ref": null},
+        {"name": "Hopuruahine suspension bridge", "quote": "Hopuruahine suspension bridge", "ref": null}
+      ],
+      "direction": null,
+      "time": "3 - 4 days",
+      "distance": "46 km one way",
+      "evidence": [
+        "Lake Waikaremoana can be walked either from Onepoto in the south or Hopuruahine in the north. It's not a circuit track and is described here from Onepoto.",
+        "The track starts from the Onepoto Shelter through the former Armed Constabulary Redoubt and climbs steadily up to the top of Panekire Bluff.",
+        "Waiharuru Hut and Campsite to Hopuruahine Landing (track start/end)",
+        "The track then follows the grassy Hopuruahine River flats to reach the Hopuruahine suspension bridge.",
+        "transport to and from the start and end of the track – the walk is one-way with the ends of the track around 30 km apart."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "Hopuruahine Landing (northern end)", "quote": "Hopuruahine landing", "ref": "T3", "onto": "Lake Waikaremoana Great Walk"}
+  ],
+  "side_trips": [
+    {"name": "Korokoro Falls", "quote": "Korokoro Falls", "ref": "T6", "from": "turn-off just before the Korokoro suspension bridge"},
+    {"name": "Edge of the Puketukutuku Peninsula", "quote": "at dusk you can go for a walk to the edge of the Puketukutuku Peninsula", "ref": null, "from": "Marauiti Hut"}
+  ],
+  "huts": [
+    {"name": "Panekire Hut", "quote": "Panekire Hut", "ref": "T12"},
+    {"name": "Waiopaoa Hut", "quote": "Waiopaoa Hut", "ref": "T20"},
+    {"name": "Marauiti Hut", "quote": "Marauiti Hut", "ref": "T9"},
+    {"name": "Waiharuru Hut", "quote": "Waiharuru Hut", "ref": "T17"}
+  ],
+  "not_on_route": [
+    {"name": "Korokoro Falls", "quote": "Korokoro Falls", "ref": "T6", "why": "side trip"},
+    {"name": "Whanganui Hut (closed)", "quote": "Whanganui Hut is closed", "ref": null, "why": "other"},
+    {"name": "Waikaremoana Holiday Park", "quote": "Waikaremoana Holiday Park", "ref": "L1", "why": "nearby"},
+    {"name": "Te Urewera Visitor Centre (Te Kura Whenua)", "quote": "Te Urewera Visitor Centre", "ref": null, "why": "nearby"},
+    {"name": "Tuai", "quote": "Tuai", "ref": "T15", "why": "nearby"}
+  ],
+  "doubts": "The page says the track can be walked from either end and is described from Onepoto, so the main way runs Onepoto to Hopuruahine Landing and Hopuruahine is recorded as the other access end. No road-end feature exists at Hopuruahine, so the end uses the place name T3 (Hopuruahine Landing). Korokoro Campsite and Maraunui Campsite are short distances off the main track but are leg ends in the description, so I kept them in via."
+}

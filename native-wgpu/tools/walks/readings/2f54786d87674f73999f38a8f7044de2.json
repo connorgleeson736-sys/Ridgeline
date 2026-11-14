@@ -1,0 +1,54 @@
+{
+  "guid": "2f54786d-8767-4f73-999f-38a8f7044de2",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Takahue Saddle Road to Makene Road",
+      "shape": "one_way",
+      "start": {"name": "junction of Takahue Saddle Road and Warner Road", "quote": "junction of Takahue Saddle Road and Warner Road", "ref": null},
+      "end": {"name": "Makene Road", "quote": "Makene Road", "ref": null},
+      "via": [
+        {"name": "old Takahue Saddle Road", "quote": "old Takahue Saddle Road", "ref": null},
+        {"name": "Mt Raetea summit", "quote": "Mt Raetea", "ref": "T7"},
+        {"name": "727 m high point junction", "quote": "727 m high point", "ref": null},
+        {"name": "Kumetewhiwhia", "quote": "Kumetewhiwhia", "ref": "T4"},
+        {"name": "Umaumakaroro", "quote": "Umaumakaroro", "ref": "T10"}
+      ],
+      "direction": null,
+      "time": "10-12 hr (allow extra time, may take much longer in poor track and weather conditions)",
+      "distance": "19 km one way",
+      "evidence": [
+        "The track starts at the junction of Takahue Saddle Road and Warner Road.",
+        "The track ends at Makene Road.",
+        "If you need transport back to Kaitaia, arrange this before you go."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "Alternative track exit via Mangamuka Summit Track to SH1",
+      "shape": "one_way",
+      "start": {"name": "junction of Takahue Saddle Road and Warner Road", "quote": "junction of Takahue Saddle Road and Warner Road", "ref": null},
+      "end": {"name": "SH1 in Mangamuka Gorge", "quote": "SH1 in Mangamuka Gorge", "ref": "F1"},
+      "via": [
+        {"name": "old Takahue Saddle Road", "quote": "old Takahue Saddle Road", "ref": null},
+        {"name": "Mt Raetea summit", "quote": "Mt Raetea", "ref": "T7"},
+        {"name": "727 m high point junction", "quote": "727 m high point", "ref": null},
+        {"name": "Mangamuka Summit Track", "quote": "Mangamuka Summit Track", "ref": "T2"}
+      ],
+      "direction": null,
+      "time": null,
+      "distance": null,
+      "evidence": [
+        "Alternative track exit: turn left at the 727 m high point and follow the Mangamuka Summit Track down through podocarp forest to end at SH1 in Mangamuka Gorge."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [],
+  "huts": [],
+  "not_on_route": [],
+  "doubts": "No feature is listed for the start (Takahue Saddle Road / Warner Road junction) or the end (Makene Road), so both have no ref."
+}

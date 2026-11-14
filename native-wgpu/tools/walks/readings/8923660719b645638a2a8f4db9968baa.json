@@ -1,0 +1,77 @@
+{
+  "guid": "89236607-19b6-4563-8a2a-8f4db9968baa",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Motatapu Track from Fern Burn carpark to Arrowtown",
+      "shape": "one_way",
+      "start": {"name": "Fern Burn carpark", "quote": "Fern Burn carpark", "ref": "F1"},
+      "end": {"name": "Arrowtown", "quote": "a 15 km 4WD road winds its way to Arrowtown", "ref": null},
+      "via": [
+        {"name": "Fern Burn", "quote": "along the true right of the Fern Burn", "ref": "T8"},
+        {"name": "Stack Conservation Area", "quote": "The track briefly enters the 4,144 ha Stack Conservation Area", "ref": null},
+        {"name": "Fern Burn Hut", "quote": "Fern Burn Hut", "ref": "T9"},
+        {"name": "Upper Fern Burn", "quote": "Upper Fern Burn", "ref": null},
+        {"name": "Jack Hall's Saddle", "quote": "1,275-m Jack Hall’s Saddle", "ref": null},
+        {"name": "Highland Creek", "quote": "descending to Highland Creek", "ref": "T12"},
+        {"name": "Highland Creek Hut", "quote": "Highland Creek Hut", "ref": "T13"},
+        {"name": "south-west ridge off Knuckle Peak", "quote": "the leading south-west ridge off Knuckle Peak", "ref": null},
+        {"name": "Motatapu River crossing", "quote": "Follow down this ridge to the Motatapu River and cross the river.", "ref": "T16"},
+        {"name": "Roses Hut", "quote": "Roses Hut", "ref": "T17"},
+        {"name": "main ridge above Roses Saddle", "quote": "the main ridge above 1,270 m Roses Saddle", "ref": null},
+        {"name": "Arrow River", "quote": "the ridge descends to the Arrow River", "ref": "T6"},
+        {"name": "Macetown", "quote": "Macetown", "ref": "T15"},
+        {"name": "Macetown Road (4WD road)", "quote": "Take the Macetown Road", "ref": "T3"}
+      ],
+      "direction": null,
+      "time": "3 - 4 days",
+      "distance": "49 km one way",
+      "evidence": [
+        "### Fern Burn carpark to Fern Burn Hut",
+        "The Fern Burn carpark and track start are signposted on this road.",
+        "### Macetown to Arrowtown",
+        "From Macetown, a 15 km 4WD road winds its way to Arrowtown."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "Alternative finish from Macetown via Big Hill Track to Arrowtown",
+      "shape": "one_way",
+      "start": {"name": "Fern Burn carpark", "quote": "Fern Burn carpark", "ref": "F1"},
+      "end": {"name": "Arrowtown", "quote": "Arrowtown", "ref": null},
+      "via": [
+        {"name": "Fern Burn Hut", "quote": "Fern Burn Hut", "ref": "T9"},
+        {"name": "Jack Hall's Saddle", "quote": "1,275-m Jack Hall’s Saddle", "ref": null},
+        {"name": "Highland Creek Hut", "quote": "Highland Creek Hut", "ref": "T13"},
+        {"name": "Roses Hut", "quote": "Roses Hut", "ref": "T17"},
+        {"name": "Macetown", "quote": "Macetown", "ref": "T15"},
+        {"name": "Big Hill Track", "quote": "An alternative route via Big Hill Track (4-5 hr) starts from the 4WD road 20 min from Macetown.", "ref": null}
+      ],
+      "direction": null,
+      "time": null,
+      "distance": null,
+      "evidence": [
+        "An alternative route via Big Hill Track (4-5 hr) starts from the 4WD road 20 min from Macetown.",
+        "Although this route avoids some of the larger river crossings, it climbs above 1000 m and is not recommended in adverse weather."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [],
+  "huts": [
+    {"name": "Fern Burn Hut", "quote": "Fern Burn Hut", "ref": "T9"},
+    {"name": "Highland Creek Hut", "quote": "Highland Creek Hut", "ref": "T13"},
+    {"name": "Roses Hut", "quote": "Roses Hut", "ref": "T17"}
+  ],
+  "not_on_route": [
+    {"name": "Spotts Creek track", "quote": "Spotts Creek", "ref": null, "why": "other walk"},
+    {"name": "Roys Peak track", "quote": "Roys Peak tracks", "ref": null, "why": "other walk"},
+    {"name": "Motatapu Valley", "quote": "stunning views across the Motatapu Valley", "ref": null, "why": "view"},
+    {"name": "Wakatipu Basin", "quote": "views over the Wakatipu Basin", "ref": null, "why": "view"},
+    {"name": "Glendhu Bay", "quote": "Glendhu Bay", "ref": "T10", "why": "other"}
+  ],
+  "doubts": "The Fern Burn carpark start is taken as F1 (where Motatapu Track meets Motatapu Road); the text only says the carpark is signposted on the Matukituki Valley road after turning off at Glendhu Bay. Arrowtown has no road-end feature, so the end is null. The track can be accessed from either end; recorded in the described direction. Between Roses Hut and Macetown there are two options (following the Arrow River, or a sidling track and water race if the river is high); both lead to Macetown. W2 is the Big Hill Track alternative for the last section (its 4-5 hr covers only that section); 'Big Hill Track' may be the map's Big Hill Walkway (T1) but the names differ, so no ref."
+}

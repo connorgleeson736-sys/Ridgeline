@@ -1,0 +1,81 @@
+{
+  "guid": "a7035d27-b444-4bb2-8bda-bfde827516e4",
+  "kind": "network",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Flagstaff Point Lookout",
+      "shape": "out_and_back",
+      "start": {"name": "Post Office Bay", "quote": "Track times given below are return times from Post Office Bay", "ref": null},
+      "end": {"name": "Flagstaff Point Lookout", "quote": "Flagstaff Point Lookout", "ref": "T3"},
+      "via": [],
+      "direction": null,
+      "time": "20 min return to Post Office Bay",
+      "distance": null,
+      "evidence": [
+        "Track times given below are return times from Post Office Bay but connected paths will allow you to return by a different route.",
+        "A short walk takes you up steps to the lookout with panoramic views back to Stewart Island/Rakiura.",
+        "You can choose to descend and return via Sydney Cove."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "Sydney Cove",
+      "shape": "out_and_back",
+      "start": {"name": "Post Office Bay", "quote": "Track times given below are return times from Post Office Bay", "ref": null},
+      "end": {"name": "Sydney Cove", "quote": "An easy walk brings you to a golden sand beach", "ref": "T8"},
+      "via": [],
+      "direction": null,
+      "time": "20 min return to Post Office Bay",
+      "distance": null,
+      "evidence": [
+        "Track times given below are return times from Post Office Bay but connected paths will allow you to return by a different route.",
+        "An easy walk brings you to a golden sand beach."
+      ]
+    },
+    {
+      "id": "W3",
+      "main": false,
+      "label": "Boulder Beach",
+      "shape": "out_and_back",
+      "start": {"name": "Post Office Bay", "quote": "Track times given below are return times from Post Office Bay", "ref": null},
+      "end": {"name": "Boulder Beach", "quote": "Boulder Beach takes its name from two massive boulders", "ref": "T2"},
+      "via": [],
+      "direction": null,
+      "time": "1 hr 30 min return to Post Office Bay",
+      "distance": null,
+      "evidence": [
+        "Track times given below are return times from Post Office Bay but connected paths will allow you to return by a different route.",
+        "Boulder Beach takes its name from two massive boulders now hidden in the forest covering the southern ridge above."
+      ]
+    },
+    {
+      "id": "W4",
+      "main": false,
+      "label": "West End Beach",
+      "shape": "out_and_back",
+      "start": {"name": "Post Office Bay", "quote": "Track times given below are return times from Post Office Bay", "ref": null},
+      "end": {"name": "West End Beach", "quote": "As you approach this most westerly of the island's beaches", "ref": "T11"},
+      "via": [],
+      "direction": null,
+      "time": "2 hr return to Post Office Bay",
+      "distance": null,
+      "evidence": [
+        "Track times given below are return times from Post Office Bay but connected paths will allow you to return by a different route.",
+        "As you approach this most westerly of the island's beaches, the heavier forest of the island merges into coastal plant communities."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [],
+  "huts": [],
+  "not_on_route": [
+    {"name": "Stewart Island/Rakiura", "quote": "panoramic views back to Stewart Island/Rakiura", "ref": null, "why": "view"},
+    {"name": "Halfmoon Bay", "quote": "Halfmoon Bay", "ref": "T5", "why": "nearby"},
+    {"name": "Golden Bay", "quote": "Golden Bay", "ref": "T4", "why": "nearby"},
+    {"name": "Paterson Inlet/Whaka a Te Wera", "quote": "Paterson Inlet/Whaka a Te Wera", "ref": "T7", "why": "view"}
+  ],
+  "doubts": "The page is a set of tracks from Post Office Bay (the main wharf), not one walk; W1 is marked main only because one way must be. Post Office Bay has no name or feature entry. The tracks are recorded as out-and-back because the times are 'return to Post Office Bay', but the page says connected paths allow returning by a different route (e.g. Flagstaff Point descending via Sydney Cove). The routes to Boulder Beach and West End Beach (via Sydney Cove and the four-way junction?) are not fully stated, so no via is given. The West End Beach / Boulder Beach loop ('an easy round trip of about three hours') is not recorded as a way because its start and order are not stated."
+}

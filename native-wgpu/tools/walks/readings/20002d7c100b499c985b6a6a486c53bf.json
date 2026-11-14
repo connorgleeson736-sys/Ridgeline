@@ -1,0 +1,117 @@
+{
+  "guid": "20002d7c-100b-499c-985b-6a6a486c53bf",
+  "kind": "loop",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Round the Mountain Track from Whakapapa Village, clockwise",
+      "shape": "loop",
+      "start": {"name": "Whakapapa Village, Ngauruhoe Place", "quote": "The track begins along Ngauruhoe Place, 100 m below Whakapapa Visitor Centre.", "ref": "F2"},
+      "end": {"name": "Whakapapa Village", "quote": "for the last 45 min to Whakapapa Village", "ref": "F2"},
+      "via": [
+        {"name": "Taranaki Falls", "quote": "Taranaki Falls", "ref": "T24"},
+        {"name": "Tama Saddle and Tama Lakes junction", "quote": "Tama Saddle and Tama Lakes junction", "ref": null},
+        {"name": "Waihohonu Stream", "quote": "down the Waihohonu Stream", "ref": "T29"},
+        {"name": "Waihohonu Hut", "quote": "Waihohonu Hut", "ref": "T28"},
+        {"name": "Tukino Mountain Road", "quote": "Tukino Mountain Road", "ref": null},
+        {"name": "Whangaehu River", "quote": "the Whangaehu River", "ref": null},
+        {"name": "Rangipo Hut", "quote": "Rangipo Hut", "ref": "T20"},
+        {"name": "Waihianoa Gorge", "quote": "Waihianoa Gorge", "ref": null},
+        {"name": "Mangaehuehu Hut", "quote": "Mangaehuehu Hut", "ref": "T16"},
+        {"name": "Waitonga Falls", "quote": "Waitonga Falls", "ref": "T31"},
+        {"name": "Rotokawa", "quote": "Rotokawa", "ref": "T21"},
+        {"name": "Waitonga Falls carpark", "quote": "Waitonga Falls carpark", "ref": "F6"},
+        {"name": "Ohakune Mountain Road", "quote": "Walk 3 km up the road to link up with the next section of Round the Mountain Track.", "ref": null},
+        {"name": "Wanganui Corner", "quote": "Wanganui Corner", "ref": "F7"},
+        {"name": "Makotuku Valley", "quote": "Makotuku Valley", "ref": null},
+        {"name": "the Cascades", "quote": "Mangaturuturu Valley via the Cascades", "ref": null},
+        {"name": "Mangaturuturu Hut", "quote": "Mangaturuturu Hut", "ref": "T17"},
+        {"name": "Mangaturuturu River", "quote": "Mangaturuturu River", "ref": null},
+        {"name": "Lake Surprise", "quote": "Lake Surprise", "ref": "T14"},
+        {"name": "Whakapapaiti Hut", "quote": "Whakapapaiti Hut", "ref": "T34"},
+        {"name": "Whakapapaiti River", "quote": "Whakapapaiti River", "ref": null},
+        {"name": "Silica Rapids Track", "quote": "Silica Rapids Track", "ref": null}
+      ],
+      "direction": "clockwise",
+      "time": "4 - 6 days",
+      "distance": "66.2 km loop",
+      "evidence": [
+        "You can walk the Round the Mountain Track in either direction; here we describe it going clockwise.",
+        "The track begins along Ngauruhoe Place, 100 m below Whakapapa Visitor Centre.",
+        "From here the track undulates for a number of easy climbs and descents before joining the well formed Silica Rapids Track, for the last 45 min to Whakapapa Village."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "Part of the track: Whakapapa Village to Ohakune Mountain Road, eastern side",
+      "shape": "one_way",
+      "start": {"name": "Whakapapa Village", "quote": "Whakapapa Village", "ref": "T33"},
+      "end": {"name": "Ohakune Mountain Road", "quote": "Ohakune Mountain Road", "ref": null},
+      "via": [
+        {"name": "Waihohonu Hut", "quote": "Waihohonu Hut", "ref": "T28"},
+        {"name": "Rangipo Hut", "quote": "Rangipo Hut", "ref": "T20"},
+        {"name": "Mangaehuehu Hut", "quote": "Mangaehuehu Hut", "ref": "T16"}
+      ],
+      "direction": null,
+      "time": null,
+      "distance": null,
+      "evidence": [
+        "You can also do a part of the track over 2 or 3 days, for example between Whakapapa Village and Ohakune Mountain Road on either the western or eastern side of Ruapehu."
+      ]
+    },
+    {
+      "id": "W3",
+      "main": false,
+      "label": "Part of the track: Whakapapa Village to Ohakune Mountain Road, western side",
+      "shape": "one_way",
+      "start": {"name": "Whakapapa Village", "quote": "Whakapapa Village", "ref": "T33"},
+      "end": {"name": "Ohakune Mountain Road", "quote": "Ohakune Mountain Road", "ref": null},
+      "via": [
+        {"name": "Whakapapaiti Hut", "quote": "Whakapapaiti Hut", "ref": "T34"},
+        {"name": "Mangaturuturu Hut", "quote": "Mangaturuturu Hut", "ref": "T17"}
+      ],
+      "direction": null,
+      "time": null,
+      "distance": null,
+      "evidence": [
+        "You can also do a part of the track over 2 or 3 days, for example between Whakapapa Village and Ohakune Mountain Road on either the western or eastern side of Ruapehu."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "Whakapapa Village entrance above Whakapapa Holiday Park (anti-clockwise)", "quote": "The track entrance is just above Whakapapa Holiday Park", "ref": null, "onto": "Whakapapaiti Hut"},
+    {"name": "Bruce Road entrance (Scoria Flat)", "quote": "there is an entrance 5 km further up Bruce Road from Whakapapa Village", "ref": "F1", "onto": "Whakapapaiti Hut"},
+    {"name": "Desert Road (SH1) parking area", "quote": "There is a parking area just off the Desert Road", "ref": null, "onto": "Waihohonu Hut"},
+    {"name": "Waitonga Falls carpark", "quote": "Waitonga Falls carpark (at 12 km - anti-clockwise direction)", "ref": "F6", "onto": null},
+    {"name": "Wanganui Corner", "quote": "Wanganui Corner (at 15 km - clockwise direction)", "ref": "F7", "onto": null},
+    {"name": "Waihohonu Track junction (Tongariro Northern Circuit)", "quote": "the Waihohonu Track junction", "ref": null, "onto": "Tongariro Northern Circuit"}
+  ],
+  "side_trips": [
+    {"name": "Tama Lakes", "quote": "Side trip: Tama Lakes", "ref": null, "from": "Tama Saddle and Tama Lakes junction"},
+    {"name": "Lower Tama", "quote": "20 min return to Lower Tama from the junction", "ref": "T15", "from": "Tama Lakes junction"},
+    {"name": "Upper Tama", "quote": "1.5 hr return to Upper Tama from the junction", "ref": "T26", "from": "Tama Lakes junction"},
+    {"name": "Historic Waihohonu Hut", "quote": "Side trip: Historic Waihohonu Hut", "ref": null, "from": "Round the Mountain Track, about 10 minutes before the new Waihohonu Hut"},
+    {"name": "Ohinepango Springs", "quote": "Side trip: Ohinepango Springs", "ref": null, "from": "Round the Mountain Track heading towards Rangipo Hut"},
+    {"name": "Blyth Hut", "quote": "Side trip: Blyth Hut", "ref": "T11", "from": "junction just east of Waitonga Falls"}
+  ],
+  "huts": [
+    {"name": "Waihohonu Hut", "quote": "Waihohonu Hut", "ref": "T28"},
+    {"name": "Rangipo Hut", "quote": "Rangipo Hut", "ref": "T20"},
+    {"name": "Mangaehuehu Hut", "quote": "Mangaehuehu Hut", "ref": "T16"},
+    {"name": "Mangaturuturu Hut", "quote": "Mangaturuturu Hut", "ref": "T17"},
+    {"name": "Whakapapaiti Hut", "quote": "Whakapapaiti Hut", "ref": "T34"}
+  ],
+  "not_on_route": [
+    {"name": "Blyth Hut", "quote": "Blyth Hut", "ref": "T11", "why": "side trip"},
+    {"name": "Historic Waihohonu Hut", "quote": "historic Waihohonu Hut", "ref": null, "why": "side trip"},
+    {"name": "Kaimanawa mountains", "quote": "views east to the Kaimanawa mountains", "ref": null, "why": "view"},
+    {"name": "Hauhungatahi", "quote": "views of Hauhungatahi", "ref": "T13", "why": "view"},
+    {"name": "Mangahuia Track", "quote": "the Mangahuia Track branches off to the left (to Mangahuia Campsite and SH47)", "ref": "T2", "why": "other walk"},
+    {"name": "Tongariro Northern Circuit", "quote": "Tongariro Northern Circuit", "ref": null, "why": "other walk"},
+    {"name": "Tukino Road", "quote": "This is not a regular access point for the track; it is the access road to Tukino ski field.", "ref": null, "why": "other"},
+    {"name": "Old Blyth Track", "quote": "Old Blyth Track", "ref": "T3", "why": "other"}
+  ],
+  "doubts": "The start is given as F2, one of two road-end features both named 'where Taranaki Falls Track meets NGAURUHOE TERRACE' (F2, F3, about 100 m apart, likely the Lower and Upper Taranaki Falls Track starts); the text calls the street Ngauruhoe Place, not Terrace. The loop actually finishes on the Silica Rapids Track at a different village entrance (just above Whakapapa Holiday Park), but end is set to the start ref because the loop returns to Whakapapa Village. The two Taranaki Falls options (Lower and Upper) are alternatives at the start and not separate ways. F6 (Waitonga Falls carpark) and F7 (Wanganui Corner) are assigned by their order up Ohakune Mountain Road (11-12 km and 15 km); the main way walks 3 km up the road between them. The junction before Whakapapaiti Hut offers a finish at Scoria Flat on Bruce Road instead of Whakapapa Village; not recorded as a separate way. W2/W3 are the page's example of doing part of the track over 2 or 3 days; their exact end point on Ohakune Mountain Road and their via are not stated, so the via lists only the huts on that side and end ref is null. T28 'Waihohonu Hut' is assumed to be the new hut, not the historic one. Old Blyth Track is an alternative exit to the 7 km point of Ohakune Mountain Road, not part of the described way."
+}

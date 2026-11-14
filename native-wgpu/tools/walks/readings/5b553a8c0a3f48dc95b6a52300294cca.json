@@ -1,0 +1,156 @@
+{
+  "guid": "5b553a8c-0a3f-48dc-95b6-a52300294cca",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Kapowairua (Spirits Bay) to Te Paki Stream",
+      "shape": "one_way",
+      "start": {"name": "Kapowairua (Spirits Bay)", "quote": "Kapowairua (Spirits Bay)", "ref": "T5"},
+      "end": {"name": "Te Paki Stream parking area", "quote": "the Te Paki Stream parking area and toilets", "ref": null},
+      "via": [
+        {"name": "Waitahora Lagoon", "quote": "Waitahora Lagoon", "ref": "T14"},
+        {"name": "Pandora", "quote": "Pandora", "ref": "T7"},
+        {"name": "Tapotupotu Bay", "quote": "Tapotupotu Bay", "ref": "T9"},
+        {"name": "Sandy Bay", "quote": "Sandy Bay", "ref": "T8"},
+        {"name": "Cape Reinga/Te Rerenga Wairua", "quote": "Cape Reinga/Te Rerenga Wairua", "ref": "T4"},
+        {"name": "Te Werahi Beach Track", "quote": "Te Werahi Beach Track", "ref": "T1"},
+        {"name": "Te Werahi Beach", "quote": "Te Werahi Beach", "ref": "T13"},
+        {"name": "Twilight Beach", "quote": "Twilight Beach", "ref": null},
+        {"name": "Te-Oneroa-a-Tōhē/Ninety Mile Beach", "quote": "Te-Oneroa-a-Tōhē/Ninety Mile Beach", "ref": null},
+        {"name": "Te Paki Stream", "quote": "Te Paki Stream", "ref": null}
+      ],
+      "direction": null,
+      "time": "4-5 days, see individual track descriptions for times",
+      "distance": "48 km total one way",
+      "evidence": [
+        "The track follows the coastline from Kapowairua (Spirits Bay) on the North-eastern Coast, past Cape Reinga/Te Rerenga Wairua (where the Te Araroa Trail starts) and finishes at Te Paki Stream on the West Coast.",
+        "Turn left and follow the stream inland through the dunes for another 1 hr 30 min until you come to the Te Paki Stream parking area and toilets.",
+        "The track ends here."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "Kapowairua (Spirits Bay) to Pandora",
+      "shape": "one_way",
+      "start": {"name": "Kapowairua campsite", "quote": "Kapowairua campsite", "ref": "T5"},
+      "end": {"name": "Pandora", "quote": "Pandora", "ref": "T7"},
+      "via": [
+        {"name": "Waitahora Lagoon", "quote": "Waitahora Lagoon", "ref": "T14"}
+      ],
+      "direction": null,
+      "time": "3 hr",
+      "distance": "9km one way",
+      "evidence": [
+        "This 3 hour walk along beautiful Spirits Bay takes you over Waitahora Lagoon to Pandora where you can stop to observe shore birds or camp for the night."
+      ]
+    },
+    {
+      "id": "W3",
+      "main": false,
+      "label": "Pandora to Tapotupotu Bay",
+      "shape": "one_way",
+      "start": {"name": "Pandora", "quote": "Pandora", "ref": "T7"},
+      "end": {"name": "Tapotupotu Bay", "quote": "Tapotupotu Bay", "ref": "T9"},
+      "via": [
+        {"name": "junction with Pandora Track", "quote": "a junction", "ref": null}
+      ],
+      "direction": null,
+      "time": "3 hr",
+      "distance": "9 km one way",
+      "evidence": [
+        "The track guides you up through vegetation, climbing steadily until you reach a junction.",
+        "The track eventually leads you back to the coastal cliffs with dozens of pohutukawa clinging to the rock faces before making your descent into Tapotupotu Bay."
+      ]
+    },
+    {
+      "id": "W4",
+      "main": false,
+      "label": "Tapotupotu to Cape Reinga/Te Rerenga Wairua",
+      "shape": "one_way",
+      "start": {"name": "western end of Tapotupotu Bay", "quote": "the western end of Tapotupotu Bay", "ref": "T9"},
+      "end": {"name": "Cape Reinga/Te Rerenga Wairua", "quote": "Cape Reinga/Te Rerenga Wairua", "ref": "T4"},
+      "via": [
+        {"name": "Sandy Bay", "quote": "Sandy Bay", "ref": "T8"}
+      ],
+      "direction": null,
+      "time": "3 hr",
+      "distance": "5 km one way",
+      "evidence": [
+        "The track starts at the western end of Tapotupotu Bay and climbs steeply for lovely views back towards the east along the coast or towards the Cape Reinga Lighthouse and Manawatāwhi/Three Kings Islands.",
+        "You will then follow the cliffs before descending into Sandy Bay."
+      ]
+    },
+    {
+      "id": "W5",
+      "main": false,
+      "label": "Cape Reinga to Te Werahi Beach Track",
+      "shape": "out_and_back",
+      "start": {"name": "Cape Reinga/Te Rerenga Wairua Lighthouse Walk", "quote": "the Cape Reinga/Te Rerenga Wairua Lighthouse Walk", "ref": null},
+      "end": {"name": "Te Werahi Beach", "quote": "Te Werahi Beach", "ref": "T13"},
+      "via": [
+        {"name": "Te Werahi Beach Track", "quote": "Te Werahi Beach Track", "ref": "T1"}
+      ],
+      "direction": null,
+      "time": "45 min return",
+      "distance": "2 km return",
+      "evidence": [
+        "From the Cape Reinga/Te Rerenga Wairua Lighthouse Walk, this 2 km track heads west , leading you down past steep cliffs to the long, sweeping Te Werahi Beach."
+      ]
+    },
+    {
+      "id": "W6",
+      "main": false,
+      "label": "Te Werahi Beach to Twilight Beach",
+      "shape": "one_way",
+      "start": {"name": "Te Werahi Beach", "quote": "Te Werahi Beach", "ref": "T13"},
+      "end": {"name": "Twilight Beach", "quote": "Twilight Beach", "ref": null},
+      "via": [],
+      "direction": null,
+      "time": "3 hr",
+      "distance": "7.25 km one way",
+      "evidence": [
+        "Experience dune landscapes and views of Cape Maria van Diemen and Motuopao Island on this 3 hour track to Twilight Beach."
+      ]
+    },
+    {
+      "id": "W7",
+      "main": false,
+      "label": "Twilight Beach to Te Paki Stream",
+      "shape": "one_way",
+      "start": {"name": "south end of Twilight Beach", "quote": "the south end of Twilight Beach", "ref": null},
+      "end": {"name": "Te Paki Stream parking area", "quote": "the Te Paki Stream parking area and toilets", "ref": null},
+      "via": [
+        {"name": "Te-Oneroa-a-Tōhē/Ninety Mile Beach", "quote": "Te-Oneroa-a-Tōhē/Ninety Mile Beach", "ref": null},
+        {"name": "Te Paki Stream", "quote": "Te Paki Stream", "ref": null}
+      ],
+      "direction": null,
+      "time": "4 hr 30 min",
+      "distance": "11 km one way",
+      "evidence": [
+        "Exit the south end of Twilight Beach following the orange markers.",
+        "Turn left and follow the stream inland through the dunes for another 1 hr 30 min until you come to the Te Paki Stream parking area and toilets.",
+        "The track ends here."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "Te Paki Stream car park", "quote": "Te Paki Stream – turn off SH1 at Te Paki onto Te Paki Stream Road approximately 5 km north of Waitiki and follow 4km of gravel road to car park", "ref": null, "onto": null}
+  ],
+  "side_trips": [
+    {"name": "Cape Maria Van Diemen", "quote": "Cape Maria Van Diemen", "ref": "T2", "from": "turnoff about 1 hr from Te Werahi Beach"}
+  ],
+  "huts": [],
+  "not_on_route": [
+    {"name": "Pandora Track to SH1", "quote": "Pandora Track", "ref": null, "why": "other walk"},
+    {"name": "Cape Reinga lighthouse", "quote": "Cape Reinga lighthouse", "ref": null, "why": "view"},
+    {"name": "Manawatāwhi/Three Kings Islands", "quote": "Manawatāwhi/Three Kings Islands", "ref": null, "why": "view"},
+    {"name": "Motuopao Island", "quote": "Motuopao Island", "ref": "T6", "why": "view"},
+    {"name": "Te Paki Farm", "quote": "Te Paki Farm", "ref": null, "why": "view"},
+    {"name": "Ahipara", "quote": "Ahipara", "ref": null, "why": "other"},
+    {"name": "Waitiki", "quote": "Waitiki", "ref": null, "why": "nearby"}
+  ],
+  "doubts": "The page offers the whole 48 km track or any of its sections; the six sections with their own time and distance are recorded as further ways. No road-end features are in the packet, so the Te Paki Stream end and Twilight Beach have no ref. Cape Reinga/Te Rerenga Wairua is given T4 (the coast entry with that exact name); T3 'Cape Reinga' (place) is a nearby alternative, and the start of the Te Werahi Beach section is the Lighthouse Walk, left without a ref. The Cape Reinga to Te Werahi Beach section is given as '45 min return', so recorded as out and back, although in the full walk it is walked one way. Kapowairua is the place entry T5; the text starts at Kapowairua campsite, which has no separate entry. Vehicle access is also listed at Tapotupotu and Cape Reinga, which are section starts."
+}

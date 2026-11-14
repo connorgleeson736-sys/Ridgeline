@@ -1,0 +1,54 @@
+{
+  "guid": "264819cc-3f92-4f3c-90d6-bdcb9bb44f19",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Birchwood Road to Lake Hāwea (Tīmaru Creek Road)",
+      "shape": "one_way",
+      "start": {"name": "Birchwood Road carpark", "quote": "The track starts at the carpark on Birchwood Road", "ref": "F3"},
+      "end": {"name": "Tīmaru Creek Road, Lake Hāwea", "quote": "Tīmaru Creek Road", "ref": "F1"},
+      "via": [
+        {"name": "Avon Burn", "quote": "Avon Burn", "ref": "T8"},
+        {"name": "Tin Hut (private)", "quote": "Tin Hut (private)", "ref": null},
+        {"name": "Mt Martha Saddle", "quote": "Mt Martha Saddle", "ref": null},
+        {"name": "Top Tīmaru Hut", "quote": "Top Tīmaru Hut", "ref": "T18"},
+        {"name": "Tīmaru River track junction", "quote": "Tīmaru River track junction", "ref": null},
+        {"name": "Stodys Hut", "quote": "Stodys Hut", "ref": "T17"},
+        {"name": "Breast Hill", "quote": "Breast Hill", "ref": "T9"},
+        {"name": "Pakituhi Hut", "quote": "Pakituhi Hut", "ref": "T16"}
+      ],
+      "direction": null,
+      "time": "3 days",
+      "distance": null,
+      "evidence": [
+        "The track starts at the carpark on Birchwood Road.",
+        "It then zig-zags down, ending at Tīmaru Creek Road, on the edge of Lake Hāwea, around 1km from Johns Creek township or approximately 6 km from Lake Hāwea township.",
+        "From the Breast Hill summit, the track follows the ridge to Pakituhi Hut."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "Lake Hawea side carpark", "quote": "From the Lake Hawea side, the start of the track is located approximately 6 km from the Lake Hawea Township on the unsealed Tīmaru River Road", "ref": "F1", "onto": "Breast Hill Track"},
+    {"name": "Melina Ridge Track", "quote": "Melina Ridge Track", "ref": "L2", "onto": "Mt Prospect Track to Top Tīmaru Hut"},
+    {"name": "Lower Tīmaru River Track", "quote": "Lower Tīmaru River Track", "ref": "L4", "onto": null},
+    {"name": "Grandview Ridge Tracks", "quote": "Grandview Ridge Tracks", "ref": "L3", "onto": null},
+    {"name": "Grandview Mountain Track", "quote": "Grandview Mountain Track", "ref": "L1", "onto": "Pakituhi Hut"}
+  ],
+  "side_trips": [
+    {"name": "Mt Prospect", "quote": "Mt Prospect", "ref": "T15", "from": "Top Tīmaru Hut"}
+  ],
+  "huts": [
+    {"name": "Tin Hut (private)", "quote": "Tin Hut (private)", "ref": null},
+    {"name": "Top Tīmaru Hut", "quote": "Top Tīmaru Hut", "ref": "T18"},
+    {"name": "Stodys Hut", "quote": "Stodys Hut", "ref": "T17"},
+    {"name": "Pakituhi Hut", "quote": "Pakituhi Hut", "ref": "T16"}
+  ],
+  "not_on_route": [
+    {"name": "Johns Creek township", "quote": "Johns Creek township", "ref": null, "why": "nearby"},
+    {"name": "Lake Hāwea township", "quote": "Lake Hāwea township", "ref": "T12", "why": "nearby"},
+    {"name": "Mt Melina track", "quote": "Mt Melina track", "ref": "T6", "why": "other walk"}
+  ],
+  "doubts": "The end is given as Tīmaru Creek Road on the edge of Lake Hāwea; F1 (unnamed track meeting Timaru Creek Road) is taken as this, not F2 which is the Lower Timaru River Track's road end. Overall distance is not stated (section distances only). Tin Hut is private and only said to be passed. The Alternative route (Melina Ridge Track then Mt Prospect Track to Top Tīmaru Hut) and the listed Alternative exits (Lower Tīmaru River Track, Grandview Ridge Tracks, Grandview Mountain Track) are recorded as access points since the text gives no start/end detail for them as ways; the Grandview Ridge tracks are also said to bypass Breast Hill. The Getting there text says the track can be started from the Lake Hawea side, which is the main way's end. Mt Martha Saddle has no matching entry (T13 is the peak)."
+}

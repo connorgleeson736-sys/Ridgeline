@@ -1,0 +1,60 @@
+{
+  "guid": "cecc2bb5-17ec-4579-9b50-85ea41461949",
+  "kind": "network",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Dawson Falls - Stratford Plateau Track",
+      "shape": "one_way",
+      "start": {"name": "Dawson Falls car park", "quote": "Dawson Falls", "ref": "T8"},
+      "end": {"name": "The Plateau car park at East Egmont", "quote": "The Plateau car park at East Egmont", "ref": null},
+      "via": [
+        {"name": "Wilkies Pools Loop Track", "quote": "Wilkies Pools Loop Track", "ref": "L1"},
+        {"name": "Junction with the Around the Mountain Track", "quote": "the junction with the high level Around the Mountain Track", "ref": null}
+      ],
+      "direction": null,
+      "time": "1 hr 20 min to the Plateau",
+      "distance": "3.1 km",
+      "evidence": [
+        "These tracks start in Dawson Falls.",
+        "Take the Wilkies Pools Loop Track from the car park, walking through forest before arriving at the series of pools and cascades scoured out of the lava.",
+        "Continue past the pools until you come to the junction with the high level Around the Mountain Track, turn left toward the Plateau and climb northeast into mountain totara and cedar before emerging in subalpine scrub near The Plateau car park at East Egmont."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "Dawson Falls - Stratford Plateau - Enchanted Track - Waingongoro Track",
+      "shape": "loop",
+      "start": {"name": "Dawson Falls car park", "quote": "Dawson Falls", "ref": "T8"},
+      "end": {"name": "Dawson Falls visitor centre", "quote": "the visitor centre", "ref": "T8"},
+      "via": [
+        {"name": "Wilkies Pools Loop Track", "quote": "Wilkies Pools Loop Track", "ref": "L1"},
+        {"name": "Track toward the Stratford Plateau", "quote": "the track on toward the Stratford Plateau", "ref": null},
+        {"name": "Enchanted Track", "quote": "Enchanted Track", "ref": "T1"},
+        {"name": "Track toward Waingongoro Hut", "quote": "head in the direction of Waingongoro Hut", "ref": null},
+        {"name": "Swingbridge over the Waingongoro Stream", "quote": "the swingbridge over the Waingongoro Stream", "ref": null},
+        {"name": "Ridge Track junction", "quote": "Ridge Track junction", "ref": "T4"}
+      ],
+      "direction": null,
+      "time": "3 hr 30 min to 4 hr return",
+      "distance": "7.8 km",
+      "evidence": [
+        "Take the Wilkies Pools Loop Track from the car park, then the track on toward the Stratford Plateau. Descend the steep Enchanted Track.",
+        "Cross the unbridged stream and turning at the bottom to head in the direction of Waingongoro Hut.",
+        "After crossing the swingbridge over the Waingongoro Stream, either take a 5 minute detour to Waingongoro Hut, or head uphill, climbing the rough track steadily uphill to the Ridge Track junction. From here follow signs back to the visitor centre."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [
+    {"name": "Waingongoro Hut", "quote": "Waingongoro Hut", "ref": "T11", "from": "swingbridge over the Waingongoro Stream"}
+  ],
+  "huts": [],
+  "not_on_route": [
+    {"name": "Waingongoro Hut", "quote": "Waingongoro Hut", "ref": "T11", "why": "side trip"},
+    {"name": "Kapuni Track", "quote": "Kapuni Track", "ref": null, "why": "other"}
+  ],
+  "doubts": "Page covers two tracks ('tracks'), recorded as a network with two ways. Start: the text says only 'the car park' and 'These tracks start in Dawson Falls'; no road-end feature names the Wilkies Pools Loop Track, so I gave the Dawson Falls place (T8) rather than one of the Manaia Road road ends (F1-F3). W1 end: 'The Plateau car park at East Egmont' could be F5 (Enchanted Track meets Pembroke Road, which the W2 route suggests is near the Plateau) or F6/T9 (East Egmont, Patea Loop Track meets Pembroke Road); they are about 2 km apart, so left null. W2 is treated as a loop because it returns to the visitor centre by the Waingongoro/Ridge Track route, though its time says 'return'. Not sure W2 reaches the Plateau itself before descending the Enchanted Track. Flood detours (upper Wilkies Pools Track bridge, Ridge Track/Kapuni Track bridge) not recorded as ways."
+}

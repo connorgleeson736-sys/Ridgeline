@@ -19,6 +19,7 @@ internal object DocPages {
     /** The words of [blocks] (photos' captions are not the walk's text). */
     fun words(blocks:List<Block>)=blocks.filter{it !is Image}
     private val image=Regex("""<img\b[^>]*?\bsrc\s*=\s*"?([^"\s>]+)"?[^>]*?(?:\bwidth\s*=\s*"?(\d+))?[^>]*>""",RegexOption.IGNORE_CASE)
+    private val larger=Regex("""<a\b[^>]*?\bhref\s*=\s*"?([^"\s>]+\.(?:jpe?g|png|webp))"?""",RegexOption.IGNORE_CASE)
     private val seeLarger=Regex("""\s*See larger\s*\([^)]*\)\s*""",RegexOption.IGNORE_CASE)
     data class Section(val title:String,val blocks:List<Block>)
 
@@ -146,7 +147,9 @@ internal object DocPages {
                 // the photo, its caption and credit (not icons or "See larger" links).
                 val img=image.find(e.groupValues[2])
                 if(img!=null&&(img.groupValues[2].toIntOrNull()?:400)>=120){
-                    val src=img.groupValues[1].trim();val url=if(src.startsWith("/"))SITE+src.removePrefix("/")else src
+                    // DOC's larger version when the photo links to one ("See larger": Cave Stream's
+                    // 390 px photo links to 1920 px); most are published only at 300-600 px.
+                    val src=(larger.find(e.groupValues[2])?.groupValues?.get(1)?:img.groupValues[1]).trim();val url=if(src.startsWith("/"))SITE+src.removePrefix("/")else src
                     val caption=text(e.groupValues[2]).lines().map{it.replace(seeLarger,"").trim()}.filter{it.isNotEmpty()}.joinToString("\n")
                     if(url.startsWith("https://"))blocks.add(Image(url,caption))
                     continue

@@ -1,0 +1,36 @@
+{
+  "guid": "54ce2667-09f2-4cd3-a3ad-37d0d81bb5c9",
+  "kind": "out_and_back",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Mount Aicken Track to the bushline",
+      "shape": "out_and_back",
+      "start": {"name": "Devils Punchbowl Walking Track at the northern end of Arthur's Pass village", "quote": "Start on the Devils Punchbowl Walking Track at the northern end of Arthur's Pass village", "ref": "F4"},
+      "end": {"name": "bushline", "quote": "This track ends at the bushline", "ref": null},
+      "via": [
+        {"name": "Devils Punchbowl Walking Track", "quote": "Devils Punchbowl Walking Track", "ref": "T2"},
+        {"name": "signposted turnoff", "quote": "The turnoff is signposted 15 min up the Devils Punchbowl Walking Track", "ref": null},
+        {"name": "old pipeline", "quote": "The track passes an old pipeline", "ref": null}
+      ],
+      "direction": null,
+      "time": "2-4 hr return to the bushline",
+      "distance": "2.8 km (540 vertical climb) to the bushline return via same track",
+      "evidence": [
+        "Start on the Devils Punchbowl Walking Track at the northern end of Arthur's Pass village, just off SH73.",
+        "The turnoff is signposted 15 min up the Devils Punchbowl Walking Track.",
+        "The track passes an old pipeline that fed an electricity generator used during the rail tunnel construction, then climbs steeply to the bushline.",
+        "This track ends at the bushline as there have been multiple fatalities from inexperienced trampers/walkers falling to their deaths."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [],
+  "huts": [],
+  "not_on_route": [
+    {"name": "Mount Aicken summit", "quote": "Mount Aicken summit", "ref": "T8", "why": "other"},
+    {"name": "Avalanche Peak", "quote": "Avalanche Peak is an alternative trip", "ref": "T7", "why": "other walk"}
+  ],
+  "doubts": "Start ref F4 is the only road end on the Devils Punchbowl Walking Track near the village, but its road is labelled 'Otira Railway Tunnel', not SH73; chosen as the track's start in the village. The text gives no named place for the end beyond 'the bushline'. Shape taken from DOC's distance 'return via same track'."
+}

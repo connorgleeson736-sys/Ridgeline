@@ -1,0 +1,37 @@
+{
+  "guid": "2452d706-2295-47a9-ad10-b87260381c79",
+  "kind": "out_and_back",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Devils Punchbowl Falls car park to the viewing platform near the base of the waterfall",
+      "shape": "out_and_back",
+      "start": {"name": "Devils Punchbowl Falls car park", "quote": "Devils Punchbowl Walking Track is signposted from Devils Punchbowl Falls car park", "ref": "F2"},
+      "end": {"name": "Viewing platform near the base of Devils Punchbowl Falls", "quote": "a viewing platform near the base of the waterfall", "ref": "T9"},
+      "via": [
+        {"name": "Devils Punchbowl Walking Track", "quote": "Devils Punchbowl Walking Track", "ref": "T1"},
+        {"name": "Wardens Creek", "quote": "There’s an unbridged stream crossing at Wardens Creek", "ref": "T10"},
+        {"name": "Bealey River bridge", "quote": "the first bridge across the Bealey River", "ref": "T7"},
+        {"name": "Devils Punchbowl Creek bridge", "quote": "a second bridge crosses Devils Punchbowl Creek", "ref": "T8"}
+      ],
+      "direction": null,
+      "time": "1 hr return",
+      "distance": "2 km return via same track",
+      "evidence": [
+        "Devils Punchbowl Walking Track is signposted from Devils Punchbowl Falls car park.",
+        "The track then climbs steeply up through native mountain beech/tāwhairauriki forest to a viewing platform near the base of the waterfall.",
+        "Return to the car park the same way you came."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [],
+  "huts": [],
+  "not_on_route": [
+    {"name": "Arthur's Pass National Park Visitor Centre", "quote": "Arthur’s Pass National Park Visitor Centre (5 min by car)", "ref": null, "why": "nearby"},
+    {"name": "Avalanche Creek Shelter Campsite", "quote": "Avalanche Creek Shelter Campsite (5 min by car)", "ref": "L1", "why": "nearby"},
+    {"name": "Arthur's Pass Village", "quote": "Arthur’s Pass Village", "ref": "T2", "why": "nearby"}
+  ],
+  "doubts": "Start ref F2 is the road end where Devils Punchbowl Walking Track meets a road (named on the map as Otira Railway Tunnel); the text names only the car park off SH73 at the northern end of Arthur's Pass Village. End ref T9 is the waterfall point; the text's end is a viewing platform near the base of the waterfall. Order of Wardens Creek before the Bealey River bridge is from the hazards note ('Wardens Creek can flood the track before Bealey River bridge'); the bridge refs are the rivers they cross."
+}

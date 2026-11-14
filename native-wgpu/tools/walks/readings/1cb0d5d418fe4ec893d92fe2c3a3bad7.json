@@ -1,0 +1,52 @@
+{
+  "guid": "1cb0d5d4-18fe-4ec8-93d9-2fe2c3a3bad7",
+  "kind": "out_and_back",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Car park to historic tunnel and Tunnel Beach",
+      "shape": "out_and_back",
+      "start": {"name": "Tunnel Beach car park", "quote": "The car park is at the end of the road.", "ref": "F1"},
+      "end": {"name": "Tunnel Beach", "quote": "A short tunnel with steps leads down to Tunnel Beach.", "ref": "T5"},
+      "via": [
+        {"name": "first viewpoint", "quote": "Continue past the first viewpoint", "ref": null},
+        {"name": "historic tunnel", "quote": "A short tunnel with steps", "ref": null}
+      ],
+      "direction": null,
+      "time": "1 hr return",
+      "distance": "2.6 km return via same track",
+      "evidence": [
+        "Return to the car park the same way you came.",
+        "Continue past the first viewpoint and down to the spectacular rocky coastline. A short tunnel with steps leads down to Tunnel Beach.",
+        "From Blackhead Road, take the signposted turnoff to Tunnel Beach Road. The car park is at the end of the road."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "Car park to viewpoint",
+      "shape": "out_and_back",
+      "start": {"name": "Tunnel Beach car park", "quote": "Car park to viewpoint", "ref": "F1"},
+      "end": {"name": "first viewpoint", "quote": "Follow the well-formed path to the first viewpoint", "ref": null},
+      "via": [],
+      "direction": null,
+      "time": "10 min",
+      "distance": "600 m",
+      "evidence": [
+        "For an easy walk, stop at the first viewpoint and enjoy the view.",
+        "Follow the well-formed path to the first viewpoint for dramatic views of the headland, coastline and a natural rock archway."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "bus stop at 292 Middleton Road, Corstorphine", "quote": "the closest parking is by the bus stop at 292 Middleton Road, Corstorphine", "ref": null, "onto": "Tunnel Beach Road (footpath to the track entrance)"}
+  ],
+  "side_trips": [],
+  "huts": [],
+  "not_on_route": [
+    {"name": "Dunedin", "quote": "15 min by car from Dunedin", "ref": null, "why": "nearby"},
+    {"name": "Concord", "quote": "Concord", "ref": "T3", "why": "nearby"}
+  ],
+  "doubts": "Start taken as F1 (where Tunnel Beach Walkway meets Tunnel Beach Road), matching 'The car park is at the end of the road.' W2 time/distance come from the line '600 m / 10 min (return)', split into its parts. The Middleton Road bus stop is alternative parking reached by a 25 min road footpath walk to the track entrance; it is listed as an access point but is not on a track."
+}

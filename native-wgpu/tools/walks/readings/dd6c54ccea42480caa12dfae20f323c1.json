@@ -1,0 +1,61 @@
+{
+  "guid": "dd6c54cc-ea42-480c-aa12-dfae20f323c1",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Toaroha road end over the Toaroha Range and Lathrop Saddle to Lake Kaniere Road",
+      "shape": "one_way",
+      "start": {"name": "Toaroha road end car park", "quote": "Roadend", "ref": "F2"},
+      "end": {"name": "car park at Lake Kaniere Road", "quote": "the carpark at the Lake Kaniere Road", "ref": null},
+      "via": [
+        {"name": "Toaroha Canyon", "quote": "Toaroha Canyon", "ref": "T12"},
+        {"name": "Cedar Flat Hut", "quote": "Cedar Flat Hut", "ref": "T3"},
+        {"name": "Adventure Ridge Bivouac", "quote": "Adventure Ridge Bivouac", "ref": null},
+        {"name": "Toaroha Range", "quote": "Toaroha Range", "ref": "T13"},
+        {"name": "Kokatahi River", "quote": "Kokatahi River", "ref": "T7"},
+        {"name": "Top Kokatahi Hut", "quote": "Top Kokatahi Hut", "ref": "T16"},
+        {"name": "Crawford Junction Hut", "quote": "Crawford Junction Hut", "ref": "T5"},
+        {"name": "Crawford Creek", "quote": "Crawford Creek", "ref": "T4"},
+        {"name": "Farquharson Creek", "quote": "Farquharson Creek", "ref": "T6"},
+        {"name": "Top Crawford Hut", "quote": "Top Crawford Hut", "ref": "T15"},
+        {"name": "Lathrop Saddle", "quote": "Lathrop Saddle", "ref": "T8"},
+        {"name": "Browning Bivouac", "quote": "Browning Bivouac", "ref": null},
+        {"name": "Styx Valley track", "quote": "Styx Valley track", "ref": null},
+        {"name": "Grassy Flats Hut", "quote": "Grassy Flats Hut", "ref": null},
+        {"name": "Mid Styx Hut", "quote": "Mid Styx Hut", "ref": "T9"},
+        {"name": "Tyndall Creek", "quote": "Tyndall Creek", "ref": "T17"},
+        {"name": "Styx River", "quote": "Styx River", "ref": "T11"}
+      ],
+      "direction": null,
+      "time": "3-4 days",
+      "distance": null,
+      "evidence": [
+        "From the car park follow the rough farm road down to river level, then pick up the orange triangular markers and follow these across the open flats to the bush line and the start of the track.",
+        "Turn off the Kokatahi/Lake Kaniere circuit road at the signpost 'Access to Toaroha Valley', cross the bridge over the Kokatahi River and follow the road as far as your vehicle will allow.",
+        "The Styx is crossed again to and an old farm track leads to the carpark at the Lake Kaniere Road."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [
+    {"name": "hot springs up Wren Creek", "quote": "Wren Creek", "ref": "T18", "from": "Cedar Flat Huts"}
+  ],
+  "huts": [
+    {"name": "Cedar Flat Hut", "quote": "Cedar Flat Hut", "ref": "T3"},
+    {"name": "Adventure Ridge Bivouac", "quote": "Adventure Ridge Bivouac", "ref": null},
+    {"name": "Top Kokatahi Hut", "quote": "Top Kokatahi Hut", "ref": "T16"},
+    {"name": "Crawford Junction Hut", "quote": "Crawford Junction Hut", "ref": "T5"},
+    {"name": "Top Crawford Hut", "quote": "Top Crawford Hut", "ref": "T15"},
+    {"name": "Browning Bivouac", "quote": "Browning Bivouac", "ref": null},
+    {"name": "Grassy Flats Hut", "quote": "Grassy Flats Hut", "ref": null},
+    {"name": "Mid Styx Hut", "quote": "Mid Styx Hut", "ref": "T9"}
+  ],
+  "not_on_route": [
+    {"name": "Zit Saddle", "quote": "Zit Saddle", "ref": "T20", "why": "other"},
+    {"name": "Arahura Track", "quote": "Arahura Track", "ref": null, "why": "other walk"},
+    {"name": "Snowball Creek", "quote": "Snowball Creek", "ref": "T10", "why": "other"}
+  ],
+  "doubts": "Start: the text names no road; F2 (an unnamed track meeting Middlebranch Road) lies south of the Kokatahi River and east of the Toaroha River, which fits the access 'cross the bridge over the Kokatahi River' and a track up the true right of the Toaroha, but the feature is not named in the text, so the ref is likely rather than certain. F1 is at the Cedar Flat Bridge, not the road end. End: no feature for the car park at Lake Kaniere Road, so null. The route crosses the Toaroha Range ridgeline 'about 500 m north of Zit Saddle', so Zit Saddle itself is not listed on the way despite the route's name. Grassy Flats Hut is 5 minutes upstream of the Styx Valley track junction and the next section starts there, so it is included. The Arahura valley is mentioned as an alternative for parties not confident crossing the Styx, but not described as a way."
+}

@@ -1,0 +1,41 @@
+{
+  "guid": "c832a31e-b1ec-48d9-a46b-b760d9859c92",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Mangahao Road to Poulton Drive car park",
+      "shape": "one_way",
+      "start": {"name": "parking area on Mangahao Road", "quote": "parking area on Mangahao Road", "ref": null},
+      "end": {"name": "Poulton Drive car park", "quote": "Poulton Drive car park", "ref": "F1"},
+      "via": [
+        {"name": "Blackwood Stream", "quote": "Blackwood Stream", "ref": "T1"},
+        {"name": "Makahika Ridge", "quote": "Makahika Ridge", "ref": null},
+        {"name": "Horowhenua Lookout", "quote": "Horowhenua Lookout", "ref": null},
+        {"name": "Kāpiti Viewpoint", "quote": "Kāpiti Viewpoint", "ref": null},
+        {"name": "historic Makahika tramline", "quote": "historic Makahika tramline", "ref": null},
+        {"name": "Makahika Stream", "quote": "Makahika Stream", "ref": "T4"}
+      ],
+      "direction": null,
+      "time": "6 - 7 hrs going south, 7- 8 hrs going north",
+      "distance": "13 km one way",
+      "evidence": [
+        "From the parking area on Mangahao Road, the track enters the bush and climbs to a low spur, where an orientation sign is located.",
+        "The track ends at the Poulton Drive car park.",
+        "400 m past the Tararua Forest Park sign is a small parking area. This is the start of the track.",
+        "It is a further 1.9 km along Gladstone Road Poulton Drive junction to the carpark and start of the track."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [],
+  "huts": [],
+  "not_on_route": [
+    {"name": "Mangaore Stream", "quote": "Mangaore Stream", "ref": null, "why": "view"},
+    {"name": "Kāpiti", "quote": "Kāpiti", "ref": null, "why": "view"},
+    {"name": "Shannon", "quote": "Shannon", "ref": null, "why": "view"},
+    {"name": "Arapaepae Lookout Trail", "quote": "Arapaepae Lookout Trail", "ref": null, "why": "other walk"}
+  ],
+  "doubts": "No feature or name entry for the Mangahao Road parking area, so the start has no ref. The track can be walked in either direction (times given going south and north); the description runs south from Mangahao Road. Makahika Ridge is not clearly the 'Makahika' peak entry, so left without ref."
+}

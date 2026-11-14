@@ -1,0 +1,39 @@
+{
+  "guid": "f0215e07-0d91-42ab-ad56-4a96a0018529",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Bush Stream car park to skifield road car park",
+      "shape": "one_way",
+      "start": {"name": "Bush Stream car park", "quote": "Bush Stream car park to Crooked Spur Hut", "ref": null},
+      "end": {"name": "skifield road car park", "quote": "Camp Stream Hut to skifield road car park", "ref": null},
+      "via": [
+        {"name": "Crooked Spur Hut", "quote": "Crooked Spur Hut", "ref": "T8"},
+        {"name": "Stone Hut", "quote": "Crooked Spur Hut to Stone Hut", "ref": "T13"},
+        {"name": "Royal Hut", "quote": "Stone Hut to Royal Hut", "ref": "L1"},
+        {"name": "Stag Saddle", "quote": "Royal Hut to Stag Saddle", "ref": "T12"},
+        {"name": "Camp Stream Hut", "quote": "Stag Saddle to Camp Stream Hut", "ref": "T5"}
+      ],
+      "direction": null,
+      "time": "2-3 days",
+      "distance": null,
+      "evidence": [
+        "Bush Stream car park to Crooked Spur Hut",
+        "Stag Saddle to Camp Stream Hut",
+        "Camp Stream Hut to skifield road car park"
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [],
+  "huts": [
+    {"name": "Crooked Spur Hut", "quote": "Crooked Spur Hut", "ref": "T8"},
+    {"name": "Stone Hut", "quote": "Stone Hut", "ref": "T13"},
+    {"name": "Royal Hut", "quote": "Royal Hut", "ref": "L1"},
+    {"name": "Camp Stream Hut", "quote": "Camp Stream Hut", "ref": "T5"}
+  ],
+  "not_on_route": [],
+  "doubts": "Neither the Bush Stream car park nor the skifield road car park matches a feature with confidence (the Lilybank Road ends F1/F2 and the ski tow ends F3/F4 are not clearly either), so both refs are null. The page does not say 'arrange transport', but the walking-time legs run from one car park to a different one, so the shape is taken as one way. Between Stag Saddle and Camp Stream Hut there are two routes (a poled valley-floor route and an informal ridgeline route); which the main way uses is not fixed. The track also reaches Bush Stream (Sawtooth Bluff) and Coal River, but their order is not given in the legs, so they are not listed as via."
+}

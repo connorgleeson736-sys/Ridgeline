@@ -1,0 +1,47 @@
+{
+  "guid": "6246caac-2b0d-4fee-87c7-7e0ecaeb2440",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Otago Central Rail Trail, Middlemarch to Clyde",
+      "shape": "one_way",
+      "start": {"name": "Middlemarch", "quote": "Middlemarch", "ref": "F18"},
+      "end": {"name": "Clyde", "quote": "Clyde", "ref": "F10"},
+      "via": [
+        {"name": "Otago Central Rail Trail", "quote": "Otago Central Rail Trail", "ref": "T2"},
+        {"name": "Hyde", "quote": "Hyde", "ref": "T8"},
+        {"name": "Prices Creek tunnel and viaduct", "quote": "Prices Creek tunnel and viaduct", "ref": null},
+        {"name": "Tiroiti", "quote": "Tiroiti", "ref": "T19"},
+        {"name": "Kokonga", "quote": "Kokonga", "ref": "T9"},
+        {"name": "Waipiata", "quote": "Waipiata", "ref": "T20"},
+        {"name": "Ranfurly", "quote": "Ranfurly", "ref": "T18"},
+        {"name": "Wedderburn", "quote": "Wedderburn", "ref": "T21"},
+        {"name": "Auripo", "quote": "Auripo", "ref": "T4"},
+        {"name": "Lauder", "quote": "Lauder", "ref": "T10"},
+        {"name": "Chatto Creek", "quote": "Chatto Creek", "ref": "T6"}
+      ],
+      "direction": null,
+      "time": null,
+      "distance": "150 km one way",
+      "evidence": [
+        "The 3-4 day Otago Central Rail Trail is a unique recreational experience, following the former Otago Central Branch Railway for 150 km from Middlemarch to Clyde.",
+        "In 1990 the 150 km stretch of railway from Middlemarch to Clyde closed and the line was pulled up."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [
+    {"name": "Golden Progress mine", "quote": "Golden Progress mine", "ref": null, "from": "Oturehua"}
+  ],
+  "huts": [],
+  "not_on_route": [
+    {"name": "Naseby", "quote": "Naseby", "ref": null, "why": "other"},
+    {"name": "Omakau", "quote": "Omakau", "ref": "T13", "why": "nearby"},
+    {"name": "Ophir", "quote": "Ophir", "ref": "T14", "why": "nearby"},
+    {"name": "Gabriells Gully", "quote": "Gabriells Gully", "ref": null, "why": "other"},
+    {"name": "Taieri Gorge Railway", "quote": "Taieri Gorge Railway", "ref": null, "why": "other walk"}
+  ],
+  "doubts": "The text says the trail runs 'from Middlemarch to Clyde' but not that it must be done in that direction, so direction is null and the shape one way. Start ref F18 is where the trail meets Cardigan Street East, the trail road end nearest Middlemarch; end ref F10 is the westernmost trail road end on Clyde-Alexandra Road, nearest Clyde (F11 is a second crossing of the same road about 0.7 km away). The text names trailside towns but never gives their order; the via order is taken from the packet's point positions along the Middlemarch to Clyde line, and Taieri Gorge, Poolburn Gorge, Daisybank, Oturehua and Alexandra are left out of via because the text does not place them. DOC gives no time; the text says '3-4 day' and also that most cyclists take 3-4 days and walkers up to a week, so time is null. The text mentions 150 km and 152 km. Shorter sections (e.g. Lauder to Auripo) are mentioned as alternatives but not described as ways."
+}

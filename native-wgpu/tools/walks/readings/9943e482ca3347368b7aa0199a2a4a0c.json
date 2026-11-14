@@ -1,0 +1,71 @@
+{
+  "guid": "9943e482-ca33-4736-8b7a-a0199a2a4a0c",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Heaphy Track, Brown Hut to Kohaihai",
+      "shape": "one_way",
+      "start": {"name": "Brown Hut", "quote": "Brown Hut in Golden Bay", "ref": "L2"},
+      "end": {"name": "Kohaihai carpark", "quote": "The track follows the riverbank for 400 m to Kohaihai carpark where there is a shelter and phone.", "ref": "F1"},
+      "via": [
+        {"name": "Brown River bridge", "quote": "cross the bridge over the Brown River", "ref": "T7"},
+        {"name": "Aorere Shelter", "quote": "Aorere Shelter", "ref": null},
+        {"name": "Perry Saddle Hut", "quote": "Perry Saddle Hut", "ref": "L5"},
+        {"name": "Perry Saddle", "quote": "Cross Perry Saddle", "ref": "T25"},
+        {"name": "Perry Creek", "quote": "sidle above Perry Creek", "ref": "T24"},
+        {"name": "Gouland Downs", "quote": "Gouland Downs", "ref": "T11"},
+        {"name": "Cave Brook", "quote": "Cave Brook", "ref": "T8"},
+        {"name": "Gouland Downs Hut", "quote": "Gouland Downs Hut", "ref": "L7"},
+        {"name": "Saxon Hut", "quote": "Saxon Hut", "ref": "L9"},
+        {"name": "Saxon River", "quote": "Saxon River", "ref": "T30"},
+        {"name": "Mackay Downs", "quote": "Mackay Downs", "ref": "T23"},
+        {"name": "James Mackay Hut", "quote": "James Mackay Hut", "ref": "L11"},
+        {"name": "Lewis Shelter", "quote": "Lewis Shelter", "ref": null},
+        {"name": "Lewis River swing bridge", "quote": "Lewis River swing bridge", "ref": "T22"},
+        {"name": "Heaphy River swing bridge", "quote": "Heaphy River swing bridge", "ref": "T16"},
+        {"name": "Heaphy Hut", "quote": "Heaphy Hut", "ref": "L13"},
+        {"name": "Katipo Creek", "quote": "Just beyond Katipo Creek is Crayfish (Koura) Point.", "ref": "T20"},
+        {"name": "Crayfish Point", "quote": "Crayfish (Koura) Point", "ref": "T9"},
+        {"name": "Scotts Beach", "quote": "Scotts Beach", "ref": "T31"},
+        {"name": "Kohaihai Saddle", "quote": "Kohaihai Saddle", "ref": null},
+        {"name": "Kohaihai River bridge", "quote": "a bridge across the Kohaihai River", "ref": null}
+      ],
+      "direction": null,
+      "time": "4-6 days",
+      "distance": "78.4 km one way",
+      "evidence": [
+        "The Heaphy Track is not a circuit track.",
+        "Brown Hut in Golden Bay – 156 km from Nelson – at the end of Aorere Valley Rd, or",
+        "About 180 m upstream from the hut, cross the bridge over the Brown River, then a grass flat, before winding up a well-defined track and into the bush.",
+        "The track follows the riverbank for 400 m to Kohaihai carpark where there is a shelter and phone."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "Kohaihai", "quote": "Kohaihai on the West Coast – 110 km from Westport – at the end of Kohaihai Rd.", "ref": "F1", "onto": "Heaphy Track"}
+  ],
+  "side_trips": [
+    {"name": "Flanagans Corner viewpoint", "quote": "a short track leads to a viewpoint at Flanagans Corner", "ref": null, "from": "Thirty minutes before Perry Saddle Hut"},
+    {"name": "Ōparara Arch", "quote": "Ōparara Arch", "ref": "L17", "from": null}
+  ],
+  "huts": [
+    {"name": "Brown Hut", "quote": "Brown Hut", "ref": "L2"},
+    {"name": "Perry Saddle Hut", "quote": "Perry Saddle Hut", "ref": "L5"},
+    {"name": "Gouland Downs Hut", "quote": "Gouland Downs Hut", "ref": "L7"},
+    {"name": "Saxon Hut", "quote": "Saxon Hut", "ref": "L9"},
+    {"name": "James Mackay Hut", "quote": "James Mackay Hut", "ref": "L11"},
+    {"name": "Heaphy Hut", "quote": "Heaphy Hut", "ref": "L13"}
+  ],
+  "not_on_route": [
+    {"name": "Flanagans Corner", "quote": "Flanagans Corner", "ref": null, "why": "side trip"},
+    {"name": "Ōparara Arch", "quote": "On the road from Kohaihai to Karamea you'll pass the entrance to Ōparara Arch", "ref": "L17", "why": "side trip"},
+    {"name": "Aorere Valley", "quote": "the Aorere Valley is seen extending northwards", "ref": null, "why": "view"},
+    {"name": "Mt Taranaki/Egmont", "quote": "Mt Taranaki/Egmont", "ref": null, "why": "view"},
+    {"name": "Gorge Creek pool", "quote": "Near the hut in Gorge Creek is a deep but cold pool", "ref": "T10", "why": "nearby"},
+    {"name": "Tasman Sea and Heaphy River mouth", "quote": "The Tasman Sea and Heaphy River mouth can be seen from here", "ref": null, "why": "view"},
+    {"name": "Shakespeare Flat", "quote": "the turnoff to Shakespeare Flat", "ref": "T33", "why": "nearby"}
+  ],
+  "doubts": "The track can be started from either end (Brown Hut or Kohaihai); it is recorded Brown Hut to Kohaihai as the sections describe it, with Kohaihai as an access point. No road-end feature exists for Brown Hut / Aorere Valley Rd, so the start ref is the Brown Hut link. Aorere Shelter and Lewis Shelter have no exact entry (L3 is the Aorere Shelter Campsite), so their refs are null. Ōparara Arch is called a side trip but is reached from the road beyond Kohaihai, not from the track. An alternative track bypasses the Kohaihai River mouth when it floods; not recorded."
+}

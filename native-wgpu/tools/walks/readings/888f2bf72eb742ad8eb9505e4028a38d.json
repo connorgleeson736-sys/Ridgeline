@@ -1,0 +1,36 @@
+{
+  "guid": "888f2bf7-2eb7-42ad-8eb9-505e4028a38d",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Through the cave from stream outlet to stream inlet",
+      "shape": "one_way",
+      "start": {"name": "stream outlet/cave entrance", "quote": "the first corner at the stream outlet/cave entrance (the start of this trip)", "ref": null},
+      "end": {"name": "stream inlet/cave exit", "quote": "A 3 m waterfall by the stream inlet/cave exit", "ref": null},
+      "via": [
+        {"name": "Cave Stream (against the flow)", "quote": "walk against the flow of the stream", "ref": "T3"},
+        {"name": "rung ladder beside the 3 m waterfall", "quote": "a rung ladder ascends beside the waterfall", "ref": null},
+        {"name": "overhang ledge", "quote": "A chain and steps help to get along the overhang ledge to the cave exit", "ref": null}
+      ],
+      "direction": null,
+      "time": "1 hr",
+      "distance": null,
+      "evidence": [
+        "The deepest section is usually at the first corner at the stream outlet/cave entrance (the start of this trip).",
+        "The cave passage meanders and twists in pitch darkness for 594 m between the two entrances.",
+        "Cavers are recommended to enter the cave at the stream outlet and walk against the flow of the stream.",
+        "A chain and steps help to get along the overhang ledge to the cave exit."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [],
+  "huts": [],
+  "not_on_route": [
+    {"name": "Cave Stream Loop Walk", "quote": "Cave Stream Loop Walk offers a family-friendly alternative", "ref": "L1", "why": "other walk"},
+    {"name": "Mistletoe Flats Campsite", "quote": "Mistletoe Flats Campsite is nearby at Craigieburn Forest Park", "ref": "L2", "why": "nearby"}
+  ],
+  "doubts": "The page describes only the trip through the cave (outlet to inlet, 594 m); it does not say how cavers get from the car park to the outlet (only that a track leads down to Broken River, which may need crossing) or how they return from the cave exit, so start and end have no refs and the walk to and from the car park is not recorded. The cave entrances have no name or feature entries."
+}

@@ -1,0 +1,46 @@
+{
+  "guid": "ae6ce4ad-9a31-4fa1-967e-fadd7b53e03c",
+  "kind": "unclear",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Camerons Flat up the East Matukituki and Kitchener to Aspiring Flats",
+      "shape": null,
+      "start": {"name": "Camerons Flat (opposite side of the Matukituki River)", "quote": "Camerons Flat", "ref": null},
+      "end": {"name": "Aspiring Flats", "quote": "Aspiring Flats", "ref": "T4"},
+      "via": [
+        {"name": "Matukituki River ford", "quote": "Matukituki River", "ref": null},
+        {"name": "East Matukituki track", "quote": "East Matukituki track", "ref": "T1"},
+        {"name": "Glacier Burn", "quote": "Glacier Burn", "ref": "T5"},
+        {"name": "East Matukituki River", "quote": "East Matukituki River", "ref": null},
+        {"name": "Junction Flat", "quote": "Junction Flat", "ref": "T6"},
+        {"name": "Kitchener River", "quote": "Kitchener River", "ref": "T7"}
+      ],
+      "direction": null,
+      "time": "8–10 hr",
+      "distance": null,
+      "evidence": [
+        "This track starts on the opposite side of the Matukituki River from Camerons Flat.",
+        "Ford the Matukituki River at Camerons Flat.",
+        "After reaching and crossing the Glacier Burn the track undulates alongside the East Matukituki River until it reaches Junction Flat and the Kitchener River.",
+        "The track passes through beech forest to the top of the gorge and ends at Aspiring Flats."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "Otago Boys' High Bridge at MacPherson Creek", "quote": "Otago Boys' High Bridge at MacPherson Creek", "ref": null, "onto": "East Matukituki track"}
+  ],
+  "side_trips": [
+    {"name": "Rock of Ages Biv", "quote": "Rock of Ages Biv", "ref": null, "from": "Aspiring Flats"}
+  ],
+  "huts": [],
+  "not_on_route": [
+    {"name": "Rock of Ages Biv", "quote": "Rock of Ages Biv", "ref": null, "why": "side trip"},
+    {"name": "Glacier Burn Track", "quote": "Glacier Burn Track", "ref": "L1", "why": "other walk"},
+    {"name": "Kitchener Cirque", "quote": "Kitchener Cirque", "ref": null, "why": "view"},
+    {"name": "Raspberry Creek", "quote": "Raspberry Creek", "ref": null, "why": "nearby"},
+    {"name": "Wānaka", "quote": "Wānaka", "ref": null, "why": "nearby"}
+  ],
+  "doubts": "Shape: the text describes the track from Camerons Flat to Aspiring Flats (3 hr + 1 hr) but never says whether it returns the same way; DOC's time of 8–10 hr suggests a return trip but does not say 'return', so shape is null and kind unclear. Start: Camerons Flat car park has no feature or name entry in the packet, so its ref is null. The Otago Boys' High Bridge at MacPherson Creek is the high-river alternative start, joining the East Matukituki track after about an hour. The Rock of Ages Biv is 30 minutes beyond where the track reaches the flats, with no marked track; recorded as a side trip rather than the end."
+}

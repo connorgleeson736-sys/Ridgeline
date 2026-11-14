@@ -23,7 +23,9 @@ internal object WalkOptions {
     /** One way to walk it: from start [start] to end [end] (indexes into the
      * choice's names) along [line], DOC's [leg] when DOC describes it, and the
      * map's named tracks it follows. */
-    class Option(val start:Int,val end:Int,val line:List<Coordinate>,val leg:DocPages.Leg?,val pieces:List<Pair<String,List<Coordinate>>>)
+    /** [time]: DOC's time for this way (compiled walks); [stops]: places named on it and where they are along [line]. */
+    class Option(val start:Int,val end:Int,val line:List<Coordinate>,val leg:DocPages.Leg?,val pieces:List<Pair<String,List<Coordinate>>>,
+                 val time:String="",val stops:List<Pair<String,Double>> = emptyList())
     class Choice(val starts:List<String>,val ends:List<String>,val options:List<Option>){
         fun option(s:Int,e:Int)=options.firstOrNull{it.start==s&&it.end==e}
     }
@@ -45,6 +47,10 @@ internal object WalkOptions {
     const val SNAP_METERS=2.0
     /** A track's dead end this close to another track joins it. */
     const val JOIN_METERS=15.0
+    /** A fallback line's end this close to track far round by the network is joined to it (see Network). */
+    const val CROSSING_METERS=400.0
+    /** A track's dead end this close to another track joins it, at a cost (see Network). */
+    const val JOIN_FAR_METERS=80.0
     /** Separate parts of the map's tracks are joined across gaps this short. */
     const val BRIDGE_METERS=200.0
     /** A place found by name this close to a track is reached by it. */
@@ -54,8 +60,17 @@ internal object WalkOptions {
 
     /** The map's tracks as a graph: points joined along each track; tracks
      * meet where they share a point or where one ends within [JOIN_METERS] of another. */
-    class Network(val tracks:List<Pair<String,List<Coordinate>>>){
+    /** [cost]: per track, how much each metre of it counts for routing (1:
+     * the map's tracks; more for a fallback line such as DOC's own, used only
+     * where the map has no track). Distances measured on lines stay in metres. */
+    /** [gap]: per track, the longest gap from its dead ends that is bridged to
+     * another part of the network ([BRIDGE_METERS] for the map's tracks; more
+     * for DOC's own line, which crosses tidal inlets and fords the map has no track over). */
+    class Network(val tracks:List<Pair<String,List<Coordinate>>>,val cost:(Int)->Double={1.0},val gap:(Int)->Double={BRIDGE_METERS}){
         val points=ArrayList<Coordinate>()
+        private val dead=ArrayList<Int>()
+        /** Each track piece's two end points (point, track index). */
+        private val pieceEnds=ArrayList<Pair<Int,Int>>()
         /** Per point: (neighbour, metres, track index). */
         val edges=ArrayList<MutableList<Triple<Int,Double,Int>>>()
         private val lat0=tracks.firstOrNull{it.second.isNotEmpty()}?.second?.first()?.latitude?:0.0
@@ -72,25 +87,35 @@ internal object WalkOptions {
         private fun link(a:Int,b:Int,m:Double,track:Int){if(a==b)return;edges[a].add(Triple(b,m,track));edges[b].add(Triple(a,m,track))}
         init{
             val segments=ArrayList<IntArray>()
-            for((ti,t) in tracks.withIndex()){var prev=-1
-                for(c in t.second){val v=node(c);if(prev>=0&&prev!=v){link(prev,v,DocTracks.meters(points[prev],c),ti);segments.add(intArrayOf(prev,v,ti))};prev=v}}
+            for((ti,t) in tracks.withIndex()){var prev=-1;var first=-1
+                for(c in t.second){val v=node(c);if(first<0)first=v;if(prev>=0&&prev!=v){link(prev,v,DocTracks.meters(points[prev],c)*cost(ti),ti);segments.add(intArrayOf(prev,v,ti))};prev=v}
+                if(first>=0){pieceEnds.add(first to ti);pieceEnds.add(prev to ti)}}
             // A track ending at another without sharing a point (a T junction):
             // joined to the nearest point of that track's segment.
             val bySeg=HashMap<Long,MutableList<Int>>()
             for((si,s) in segments.withIndex()){val a=points[s[0]];val b=points[s[1]]
                 for(cx in floor(min(x(a),x(b))/CELL).toInt()..floor(max(x(a),x(b))/CELL).toInt())for(cy in floor(min(y(a),y(b))/CELL).toInt()..floor(max(y(a),y(b))/CELL).toInt())
                     bySeg.getOrPut((cx.toLong() shl 32) or (cy.toLong() and 0xffffffffL)){ArrayList()}.add(si)}
-            for(v in points.indices){if(edges[v].size!=1)continue
+            // The tracks' own dead ends, before any joins (gaps are bridged from these below).
+            dead.addAll(points.indices.filter{edges[it].size==1})
+            for(v in dead.toList()){if(edges[v].size!=1)continue
                 val own=edges[v][0].third;val px=x(points[v]);val py=y(points[v])
-                var best=-1;var bestD=JOIN_METERS;var bestT=0.0
-                for(dx in -1..1)for(dy in -1..1)for(si in bySeg[cell(px+dx*CELL,py+dy*CELL)]?:continue){val s=segments[si]
-                    if(s[2]==own||s[0]==v||s[1]==v)continue
+                // Not back onto the track it ends (a stub left where a tile edge cuts a
+                // track, the Tiki Track's at the gondola top): points within two steps.
+                val close=HashSet<Int>();close.add(v);for(a in edges[v]){close.add(a.first);for(b in edges[a.first])close.add(b.first)}
+                var best=-1;var bestD=JOIN_FAR_METERS;var bestT=0.0
+                val reachCells=ceil(JOIN_FAR_METERS/CELL).toInt()
+                for(dx in -reachCells..reachCells)for(dy in -reachCells..reachCells)for(si in bySeg[cell(px+dx*CELL,py+dy*CELL)]?:continue){val s=segments[si]
+                    if(s[2]==own||s[0] in close||s[1] in close)continue
                     val ax=x(points[s[0]]);val ay=y(points[s[0]]);val bx=x(points[s[1]]);val by=y(points[s[1]])
                     val l=(bx-ax)*(bx-ax)+(by-ay)*(by-ay);val t=if(l==0.0)0.0 else(((px-ax)*(bx-ax)+(py-ay)*(by-ay))/l).coerceIn(0.0,1.0)
                     val d=hypot(ax+(bx-ax)*t-px,ay+(by-ay)*t-py);if(d<bestD){bestD=d;best=si;bestT=t}}
-                if(best>=0){val s=segments[best];val len=DocTracks.meters(points[s[0]],points[s[1]])
-                    edges[v].add(Triple(s[0],bestD+len*bestT,s[2]));edges[s[0]].add(Triple(v,bestD+len*bestT,s[2]))
-                    edges[v].add(Triple(s[1],bestD+len*(1-bestT),s[2]));edges[s[1]].add(Triple(v,bestD+len*(1-bestT),s[2]))}
+                // A join over [JOIN_METERS] (a track stopping short of the one it meets: the
+                // Rere Lake Walk 50 m from the Greenstone Track) counts three times its length,
+                // so routes use it only to make a connection, never as a short cut.
+                if(best>=0){val s=segments[best];val len=DocTracks.meters(points[s[0]],points[s[1]]);val j=if(bestD>JOIN_METERS)bestD*3 else bestD
+                    edges[v].add(Triple(s[0],j+len*bestT,s[2]));edges[s[0]].add(Triple(v,j+len*bestT,s[2]))
+                    edges[v].add(Triple(s[1],j+len*(1-bestT),s[2]));edges[s[1]].add(Triple(v,j+len*(1-bestT),s[2]))}
             }
         }
         init{
@@ -101,13 +126,24 @@ internal object WalkOptions {
             fun find(v:Int):Int{var r=v;while(root[r]!=r)r=root[r];var c=v;while(root[c]!=r){val n=root[c];root[c]=r;c=n};return r}
             for(v in points.indices)for(e in edges[v])root[find(v)]=find(e.first)
             val gaps=ArrayList<Triple<Int,Int,Double>>()
-            for(v in points.indices){if(edges[v].size!=1)continue
-                val px=x(points[v]);val py=y(points[v]);val reach=ceil(BRIDGE_METERS/CELL).toInt()
-                var best=-1;var bestD=BRIDGE_METERS
+            for(v in dead){
+                val limit=edges[v].maxOfOrNull{if(it.third>=0)gap(it.third) else BRIDGE_METERS}?:BRIDGE_METERS
+                val px=x(points[v]);val py=y(points[v]);val reach=ceil(limit/CELL).toInt()
+                var best=-1;var bestD=limit
                 for(dx in -reach..reach)for(dy in -reach..reach)for(i in cells[cell(px+dx*CELL,py+dy*CELL)]?:continue){
                     if(find(i)==find(v))continue;val d=hypot(x(points[i])-px,y(points[i])-py);if(d<bestD){bestD=d;best=i}}
                 if(best>=0)gaps.add(Triple(v,best,bestD))}
             for((a,b,d) in gaps.sortedBy{it.third})if(find(a)!=find(b)){root[find(a)]=find(b);edges[a].add(Triple(b,d,-1));edges[b].add(Triple(a,d,-1))}
+            // A crossing the map lacks (the stock bridge at the start of the Lake Rere Walk):
+            // where a fallback line (DOC's own, bridged further than the map's tracks) ends
+            // within [CROSSING_METERS] of track that is far round by the network, the two
+            // are joined at three times the distance.
+            for((v,t) in pieceEnds){if(gap(t)<=BRIDGE_METERS)continue
+                val near=points.indices.filter{it!=v&&DocTracks.meters(points[it],points[v])<=CROSSING_METERS&&edges[it].none{e->e.third==t}}
+                if(near.isEmpty())continue
+                val (dist,_)=from(v)
+                val far=near.filter{dist[it]>5*DocTracks.meters(points[it],points[v])+1000}.minByOrNull{DocTracks.meters(points[it],points[v])}?:continue
+                val d=DocTracks.meters(points[far],points[v])*3;edges[v].add(Triple(far,d,-1));edges[far].add(Triple(v,d,-1))}
         }
         fun nearest(c:Coordinate,within:Double):Int?{
             var best=-1;var bestD=within;for(i in points.indices){val d=DocTracks.meters(points[i],c);if(d<bestD){bestD=d;best=i}}
@@ -124,11 +160,12 @@ internal object WalkOptions {
         /** Metres and previous points from [source] (Dijkstra). */
         /** [avoid]: points not to pass through; [walked]: steps already taken
          * (key [step]), costing [again] times as much (a loop does not retrace itself). */
-        fun from(source:Int,avoid:Set<Int> = emptySet(),walked:Set<Long> = emptySet(),again:Double=1.0):Pair<DoubleArray,IntArray>{
+        /** [prefer]: tracks (indexes) to keep to ("continue on the Greenstone Track"), counted at [preferred] of their length. */
+        fun from(source:Int,avoid:Set<Int> = emptySet(),walked:Set<Long> = emptySet(),again:Double=1.0,prefer:Set<Int> = emptySet(),preferred:Double=.6):Pair<DoubleArray,IntArray>{
             val dist=DoubleArray(points.size){Double.MAX_VALUE};val prev=IntArray(points.size){-1};dist[source]=0.0
             val queue=java.util.PriorityQueue<Pair<Double,Int>>(compareBy{it.first});queue.add(0.0 to source)
             while(queue.isNotEmpty()){val (d,u)=queue.poll();if(d>dist[u])continue
-                for((v,w0,_) in edges[u]){if(v in avoid)continue;val w=if(walked.isNotEmpty()&&step(u,v) in walked)w0*again else w0
+                for((v,w1,t) in edges[u]){if(v in avoid)continue;val w0=if(t in prefer)w1*preferred else w1;val w=if(walked.isNotEmpty()&&step(u,v) in walked)w0*again else w0
                     if(d+w<dist[v]){dist[v]=d+w;prev[v]=u;queue.add(dist[v] to v)}}}
             return dist to prev
         }

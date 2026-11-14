@@ -1,0 +1,60 @@
+{
+  "guid": "5266695c-0425-4d5e-9004-3f5d16c8ba8a",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "View Hill car park to Lees Valley Road via Wharfedale Hut and the Townshend Track",
+      "shape": "one_way",
+      "start": {"name": "View Hill car park", "quote": "the turn-off to the start of the Wharfedale Track where the View Hill car park is located", "ref": "F1"},
+      "end": {"name": "Lees Valley Road", "quote": "follows a 4WD track over grazed flats coming out at Lees Valley Road", "ref": null},
+      "via": [
+        {"name": "Saddle", "quote": "gently climbs through beech forest to the saddle", "ref": null},
+        {"name": "Wharfedale Hut", "quote": "It is then mostly downhill to Wharfedale Hut, close to Dobson Stream", "ref": "T9"},
+        {"name": "Townshend Track", "quote": "Townshend Track", "ref": null},
+        {"name": "Townshend River", "quote": "This track crosses the Townshend River twice", "ref": "T7"}
+      ],
+      "direction": null,
+      "time": "1–2 days",
+      "distance": null,
+      "evidence": [
+        "View Hill car park to Wharfedale Hut",
+        "The track sidles and gently climbs through beech forest to the saddle. It is then mostly downhill to Wharfedale Hut, close to Dobson Stream.",
+        "About half an hour after leaving Wharfedale Hut, the track opens out and follows a 4WD track over grazed flats coming out at Lees Valley Road."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "View Hill car park to Wharfedale Hut",
+      "shape": "one_way",
+      "start": {"name": "View Hill car park", "quote": "View Hill car park to Wharfedale Hut", "ref": "F1"},
+      "end": {"name": "Wharfedale Hut", "quote": "It is then mostly downhill to Wharfedale Hut, close to Dobson Stream", "ref": "T9"},
+      "via": [
+        {"name": "Saddle", "quote": "gently climbs through beech forest to the saddle", "ref": null}
+      ],
+      "direction": null,
+      "time": "5 hr one way",
+      "distance": "15 km one way",
+      "evidence": [
+        "View Hill car park to Wharfedale Hut",
+        "Time: 5 hr one way",
+        "Distance: 15 km one way",
+        "The track sidles and gently climbs through beech forest to the saddle. It is then mostly downhill to Wharfedale Hut, close to Dobson Stream."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "Lees Valley Road (DOC sign, locked gate)", "quote": "Turn into Lees Valley Road and follow this for 20 km to the DOC sign", "ref": null, "onto": "Townshend Track"}
+  ],
+  "side_trips": [],
+  "huts": [
+    {"name": "Wharfedale Hut", "quote": "Wharfedale Hut", "ref": "T9"}
+  ],
+  "not_on_route": [
+    {"name": "Black Hill Hut tracks", "quote": "These tracks connect with tracks to Black Hill Hut", "ref": "L1", "why": "other walk"},
+    {"name": "Fosters Ridge Track Junction", "quote": "between Wharfdale Hut and Fosters Ridge Track Junction", "ref": null, "why": "other"}
+  ],
+  "doubts": "The page presents the Wharfedale Track (View Hill car park to Wharfedale Hut) and the Townshend Track (Wharfedale Hut out to Lees Valley Road) as sections; the main way is taken as the full crossing named in the title, with DOC's 1–2 days. The text does not say whether people return the same way or arrange transport. View Hill car park is taken as F1 (Wharfedale Track meeting the road also called Wharfedale Track at the start of the track); the gazetteer 'View Hill' place (T8) is several km away and not used. The Lees Valley Road end has no entry. The Fosters Ridge Track junction is mentioned only for a slip between it and Wharfedale Hut; whether it lies on this way is unclear."
+}

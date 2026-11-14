@@ -1,0 +1,59 @@
+{
+  "guid": "548b9542-23d3-4969-abd4-1927614345d9",
+  "kind": "loop",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Hollyford Road end via Pyke Valley, Big Bay and Martins Bay back to Hollyford Road end",
+      "shape": "loop",
+      "start": {"name": "Hollyford Road end", "quote": "Hollyford Road end", "ref": "F1"},
+      "end": {"name": "Hollyford Road end", "quote": "Hollyford Road End", "ref": "F1"},
+      "via": [
+        {"name": "Hollyford Track", "quote": "via the Hollyford Track", "ref": "L1"},
+        {"name": "Lake Alabaster Hut", "quote": "Lake Alabaster Hut", "ref": "T13"},
+        {"name": "Lake Alabaster shore", "quote": "follow the lake shore to Alabaster Creek at the head of the lake", "ref": "T12"},
+        {"name": "Alabaster Creek", "quote": "Alabaster Creek", "ref": "T3"},
+        {"name": "Black Swamp", "quote": "Black Swamp", "ref": null},
+        {"name": "Pyke River (true left)", "quote": "follows an overgrown track up the true left of the Pyke River", "ref": "T22"},
+        {"name": "Olivine Hut", "quote": "Olivine Hut", "ref": "T19"},
+        {"name": "Olivine River cableway", "quote": "Use the cableway to cross the Olivine River.", "ref": "T20"},
+        {"name": "Diorite River", "quote": "Diorite", "ref": null},
+        {"name": "Barrier River", "quote": "Barrier Rivers", "ref": null},
+        {"name": "Lake Wilmot", "quote": "Lake Wilmot", "ref": "T14"},
+        {"name": "Pyke Airstrip", "quote": "Pyke Airstrip", "ref": null},
+        {"name": "Pyke Crossing", "quote": "Pyke Crossing", "ref": null},
+        {"name": "Paulin Creek", "quote": "The route follows Paulin Creek", "ref": "T21"},
+        {"name": "dry Awarua River", "quote": "the dry Awarua River", "ref": "T9"},
+        {"name": "Big Bay", "quote": "the mouth of the river at Big Bay", "ref": "T7"},
+        {"name": "Big Bay Hut", "quote": "Big Bay Hut", "ref": "T8"},
+        {"name": "McKenzie Creek", "quote": "McKenzie Creek", "ref": null},
+        {"name": "Long Reef", "quote": "Long Reef", "ref": null},
+        {"name": "Martins Bay Hut", "quote": "Martins Bay Hut", "ref": "T16"},
+        {"name": "Hollyford Track", "quote": "Martins Bay Hut to Hollyford Road End (via Hollyford Track)", "ref": "L1"},
+        {"name": "Hollyford River/Whakatipu Kā Tuka", "quote": "Hollyford River/Whakatipu Kä Tuka", "ref": "T11"}
+      ],
+      "direction": null,
+      "time": null,
+      "distance": null,
+      "evidence": [
+        "Hollyford Road end to Lake Alabaster Hut via the Hollyford Track",
+        "Big Bay Hut to Martins Bay Hut",
+        "Martins Bay Hut to Hollyford Road End (via Hollyford Track)",
+        "This track starts either on the first part of the Hollyford Track (end of the Hollyford Road), or at Big Bay on the West Coast."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "Big Bay", "quote": "at Big Bay on the West Coast", "ref": "T7", "onto": null}
+  ],
+  "side_trips": [],
+  "huts": [
+    {"name": "Lake Alabaster Hut", "quote": "Lake Alabaster Hut", "ref": "T13"},
+    {"name": "Olivine Hut", "quote": "Olivine Hut", "ref": "T19"},
+    {"name": "Big Bay Hut", "quote": "Big Bay Hut", "ref": "T8"},
+    {"name": "Martins Bay Hut", "quote": "Martins Bay Hut", "ref": "T16"}
+  ],
+  "not_on_route": [],
+  "doubts": "The page never calls the route a loop or circuit; the shape comes from the day headings, which start and finish at the Hollyford Road end, with the Hollyford Track walked both out (to Lake Alabaster Hut) and back (from Martins Bay Hut), so part of it is shared. No direction is named. The intro gives '88 km' for the route, but the section distances add to far more, so no distance is recorded for the way. McKenzie Creek has two name entries and neither is clearly at the southern end of Big Bay, so its ref is null. The Hollyford Track sections are described only by a link, so huts on them are not listed."
+}

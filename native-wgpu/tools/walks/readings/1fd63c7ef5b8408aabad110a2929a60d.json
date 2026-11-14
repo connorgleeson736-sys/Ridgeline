@@ -1,0 +1,34 @@
+{
+  "guid": "1fd63c7e-f5b8-408a-abad-110a2929a60d",
+  "kind": "out_and_back",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Lake Matheson carpark to the Lake Gault lookout",
+      "shape": "out_and_back",
+      "start": {"name": "Lake Matheson carpark", "quote": "Beginning from the Lake Matheson carpark", "ref": "F1"},
+      "end": {"name": "Lake Gault lookout", "quote": "before branching off to Lake Gault", "ref": "T4"},
+      "via": [
+        {"name": "Lake Matheson/Te Ara Kairaumati walk", "quote": "follow the Lake Matheson/Te Ara Kairaumati walk in an anti-clockwise direction", "ref": "T2"},
+        {"name": "Lookout spot with a seat", "quote": "There is a lookout spot with a seat about half-way up the hill", "ref": null}
+      ],
+      "direction": null,
+      "time": "3 hr return",
+      "distance": "8 km return via same track",
+      "evidence": [
+        "Beginning from the Lake Matheson carpark, follow the Lake Matheson/Te Ara Kairaumati walk in an anti-clockwise direction before branching off to Lake Gault.",
+        "As the track flattens out, you’ll catch glimpses of Lake Gault through the vegetation. Continue several minutes to the lookout point.",
+        "The track starts from the Lake Matheson carpark."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [],
+  "huts": [],
+  "not_on_route": [
+    {"name": "Southern Alps/Kā Tiritiri o te Moana, Aoraki/Mount Cook and Mount Tasman", "quote": "panoramic views of the Southern Alps/Kā Tiritiri o te Moana, Aoraki/Mount Cook and Mount Tasman", "ref": null, "why": "view"},
+    {"name": "Fox Glacier/Te Moeka o Tuawe", "quote": "Fox Glacier/Te Moeka o Tuawe", "ref": null, "why": "other"}
+  ],
+  "doubts": "The end is the lookout point (with a shelter) above Lake Gault; the ref given is the lake itself (T4), as no entry is the lookout. The 'anti-clockwise direction' refers to the Lake Matheson walk followed on the way out, not to this out-and-back walk. The branch-off point from the Lake Matheson walk is not named."
+}

@@ -1,0 +1,34 @@
+{
+  "guid": "2042f491-c0de-49e6-a251-9b50c33a7603",
+  "kind": "out_and_back",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Truman Track from the highway down to the lower viewing platform",
+      "shape": "out_and_back",
+      "start": {"name": "Truman Track entrance on SH6", "quote": "Truman Track is signposted off SH6, 3 km north of the Punangairi Visitor Centre in Punakaiki", "ref": "F2"},
+      "end": {"name": "Lower viewing platform", "quote": "The walk ends at the lower viewing platform", "ref": null},
+      "via": [
+        {"name": "Upper viewing platform", "quote": "From the upper platform, enjoy spectacular views", "ref": null}
+      ],
+      "direction": null,
+      "time": "30 min return",
+      "distance": "1.4 km return via same track",
+      "evidence": [
+        "Truman Track leads from the highway just north of Punakaiki down to the Tasman Sea.",
+        "The walk ends at the lower viewing platform.",
+        "Return to the carpark the same way you came."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [],
+  "huts": [],
+  "not_on_route": [
+    {"name": "Pancake Rocks", "quote": "and south to the Pancake Rocks", "ref": "T3", "why": "view"},
+    {"name": "Beach at the end of Truman Track", "quote": "There are serious hazards if you choose to explore the beach", "ref": null, "why": "nearby"},
+    {"name": "Punangairi Visitor Centre", "quote": "Punangairi Visitor Centre in Punakaiki", "ref": null, "why": "nearby"}
+  ],
+  "doubts": "The car park is across the road from the track entrance; the start is given as where Truman Track meets SH6 (F2). The lower viewing platform end has no entry, so its ref is null. Exploring the beach beyond the platform is optional and not part of the walk."
+}

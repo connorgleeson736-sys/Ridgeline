@@ -1,0 +1,48 @@
+{
+  "guid": "c972ec3a-af3f-4e2e-8d44-3f7b17880954",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Makahu Road to Makahu Saddle via Middle Hill Hut and Kaweka Flats",
+      "shape": "one_way",
+      "start": {"name": "Makahu Road carpark", "quote": "Makahu Road", "ref": "F1"},
+      "end": {"name": "Makahu Saddle car park", "quote": "Makahu Saddle car park", "ref": null},
+      "via": [
+        {"name": "Mangatutunui Stream", "quote": "Mangatutunui Stream", "ref": "T10"},
+        {"name": "Middle Hill Hut", "quote": "Middle Hill Hut", "ref": "T11"},
+        {"name": "Koaro Stream", "quote": "Koaro Stream", "ref": "T8"},
+        {"name": "Makehu River", "quote": "Makehu River", "ref": null},
+        {"name": "Kaweka Flats", "quote": "Kaweka Flats", "ref": "T6"},
+        {"name": "Kaweka Flats Bivvy", "quote": "Kaweka Flats Bivvy", "ref": "T7"},
+        {"name": "Makahu Saddle Hut", "quote": "Makahu Saddle Hut", "ref": "T9"}
+      ],
+      "direction": null,
+      "time": "5.5-7.5 hrs",
+      "distance": null,
+      "evidence": [
+        "The track to Middle Hill Hut begins at the north-west corner of the carpark.",
+        "A benched track leads from Kaweka Flats Bivvy to Makahu Saddle Hut, which is situated 5 minutes from Makahu Saddle car park (at the end of Kaweka Road).",
+        "You will need to organise transport from Makahu Saddle to Makahu Road."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [
+    {"name": "Iron Whare", "quote": "Iron Whare", "ref": "T4", "from": "plateau after crossing the Makehu River branch, before Kaweka Flats"}
+  ],
+  "huts": [
+    {"name": "Middle Hill Hut", "quote": "Middle Hill Hut", "ref": "T11"},
+    {"name": "Kaweka Flats Bivvy", "quote": "Kaweka Flats Bivvy", "ref": "T7"},
+    {"name": "Makahu Saddle Hut", "quote": "Makahu Saddle Hut", "ref": "T9"}
+  ],
+  "not_on_route": [
+    {"name": "Iron Whare", "quote": "Iron Whare", "ref": "T4", "why": "side trip"},
+    {"name": "Camp Spur", "quote": "Camp Spur", "ref": null, "why": "other"},
+    {"name": "Mangatutu Hot Springs", "quote": "Mangatutu Hot Springs", "ref": null, "why": "nearby"},
+    {"name": "Te Puia Lodge", "quote": "Te Puia Lodge", "ref": null, "why": "nearby"},
+    {"name": "Mangatainoka Hot Springs", "quote": "Mangatainoka Hot Springs", "ref": null, "why": "nearby"}
+  ],
+  "doubts": "The start carpark is only described as signposted partway along Makahu Road; it is matched to F1 (the only track meeting Makahu Road in the packet). The end, Makahu Saddle car park at the end of Kaweka Road, has no feature in the packet, so its ref is null (Makahu Saddle Hut T9 is 5 minutes before it). 'Koaro Stream' in the text is taken as the Kōaro Stream entry. Camp Spur (the track not taken at the junction) is ambiguous between the ridge and the track, so no ref."
+}

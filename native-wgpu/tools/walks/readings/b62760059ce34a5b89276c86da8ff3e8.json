@@ -1,0 +1,41 @@
+{
+  "guid": "b6276005-9ce3-4a5b-8927-6c86da8ff3e8",
+  "kind": "unclear",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Camerons Flat to Aspiring Flats",
+      "shape": null,
+      "start": {"name": "Camerons Flat", "quote": "Ford the Matukituki River at Camerons Flat", "ref": "T5"},
+      "end": {"name": "Aspiring Flats", "quote": "ends at Aspiring Flats", "ref": "T4"},
+      "via": [
+        {"name": "Matukituki River ford", "quote": "Ford the Matukituki River", "ref": null},
+        {"name": "East Matukituki valley", "quote": "The track leads up the East Matukituki valley", "ref": "T1"},
+        {"name": "Glacier Burn", "quote": "After reaching and crossing the Glacier Burn", "ref": "T6"},
+        {"name": "Junction Flat", "quote": "until it reaches Junction Flat and the Kitchener River", "ref": "T7"},
+        {"name": "Kitchener River (true right)", "quote": "This track follows the true right of the Kitchener River", "ref": "T8"},
+        {"name": "top of the gorge", "quote": "The track passes through beech forest to the top of the gorge", "ref": null}
+      ],
+      "direction": null,
+      "time": "8–10 hr",
+      "distance": null,
+      "evidence": [
+        "This track starts on the opposite side of the Matukituki River from Camerons Flat.",
+        "Ford the Matukituki River at Camerons Flat.",
+        "The track passes through beech forest to the top of the gorge and ends at Aspiring Flats."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "Otago Boys' High Bridge at MacPherson Creek", "quote": "park by the Otago Boys' High Bridge at MacPherson Creek. Use the bridge to cross the West Matukituki and walk for an hour to join the East Matukituki track", "ref": null, "onto": "East Matukituki track"}
+  ],
+  "side_trips": [],
+  "huts": [],
+  "not_on_route": [
+    {"name": "Rock of Ages Biv", "quote": "The rock biv is 30 minutes further on from where the track reaches the flats", "ref": null, "why": "other"},
+    {"name": "Kitchener Cirque", "quote": "There are spectacular views of the Kitchener Cirque from Aspiring Flats", "ref": null, "why": "view"},
+    {"name": "Glacier Burn Track", "quote": "at the turn off for the Glacier Burn Track", "ref": "L1", "why": "other walk"}
+  ],
+  "doubts": "The page never says how the walk is finished: the track ends at Aspiring Flats and the legs total 4 hr while DOC's time is 8–10 hr, which suggests a return the same way, but this is not stated, so shape is null and kind unclear. The start is the Camerons Flat ford (T5); the Camerons Flat car park could not be matched confidently to any road end feature (F1/F2 are on Cameron Flat Road, F3 on Wanaka-Mount Aspiring Road), and the MacPherson Creek alternative start is also left without a ref. The Rock of Ages Biv lies 30 min beyond where the track reaches the flats, off any marked track."
+}

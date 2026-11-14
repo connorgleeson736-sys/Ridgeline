@@ -1,0 +1,91 @@
+{
+  "guid": "62552ff0-94d4-4ede-8bb3-6304de174745",
+  "kind": "loop",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "North West Circuit from Halfmoon Bay",
+      "shape": "loop",
+      "start": {"name": "Halfmoon Bay", "quote": "Halfmoon Bay", "ref": "T20"},
+      "end": {"name": "Halfmoon Bay", "quote": "Halfmoon Bay", "ref": "T20"},
+      "via": [
+        {"name": "Horseshoe Bay", "quote": "Horseshoe Bay", "ref": "T22"},
+        {"name": "Lee Bay", "quote": "Lee Bay", "ref": "F2"},
+        {"name": "Little River", "quote": "Little River", "ref": "T28"},
+        {"name": "Maori Beach", "quote": "Maori Beach", "ref": "T32"},
+        {"name": "Rakiura Track turn-off", "quote": "Rakiura Track turn-off to North Arm", "ref": null},
+        {"name": "Port William Hut", "quote": "Port William Hut", "ref": "L3"},
+        {"name": "Big Bungaree Beach", "quote": "Big Bungaree Beach", "ref": "T6"},
+        {"name": "Bungaree Hut", "quote": "Bungaree Hut", "ref": "L4"},
+        {"name": "Murray Beach", "quote": "Murray Beach", "ref": "T37"},
+        {"name": "Murray River", "quote": "Murray River", "ref": "T38"},
+        {"name": "old tramline", "quote": "old tramline", "ref": null},
+        {"name": "Christmas Village Hut", "quote": "Christmas Village Hut", "ref": "L5"},
+        {"name": "Mount Anglem Track junction", "quote": "Mount Anglem Track junction", "ref": null},
+        {"name": "Lucky Beach", "quote": "Lucky Beach", "ref": "T31"},
+        {"name": "Yankee River", "quote": "Yankee River", "ref": "T51"},
+        {"name": "Yankee River Hut", "quote": "Yankee River Hut", "ref": "L6"},
+        {"name": "Black Rock Point", "quote": "Black Rock Point", "ref": "T8"},
+        {"name": "Smoky Beach", "quote": "Smoky Beach", "ref": "T49"},
+        {"name": "Smoky River", "quote": "Smoky River", "ref": null},
+        {"name": "Long Harry Hut", "quote": "Long Harry Hut", "ref": "L7"},
+        {"name": "Cave Point ridge", "quote": "Cave Point ridge", "ref": null},
+        {"name": "East Ruggedy Hut", "quote": "East Ruggedy Hut", "ref": "L8"},
+        {"name": "West Ruggedy", "quote": "West Ruggedy", "ref": null},
+        {"name": "Ruggedy Range", "quote": "Ruggedy Range", "ref": null},
+        {"name": "Waituna Bay", "quote": "Waituna Bay", "ref": "T50"},
+        {"name": "Big Hellfire Hut", "quote": "Big Hellfire Hut", "ref": "L9"},
+        {"name": "Little Hellfire Beach", "quote": "Little Hellfire beach", "ref": "T27"},
+        {"name": "Mason Bay", "quote": "Mason Bay", "ref": "T33"},
+        {"name": "Duck Creek", "quote": "Duck Creek", "ref": "T14"},
+        {"name": "Mason Bay Hut", "quote": "Mason Bay Hut", "ref": "L10"},
+        {"name": "Island Hill homestead", "quote": "Island Hill homestead", "ref": null},
+        {"name": "Freshwater River", "quote": "Freshwater River", "ref": "T18"},
+        {"name": "Freshwater Hut", "quote": "Freshwater Hut", "ref": "L11"},
+        {"name": "Thompson Ridge", "quote": "Thompson Ridge", "ref": null},
+        {"name": "North Arm Hut", "quote": "North Arm Hut", "ref": "L12"},
+        {"name": "Sawdust Bay", "quote": "Sawdust Bay", "ref": "T48"},
+        {"name": "Kidney Fern Arm", "quote": "Kidney Fern Arm", "ref": "T25"},
+        {"name": "Kaipipi Bay", "quote": "Kaipipi Bay", "ref": "T24"},
+        {"name": "Kaipipi Road", "quote": "former Kaipipi Road", "ref": null}
+      ],
+      "direction": null,
+      "time": "9 - 11 days",
+      "distance": "125 km loop",
+      "evidence": [
+        "Follow the road to Horseshoe Bay, then on to Lee Bay, the official entrance to Rakiura National Park.",
+        "From here the well defined track follows the coast to Little River and Maori Beach, a former sawmill settlement.",
+        "From there it follows the former Kaipipi Road to Halfmoon Bay."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [
+    {"name": "Mount Anglem/Hananui", "quote": "Mount Anglem/Hananui", "ref": "T36", "from": "Christmas Village Hut"},
+    {"name": "Rocky Mountain Track", "quote": "Rocky Mountain Track", "ref": "T4", "from": "Freshwater Hut"}
+  ],
+  "huts": [
+    {"name": "Port William Hut", "quote": "Port William Hut", "ref": "L3"},
+    {"name": "Bungaree Hut", "quote": "Bungaree Hut", "ref": "L4"},
+    {"name": "Christmas Village Hut", "quote": "Christmas Village Hut", "ref": "L5"},
+    {"name": "Yankee River Hut", "quote": "Yankee River Hut", "ref": "L6"},
+    {"name": "Long Harry Hut", "quote": "Long Harry Hut", "ref": "L7"},
+    {"name": "East Ruggedy Hut", "quote": "East Ruggedy Hut", "ref": "L8"},
+    {"name": "Big Hellfire Hut", "quote": "Big Hellfire Hut", "ref": "L9"},
+    {"name": "Mason Bay Hut", "quote": "Mason Bay Hut", "ref": "L10"},
+    {"name": "Freshwater Hut", "quote": "Freshwater Hut", "ref": "L11"},
+    {"name": "North Arm Hut", "quote": "North Arm Hut", "ref": "L12"}
+  ],
+  "not_on_route": [
+    {"name": "Rakiura Track", "quote": "Rakiura Track", "ref": "T3", "why": "other walk"},
+    {"name": "Gull Rock Point", "quote": "Gull Rock Point", "ref": "T19", "why": "nearby"},
+    {"name": "East Ruggedy Beach", "quote": "East Ruggedy Beach", "ref": "T15", "why": "view"},
+    {"name": "Freshwater Flats", "quote": "Freshwater Flats", "ref": null, "why": "view"},
+    {"name": "Paterson inlet", "quote": "Paterson inlet", "ref": "T43", "why": "view"},
+    {"name": "Freshwater Landing", "quote": "Freshwater Landing", "ref": null, "why": "other"},
+    {"name": "Bluff", "quote": "Bluff", "ref": null, "why": "other"},
+    {"name": "Invercargill", "quote": "Invercargill", "ref": null, "why": "other"}
+  ],
+  "doubts": "The circuit starts and ends at Halfmoon Bay, walking roads to Horseshoe Bay and Lee Bay first; no road end feature is clearly in Halfmoon Bay, so the start/end ref is the Halfmoon Bay coast name T20 (the settlement lies in the bay). Lee Bay, the park entrance where the track begins, is given as F2 (North West Circuit Track meets Lee Bay Road). F1 (unnamed track meets Main Road) may be where the former Kaipipi Road reaches the settlement, but the text does not say, so it is not used. No direction is stated; the page describes the circuit from Halfmoon Bay via Port William first. The text says the track passes inland from Gull Rock Point and reaches a lookout over East Ruggedy Beach before descending to a river crossing; whether the beach itself is walked is not clear. Big Hellfire Hut is also called 'Hellfire Pass Hut' in the text. Duck Creek T14 is the one near Mason Bay. The Features section mentions flying in to Mason Bay and walking to the Freshwater River as an option for those not doing the multi-day tramp; it is not recorded as a way of this circuit."
+}

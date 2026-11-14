@@ -1,0 +1,85 @@
+{
+  "guid": "97aa6e32-7297-4894-b8d4-2504b331373c",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Rolling River car park to Wangapeka Road car park",
+      "shape": "one_way",
+      "start": {"name": "Rolling River car park", "quote": "Rolling River car park", "ref": "F1"},
+      "end": {"name": "Wangapeka Road car park", "quote": "Wangapeka Road car park", "ref": "F2"},
+      "via": [
+        {"name": "junction of Kiwi Stream", "quote": "the junction of Kiwi Stream", "ref": "T13"},
+        {"name": "Kings Creek Hut", "quote": "Kings Creek Hut", "ref": "T9"},
+        {"name": "Cecil Kings Hut", "quote": "Cecil Kings Hut", "ref": "T7"},
+        {"name": "Stone Hut", "quote": "Stone Hut", "ref": "T23"},
+        {"name": "Wangapeka Saddle", "quote": "Wangapeka Saddle", "ref": "T28"},
+        {"name": "Waters Creek", "quote": "Waters Creek", "ref": "T29"},
+        {"name": "Helicopter Flat Hut", "quote": "Helicopter Flat Hut", "ref": "T8"},
+        {"name": "Tabernacle lookout", "quote": "Tabernacle lookout", "ref": null},
+        {"name": "Taipo footbridge", "quote": "Taipo footbridge", "ref": null},
+        {"name": "Taipo Hut", "quote": "Taipo Hut", "ref": "T24"},
+        {"name": "Stag Flat Bivvy", "quote": "Stag Flat Bivvy", "ref": "L3"},
+        {"name": "Little Wanganui Saddle", "quote": "Little Wanganui Saddle", "ref": "T16"},
+        {"name": "Saddle Lakes", "quote": "Saddle Lakes", "ref": "T20"},
+        {"name": "Little Wanganui River swing bridge", "quote": "drops steeply to the Little Wanganui River", "ref": "T15"},
+        {"name": "Tangent Creek", "quote": "Tangent Creek", "ref": "T26"},
+        {"name": "Smith Creek", "quote": "Smith Creek", "ref": "T22"},
+        {"name": "Belltown Manunui Hut", "quote": "Belltown Manunui Hut", "ref": "T5"},
+        {"name": "Lawrence Stream swing bridge", "quote": "Lawrence Stream swing bridge", "ref": "T14"},
+        {"name": "Gilmor Clearing", "quote": "Gilmor Clearing", "ref": null}
+      ],
+      "direction": null,
+      "time": "4 - 6 days one way",
+      "distance": "59 km one way",
+      "evidence": [
+        "The route is described here from east to west.",
+        "Cross the ford and continue 7 km up the valley to Prices clearing, where there is an information kiosk and intentions book. The track starts 1 km further on at the Rolling River car park.",
+        "It is a further 4 km to the end of the route at the Wangapeka Road car park."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "Biggs Tops/Trevor Carter Hut alternative between Wangapeka Saddle and Taipo footbridge",
+      "shape": "one_way",
+      "start": {"name": "Wangapeka Saddle", "quote": "At Wangapeka Saddle", "ref": "T28"},
+      "end": {"name": "Taipo footbridge", "quote": "Taipo footbridge", "ref": null},
+      "via": [
+        {"name": "Biggs Tops", "quote": "Biggs Tops", "ref": "T6"},
+        {"name": "Trevor Carter Hut", "quote": "Trevor Carter Hut", "ref": "T27"}
+      ],
+      "direction": null,
+      "time": "5 hr",
+      "distance": null,
+      "evidence": [
+        "At Wangapeka Saddle a route leads over Biggs Tops and heads steeply down to Trevor Carter Hut.",
+        "From here there are three ways to get back on the main route: Lost Valley Track to Helicopter Flat Hut; Saxon Falls Track, rejoining near Tabernacle lookout; or across the Karamea and along its true left bank to Taipo footbridge."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [
+    {"name": "Kiwi Saddle Hut", "quote": "trampers can do a side trip on Kiwi Track to Kiwi Saddle Hut", "ref": "L2", "from": "junction of Kiwi Stream"},
+    {"name": "Little Wanganui Gorge Shelter", "quote": "a signposted side-track leads to Little Wanganui Gorge Shelter", "ref": null, "from": "Little Wanganui River swing bridge"}
+  ],
+  "huts": [
+    {"name": "Kings Creek Hut", "quote": "Kings Creek Hut", "ref": "T9"},
+    {"name": "Cecil Kings Hut", "quote": "Cecil Kings Hut", "ref": "T7"},
+    {"name": "Stone Hut", "quote": "Stone Hut", "ref": "T23"},
+    {"name": "Helicopter Flat Hut", "quote": "Helicopter Flat Hut", "ref": "T8"},
+    {"name": "Taipo Hut", "quote": "Taipo Hut", "ref": "T24"},
+    {"name": "Stag Flat Bivvy", "quote": "Stag Flat Bivvy", "ref": "L3"},
+    {"name": "Belltown Manunui Hut", "quote": "Belltown Manunui Hut", "ref": "T5"}
+  ],
+  "not_on_route": [
+    {"name": "Kiwi Saddle Hut", "quote": "Kiwi Saddle Hut", "ref": "L2", "why": "side trip"},
+    {"name": "Kiwi Track", "quote": "Kiwi Track", "ref": "L1", "why": "other walk"},
+    {"name": "Mount Patriarch", "quote": "Mount Patriarch", "ref": "T18", "why": "side trip"},
+    {"name": "Little Wanganui Gorge Shelter", "quote": "Little Wanganui Gorge Shelter", "ref": null, "why": "side trip"},
+    {"name": "Saxon Falls", "quote": "where the river drops away over Saxon Falls", "ref": "T21", "why": "view"},
+    {"name": "Leslie/Karamea Track", "quote": "Leslie/Karamea Track", "ref": null, "why": "other walk"}
+  ],
+  "doubts": "The page describes the route east to west; direction is not recorded because the walk is one way, not a loop. W2 is the page's Biggs Tops/Trevor Carter Hut alternative section between Wangapeka Saddle and Taipo footbridge (with its own heading and time), not a whole end-to-end way; from Trevor Carter Hut it offers three ways back to the main route and I used its last-named end (Taipo footbridge), which has no entry. Tabernacle lookout, Taipo footbridge and Gilmor Clearing have no entries. Belltown Manunui Hut is set back 60 m from the main track and Stag Flat Bivvy is adjacent to the route; both counted as on the way. Cecil Kings Hut is 5 min further up the main track from Kings Creek Hut."
+}

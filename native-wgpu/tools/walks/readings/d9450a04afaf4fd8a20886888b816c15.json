@@ -1,0 +1,140 @@
+{
+  "guid": "d9450a04-afaf-4fd8-a208-86888b816c15",
+  "kind": "network",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Hunter Valley Track, Ferguson Hut to the forks",
+      "shape": "one_way",
+      "start": {"name": "Ferguson Hut", "quote": "The track begins at Ferguson Hut", "ref": "T4"},
+      "end": {"name": "forks of the East and West Branches of the Hunter Valley", "quote": "finishes at the forks of the East and West Branches of the Hunter Valley", "ref": "T10"},
+      "via": [
+        {"name": "Ferguson Creek", "quote": "follow the 4WD track to cross Ferguson Creek", "ref": "T3"},
+        {"name": "Hunter River crossing", "quote": "Follow and cross the Hunter River.", "ref": "T7"},
+        {"name": "Joes Flat", "quote": "Joes Flat", "ref": "T8"},
+        {"name": "Forbes Flat", "quote": "the bottom of Forbes Flat", "ref": "T5"},
+        {"name": "Forbes Hut", "quote": "Forbes Hut is halfway up the flat.", "ref": "T6"}
+      ],
+      "direction": null,
+      "time": null,
+      "distance": "12.6 km one way",
+      "evidence": [
+        "Distance: 12.6 km one way",
+        "The track begins at Ferguson Hut and finishes at the forks of the East and West Branches of the Hunter Valley."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "Western side access, Kidds Bush to Scrubby Creek",
+      "shape": "one_way",
+      "start": {"name": "Kidds Bush Campsite", "quote": "The 4WD farm road from the Kidds Bush Campsite to Scrubby Creek", "ref": null},
+      "end": {"name": "Scrubby Creek", "quote": "Kidds Bush to Scrubby Creek", "ref": null},
+      "via": [
+        {"name": "4WD farm road through Hunter Valley Station", "quote": "The 4WD farm road from the Kidds Bush Campsite to Scrubby Creek crosses through the working high-country Hunter Valley Station.", "ref": null},
+        {"name": "Terrace Creek", "quote": "From Terrace Creek the 4WD farm road follows the Hunter River Valley floor", "ref": null},
+        {"name": "Little Hopwood Burn (bridge closed, detour)", "quote": "The bridge at Little Hopwood Burn has been closed due to safety concerns", "ref": null}
+      ],
+      "direction": null,
+      "time": "10-12 hr",
+      "distance": "45 km",
+      "evidence": [
+        "Kidds Bush to Scrubby Creek",
+        "The 4WD farm road from the Kidds Bush Campsite to Scrubby Creek crosses through the working high-country Hunter Valley Station."
+      ]
+    },
+    {
+      "id": "W3",
+      "main": false,
+      "label": "Eastern side access, Dingle Burn Carpark to Scrubby Creek",
+      "shape": "one_way",
+      "start": {"name": "Dingle Burn Carpark", "quote": "the public carpark on the Dingle Burn road", "ref": null},
+      "end": {"name": "Scrubby Creek", "quote": "Dingle Burn Carpark to Scrubby Creek", "ref": null},
+      "via": [
+        {"name": "Lake Hāwea Track", "quote": "Lake Hawea Track", "ref": "L1"},
+        {"name": "Dingle Burn Peninsula Track", "quote": "Dingle Burn Peninsula Track", "ref": "L2"}
+      ],
+      "direction": null,
+      "time": "13-14 hr",
+      "distance": "46.5 km",
+      "evidence": [
+        "Dingle Burn Carpark to Scrubby Creek",
+        "It's 46.5 km to reach the conservation area from the public carpark on the Dingle Burn road.",
+        "The first two sections of this access are described in the Lake Hawea Track and Dingle Burn Peninsula Track descriptions."
+      ]
+    },
+    {
+      "id": "W4",
+      "main": false,
+      "label": "Scrubby Creek to Ferguson Hut",
+      "shape": "one_way",
+      "start": {"name": "Scrubby Flat Creek", "quote": "From Scrubby Flat Creek there is no marked track in the conservation area", "ref": null},
+      "end": {"name": "Ferguson Hut", "quote": "Scrubby Creek to Ferguson Hut", "ref": "T4"},
+      "via": [
+        {"name": "Hunter River crossings", "quote": "the main Hunter River has to be crossed at least 4 times", "ref": "T7"}
+      ],
+      "direction": null,
+      "time": "1 hr 30 min – 2 hr",
+      "distance": "7 km",
+      "evidence": [
+        "Scrubby Creek to Ferguson Hut",
+        "From Scrubby Flat Creek there is no marked track in the conservation area and the main Hunter River has to be crossed at least 4 times."
+      ]
+    },
+    {
+      "id": "W5",
+      "main": false,
+      "label": "Ferguson Hut to Forbes Hut",
+      "shape": "one_way",
+      "start": {"name": "Ferguson Hut", "quote": "From Ferguson Hut, follow the 4WD track", "ref": "T4"},
+      "end": {"name": "Forbes Hut", "quote": "Forbes Hut is halfway up the flat.", "ref": "T6"},
+      "via": [
+        {"name": "Ferguson Creek", "quote": "cross Ferguson Creek", "ref": "T3"},
+        {"name": "Hunter River crossing", "quote": "Follow and cross the Hunter River.", "ref": "T7"},
+        {"name": "Joes Flat", "quote": "Joes Flat", "ref": "T8"},
+        {"name": "Forbes Flat", "quote": "Forbes Flat", "ref": "T5"}
+      ],
+      "direction": null,
+      "time": "2-3 hr",
+      "distance": "10 km",
+      "evidence": [
+        "Ferguson Hut to Forbes Hut",
+        "Forbes Hut is halfway up the flat."
+      ]
+    },
+    {
+      "id": "W6",
+      "main": false,
+      "label": "Forbes Hut to the West Branch bushline",
+      "shape": "one_way",
+      "start": {"name": "Forbes Hut", "quote": "From the hut to the West Branch bushline (3 hours)", "ref": "T6"},
+      "end": {"name": "West Branch bushline", "quote": "continues on the true right to the bush line", "ref": null},
+      "via": [
+        {"name": "Hunter River crossing below the forks", "quote": "cross the Hunter River below the forks", "ref": "T7"},
+        {"name": "West Branch crossing to ridge between East and West branches", "quote": "cross the West Branch to the start of the track, on a ridge between the East and West branches", "ref": null}
+      ],
+      "direction": null,
+      "time": "3 hours",
+      "distance": null,
+      "evidence": [
+        "From the hut to the West Branch bushline (3 hours), follow the flat up and cross the Hunter River below the forks.",
+        "About an hour from the forks, the track crosses the river and continues on the true right to the bush line."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "fly in by plane or helicopter", "quote": "you may wish to fly by plane or helicopter into the Hunter Valley", "ref": null, "onto": null}
+  ],
+  "side_trips": [],
+  "huts": [
+    {"name": "Forbes Hut", "quote": "Forbes Hut", "ref": "T6"}
+  ],
+  "not_on_route": [
+    {"name": "Wills valley", "quote": "experienced trampers can reach the Wills valley", "ref": null, "why": "other"},
+    {"name": "Long Flat Creek track", "quote": "Long Flat Creek track", "ref": "T2", "why": "other walk"},
+    {"name": "Turihuka campsite", "quote": "Turihuka campsite", "ref": null, "why": "nearby"},
+    {"name": "Hunter Valley Station huts", "quote": "Hunter Valley Station huts", "ref": null, "why": "nearby"}
+  ],
+  "doubts": "A page for several access routes and track sections, recorded as a network. Each section is given as A to B and recorded as one way; the page does not say whether people return the same way. The Hunter Valley Track's end ref T10 (The Forks) is assumed to be the forks of the East and West Branches the text names. Scrubby Creek / Scrubby Flat Creek, Kidds Bush Campsite and the Dingle Burn carpark have no entries, so their refs are null. Ferguson Hut is the start of the main way, so it is not listed in huts. The West Branch bushline route (W6) is described only in outline. DOC gives no overall time or distance for the page."
+}
