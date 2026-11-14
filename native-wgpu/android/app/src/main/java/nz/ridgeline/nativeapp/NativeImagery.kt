@@ -32,6 +32,8 @@ internal class NativeImagery(
     private val checkPreparation:()->Unit={},
     private val readLocal:(String,()->ByteArray?)->ByteArray?={_,read->read()},
     private val settings:()->MapSettings.State={MapSettings.State()},
+    /** Where an overview tile is served online (payload, offset), or null: OverviewStream. */
+    private val stream:(String,Long)->String?={_,_->null},
 ) {
     private val catalog by lazy { json("overview-index.json") }
     private val atlas by lazy { json("gap-atlas.json") }
@@ -97,8 +99,22 @@ internal class NativeImagery(
             }
         }
     }
+    /** An overview tile not held on the phone, served online: its URL and exact length. */
+    private fun streamed(z:Int,x:Int,y:Int):Pair<String,Int>?{
+        if(z>12||hasSaved(z,x,y))return null
+        val entry=catalog.getJSONObject("tiles").optJSONObject("$z/$x/$y")?:return null
+        val row=entry.optJSONObject(if(settings().natural)"natural"else"raw")?:entry
+        val length=row.getInt("bytes");if(length !in 20..1048576)return null
+        return stream(row.getString("file"),row.getLong("offset"))?.let{it to length}
+    }
     private fun base(z:Int,x:Int,y:Int):Bitmap {
-        return bitmap((if(hasSaved(z,x,y)) readLocal("saved:$z/$x/$y"){saved(z,x,y)} else null) ?: fetch(linz(z,x,y)))
+        (if(hasSaved(z,x,y)) readLocal("saved:$z/$x/$y"){saved(z,x,y)} else null)?.let{return bitmap(it)}
+        // The overview imagery served online; LINZ's own tile if it cannot be had.
+        streamed(z,x,y)?.let{(url,length)->
+            val bytes=try{fetch(url)}catch(_:java.io.IOException){null}
+            if(bytes!=null&&OverviewStream.complete(bytes,length))return bitmap(bytes)
+        }
+        return bitmap(fetch(linz(z,x,y)))
     }
     private fun rings(rows:JSONArray?):List<List<SourceGeometry.Point>> = if(rows==null) emptyList() else List(rows.length()) { i ->
         val ring=rows.getJSONArray(i)
@@ -148,7 +164,7 @@ internal class NativeImagery(
     fun inputs(z:Int,x:Int,y:Int):List<String>{
         alternate(z,x,y)?.let{return listOf(it)}
         val p=plan(z,x,y);val urls=ArrayList<String>()
-        if(p.mode=="linz"||p.mode=="boundary")if(!hasSaved(z,x,y))urls+=linz(z,x,y)
+        if(p.mode=="linz"||p.mode=="boundary")if(!hasSaved(z,x,y))urls+=streamed(z,x,y)?.first?:linz(z,x,y)
         if(p.mode!="linz"&&p.coarse==null){val ez=minOf(z,18);val f=1 shl(z-ez)
             urls+="https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/$ez/${y/f}/${x/f}"
             val entry=p.entry
