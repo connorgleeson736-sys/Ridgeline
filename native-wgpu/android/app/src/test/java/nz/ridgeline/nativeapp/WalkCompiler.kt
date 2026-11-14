@@ -274,7 +274,7 @@ internal object WalkCompiler {
         if(along.size>=2)for(h in r.optJSONArray("huts")?.let{x->(0 until x.length()).map{x.getJSONObject(it)}}.orEmpty()){
             if(!h.isNull("ref")&&h.optString("ref").let{links[it]?.getString("kind")=="hut"})continue
             val n=DocTracks.hutName(h.optString("name"))
-            val m=input.huts.filter{DocTracks.hutName(it.name).equals(n,true)&&DocTracks.distanceTo(along,it.point)<2000}
+            val m=input.huts.distinctBy{it.link}.filter{DocTracks.hutName(it.name).equals(n,true)&&DocTracks.distanceTo(along,it.point)<2000}
             val one=m.singleOrNull()?:continue
             if(linked.none{it.link==one.link})linked.add(one)
         }

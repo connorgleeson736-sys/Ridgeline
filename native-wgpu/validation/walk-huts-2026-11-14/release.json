@@ -1,0 +1,25 @@
+{
+  "artifact": "Ridgeline-Native-Walk-Huts-0.1.57-Base.apk",
+  "bytes": 34439979,
+  "sha256": "c252a179100549d8f6a92a93ea99c32a5546c67341feeee09f5a23d07d91f0d5",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.57-walk-huts",
+  "versionCode": 58,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.56 Full Audit (same package and signer)",
+  "changes": [
+    "Huts a walk page names without linking are matched to DOC's hut data once per hut: DOC's hut service lists 497 of its 920 huts twice (same name, place and page), and a name with two entries was treated as ambiguous and dropped. 68 of the 145 compiled walks gain huts, e.g. Rees-Dart Track: Shelter Rock, Dart and Daleys Flat huts. Different huts sharing a name near a walk are still left out. No walk changed status; every hut added is within 600 m of its walk's route."
+  ],
+  "dataChecks": "compile-report.json and review.html (same 145 readings as 0.1.56; 93 verified).",
+  "tests": {
+    "kotlinJvm": "all pass (new: Rees-Dart lists its three huts once each)",
+    "rust": "unchanged"
+  },
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}
