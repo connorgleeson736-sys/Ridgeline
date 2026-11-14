@@ -20,7 +20,7 @@ internal object HuntingDetails {
             val facts=listOf(a.type.let{if(it=="Ordinary")"Hunting permit area" else it},a.permitArea,if(a.hectares>0)String.format(java.util.Locale.ROOT,"%,.0f ha",a.hectares)else"").filter{it.isNotBlank()}
             content.addView(NativeUi.text(activity,facts.joinToString("\n"),13f).apply{setTextColor(NativeUi.muted);setPadding(0,dp(2),0,dp(4))})
             if(a.webPage.startsWith("https://"))content.addView(TextView(activity).apply{
-                text="Permit and conditions on the DOC website ↗";textSize=13.5f;setTextColor(android.graphics.Color.rgb(196,104,46));setPadding(0,dp(6),0,dp(6));isClickable=true;background=NativeUi.pressable(activity,null)
+                text="Permit and conditions on the DOC website ↗";textSize=13.5f;setTextColor(NativeUi.link);setPadding(0,dp(6),0,dp(6));isClickable=true;background=NativeUi.pressable(activity,null)
                 setOnClickListener{runCatching{activity.startActivity(Intent(Intent.ACTION_VIEW,Uri.parse(a.webPage)))}}
             },LinearLayout.LayoutParams(-2,-2))
         }

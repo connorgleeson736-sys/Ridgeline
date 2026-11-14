@@ -214,20 +214,20 @@ class ElevationProfileView(context:Context):View(context){
      * section's distance, ascent and descent while dragging. */
     private fun tooltip(canvas:Canvas,p:NativeGeo.ProfilePoint?,selected:Pair<Double,Double>?){
         val lines:List<Pair<String,Int>> = if(selected!=null){val s=section?:return
-            listOf("Distance "+distance(s.distance) to Color.rgb(17,17,17),
-                "↑ Ascent "+(if(s.complete)"${s.ascent.roundToInt()} m" else "unavailable") to Color.rgb(60,120,83),
+            listOf("Distance "+distance(s.distance) to NativeUi.ink,
+                "↑ Ascent "+(if(s.complete)"${s.ascent.roundToInt()} m" else "unavailable") to (if(NativeUi.dark)Color.rgb(126,196,146)else Color.rgb(60,120,83)),
                 "↓ Descent "+(if(s.complete)"${s.descent.roundToInt()} m" else "unavailable") to END)
         }else{if(p==null)return;val grade=index.grade(p.distance)
-            listOf((p.height?.let{String.format(java.util.Locale.ROOT,"%,d m",it.roundToInt())}?:"Elevation unavailable") to Color.rgb(17,17,17),
-                distance(p.distance)+" from start" to Color.rgb(51,74,60),
-                (if(grade==null)"Grade unavailable" else "Grade "+(if(grade>0)"+" else "")+String.format(java.util.Locale.ROOT,"%.1f%%",grade)) to Color.rgb(51,74,60))}
+            listOf((p.height?.let{String.format(java.util.Locale.ROOT,"%,d m",it.roundToInt())}?:"Elevation unavailable") to NativeUi.ink,
+                distance(p.distance)+" from start" to NativeUi.muted,
+                (if(grade==null)"Grade unavailable" else "Grade "+(if(grade>0)"+" else "")+String.format(java.util.Locale.ROOT,"%.1f%%",grade)) to NativeUi.muted)}
         text.textSize=11*scaled;text.textAlign=Paint.Align.LEFT
         val w=lines.maxOf{text.measureText(it.first)}+16*density;val line=15*density;val h=lines.size*line+8*density
         val anchor=if(selected!=null)x(selected.second)else x(p!!.distance)
         val bx=(if(anchor+12*density+w<=right)anchor+12*density else anchor-12*density-w).coerceIn(left,max(left,right-w))
         val by=top+12*density
-        box.set(bx,by,bx+w,by+h);paint.style=Paint.Style.FILL;paint.color=if(selected!=null)Color.rgb(247,250,246)else Color.WHITE;canvas.drawRoundRect(box,6*density,6*density,paint)
-        paint.style=Paint.Style.STROKE;paint.strokeWidth=density;paint.color=if(selected!=null)Color.rgb(128,161,138)else Color.rgb(205,214,204);canvas.drawRoundRect(box,6*density,6*density,paint)
+        box.set(bx,by,bx+w,by+h);paint.style=Paint.Style.FILL;paint.color=if(selected!=null)NativeUi.chip else NativeUi.surface;canvas.drawRoundRect(box,6*density,6*density,paint)
+        paint.style=Paint.Style.STROKE;paint.strokeWidth=density;paint.color=if(selected!=null)Color.rgb(128,161,138)else NativeUi.line;canvas.drawRoundRect(box,6*density,6*density,paint)
         for((i,row) in lines.withIndex()){text.color=row.second;canvas.drawText(row.first,bx+8*density,by+line*(i+1),text)}
     }
     private fun distance(m:Double)=if(m>=1000)String.format(java.util.Locale.ROOT,"%.2f km",m/1000)else"${m.roundToInt()} m"

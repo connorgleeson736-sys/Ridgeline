@@ -22,7 +22,24 @@ class MainActivity:Activity(){
     private lateinit var layersUi:LayersUi
     private lateinit var mapLayers:MapLayers
     private fun dp(value:Int)=(value*resources.displayMetrics.density+.5f).toInt()
+    private fun night(config:android.content.res.Configuration)=(config.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK)==android.content.res.Configuration.UI_MODE_NIGHT_YES
+    /** The phone's status and navigation bars over the app's background, their icons
+     * dark on the light theme and light on the dark one (white on white was unreadable). */
+    private fun systemBars(){
+        val light=!NativeUi.dark
+        @Suppress("DEPRECATION") run{window.statusBarColor=NativeUi.paper;window.navigationBarColor=NativeUi.paper}
+        if(android.os.Build.VERSION.SDK_INT>=30){
+            val mask=android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS or android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS
+            window.insetsController?.setSystemBarsAppearance(if(light)mask else 0,mask)
+        }else @Suppress("DEPRECATION") run{window.decorView.systemUiVisibility=if(light)View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR else 0}
+    }
+    /** The app follows the phone's dark mode, also when it changes while open. */
+    override fun onConfigurationChanged(config:android.content.res.Configuration){
+        super.onConfigurationChanged(config)
+        if(night(config)!=NativeUi.dark)recreate()
+    }
     override fun onCreate(state:Bundle?){
+        NativeUi.dark=night(resources.configuration)
         super.onCreate(state)
         terrain=TerrainView(this)
         val root=FrameLayout(this)
@@ -34,8 +51,8 @@ class MainActivity:Activity(){
             text="Loading map…"
             textSize=11f
             setPadding(dp(8),dp(5),dp(8),dp(5))
-            background=NativeUi.background(this@MainActivity,Color.argb(235,255,255,255),14)
-            setTextColor(Color.rgb(40,55,48))
+            background=NativeUi.background(this@MainActivity,NativeUi.glass,14)
+            setTextColor(NativeUi.ink)
         }
         mapHost.addView(status,FrameLayout.LayoutParams(-2,-2,Gravity.TOP or Gravity.CENTER_HORIZONTAL).apply{topMargin=dp(62)})
         terrain.onStatus={if(status.text.toString()!=it)status.text=it;status.visibility=if(it.isEmpty())View.GONE else View.VISIBLE}
@@ -46,9 +63,9 @@ class MainActivity:Activity(){
                 "Hunting areas, tracks &amp; huts: <a href=\"https://www.doc.govt.nz/about-us/our-policies-and-profile/copyright/\">Department of Conservation · CC BY 4.0</a>",
                 Html.FROM_HTML_MODE_LEGACY)
             textSize=10f;movementMethod=LinkMovementMethod.getInstance()
-            setTextColor(Color.rgb(40,55,48));setLinkTextColor(Color.rgb(40,55,48))
+            setTextColor(NativeUi.ink);setLinkTextColor(NativeUi.ink)
             setPadding(dp(8),dp(4),dp(8),dp(4))
-            background=NativeUi.background(this@MainActivity,Color.argb(235,255,255,255),12);visibility=View.GONE
+            background=NativeUi.background(this@MainActivity,NativeUi.glass,12);visibility=View.GONE
         }
         // Capacitor compact attribution: an "i" button toggles the credits.
         val info=MapControls.iconButton(this,MapControls.InfoIcon(this),"Show map attribution"){attribution.visibility=if(attribution.visibility==View.VISIBLE)View.GONE else View.VISIBLE}.apply{background=NativeUi.pressable(this@MainActivity,null);elevation=0f}
@@ -57,6 +74,8 @@ class MainActivity:Activity(){
         val scale=MapControls.Scale(this)
         mapHost.addView(scale,FrameLayout.LayoutParams(dp(102),dp(20),Gravity.BOTTOM or Gravity.START).apply{marginStart=dp(12);bottomMargin=dp(14)})
         setContentView(root)
+        // Behind the status and navigation bars (the root's padding): the app's background.
+        root.setBackgroundColor(NativeUi.paper);systemBars()
         loader=TileLoader(this,terrain)
         mapLayers=MapLayers(terrain,loader)
         terrain.onCamera={loader.cameraChanged();mapLayers.refresh()};terrain.onData={loader.cameraChanged();mapLayers.refresh()}
@@ -65,6 +84,7 @@ class MainActivity:Activity(){
         planner.onOffline={layersUi.dismiss();offlineUi.startRegion()}
         planner.savedRegions={list,close->offlineUi.fillSavedRegions(list,close)}
         // Tap a track name for its summary; tap inside a hunting permit area for its details.
+        // A tap elsewhere leaves an open summary as it is (it closes with its X).
         trackSheet=TrackSheet(this,root,loader,mapHost)
         trackSheet.onLine={line,part->planner.highlightTrack(line,part)}
         trackSheet.onClosed={planner.relayout()}
@@ -100,7 +120,6 @@ class MainActivity:Activity(){
                 label!=null&&at!=null&&label.ref.isNotEmpty()&&!label.section->trackSheet.showWalk(label.ref,label.text,at)
                 // A section under its own name: in the walk the map gives it.
                 label!=null&&at!=null->trackSheet.show(label.text.removeSuffix(" (mapped closed)"),at,label.ref.takeIf{label.section})
-                trackSheet.visible->trackSheet.hide()
                 loader.mapSettings.state.hunting->terrain.pick(x,y){hit->if(hit!=null)mapLayers.huntingAt(hit[0],hit[1]){areas->HuntingDetails.show(this,areas)}}
             }
         }

@@ -16,7 +16,7 @@ internal object MapControls {
     private fun dp(context:Context,v:Int)=NativeUi.dp(context,v)
 
     /** White rounded map button, as the Capacitor/MapLibre controls. */
-    fun tile(context:Context,radius:Int=8)=GradientDrawable().apply{setColor(Color.WHITE);cornerRadius=dp(context,radius).toFloat()}
+    fun tile(context:Context,radius:Int=8)=GradientDrawable().apply{setColor(NativeUi.surface);cornerRadius=dp(context,radius).toFloat()}
 
     fun iconButton(context:Context,icon:Drawable,description:String,action:()->Unit)=ImageButton(context).apply{
         setImageDrawable(icon);contentDescription=description;scaleType=ImageView.ScaleType.CENTER
@@ -96,7 +96,7 @@ internal object MapControls {
         }
         fun set(threeD:Boolean){
             for((view,active) in listOf(flat to !threeD,relief to threeD)){
-                view.setTextColor(if(active)Color.WHITE else NativeUi.ink)
+                view.setTextColor(if(active)NativeUi.onInk else NativeUi.ink)
                 view.background=if(active)GradientDrawable().apply{setColor(NativeUi.ink);cornerRadius=dp(context,8).toFloat()}else NativeUi.pressable(context,null)
                 view.isSelected=active
             }
@@ -143,8 +143,8 @@ internal object MapControls {
         override fun getIntrinsicWidth()=dp(context,24);override fun getIntrinsicHeight()=dp(context,24)
         override fun draw(canvas:Canvas){
             val b=bounds;val cx=b.exactCenterX();val cy=b.exactCenterY();val r=b.width()*.42f
-            paint.style=Paint.Style.FILL;paint.color=Color.BLACK;canvas.drawCircle(cx,cy,r,paint)
-            paint.color=Color.WHITE;canvas.drawCircle(cx,cy-r*.45f,r*.13f,paint)
+            paint.style=Paint.Style.FILL;paint.color=NativeUi.ink;canvas.drawCircle(cx,cy,r,paint)
+            paint.color=NativeUi.surface;canvas.drawCircle(cx,cy-r*.45f,r*.13f,paint)
             canvas.drawRoundRect(RectF(cx-r*.12f,cy-r*.18f,cx+r*.12f,cy+r*.55f),r*.06f,r*.06f,paint)
         }
         override fun setAlpha(alpha:Int){};override fun setColorFilter(filter:ColorFilter?){}

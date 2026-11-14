@@ -53,6 +53,45 @@ internal object HuntingAreas {
         }
     }
 
+    /** The area shaded as map lines: diagonal hatching inside it (even-odd over all its
+     * rings, so holes stay clear), clipped to [box] (world units). The lines are the
+     * world's diagonals x+y=k·[spacing], so they continue across tiles and never
+     * overlap one another (no doubled colour where a translucent fill would need a
+     * polygon renderer). */
+    fun hatch(area:Area,box:DoubleArray,spacing:Double):List<List<VectorTile.Point>>{
+        val out=ArrayList<List<VectorTile.Point>>()
+        val b=area.bounds
+        val x0=max(b[0],box[0]);val y0=max(b[1],box[1]);val x1=min(b[2],box[2]);val y1=min(b[3],box[3])
+        if(x0>=x1||y0>=y1||spacing<=0)return out
+        // Every edge, with its range of x+y (a line's parity needs all its crossings).
+        val edges=ArrayList<DoubleArray>()
+        for(r in area.rings)for(i in 1 until r.size){val a=r[i-1];val c=r[i];edges.add(doubleArrayOf(a.x,a.y,c.x,c.y,a.x+a.y,c.x+c.y))}
+        val crossings=ArrayList<Double>()
+        var k=ceil((x0+y0)/spacing)
+        while(k*spacing<=x1+y1){
+            val u=k*spacing;k+=1.0
+            crossings.clear()
+            for(e in edges){val ua=e[4];val uc=e[5]
+                if((ua>u)==(uc>u))continue
+                val t=(u-ua)/(uc-ua);val x=e[0]+(e[2]-e[0])*t;val y=e[1]+(e[3]-e[1])*t
+                crossings.add(x-y)}
+            if(crossings.size<2)continue
+            crossings.sort()
+            var i=0
+            while(i+1<crossings.size){
+                // Inside from crossing i to i+1 along x+y=u, by v=x−y: clipped to the box.
+                var va=crossings[i];var vb=crossings[i+1];i+=2
+                // On the line, x=(u+v)/2 and y=(u−v)/2.
+                va=max(va,max(2*x0-u,u-2*y1));vb=min(vb,min(2*x1-u,u-2*y0))
+                if(vb-va<=1e-12)continue
+                out.add(listOf(VectorTile.Point((u+va)/2,(u-va)/2),VectorTile.Point((u+vb)/2,(u-vb)/2)))
+            }
+        }
+        return out
+    }
+    /** Hatch spacing for a data tile of zoom [z]: about 96 lines across it. */
+    fun hatchSpacing(z:Int)=1.0/(1 shl z)/96.0
+
     /** Decodes ArcGIS's FeatureCollection protocol buffer (query f=pbf):
      * attributes in field order, geometry as ring lengths and zigzag delta
      * coordinates quantised by the result's transform (upper-left origin). */

@@ -1,0 +1,29 @@
+{
+  "artifact": "Ridgeline-Native-Sheets-Dark-Topo-0.1.61-Base.apk",
+  "bytes": 34613851,
+  "sha256": "e702c6fdd9cef4906bce489fa09634420f5041f3f406732f17382ee7c8527bca",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.61-sheets-dark-topo",
+  "versionCode": 62,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.60 Full Audit (same package and signer)",
+  "changes": [
+    "Track summary: a hut opened from a track or walk returns to it when its X (or back) is pressed; the summary no longer closes on a drag down or a tap on the map, only with its X.",
+    "Route and track stats size to their text and line up by their tops; the route tools (Edit, Undo, Export GPX, Delete point) take the height of the tallest, so two-line labels are never cut off or out of line; the route sheet's compact stop fits them.",
+    "DOC's walks drawn as track lines from zoom 9 until the map's own tracks start at zoom 12 (LINZ's vector tiles carry tracks from zoom 12 only); no names until then.",
+    "NZ Topo chosen at the phone's pixel density (a 256 px tile over 256 screen pixels, not 256 points): about twice as sharp on a 2x screen; LINZ letters each zoom at the same pixel size, so labels stay as large.",
+    "Dark mode following the phone (also when it changes while open); status and navigation bars take the app's background with icons readable on it (they were white on white).",
+    "Hunting permit areas shaded with translucent blaze-orange hatching under a bolder outline; data tiles now cover a tilted view's distant tiles (they were cut at 32, so distant areas never loaded)."
+  ],
+  "tests": {
+    "kotlinJvm": "all pass (new: hunting hatching)",
+    "rust": "unchanged"
+  },
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

@@ -34,7 +34,7 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
         val tabs=LinearLayout(activity)
         for((label,flag)in listOf("Layers" to false,"Advanced" to true))tabs.addView(TextView(activity).apply{
             text=label;textSize=14f;gravity=Gravity.CENTER;isClickable=true;isFocusable=true;isSelected=advanced==flag
-            setTextColor(if(advanced==flag)Color.WHITE else NativeUi.ink)
+            setTextColor(if(advanced==flag)NativeUi.onInk else NativeUi.ink)
             background=if(advanced==flag)android.graphics.drawable.GradientDrawable().apply{setColor(NativeUi.ink);val r=dp(8).toFloat();cornerRadii=floatArrayOf(r,r,r,r,0f,0f,0f,0f)}else NativeUi.pressable(activity,null)
             setOnClickListener{if(advanced!=flag){advanced=flag;render()}}
         },LinearLayout.LayoutParams(0,dp(36),1f))
@@ -83,7 +83,7 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
             val selected=state.base==mode
             val card=NativeUi.column(activity).apply{
                 setPadding(dp(6),dp(6),dp(6),dp(6));isClickable=true;isSelected=selected;contentDescription=label
-                background=NativeUi.pressable(activity,android.graphics.drawable.GradientDrawable().apply{setColor(Color.WHITE);cornerRadius=dp(8).toFloat();setStroke(dp(if(selected)2 else 1),if(selected)NativeUi.ink else NativeUi.line)})
+                background=NativeUi.pressable(activity,android.graphics.drawable.GradientDrawable().apply{setColor(NativeUi.surface);cornerRadius=dp(8).toFloat();setStroke(dp(if(selected)2 else 1),if(selected)NativeUi.ink else NativeUi.line)})
                 addView(View(activity).apply{background=swatch(mode==MapSettings.Base.TOPO)},LinearLayout.LayoutParams(-1,dp(32)))
                 addView(NativeUi.text(activity,label,13f).apply{setSingleLine();ellipsize=android.text.TextUtils.TruncateAt.END;setPadding(0,dp(6),0,0)})
                 setOnClickListener{settings.change{it.copy(base=mode)};render()}
@@ -104,7 +104,7 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
         check(parent,"Hunting permit areas",state.hunting,huntingKey()){v->settings.change{it.copy(hunting=v)}}
         parent.addView(NativeUi.text(activity,"Highways and major names appear first. Zoom in for smaller roads, road names, lesser peaks, local tracks and bivouacs.",14f).apply{setTextColor(NativeUi.muted);setPadding(0,dp(10),0,dp(8))})
         parent.addView(NativeUi.text(activity,"Check DOC alerts ↗",14f).apply{
-            paintFlags=paintFlags or android.graphics.Paint.UNDERLINE_TEXT_FLAG;setTextColor(Color.rgb(58,110,76));minHeight=dp(40);gravity=Gravity.CENTER_VERTICAL;isClickable=true
+            paintFlags=paintFlags or android.graphics.Paint.UNDERLINE_TEXT_FLAG;setTextColor(if(NativeUi.dark)Color.rgb(126,196,146)else Color.rgb(58,110,76));minHeight=dp(40);gravity=Gravity.CENTER_VERTICAL;isClickable=true
             setOnClickListener{runCatching{activity.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW,android.net.Uri.parse("https://www.doc.govt.nz/parks-and-recreation/know-before-you-go/alerts/")))}}
         })
         parent.addView(NativeUi.text(activity,(if(state.threeD)"3D terrain"else"2D map")+" · Native",12f).apply{setTextColor(NativeUi.muted);setPadding(0,dp(10),0,0)})

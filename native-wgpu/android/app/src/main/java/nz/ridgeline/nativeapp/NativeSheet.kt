@@ -81,7 +81,12 @@ internal class NativeSheet(private val root:FrameLayout,private val map:FrameLay
         if(!dragged&&!moved)next=1-index else if(abs(delta)>dp(32)&&next==index)next=(index+if(delta>0)1 else -1).coerceIn(0,1)
         dragging=false;settle(if(cancel)index else next)
     }
-    private fun stops():IntArray{val h=(root.height-root.paddingTop-root.paddingBottom).takeIf{it>0}?:context.resources.displayMetrics.heightPixels;val compact=min(dp(COMPACT_DP),(h*.33).toInt());return intArrayOf(compact,min(h-dp(80),max(compact+dp(80),(h*.64).toInt())))}
+    /** Height the compact stop must show below the grip (stats and tools), when known. */
+    var compactContent:()->Int={0}
+    private fun stops():IntArray{val h=(root.height-root.paddingTop-root.paddingBottom).takeIf{it>0}?:context.resources.displayMetrics.heightPixels
+        // At least the stats and tools as laid out (larger phone fonts), at most half the screen.
+        val compact=min(max(dp(COMPACT_DP),dp(GRIP_DP)+compactContent()),(h*.5).toInt())
+        return intArrayOf(compact,min(h-dp(80),max(compact+dp(80),(h*.64).toInt())))}
     fun expanded()=index==1
     /** Applies the current stop again (map size and cover). */
     fun refresh()=settle(index)

@@ -113,7 +113,7 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
             val row=NativeUi.column(activity).apply{setPadding(dp(2),dp(8),dp(2),dp(8));background=NativeUi.pressable(activity,null);isClickable=true;contentDescription="${PlaceSearch.label(place.kind)} ${place.name}"}
             row.addView(NativeUi.text(activity,place.name,14f).apply{setTypeface(null,android.graphics.Typeface.BOLD);setTextColor(NativeUi.ink);maxLines=2})
             val distance=if(result.distanceKm<1)"${(result.distanceKm*1000).roundToInt()} m away" else if(result.distanceKm<100)String.format(java.util.Locale.ROOT,"%.1f km away",result.distanceKm)else"${result.distanceKm.roundToInt()} km away"
-            row.addView(NativeUi.text(activity,listOf(PlaceSearch.label(place.kind),place.detail,distance).filter{it.isNotBlank()}.joinToString(" · "),11.5f).apply{setTextColor(Color.rgb(120,132,124));maxLines=2})
+            row.addView(NativeUi.text(activity,listOf(PlaceSearch.label(place.kind),place.detail,distance).filter{it.isNotBlank()}.joinToString(" · "),11.5f).apply{setTextColor(NativeUi.detail);maxLines=2})
             if(place.link.isNotBlank())row.addView(link("DOC page"){runCatching{activity.startActivity(Intent(Intent.ACTION_VIEW,android.net.Uri.parse(place.link)))}.onFailure{toast("No browser is available.")}}.apply{textSize=12.5f},LinearLayout.LayoutParams(-2,dp(30)))
             row.setOnClickListener{
                 hideKeyboard();dismissDrawer()
@@ -133,7 +133,7 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
     private fun dp(value:Int)=(value*activity.resources.displayMetrics.density+.5f).toInt()
     private fun button(text:String,action:()->Unit)=NativeUi.button(activity,text,action=action)
     /** Capacitor drawer actions: orange text links. */
-    private fun link(text:String,action:()->Unit)=TextView(activity).apply{this.text=text;textSize=15f;setTextColor(android.graphics.Color.rgb(196,104,46));gravity=Gravity.CENTER_VERTICAL;setPadding(0,0,dp(18),0);isClickable=true;isFocusable=true;background=NativeUi.pressable(activity,null);setOnClickListener{action()}}
+    private fun link(text:String,action:()->Unit)=TextView(activity).apply{this.text=text;textSize=15f;setTextColor(NativeUi.link);gravity=Gravity.CENTER_VERTICAL;setPadding(0,0,dp(18),0);isClickable=true;isFocusable=true;background=NativeUi.pressable(activity,null);setOnClickListener{action()}}
     /** Set text only when it changes: each set re-lays-out the sheet, and drags
      * update route state on every move. */
     private fun show(view:TextView,value:String){if(view.text.toString()!=value)view.text=value}
@@ -142,16 +142,25 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         // Capacitor route sheet: name field, stats, a chart that fills the
         // expanded sheet, then Edit / Undo / Export GPX / Delete point.
         val heading=LinearLayout(activity)
-        title.background=android.graphics.drawable.GradientDrawable().apply{setColor(Color.WHITE);cornerRadius=dp(4).toFloat();setStroke(dp(1),Color.rgb(180,188,182))};title.setPadding(dp(8),0,dp(8),0);title.textSize=16f
+        title.background=android.graphics.drawable.GradientDrawable().apply{setColor(NativeUi.surface);cornerRadius=dp(4).toFloat();setStroke(dp(1),NativeUi.line)};title.setTextColor(NativeUi.ink);title.setPadding(dp(8),0,dp(8),0);title.textSize=16f
         heading.addView(title,LinearLayout.LayoutParams(0,dp(40),1f))
         panel.addView(heading,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(6)})
         // Same columns as the tool buttons below (equal widths, 8 dp gaps), centred.
-        panel.addView(LinearLayout(activity).apply{for((i,v) in stats.withIndex())addView(v.apply{gravity=Gravity.CENTER},LinearLayout.LayoutParams(0,dp(40),1f).apply{if(i>0)marginStart=dp(8)})})
+        // Stats size to their text (two lines, larger phone fonts too) and line up by their tops.
+        val statRow=LinearLayout(activity)
+        panel.addView(statRow.apply{isBaselineAligned=false;for((i,v) in stats.withIndex())addView(v.apply{gravity=Gravity.CENTER;minHeight=dp(40);maxLines=2},LinearLayout.LayoutParams(0,-2,1f).apply{if(i>0)marginStart=dp(8)})})
         panel.addView(chart,LinearLayout.LayoutParams(-1,0,1f).apply{topMargin=dp(4)})
         val export=button("Export GPX"){exportGpx()}.apply{setOnLongClickListener{shareGpx();true};contentDescription="Export GPX. Long press to share."}
         delete.setTextColor(android.content.res.ColorStateList(arrayOf(intArrayOf(-android.R.attr.state_enabled),intArrayOf()),intArrayOf(Color.argb(110,186,99,53),Color.rgb(186,99,53))))
-        for((i,view) in listOf(edit,undo,export,delete).withIndex())tools.addView(view.apply{minimumHeight=0;minHeight=0},LinearLayout.LayoutParams(0,dp(34),1f).apply{if(i>0)marginStart=dp(8)})
+        // Tools line up by their tops (not their text baselines) and all take the height of the
+        // tallest, so a label on two lines ("Export GPX" on a narrow phone) is never cut off.
+        tools.isBaselineAligned=false
+        for((i,view) in listOf(edit,undo,export,delete).withIndex())tools.addView(view.apply{minimumHeight=dp(34);minHeight=dp(34);maxLines=2;gravity=Gravity.CENTER;setPadding(dp(6),dp(4),dp(6),dp(4))},LinearLayout.LayoutParams(0,-1,1f).apply{if(i>0)marginStart=dp(8)})
         panel.addView(tools,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(6)});panel.addView(summary)
+        // The compact stop shows the stats and tools whole, however tall the phone's font makes them.
+        sheet.compactContent={if(statRow.height>0&&tools.height>0)statRow.height+dp(6)+tools.height+dp(10)else 0}
+        val resize=View.OnLayoutChangeListener{_,_,top,_,bottom,_,oldTop,_,oldBottom->if(bottom-top!=oldBottom-oldTop&&!sheet.expanded())main.post{sheet.refresh()}}
+        statRow.addOnLayoutChangeListener(resize);tools.addOnLayoutChangeListener(resize)
         sheet.onClose={controller.unload()}
         sheet.onCover={onMapCover(it)}
         sheet.onSnap={expanded->chart.visibility=if(expanded)View.VISIBLE else View.GONE;heading.visibility=if(expanded)View.VISIBLE else View.GONE;summary.visibility=if(expanded&&controller.state.drawing)View.VISIBLE else View.GONE;if(!expanded)chart.clearInspection()}
@@ -301,8 +310,8 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         val top=LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL;setPadding(0,dp(8),0,dp(2))}
         val field=EditText(activity).apply{
             hint="Search places, huts, tracks";textSize=14f;setSingleLine();imeOptions=android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH
-            setTextColor(NativeUi.ink);setHintTextColor(Color.rgb(132,142,136));setPadding(dp(12),0,dp(12),0)
-            background=NativeUi.background(activity,Color.rgb(237,241,233),10,true);contentDescription="Search places, huts and tracks"
+            setTextColor(NativeUi.ink);setHintTextColor(NativeUi.hint);setPadding(dp(12),0,dp(12),0)
+            background=NativeUi.background(activity,NativeUi.chip,10,true);contentDescription="Search places, huts and tracks"
             setText(searchQuery);setOnEditorActionListener{_,_,_->hideKeyboard();true}
             addTextChangedListener(object:android.text.TextWatcher{
                 override fun beforeTextChanged(t:CharSequence?,a:Int,b:Int,c:Int){}
@@ -341,10 +350,10 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         for((index,row)in state.records.withIndex()){
             val card=drawerCards.getOrPut(row.id){
                 val view=NativeUi.column(activity).apply{setPadding(0,dp(10),0,dp(2))};val heading=LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL}
-                val thumb=RouteThumbnailView(activity).apply{contentDescription="Route preview for ${row.name}";background=NativeUi.background(activity,android.graphics.Color.rgb(237,241,233),8,true)};heading.addView(thumb,LinearLayout.LayoutParams(dp(50),dp(42)))
+                val thumb=RouteThumbnailView(activity).apply{contentDescription="Route preview for ${row.name}";background=NativeUi.background(activity,NativeUi.chip,8,true)};heading.addView(thumb,LinearLayout.LayoutParams(dp(50),dp(42)))
                 val details=NativeUi.column(activity)
                 val check=CheckBox(activity).apply{textSize=13.5f;setPadding(dp(4),0,0,0);setTypeface(null,android.graphics.Typeface.BOLD);setTextColor(NativeUi.ink);buttonTintList=android.content.res.ColorStateList.valueOf(NativeUi.ink);setOnCheckedChangeListener{_,checked->if(!updatingCards){if(checked)combineSelection[row.id]=false else combineSelection.remove(row.id);renderDrawer()}}};details.addView(check)
-                val summary=NativeUi.text(activity,"",11.5f).apply{setTextColor(Color.rgb(120,132,124));setPadding(dp(2),0,0,0)};details.addView(summary)
+                val summary=NativeUi.text(activity,"",11.5f).apply{setTextColor(NativeUi.detail);setPadding(dp(2),0,0,0)};details.addView(summary)
                 heading.addView(details,LinearLayout.LayoutParams(0,-2,1f).apply{marginStart=dp(8)});view.addView(heading)
                 val actions=LinearLayout(activity).apply{setPadding(0,dp(2),0,0)}
                 // Opening a route closes the sidebar so the route is visible (Capacitor).

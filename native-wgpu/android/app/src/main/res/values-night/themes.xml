@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark: when the phone is in dark mode. -->
+    <color name="ridgeline_paper">#1B1F1D</color>
+    <style name="RidgelineTheme" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/ridgeline_paper</item>
+        <item name="android:statusBarColor">@color/ridgeline_paper</item>
+        <item name="android:navigationBarColor">@color/ridgeline_paper</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>
