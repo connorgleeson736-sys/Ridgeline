@@ -228,7 +228,14 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
         val names=packs.map{"Detach ${it.name}"}.toTypedArray()
         AlertDialog.Builder(activity).setTitle("Overview imagery · ${packs.size}/6 packs")
             .setItems(names){_,i->loader.detachOverview(packs[i].payload){Toast.makeText(activity,"Detached ${packs[i].name}",Toast.LENGTH_SHORT).show()}}
-            .setPositiveButton("Add ZIPs"){_,_->closeBar();addImagery()}.setNegativeButton("Close",null).show()
+            .setPositiveButton("Add ZIPs"){_,_->closeBar();addImagery()}.setNegativeButton("Close",null)
+            .apply{if(loader.overviewsOnline&&packs.size<6)setNeutralButton("Download all"){_,_->downloadImagery()}}.show()
+    }
+    /** All six overview ZIPs from where the imagery is served, kept for offline use. */
+    private fun downloadImagery(){
+        hint("Downloading overview imagery…")
+        loader.downloadOverviews({got,total->hint("Overview imagery ${got*100/maxOf(1L,total)}% · ${got/1_000_000}/${total/1_000_000} MB")}){error->
+            Toast.makeText(activity,error?:"Overview imagery saved for offline use · ${loader.overviews.list().size}/6 packs",Toast.LENGTH_LONG).show()}
     }
     /** A short note at the top of the map, styled like the map status ("Terrain load failed…"). */
     private var hintView:TextView?=null

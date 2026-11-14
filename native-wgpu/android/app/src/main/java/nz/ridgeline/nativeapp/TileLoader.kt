@@ -80,6 +80,10 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
                 runCatching{File(context.cacheDir,name).deleteRecursively()}
         }
     }
+    /** Where the overview imagery is served online (map-defaults.json "overviewUrl"; blank: not streamed). */
+    internal val overviewBase = context.assets.open("map-defaults.json").use {
+        JSONObject(it.readBytes().toString(Charsets.UTF_8)).optString("overviewUrl")
+    }
     private val key = context.assets.open("map-defaults.json").use {
         JSONObject(it.readBytes().toString(Charsets.UTF_8)).getString("linzApiKey")
     }
@@ -107,13 +111,47 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     fun offlineOnly(value:Boolean){offlineOnly=value;preferences.edit().putBoolean("offlineOnly",value).apply();transport.batchDemand{for(task in jobs.values)task.cancel();clearWarm()};synchronized(ready){ready.clear();readyBytes=0};synchronized(decoded){decoded.clear()};cameraChanged()}
     val overviews=OverviewAttachments(context)
     private val attachmentJobs=Executors.newSingleThreadExecutor()
-    private val imagery = NativeImagery(context, ::fetch, {z,x,y->linz("aerial",Id(z,x,y),"webp")},overviews,::checkPreparation,::localImage,{mapSettings.state})
+    private val imagery = NativeImagery(context, ::fetch, {z,x,y->linz("aerial",Id(z,x,y),"webp")},overviews,::checkPreparation,::localImage,{mapSettings.state},{file,offset->OverviewStream.tileUrl(overviewBase,file,offset)})
     private val imageryReady=CompletableFuture.runAsync({imagery.initialize()},attachmentJobs)
     fun attachOverview(uri:android.net.Uri,done:(String?)->Unit){attachmentJobs.execute{
         val error=try{overviews.attach(uri);imageryChanged();null}catch(e:Exception){e.message?:"Could not attach imagery ZIP."}
         view.post{if(!dead)done(error)}
     }}
-    fun detachOverview(payload:String,done:()->Unit){attachmentJobs.execute{overviews.detach(payload);imageryChanged();view.post{if(!dead)done()}}}
+    fun detachOverview(payload:String,done:()->Unit){attachmentJobs.execute{
+        val pack=overviews.list().firstOrNull{it.payload==payload}
+        overviews.detach(payload);imageryChanged()
+        // A pack this app downloaded (not one the user chose) is deleted with it.
+        pack?.uri?.let{android.net.Uri.parse(it)}?.takeIf{it.scheme=="file"}?.path?.let{File(it)}?.takeIf{it.parentFile==overviewDir}?.delete()
+        view.post{if(!dead)done()}}}
+    private val overviewDir get()=File(context.filesDir,"overview-packs")
+    /** Whether the overview imagery is served online (streamed, and downloadable whole). */
+    val overviewsOnline get()=overviewBase.isNotBlank()
+    /** The six original overview ZIPs from where the overview imagery is served, kept on
+     * the phone and attached as ZIPs chosen by hand are (each checked against its SHA-256),
+     * resuming a partial download. [progress]: bytes so far and in all (UI thread); [done]:
+     * an error, or null when all six are attached. */
+    fun downloadOverviews(progress:(Long,Long)->Unit,done:(String?)->Unit){attachmentJobs.execute{
+        val error=try{
+            val files=context.assets.open("overview-archives.json").use{JSONObject(it.readBytes().toString(Charsets.UTF_8)).getJSONArray("files")}
+            val have=overviews.list().map{it.payload}.toSet()
+            val todo=(0 until files.length()).map{files.getJSONObject(it)}.filter{it.getString("payload") !in have}
+            val total=todo.sumOf{it.getLong("bytes")};var before=0L;var shown=-1L
+            val dir=overviewDir.apply{mkdirs()}
+            val http=client.newBuilder().cache(null).readTimeout(60,TimeUnit.SECONDS).build()
+            for(row in todo){
+                val name=row.getString("name");val size=row.getLong("bytes")
+                val url=OverviewStream.packUrl(overviewBase,name)?:throw IOException("Overview imagery is not available online.")
+                val file=File(dir,name)
+                OverviewDownload.fetch(http,url,file,size,{dead}){got->val now=(before+got)*100/max(1L,total)
+                    if(now!=shown){shown=now;val b=before+got;view.post{if(!dead)progress(b,total)}}}
+                try{overviews.attach(android.net.Uri.fromFile(file))}catch(e:Exception){file.delete();throw e}
+                before+=size
+            }
+            if(todo.isNotEmpty())imageryChanged()
+            null
+        }catch(e:Exception){e.message?:"Could not download the overview imagery."}
+        view.post{if(!dead)done(error)}
+    }}
     private val am = context.getSystemService(ActivityManager::class.java)
     val recommendedRamCacheMiB=RamCacheBudget.recommended(am.memoryClass,am.isLowRamDevice)
     val ramCacheMiB get()=preferences.getInt("ramCacheMiB",recommendedRamCacheMiB).coerceIn(0,1000)
@@ -810,7 +848,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         val encoded=painted?.let{PaintedArea.encode(it)};downloadCancel.set(false)
         val overlays=display.base!=MapSettings.Base.TOPO&&includeTopo
         fun topoUrl(id:Id)=linz("topo-raster",id,"webp")
-        val downloadImagery=NativeImagery(context,::fetch,{z,x,y->linz("aerial",Id(z,x,y),"webp")},overviews,::checkPreparation,::localImage,{display})
+        val downloadImagery=NativeImagery(context,::fetch,{z,x,y->linz("aerial",Id(z,x,y),"webp")},overviews,::checkPreparation,::localImage,{display},{file,offset->OverviewStream.tileUrl(overviewBase,file,offset)})
         downloadJobs.execute{
             val region=resume?.let{offline.reopen(it)}?:offline.begin(name,OfflineStore.Metadata(bounds,detail,display.base.name,overlays,encoded));regionContext.set(region);regionBatch.set(ArrayList());val demDone=HashSet<Id>()
             // Pacing: network starts in the last minute (all of the app's requests).
