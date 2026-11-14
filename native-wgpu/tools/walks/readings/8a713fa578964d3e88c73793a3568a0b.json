@@ -1,36 +1,93 @@
 {
-  "guid": "8a713fa5-7896-4d3e-88c7-3793a3568a0b",
-  "kind": "one_way",
-  "ways": [
+ "guid": "8a713fa5-7896-4d3e-88c7-3793a3568a0b",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Careys Creek Track from Double Hill Road carpark to Evansdale Glen",
+   "shape": "one_way",
+   "start": {
+    "name": "carpark on Double Hill Road",
+    "quote": "the carpark on Double Hill Road",
+    "ref": "F3"
+   },
+   "end": {
+    "name": "Evansdale Glen/Waimoi",
+    "quote": "Evansdale Glen/Waimoi",
+    "ref": "F1"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Careys Creek Track, Double Hill Road to Evansdale Glen",
-      "shape": "one_way",
-      "start": {"name": "carpark on Double Hill Road", "quote": "the carpark on Double Hill Road", "ref": "F3"},
-      "end": {"name": "Evansdale Glen/Waimoi", "quote": "Evansdale Glen/Waimoi", "ref": "F1"},
-      "via": [
-        {"name": "Careys Creek", "quote": "Careys Creek", "ref": "T5"}
-      ],
-      "direction": null,
-      "time": "4 hr one way",
-      "distance": "9.5 km one way",
-      "evidence": [
-        "From the carpark on Double Hill Road, the track will take you to Evansdale Glen/Waimoi.",
-        "Alternatively, the track can be walked in the opposite direction from Evansdale Glen."
-      ]
+     "name": "Careys Creek",
+     "quote": "The track crosses the creek numerous times",
+     "ref": "T5"
     }
-  ],
-  "access_points": [
-    {"name": "Evansdale Glen (walking in the opposite direction)", "quote": "Evansdale Glen", "ref": "F1", "onto": "Careys Creek Track"}
-  ],
-  "side_trips": [
-    {"name": "Honeycomb Track and Rongomai Track Loop", "quote": "Honeycomb Track and Rongomai Track Loop", "ref": null, "from": "Careys Creek Track"}
-  ],
-  "huts": [],
-  "not_on_route": [
-    {"name": "Blueskin Bay", "quote": "Blueskin Bay", "ref": "T4", "why": "nearby"},
-    {"name": "Silverpeaks Circuit Track", "quote": "Silverpeaks Circuit Track", "ref": null, "why": "other walk"}
-  ],
-  "doubts": "The page says the track can also be walked in the opposite direction from Evansdale Glen; recorded as an access point at the end rather than a separate way. The side-trip loop is made of two map tracks (T2 Honeycomb Track, T3 Rongomai track) and so has no single ref; the page does not say exactly where on Careys Creek Track it leaves."
+   ],
+   "direction": null,
+   "time": "4 hr one way",
+   "distance": "9.5 km one way",
+   "evidence": [
+    "From the carpark on Double Hill Road, the track will take you to Evansdale Glen/Waimoi.",
+    "Alternatively, the track can be walked in the opposite direction from Evansdale Glen."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Evansdale Glen (walking in the opposite direction)",
+   "quote": "Alternatively, the track can be walked in the opposite direction from Evansdale Glen.",
+   "ref": "F1",
+   "onto": "Careys Creek Track"
+  },
+  {
+   "name": "Evansdale Glen Entrance",
+   "quote": "Careys Creek Track via Evansdale Glen Entrance",
+   "ref": "F1",
+   "onto": "Careys Creek Track"
+  }
+ ],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Honeycomb Track and Rongomai Track loop",
+   "quote": "which can make a loop for a challenging side trip",
+   "ref": null,
+   "from": null
+  }
+ ],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Blueskin Bay",
+   "quote": "tucked away behind Blueskin Bay",
+   "ref": "T4",
+   "why": "nearby"
+  },
+  {
+   "name": "Silverpeaks Circuit Track",
+   "quote": "the entrance to the Silverpeaks Circuit Track",
+   "ref": null,
+   "why": "other walk"
+  },
+  {
+   "name": "Black Gully Dam",
+   "quote": "Black Gully Dam is situated on Careys Creek",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Waitati",
+   "quote": "turn left just after Waitati",
+   "ref": "T11",
+   "why": "nearby"
+  },
+  {
+   "name": "Warrington",
+   "quote": "past the turn off to Warrington",
+   "ref": "T12",
+   "why": "nearby"
+  }
+ ],
+ "doubts": "The end ref F1 (where Careys Creek Track meets Evansdale Glen Road) is taken as the Evansdale Glen/Waimoi end from the Evansdale Glen Entrance text, where the car park is in the gravel turn-around before the ford; F2 is a different unnamed track on the Waikouaiti-Waitati Road nearby and is not used. The page says the track can be walked in the opposite direction from Evansdale Glen; this is recorded as an access point, not a separate way. The side-trip loop (Honeycomb Track and Rongomai Track) has its own times (Honeycomb 60 min one way, 1.8 km; Rongomai 40 min one way, 2.2 km), but the page does not say where it leaves Careys Creek Track, so from is null. The track crosses the creek numerous times, but the text does not say whether those crossings are unbridged, so no ford tag."
 }

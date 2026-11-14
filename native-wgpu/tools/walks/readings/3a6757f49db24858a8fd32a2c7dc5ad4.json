@@ -1,36 +1,49 @@
 {
-  "guid": "3a6757f4-9db2-4858-a8fd-32a2c7dc5ad4",
-  "kind": "loop",
-  "ways": [
-    {
-      "id": "W1",
-      "main": true,
-      "label": "Kura Tāwhiti Access Track loop from the car park",
-      "shape": "loop",
-      "start": {"name": "Castle Hill/Kura Tāwhiti car park", "quote": "Castle Hill/Kura Tāwhiti car park", "ref": null},
-      "end": {"name": "Castle Hill/Kura Tāwhiti car park", "quote": "Castle Hill/Kura Tāwhiti car park", "ref": null},
-      "via": [
-        {"name": "pou whenua", "quote": "pou whenua", "ref": null},
-        {"name": "limestone boulders", "quote": "limestone boulders", "ref": null}
-      ],
-      "direction": null,
-      "time": "40 min",
-      "distance": "1.7 km loop",
-      "evidence": [
-        "Kura Tāwhiti Access Track begins at Castle Hill/Kura Tāwhiti car park, in Canterbury’s Waimakariri Basin.",
-        "Complete the loop and return to the car park the same way you came."
-      ]
-    }
-  ],
-  "access_points": [],
-  "side_trips": [],
-  "huts": [],
-  "not_on_route": [
-    {"name": "Torlesse Range", "quote": "Torlesse Range", "ref": null, "why": "view"},
-    {"name": "Craigieburn Range", "quote": "Craigieburn Range", "ref": null, "why": "view"},
-    {"name": "Cave Stream Loop Walk", "quote": "Cave Stream Loop Walk", "ref": "L1", "why": "other walk"},
-    {"name": "Mistletoe Flats Campsite", "quote": "Mistletoe Flats Campsite", "ref": "L2", "why": "nearby"},
-    {"name": "Castle Hill Village", "quote": "Castle Hill Village", "ref": "T4", "why": "nearby"}
-  ],
-  "doubts": "No road end feature is listed for the car park, so the start has no ref. The shape is a loop reached by a stem: 'Complete the loop and return to the car park the same way you came'; the text does not describe the loop's route or direction."
+ "guid": "3a6757f4-9db2-4858-a8fd-32a2c7dc5ad4",
+ "kind": "loop",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Kura Tāwhiti Access Track loop",
+   "shape": "loop",
+   "start": {
+    "name": "Castle Hill/Kura Tāwhiti car park",
+    "quote": "Kura Tāwhiti Access Track begins at Castle Hill/Kura Tāwhiti car park",
+    "ref": null
+   },
+   "end": {
+    "name": "Castle Hill/Kura Tāwhiti car park",
+    "quote": "Complete the loop and return to the car park the same way you came.",
+    "ref": null
+   },
+   "via": [],
+   "direction": null,
+   "time": "40 min",
+   "distance": "1.7 km loop",
+   "evidence": [
+    "Kura Tāwhiti Access Track begins at Castle Hill/Kura Tāwhiti car park, in Canterbury’s Waimakariri Basin.",
+    "Complete the loop and return to the car park the same way you came."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Cave Stream Loop Walk",
+   "quote": "consider taking a side trip to Cave Stream Loop Walk (5 min by car)",
+   "ref": "L1",
+   "why": "other walk"
+  },
+  {
+   "name": "Mistletoe Flats Campsite",
+   "quote": "Camping is available at Mistletoe Flats Campsite (10 min by car)",
+   "ref": "L2",
+   "why": "nearby"
+  }
+ ],
+ "doubts": "No features given, so the car park has no ref. The page calls it a loop but also says to 'return to the car park the same way you came', so the shape is a little unclear; DOC's distance says loop, so loop is used."
 }

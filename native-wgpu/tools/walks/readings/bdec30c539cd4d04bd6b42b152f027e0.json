@@ -1,50 +1,248 @@
 {
-  "guid": "bdec30c5-39cd-4d04-bd6b-42b152f027e0",
-  "kind": "loop",
-  "ways": [
+ "guid": "bdec30c5-39cd-4d04-bd6b-42b152f027e0",
+ "kind": "loop",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Jollie Brook Circuit from the Jollie Brook swing bridge",
+   "shape": "loop",
+   "start": {
+    "name": "Jollie Brook swing bridge",
+    "quote": "Jollie Brook swing bridge to Sisters swing bridge",
+    "ref": null
+   },
+   "end": {
+    "name": "Jollie Brook swing bridge",
+    "quote": "Cross the river via the swing bridge just below the Jollie Brook / Hurunui confluence",
+    "ref": null
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Jollie Brook Circuit",
-      "shape": "loop",
-      "start": {"name": "Jollie Brook swing bridge", "quote": "Jollie Brook swing bridge", "ref": "F2"},
-      "end": {"name": "Jollie Brook swing bridge", "quote": "Jollie Brook swing bridge", "ref": "F2"},
-      "via": [
-        {"name": "Hurunui River", "quote": "Hurunui River", "ref": null},
-        {"name": "Sisters swing bridge (Sisters car park)", "quote": "Sisters swing bridge", "ref": "F1"},
-        {"name": "Gabriel Hut", "quote": "Gabriel Hut", "ref": "T5"},
-        {"name": "Gabriel Stream", "quote": "Gabriel Stream", "ref": "T6"},
-        {"name": "Jollie Brook", "quote": "Jollie Brook", "ref": "T9"},
-        {"name": "Jollie Brook Hut", "quote": "Jollie Brook Hut", "ref": null},
-        {"name": "junction with Cold Stream", "quote": "the junction with Cold Stream", "ref": null},
-        {"name": "Jollie Brook / Hurunui confluence", "quote": "Jollie Brook / Hurunui confluence", "ref": null}
-      ],
-      "direction": null,
-      "time": "18 hr 30 min",
-      "distance": "24 km loop",
-      "evidence": [
-        "The Jollie Brook Circuit starts and finishes off Lake Sumner Road, with the option of starting from either of the two swing bridges over the Hurunui River (approximately 3 km apart on the Lake Sumner Road).",
-        "On the river flats of the Hurunui River, a signpost marks the track that follows the true left of the Hurunui River to the Sisters car park.",
-        "Cross the river via the swing bridge just below the Jollie Brook / Hurunui confluence."
-      ]
+     "name": "Jollie Brook",
+     "quote": "The Jollie Brook needs to be crossed",
+     "ref": "T9"
+    },
+    {
+     "name": "Sisters swing bridge",
+     "quote": "From the swing bridge the track is marked with poles up the true left of the valley",
+     "ref": null
+    },
+    {
+     "name": "Gabriel Hut",
+     "quote": "until you reach Gabriel Hut",
+     "ref": "T5"
+    },
+    {
+     "name": "Gabriel Stream",
+     "quote": "Track leads up Gabriel Stream through beech forest to a low saddle",
+     "ref": "T6"
+    },
+    {
+     "name": "Jollie Brook",
+     "quote": "Cross the Jollie Brook to reach the hut.",
+     "ref": "T9"
+    },
+    {
+     "name": "Jollie Brook Hut",
+     "quote": "Jollie Brook Hut to Jollie Brook swing bridge",
+     "ref": null
+    },
+    {
+     "name": "junction with Cold Stream",
+     "quote": "until you reach the junction with Cold Stream",
+     "ref": null
+    },
+    {
+     "name": "Cold Stream",
+     "quote": "After crossing Cold Stream, gravel flats lead to a short gorge.",
+     "ref": null
     }
-  ],
-  "access_points": [
-    {"name": "Sisters swing bridge", "quote": "Sisters swing bridge", "ref": "F1", "onto": "Sisters Stream Track"}
-  ],
-  "side_trips": [
-    {"name": "Cold Stream Hut", "quote": "Cold Stream Hut", "ref": "T3", "from": "Jollie Brook Track, about halfway between Jollie Brook Hut and the Jollie Brook swing bridge"}
-  ],
-  "huts": [
-    {"name": "Gabriel Hut", "quote": "Gabriel Hut", "ref": "T5"},
-    {"name": "Jollie Brook Hut", "quote": "Jollie Brook Hut", "ref": null}
-  ],
-  "not_on_route": [
-    {"name": "Hope Kiwi Lodge", "quote": "Hope Kiwi Lodge", "ref": "T7", "why": "other walk"},
-    {"name": "Hope Kiwi Track", "quote": "Hope Kiwi Track", "ref": "L1", "why": "other walk"},
-    {"name": "Lake Sumner", "quote": "Lake Sumner", "ref": "T11", "why": "other walk"},
-    {"name": "Lake Marion", "quote": "Lake Marion", "ref": "T10", "why": "other walk"},
-    {"name": "Cold Stream Hut", "quote": "Cold Stream Hut", "ref": "T3", "why": "side trip"}
-  ],
-  "doubts": "The page lets the circuit start from either swing bridge; the leg order (Jollie Brook swing bridge to Sisters swing bridge first) is used for the start, the Sisters bridge is listed as an access point. The two Lake Sumner Road road ends were matched by position (F2 lies by the Jollie Brook river entry, F1 to the west toward Sisters Stream, about 3 km apart); this matching is inferred from coordinates. Jollie Brook Hut has no entry in the packet. DOC's '18 hr 30 min' does not match the leg times (1 + 2 + 1.5 + 4 hr) and may include the Hope Kiwi - Jollie Brook Route; that route (Gabriel Hut via Lake Sumner and Lake Marion to Hope Kiwi Lodge, then Hope Kiwi Track junction to a 'Hurunui swing bridge') is described on the page but not clearly as a way of doing the circuit, so it is recorded as not on route. Cold Stream Hut is reached by a short route off the Jollie Brook Track, recorded as a side trip. The circuit's walking direction is given only by the leg order, not stated."
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "The Jollie Brook Circuit starts and finishes off Lake Sumner Road, with the option of starting from either of the two swing bridges over the Hurunui River (approximately 3 km apart on the Lake Sumner Road).",
+    "On the river flats of the Hurunui River, a signpost marks the track that follows the true left of the Hurunui River to the Sisters car park.",
+    "Track leads up Gabriel Stream through beech forest to a low saddle then follows a side-stream to the Jollie Brook.",
+    "Cross the river via the swing bridge just below the Jollie Brook / Hurunui confluence."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Hope Kiwi - Jollie Brook Route, from Gabriel Hut to the Hurunui swing bridge",
+   "shape": null,
+   "start": {
+    "name": "Jollie Brook swing bridge",
+    "quote": "Jollie Brook swing bridge to Sisters swing bridge",
+    "ref": null
+   },
+   "end": {
+    "name": "Hurunui swing bridge",
+    "quote": "pick up the 4WD track back to the swing bridge here",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Sisters swing bridge",
+     "quote": "From the swing bridge the track is marked with poles up the true left of the valley",
+     "ref": null
+    },
+    {
+     "name": "Gabriel Hut",
+     "quote": "Traverse a series of large ancient river terraces close to the hillside until you reach Gabriel Hut.",
+     "ref": "T5"
+    },
+    {
+     "name": "Lake Sumner",
+     "quote": "follow the track to Lake Sumner (about 15 minutes), and then along the north shore of Lake Sumner",
+     "ref": "T11"
+    },
+    {
+     "name": "Evangeline Stream",
+     "quote": "Cross Evangeline Stream to reach Marion Stream.",
+     "ref": "T4"
+    },
+    {
+     "name": "Marion Stream",
+     "quote": "Cross Evangeline Stream to reach Marion Stream.",
+     "ref": "T14"
+    },
+    {
+     "name": "Lake Marion",
+     "quote": "Follow the track past Lake Marion",
+     "ref": "T10"
+    },
+    {
+     "name": "Hope Kiwi Track",
+     "quote": "up a hill to meet the Hope Kiwi Track",
+     "ref": "T2"
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "From Gabriel Hut follow the track to Lake Sumner (about 15 minutes), and then along the north shore of Lake Sumner.",
+    "The track descends easily through the forest and emerges onto the Hurunui River flats; pick up the 4WD track back to the swing bridge here."
+   ]
+  },
+  {
+   "id": "W3",
+   "main": false,
+   "label": "Jollie Brook Circuit from the Sisters swing bridge",
+   "shape": "loop",
+   "start": {
+    "name": "Sisters swing bridge",
+    "quote": "with the option of starting from either of the two swing bridges over the Hurunui River",
+    "ref": null
+   },
+   "end": {
+    "name": "Sisters swing bridge",
+    "quote": "to the Sisters car park",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Gabriel Hut",
+     "quote": "until you reach Gabriel Hut",
+     "ref": "T5"
+    },
+    {
+     "name": "Gabriel Stream",
+     "quote": "Track leads up Gabriel Stream through beech forest to a low saddle",
+     "ref": "T6"
+    },
+    {
+     "name": "Jollie Brook",
+     "quote": "Cross the Jollie Brook to reach the hut.",
+     "ref": "T9"
+    },
+    {
+     "name": "Jollie Brook Hut",
+     "quote": "Jollie Brook Hut to Jollie Brook swing bridge",
+     "ref": null
+    },
+    {
+     "name": "junction with Cold Stream",
+     "quote": "until you reach the junction with Cold Stream",
+     "ref": null
+    },
+    {
+     "name": "Cold Stream",
+     "quote": "After crossing Cold Stream, gravel flats lead to a short gorge.",
+     "ref": null
+    },
+    {
+     "name": "Jollie Brook swing bridge",
+     "quote": "Cross the river via the swing bridge just below the Jollie Brook / Hurunui confluence",
+     "ref": null
+    },
+    {
+     "name": "Jollie Brook",
+     "quote": "The Jollie Brook needs to be crossed",
+     "ref": "T9"
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "The Jollie Brook Circuit starts and finishes off Lake Sumner Road, with the option of starting from either of the two swing bridges over the Hurunui River (approximately 3 km apart on the Lake Sumner Road).",
+    "Traverse a series of large ancient river terraces close to the hillside until you reach Gabriel Hut.",
+    "On the river flats of the Hurunui River, a signpost marks the track that follows the true left of the Hurunui River to the Sisters car park."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Cold Stream Hut",
+   "quote": "This route turns off the Jollie Brook Track",
+   "ref": "T3",
+   "from": null
+  }
+ ],
+ "huts": [
+  {
+   "name": "Gabriel Hut",
+   "quote": "until you reach Gabriel Hut",
+   "ref": "T5"
+  },
+  {
+   "name": "Jollie Brook Hut",
+   "quote": "Gabriel Hut to Jollie Brook Hut",
+   "ref": null
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Hope Kiwi Lodge",
+   "quote": "From here it is another 1 hour 30 minutes to Hope Kiwi Lodge.",
+   "ref": "T7",
+   "why": "other"
+  },
+  {
+   "name": "Hope Kiwi Track",
+   "quote": "to meet the Hope Kiwi Track",
+   "ref": "T2",
+   "why": "other walk"
+  },
+  {
+   "name": "Lake Taylor",
+   "quote": "Lake Sumner Road is suitable for 2WD vehicles as far as Lake Taylor.",
+   "ref": "T12",
+   "why": "nearby"
+  },
+  {
+   "name": "Loch Katrine",
+   "quote": "the road to Loch Katrine is suitable for 4WD vehicles only",
+   "ref": "T13",
+   "why": "nearby"
+  }
+ ],
+ "doubts": "This page describes one circuit that can start from either swing bridge on Lake Sumner Road. The main way is the circuit from the Jollie Brook swing bridge, since its section comes first; the same circuit from the Sisters swing bridge is recorded as W3 (loop, direction not stated). The Hope Kiwi - Jollie Brook Route has its own headings and times, so it is recorded as W2; its end, 'the swing bridge', is not named, so shape is null, and it is not clear it returns to the Jollie Brook swing bridge. The start and end swing bridges match no feature, and the two road ends on Lake Sumner Road (F1, F2) are not matched to them, so refs are null. DOC's time 18 hr 30 min and 24 km loop are not split per way, so time and distance are null. Jollie Brook Hut is not in the links and has no name entry, so its ref is null. The Cold Stream Hut route is recorded as a side trip to a hut, with no named departure place. The Jollie Brook crossing on the first leg is not said to be bridged, so no how is given."
 }

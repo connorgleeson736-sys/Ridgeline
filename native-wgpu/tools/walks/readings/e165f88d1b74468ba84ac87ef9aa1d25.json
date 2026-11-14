@@ -1,53 +1,164 @@
 {
-  "guid": "e165f88d-1b74-468b-a84a-c87ef9aa1d25",
-  "kind": "one_way",
-  "ways": [
+ "guid": "e165f88d-1b74-468b-a84a-c87ef9aa1d25",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Inland Track, Marahau to Wainui car park via Pigeon Saddle",
+   "shape": "one_way",
+   "start": {
+    "name": "Marahau",
+    "quote": "The Inland Track links Marahau to Wainui Bay via Pigeon Saddle",
+    "ref": "F3"
+   },
+   "end": {
+    "name": "Wainui car park",
+    "quote": "an easy 45-minute descent begins to the Wainui car park",
+    "ref": null
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Inland Track, Marahau to Wainui car park via Pigeon Saddle",
-      "shape": "one_way",
-      "start": {"name": "Marahau", "quote": "From Marahau follow the Coast Track to Tinline Bay", "ref": "F3"},
-      "end": {"name": "Wainui car park", "quote": "an easy 45-minute descent begins to the Wainui car park", "ref": null},
-      "via": [
-        {"name": "Coast Track", "quote": "follow the Coast Track to Tinline Bay", "ref": "T1"},
-        {"name": "Tinline Bay", "quote": "Tinline Bay. Here the Inland Track begins", "ref": "T16"},
-        {"name": "Inland Track", "quote": "Here the Inland Track begins", "ref": "T4"},
-        {"name": "Holyoake Clearing shelter", "quote": "Holyoake Clearing is reached, where there is a shelter", "ref": null},
-        {"name": "Castle Rock Hut", "quote": "continues climbing to Castle Rock Hut", "ref": "T9"},
-        {"name": "Moa Park Shelter", "quote": "descending to Moa Park Shelter", "ref": null},
-        {"name": "Evans Ridge", "quote": "Upon reaching Evans Ridge it turns north", "ref": "T10"},
-        {"name": "Awapoto Hut", "quote": "a gradual descent to Awapoto Hut", "ref": "T8"},
-        {"name": "Pigeon Saddle", "quote": "descending steeply to the road at Pigeon Saddle", "ref": "T14"},
-        {"name": "Gibbs Hill", "quote": "the short climb up Gibbs Hill", "ref": "T11"},
-        {"name": "Saddle on the Wainui–Whariwharangi section of the Abel Tasman Coast Track", "quote": "the saddle on the Wainui–Whariwharangi section of the Abel Tasman Coast Track", "ref": null}
-      ],
-      "direction": null,
-      "time": "3 days",
-      "distance": "41.1 km one way",
-      "evidence": [
-        "The Inland Track links Marahau to Wainui Bay via Pigeon Saddle on the Tākaka - Tōtaranui Road.",
-        "From Marahau follow the Coast Track to Tinline Bay.",
-        "At this saddle, the track forks and an easy 45-minute descent begins to the Wainui car park."
-      ]
+     "name": "Coast Track",
+     "quote": "From Marahau follow the Coast Track to Tinline Bay.",
+     "ref": "T1"
+    },
+    {
+     "name": "Tinline Bay",
+     "quote": "Tinline Bay. Here the Inland Track begins",
+     "ref": "T16"
+    },
+    {
+     "name": "Holyoake Clearing",
+     "quote": "Holyoake Clearing is reached, where there is a shelter",
+     "ref": null
+    },
+    {
+     "name": "Castle Rock Hut",
+     "quote": "continues climbing to Castle Rock Hut",
+     "ref": "T9"
+    },
+    {
+     "name": "Moa Park Shelter",
+     "quote": "before descending to Moa Park Shelter",
+     "ref": null
+    },
+    {
+     "name": "Evans Ridge",
+     "quote": "Upon reaching Evans Ridge it turns north",
+     "ref": "T10"
+    },
+    {
+     "name": "Awapoto Hut",
+     "quote": "a gradual descent to Awapoto Hut",
+     "ref": "T8"
+    },
+    {
+     "name": "Pigeon Saddle",
+     "quote": "descending steeply to the road at Pigeon Saddle",
+     "ref": "T14"
+    },
+    {
+     "name": "Gibbs Hill",
+     "quote": "the short climb up Gibbs Hill",
+     "ref": "T11"
+    },
+    {
+     "name": "Saddle on the Wainui–Whariwharangi section of the Abel Tasman Coast Track",
+     "quote": "to the saddle on the Wainui–Whariwharangi section of the Abel Tasman Coast Track",
+     "ref": null
     }
-  ],
-  "access_points": [
-    {"name": "Canaan car park", "quote": "Canaan, turn off State Highway 60 on the Tākaka Hill onto Canaan Road and follow the unsealed road for 11 km to the car park", "ref": "F7", "onto": null},
-    {"name": "Pigeon Saddle", "quote": "Pigeon Saddle (on the Tōtaranui Road)", "ref": "F2", "onto": "Inland Track"}
-  ],
-  "side_trips": [
-    {"name": "Lookouts near Moa Park, including Porter Rock", "quote": "There are two side tracks leading to lookouts; Porter Rock is a granite outcrop worth visiting for its excellent views", "ref": "T15", "from": "Moa Park Shelter"},
-    {"name": "Viewpoint after Pigeon Saddle", "quote": "passing a turn-off to a good viewpoint", "ref": null, "from": "Pigeon Saddle"}
-  ],
-  "huts": [
-    {"name": "Castle Rock Hut", "quote": "Castle Rock Hut", "ref": "T9"},
-    {"name": "Awapoto Hut", "quote": "Awapoto Hut", "ref": "T8"}
-  ],
-  "not_on_route": [
-    {"name": "Tōtaranui", "quote": "32 km to Tōtaranui", "ref": "T18", "why": "nearby"},
-    {"name": "Kaiteriteri", "quote": "Boat services from Kaiteriteri and Marahau provide access to Tōtaranui", "ref": "T12", "why": "nearby"},
-    {"name": "Marahau Valley and Tasman Bay/Te Tai-o-Aorere", "quote": "wide views of Marahau Valley and Tasman Bay/Te Tai-o-Aorere", "ref": null, "why": "view"}
-  ],
-  "doubts": "Start ref F3 (where Coast Track meets Harvey Road, about 1 km from the Marahau place point) is taken as the Marahau start, since the text says to follow the Coast Track from Marahau. No road-end feature is clearly the Wainui car park (F6, Wainui Track at Bird Road, lies well inland of Wainui Bay; F1 is the Taupo Point Track), so the end has no ref. Holyoake Clearing and Moa Park have shelters, but the text does not say they have bunks, so only Castle Rock Hut and Awapoto Hut are listed as huts. The Canaan access point is given its road end (F7, Moa Park Track at Canaan Road) but the text does not say which track it leads onto. The page mentions linking with the Abel Tasman Coast Track or a water taxi for a round trip but does not describe one, so no loop way is recorded. Which of the two Porter Rock/lookout side tracks is which is not stated."
+   ],
+   "direction": null,
+   "time": "3 days",
+   "distance": "41.1 km one way",
+   "evidence": [
+    "The Inland Track links Marahau to Wainui Bay via Pigeon Saddle on the Tākaka - Tōtaranui Road.",
+    "From Marahau follow the Coast Track to Tinline Bay.",
+    "At this saddle, the track forks and an easy 45-minute descent begins to the Wainui car park."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Canaan car park",
+   "quote": "Canaan, turn off State Highway 60 on the Tākaka Hill onto Canaan Road and follow the unsealed road for 11 km to the car park",
+   "ref": "F7",
+   "onto": null
+  },
+  {
+   "name": "Pigeon Saddle",
+   "quote": "To reach the northern end or Pigeon Saddle (on the Tōtaranui Road)",
+   "ref": "F2",
+   "onto": null
+  },
+  {
+   "name": "Wainui car park",
+   "quote": "from there it is 23 km to Wainui car park",
+   "ref": null,
+   "onto": null
+  }
+ ],
+ "exits": [
+  {
+   "name": "Water taxi",
+   "quote": "or water taxi to make a varied round trip",
+   "ref": null,
+   "from": null,
+   "how": "boat"
+  }
+ ],
+ "side_trips": [
+  {
+   "name": "Porter Rock lookout side track",
+   "quote": "There are two side tracks leading to lookouts; Porter Rock is a granite outcrop worth visiting",
+   "ref": "T15",
+   "from": null
+  },
+  {
+   "name": "Viewpoint turn-off",
+   "quote": "passing a turn-off to a good viewpoint",
+   "ref": null,
+   "from": null
+  }
+ ],
+ "huts": [
+  {
+   "name": "Castle Rock Hut",
+   "quote": "continues climbing to Castle Rock Hut",
+   "ref": "T9"
+  },
+  {
+   "name": "Awapoto Hut",
+   "quote": "a gradual descent to Awapoto Hut",
+   "ref": "T8"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Tōtaranui",
+   "quote": "32 km to Tōtaranui",
+   "ref": "T18",
+   "why": "nearby"
+  },
+  {
+   "name": "Kaiteriteri",
+   "quote": "Boat services from Kaiteriteri and Marahau provide access to Tōtaranui",
+   "ref": "T12",
+   "why": "nearby"
+  },
+  {
+   "name": "Marahau Valley and Tasman Bay/Te Tai-o-Aorere",
+   "quote": "wide views of Marahau Valley and Tasman Bay/Te Tai-o-Aorere",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Abel Tasman Coast Track",
+   "quote": "can be linked with the Abel Tasman Coast Track",
+   "ref": null,
+   "why": "other walk"
+  }
+ ],
+ "doubts": "Start: the text names Marahau; F3 (where Coast Track meets Harvey Road) is taken as the Marahau start, about 1 km from the Mārahau place point, but the page names no road; this is a judgement. The Wainui car park has no feature the text clearly matches (F6 is well inland of Wainui Bay, F1 is the Taupo Point Track), so the end ref is null. Pigeon Saddle is walked (via T14) and also given as an access point at F2, the road-end feature on Totaranui Road at the saddle. The Canaan car park is taken as F7 (where Moa Park Track meets Canaan Road), but the text does not say which track it joins, so onto is null. Porter Rock side track: the text does not say where it leaves the way, so from is null. The water taxi is named in the round-trip sentence rather than as a way out, so the exit is a judgement. Holyoake Clearing and Moa Park Shelter are shelters with no bunks stated, so they are not listed as huts. DOC's '3 days' is copied; the section times add to about two days."
 }

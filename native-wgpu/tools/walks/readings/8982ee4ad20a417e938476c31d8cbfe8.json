@@ -1,61 +1,195 @@
 {
-  "guid": "8982ee4a-d20a-417e-9384-76c31d8cbfe8",
-  "kind": "one_way",
-  "ways": [
+ "guid": "8982ee4a-d20a-417e-9384-76c31d8cbfe8",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Cass car park to Bealey Hut and SH73",
+   "shape": "one_way",
+   "start": {
+    "name": "Cass car park",
+    "quote": "starts from the signposted car park at the east end of the Cass road bridge",
+    "ref": null
+   },
+   "end": {
+    "name": "car park by Cora Lynn Station",
+    "quote": "the car park by Cora Lynn Station",
+    "ref": "F1"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Cass car park to Bealey Hut and SH73",
-      "shape": "one_way",
-      "start": {"name": "Cass car park", "quote": "the signposted car park at the east end of the Cass River road bridge", "ref": "F2"},
-      "end": {"name": "car park by Cora Lynn Station", "quote": "the car park by Cora Lynn Station", "ref": "F1"},
-      "via": [
-        {"name": "Cass River", "quote": "Cass River", "ref": "T5"},
-        {"name": "Long Valley Stream junction", "quote": "the junction with Long Valley Stream", "ref": "T15"},
-        {"name": "Cass Saddle Hut", "quote": "Cass Saddle Hut", "ref": "T7"},
-        {"name": "Cass Saddle", "quote": "Cass Saddle", "ref": "T6"},
-        {"name": "Hamilton Creek", "quote": "Hamilton Creek", "ref": "T10"},
-        {"name": "Hamilton Hut", "quote": "Hamilton Hut", "ref": "T11"},
-        {"name": "Hamilton Creek footbridge", "quote": "the footbridge 10 minutes downstream from Hamilton Hut", "ref": null},
-        {"name": "swing bridge across Harper River", "quote": "a swing bridge across Harper River", "ref": null},
-        {"name": "West Harper Hut", "quote": "West Harper Hut", "ref": "T17"},
-        {"name": "confluence of Long Creek and Harper River", "quote": "the confluence of Long Creek and Harper River", "ref": "T14"},
-        {"name": "Lagoon Saddle Shelter", "quote": "Lagoon Saddle Shelter", "ref": null},
-        {"name": "Lagoon Saddle Hut", "quote": "Lagoon Saddle Hut", "ref": "T13"},
-        {"name": "Lagoon Saddle", "quote": "Lagoon Saddle", "ref": "T12"},
-        {"name": "northern face of Mount Bruce", "quote": "the northern face of Mount Bruce", "ref": "T16"},
-        {"name": "Bealey Hut", "quote": "Bealey Hut", "ref": "T3"}
-      ],
-      "direction": null,
-      "time": "2 - 3 days",
-      "distance": null,
-      "evidence": [
-        "From the signposted car park at the east end of the Cass River road bridge, follow the vehicle track next to the row of pine trees until it meets Cass River.",
-        "The track descends through beech and exotic forest to Bealey Hut (six bunks).",
-        "A further 5 minute walk from the hut takes you to the car park by Cora Lynn Station, and another 2 minutes to SH73.",
-        "Most trampers prefer to begin the track from the Cass end, as this avoids the steepest ascents."
-      ]
+     "name": "Cass River",
+     "quote": "follow the vehicle track next to the row of pine trees until it meets Cass River",
+     "ref": "T5"
+    },
+    {
+     "name": "Long Valley Stream",
+     "quote": "just below the junction with Long Valley Stream",
+     "ref": "T15"
+    },
+    {
+     "name": "Cass Saddle Hut",
+     "quote": "Cass Saddle Hut is reached soon after you have crossed to the true right bank",
+     "ref": "T7"
+    },
+    {
+     "name": "Cass Saddle",
+     "quote": "the poled route climbs gradually to the saddle",
+     "ref": "T6"
+    },
+    {
+     "name": "Hamilton Creek",
+     "quote": "joining Hamilton Creek 15 minutes from Hamilton Hut",
+     "ref": "T10"
+    },
+    {
+     "name": "Hamilton Hut",
+     "quote": "The 20 bunk hut has a wood burning stove",
+     "ref": "T11"
+    },
+    {
+     "name": "Hamilton Creek footbridge",
+     "quote": "The route crosses Hamilton Creek at the footbridge 10 minutes downstream from Hamilton Hut",
+     "ref": null
+    },
+    {
+     "name": "Harper River swing bridge",
+     "quote": "a swing bridge across Harper River",
+     "ref": null
+    },
+    {
+     "name": "Harper River riverbed",
+     "quote": "Follow the markers up the Harper riverbed for approximately 500 metres",
+     "ref": null
+    },
+    {
+     "name": "West Harper Hut",
+     "quote": "the true right of the river to West Harper Hut",
+     "ref": "T17"
+    },
+    {
+     "name": "confluence of Long Creek and Harper River",
+     "quote": "the confluence of Long Creek and Harper River",
+     "ref": null
+    },
+    {
+     "name": "Lagoon Saddle Shelter",
+     "quote": "a formed track on the true left climbs steadily to Lagoon Saddle Shelter",
+     "ref": null
+    },
+    {
+     "name": "Lagoon Saddle Hut",
+     "quote": "Lagoon Saddle Hut is located just across the river and has two bunks and mattresses",
+     "ref": "T13"
+    },
+    {
+     "name": "Lagoon Saddle",
+     "quote": "above the tarns on Lagoon Saddle",
+     "ref": "T12"
+    },
+    {
+     "name": "northern face of Mount Bruce",
+     "quote": "Once on the northern face of Mount Bruce",
+     "ref": "T16"
+    },
+    {
+     "name": "Bealey Hut",
+     "quote": "to Bealey Hut (six bunks)",
+     "ref": "T3"
     }
-  ],
-  "access_points": [
-    {"name": "Cass settlement car park", "quote": "the marked car park at Cass settlement", "ref": "T4", "onto": "the start of the track on SH73"},
-    {"name": "Cora Lynn Road car park (western end, for walking in reverse)", "quote": "There is a car park here for trampers through the gate signposted ‘Cass – Lagoon Track’", "ref": "F1", "onto": null}
-  ],
-  "side_trips": [
-    {"name": "The Pinnacles", "quote": "The Pinnacles", "ref": null, "from": "Hamilton Hut"},
-    {"name": "Mirror Tarn", "quote": "Mirror Tarn", "ref": null, "from": "Hamilton Creek bridge"}
-  ],
-  "huts": [
-    {"name": "Cass Saddle Hut", "quote": "Cass Saddle Hut", "ref": "T7"},
-    {"name": "Hamilton Hut", "quote": "Hamilton Hut", "ref": "T11"},
-    {"name": "West Harper Hut", "quote": "West Harper Hut", "ref": "T17"},
-    {"name": "Lagoon Saddle Hut", "quote": "Lagoon Saddle Hut", "ref": "T13"},
-    {"name": "Bealey Hut", "quote": "Bealey Hut", "ref": "T3"}
-  ],
-  "not_on_route": [
-    {"name": "Arthur's Pass Wilderness Lodge", "quote": "Arthur’s Pass Wilderness Lodge", "ref": null, "why": "nearby"},
-    {"name": "Arthur's Pass National Park", "quote": "Arthur’s Pass National Park", "ref": null, "why": "view"},
-    {"name": "Waimakariri River", "quote": "the braided Waimakariri River", "ref": null, "why": "view"}
-  ],
-  "doubts": "Start taken as F2 (unnamed track meeting West Coast Road, i.e. SH73 at Cass) and end as F1 (unnamed track meeting Cora Lynn Road by Bealey Hut); the text says the end car park is 2 minutes from SH73 and is reached through the gate on Cora Lynn Road. The page notes the route can be walked in reverse from the Cora Lynn Road end, recorded as an access point rather than a separate way. The Long Creek ref T14 marks the creek, used for its confluence with the Harper River. No overall distance is given. Lagoon Saddle Shelter has no matching entry."
+   ],
+   "direction": null,
+   "time": "2 - 3 days",
+   "distance": null,
+   "evidence": [
+    "The Cass River end of the track starts from the signposted car park at the east end of the Cass road bridge, opposite Cass settlement.",
+    "The track descends through beech and exotic forest to Bealey Hut (six bunks).",
+    "A further 5 minute walk from the hut takes you to the car park by Cora Lynn Station, and another 2 minutes to SH73."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Cass settlement car park",
+   "quote": "the marked car park at Cass settlement and walk 1 km along the gravel road to the start of the track on SH73",
+   "ref": "T4",
+   "onto": "gravel road to the start of the track on SH73"
+  },
+  {
+   "name": "SH73 track start",
+   "quote": "the start of the track on SH73",
+   "ref": "F2",
+   "onto": "gravel road from Cass settlement car park"
+  },
+  {
+   "name": "Cora Lynn Road car park (western end)",
+   "quote": "the gate signposted ‘Cass – Lagoon Track’",
+   "ref": "F1",
+   "onto": "Cass – Lagoon Track"
+  }
+ ],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "The Pinnacles",
+   "quote": "a worthwhile side trip from Hamilton Hut",
+   "ref": null,
+   "from": "Hamilton Hut"
+  },
+  {
+   "name": "Mirror Tarn",
+   "quote": "About 20 m beyond the Hamilton Creek bridge is the sign to Mirror Tarn",
+   "ref": null,
+   "from": "Hamilton Creek bridge"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Cass Saddle Hut",
+   "quote": "Cass Saddle Hut is reached soon after you have crossed to the true right bank",
+   "ref": "T7"
+  },
+  {
+   "name": "Hamilton Hut",
+   "quote": "The 20 bunk hut has a wood burning stove",
+   "ref": "T11"
+  },
+  {
+   "name": "West Harper Hut",
+   "quote": "West Harper Hut (a hut built in the 1950s) has five canvas bunks",
+   "ref": "T17"
+  },
+  {
+   "name": "Lagoon Saddle Hut",
+   "quote": "Lagoon Saddle Hut is located just across the river and has two bunks and mattresses",
+   "ref": "T13"
+  },
+  {
+   "name": "Bealey Hut",
+   "quote": "to Bealey Hut (six bunks)",
+   "ref": "T3"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Arthur's Pass Wilderness Lodge",
+   "quote": "the Arthur's Pass Wilderness Lodge",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "Arthur's Pass National Park",
+   "quote": "views of the snow-capped peaks of Arthur’s Pass National Park",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Waimakariri River",
+   "quote": "the braided Waimakariri River",
+   "ref": null,
+   "why": "view"
+  }
+ ],
+ "doubts": "The main start is the signposted car park at the east end of the Cass road bridge, which is not a road-end feature, so the start ref is null. F2 (unnamed track meeting West Coast Road) is recorded as the SH73 track start, which the text reaches by walking 1 km from the Cass settlement car park rather than being the car park itself. The end is taken as F1 (unnamed track meeting Cora Lynn Road) for the car park by Cora Lynn Station. The Cass River is not a clearly unbridged ford: the text says to cross it several times but also notes a bridged crossing, so no ford tag. Lagoon Saddle Shelter is not counted as a hut as the text gives no bunks for it. The riverbed Hamilton-West Harper alternative and the reverse walk from Cora Lynn Road are not separate ways (no heading, time or distance; the reverse is the same route). The DOC distance is blank, so distance is null."
 }

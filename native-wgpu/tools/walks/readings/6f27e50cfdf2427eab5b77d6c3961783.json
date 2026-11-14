@@ -1,36 +1,77 @@
 {
-  "guid": "6f27e50c-fdf2-427e-ab5b-77d6c3961783",
-  "kind": "out_and_back",
-  "ways": [
+ "guid": "6f27e50c-fdf2-427e-ab5b-77d6c3961783",
+ "kind": "out_and_back",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Lake Alta Track",
+   "shape": "out_and_back",
+   "start": {
+    "name": "road behind the Remarkables ski field buildings",
+    "quote": "The track begins on the road behind the Remarkables ski field buildings",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Lake Alta",
+    "quote": "Lake Alta",
+    "ref": "T3"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Remarkables ski field to Lake Alta",
-      "shape": "out_and_back",
-      "start": {"name": "road behind the Remarkables ski field buildings", "quote": "road behind the Remarkables ski field buildings", "ref": "F1"},
-      "end": {"name": "Lake Alta", "quote": "Lake Alta", "ref": "T3"},
-      "via": [
-        {"name": "ski field road", "quote": "ski field road", "ref": null},
-        {"name": "top of the Alta Chairlift", "quote": "top of the Alta Chairlift", "ref": null},
-        {"name": "alpine wetlands", "quote": "alpine wetlands", "ref": null},
-        {"name": "glacial cirque", "quote": "glacial cirque", "ref": null}
-      ],
-      "direction": null,
-      "time": "1 hr 30 min",
-      "distance": "2.4 km return via same track",
-      "evidence": [
-        "The track begins on the road behind the Remarkables ski field buildings and follows a ski field road to the top of the Alta Chairlift.",
-        "From there, cairns and flagstones mark the way through alpine wetlands, up to the glacial cirque."
-      ]
+     "name": "ski field road",
+     "quote": "follows a ski field road",
+     "ref": null,
+     "how": "road"
+    },
+    {
+     "name": "top of the Alta Chairlift",
+     "quote": "the top of the Alta Chairlift",
+     "ref": null
+    },
+    {
+     "name": "alpine wetlands",
+     "quote": "alpine wetlands",
+     "ref": null
+    },
+    {
+     "name": "glacial cirque",
+     "quote": "the glacial cirque",
+     "ref": null
     }
-  ],
-  "access_points": [],
-  "side_trips": [],
-  "huts": [],
-  "not_on_route": [
-    {"name": "Lake Hayes Walkway", "quote": "Lake Hayes Walkway", "ref": "L1", "why": "other walk"},
-    {"name": "Bannockburn Sluicings", "quote": "Bannockburn Sluicings", "ref": "L2", "why": "other walk"},
-    {"name": "Mt Crichton Loop Track", "quote": "Mt Crichton Loop Track", "ref": "L3", "why": "other walk"}
-  ],
-  "doubts": "Start ref F1 (an unnamed track meeting the Remarkables Ski Field Access Road) is the only road end listed and matches 'begins on the road behind the Remarkables ski field buildings', but the feature is unnamed so this is not certain. The listed lift ends (1865 m and 1933 m) do not clearly match the 'top of the Alta Chairlift' (the track runs 1600-1800 m), so no ref for it. In winter the route through the ski field differs and must be checked with NZSki; not recorded as a way."
+   ],
+   "direction": null,
+   "time": "1 hr 30 min",
+   "distance": "2.4 km return via same track",
+   "evidence": [
+    "The track begins on the road behind the Remarkables ski field buildings and follows a ski field road to the top of the Alta Chairlift.",
+    "From there, cairns and flagstones mark the way through alpine wetlands, up to the glacial cirque."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Lake Hayes Walkway",
+   "quote": "Lake Hayes Walkway",
+   "ref": "L1",
+   "why": "other walk"
+  },
+  {
+   "name": "Bannockburn Sluicings",
+   "quote": "Bannockburn Sluicings",
+   "ref": "L2",
+   "why": "other walk"
+  },
+  {
+   "name": "Mt Crichton Loop Track",
+   "quote": "Mt Crichton Loop Track",
+   "ref": "L3",
+   "why": "other walk"
+  }
+ ],
+ "doubts": "Start ref F1 (unnamed track meeting the Remarkables Ski Field Access Road) is the only road end listed and fits 'the road behind the Remarkables ski field buildings', but is not named by the text. The lift ends (1865 m, 1933 m) do not clearly match the 'Alta Chairlift' top, so no ref. Shape is out and back from DOC's distance 'return via same track'. Winter route through the ski field differs and is not recorded as a way."
 }

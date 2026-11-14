@@ -14,6 +14,8 @@ import json, os, re, sys, unicodedata
 KINDS = {"one_way", "out_and_back", "loop", "network", "unclear"}
 SHAPES = {"one_way", "out_and_back", "loop", None}
 WHY = {"view", "nearby", "other walk", "side trip", "other"}
+# Where `how` may appear (READING.md rules 7 and 10), and its values.
+HOW = {"via": {"ford", "road"}, "exits": {"fly", "boat", "track", "road", "other"}}
 
 
 def norm(s):
@@ -33,7 +35,7 @@ def check(packet, reading):
             if not nullable:
                 errs.append(f"{where}: missing")
             return
-        if not isinstance(p, dict) or set(p) - {"name", "quote", "ref", "from", "why", "onto"} or not {"name", "quote", "ref"} <= set(p):
+        if not isinstance(p, dict) or set(p) - {"name", "quote", "ref", "from", "why", "onto", "how"} or not {"name", "quote", "ref"} <= set(p):
             errs.append(f"{where}: needs name, quote, ref"); return
         q = p.get("quote")
         if not isinstance(q, str) or not q.strip():
@@ -42,10 +44,12 @@ def check(packet, reading):
             errs.append(f"{where}: quote not in the page: {q!r}")
         if p.get("ref") is not None and p["ref"] not in ids:
             errs.append(f"{where}: unknown ref {p['ref']!r}")
+        if "how" in p and p["how"] not in HOW.get(where.split(".")[-1].split("[")[0], set()):
+            errs.append(f"{where}: how {p.get('how')!r}")
 
     if not isinstance(reading, dict):
         return ["not an object"]
-    extra = set(reading) - {"guid", "kind", "ways", "access_points", "side_trips", "huts", "not_on_route", "doubts"}
+    extra = set(reading) - {"guid", "kind", "ways", "access_points", "exits", "side_trips", "huts", "not_on_route", "doubts"}
     if extra:
         errs.append(f"unexpected fields {sorted(extra)}")
     if reading.get("guid") != packet["guid"]:
@@ -93,14 +97,16 @@ def check(packet, reading):
                 errs.append(f"{at}: a loop must end where it starts")
         if w.get("direction") and w.get("shape") != "loop":
             errs.append(f"{at}: direction is only for loops")
-    for key in ("access_points", "side_trips", "huts", "not_on_route"):
-        v = reading.get(key)
+    for key in ("access_points", "exits", "side_trips", "huts", "not_on_route"):
+        v = reading.get(key, [] if key == "exits" else None)
         if not isinstance(v, list):
             errs.append(f"{key} is not a list"); continue
         for j, p in enumerate(v):
             place(p, f"{key}[{j}]")
             if key == "not_on_route" and isinstance(p, dict) and p.get("why") not in WHY:
                 errs.append(f"{key}[{j}]: why {p.get('why')!r}")
+            if key == "exits" and isinstance(p, dict) and (p.get("how") not in HOW["exits"] or "from" not in p):
+                errs.append(f"{key}[{j}]: needs from and how")
     if not isinstance(reading.get("doubts"), str):
         errs.append("doubts is not a string")
     return errs

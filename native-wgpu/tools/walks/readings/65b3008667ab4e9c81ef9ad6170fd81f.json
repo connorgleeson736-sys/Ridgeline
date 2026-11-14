@@ -1,75 +1,125 @@
 {
-  "guid": "65b30086-67ab-4e9c-81ef-9ad6170fd81f",
-  "kind": "network",
-  "ways": [
+ "guid": "65b30086-67ab-4e9c-81ef-9ad6170fd81f",
+ "kind": "network",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Lower Tīmaru River Track",
+   "shape": "one_way",
+   "start": {
+    "name": "Lower Tīmaru River Track car park",
+    "quote": "carpark at the start of the Lower Tīmaru River Track",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "junction with the Breast Hill Track",
+    "quote": "junction with the Breast Hill Track",
+    "ref": "L1"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Lower Tīmaru River Track",
-      "shape": "one_way",
-      "start": {"name": "Carpark at the start of the Lower Tīmaru River Track", "quote": "The carpark at the start of the Lower Tīmaru River Track is 10 km from Lake Hāwea Township, on the unsealed Tīmaru River Road", "ref": "F1"},
-      "end": {"name": "Junction with the Breast Hill Track", "quote": "Lower Tīmaru River Track ends at the junction with the Breast Hill Track (part of Te Araroa)", "ref": "L1"},
-      "via": [
-        {"name": "Tīmaru River", "quote": "The marked track starts on the Tīmaru River's true left and crosses it several times during the first hour", "ref": "T7"},
-        {"name": "Junction Hut (private)", "quote": "It then crosses open flats near Junction Hut (private)", "ref": null}
-      ],
-      "direction": null,
-      "time": "3 hr",
-      "distance": "10.3 km one way",
-      "evidence": [
-        "The carpark at the start of the Lower Tīmaru River Track is 10 km from Lake Hāwea Township, on the unsealed Tīmaru River Road.",
-        "Distance:10.3 km one way",
-        "Lower Tīmaru River Track ends at the junction with the Breast Hill Track (part of Te Araroa)."
-      ]
+     "name": "Tīmaru River",
+     "quote": "Tīmaru River",
+     "ref": "T7",
+     "how": "ford"
     },
     {
-      "id": "W2",
-      "main": false,
-      "label": "Tīmaru High River Track",
-      "shape": "out_and_back",
-      "start": {"name": "Tīmaru High River Track road end", "quote": "The High River Track is signposted 50 m further along the road", "ref": "F2"},
-      "end": {"name": "Deer Spur Creek near Junction Hut", "quote": "descend to Deer Spur Creek near Junction Hut", "ref": "T6"},
-      "via": [
-        {"name": "4WD track above the Tīmaru River", "quote": "then joins a 4WD track above the Tīmaru River", "ref": null},
-        {"name": "Turnoff to Corner Peak Route", "quote": "passing the turnoff to Corner Peak Route", "ref": null}
-      ],
-      "direction": null,
-      "time": null,
-      "distance": "7.3 km one way",
-      "evidence": [
-        "Tīmaru High River Track is signposted 50 m along the road.",
-        "For the last 900 m of the track, descend to Deer Spur Creek near Junction Hut (1.5 km).",
-        "From here you can return back the way you came, or cross the river and join the Lower Tīmaru River Track.",
-        "Tīmaru High River Track is wider than Lower Tīmaru River Track, and if used as a there-and-back track has no crossings of the Tīmaru River."
-      ]
-    },
-    {
-      "id": "W3",
-      "main": false,
-      "label": "Timaru River Loop",
-      "shape": "loop",
-      "start": {"name": "Car park", "quote": "returning back to the car park via Lower Tīmaru River Track", "ref": "F1"},
-      "end": {"name": "Car park", "quote": "returning back to the car park via Lower Tīmaru River Track", "ref": "F1"},
-      "via": [
-        {"name": "Tīmaru High River Track", "quote": "walking the Tīmaru High River Track", "ref": "T3"},
-        {"name": "Deer Spur Creek", "quote": "descend to Deer Spur Creek near Junction Hut", "ref": "T6"},
-        {"name": "Tīmaru River crossing", "quote": "then crossing Tīmaru River", "ref": "T7"},
-        {"name": "Lower Tīmaru River Track", "quote": "returning back to the car park via Lower Tīmaru River Track", "ref": "T2"}
-      ],
-      "direction": null,
-      "time": "4 – 5 hr",
-      "distance": null,
-      "evidence": [
-        "You can combine these two tracks into a day hike, walking the Tīmaru High River Track then crossing Tīmaru River and returning back to the car park via Lower Tīmaru River Track."
-      ]
+     "name": "Junction Hut (private)",
+     "quote": "Junction Hut (private)",
+     "ref": null
     }
-  ],
-  "access_points": [],
-  "side_trips": [],
-  "huts": [],
-  "not_on_route": [
-    {"name": "Corner Peak Route", "quote": "passing the turnoff to Corner Peak Route", "ref": "L2", "why": "other walk"},
-    {"name": "Te Araroa", "quote": "part of Te Araroa", "ref": null, "why": "other walk"}
-  ],
-  "doubts": "The page is titled 'Tīmaru River Tracks' and describes two tracks plus a loop combining them, so kind is network; DOC's summary time/distance (3 hr, 10.3 km one way) are the Lower Tīmaru River Track's, so it is given as the main way. The Lower track's end is the junction with the Breast Hill Track, given as the Breast Hill Track link (L1); the text does not say whether walkers then return. Junction Hut is private and is not listed as a hut. The High River Track is described both as 7.3 km one way and as usable there-and-back; it is recorded out_and_back since the loop option is its own way (W3). The loop's car park is taken as the Lower track carpark (F1), with the High River Track starting 50 m further along the road (F2)."
+   ],
+   "direction": null,
+   "time": "3 hr",
+   "distance": "10.3 km one way",
+   "evidence": [
+    "The marked track starts on the Tīmaru River's true left and crosses it several times during the first hour.",
+    "Lower Tīmaru River Track ends at the junction with the Breast Hill Track (part of Te Araroa).",
+    "The carpark at the start of the Lower Tīmaru River Track is 10 km from Lake Hāwea Township, on the unsealed Tīmaru River Road."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Tīmaru High River Track",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Tīmaru High River Track signpost",
+    "quote": "signposted 50 m along the road",
+    "ref": null
+   },
+   "end": {
+    "name": "Deer Spur Creek",
+    "quote": "Deer Spur Creek",
+    "ref": "T6"
+   },
+   "via": [
+    {
+     "name": "Corner Peak Route turnoff",
+     "quote": "turnoff to Corner Peak Route",
+     "ref": "L2"
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": "7.3 km one way",
+   "evidence": [
+    "Tīmaru High River Track is signposted 50 m along the road.",
+    "For the last 900 m of the track, descend to Deer Spur Creek near Junction Hut (1.5 km).",
+    "From here you can return back the way you came, or cross the river and join the Lower Tīmaru River Track."
+   ]
+  },
+  {
+   "id": "W3",
+   "main": false,
+   "label": "Timaru River Loop",
+   "shape": "loop",
+   "start": {
+    "name": "car park",
+    "quote": "car park",
+    "ref": null
+   },
+   "end": {
+    "name": "car park",
+    "quote": "car park",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Tīmaru High River Track",
+     "quote": "Tīmaru High River Track",
+     "ref": "T3"
+    },
+    {
+     "name": "Deer Spur Creek",
+     "quote": "Deer Spur Creek",
+     "ref": "T6"
+    },
+    {
+     "name": "Tīmaru River",
+     "quote": "Tīmaru River",
+     "ref": "T7",
+     "how": "ford"
+    },
+    {
+     "name": "Lower Tīmaru River Track",
+     "quote": "Lower Tīmaru River Track",
+     "ref": "T2"
+    }
+   ],
+   "direction": null,
+   "time": "4 – 5 hr",
+   "distance": null,
+   "evidence": [
+    "You can combine these two tracks into a day hike, walking the Tīmaru High River Track then crossing Tīmaru River and returning back to the car park via Lower Tīmaru River Track."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [],
+ "doubts": "Page describes two tracks plus a combined loop (network). Lower track described as ending at the Breast Hill Track junction though it is introduced as 'to Deer Spur Creek'. High track start road is named differently from F2 (Dingle Burn Station Road) so start ref is null; W3 car park ref null (carpark is at the Lower track start, High track starts 50 m further). W2 shape taken from 'return back the way you came'."
 }

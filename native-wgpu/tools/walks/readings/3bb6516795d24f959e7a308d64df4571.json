@@ -1,47 +1,129 @@
 {
-  "guid": "3bb65167-95d2-4f95-9e7a-308d64df4571",
-  "kind": "out_and_back",
-  "ways": [
+ "guid": "3bb65167-95d2-4f95-9e7a-308d64df4571",
+ "kind": "out_and_back",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Track to summit and return",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Te Waipapa/Diamond Harbour wharf",
+    "quote": "The track starts from the Te Waipapa/Diamond Harbour wharf.",
+    "ref": null
+   },
+   "end": {
+    "name": "Mount Herbert/Te Ahu Pātiki summit",
+    "quote": "The Mount Herbert/Te Ahu Pātiki summit at 920 m",
+    "ref": "T6"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Diamond Harbour wharf to Mount Herbert/Te Ahu Pātiki summit",
-      "shape": "out_and_back",
-      "start": {"name": "Te Waipapa/Diamond Harbour wharf", "quote": "Te Waipapa/Diamond Harbour wharf", "ref": null},
-      "end": {"name": "Mount Herbert/Te Ahu Pātiki summit", "quote": "Mount Herbert/Te Ahu Pātiki summit", "ref": "T6"},
-      "via": [
-        {"name": "the beach", "quote": "the beach", "ref": null},
-        {"name": "Marine Drive", "quote": "Marine Drive", "ref": "F3"},
-        {"name": "Bayview Road", "quote": "Bayview Road", "ref": "F1"},
-        {"name": "4WD track", "quote": "4WD track", "ref": null}
-      ],
-      "direction": null,
-      "time": "6 – 8 hr return",
-      "distance": "14 km return via same track",
-      "evidence": [
-        "The track starts from the Te Waipapa/Diamond Harbour wharf.",
-        "Very near the summit, a junction indicates 10 minutes left to continue to the summit, or 15 minutes right to the shelter.",
-        "Either return the same way you came, or continue left on to the Port Levy Saddle and from there to the Rod Donald Hut in 3 hr 20 min."
-      ]
+     "name": "road up to the Village",
+     "quote": "From the wharf follow the road up towards the Village.",
+     "ref": null,
+     "how": "road"
+    },
+    {
+     "name": "beach",
+     "quote": "soon dropping down to the beach",
+     "ref": null
+    },
+    {
+     "name": "creek bed",
+     "quote": "following a creek bed through pine forest and regenerating bush",
+     "ref": null
+    },
+    {
+     "name": "Marine Drive",
+     "quote": "After crossing Marine Drive at a bend",
+     "ref": null
+    },
+    {
+     "name": "Bayview Road",
+     "quote": "Cross the unsealed Bayview Road",
+     "ref": null
+    },
+    {
+     "name": "4WD track",
+     "quote": "soon meets a 4WD track",
+     "ref": null
     }
-  ],
-  "access_points": [
-    {"name": "Bayview Road", "quote": "Bayview Road", "ref": "F1", "onto": "Mt Herbert Walkway"}
-  ],
-  "side_trips": [
-    {"name": "Mt Herbert shelter", "quote": "shelter", "ref": null, "from": "junction very near the summit"}
-  ],
-  "huts": [],
-  "not_on_route": [
-    {"name": "Port Levy Saddle", "quote": "Port Levy Saddle", "ref": null, "why": "other"},
-    {"name": "Rod Donald Hut", "quote": "Rod Donald Hut", "ref": "T8", "why": "other"},
-    {"name": "Orton Bradley Park", "quote": "Orton Bradley Park", "ref": null, "why": "other"},
-    {"name": "Kaituna Valley", "quote": "Kaituna Valley", "ref": null, "why": "other"},
-    {"name": "Gebbies Pass", "quote": "Gebbies Pass", "ref": null, "why": "other"},
-    {"name": "Packhorse Hut", "quote": "Packhorse Hut", "ref": "T7", "why": "other"},
-    {"name": "Te Ara Pātaka/Summit Walkway", "quote": "Te Ara Pātaka/Summit Walkway", "ref": "L1", "why": "other walk"},
-    {"name": "Mount Thomas", "quote": "Mount Thomas", "ref": null, "why": "view"},
-    {"name": "Mount Grey", "quote": "Mount Grey", "ref": null, "why": "view"}
-  ],
-  "doubts": "No feature for the Diamond Harbour wharf; T9 is the bay (coast) rather than the wharf, so the start has no ref. Bayview Road ref F1 is the only track/Bayview Road junction listed; the text says it is the last place within Diamond Harbour to start the track. The shelter is 15 minutes right from a junction near the summit and is not on the way to the summit; recorded as a side trip. Onward routes to Rod Donald Hut, Packhorse Hut and other exits are continuations, not ways of this walk."
+   ],
+   "direction": null,
+   "time": "6 – 8 hr return",
+   "distance": "14 km return via same track",
+   "evidence": [
+    "The track starts from the Te Waipapa/Diamond Harbour wharf.",
+    "Either return the same way you came, or continue left on to the Port Levy Saddle and from there to the Rod Donald Hut in 3 hr 20 min."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Bayview Road",
+   "quote": "Cross the unsealed Bayview Road and veer slightly left to pick up the track again. This is last place within Diamond Harbour you could start the track, cutting about 30 minutes off your walking time.",
+   "ref": "F1",
+   "onto": "Mt Herbert track"
+  },
+  {
+   "name": "Lyttelton ferry to the wharf",
+   "quote": "Alternatively take the ferry across the harbour from Lyttelton to the wharf.",
+   "ref": null,
+   "onto": "Te Waipapa/Diamond Harbour wharf"
+  }
+ ],
+ "exits": [
+  {
+   "name": "Orton Bradley Park",
+   "quote": "exit right via Orton Bradley Park, Kaituna Valley or Gebbies Pass",
+   "ref": null,
+   "from": "Mount Herbert/Te Ahu Pātiki summit",
+   "how": "track"
+  },
+  {
+   "name": "Kaituna Valley",
+   "quote": "exit right via Orton Bradley Park, Kaituna Valley or Gebbies Pass",
+   "ref": null,
+   "from": "Mount Herbert/Te Ahu Pātiki summit",
+   "how": "track"
+  },
+  {
+   "name": "Gebbies Pass",
+   "quote": "exit right via Orton Bradley Park, Kaituna Valley or Gebbies Pass",
+   "ref": null,
+   "from": "Mount Herbert/Te Ahu Pātiki summit",
+   "how": "track"
+  }
+ ],
+ "side_trips": [
+  {
+   "name": "shelter",
+   "quote": "15 minutes right to the shelter",
+   "ref": null,
+   "from": "junction near the summit"
+  }
+ ],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Rod Donald Hut",
+   "quote": "the Rod Donald Hut in 3 hr 20 min",
+   "ref": "T8",
+   "why": "other walk"
+  },
+  {
+   "name": "Packhorse Hut",
+   "quote": "stay at the Packhorse Hut along the way",
+   "ref": "T7",
+   "why": "other walk"
+  },
+  {
+   "name": "Te Ara Pātaka/Summit Walkway",
+   "quote": "Te Ara Pātaka/Summit Walkway",
+   "ref": "L1",
+   "why": "other walk"
+  }
+ ],
+ "doubts": "The Diamond Harbour wharf has no clear feature or name entry (coast and place entries exist for Diamond Harbour but not the wharf), so the start ref is null. Marine Drive and Bayview Road are crossed, not followed; no ref given (F3 and F1 are road ends of tracks and may not be these crossing points); F1 is used for the Bayview Road access point because the text says that is where the track can be started. Continuing to Rod Donald Hut or exiting right are described as alternatives at the summit, so the exits are given from the summit."
 }

@@ -1,44 +1,90 @@
 {
-  "guid": "45055658-49a3-4560-80a5-86c2e67a7d41",
-  "kind": "out_and_back",
-  "ways": [
+ "guid": "45055658-49a3-4560-80a5-86c2e67a7d41",
+ "kind": "out_and_back",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Hooker Valley Track to Hooker Lake",
+   "shape": "out_and_back",
+   "start": {
+    "name": "White Horse Hill car park",
+    "quote": "Hooker Valley Track begins at White Horse Hill car park",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Hooker Lake",
+    "quote": "The track ends at Hooker Lake",
+    "ref": "T4"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Hooker Valley Track to Hooker Lake",
-      "shape": "out_and_back",
-      "start": {"name": "White Horse Hill car park", "quote": "Hooker Valley Track begins at White Horse Hill car park", "ref": "F1"},
-      "end": {"name": "Hooker Lake", "quote": "The track ends at Hooker Lake", "ref": "T4"},
-      "via": [
-        {"name": "Mueller Lookout", "quote": "Mueller Lookout", "ref": null},
-        {"name": "first swing bridge over the Hooker River", "quote": "the first swing bridge over the Hooker River", "ref": null},
-        {"name": "Kakīroa/Mount Sefton View Lookout", "quote": "Kakīroa/Mount Sefton View Lookout", "ref": null},
-        {"name": "second swing bridge over the Hooker River", "quote": "A new second swing bridge over the Hooker River", "ref": null},
-        {"name": "third swing bridge", "quote": "Cross a third and final swing bridge", "ref": null}
-      ],
-      "direction": null,
-      "time": "3 hr return",
-      "distance": "10 km return via same track",
-      "evidence": [
-        "Hooker Valley Track begins at White Horse Hill car park. It leads through the Hooker Valley to Hooker Lake, at the foot of Aoraki/Mount Cook.",
-        "White Horse Hill car park is at the end of Hooker Valley Road.",
-        "The track ends at Hooker Lake, where you’ll enjoy majestic views of Aoraki/Mount Cook and the Southern Alps/Kā Tiritiri o te Moana.",
-        "Return to the car park the same way you came."
-      ]
+     "name": "Mueller Lookout",
+     "quote": "Mueller Lookout",
+     "ref": null
+    },
+    {
+     "name": "first swing bridge over the Hooker River",
+     "quote": "the first swing bridge over the Hooker River",
+     "ref": null
+    },
+    {
+     "name": "Kakīroa/Mount Sefton View Lookout",
+     "quote": "Kakīroa/Mount Sefton View Lookout",
+     "ref": null
+    },
+    {
+     "name": "second swing bridge over the Hooker River",
+     "quote": "A new second swing bridge over the Hooker River",
+     "ref": null
+    },
+    {
+     "name": "third swing bridge",
+     "quote": "Cross a third and final swing bridge",
+     "ref": null
     }
-  ],
-  "access_points": [],
-  "side_trips": [
-    {"name": "Freda's Rock", "quote": "Freda’s Rock", "ref": null, "from": "track between White Horse Hill car park and first swing bridge"},
-    {"name": "Alpine Memorial", "quote": "the Alpine Memorial", "ref": null, "from": "track between White Horse Hill car park and first swing bridge"}
-  ],
-  "huts": [],
-  "not_on_route": [
-    {"name": "Aoraki/Mount Cook", "quote": "views of Aoraki/Mount Cook", "ref": null, "why": "view"},
-    {"name": "Mueller Lake", "quote": "Mueller Lake", "ref": null, "why": "view"},
-    {"name": "Kakīroa/Mount Sefton", "quote": "Mueller Glacier and Kakīroa/Mount Sefton", "ref": "T7", "why": "view"},
-    {"name": "Mueller Hut", "quote": "The track to Mueller Hut", "ref": "T8", "why": "other walk"},
-    {"name": "White Horse Hill Campground", "quote": "White Horse Hill Campground", "ref": "L1", "why": "nearby"}
-  ],
-  "doubts": "The side track to the Alpine Memorial may be the map track 'Alpine Memorial Track' (T1), but the text names the memorial, not the track, so no ref given. The page's three swing bridges are not separately named on the map. White Horse Hill Campground is described as 'at the start' but not as the start."
+   ],
+   "direction": null,
+   "time": "3 hr return",
+   "distance": "10 km return via same track",
+   "evidence": [
+    "Hooker Valley Track begins at White Horse Hill car park. It leads through the Hooker Valley to Hooker Lake, at the foot of Aoraki/Mount Cook.",
+    "White Horse Hill car park is at the end of Hooker Valley Road.",
+    "The track ends at Hooker Lake, where you’ll enjoy majestic views of Aoraki/Mount Cook and the Southern Alps/Kā Tiritiri o te Moana.",
+    "Return to the car park the same way you came."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Freda's Rock",
+   "quote": "Freda’s Rock",
+   "ref": null,
+   "from": "White Horse Hill car park"
+  },
+  {
+   "name": "Alpine Memorial",
+   "quote": "the Alpine Memorial",
+   "ref": null,
+   "from": "White Horse Hill car park"
+  }
+ ],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Mueller Hut",
+   "quote": "The track to Mueller Hut",
+   "ref": "T8",
+   "why": "other walk"
+  },
+  {
+   "name": "White Horse Hill Campground",
+   "quote": "White Horse Hill Campground",
+   "ref": "L1",
+   "why": "nearby"
+  }
+ ],
+ "doubts": "The side track to the Alpine Memorial may be map track T1 but the text names the memorial, so no ref. The three swing bridges are not separately named on the map. Start ref F1 is the road end where Hooker Track meets Hooker Valley Road, which the text says the car park is at the end of."
 }

@@ -1,48 +1,112 @@
 {
-  "guid": "40ead183-d61e-42a6-8b4f-6cbf5437e96b",
-  "kind": "one_way",
-  "ways": [
+ "guid": "40ead183-d61e-42a6-8b4f-6cbf5437e96b",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Raspberry Creek car park over Cascade Saddle to Dart Hut",
+   "shape": "one_way",
+   "start": {
+    "name": "Raspberry Creek car park",
+    "quote": "Raspberry Creek car park to Aspiring Hut",
+    "ref": null
+   },
+   "end": {
+    "name": "Dart Hut",
+    "quote": "Cascade Saddle to Dart Hut",
+    "ref": "T10"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Cascade Saddle Route from Raspberry Creek car park over Cascade Saddle to Dart Hut and out on the Rees-Dart Track",
-      "shape": "one_way",
-      "start": {"name": "Raspberry Creek car park", "quote": "Raspberry Creek car park", "ref": null},
-      "end": {"name": "road end (Rees or Dart Valley)", "quote": "Dart Hut to road end", "ref": null},
-      "via": [
-        {"name": "West Matukituki Track", "quote": "Follow the West Matukituki Track to Aspiring Hut.", "ref": "L1"},
-        {"name": "Aspiring Hut", "quote": "Aspiring Hut", "ref": "T6"},
-        {"name": "pylon at the top of the ridge", "quote": "the pylon at the top of the ridge (1835 m)", "ref": null},
-        {"name": "Cascade Creek", "quote": "follow the poles down to Cascade Creek", "ref": "T7"},
-        {"name": "Cascade Saddle (route veers off just before it)", "quote": "just before you reach Cascade Saddle", "ref": "T8"},
-        {"name": "Dart Glacier lateral moraines", "quote": "lateral moraines of the Dart Glacier", "ref": "T9"},
-        {"name": "Dart River true left bank", "quote": "Stay on the true left bank of the Dart River/Te Awa Whakatipu", "ref": null},
-        {"name": "bridge over Snowy Creek", "quote": "a bridge over the creek leads to Dart Hut", "ref": "T11"},
-        {"name": "Dart Hut", "quote": "Dart Hut", "ref": "T10"},
-        {"name": "Rees-Dart Track", "quote": "Walk out via the Rees or Dart Valleys on the Rees-Dart Track.", "ref": "L2"}
-      ],
-      "direction": null,
-      "time": "4-5 days one way",
-      "distance": null,
-      "evidence": [
-        "The route connects the West Matukituki Valley with the Dart Valley.",
-        "DOC recommends trampers begin from the Matukituki side as ascending is much safer than descending.",
-        "### Raspberry Creek car park to Aspiring Hut",
-        "Follow the West Matukituki Track to Aspiring Hut.",
-        "### Dart Hut to road end",
-        "Walk out via the Rees or Dart Valleys on the Rees-Dart Track."
-      ]
+     "name": "West Matukituki Track",
+     "quote": "Follow the West Matukituki Track to Aspiring Hut.",
+     "ref": "T5"
+    },
+    {
+     "name": "Aspiring Hut",
+     "quote": "Aspiring Hut to Cascade Saddle",
+     "ref": "T6"
+    },
+    {
+     "name": "stream near the top of the bush",
+     "quote": "There is a stream crossing near the top of the bush – this is unbridged",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "pylon",
+     "quote": "The route reaches the pylon at the top of the ridge (1835 m)",
+     "ref": null
+    },
+    {
+     "name": "Cascade Creek",
+     "quote": "After the pylon follow the poles down to Cascade Creek.",
+     "ref": "T7",
+     "how": "ford"
+    },
+    {
+     "name": "Cascade Saddle",
+     "quote": "the easy slopes and flats leading to Cascade Saddle (1524 m)",
+     "ref": "T8"
+    },
+    {
+     "name": "Dart Glacier moraines",
+     "quote": "lateral moraines of the Dart Glacier",
+     "ref": "T9"
+    },
+    {
+     "name": "side streams",
+     "quote": "You will need to ford several side streams.",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Snowy Creek bridge",
+     "quote": "a bridge over the creek leads to Dart Hut",
+     "ref": "T11"
     }
-  ],
-  "access_points": [],
-  "side_trips": [],
-  "huts": [
-    {"name": "Aspiring Hut", "quote": "Aspiring Hut", "ref": "T6"},
-    {"name": "Dart Hut", "quote": "Dart Hut", "ref": "T10"}
-  ],
-  "not_on_route": [
-    {"name": "Cascade Hut", "quote": "Cascade Hut", "ref": null, "why": "other"},
-    {"name": "Tyndall Ridge", "quote": "Tyndall Ridge", "ref": null, "why": "other"}
-  ],
-  "doubts": "No road-end features: the Raspberry Creek car park start has no entry, so null. The end is only 'road end' after walking out 'via the Rees or Dart Valleys' on the Rees-Dart Track, so which road end is not stated; null. The text says the route veers off 'just before you reach Cascade Saddle', so the saddle itself may not be walked over; the order of Cascade Creek and the saddle follows the text. The Snowy Creek bridge ref assumes 'the creek' is Snowy Creek. The route can also be done in reverse from the Rees-Dart Track (strongly discouraged); not recorded as a separate way."
+   ],
+   "direction": null,
+   "time": "4-5 days one way",
+   "distance": null,
+   "evidence": [
+    "The route connects the West Matukituki Valley with the Dart Valley.",
+    "DOC recommends trampers begin from the Matukituki side as ascending is much safer than descending.",
+    "Slightly upstream from the confluence of the Dart and Snowy Creek, a bridge over the creek leads to Dart Hut."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Rees-Dart Track",
+   "quote": "the route can be accessed via the Rees-Dart Track",
+   "ref": "L2",
+   "onto": "Cascade Saddle Route (in reverse)"
+  }
+ ],
+ "exits": [
+  {
+   "name": "Rees-Dart Track",
+   "quote": "Walk out via the Rees or Dart Valleys on the Rees-Dart Track.",
+   "ref": "L2",
+   "from": "Dart Hut",
+   "how": "track"
+  }
+ ],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Aspiring Hut",
+   "quote": "Aspiring Hut",
+   "ref": "T6"
+  },
+  {
+   "name": "Dart Hut",
+   "quote": "Dart Hut",
+   "ref": "T10"
+  }
+ ],
+ "not_on_route": [],
+ "doubts": "No features given; the Raspberry Creek car park has no ref. DOC's 4-5 days appears to include the 2 day walk out from Dart Hut, but the page names no exact road end, so the way is ended at Dart Hut and the walk out is recorded as an exit on the Rees-Dart Track. The two 'stream' crossings near the bushline and the side streams are unnamed fords. The page notes the route is more dangerous in reverse; walking it the other way is not another way."
 }

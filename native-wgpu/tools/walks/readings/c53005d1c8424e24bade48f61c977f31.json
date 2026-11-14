@@ -1,97 +1,350 @@
 {
-  "guid": "c53005d1-c842-4e24-bade-48f61c977f31",
-  "kind": "one_way",
-  "ways": [
+ "guid": "c53005d1-c842-4e24-bade-48f61c977f31",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Smoke-ho car park to Pororari River car park (walkers' exit)",
+   "shape": "one_way",
+   "start": {
+    "name": "Smoke-ho car park",
+    "quote": "Smoke-ho car park at the end of Blackball Road",
+    "ref": "F4"
+   },
+   "end": {
+    "name": "Pororari River car park",
+    "quote": "Walkers can exit out to the Pororari River car park.",
+    "ref": null
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Smoke-ho car park to Pororari River car park (walkers' exit)",
-      "shape": "one_way",
-      "start": {"name": "Smoke-ho car park", "quote": "Smoke-ho car park at the end of Blackball Road", "ref": "F4"},
-      "end": {"name": "Pororari River car park", "quote": "Pororari River car park", "ref": null},
-      "via": [
-        {"name": "Croesus Track", "quote": "Croesus Track", "ref": "T2"},
-        {"name": "Smoke-ho Creek suspension bridge", "quote": "Smoke-ho Creek", "ref": "T23"},
-        {"name": "Battery Track turn-off", "quote": "turn-off to the Battery Track", "ref": null},
-        {"name": "Croesus Top Hut", "quote": "Croesus Top Hut", "ref": null},
-        {"name": "Ces Clark Hut", "quote": "Ces Clark Hut", "ref": "T10"},
-        {"name": "Croesus Knob turn-off", "quote": "The turn-off to Croesus Knob", "ref": null},
-        {"name": "Main Paparoa Range ridge", "quote": "main Paparoa Range", "ref": null},
-        {"name": "Moonlight Tops Hut", "quote": "Moonlight Tops Hut", "ref": "T14"},
-        {"name": "Junction of the Pike ridge (Pike29 Memorial Track)", "quote": "junction of the Pike ridge with the main Paparoa Range", "ref": null},
-        {"name": "Escarpment emergency shelter", "quote": "emergency shelter on the northern end of the escarpment", "ref": null},
-        {"name": "Ridge above Tindale Creek", "quote": "the ridge above Tindale Creek", "ref": null},
-        {"name": "Pororari Hut", "quote": "Pororari Hut", "ref": "T18"},
-        {"name": "Pororari River", "quote": "upper Pororari River valley", "ref": "T19"},
-        {"name": "Pororari River Gorge", "quote": "Pororari River Gorge", "ref": "T20"},
-        {"name": "Junction to the Cave Creek Memorial/Inland Pack Track", "quote": "junction to the Cave Creek Memorial/Inland Pack Track", "ref": null},
-        {"name": "Junction where the track diverges", "quote": "In another 300 m the Paparoa Track diverges at a junction.", "ref": null}
-      ],
-      "direction": null,
-      "time": "3 days one way",
-      "distance": "55 km one way",
-      "evidence": [
-        "Smoke-ho car park at the end of Blackball Road, 8 km north of Blackball.",
-        "The first part of the Paparoa Track follows this route.",
-        "In another 300 m the Paparoa Track diverges at a junction.",
-        "Walkers can exit out to the Pororari River car park.",
-        "Pororari River Track carpark on SH 6, 1.2 km north of Pancake Rocks at Punakaiki"
-      ]
+     "name": "Croesus Track",
+     "quote": "The first part of the Paparoa Track follows this route.",
+     "ref": "T2"
     },
     {
-      "id": "W2",
-      "main": false,
-      "label": "Smoke-ho car park to Waikori Road car park (mountain bikers' exit)",
-      "shape": "one_way",
-      "start": {"name": "Smoke-ho car park", "quote": "Smoke-ho car park at the end of Blackball Road", "ref": "F4"},
-      "end": {"name": "Waikori Road car park", "quote": "Waikori Road car park", "ref": "F2"},
-      "via": [
-        {"name": "Croesus Track", "quote": "Croesus Track", "ref": "T2"},
-        {"name": "Ces Clark Hut", "quote": "Ces Clark Hut", "ref": "T10"},
-        {"name": "Moonlight Tops Hut", "quote": "Moonlight Tops Hut", "ref": "T14"},
-        {"name": "Pororari Hut", "quote": "Pororari Hut", "ref": "T18"},
-        {"name": "Pororari River", "quote": "upper Pororari River valley", "ref": "T19"},
-        {"name": "Junction where the track diverges", "quote": "In another 300 m the Paparoa Track diverges at a junction.", "ref": null},
-        {"name": "Punakaiki River Valley", "quote": "Punakaiki River Valley", "ref": "T22"}
-      ],
-      "direction": null,
-      "time": null,
-      "distance": null,
-      "evidence": [
-        "Pororari Hut to Pororari River car park or Waikori Road car park",
-        "Mountain bikers must exit out the Punakaiki River Valley to Waikori Road car park.",
-        "Waikori Road carpark on SH 6, 2.4 km south of Pancake Rocks at Punakaiki",
-        "The stretch between Waikori Road car park and the Pororari River follows the 1867 Inland Pack Track, once one of the main access routes between Greymouth and Westport."
-      ]
+     "name": "Smoke-ho Creek suspension bridge",
+     "quote": "cross a wire suspension bridge over the Smoke-ho Creek",
+     "ref": "T23"
+    },
+    {
+     "name": "Battery Track turn-off",
+     "quote": "until you reach the turn-off to the Battery Track",
+     "ref": null
+    },
+    {
+     "name": "Croesus Top Hut",
+     "quote": "the historic Croesus Top Hut",
+     "ref": null
+    },
+    {
+     "name": "Ces Clark Hut",
+     "quote": "Ces Clark Hut",
+     "ref": "T10"
+    },
+    {
+     "name": "Croesus Knob turn-off",
+     "quote": "The turn-off to Croesus Knob is a 30-minute walk beyond Ces Clark Hut.",
+     "ref": null
+    },
+    {
+     "name": "Paparoa Range ridge",
+     "quote": "The track follows the ridge of the main Paparoa Range",
+     "ref": null
+    },
+    {
+     "name": "Moonlight Tops Hut",
+     "quote": "Ces Clark Hut to Moonlight Tops Hut",
+     "ref": "T14"
+    },
+    {
+     "name": "junction of the Pike ridge with the main Paparoa Range",
+     "quote": "you will meet the junction of the Pike ridge with the main Paparoa Range",
+     "ref": null
+    },
+    {
+     "name": "emergency shelter on the escarpment",
+     "quote": "There is an emergency shelter on the northern end of the escarpment.",
+     "ref": null
+    },
+    {
+     "name": "ridge above Tindale Creek",
+     "quote": "The track then follows the ridge above Tindale Creek to Pororari Hut.",
+     "ref": null
+    },
+    {
+     "name": "Pororari Hut",
+     "quote": "Moonlight Tops Hut to Pororari Hut",
+     "ref": "T18"
+    },
+    {
+     "name": "Pororari River",
+     "quote": "The track descends into the upper Pororari River valley and follows the river.",
+     "ref": "T19"
+    },
+    {
+     "name": "Pororari River Gorge",
+     "quote": "The track sidles along a spectacular gorge",
+     "ref": "T20"
+    },
+    {
+     "name": "junction to the Cave Creek Memorial/Inland Pack Track",
+     "quote": "The Paparoa Track then passes the junction to the Cave Creek Memorial/Inland Pack Track.",
+     "ref": null
+    },
+    {
+     "name": "junction where the track diverges",
+     "quote": "In another 300 m the Paparoa Track diverges at a junction.",
+     "ref": null
     }
-  ],
-  "access_points": [
-    {"name": "Pororari River Track carpark (Punakaiki end)", "quote": "Pororari River Track carpark on SH 6", "ref": null, "onto": "Paparoa Track via the Pororari River"},
-    {"name": "Waikori Road carpark (Punakaiki end)", "quote": "Waikori Road carpark on SH 6", "ref": "F2", "onto": "Paparoa Track via the Punakaiki River Valley"}
-  ],
-  "side_trips": [
-    {"name": "Croesus Knob", "quote": "Croesus Knob", "ref": "T11", "from": "Croesus Knob turn-off, 30 minutes beyond Ces Clark Hut"},
-    {"name": "Garden Gully", "quote": "Garden Gully", "ref": null, "from": null}
-  ],
-  "huts": [
-    {"name": "Croesus Top Hut (historic, emergency shelter only)", "quote": "Croesus Top Hut", "ref": null},
-    {"name": "Ces Clark Hut", "quote": "Ces Clark Hut", "ref": "T10"},
-    {"name": "Moonlight Tops Hut", "quote": "Moonlight Tops Hut", "ref": "T14"},
-    {"name": "Pororari Hut", "quote": "Pororari Hut", "ref": "T18"}
-  ],
-  "not_on_route": [
-    {"name": "Paparoa Track: Pororari Hut Track", "quote": "Paparoa Track: Pororari Hut Track", "ref": "L1", "why": "other walk"},
-    {"name": "Pike29 Memorial Track", "quote": "Pike29 Memorial Track", "ref": "L2", "why": "other walk"},
-    {"name": "Pike River Mine site", "quote": "Pike River Mine site", "ref": null, "why": "nearby"},
-    {"name": "Lone Hand", "quote": "Lone Hand", "ref": "T12", "why": "view"},
-    {"name": "Lake Brunner", "quote": "Lake Brunner", "ref": null, "why": "view"},
-    {"name": "Aoraki Mount Cook", "quote": "Aoraki Mount Cook", "ref": null, "why": "view"},
-    {"name": "Pike Stream", "quote": "Pike Stream", "ref": "T16", "why": "view"},
-    {"name": "Cave Creek", "quote": "Cave Creek", "ref": "T9", "why": "nearby"},
-    {"name": "Pancake Rocks", "quote": "Pancake Rocks", "ref": "T15", "why": "nearby"},
-    {"name": "Blackball", "quote": "Blackball", "ref": "T7", "why": "nearby"},
-    {"name": "Greymouth", "quote": "Greymouth", "ref": null, "why": "nearby"},
-    {"name": "Punakaiki", "quote": "Punakaiki", "ref": "T21", "why": "nearby"}
-  ],
-  "doubts": "No feature matches the Pororari River car park on SH 6 (walkers' end), so W1's end ref is null. Start F4 (unnamed track meets Blackball Road) taken as the Smoke-ho car park at the end of Blackball Road. W2 ends at Waikori Road car park (F2, where the Paparoa Track meets Waikori Road); the page gives it as the mountain bikers' compulsory exit and the section heading offers both car parks as ends, so it may not be meant as a walking option. Neither way's full distance is given except DOC's 55 km (walking); the leg distances '16 km to Pororari River car park, 17.1 km to Waikori Road carpark' cover only the last section. The Pororari River and Waikori Road car parks are also listed under 'accessed by road', so they are recorded as access points (the track can be started from the Punakaiki end) even though they are the ways' ends; the access 'onto' values are my reading of the last section, not stated in Getting there. Croesus Top Hut is passed but cannot be stayed in."
+   ],
+   "direction": null,
+   "time": "3 days one way",
+   "distance": "55 km one way",
+   "evidence": [
+    "Smoke-ho car park at the end of Blackball Road, 8 km north of Blackball.",
+    "The first part of the Paparoa Track follows this route.",
+    "In another 300 m the Paparoa Track diverges at a junction.",
+    "Walkers can exit out to the Pororari River car park."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Smoke-ho car park to Waikori Road car park (mountain bikers' exit)",
+   "shape": "one_way",
+   "start": {
+    "name": "Smoke-ho car park",
+    "quote": "Smoke-ho car park at the end of Blackball Road",
+    "ref": "F4"
+   },
+   "end": {
+    "name": "Waikori Road car park",
+    "quote": "to Waikori Road car park",
+    "ref": "F2"
+   },
+   "via": [
+    {
+     "name": "Croesus Track",
+     "quote": "The first part of the Paparoa Track follows this route.",
+     "ref": "T2"
+    },
+    {
+     "name": "Smoke-ho Creek suspension bridge",
+     "quote": "cross a wire suspension bridge over the Smoke-ho Creek",
+     "ref": "T23"
+    },
+    {
+     "name": "Battery Track turn-off",
+     "quote": "until you reach the turn-off to the Battery Track",
+     "ref": null
+    },
+    {
+     "name": "Croesus Top Hut",
+     "quote": "the historic Croesus Top Hut",
+     "ref": null
+    },
+    {
+     "name": "Ces Clark Hut",
+     "quote": "Ces Clark Hut",
+     "ref": "T10"
+    },
+    {
+     "name": "Croesus Knob turn-off",
+     "quote": "The turn-off to Croesus Knob is a 30-minute walk beyond Ces Clark Hut.",
+     "ref": null
+    },
+    {
+     "name": "Paparoa Range ridge",
+     "quote": "The track follows the ridge of the main Paparoa Range",
+     "ref": null
+    },
+    {
+     "name": "Moonlight Tops Hut",
+     "quote": "Ces Clark Hut to Moonlight Tops Hut",
+     "ref": "T14"
+    },
+    {
+     "name": "junction of the Pike ridge with the main Paparoa Range",
+     "quote": "you will meet the junction of the Pike ridge with the main Paparoa Range",
+     "ref": null
+    },
+    {
+     "name": "emergency shelter on the escarpment",
+     "quote": "There is an emergency shelter on the northern end of the escarpment.",
+     "ref": null
+    },
+    {
+     "name": "ridge above Tindale Creek",
+     "quote": "The track then follows the ridge above Tindale Creek to Pororari Hut.",
+     "ref": null
+    },
+    {
+     "name": "Pororari Hut",
+     "quote": "Moonlight Tops Hut to Pororari Hut",
+     "ref": "T18"
+    },
+    {
+     "name": "Pororari River",
+     "quote": "The track descends into the upper Pororari River valley and follows the river.",
+     "ref": "T19"
+    },
+    {
+     "name": "Pororari River Gorge",
+     "quote": "The track sidles along a spectacular gorge",
+     "ref": "T20"
+    },
+    {
+     "name": "junction to the Cave Creek Memorial/Inland Pack Track",
+     "quote": "The Paparoa Track then passes the junction to the Cave Creek Memorial/Inland Pack Track.",
+     "ref": null
+    },
+    {
+     "name": "junction where the track diverges",
+     "quote": "In another 300 m the Paparoa Track diverges at a junction.",
+     "ref": null
+    },
+    {
+     "name": "Punakaiki River Valley",
+     "quote": "Mountain bikers must exit out the Punakaiki River Valley to Waikori Road car park.",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "2 days mountain biking (no e-bikes)",
+   "distance": "56. 2 km mountain biking (no-e-bikes)",
+   "evidence": [
+    "Mountain bikers must exit out the Punakaiki River Valley to Waikori Road car park.",
+    "Distance: 16 km to Pororari River car park, 17.1 km to Waikori Road carpark",
+    "Waikori Road carpark on SH 6, 2.4 km south of Pancake Rocks at Punakaiki"
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Pororari River Track carpark",
+   "quote": "Pororari River Track carpark on SH 6",
+   "ref": null,
+   "onto": null
+  },
+  {
+   "name": "Waikori Road carpark",
+   "quote": "Waikori Road carpark on SH 6",
+   "ref": "F2",
+   "onto": null
+  }
+ ],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Croesus Knob",
+   "quote": "Side trip: Croesus Knob",
+   "ref": "T11",
+   "from": "Croesus Knob turn-off"
+  },
+  {
+   "name": "Garden Gully",
+   "quote": "taking a side trip to Garden Gully",
+   "ref": null,
+   "from": null
+  }
+ ],
+ "huts": [
+  {
+   "name": "Croesus Top Hut",
+   "quote": "the historic Croesus Top Hut",
+   "ref": null
+  },
+  {
+   "name": "Ces Clark Hut",
+   "quote": "Ces Clark Hut",
+   "ref": "T10"
+  },
+  {
+   "name": "Moonlight Tops Hut",
+   "quote": "Ces Clark Hut to Moonlight Tops Hut",
+   "ref": "T14"
+  },
+  {
+   "name": "Pororari Hut",
+   "quote": "Moonlight Tops Hut to Pororari Hut",
+   "ref": "T18"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Paparoa Track: Pororari Hut Track",
+   "quote": "see Paparoa Track: Pororari Hut Track",
+   "ref": "L1",
+   "why": "other walk"
+  },
+  {
+   "name": "Pike29 Memorial Track",
+   "quote": "The Pike29 Memorial Track can be used along side the Paparoa Track",
+   "ref": "L2",
+   "why": "other walk"
+  },
+  {
+   "name": "Cave Creek Memorial/Inland Pack Track",
+   "quote": "Cave Creek Memorial/Inland Pack Track",
+   "ref": null,
+   "why": "other walk"
+  },
+  {
+   "name": "Pike River Mine site",
+   "quote": "the Pike River Mine site begins",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "Lone Hand",
+   "quote": "Keep an eye out for the Lone Hand",
+   "ref": "T12",
+   "why": "view"
+  },
+  {
+   "name": "Lake Brunner",
+   "quote": "views of Lake Brunner",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Aoraki Mount Cook",
+   "quote": "down to Aoraki Mount Cook",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Pike Stream",
+   "quote": "down to the Pike Stream",
+   "ref": "T16",
+   "why": "view"
+  },
+  {
+   "name": "Pancake Rocks",
+   "quote": "1.2 km north of Pancake Rocks",
+   "ref": "T15",
+   "why": "nearby"
+  },
+  {
+   "name": "Blackball",
+   "quote": "8 km north of Blackball",
+   "ref": "T7",
+   "why": "nearby"
+  },
+  {
+   "name": "Greymouth",
+   "quote": "The nearest towns are Blackball, Greymouth and Punakaiki.",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "Punakaiki",
+   "quote": "The nearest towns are Blackball, Greymouth and Punakaiki.",
+   "ref": "T21",
+   "why": "nearby"
+  }
+ ],
+ "doubts": "The page describes one track with two ends for two users: walkers exit at the Pororari River car park (W1, main, 55 km walking, which matches the leg distances summed from Smoke-ho car park); mountain bikers exit at Waikori Road car park (W2, 56.2 km, with its own distance in the Pororari Hut section). W2 is treated as its own way because it has its own distance; its time and distance are the mountain biking figures from the Description. The Pororari River car park has no feature entry, so the W1 end ref is null. The start is the Smoke-ho car park at the end of Blackball Road, given ref F4 (the unnamed track meeting Blackball Road). The Pororari River and Waikori Road car parks are both listed under 'accessed by road', so they are recorded as access points; the page does not say what they join. The Punakaiki River Valley has no entry of its own (T22 is the Punakaiki River), so no ref is given. The Pororari River Gorge ref (T20) is taken from the name in the text 'a spectacular gorge' in the Pororari Hut section. Croesus Top Hut is passed by both ways but may only be used for shelter."
 }

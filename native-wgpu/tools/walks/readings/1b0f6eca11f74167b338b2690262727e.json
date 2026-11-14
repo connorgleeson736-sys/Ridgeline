@@ -1,64 +1,137 @@
 {
-  "guid": "1b0f6eca-11f7-4167-b338-b2690262727e",
-  "kind": "loop",
-  "ways": [
+ "guid": "1b0f6eca-11f7-4167-b338-b2690262727e",
+ "kind": "loop",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Round trip: up Avalanche Peak Track and Avalanche Peak Route, down Scotts Route and Scotts Track",
+   "shape": "loop",
+   "start": {
+    "name": "Arthur's Pass Visitor Centre",
+    "quote": "From Arthur's Pass Visitor Centre",
+    "ref": null
+   },
+   "end": {
+    "name": "Arthur's Pass Visitor Centre",
+    "quote": "From Arthur's Pass Visitor Centre",
+    "ref": null
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Round trip: up Avalanche Peak Track/Route, down Scotts Route/Track",
-      "shape": "loop",
-      "start": {"name": "Arthur's Pass Visitor Centre", "quote": "Arthur's Pass Visitor Centre", "ref": null},
-      "end": {"name": "Arthur's Pass Visitor Centre", "quote": "Arthur's Pass Visitor Centre", "ref": null},
-      "via": [
-        {"name": "Avalanche Peak Track", "quote": "Avalanche Peak Track", "ref": "T1"},
-        {"name": "Avalanche Creek", "quote": "Avalanche Creek", "ref": "T7"},
-        {"name": "Avalanche Peak Route", "quote": "Avalanche Peak Route", "ref": null},
-        {"name": "Avalanche Peak summit", "quote": "Avalanche Peak summit", "ref": "T8"},
-        {"name": "Scotts Route", "quote": "Scotts Route", "ref": null},
-        {"name": "Scotts Track", "quote": "Scotts Track", "ref": "T3"},
-        {"name": "Punchbowl car park", "quote": "Punchbowl car park", "ref": "F2"}
-      ],
-      "direction": null,
-      "time": null,
-      "distance": null,
-      "evidence": [
-        "You have the option of tramping both routes for a round trip or going up and down the same route.",
-        "If doing the round trip, we recommend you start with the Avalanche Peak Track, which begins just behind the visitor centre.",
-        "From Arthur's Pass Visitor Centre follow the bush edge northwards to pick up the start of the track, signposted before the Glasgow Bridge over Avalanche Creek (elevation 737 m).",
-        "The track meets the road about 700 m west from the Arthur’s Pass Visitor Centre, the track then continues across the road and ends at the Punchbowl car park."
-      ]
+     "name": "Avalanche Peak Track",
+     "quote": "Avalanche Peak Track",
+     "ref": "T1"
     },
     {
-      "id": "W2",
-      "main": false,
-      "label": "Up and down return trip via Scotts Track/Route",
-      "shape": "out_and_back",
-      "start": {"name": "Scotts Track start by the Punchbowl carpark on SH73", "quote": "Punchbowl carpark", "ref": "F2"},
-      "end": {"name": "Avalanche Peak summit", "quote": "Avalanche Peak summit", "ref": "T8"},
-      "via": [
-        {"name": "Scotts Track", "quote": "Scotts Track", "ref": "T3"},
-        {"name": "Scotts Route", "quote": "Scotts Route", "ref": null}
-      ],
-      "direction": null,
-      "time": null,
-      "distance": null,
-      "evidence": [
-        "For those intending to go up and down the same way, we recommend Scotts Track/Route.",
-        "Scotts Track is signposted on the main road, about 700 m west of the Arthur’s Pass Visitor Centre.",
-        "The track start is 30 m from the Punchbowl carpark.",
-        "Take note of the route up, to enable you to return the same way."
-      ]
+     "name": "Avalanche Peak Route",
+     "quote": "Avalanche Peak Route",
+     "ref": null
+    },
+    {
+     "name": "Avalanche Peak summit",
+     "quote": "Avalanche Peak summit",
+     "ref": "T8"
+    },
+    {
+     "name": "Scotts Route",
+     "quote": "Scotts Route (orange poles)",
+     "ref": null
+    },
+    {
+     "name": "Scotts Track",
+     "quote": "Scotts Track",
+     "ref": "T3"
+    },
+    {
+     "name": "Punchbowl car park",
+     "quote": "ends at the Punchbowl car park",
+     "ref": "F2"
     }
-  ],
-  "access_points": [],
-  "side_trips": [],
-  "huts": [],
-  "not_on_route": [
-    {"name": "Mount Cassidy", "quote": "Mount Cassidy", "ref": "T13", "why": "view"},
-    {"name": "Mt Rolleston (Kaimatau)", "quote": "Mt Rolleston", "ref": "T14", "why": "view"},
-    {"name": "Crow Glacier", "quote": "Crow Glacier", "ref": "T9", "why": "view"},
-    {"name": "Mount Bealey", "quote": "Mount Bealey", "ref": "T12", "why": "view"},
-    {"name": "Devils Punchbowl Falls", "quote": "Devils Punchbowl Falls", "ref": "T10", "why": "view"}
-  ],
-  "doubts": "The page calls Option 1 a 'round trip', so recorded as a loop from the visitor centre, but the descent ends at the Punchbowl car park about 700 m west of the visitor centre and the text says the highway is unsafe to walk on, so the loop does not close on foot as described. No feature is where the Avalanche Peak Track starts behind the visitor centre, so the start ref is null. F2 (Scotts Track meets West Coast Road/SH73) is used for the Scotts Track road end and Punchbowl car park; the car park is just across the road from where the track meets the road, so it may not be exactly F2. DOC's time ('3-4 hr to summit') and distance ('2.5 km ... one way') are to the summit, not for either full way, so left null. Going up and down the Avalanche Peak Track is also allowed but not described as its own option."
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "You have the option of tramping both routes for a round trip or going up and down the same route.",
+    "If doing the round trip, we recommend you start with the Avalanche Peak Track, which begins just behind the visitor centre.",
+    "From Arthur's Pass Visitor Centre follow the bush edge northwards to pick up the start of the track, signposted before the Glasgow Bridge over Avalanche Creek (elevation 737 m).",
+    "The track meets the road about 700 m west from the Arthur’s Pass Visitor Centre, the track then continues across the road and ends at the Punchbowl car park."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Up and down return trip via Scotts Track and Scotts Route",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Punchbowl car park",
+    "quote": "The track start is 30 m from the Punchbowl carpark.",
+    "ref": "F2"
+   },
+   "end": {
+    "name": "Avalanche Peak summit",
+    "quote": "From the bushline to Avalanche Peak summit",
+    "ref": "T8"
+   },
+   "via": [
+    {
+     "name": "Scotts Track",
+     "quote": "Scotts Track",
+     "ref": "T3"
+    },
+    {
+     "name": "Scotts Route",
+     "quote": "Scotts Route",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "For those intending to go up and down the same way, we recommend Scotts Track/Route.",
+    "Scotts Track is signposted on the main road, about 700 m west of the Arthur’s Pass Visitor Centre.",
+    "The track start is 30 m from the Punchbowl carpark.",
+    "Take note of the route up, to enable you to return the same way."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Mount Cassidy",
+   "quote": "Mount Cassidy",
+   "ref": "T13",
+   "why": "view"
+  },
+  {
+   "name": "Mt Rolleston (Kaimatau)",
+   "quote": "Mt Rolleston (Kaimatau)",
+   "ref": "T14",
+   "why": "view"
+  },
+  {
+   "name": "Crow Glacier",
+   "quote": "Crow Glacier",
+   "ref": "T9",
+   "why": "view"
+  },
+  {
+   "name": "Mount Bealey",
+   "quote": "Mount Bealey",
+   "ref": "T12",
+   "why": "view"
+  },
+  {
+   "name": "Devils Punchbowl Falls",
+   "quote": "Devils Punchbowl Falls",
+   "ref": "T10",
+   "why": "view"
+  }
+ ],
+ "doubts": "W1 is the page's round trip, recorded as a loop. The descent ends at the Punchbowl car park about 700 m west of the visitor centre and the page says the highway must not be walked, so the closing leg is not described; the loop end is set to the start to meet the loop shape, and the car park is the last via. The visitor centre start has no feature; the start ref is null. The Punchbowl car park is F2 (where Scotts Track meets the road), the nearest feature; the page says the track crosses the road to the car park. Going up and down the Avalanche Peak Route is offered in one sentence without its own heading, so it is not a separate way. DOC's time (3-4 hr to summit) and distance (2.5 km one way) cover the summit, not either full way, so way times and distances are null. Per-section times are not summed. The stray 'Cape Brett Track virtual guide' line at the end of the page is not a walk on this route and is not recorded."
 }

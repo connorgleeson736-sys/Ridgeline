@@ -1,44 +1,122 @@
 {
-  "guid": "fde05f79-debb-43fd-8994-8f6730beacbe",
-  "kind": "out_and_back",
-  "ways": [
+ "guid": "fde05f79-debb-43fd-8994-8f6730beacbe",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "SH6 up the Moeraki valley to Middle Head Hut",
+   "shape": "one_way",
+   "start": {
+    "name": "SH6 at the Windbag Saddle",
+    "quote": "Access to the track is signposted approximately 40 km northeast of Haast on SH6 at the Windbag Saddle",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Middle Head Hut",
+    "quote": "Middle Head Hut",
+    "ref": "T2"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "SH6 up the Moeraki valley to Horseshoe Flat Hut and Middle Head Hut",
-      "shape": "out_and_back",
-      "start": {"name": "SH6 at the Windbag Saddle parking area", "quote": "Access to the track is signposted approximately 40 km northeast of Haast on SH6 at the Windbag Saddle", "ref": "F1"},
-      "end": {"name": "Middle Head Hut", "quote": "Middle Head Hut is located near the confluence of this creek and the Middle Head branch of the Moeraki River", "ref": "T2"},
-      "via": [
-        {"name": "Haast – Paringa Cattle Track", "quote": "The track up the Moeraki valley initially follows the Haast – Paringa Cattle Track", "ref": "L1"},
-        {"name": "Moeraki River", "quote": "The flat, well-benched track then follows the Moeraki (Blue) River", "ref": "T3"},
-        {"name": "Moeraki Valley Track junction", "quote": "to the Moeraki Valley Track junction", "ref": null},
-        {"name": "Horseshoe Flat Hut", "quote": "Horseshoe Flat Hut will soon come into view on a grassy flat", "ref": "T1"}
-      ],
-      "direction": null,
-      "time": "2+ days",
-      "distance": null,
-      "evidence": [
-        "Access to the track is signposted approximately 40 km northeast of Haast on SH6 at the Windbag Saddle.",
-        "The track up the Moeraki valley initially follows the Haast – Paringa Cattle Track.",
-        "Turn left at the junction, following the sign for Horseshoe Flat Hut.",
-        "Middle Head Hut is located near the confluence of this creek and the Middle Head branch of the Moeraki River.",
-        "Do not attempt to cross in these conditions or if rain is forecast while you are further up the valley, as you will be unable to return to Horseshoe Flat Hut."
-      ]
+     "name": "Haast – Paringa Cattle Track",
+     "quote": "initially follows the Haast – Paringa Cattle Track",
+     "ref": "L1"
+    },
+    {
+     "name": "Moeraki River",
+     "quote": "follows the Moeraki (Blue) River",
+     "ref": "T3"
+    },
+    {
+     "name": "Moeraki Valley Track junction",
+     "quote": "to the Moeraki Valley Track junction",
+     "ref": null
+    },
+    {
+     "name": "Horseshoe Flat Hut",
+     "quote": "Horseshoe Flat Hut",
+     "ref": "T1"
+    },
+    {
+     "name": "Moeraki River",
+     "quote": "cross the river and continue upstream over the gravel flats",
+     "ref": "T3",
+     "how": "ford"
+    },
+    {
+     "name": "Creek flowing from Zelian Saddle",
+     "quote": "a crossing of a creek flowing from Zelian Saddle",
+     "ref": null
     }
-  ],
-  "access_points": [],
-  "side_trips": [
-    {"name": "Middle Head Basin", "quote": "The side-trip into Middle Head Basin from the hut is worthwhile", "ref": null, "from": "Middle Head Hut"}
-  ],
-  "huts": [
-    {"name": "Horseshoe Flat Hut", "quote": "Horseshoe Flat Hut", "ref": "T1"},
-    {"name": "Middle Head Hut", "quote": "Middle Head Hut", "ref": "T2"}
-  ],
-  "not_on_route": [
-    {"name": "Blowfly (Blue River) Hut", "quote": "just before the swingbridge to Blowfly (Blue River) Hut", "ref": null, "why": "nearby"},
-    {"name": "Windbag Creek", "quote": "to avoid the lowland swampy landscape around Windbag Creek", "ref": "T5", "why": "nearby"},
-    {"name": "Zelian Saddle", "quote": "a creek flowing from Zelian Saddle", "ref": null, "why": "other"}
-  ],
-  "doubts": "The text never says 'return the same way'; out_and_back is inferred from the valley route ending at Middle Head Hut/Basin with no other exit and from 'you will be unable to return to Horseshoe Flat Hut'. Start F1 (unnamed track meeting Haast Highway) is taken as the signposted Windbag Saddle parking area on SH6, which it is near; the text names no road end explicitly. The Middle Head Basin route has its own heading and time but the page calls it a side-trip, so it is recorded as a side trip, not a way."
+   ],
+   "direction": null,
+   "time": "2+ days",
+   "distance": null,
+   "evidence": [
+    "Access to the track is signposted approximately 40 km northeast of Haast on SH6 at the Windbag Saddle.",
+    "The track up the Moeraki valley initially follows the Haast – Paringa Cattle Track.",
+    "The flat, well-benched track then follows the Moeraki (Blue) River to the Moeraki Valley Track junction, just before the swingbridge to Blowfly (Blue River) Hut.",
+    "Turn left at the junction, following the sign for Horseshoe Flat Hut.",
+    "Horseshoe Flat Hut will soon come into view on a grassy flat.",
+    "If it is safe to do so, cross the river and continue upstream over the gravel flats until markers indicate the beginning of the route through the bush again.",
+    "Middle Head Hut is located near the confluence of this creek and the Middle Head branch of the Moeraki River."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Middle Head Basin",
+   "quote": "The side-trip into Middle Head Basin from the hut is worthwhile",
+   "ref": null,
+   "from": "Middle Head Hut"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Horseshoe Flat Hut",
+   "quote": "Horseshoe Flat Hut",
+   "ref": "T1"
+  },
+  {
+   "name": "Middle Head Hut",
+   "quote": "Middle Head Hut",
+   "ref": "T2"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Blowfly (Blue River) Hut",
+   "quote": "Blowfly (Blue River) Hut",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "Windbag Creek",
+   "quote": "around Windbag Creek",
+   "ref": "T5",
+   "why": "nearby"
+  },
+  {
+   "name": "Zelian Saddle",
+   "quote": "Zelian Saddle",
+   "ref": null,
+   "why": "other"
+  },
+  {
+   "name": "Rock biv",
+   "quote": "Continuing past a rock biv",
+   "ref": null,
+   "why": "side trip"
+  },
+  {
+   "name": "Haast",
+   "quote": "northeast of Haast",
+   "ref": null,
+   "why": "nearby"
+  }
+ ],
+ "doubts": "Shape: the text never says the walker returns by the same track; one_way is taken because the way is described as ending at Middle Head Hut. The line 'you will be unable to return to Horseshoe Flat Hut' implies a return, but it is not stated as the way back, so this is a doubt. Start: F1 (where an unnamed track meets Haast Highway) is taken as the signposted Windbag Saddle parking area on SH6; the text names no road end, and the match is inferred from the location. The ford: the text says 'cross the river' without naming it; it is taken as the Moeraki River, since the page refers to 'the main Moeraki River' and this is the river the route follows. The creek from Zelian Saddle is said to have a 'crossing' but the text does not say to cross it, so it is listed as a via with no how. The Middle Head Basin route has its own heading and time, but the page calls it a side trip, so it is recorded as a side trip, not a way. The DOC time '2+ days' is the whole way's time. The section times (4 hr 30 min and 2 hr) are not summed."
 }

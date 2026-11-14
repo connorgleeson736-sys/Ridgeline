@@ -1,34 +1,62 @@
 {
-  "guid": "1fd63c7e-f5b8-408a-abad-110a2929a60d",
-  "kind": "out_and_back",
-  "ways": [
+ "guid": "1fd63c7e-f5b8-408a-abad-110a2929a60d",
+ "kind": "out_and_back",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Lake Matheson carpark to the Lake Gault lookout",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Lake Matheson carpark",
+    "quote": "The track starts from the Lake Matheson carpark.",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Lake Gault lookout",
+    "quote": "Continue several minutes to the lookout point.",
+    "ref": "T4"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Lake Matheson carpark to the Lake Gault lookout",
-      "shape": "out_and_back",
-      "start": {"name": "Lake Matheson carpark", "quote": "Beginning from the Lake Matheson carpark", "ref": "F1"},
-      "end": {"name": "Lake Gault lookout", "quote": "before branching off to Lake Gault", "ref": "T4"},
-      "via": [
-        {"name": "Lake Matheson/Te Ara Kairaumati walk", "quote": "follow the Lake Matheson/Te Ara Kairaumati walk in an anti-clockwise direction", "ref": "T2"},
-        {"name": "Lookout spot with a seat", "quote": "There is a lookout spot with a seat about half-way up the hill", "ref": null}
-      ],
-      "direction": null,
-      "time": "3 hr return",
-      "distance": "8 km return via same track",
-      "evidence": [
-        "Beginning from the Lake Matheson carpark, follow the Lake Matheson/Te Ara Kairaumati walk in an anti-clockwise direction before branching off to Lake Gault.",
-        "As the track flattens out, you’ll catch glimpses of Lake Gault through the vegetation. Continue several minutes to the lookout point.",
-        "The track starts from the Lake Matheson carpark."
-      ]
+     "name": "Lake Matheson/Te Ara Kairaumati walk",
+     "quote": "follow the Lake Matheson/Te Ara Kairaumati walk in an anti-clockwise direction",
+     "ref": "T2"
+    },
+    {
+     "name": "lookout spot with a seat",
+     "quote": "There is a lookout spot with a seat about half-way up the hill",
+     "ref": null
     }
-  ],
-  "access_points": [],
-  "side_trips": [],
-  "huts": [],
-  "not_on_route": [
-    {"name": "Southern Alps/Kā Tiritiri o te Moana, Aoraki/Mount Cook and Mount Tasman", "quote": "panoramic views of the Southern Alps/Kā Tiritiri o te Moana, Aoraki/Mount Cook and Mount Tasman", "ref": null, "why": "view"},
-    {"name": "Fox Glacier/Te Moeka o Tuawe", "quote": "Fox Glacier/Te Moeka o Tuawe", "ref": null, "why": "other"}
-  ],
-  "doubts": "The end is the lookout point (with a shelter) above Lake Gault; the ref given is the lake itself (T4), as no entry is the lookout. The 'anti-clockwise direction' refers to the Lake Matheson walk followed on the way out, not to this out-and-back walk. The branch-off point from the Lake Matheson walk is not named."
+   ],
+   "direction": null,
+   "time": "3 hr return",
+   "distance": "8 km return via same track",
+   "evidence": [
+    "Beginning from the Lake Matheson carpark, follow the Lake Matheson/Te Ara Kairaumati walk in an anti-clockwise direction before branching off to Lake Gault.",
+    "There is a lookout spot with a seat about half-way up the hill.",
+    "Continue several minutes to the lookout point.",
+    "The track starts from the Lake Matheson carpark."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Fox Glacier",
+   "quote": "Fox Glacier Weheka township",
+   "ref": "T3",
+   "why": "nearby"
+  },
+  {
+   "name": "Southern Alps, Aoraki/Mount Cook and Mount Tasman views",
+   "quote": "panoramic views of the Southern Alps/Kā Tiritiri o te Moana, Aoraki/Mount Cook and Mount Tasman",
+   "ref": null,
+   "why": "view"
+  }
+ ],
+ "doubts": "The start is the Lake Matheson carpark, placed at F1 (where the Lake Matheson Walk meets Lake Matheson Road). The end is the lookout point, which has no feature; ref T4 (Lake Gault) is used because the page places the lookout on Lake Gault ('reflected on the surface of Lake Gault'). The branch-off point from the Lake Matheson walk is not named. 'Anti-clockwise' refers to the Lake Matheson walk followed on the way out, not to this out-and-back walk, so direction is null. Time and distance are DOC's summary for the way. Out and back is from DOC's 'return via same track' distance and the 'return' time."
 }

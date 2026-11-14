@@ -1,46 +1,118 @@
 {
-  "guid": "e5db00fb-21df-40ee-88d1-33bd4fec2e92",
-  "kind": "one_way",
-  "ways": [
+ "guid": "e5db00fb-21df-40ee-88d1-33bd4fec2e92",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "North-South Track from Karangahake Gorge to Kaimai Summit (SH29)",
+   "shape": "one_way",
+   "start": {
+    "name": "Karangahake Gorge (SH2)",
+    "quote": "The track starts from Karangahake Gorge",
+    "ref": "T11"
+   },
+   "end": {
+    "name": "Kaimai Summit (SH29)",
+    "quote": "The track exits on to SH29 at the Kaimai Summit",
+    "ref": "F2"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "North-South Track, Karangahake Gorge to Kaimai Summit",
-      "shape": "one_way",
-      "start": {"name": "Karangahake Gorge (SH2)", "quote": "Karangahake Gorge", "ref": "T11"},
-      "end": {"name": "Kaimai Summit (SH29)", "quote": "Kaimai Summit", "ref": "F2"},
-      "via": [
-        {"name": "Daly's Clearing Hut", "quote": "Daly’s Clearing Hut", "ref": "L1"},
-        {"name": "Waitawheta Hut", "quote": "Waitawheta Hut", "ref": "L2"},
-        {"name": "Te Rereatukahia Hut", "quote": "Te Rereatukahia Hut", "ref": "L3"},
-        {"name": "Motutapere Hut", "quote": "Motutapere Hut", "ref": "T13"},
-        {"name": "Poupou Stream", "quote": "Poupou Stream", "ref": "T15"},
-        {"name": "Te Whare Okioki", "quote": "Te Whare Okioki", "ref": "L4"},
-        {"name": "Hurunui Hut", "quote": "Hurunui Hut", "ref": "L5"}
-      ],
-      "direction": null,
-      "time": "5 - 7 days",
-      "distance": "82 km one way",
-      "evidence": [
-        "The track starts from Karangahake Gorge, off SH2 at Karangahake. The track exits on to SH29 at the Kaimai Summit.",
-        "The recommended North-South track is via Waitawheta Hut, and the Waitawheta and Wharawhara valleys."
-      ]
+     "name": "Daly's Clearing Hut",
+     "quote": "Daly’s Clearing Hut",
+     "ref": "L1"
+    },
+    {
+     "name": "Waitawheta Hut",
+     "quote": "Waitawheta Hut",
+     "ref": "L2"
+    },
+    {
+     "name": "Te Rereatukahia Hut",
+     "quote": "Te Rereatukahia Hut",
+     "ref": "L3"
+    },
+    {
+     "name": "Poupou Stream",
+     "quote": "Poupou Stream",
+     "ref": "T15"
+    },
+    {
+     "name": "Motutapere Hut",
+     "quote": "track between Motutapere Hut and Te Whare Okioki",
+     "ref": "T13"
+    },
+    {
+     "name": "Te Whare Okioki",
+     "quote": "Te Whare Okioki",
+     "ref": "L4"
+    },
+    {
+     "name": "Hurunui Hut",
+     "quote": "Hurunui Hut or Kaimai Summit (SH29)",
+     "ref": "L5"
     }
-  ],
-  "access_points": [],
-  "side_trips": [],
-  "huts": [
-    {"name": "Daly's Clearing Hut", "quote": "Daly’s Clearing Hut", "ref": "L1"},
-    {"name": "Waitawheta Hut", "quote": "Waitawheta Hut", "ref": "L2"},
-    {"name": "Te Rereatukahia Hut", "quote": "Te Rereatukahia Hut", "ref": "L3"},
-    {"name": "Motutapere Hut", "quote": "Motutapere Hut", "ref": "T13"},
-    {"name": "Te Whare Okioki", "quote": "Te Whare Okioki", "ref": "L4"},
-    {"name": "Hurunui Hut", "quote": "Hurunui Hut", "ref": "L5"}
-  ],
-  "not_on_route": [
-    {"name": "Kauritatahi Hut", "quote": "Kauritatahi", "ref": null, "why": "nearby"},
-    {"name": "Mangamuka Hut", "quote": "Mangamuka huts", "ref": null, "why": "nearby"},
-    {"name": "old North-South track via Mount Te Aroha, Pahiko and Wahine Rock", "quote": "The old North-South track", "ref": "T4", "why": "other"}
-  ],
-  "doubts": "The start is matched to the Karangahake Gorge name (T11); the only road end feature near there is on Dickey Flat Road, which the text does not mention. Motutapere Hut's place in the order is inferred from 'the track between Motutapere Hut and Te Whare Okioki'; the itinerary does not list it. Hurunui Hut is taken as on the way because Day 6 ends at 'Hurunui Hut or Kaimai Summit (SH29)' with an optional Day 7 from Hurunui Hut to Kaimai Summit. The page says the walk can be shortened at side tracks but names none. The old North-South route along the main range is an alternative described only briefly, without start or end, so it is not recorded as a way; its ref T4 (Old North South Route) is assumed from the name."
+   ],
+   "direction": null,
+   "time": "5 - 7 days",
+   "distance": "82 km one way",
+   "evidence": [
+    "The track starts from Karangahake Gorge, off SH2 at Karangahake. The track exits on to SH29 at the Kaimai Summit.",
+    "Day 1 – Karangahake Gorge (SH2) to Daly’s Clearing Hut",
+    "Day 6 – Te Whare Okioki to Hurunui Hut or Kaimai Summit (SH29)",
+    "The recommended North-South track is via Waitawheta Hut, and the Waitawheta and Wharawhara valleys."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Daly's Clearing Hut",
+   "quote": "Daly’s Clearing Hut",
+   "ref": "L1"
+  },
+  {
+   "name": "Waitawheta Hut",
+   "quote": "Waitawheta Hut",
+   "ref": "L2"
+  },
+  {
+   "name": "Te Rereatukahia Hut",
+   "quote": "Te Rereatukahia Hut",
+   "ref": "L3"
+  },
+  {
+   "name": "Motutapere Hut",
+   "quote": "track between Motutapere Hut and Te Whare Okioki",
+   "ref": "T13"
+  },
+  {
+   "name": "Te Whare Okioki",
+   "quote": "Te Whare Okioki",
+   "ref": "L4"
+  },
+  {
+   "name": "Hurunui Hut",
+   "quote": "Hurunui Hut or Kaimai Summit (SH29)",
+   "ref": "L5"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Kauritatahi and Mangamuka huts",
+   "quote": "Kauritatahi and Mangamuka huts are well off the main track",
+   "ref": null,
+   "why": "side trip"
+  },
+  {
+   "name": "old North-South track via Mount Te Aroha, Pahiko and Wahine Rock",
+   "quote": "The old North-South track along the crest of the main range from Mount Te Aroha through Pahiko and Wahine Rock is a route",
+   "ref": "T4",
+   "why": "other"
+  }
+ ],
+ "doubts": "The start is matched to the Karangahake Gorge valley (T11) named in the text; the place 'Karangahake' (T10) is not used. The page says the walk can be shortened by entering or exiting at a side track, but names none, so no exit is recorded. Motutapere Hut is not in the example itinerary; its place is taken from 'the track between Motutapere Hut and Te Whare Okioki', so it is placed after Poupou Stream and before Te Whare Okioki. Hurunui Hut is on the main way because Day 7 (optional) runs from it to Kaimai Summit, but Day 6 may also end at Kaimai Summit. The Wharawhara valley is named in the recommended route but its place in the order is not stated, so it is not a via. Kauritatahi and Mangamuka huts are off the main track and have no packet entries. The old North-South track is an alternative route with no given start or end, so it is not a way; its ref T4 is the map track of that name."
 }

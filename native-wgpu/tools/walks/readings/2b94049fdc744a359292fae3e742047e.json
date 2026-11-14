@@ -1,75 +1,141 @@
 {
-  "guid": "2b94049f-dc74-4a35-9292-fae3e742047e",
-  "kind": "out_and_back",
-  "ways": [
+ "guid": "2b94049f-dc74-4a35-9292-fae3e742047e",
+ "kind": "out_and_back",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Whitianga Rock Walk",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Ferry Landing Wharf",
+    "quote": "The track starts at Ferry Landing Wharf",
+    "ref": "F2"
+   },
+   "end": {
+    "name": "Whitianga Rock peninsula",
+    "quote": "The track continues along top of the Whitianga Rock peninsula",
+    "ref": null
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Whitianga Rock Walk",
-      "shape": "out_and_back",
-      "start": {"name": "Ferry Landing Wharf", "quote": "The track starts at Ferry Landing Wharf", "ref": "F2"},
-      "end": {"name": "Whitianga Rock peninsula", "quote": "The track continues along top of the Whitianga Rock peninsula", "ref": null},
-      "via": [
-        {"name": "Ngāti Hei pā site", "quote": "climbs to the remains of a well-fortified Ngāti Hei pā site", "ref": null},
-        {"name": "grassy area", "quote": "At the grassy area", "ref": null}
-      ],
-      "direction": null,
-      "time": "20 min return",
-      "distance": "300 m one way",
-      "evidence": [
-        "The track starts at Ferry Landing Wharf.",
-        "Follow the track as it leads along the edge of the harbour then climbs to the remains of a well-fortified Ngāti Hei pā site.",
-        "The track continues along top of the Whitianga Rock peninsula, with dramatic views of Whitianga Harbour and Back Bay."
-      ]
+     "name": "Ngāti Hei pā site",
+     "quote": "climbs to the remains of a well-fortified Ngāti Hei pā site",
+     "ref": null
     },
     {
-      "id": "W2",
-      "main": false,
-      "label": "Loop walk",
-      "shape": "loop",
-      "start": {"name": "Ferry Landing Wharf", "quote": "Starting from Ferry Landing Wharf", "ref": "F2"},
-      "end": {"name": "Ferry Landing Wharf", "quote": "the follow the footpath back to Ferry Landing Wharf", "ref": "F2"},
-      "via": [
-        {"name": "Whitianga Rock Walk", "quote": "follow Whitianga Rock Walk to the pā site", "ref": "T1"},
-        {"name": "pā site", "quote": "the pā site", "ref": null},
-        {"name": "Maramaratotara Track", "quote": "turn off onto Maramaratotoara Track", "ref": null},
-        {"name": "Maramaratotara Bay", "quote": "Continue on Maramaratotoara Track to Maramaratotoara Bay", "ref": "T4"},
-        {"name": "footpath", "quote": "follow the footpath back", "ref": null}
-      ],
-      "direction": null,
-      "time": null,
-      "distance": "1.8 km loop",
-      "evidence": [
-        "You can combine Whitianga Rock Walk and Maramaratotoara Track to form a loop.",
-        "Starting from Ferry Landing Wharf, follow Whitianga Rock Walk to the pā site, then turn off onto Maramaratotoara Track. Continue on Maramaratotoara Track to Maramaratotoara Bay, the follow the footpath back to Ferry Landing Wharf."
-      ]
-    },
-    {
-      "id": "W3",
-      "main": false,
-      "label": "Maramaratotara Track",
-      "shape": null,
-      "start": {"name": "Maramaratotara Bay", "quote": "Starts on Purangi Road at Maramaratotara Bay", "ref": "F3"},
-      "end": {"name": "historic pā site", "quote": "The track then climbs to the historic pā site, where it connects with Whitianga Rock Walk", "ref": null},
-      "via": [
-        {"name": "Back Bay", "quote": "then descends to Back Bay", "ref": "T2"}
-      ],
-      "direction": null,
-      "time": null,
-      "distance": "1 km one way",
-      "evidence": [
-        "The track starts at Maramaratotara Bay.",
-        "It climbs the hill behind the bay, then descends to Back Bay.",
-        "The track then climbs to the historic pā site, where it connects with Whitianga Rock Walk."
-      ]
+     "name": "grassy area",
+     "quote": "At the grassy area",
+     "ref": null
     }
-  ],
-  "access_points": [],
-  "side_trips": [],
-  "huts": [],
-  "not_on_route": [
-    {"name": "Whitianga Harbour", "quote": "Excellent views of Whitianga Harbour", "ref": "T11", "why": "view"},
-    {"name": "Whitianga", "quote": "a short ferry ride from Whitianga", "ref": "T10", "why": "nearby"}
-  ],
-  "doubts": "The page covers two tracks plus a loop; W1 (Whitianga Rock Walk) is taken as main because DOC's '20 min return' fits its 300 m one way, but the page could also be read as a network. The text does not name where Whitianga Rock Walk ends; it is taken as the top/end of the Whitianga Rock peninsula, returning the same way (not stated explicitly). Ferry Landing Wharf is taken as road end F2 (the western Purangi Road end, nearer Ferry Landing) and Maramaratotara Bay start as F3 (the eastern one, nearer Maramaratotara Bay); both features carry the same name. Maramaratotara Track's '1 km one way' does not say whether it is walked back, so its shape is left null."
+   ],
+   "direction": null,
+   "time": "20 min return",
+   "distance": "300 m one way",
+   "evidence": [
+    "The track starts at Ferry Landing Wharf.",
+    "Follow the track as it leads along the edge of the harbour then climbs to the remains of a well-fortified Ngāti Hei pā site.",
+    "The track continues along top of the Whitianga Rock peninsula, with dramatic views of Whitianga Harbour and Back Bay."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Loop walk",
+   "shape": "loop",
+   "start": {
+    "name": "Ferry Landing Wharf",
+    "quote": "Starting from Ferry Landing Wharf",
+    "ref": "F2"
+   },
+   "end": {
+    "name": "Ferry Landing Wharf",
+    "quote": "the follow the footpath back to Ferry Landing Wharf",
+    "ref": "F2"
+   },
+   "via": [
+    {
+     "name": "Whitianga Rock Walk",
+     "quote": "follow Whitianga Rock Walk to the pā site",
+     "ref": "T1"
+    },
+    {
+     "name": "pā site",
+     "quote": "the pā site",
+     "ref": null
+    },
+    {
+     "name": "Maramaratotara Track",
+     "quote": "turn off onto Maramaratotoara Track",
+     "ref": null
+    },
+    {
+     "name": "Maramaratotara Bay",
+     "quote": "Continue on Maramaratotoara Track to Maramaratotoara Bay",
+     "ref": "T4"
+    },
+    {
+     "name": "footpath",
+     "quote": "follow the footpath back",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": "1.8 km loop",
+   "evidence": [
+    "You can combine Whitianga Rock Walk and Maramaratotoara Track to form a loop.",
+    "Starting from Ferry Landing Wharf, follow Whitianga Rock Walk to the pā site, then turn off onto Maramaratotoara Track. Continue on Maramaratotoara Track to Maramaratotoara Bay, the follow the footpath back to Ferry Landing Wharf."
+   ]
+  },
+  {
+   "id": "W3",
+   "main": false,
+   "label": "Maramaratotara Track",
+   "shape": null,
+   "start": {
+    "name": "Maramaratotara Bay",
+    "quote": "Starts on Purangi Road at Maramaratotara Bay",
+    "ref": "F3"
+   },
+   "end": {
+    "name": "historic pā site",
+    "quote": "The track then climbs to the historic pā site, where it connects with Whitianga Rock Walk",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Back Bay",
+     "quote": "then descends to Back Bay",
+     "ref": "T2"
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": "1 km one way",
+   "evidence": [
+    "The track starts at Maramaratotara Bay.",
+    "It climbs the hill behind the bay, then descends to Back Bay.",
+    "The track then climbs to the historic pā site, where it connects with Whitianga Rock Walk."
+   ]
+  }
+ ],
+ "access_points": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Whitianga Harbour",
+   "quote": "Excellent views of Whitianga Harbour",
+   "ref": "T11",
+   "why": "view"
+  },
+  {
+   "name": "Whitianga",
+   "quote": "a short ferry ride from Whitianga",
+   "ref": "T10",
+   "why": "nearby"
+  }
+ ],
+ "doubts": "The page covers two tracks plus a loop; W1 (Whitianga Rock Walk) is taken as main because DOC's '20 min return' fits its 300 m one way, but the page could also be read as a network. The text does not name where Whitianga Rock Walk ends; it is taken as the top/end of the Whitianga Rock peninsula, returning the same way (not stated explicitly). Ferry Landing Wharf is taken as road end F2 (the western Purangi Road end, nearer Ferry Landing) and Maramaratotara Bay start as F3 (the eastern one, nearer Maramaratotara Bay); both features carry the same name. Maramaratotara Track's '1 km one way' does not say whether it is walked back, so its shape is left null."
 }

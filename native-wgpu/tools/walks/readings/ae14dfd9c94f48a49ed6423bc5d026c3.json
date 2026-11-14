@@ -1,55 +1,305 @@
 {
-  "guid": "ae14dfd9-c94f-48a4-9ed6-423bc5d026c3",
-  "kind": "loop",
-  "ways": [
+ "guid": "ae14dfd9-c94f-48a4-9ed6-423bc5d026c3",
+ "kind": "loop",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Awaroa/Godley Head Loop from Taylors Mistake car park",
+   "shape": "loop",
+   "start": {
+    "name": "Taylors Mistake car park",
+    "quote": "start at Te Onepoto/Taylors Mistake",
+    "ref": "F2"
+   },
+   "end": {
+    "name": "Taylors Mistake car park",
+    "quote": "Turn left to return to Taylors Mistake car park (15 min).",
+    "ref": "F2"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Awaroa/Godley Head Loop from Taylors Mistake car park",
-      "shape": "loop",
-      "start": {"name": "Taylors Mistake car park", "quote": "Taylors Mistake car park", "ref": "F2"},
-      "end": {"name": "Taylors Mistake car park", "quote": "Turn left to return to Taylors Mistake car park", "ref": "F2"},
-      "via": [
-        {"name": "Pilgrims Way coastal track", "quote": "walk to Awaroa/Godley Head via the Pilgrims Way coastal track", "ref": "T3"},
-        {"name": "Rotten Row", "quote": "the baches at Rotten Row", "ref": null},
-        {"name": "Boulder Bay", "quote": "Climb past Boulder Bay", "ref": "T6"},
-        {"name": "Taylor Battery", "quote": "two gun platforms at Taylor Battery", "ref": null},
-        {"name": "Awaroa/Godley Head", "quote": "the Awaroa/Godley Head coastal defence battery", "ref": "T4"},
-        {"name": "Godley Head car park", "quote": "From Godley Head car park, the track climbs high above Breeze Bay", "ref": null},
-        {"name": "Breeze Bay", "quote": "Breeze Bay", "ref": "T7"},
-        {"name": "Breeze Col on Summit Road", "quote": "the small car park at Breeze Col on Summit Road", "ref": null},
-        {"name": "Black Rock", "quote": "Follow the signposted track to Taylors Mistake via Black Rock", "ref": "T5"},
-        {"name": "junction with Pilgrims Way coastal track", "quote": "the junction with Pilgrims Way coastal track", "ref": null}
-      ],
-      "direction": null,
-      "time": "3 hr loop",
-      "distance": "9.3 km loop",
-      "evidence": [
-        "start at Te Onepoto/Taylors Mistake",
-        "walk to Awaroa/Godley Head via the Pilgrims Way coastal track",
-        "return to Taylors Mistake via Breeze Bay.",
-        "Access to the loop track is signposted from Taylors Mistake car park, by the toilet block.",
-        "Turn left to return to Taylors Mistake car park (15 min).",
-        "Most visitors begin and end the walk here."
-      ]
+     "name": "Pilgrims Way coastal track",
+     "quote": "walk to Awaroa/Godley Head via the Pilgrims Way coastal track",
+     "ref": "T3"
+    },
+    {
+     "name": "Rotten Row",
+     "quote": "past the baches at Rotten Row",
+     "ref": null
+    },
+    {
+     "name": "Boulder Bay",
+     "quote": "Climb past Boulder Bay to two gun platforms at Taylor Battery.",
+     "ref": "T6"
+    },
+    {
+     "name": "Taylor Battery",
+     "quote": "two gun platforms at Taylor Battery",
+     "ref": null
+    },
+    {
+     "name": "Awaroa/Godley Head",
+     "quote": "the Awaroa/Godley Head coastal defence battery",
+     "ref": "T4"
+    },
+    {
+     "name": "Godley Head car park",
+     "quote": "From Godley Head car park, the track climbs high above Breeze Bay",
+     "ref": null
+    },
+    {
+     "name": "Breeze Bay",
+     "quote": "the track climbs high above Breeze Bay",
+     "ref": "T7"
+    },
+    {
+     "name": "Breeze Col car park",
+     "quote": "The track then drops back down to the small car park at Breeze Col on Summit Road.",
+     "ref": null
+    },
+    {
+     "name": "Black Rock",
+     "quote": "Follow the signposted track to Taylors Mistake via Black Rock",
+     "ref": "T5"
+    },
+    {
+     "name": "junction with Pilgrims Way coastal track",
+     "quote": "downhill to the junction with Pilgrims Way coastal track",
+     "ref": null
     }
-  ],
-  "access_points": [
-    {"name": "Godley Head car park", "quote": "Godley Head car park is 50 min by car from central Christchurch, at the end of Summit Road.", "ref": null, "onto": "Awaroa/Godley Head Loop Track"},
-    {"name": "Breeze Col car park", "quote": "A small car park at Breeze Col also provides access to Awaroa/Godley Head Loop Track.", "ref": null, "onto": "Awaroa/Godley Head Loop Track"}
-  ],
-  "side_trips": [
-    {"name": "Scott's Cabin", "quote": "historic Scott’s Cabin", "ref": null, "from": "Taylor Battery"}
-  ],
-  "huts": [],
-  "not_on_route": [
-    {"name": "Pegasus Bay", "quote": "Pegasus Bay", "ref": null, "why": "view"},
-    {"name": "New Brighton Beach", "quote": "New Brighton Beach", "ref": null, "why": "view"},
-    {"name": "Kaikōura Ranges", "quote": "Kaikōura Ranges", "ref": null, "why": "view"},
-    {"name": "Lyttelton Harbour/Whakaraupō", "quote": "Lyttelton Harbour/Whakaraupō", "ref": "T12", "why": "view"},
-    {"name": "Banks Peninsula/Te Pātaka o Rākaihautū", "quote": "Banks Peninsula/Te Pātaka o Rākaihautū", "ref": null, "why": "view"},
-    {"name": "Awaroa/Godley Head Campsite", "quote": "Awaroa/Godley Head Campsite", "ref": "L1", "why": "nearby"},
-    {"name": "Sumner", "quote": "Food and petrol can be found in Sumner", "ref": "T13", "why": "nearby"}
-  ],
-  "doubts": "Start ref F2 is the only road end on Taylors Mistake Road, where the car park is said to be. Godley Head and Breeze Col car parks are on Summit Road but several Summit Road road ends exist (F1, F3-F7), so their refs are left null. Direction is not stated as clockwise/anticlockwise. Whether the loop passes through the Godley Head car park itself is implied ('From Godley Head car park, the track climbs') but the text also says the track between the gun emplacements and the car park has been rerouted."
+   ],
+   "direction": null,
+   "time": "3 hr loop",
+   "distance": "9.3 km loop",
+   "evidence": [
+    "start at Te Onepoto/Taylors Mistake",
+    "walk to Awaroa/Godley Head via the Pilgrims Way coastal track",
+    "return to Taylors Mistake via Breeze Bay.",
+    "Access to the loop track is signposted from Taylors Mistake car park, by the toilet block.",
+    "Follow the signposted track to Taylors Mistake via Black Rock downhill to the junction with Pilgrims Way coastal track.",
+    "Turn left to return to Taylors Mistake car park (15 min)."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Awaroa/Godley Head Loop from Godley Head car park",
+   "shape": "loop",
+   "start": {
+    "name": "Godley Head car park",
+    "quote": "You can also begin and end the track here.",
+    "ref": null
+   },
+   "end": {
+    "name": "Godley Head car park",
+    "quote": "You can also begin and end the track here.",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Breeze Bay",
+     "quote": "the track climbs high above Breeze Bay",
+     "ref": "T7"
+    },
+    {
+     "name": "Breeze Col car park",
+     "quote": "The track then drops back down to the small car park at Breeze Col on Summit Road.",
+     "ref": null
+    },
+    {
+     "name": "Black Rock",
+     "quote": "Follow the signposted track to Taylors Mistake via Black Rock",
+     "ref": "T5"
+    },
+    {
+     "name": "junction with Pilgrims Way coastal track",
+     "quote": "downhill to the junction with Pilgrims Way coastal track",
+     "ref": null
+    },
+    {
+     "name": "Taylors Mistake car park",
+     "quote": "Turn left to return to Taylors Mistake car park (15 min).",
+     "ref": "F2"
+    },
+    {
+     "name": "Pilgrims Way coastal track",
+     "quote": "walk to Awaroa/Godley Head via the Pilgrims Way coastal track",
+     "ref": "T3"
+    },
+    {
+     "name": "Rotten Row",
+     "quote": "past the baches at Rotten Row",
+     "ref": null
+    },
+    {
+     "name": "Boulder Bay",
+     "quote": "Climb past Boulder Bay to two gun platforms at Taylor Battery.",
+     "ref": "T6"
+    },
+    {
+     "name": "Taylor Battery",
+     "quote": "two gun platforms at Taylor Battery",
+     "ref": null
+    },
+    {
+     "name": "Awaroa/Godley Head",
+     "quote": "the Awaroa/Godley Head coastal defence battery",
+     "ref": "T4"
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "You can start the walk at three different car parks.",
+    "You can also access the Godley Head gun emplacements directly from Godley Head car park.",
+    "From Godley Head car park, the track climbs high above Breeze Bay, past two WWII observation posts."
+   ]
+  },
+  {
+   "id": "W3",
+   "main": false,
+   "label": "Awaroa/Godley Head Loop from Breeze Col car park",
+   "shape": "loop",
+   "start": {
+    "name": "Breeze Col car park",
+    "quote": "A small car park at Breeze Col also provides access to Awaroa/Godley Head Loop Track.",
+    "ref": null
+   },
+   "end": {
+    "name": "Breeze Col car park",
+    "quote": "A small car park at Breeze Col also provides access to Awaroa/Godley Head Loop Track.",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Black Rock",
+     "quote": "Follow the signposted track to Taylors Mistake via Black Rock",
+     "ref": "T5"
+    },
+    {
+     "name": "junction with Pilgrims Way coastal track",
+     "quote": "downhill to the junction with Pilgrims Way coastal track",
+     "ref": null
+    },
+    {
+     "name": "Taylors Mistake car park",
+     "quote": "Turn left to return to Taylors Mistake car park (15 min).",
+     "ref": "F2"
+    },
+    {
+     "name": "Pilgrims Way coastal track",
+     "quote": "walk to Awaroa/Godley Head via the Pilgrims Way coastal track",
+     "ref": "T3"
+    },
+    {
+     "name": "Rotten Row",
+     "quote": "past the baches at Rotten Row",
+     "ref": null
+    },
+    {
+     "name": "Boulder Bay",
+     "quote": "Climb past Boulder Bay to two gun platforms at Taylor Battery.",
+     "ref": "T6"
+    },
+    {
+     "name": "Taylor Battery",
+     "quote": "two gun platforms at Taylor Battery",
+     "ref": null
+    },
+    {
+     "name": "Awaroa/Godley Head",
+     "quote": "the Awaroa/Godley Head coastal defence battery",
+     "ref": "T4"
+    },
+    {
+     "name": "Godley Head car park",
+     "quote": "From Godley Head car park, the track climbs high above Breeze Bay",
+     "ref": null
+    },
+    {
+     "name": "Breeze Bay",
+     "quote": "the track climbs high above Breeze Bay",
+     "ref": "T7"
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "You can start the walk at three different car parks.",
+    "A small car park at Breeze Col also provides access to Awaroa/Godley Head Loop Track.",
+    "The track then drops back down to the small car park at Breeze Col on Summit Road."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Scott’s Cabin",
+   "quote": "side trip (10 min return) to historic Scott’s Cabin",
+   "ref": null,
+   "from": "Taylor Battery"
+  }
+ ],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Scott’s Cabin",
+   "quote": "side trip (10 min return) to historic Scott’s Cabin",
+   "ref": null,
+   "why": "side trip"
+  },
+  {
+   "name": "Pegasus Bay",
+   "quote": "beyond to Pegasus Bay and the Kaikōura Ranges",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "New Brighton Beach",
+   "quote": "towards New Brighton Beach",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Kaikōura Ranges",
+   "quote": "the Kaikōura Ranges",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Lyttelton Harbour/Whakaraupō",
+   "quote": "Lyttelton Harbour/Whakaraupō",
+   "ref": "T12",
+   "why": "view"
+  },
+  {
+   "name": "Banks Peninsula/Te Pātaka o Rākaihautū",
+   "quote": "Banks Peninsula/Te Pātaka o Rākaihautū",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Awaroa/Godley Head Campsite",
+   "quote": "Awaroa/Godley Head Campsite",
+   "ref": "L1",
+   "why": "nearby"
+  },
+  {
+   "name": "Lighthouse Cottage",
+   "quote": "You can also book Lighthouse Cottage.",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "Sumner",
+   "quote": "Food and petrol can be found in Sumner",
+   "ref": "T13",
+   "why": "nearby"
+  }
+ ],
+ "doubts": "The page gives one loop with three car parks where the walk can start: Taylors Mistake (main way, the page's usual start), Godley Head car park, and Breeze Col car park. Each start is recorded as its own loop way, walked round from that start in the same direction as the main way. The page does not say clockwise or anticlockwise, so direction is null. Taylors Mistake car park is F2, the only road end on Taylors Mistake Road; the text says the car park is at the end of Taylors Mistake Road. Godley Head car park and Breeze Col car park are on Summit Road, where several road ends exist (F1, F3 to F7), and the text does not tie either car park to one of them, so their refs are null. Only the main way has DOC's time and distance; the 3 hr loop and 9.3 km figures are DOC's whole-loop figures. The Pilgrims Way leg and the return leg each have their own time and distance in the text (1 hr 45 min / 4.1 km and 1 hr 45 min / 5.6 km), but as they are legs of the main way they are not recorded as ways. Scott's Cabin is a side trip from Taylor Battery and is recorded as a side trip and as not on route. Godley Head Campsite is not stated to be on the way, so it is not a hut. Pilgrims Way and the walk through Rotten Row are described only as the main way's first leg."
 }

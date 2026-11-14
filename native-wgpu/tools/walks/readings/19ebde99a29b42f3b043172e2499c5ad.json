@@ -1,60 +1,205 @@
 {
-  "guid": "19ebde99-a29b-42f3-b043-172e2499c5ad",
-  "kind": "loop",
-  "ways": [
+ "guid": "19ebde99-a29b-42f3-b043-172e2499c5ad",
+ "kind": "loop",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Pouākai Circuit from North Egmont",
+   "shape": "loop",
+   "start": {
+    "name": "North Egmont",
+    "quote": "Beginning at North Taranaki Park Visitor Centre (North Egmont)",
+    "ref": "T21"
+   },
+   "end": {
+    "name": "North Egmont road end",
+    "quote": "Follow the Ram Track uphill to return to North Egmont road end.",
+    "ref": "T21"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Pouākai Circuit from North Egmont via Holly Hut and Pouākai Hut",
-      "shape": "loop",
-      "start": {"name": "North Egmont (North Taranaki Visitor Centre)", "quote": "North Egmont", "ref": "T21"},
-      "end": {"name": "North Egmont (North Taranaki Visitor Centre)", "quote": "North Egmont", "ref": "T21"},
-      "via": [
-        {"name": "Veronica Loop/Holly Hut Track", "quote": "Holly Hut Track", "ref": "T4"},
-        {"name": "Boomerang Slip", "quote": "Boomerang Slip", "ref": "T16"},
-        {"name": "Kōkōwai Track junction", "quote": "Kōkōwai Track", "ref": "T6"},
-        {"name": "Ahukawakawa Track junction", "quote": "Ahukawakawa Track junction", "ref": "T1"},
-        {"name": "Minarapa Stream", "quote": "Minarapa Stream", "ref": "T20"},
-        {"name": "Holly Hut", "quote": "Holly Hut", "ref": "T18"},
-        {"name": "Ahukawakawa", "quote": "Ahukawakawa", "ref": null},
-        {"name": "Pouākai Track", "quote": "Pouākai Track", "ref": "T9"},
-        {"name": "Mangorei Track junction", "quote": "Mangorei Track junction", "ref": "T7"},
-        {"name": "Pouākai Hut", "quote": "Pouākai Hut", "ref": null},
-        {"name": "Maude Peak", "quote": "Maude Peak", "ref": "T19"},
-        {"name": "Henry Peak", "quote": "Henry Peak", "ref": "T17"},
-        {"name": "Kaiauai Track", "quote": "Kaiauai Track", "ref": "T5"},
-        {"name": "Kaiauai Shelter", "quote": "Kaiauai Shelter", "ref": null},
-        {"name": "Kai Auahi Stream swingbridge", "quote": "Kai Auahi Stream", "ref": null},
-        {"name": "Waiwhakaiho River swingbridge", "quote": "Waiwhakaiho River", "ref": "T29"},
-        {"name": "Ram Track", "quote": "Ram Track", "ref": "T10"}
-      ],
-      "direction": null,
-      "time": "2 - 3 days",
-      "distance": null,
-      "evidence": [
-        "Beginning at North Taranaki Park Visitor Centre (North Egmont), the track can be walked in either direction.",
-        "The Pouākai Circuit begins on the Veronica Loop/Holly Hut Track, starting at North Egmont.",
-        "Follow the Ram Track uphill to return to North Egmont road end."
-      ]
+     "name": "Veronica Loop/Holly Hut Track",
+     "quote": "The Pouākai Circuit begins on the Veronica Loop/Holly Hut Track, starting at North Egmont.",
+     "ref": "T13"
+    },
+    {
+     "name": "Camphouse",
+     "quote": "Follow the boardwalk past the Camphouse.",
+     "ref": null
+    },
+    {
+     "name": "Ambury Monument",
+     "quote": "Ambury Monument",
+     "ref": null
+    },
+    {
+     "name": "Boomerang Slip",
+     "quote": "Boomerang Slip",
+     "ref": "T16"
+    },
+    {
+     "name": "Kōkōwai Track junction",
+     "quote": "a track junction with Kōkōwai Track",
+     "ref": "T6"
+    },
+    {
+     "name": "Ahukawakawa Track junction",
+     "quote": "the Ahukawakawa Track junction",
+     "ref": "T1"
+    },
+    {
+     "name": "Minarapa Stream",
+     "quote": "Minarapa Stream just prior to the hut is unbridged",
+     "ref": "T20",
+     "how": "ford"
+    },
+    {
+     "name": "Holly Hut",
+     "quote": "Holly Hut",
+     "ref": "T18"
+    },
+    {
+     "name": "Ahukawakawa",
+     "quote": "follow the boardwalk across Ahukawakawa",
+     "ref": null
+    },
+    {
+     "name": "Pouākai Track",
+     "quote": "Pouākai Track",
+     "ref": "T9"
+    },
+    {
+     "name": "Mangorei Track junction",
+     "quote": "the Mangorei Track junction",
+     "ref": "T7"
+    },
+    {
+     "name": "Pouākai Hut",
+     "quote": "Pouākai Hut",
+     "ref": null
+    },
+    {
+     "name": "Maude Peak",
+     "quote": "Maude Peak",
+     "ref": "T19"
+    },
+    {
+     "name": "Henry Peak",
+     "quote": "Henry Peak (1220 m)",
+     "ref": "T17"
+    },
+    {
+     "name": "Kaiauai Track",
+     "quote": "Kaiauai Track",
+     "ref": "T5"
+    },
+    {
+     "name": "Kaiauai Shelter",
+     "quote": "Kaiauai Shelter",
+     "ref": null
+    },
+    {
+     "name": "Kai Auahi Stream swingbridge",
+     "quote": "the swingbridge over the Kai Auahi Stream",
+     "ref": null
+    },
+    {
+     "name": "Waiwhakaiho River swingbridge",
+     "quote": "the swingbridge across the Waiwhakaiho River",
+     "ref": "T29"
+    },
+    {
+     "name": "Ram Track",
+     "quote": "Ram Track",
+     "ref": "T10"
     }
-  ],
-  "access_points": [
-    {"name": "Kaiauai car park", "quote": "Kaiauai car park", "ref": "F1", "onto": "Kaiauai Track"},
-    {"name": "Mangorei Road car park", "quote": "Mangorei Road", "ref": "F3", "onto": "Mangorei Track"},
-    {"name": "Carrington Road opposite Dover Road", "quote": "Carrington Road opposite Dover Road", "ref": null, "onto": "Dover Track"},
-    {"name": "Ahukawakawa Track from Holly Hut on the Around the Mountain Circuit", "quote": "Ahukawakawa Track", "ref": "T1", "onto": "Ahukawakawa Track"}
-  ],
-  "side_trips": [
-    {"name": "Te Rere-o-Tahurangi Falls via Bells Falls track", "quote": "Te Rere-o-Tahurangi Falls", "ref": "T28", "from": "Holly Hut"},
-    {"name": "Pouākai Trig", "quote": "PouākaiTrig", "ref": "T24", "from": "Pouākai Track junction"}
-  ],
-  "huts": [
-    {"name": "Holly Hut", "quote": "Holly Hut", "ref": "T18"},
-    {"name": "Pouākai Hut", "quote": "Pouākai Hut", "ref": null}
-  ],
-  "not_on_route": [
-    {"name": "Kōkōwai Track to Egmont Road (bad-weather exit)", "quote": "Kōkōwai Track", "ref": "T6", "why": "other"},
-    {"name": "Mangorei Road end (bad-weather exit)", "quote": "Mangorei Road end", "ref": "F3", "why": "other"}
-  ],
-  "doubts": "The circuit can be walked in either direction; it is described from North Egmont to Holly Hut first, but the text does not say clockwise or anticlockwise. No road-end feature is where the Holly Hut/Veronica Loop Track leaves North Egmont, so the start uses the place North Egmont (T21). Pouākai Hut has no entry (it is 5 minutes down the Mangorei Track from the junction). 'PouākaiTrig (1,440 m)' taken as the peak Pouākai (T24). The Ahukawakawa Track access point is stated as from Holly Hut on the Around the Mountain Circuit, so its ref is the track. DOC gives no total distance (sections 7.5 + 4.5 + 13 km)."
+   ],
+   "direction": null,
+   "time": "2 - 3 days",
+   "distance": null,
+   "evidence": [
+    "Beginning at North Taranaki Park Visitor Centre (North Egmont), the track can be walked in either direction.",
+    "The Pouākai Circuit begins on the Veronica Loop/Holly Hut Track, starting at North Egmont.",
+    "Follow the Ram Track uphill to return to North Egmont road end."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Kaiauai car park",
+   "quote": "Kaiauai car park: Acces is via the Kaiauai Track leaving the carpark area, 2 km below the visitor centre on Egmont Road.",
+   "ref": null,
+   "onto": "Kaiauai Track"
+  },
+  {
+   "name": "Mangorei Road",
+   "quote": "Mangorei Road: Access is from the carpark at the top of Mangorei Road, off SH3, south of New Plymouth.",
+   "ref": "F3",
+   "onto": "Mangorei Track"
+  },
+  {
+   "name": "Dover Track",
+   "quote": "Dover Track: Access is from Carrington Road opposite Dover Road.",
+   "ref": null,
+   "onto": "Dover Route"
+  },
+  {
+   "name": "Ahukawakawa Track",
+   "quote": "Ahukawakawa Track: Access is via the Ahukawakawa Track across the swamp from Holly Hut on the Around the Mountain Circuit.",
+   "ref": "T1",
+   "onto": "Holly Hut"
+  }
+ ],
+ "exits": [
+  {
+   "name": "Veronica Loop Track",
+   "quote": "returning down the Veronica Loop Track",
+   "ref": "T13",
+   "from": "lookout",
+   "how": "track"
+  },
+  {
+   "name": "Egmont Road via Kōkōwai Track",
+   "quote": "take Kōkōwai Track to Egmont Road",
+   "ref": "T6",
+   "from": "Kōkōwai Track junction",
+   "how": "track"
+  },
+  {
+   "name": "Mangorei Road end",
+   "quote": "allow 2 hr to Mangorei Road end",
+   "ref": "F3",
+   "from": "Mangorei Track junction",
+   "how": "track"
+  }
+ ],
+ "side_trips": [
+  {
+   "name": "Te Rere-o-Tahurangi Falls",
+   "quote": "Te Rere-o-Tahurangi Falls (31 m)",
+   "ref": "T28",
+   "from": "Holly Hut"
+  },
+  {
+   "name": "Pouākai Trig",
+   "quote": "detour to PouākaiTrig (1,440 m)",
+   "ref": null,
+   "from": "Pouākai Track"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Holly Hut",
+   "quote": "Holly Hut",
+   "ref": "T18"
+  },
+  {
+   "name": "Pouākai Hut",
+   "quote": "Pouākai Hut",
+   "ref": null
+  }
+ ],
+ "not_on_route": [],
+ "doubts": "Described anticlockwise-ish but text only says either direction, so direction null. North Egmont start has no road end feature (F1/F2 are on Egmont Road but not clearly the visitor centre), so ref is the place name T21. The 'lookout' exit point is the lookout ten minutes past the junction. Getting-there places listed as access points, not as separate starts (page says begins at North Egmont). Distance not given for whole circuit."
 }

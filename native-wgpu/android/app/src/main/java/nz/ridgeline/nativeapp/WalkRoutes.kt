@@ -111,6 +111,15 @@ internal object WalkRoutes {
             for(b in ends)if(b!=a&&dist[b]<Double.MAX_VALUE&&dist[b]>bestD){bestD=dist[b];best=g.path(prev,b)}}
         return (best?:listOf(0)).map{g.points[it]}.takeIf{it.size>=2}?:paths.maxByOrNull{DocTracks.length(it)}.orEmpty()
     }
+    /** Ways along DOC's line: the shortest path between each two of its ends (pieces
+     * joined as for [mainLine]), longest first, at most [limit]. For choosing, by what a
+     * walk's page says it passes, the way a walk that fails its compile checks is shown. */
+    fun endPaths(paths:List<List<Coordinate>>,limit:Int=40):List<List<Coordinate>>{
+        val g=Graph(paths.filter{it.size>=2});if(g.points.size<2)return emptyList()
+        val ends=g.deadEnds;val found=ArrayList<Triple<Double,Int,Int>>()
+        for(a in ends){val (dist,_)=g.from(a);for(b in ends)if(b>a&&dist[b]<Double.MAX_VALUE)found.add(Triple(dist[b],a,b))}
+        return found.sortedByDescending{it.first}.take(limit).map{t->g.path(g.from(t.second).second,t.third).map{g.points[it]}}.filter{it.size>=2}
+    }
     /** The length DOC gives the walk on its page ("53.5 km one way", "80 km
      * loop", "16 km return via same track": half, the line is walked twice), in metres. */
     fun stated(distance:String):Double?{

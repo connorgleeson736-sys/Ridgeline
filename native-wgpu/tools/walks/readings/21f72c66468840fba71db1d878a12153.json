@@ -1,69 +1,174 @@
 {
-  "guid": "21f72c66-4688-40fb-a71d-b1d878a12153",
-  "kind": "one_way",
-  "ways": [
+ "guid": "21f72c66-4688-40fb-a71d-b1d878a12153",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "SH73 to Carrington Hut via O’Malley's Track",
+   "shape": "one_way",
+   "start": {
+    "name": "SH73 south of the Bealey road bridge",
+    "quote": "The trip starts at SH73 on the true right of the Waimakariri River, just south of the Bealey road bridge",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Carrington Hut",
+    "quote": "a short section of marked track leads to Carrington Hut",
+    "ref": "T4"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "SH73 to Carrington Hut via O'Malley's Track",
-      "shape": "one_way",
-      "start": {"name": "SH73 south of the Bealey road bridge", "quote": "The trip starts at SH73 on the true right of the Waimakariri River, just south of the Bealey road bridge", "ref": "F1"},
-      "end": {"name": "Carrington Hut", "quote": "a short section of marked track leads to Carrington Hut", "ref": "T4"},
-      "via": [
-        {"name": "O'Malley's Track", "quote": "O’Malley's Track", "ref": null},
-        {"name": "Turkey Flat", "quote": "Turkey Flat by Jordan Stream", "ref": "T13"},
-        {"name": "Anti Crow Hut", "quote": "follow the bush edge to Anti Crow Hut", "ref": "T1"},
-        {"name": "Anti Crow River", "quote": "When you reach the Anti Crow River", "ref": "T2"},
-        {"name": "Greenlaw Creek", "quote": "crossing Greenlaw Creek", "ref": "T8"},
-        {"name": "Harper Creek", "quote": "Harper Creek", "ref": "T9"}
-      ],
-      "direction": null,
-      "time": "4-6 hr to Carrington Hut one way",
-      "distance": "12.3 km to Carrington Hut one way",
-      "evidence": [
-        "The trip starts at SH73 on the true right of the Waimakariri River, just south of the Bealey road bridge (about 10 km east of Arthur's Pass village).",
-        "The route follows O'Malley's Track for the first stage of the trip.",
-        "Leave SH73 on the true right of the Waimakariri River, immediately south of the road bridge over the river.",
-        "Just before the White River joins the Waimakariri River, a short section of marked track leads to Carrington Hut, marked by a large rock cairn and orange marker."
-      ]
+     "name": "O’Malley's Track",
+     "quote": "O’Malley's Track",
+     "ref": null
     },
     {
-      "id": "W2",
-      "main": false,
-      "label": "Via riverbed – not marked, from Klondyke Corner",
-      "shape": "one_way",
-      "start": {"name": "Klondyke Corner", "quote": "from the western side of Klondyke Corner", "ref": "T12"},
-      "end": {"name": "Carrington Hut", "quote": "Follow the marked track to Carrington Hut", "ref": "T4"},
-      "via": [
-        {"name": "Turkey Flat", "quote": "Aim for the lower edges of Turkey Flat", "ref": "T13"},
-        {"name": "Anti Crow River", "quote": "crossing the Anti Crow River", "ref": "T2"},
-        {"name": "Greenlaw Creek", "quote": "continue towards Greenlaw Creek", "ref": "T8"}
-      ],
-      "direction": null,
-      "time": null,
-      "distance": null,
-      "evidence": [
-        "A 2 km long gravel road leads to the Waimakariri riverbed from the western side of Klondyke Corner.",
-        "The quickest way to Carrington Hut is to head straight up the Waimakariri valley from this point, cutting corners and crossing the river where necessary.",
-        "Follow the marked track to Carrington Hut"
-      ]
+     "name": "Turkey Flat",
+     "quote": "Turkey Flat by Jordan Stream",
+     "ref": "T13"
+    },
+    {
+     "name": "Anti Crow Hut",
+     "quote": "follow the bush edge to Anti Crow Hut",
+     "ref": "T1"
+    },
+    {
+     "name": "Anti Crow River",
+     "quote": "When you reach the Anti Crow River, look for a safe place to cross.",
+     "ref": "T2",
+     "how": "ford"
+    },
+    {
+     "name": "Waimakariri River",
+     "quote": "Find a safe place to cross the river",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Waimakariri River",
+     "quote": "looking for another safe crossing to rejoin the track in the river flats",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Greenlaw Creek",
+     "quote": "crossing Greenlaw Creek",
+     "ref": "T8",
+     "how": "ford"
+    },
+    {
+     "name": "Harper Creek",
+     "quote": "Harper Creek",
+     "ref": "T9",
+     "how": "ford"
     }
-  ],
-  "access_points": [],
-  "side_trips": [
-    {"name": "White River to Barker Memorial Hut", "quote": "A trip up the White River is an interesting but challenging day walk from Carrington Hut", "ref": null, "from": "Carrington Hut"}
-  ],
-  "huts": [
-    {"name": "Anti Crow Hut", "quote": "Anti Crow Hut", "ref": "T1"},
-    {"name": "Carrington Hut", "quote": "Carrington Hut", "ref": "T4"}
-  ],
-  "not_on_route": [
-    {"name": "Barker Memorial Hut", "quote": "Barker Memorial Hut (10 bunks)", "ref": null, "why": "side trip"},
-    {"name": "Kilmarnock Falls", "quote": "Kilmarnock Falls", "ref": "T11", "why": "side trip"},
-    {"name": "Cahill Glacier", "quote": "Cahill Glacier", "ref": "T3", "why": "side trip"},
-    {"name": "Carrington Peak", "quote": "the serrated top of Carrington Peak", "ref": "T5", "why": "view"},
-    {"name": "Waimakariri Falls Hut", "quote": "The route to Waimakriri Falls Hut is covered by the Waimakariri Falls Hut to Rolleston River route", "ref": "T15", "why": "other walk"},
-    {"name": "Arthur's Pass village", "quote": "Arthur's Pass village", "ref": null, "why": "nearby"}
-  ],
-  "doubts": "Start ref F1 is the only road end (an unnamed track meeting West Coast Road); the text calls the road SH73, so F1 is taken as that start on the Bealey bridge side, but the packet does not name SH73 as West Coast Road. The original SH73 – Carrington Hut track is cut off 2 km upstream from Anti Crow Hut and needs river crossings; the main way's via is as described. O'Malley's Track has no map entry. The riverbed route (W2) starts from a 2 km gravel road off the western side of Klondyke Corner; the exact start point is the road's riverbed end, not Klondyke Corner itself."
+   ],
+   "direction": null,
+   "time": "4-6 hr to Carrington Hut one way",
+   "distance": "12.3 km to Carrington Hut one way",
+   "evidence": [
+    "The trip starts at SH73 on the true right of the Waimakariri River, just south of the Bealey road bridge (about 10 km east of Arthur's Pass village).",
+    "Leave SH73 on the true right of the Waimakariri River, immediately south of the road bridge over the river.",
+    "Just before the White River joins the Waimakariri River, a short section of marked track leads to Carrington Hut, marked by a large rock cairn and orange marker."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Via riverbed – not marked, from Klondyke Corner",
+   "shape": "one_way",
+   "start": {
+    "name": "Klondyke Corner",
+    "quote": "from the western side of Klondyke Corner",
+    "ref": "T12"
+   },
+   "end": {
+    "name": "Carrington Hut",
+    "quote": "Follow the marked track to Carrington Hut",
+    "ref": "T4"
+   },
+   "via": [
+    {
+     "name": "gravel road to the Waimakariri riverbed",
+     "quote": "A 2 km long gravel road leads to the Waimakariri riverbed",
+     "ref": null,
+     "how": "road"
+    },
+    {
+     "name": "Turkey Flat",
+     "quote": "Aim for the lower edges of Turkey Flat",
+     "ref": "T13"
+    },
+    {
+     "name": "Anti Crow River",
+     "quote": "crossing the Anti Crow River",
+     "ref": "T2",
+     "how": "ford"
+    },
+    {
+     "name": "Waimakariri River",
+     "quote": "Cross to the true left of the Waimakariri River",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Waimakariri River",
+     "quote": "Re-cross the Waiamakariri River back to its true right",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Greenlaw Creek",
+     "quote": "continue towards Greenlaw Creek",
+     "ref": "T8"
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "A 2 km long gravel road leads to the Waimakariri riverbed from the western side of Klondyke Corner.",
+    "The quickest way to Carrington Hut is to head straight up the Waimakariri valley from this point, cutting corners and crossing the river where necessary.",
+    "Follow the marked track to Carrington Hut"
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Barker Memorial Hut via White River",
+   "quote": "A trip up the White River is an interesting but challenging day walk from Carrington Hut.",
+   "ref": null,
+   "from": "Carrington Hut"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Anti Crow Hut",
+   "quote": "Anti Crow Hut",
+   "ref": "T1"
+  },
+  {
+   "name": "Carrington Hut",
+   "quote": "Carrington Hut",
+   "ref": "T4"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Barker Memorial Hut",
+   "quote": "Barker Memorial Hut",
+   "ref": null,
+   "why": "side trip"
+  },
+  {
+   "name": "Waimakariri Falls Hut",
+   "quote": "Waimakriri Falls Hut",
+   "ref": null,
+   "why": "other walk"
+  }
+ ],
+ "doubts": "F1 is the only road end (unnamed track meets West Coast Road); text says SH73 near the Bealey road bridge, so F1 is assumed but not certain. The original track is cut off by the Waimakariri River 2 km upstream of Anti Crow Hut; river crossings are described loosely (at least two Waimakariri crossings). Riverbed route W2 end-to-end details (crossing choices) are loose. Jordan Stream not recorded as a ford (text only says it can be dangerous to cross)."
 }

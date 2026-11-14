@@ -55,6 +55,14 @@ an empty field with a doubt is always better than a guess.
    with the first as its start and the others in `access_points`; a separate
    way is one the page describes on its own (its own heading, time or
    distance).
+   A circuit the page says can be started from more than one place on it
+   ("The circuit can begin from either confluence: the Wilkin/Makarora River,
+   or Young/Makarora") is one way per start: the circuit as described from its
+   first start as the main way, then the same circuit from each other start
+   (`shape` `loop`, `start` and `end` that place, `via` in the order walked
+   from there the way the page goes round; give `direction` only if the text
+   says which way). Walking a crossing the other way round is not another
+   way.
 6. `shape`: `out_and_back` when the walk returns the same way ("return via the
    same track", "retrace your steps", distance "return via same track");
    `loop` when it comes back to its start by another way (circuit, loop,
@@ -68,27 +76,42 @@ an empty field with a doubt is always better than a guess.
    seen ("views of Mt Earnslaw"), not side trips. For an out-and-back way,
    list the way out only; its end is where it turns. Day/leg headings
    ("Day 1: Glade Wharf to Clinton Hut") give the order.
+   Two kinds of via carry `how` (leave it out otherwise):
+   - `"how": "ford"`: a river or stream the way crosses with no bridge, where
+     the text says to cross it ("cross the Makarora River", "ford the river",
+     "wade across"). Name the river; its `ref` is the river's name entry if
+     there is one.
+   - `"how": "road"`: a road the way follows on foot ("continue out to the
+     main road via Wilkin Road", "walk 2 km along the road"). Name the road as
+     written; its `ref` is a `road end` feature only if the text means that
+     exact place, else `null`.
 8. `direction`: `clockwise` or `anticlockwise` only if the text says so (or
    says which way it is described). Otherwise `null`.
 9. `access_points`: every other place the page (often "Getting there") says
    the walk can be started from or joined at ("the four access points to this
    track are: …"), that is not already a way's start. Each with what it leads
    onto when the text says (`onto`: the track or place it joins, or `null`).
-10. `side_trips`: places the text describes as side trips or optional detours
+10. `exits`: other ways the page names to leave the walk part way or finish
+   it somewhere else, that are not a way of their own: flying out ("fly by
+   plane or helicopter out of Siberia Valley"), a boat ("catch a jet boat
+   from Kerin Forks", a water taxi), a track or road out to a road end. Each
+   with `from`: the place on the way where you leave (as named on the way),
+   or `null`; and `how`: `fly`, `boat`, `track`, `road` or `other`.
+11. `side_trips`: places the text describes as side trips or optional detours
    off the way, with the place on the way they leave from when stated.
-11. `huts`: the huts (and bivouacs, lodges, shelters with bunks) the main way
+12. `huts`: the huts (and bivouacs, lodges, shelters with bunks) the main way
    passes or ends at, according to the text. A page often lists them ("There
    are 3 DOC huts on this track: …"). Huts mentioned only as nearby, on other
    walks, or reached by a side trip go in `not_on_route`.
-12. `not_on_route`: places the text names that are not walked by any way:
+13. `not_on_route`: places the text names that are not walked by any way:
     views, nearby attractions, other walks, places a side trip reaches.
-13. `time`, `distance` (per way): only when the text gives them for that way
+14. `time`, `distance` (per way): only when the text gives them for that way
     (a heading's "Time: …", "Distance: …"), copied exactly; else `null`.
     Multi-day ways: the whole way's time if stated (often DOC's `time`).
-14. `evidence`: for each way, the sentences (verbatim) that establish its
+15. `evidence`: for each way, the sentences (verbatim) that establish its
     start, end and shape.
-15. `doubts`: everything you were unsure of, plainly. Empty string if none.
-16. A page for several separate tracks ("X tracks", "walks in the Y area")
+16. `doubts`: everything you were unsure of, plainly. Empty string if none.
+17. A page for several separate tracks ("X tracks", "walks in the Y area")
     that does not describe one walk: `kind: "network"`, and list each track
     the page describes as its own way only if the text gives its start and end.
 
@@ -106,7 +129,7 @@ an empty field with a doubt is always better than a guess.
       "shape": "one_way | out_and_back | loop | null",
       "start": {"name": "…", "quote": "…", "ref": "L3 | T7 | null"},
       "end":   {"name": "…", "quote": "…", "ref": "…"},
-      "via":   [{"name": "…", "quote": "…", "ref": "…"}],
+      "via":   [{"name": "…", "quote": "…", "ref": "…"}, {"name": "Makarora River", "quote": "…", "ref": "…", "how": "ford"}],
       "direction": "clockwise | anticlockwise | null",
       "time": "DOC's time for this way, verbatim (\"6-8 hr return\"), or null",
       "distance": "DOC's distance for this way, verbatim (\"14 km return\"), or null",
@@ -114,6 +137,7 @@ an empty field with a doubt is always better than a guess.
     }
   ],
   "access_points":[{"name": "…", "quote": "…", "ref": "…", "onto": "track or place it joins, or null"}],
+  "exits":        [{"name": "…", "quote": "…", "ref": "…", "from": "name of the place on the way, or null", "how": "fly | boat | track | road | other"}],
   "side_trips":   [{"name": "…", "quote": "…", "ref": "…", "from": "name of the place on the way, or null"}],
   "huts":         [{"name": "…", "quote": "…", "ref": "…"}],
   "not_on_route": [{"name": "…", "quote": "…", "ref": "…", "why": "view | nearby | other walk | side trip | other"}],

@@ -1,43 +1,75 @@
 {
-  "guid": "4e55aa3e-2b3c-4ed7-bcc2-16328065e48d",
-  "kind": "out_and_back",
-  "ways": [
+ "guid": "4e55aa3e-2b3c-4ed7-bcc2-16328065e48d",
+ "kind": "out_and_back",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Roberts Point Track",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Franz Josef Glacier car park",
+    "quote": "The hike begins at the Franz Josef Glacier car park.",
+    "ref": null
+   },
+   "end": {
+    "name": "Roberts Point",
+    "quote": "Roberts Point",
+    "ref": "T8"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Franz Josef Glacier car park to Roberts Point",
-      "shape": "out_and_back",
-      "start": {"name": "Franz Josef Glacier car park", "quote": "The hike begins at the Franz Josef Glacier car park", "ref": null},
-      "end": {"name": "Roberts Point", "quote": "The track then continues steadily upwards to Roberts Point", "ref": "T8"},
-      "via": [
-        {"name": "Douglas Walk", "quote": "Follow Douglas Walk", "ref": "T1"},
-        {"name": "Douglas Bridge", "quote": "Douglas Bridge across the Waiho River", "ref": null},
-        {"name": "Roberts Point Track", "quote": "this is the start of Roberts Point Track", "ref": "T2"},
-        {"name": "Hugh Creek", "quote": "an unbridged crossing of Hugh Creek", "ref": "T7"},
-        {"name": "Hende's Hut", "quote": "Hende's Hut", "ref": null},
-        {"name": "Hende's Gallery", "quote": "the historic Hende’s Gallery", "ref": null},
-        {"name": "suspension bridge crossing Rope Creek", "quote": "a high suspension bridge crossing Rope Creek", "ref": "T9"}
-      ],
-      "direction": null,
-      "time": "5 hr 20 min return",
-      "distance": "12.3 km return via same track",
-      "evidence": [
-        "The hike begins at the Franz Josef Glacier car park. Follow Douglas Walk, which is an easy, well-formed walking track, until you reach Douglas Bridge across the Waiho River.",
-        "Once you cross Douglas Bridge, this is the start of Roberts Point Track.",
-        "In around an hour, the track opens out onto ice smoothed rock outcrops at Hende's Hut.",
-        "The track climbs through open scrubland to a high suspension bridge crossing Rope Creek. The track then continues steadily upwards to Roberts Point.",
-        "The views from the final lookout are well worth the effort with the glacier, sheer rock walls, waterfalls and mountain peaks all visible."
-      ]
+     "name": "Douglas Walk",
+     "quote": "Douglas Walk",
+     "ref": "T1"
+    },
+    {
+     "name": "Douglas Bridge",
+     "quote": "Douglas Bridge",
+     "ref": null
+    },
+    {
+     "name": "Hugh Creek",
+     "quote": "unbridged crossing of Hugh Creek",
+     "ref": "T7",
+     "how": "ford"
+    },
+    {
+     "name": "Hende's Hut",
+     "quote": "Hende's Hut",
+     "ref": null
+    },
+    {
+     "name": "Hende’s Gallery",
+     "quote": "Hende’s Gallery",
+     "ref": null
+    },
+    {
+     "name": "Rope Creek",
+     "quote": "high suspension bridge crossing Rope Creek",
+     "ref": null
     }
-  ],
-  "access_points": [],
-  "side_trips": [],
-  "huts": [
-    {"name": "Hende's Hut", "quote": "Hende's Hut", "ref": null}
-  ],
-  "not_on_route": [
-    {"name": "Franz Josef Glacier", "quote": "Note that this is a lookout only and the track does not provide access onto the glacier", "ref": "T4", "why": "view"},
-    {"name": "Franz Josef/Waiau township", "quote": "Franz Josef/Waiau township", "ref": "T6", "why": "nearby"}
-  ],
-  "doubts": "No road-end features in the packet, so the car park start has no ref (T5 'Franz Josef Glacier' place sits at the township, not the car park). Shape taken from DOC's 'return via same track'; the text itself does not describe the return. Hende's Hut is a historic hut 'unsuitable for overnight accommodation' (a lunch shelter), listed as a hut passed with that caveat. The Rope Creek ref T9 is for the creek the bridge crosses."
+   ],
+   "direction": null,
+   "time": "5 hr 20 min return",
+   "distance": "12.3 km return via same track",
+   "evidence": [
+    "The hike begins at the Franz Josef Glacier car park. Follow Douglas Walk, which is an easy, well-formed walking track, until you reach Douglas Bridge across the Waiho River.",
+    "The track climbs through open scrubland to a high suspension bridge crossing Rope Creek. The track then continues steadily upwards to Roberts Point."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Te Ara a Waiau Walkway",
+   "quote": "Te Ara a Waiau",
+   "ref": "T3",
+   "why": "nearby"
+  }
+ ],
+ "doubts": "Start car park has no feature or name entry (4 km from Franz Josef/Waiau township along Glacier Access Road). Page does not say 'return' in the description; out-and-back taken from DOC's distance 'return via same track'. Hende's Hut is passed but the page says it is unsuitable for overnight accommodation, so not listed as a hut. Many other unbridged creek crossings are mentioned but only Hugh Creek is named. 'Hende's Hut' quote uses a straight apostrophe as in the text ('Hende's Hut' appears in 'at Hende's Hut')."
 }

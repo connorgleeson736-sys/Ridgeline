@@ -1,58 +1,158 @@
 {
-  "guid": "38a28b33-8bb5-49fe-b74a-8af184c85c1e",
-  "kind": "one_way",
-  "ways": [
+ "guid": "38a28b33-8bb5-49fe-b74a-8af184c85c1e",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Te Haua Uru Track to the Main Ridge Track junction",
+   "shape": "one_way",
+   "start": {
+    "name": "Omana Road Tangihua access car park",
+    "quote": "The Omana Road Tangihua access car park has parking for 15 cars.",
+    "ref": null
+   },
+   "end": {
+    "name": "junction of the Tangihua Main Ridge Track and the Northern Tangihua Track",
+    "quote": "up to the junction of the Tangihua Main Ridge Track which leads to the Horokaka Transmitter",
+    "ref": null
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Tangihua Lions Lodge to the Tangihua Main Ridge Track / Northern Tangihua Track junction",
-      "shape": "one_way",
-      "start": {"name": "Tangihua Lions Lodge", "quote": "Tangihua Lions Lodge", "ref": null},
-      "end": {"name": "junction of the Tangihua Main Ridge Track and the Northern Tangihua Track", "quote": "junction of the Tangihua Main Ridge Track", "ref": null},
-      "via": [
-        {"name": "orientation course", "quote": "orientation course", "ref": null},
-        {"name": "small bridge", "quote": "small bridge", "ref": null},
-        {"name": "Tumanako Track", "quote": "Tumanako Track", "ref": "T5"},
-        {"name": "Kauri Grove", "quote": "Kauri Grove", "ref": null}
-      ],
-      "direction": null,
-      "time": "3 hr 45 min to junction one way from car park",
-      "distance": null,
-      "evidence": [
-        "From the Tangihua Lions Lodge you walk past the orientation course and clearings to enter a bush track.",
-        "From here the Te Haua Uru Track continues to climb steeply up to the junction of the Tangihua Main Ridge Track which leads to the Horokaka Transmitter (an additional 2 - 3 hours tramp) and the Northern Tangihua Track which leads to the Tangihua Hut (an additional 2 - 3 hours tramp)."
-      ]
+     "name": "formed road",
+     "quote": "You will need to walk 30 minutes along a formed road to the bush line.",
+     "ref": null,
+     "how": "road"
     },
     {
-      "id": "W2",
-      "main": false,
-      "label": "Day walk as far as Kauri Grove",
-      "shape": "out_and_back",
-      "start": {"name": "Tangihua Lions Lodge", "quote": "Tangihua Lions Lodge", "ref": null},
-      "end": {"name": "Kauri Grove", "quote": "Kauri Grove", "ref": null},
-      "via": [
-        {"name": "small bridge", "quote": "small bridge", "ref": null},
-        {"name": "Tumanako Track", "quote": "Tumanako Track", "ref": "T5"}
-      ],
-      "direction": null,
-      "time": null,
-      "distance": null,
-      "evidence": [
-        "Day walkers can easily walk as far as Kauri Grove accessed from the Te Haua Uru Track."
-      ]
+     "name": "Tangihua Lions Lodge",
+     "quote": "it is another 15 minutes until you reach Tangihua Lions Lodge",
+     "ref": null
+    },
+    {
+     "name": "Tumanako Track",
+     "quote": "meets the Tumanako Track",
+     "ref": "T5"
+    },
+    {
+     "name": "stream",
+     "quote": "Signage directs you to follow the stream for approximately 20 minutes before crossing it",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Kauri Grove",
+     "quote": "large kauri trees at Kauri Grove",
+     "ref": null
     }
-  ],
-  "access_points": [
-    {"name": "Omana Road Tangihua access car park", "quote": "Omana Road Tangihua access car park", "ref": null, "onto": "Tangihua Lions Lodge"}
-  ],
-  "side_trips": [],
-  "huts": [],
-  "not_on_route": [
-    {"name": "Tangihua Main Ridge Track", "quote": "Tangihua Main Ridge Track", "ref": "L2", "why": "other walk"},
-    {"name": "Northern Tangihua Track", "quote": "Northern Tangihua Track", "ref": "L3", "why": "other walk"},
-    {"name": "Horokaka Transmitter", "quote": "Horokaka Transmitter", "ref": null, "why": "other"},
-    {"name": "Tangihua Hut", "quote": "Tangihua Hut", "ref": "T11", "why": "other"},
-    {"name": "Horokaka Track", "quote": "Horokaka Track", "ref": "T1", "why": "other walk"}
-  ],
-  "doubts": "The description starts at Tangihua Lions Lodge, but DOC's time is 'from car park' (the Omana Road car park, 45 min walk from the lodge along a formed road); I used the lodge as start and the car park as an access point. No feature or entry for the lodge, car park or the end junction, so they have no ref. The 'Tumanako Track' is both a link (L1, the Whakapapono and Tumanako tracks walk) and a map track (T5); I gave T5 as the track followed. The Kauri Grove option does not state its return; taken as out and back from 'as far as'. The 9-hour Te Haua Uru-Main Ridge-Horokaka loop is a longer combination using other tracks and is not recorded as a way."
+   ],
+   "direction": null,
+   "time": "3 hr 45 min to junction one way from car park",
+   "distance": null,
+   "evidence": [
+    "The Omana Road Tangihua access car park has parking for 15 cars.",
+    "From here the Te Haua Uru Track continues to climb steeply up to the junction of the Tangihua Main Ridge Track which leads to the Horokaka Transmitter (an additional 2 - 3 hours tramp) and the Northern Tangihua Track which leads to the Tangihua Hut (an additional 2 - 3 hours tramp)."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Te Haua Uru Track-Tangihua Main Ridge Track-Horokaka Track loop",
+   "shape": "loop",
+   "start": {
+    "name": "Omana Road Tangihua access car park",
+    "quote": "The Omana Road Tangihua access car park has parking for 15 cars.",
+    "ref": null
+   },
+   "end": {
+    "name": "Omana Road Tangihua access car park",
+    "quote": "The Omana Road Tangihua access car park has parking for 15 cars.",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Te Haua Uru Track",
+     "quote": "follow the Te Haua Uru Track-Tangihua Main Ridge Track- Horokaka Track loop",
+     "ref": null
+    },
+    {
+     "name": "Tangihua Main Ridge Track",
+     "quote": "follow the Te Haua Uru Track-Tangihua Main Ridge Track- Horokaka Track loop",
+     "ref": "T2"
+    },
+    {
+     "name": "Horokaka Track",
+     "quote": "follow the Te Haua Uru Track-Tangihua Main Ridge Track- Horokaka Track loop",
+     "ref": "T1"
+    }
+   ],
+   "direction": null,
+   "time": "a full 9 hour tramp",
+   "distance": null,
+   "evidence": [
+    "Experienced trampers wanting a challenging day can follow the Te Haua Uru Track-Tangihua Main Ridge Track- Horokaka Track loop, a full 9 hour tramp which includes strenuous climbing in places."
+   ]
+  },
+  {
+   "id": "W3",
+   "main": false,
+   "label": "Day walk to Kauri Grove",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Omana Road Tangihua access car park",
+    "quote": "The Omana Road Tangihua access car park has parking for 15 cars.",
+    "ref": null
+   },
+   "end": {
+    "name": "Kauri Grove",
+    "quote": "Day walkers can easily walk as far as Kauri Grove accessed from the Te Haua Uru Track.",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Tangihua Lions Lodge",
+     "quote": "it is another 15 minutes until you reach Tangihua Lions Lodge",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "Day walkers can easily walk as far as Kauri Grove accessed from the Te Haua Uru Track."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Tangihua Lions Lodge",
+   "quote": "From the Tangihua Lions Lodge you walk past the orientation course and clearings to enter a bush track.",
+   "ref": null,
+   "onto": "Te Haua Uru Track"
+  }
+ ],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Tangihua Hut",
+   "quote": "the Northern Tangihua Track which leads to the Tangihua Hut",
+   "ref": "T11",
+   "why": "other walk"
+  },
+  {
+   "name": "Northern Tangihua Track",
+   "quote": "the Northern Tangihua Track",
+   "ref": "L3",
+   "why": "other walk"
+  },
+  {
+   "name": "Horokaka Transmitter",
+   "quote": "Horokaka Transmitter",
+   "ref": null,
+   "why": "other walk"
+  }
+ ],
+ "doubts": "No features given, so start (Omana Road car park) has no ref. W1 is taken from DOC's 'to junction one way from car park'; whether walkers return is not stated. The page does not say where the loop starts; the Te Haua Uru Track start is assumed to be the same car park. Direction round the loop is not given. Continuing to Tangihua Hut is only 'alternatively they can continue on', so not recorded as a way. The stream crossing is unnamed and unbridged per the text 'before crossing it' (the earlier bridge crossing is a small bridge)."
 }

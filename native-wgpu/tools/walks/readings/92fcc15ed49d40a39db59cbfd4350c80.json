@@ -1,32 +1,56 @@
 {
-  "guid": "92fcc15e-d49d-40a3-9db5-9cbfd4350c80",
-  "kind": "one_way",
-  "ways": [
-    {
-      "id": "W1",
-      "main": true,
-      "label": "Waikanae Link Track",
-      "shape": "one_way",
-      "start": {"name": "Manly Street", "quote": "Manly Street", "ref": "F5"},
-      "end": null,
-      "via": [],
-      "direction": null,
-      "time": "20 min one way",
-      "distance": "1.8 km one way",
-      "evidence": [
-        "The track is accessed from multiple entry points in Waikanae - at Manly Street, Takahe Drive, Otaihanga Road end, or the Otaihanga Boat Club"
-      ]
-    }
-  ],
-  "access_points": [
-    {"name": "Takahe Drive", "quote": "Takahe Drive", "ref": null, "onto": null},
-    {"name": "Otaihanga Road end", "quote": "Otaihanga Road end", "ref": null, "onto": null},
-    {"name": "Otaihanga Boat Club", "quote": "Otaihanga Boat Club", "ref": "F7", "onto": null}
-  ],
-  "side_trips": [],
-  "huts": [],
-  "not_on_route": [
-    {"name": "Waikanae Beach", "quote": "Waikanae Beach", "ref": "T3", "why": "nearby"}
-  ],
-  "doubts": "The page never says where the track starts or ends; it only lists entry points (Manly Street, Takahe Drive, Otaihanga Road end, Otaihanga Boat Club). Manly Street, listed first, is taken as the start; the end is left null though the Otaihanga Boat Club (listed last, with parking on Makora Road) may be the other end. Shape one_way comes only from DOC's '20 min one way'. The boat club ref F7 rests on the text placing its parking on Makora Road; Takahe Drive and Otaihanga Road end have no matching feature."
+ "guid": "92fcc15e-d49d-40a3-9db5-9cbfd4350c80",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Waikanae Link Track",
+   "shape": "one_way",
+   "start": {
+    "name": "Manly Street",
+    "quote": "Manly Street",
+    "ref": "F5"
+   },
+   "end": null,
+   "via": [],
+   "direction": null,
+   "time": "20 min one way",
+   "distance": "1.8 km one way",
+   "evidence": [
+    "The track is accessed from multiple entry points in Waikanae - at Manly Street, Takahe Drive, Otaihanga Road end, or the Otaihanga Boat Club"
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Takahe Drive",
+   "quote": "Takahe Drive",
+   "ref": null,
+   "onto": null
+  },
+  {
+   "name": "Otaihanga Road end",
+   "quote": "Otaihanga Road end",
+   "ref": null,
+   "onto": null
+  },
+  {
+   "name": "Otaihanga Boat Club",
+   "quote": "Otaihanga Boat Club",
+   "ref": "F7",
+   "onto": null
+  }
+ ],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Waikanae Beach",
+   "quote": "Waikanae Beach",
+   "ref": "T3",
+   "why": "nearby"
+  }
+ ],
+ "doubts": "The page never says where the track starts or ends; it only lists entry points (Manly Street, Takahe Drive, Otaihanga Road end, Otaihanga Boat Club). Manly Street, listed first, is taken as the start; the end is left null though the Otaihanga Boat Club (listed last, with parking on Makora Road) may be the other end. Shape one_way comes only from DOC's '20 min one way'. The boat club ref F7 rests on the text placing its parking on Makora Road; Takahe Drive and Otaihanga Road end have no matching feature."
 }

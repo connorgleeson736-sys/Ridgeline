@@ -1,33 +1,50 @@
 {
-  "guid": "e27df736-6528-4335-b616-04f08630920b",
-  "kind": "loop",
-  "ways": [
+ "guid": "e27df736-6528-4335-b616-04f08630920b",
+ "kind": "loop",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Mangakara Nature Walk loop from the end of Grey Road",
+   "shape": "loop",
+   "start": {
+    "name": "End of Grey Road",
+    "quote": "turn left turn into Grey Road and follow this to the end",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "End of Grey Road",
+    "quote": "turn left turn into Grey Road and follow this to the end",
+    "ref": "F1"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Mangakara Nature Walk loop from the end of Grey Road",
-      "shape": "loop",
-      "start": {"name": "End of Grey Road", "quote": "turn left turn into Grey Road and follow this to the end", "ref": "F1"},
-      "end": {"name": "End of Grey Road", "quote": "Grey Road", "ref": "F1"},
-      "via": [
-        {"name": "Mangakara Stream", "quote": "takes you to the beautiful Mangakara Stream before looping back", "ref": "T1"},
-        {"name": "Bridge", "quote": "Please note the track sign across the bridge and veer right to stay on the Nature Walk", "ref": null}
-      ],
-      "direction": null,
-      "time": "1 hr",
-      "distance": "1.5 km loop",
-      "evidence": [
-        "The walk meanders through an ancient forest, with large rimu, kahikatea, tawa, pukatea and kohekohe and takes you to the beautiful Mangakara Stream before looping back.",
-        "The track starts 11 km north of Pirongia.",
-        "Take the first left turn into Hodgson Road, then turn left turn into Grey Road and follow this to the end."
-      ]
+     "name": "Mangakara Stream",
+     "quote": "takes you to the beautiful Mangakara Stream before looping back",
+     "ref": "T1"
     }
-  ],
-  "access_points": [],
-  "side_trips": [],
-  "huts": [],
-  "not_on_route": [
-    {"name": "Pirongia", "quote": "The track starts 11 km north of Pirongia", "ref": "T3", "why": "nearby"}
-  ],
-  "doubts": "The order of the Mangakara Stream and the bridge on the loop is not certain; the numbered posts (bridge at post 5, stream at post 10) are not tied to named places. Direction is not stated."
+   ],
+   "direction": null,
+   "time": "1 hr",
+   "distance": "1.5 km loop",
+   "evidence": [
+    "The walk meanders through an ancient forest, with large rimu, kahikatea, tawa, pukatea and kohekohe and takes you to the beautiful Mangakara Stream before looping back.",
+    "Take the first left turn into Hodgson Road, then turn left turn into Grey Road and follow this to the end.",
+    "Numbers correspond to posts on the walk and to the map included in the factsheet above."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Pirongia",
+   "quote": "The track starts 11 km north of Pirongia",
+   "ref": "T3",
+   "why": "nearby"
+  }
+ ],
+ "doubts": "The walk is a loop from the end of Grey Road (F1). The page numbers its posts 1 to 12 in the Track guide, and the stream is at post 10 ('Life in freshwater'). The text does not state the direction of travel, so direction is null and the order of the stream within the loop follows the numbering. The text does not name the bridge at post 5 ('the track sign across the bridge'), so it is not listed as a via. The stream is named in the introduction and at post 10; the ref is the Mangakara Stream name entry. The numbered posts are points of interest, not named places, so they are not listed as vias."
 }

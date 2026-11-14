@@ -1,49 +1,148 @@
 {
-  "guid": "e50df352-52a0-4e5a-b013-72af5a5f22df",
-  "kind": "one_way",
-  "ways": [
+ "guid": "e50df352-52a0-4e5a-b013-72af5a5f22df",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Wakamarina Track from Kiwi Road car park to Butchers Flat road end",
+   "shape": "one_way",
+   "start": {
+    "name": "Kiwi Road car park",
+    "quote": "From the car park on Kiwi Road",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Butchers Flat road end",
+    "quote": "the road end at Butchers Flat",
+    "ref": "F2"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Wakamarina Track from Kiwi Road to Butchers Flat",
-      "shape": "one_way",
-      "start": {"name": "Kiwi Road car park", "quote": "From the car park on Kiwi Road", "ref": "F1"},
-      "end": {"name": "Butchers Flat road end", "quote": "the road end at Butchers Flat", "ref": "F2"},
-      "via": [
-        {"name": "Bartletts Ridge", "quote": "follows the eastern side of Bartletts Ridge", "ref": null},
-        {"name": "head of Bartletts Creek", "quote": "crossing the head of Bartletts Creek", "ref": "T3"},
-        {"name": "Foster's Clearing", "quote": "known as Foster’s Clearing", "ref": null},
-        {"name": "head of Foster Creek", "quote": "the track descends into the head of Foster Creek", "ref": "T9"},
-        {"name": "saddle between Foster and Devil's Creeks", "quote": "a saddle between Foster and Devil’s Creeks", "ref": null},
-        {"name": "Devil's Creek–Foster Creek ridge", "quote": "the Devil’s Creek–Foster Creek ridge", "ref": null},
-        {"name": "Devil's Creek Hut", "quote": "Devil’s Creek Hut", "ref": "T6"},
-        {"name": "Doom Creek bridge", "quote": "A bridge crosses Doom Creek", "ref": "T7"}
-      ],
-      "direction": null,
-      "time": "7 hrs (south to north)",
-      "distance": null,
-      "evidence": [
-        "The track is best walked or ridden as described below, from south to north.",
-        "From the car park on Kiwi Road a well-graded track follows the eastern side of Bartletts Ridge before crossing the head of Bartletts Creek and climbing to the Foster Creek– Bartletts Creek saddle, known as Foster’s Clearing.",
-        "A bridge crosses Doom Creek before a short climb up to the benched track that leads to the road end at Butchers Flat."
-      ]
+     "name": "Bartletts Ridge",
+     "quote": "follows the eastern side of Bartletts Ridge",
+     "ref": null
+    },
+    {
+     "name": "Bartletts Creek",
+     "quote": "crossing the head of Bartletts Creek",
+     "ref": "T3",
+     "how": "ford"
+    },
+    {
+     "name": "Foster's Clearing",
+     "quote": "known as Foster’s Clearing",
+     "ref": null
+    },
+    {
+     "name": "Foster Creek",
+     "quote": "the track descends into the head of Foster Creek",
+     "ref": "T9"
+    },
+    {
+     "name": "saddle between Foster and Devil's Creeks",
+     "quote": "climbs to a saddle between Foster and Devil’s Creeks",
+     "ref": null
+    },
+    {
+     "name": "Devil's Creek-Foster Creek ridge",
+     "quote": "climbs along the Devil’s Creek–Foster Creek ridge",
+     "ref": null
+    },
+    {
+     "name": "Devil's Creek Hut",
+     "quote": "From Devil’s Creek Hut a benched track sidles above the river",
+     "ref": "T6"
+    },
+    {
+     "name": "Doom Creek",
+     "quote": "A bridge crosses Doom Creek",
+     "ref": "T7"
     }
-  ],
-  "access_points": [
-    {"name": "Bartletts Valley", "quote": "Road access is also possible from Bartletts Valley.", "ref": null, "onto": null}
-  ],
-  "side_trips": [
-    {"name": "Foster's Hut", "quote": "A short side track leads east up the ridge to Foster’s Hut.", "ref": "T10", "from": "Foster's Clearing"},
-    {"name": "Doom Track", "quote": "Doom Track", "ref": "T1", "from": "Doom Creek"}
-  ],
-  "huts": [
-    {"name": "Devil's Creek Hut", "quote": "Devil’s Creek Hut", "ref": "T6"}
-  ],
-  "not_on_route": [
-    {"name": "Foster's Hut", "quote": "Foster’s Hut", "ref": "T10", "why": "side trip"},
-    {"name": "Deep Creek (Golden Bar Claim)", "quote": "the Golden Bar Claim at Deep Creek", "ref": "T4", "why": "side trip"},
-    {"name": "Onamalutu Reserve", "quote": "Onamalutu Reserve (Blenheim end)", "ref": null, "why": "other"},
-    {"name": "Canvastown", "quote": "Canvastown (Havelock end)", "ref": null, "why": "other"}
-  ],
-  "doubts": "The Butchers Flat end is given as F2 (an unnamed track meeting Wakamarina Road), the only road end on the Havelock side; the text adds that vehicles must park at Butchers Flat carpark and walk to the track start, so the exact end point is a little uncertain. The Bartletts Valley access does not say where it joins the track. The mountain bike ride from Onamalutu Reserve to Canvastown (45 km) is a longer bike route, not recorded as a walking way. Deep Creek is where the Doom Track's water race led, not stated as reached by walkers."
+   ],
+   "direction": null,
+   "time": "7 hrs (south to north)",
+   "distance": null,
+   "evidence": [
+    "The track is best walked or ridden as described below, from south to north.",
+    "From the car park on Kiwi Road a well-graded track follows the eastern side of Bartletts Ridge before crossing the head of Bartletts Creek and climbing to the Foster Creek– Bartletts Creek saddle, known as Foster’s Clearing.",
+    "A bridge crosses Doom Creek before a short climb up to the benched track that leads to the road end at Butchers Flat."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Wakamarina Track mountain bike ride from Onamalutu Reserve to Canvastown",
+   "shape": "one_way",
+   "start": {
+    "name": "Onamalutu Reserve",
+    "quote": "from Onamalutu Reserve (Blenheim end)",
+    "ref": null
+   },
+   "end": {
+    "name": "Canvastown",
+    "quote": "to Canvastown (Havelock end)",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Devil's Creek Hut",
+     "quote": "Devils Creek Hut in the Wakamarina Valley is around halfway",
+     "ref": "T6"
+    }
+   ],
+   "direction": null,
+   "time": "1–2 days",
+   "distance": "45 km",
+   "evidence": [
+    "Mountain bikers could complete the trip in one day, and it is best ridden from Onamalutu Reserve (Blenheim end) to Canvastown (Havelock end).",
+    "It is grade 3 (intermediate) to grade 5 (expert). 45 km, 1–2 days."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Bartletts Valley",
+   "quote": "Road access is also possible from Bartletts Valley.",
+   "ref": null,
+   "onto": null
+  }
+ ],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Foster's Hut",
+   "quote": "A short side track leads east up the ridge to Foster’s Hut.",
+   "ref": "T10",
+   "from": "Foster's Clearing"
+  },
+  {
+   "name": "Doom Track",
+   "quote": "This wide, benched and historically significant tramping track leaves the main track near Doom Creek.",
+   "ref": "T1",
+   "from": "Doom Creek"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Devil's Creek Hut",
+   "quote": "Devil’s Creek Hut",
+   "ref": "T6"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Foster's Hut",
+   "quote": "Foster’s Hut",
+   "ref": "T10",
+   "why": "side trip"
+  },
+  {
+   "name": "Golden Bar Claim at Deep Creek",
+   "quote": "the Golden Bar Claim at Deep Creek",
+   "ref": "T4",
+   "why": "other"
+  }
+ ],
+ "doubts": "The Butchers Flat end is F2 (the only other road end, an unnamed track meeting Wakamarina Road); the text places the Butchers Flat road end at the track's end, so F2 is my best match but not certain. 'Crossing the head of Bartletts Creek' names no bridge, so it is marked ford on judgement from the wording; no ford is recorded for the unnamed creeks crossed on the Foster section, and the bridged Doom Creek is not a ford. The mountain bike ride (W2) is a separate way with its own heading and distance; its start and end are named in the text only and have no packet entries, and its via is limited to Devils Creek Hut because the text gives no other places on the bike route. Bartletts Road/Bartletts Creek Road 4WD access is not recorded as an access point because the text does not say where it joins the track. The Golden Bar Claim at Deep Creek is only the destination of the water race described on the Doom Track side trip; it is not stated to be reached on either way."
 }

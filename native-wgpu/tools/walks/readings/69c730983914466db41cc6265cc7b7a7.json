@@ -1,50 +1,119 @@
 {
-  "guid": "69c73098-3914-466d-b41c-c6265cc7b7a7",
-  "kind": "one_way",
-  "ways": [
+ "guid": "69c73098-3914-466d-b41c-c6265cc7b7a7",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "SH6 to Blowfly Hut, Māori Saddle Hut and Coppermine Creek Hut",
+   "shape": "one_way",
+   "start": {
+    "name": "SH6 at Windbag Saddle",
+    "quote": "SH6 at the Windbag Saddle",
+    "ref": "F2"
+   },
+   "end": {
+    "name": "gate south of the Waita River Bridge",
+    "quote": "a gate just south of the Waita River Bridge",
+    "ref": null
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Historic Haast to Paringa Cattle Track, SH6 at Windbag Saddle to SH6 near Waita River Bridge",
-      "shape": "one_way",
-      "start": {"name": "north end on SH6 at Windbag Saddle", "quote": "Access to the north end of the track is signposted approximately 40 km northeast of Haast on SH6 at the Windbag Saddle.", "ref": "F2"},
-      "end": {"name": "south end gate near Waita River Bridge", "quote": "The sound end of the track is marked by a gate just south of the Waita River Bridge", "ref": "F1"},
-      "via": [
-        {"name": "Moeraki River", "quote": "The flat well-benched track then follows the Moeraki River", "ref": "T10"},
-        {"name": "Blowfly Hut", "quote": "Blowfly Hut", "ref": "L1"},
-        {"name": "Mica Mine Tops Route junction", "quote": "the Mica Mine Tops Route junction", "ref": null},
-        {"name": "Thompson Creek", "quote": "at Thompson Creek", "ref": null},
-        {"name": "Māori Saddle", "quote": "The track to Māori Saddle winds its way steadily uphill", "ref": "T7"},
-        {"name": "Māori Saddle Hut", "quote": "Māori Saddle Hut", "ref": "T8"},
-        {"name": "Slippery Face near Robinson Creek", "quote": "Slippery Face near Robinson Creek", "ref": null},
-        {"name": "Coppermine Creek Hut", "quote": "Coppermine Creek Hut", "ref": "T6"}
-      ],
-      "direction": null,
-      "time": "3 days",
-      "distance": null,
-      "evidence": [
-        "Walking the Haast to Paringa Cattle Track is a three-day journey and you will need to be prepared to stay in huts along the route.",
-        "Access to the north end of the track is signposted approximately 40 km northeast of Haast on SH6 at the Windbag Saddle.",
-        "Eventually the track swings to the north and follows a fence-line towards Coppermine Creek where the DOC hut is on the “true right” of the creek and the furthest of the three huts. It is another two-hour walk to the highway.",
-        "The sound end of the track is marked by a gate just south of the Waita River Bridge about 11 km north of Haast Junction."
-      ]
+     "name": "Windbag Creek",
+     "quote": "Windbag Creek",
+     "ref": "T14"
+    },
+    {
+     "name": "Moeraki River",
+     "quote": "Moeraki River",
+     "ref": "T10"
+    },
+    {
+     "name": "Blowfly Hut",
+     "quote": "Blowfly Hut",
+     "ref": "L1"
+    },
+    {
+     "name": "Mica Mine Tops Route junction",
+     "quote": "Mica Mine Tops Route junction",
+     "ref": "L2"
+    },
+    {
+     "name": "Thompson Creek",
+     "quote": "Thompson Creek",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Māori Saddle",
+     "quote": "Māori Saddle",
+     "ref": "T7"
+    },
+    {
+     "name": "Māori Saddle Hut",
+     "quote": "Māori Saddle Hut",
+     "ref": "T8"
+    },
+    {
+     "name": "Slippery Face",
+     "quote": "Slippery Face",
+     "ref": null
+    },
+    {
+     "name": "Robinson Creek",
+     "quote": "Robinson Creek",
+     "ref": "T11"
+    },
+    {
+     "name": "Coppermine Creek Hut",
+     "quote": "Coppermine Creek Hut",
+     "ref": "T6"
     }
-  ],
-  "access_points": [],
-  "side_trips": [
-    {"name": "Mataketake Hut via Mica Mine Tops Route", "quote": "The first is Mica Mine Tops Route around 2 hours from Blowfly Hut.", "ref": "L2", "from": "Mica Mine Tops Route junction"},
-    {"name": "Mataketake Hut via Māori Saddle Route", "quote": "The second is Māori Saddle Route signposted 10 minutes past Māori Saddle Hut.", "ref": "L3", "from": "Māori Saddle Hut"}
-  ],
-  "huts": [
-    {"name": "Blowfly Hut", "quote": "Blowfly Hut", "ref": "L1"},
-    {"name": "Māori Saddle Hut", "quote": "Māori Saddle Hut", "ref": "T8"},
-    {"name": "Coppermine Creek Hut", "quote": "Coppermine Creek Hut", "ref": "T6"}
-  ],
-  "not_on_route": [
-    {"name": "Mataketake Hut", "quote": "Mataketake Hut can be started from two points", "ref": "T9", "why": "side trip"},
-    {"name": "Windbag Creek swampy area", "quote": "a lowland swampy area around Windbag Creek", "ref": "T14", "why": "other"},
-    {"name": "Lake Paringa", "quote": "Lake Paringa", "ref": null, "why": "other"},
-    {"name": "Haast", "quote": "approximately 40 km northeast of Haast", "ref": null, "why": "nearby"}
-  ],
-  "doubts": "Start: F2 ('where an unnamed track meets HAAST HIGHWAY') lies near Windbag Creek and Blowfly Hut, which fits the north-end access at Windbag Saddle and the initial detour track, but it is an unnamed track so not certain. End: F1 ('where Haast to Paringa Cattle Track meets HAAST HIGHWAY') taken as the south-end gate near Waita River Bridge. The page describes the track north to south and does not say whether the reverse is usual. Blowfly Hut is 15 min from a junction across a swing bridge, with the onward turn-off just before the hut, so it may be a short detour rather than directly on the line. No total distance is given."
+   ],
+   "direction": null,
+   "time": "3 days",
+   "distance": null,
+   "evidence": [
+    "Walking the Haast to Paringa Cattle Track is a three-day journey and you will need to be prepared to stay in huts along the route.",
+    "Access to the north end of the track is signposted approximately 40 km northeast of Haast on SH6 at the Windbag Saddle.",
+    "The sound end of the track is marked by a gate just south of the Waita River Bridge about 11 km north of Haast Junction.",
+    "It is another two-hour walk to the highway."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Mataketake Hut",
+   "quote": "Mataketake Hut",
+   "ref": "T9",
+   "from": "Mica Mine Tops Route junction"
+  },
+  {
+   "name": "Māori Saddle Route",
+   "quote": "Māori Saddle Route",
+   "ref": "L3",
+   "from": "Māori Saddle Hut"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Blowfly Hut",
+   "quote": "Blowfly Hut",
+   "ref": "L1"
+  },
+  {
+   "name": "Māori Saddle Hut",
+   "quote": "Māori Saddle Hut",
+   "ref": "T8"
+  },
+  {
+   "name": "Coppermine Creek Hut",
+   "quote": "Coppermine Creek Hut",
+   "ref": "T6"
+  }
+ ],
+ "not_on_route": [],
+ "doubts": "Start ref F2 (unnamed track meeting the highway, east end) chosen from the text's north end near Windbag Saddle; position agrees but not certain. End: text puts the highway two hours past Coppermine Creek Hut; the gate end has no clear feature, ref null. Thompson Creek is the only crossing the text singles out (steep access into a fast-flowing river, needs extreme caution to cross), recorded as a ford. 'sound end' is the page's wording (likely 'south end'). Mataketake Hut reached by Mica Mine Tops Route (about 2 hours from Blowfly Hut) or Māori Saddle Route (10 minutes past Māori Saddle Hut), recorded as side trips."
 }

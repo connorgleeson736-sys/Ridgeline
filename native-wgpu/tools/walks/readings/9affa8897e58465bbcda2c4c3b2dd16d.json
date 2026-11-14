@@ -1,67 +1,213 @@
 {
-  "guid": "9affa889-7e58-465b-bcda-2c4c3b2dd16d",
-  "kind": "one_way",
-  "ways": [
+ "guid": "9affa889-7e58-465b-bcda-2c4c3b2dd16d",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Lake Hauroko to Lake Manapouri",
+   "shape": "one_way",
+   "start": {
+    "name": "Hauroko Burn Hut, Lake Hauroko",
+    "quote": "Hauroko Burn Hut",
+    "ref": "T11"
+   },
+   "end": {
+    "name": "West Arm, Lake Manapouri",
+    "quote": "West Arm, Lake Manapouri",
+    "ref": null
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Lake Hauroko to Lake Manapouri",
-      "shape": "one_way",
-      "start": {"name": "Hauroko Burn Hut, Lake Hauroko", "quote": "Hauroko Burn Hut", "ref": "T11"},
-      "end": {"name": "West Arm, Lake Manapouri", "quote": "West Arm, Lake Manapouri", "ref": null},
-      "via": [
-        {"name": "Hauroko Burn", "quote": "Hauroko Burn", "ref": "T10"},
-        {"name": "Halfway Hut", "quote": "Halfway Hut", "ref": "T9"},
-        {"name": "Lake Roe Hut", "quote": "Lake Roe Hut", "ref": "T18"},
-        {"name": "Furkert Pass", "quote": "Furkert Pass", "ref": "T6"},
-        {"name": "Lake Horizon", "quote": "Lake Horizon", "ref": "T15"},
-        {"name": "Pleasant Range", "quote": "Pleasant Range", "ref": "T23"},
-        {"name": "Loch Maree", "quote": "Loch Maree", "ref": "T19"},
-        {"name": "Loch Maree Hut", "quote": "Loch Maree Hut", "ref": "T20"},
-        {"name": "Deadwood Creek", "quote": "Deadwood Creek", "ref": "T5"},
-        {"name": "Kenneth Burn", "quote": "Kenneth Burn", "ref": "T12"},
-        {"name": "Gair Loch", "quote": "Gair Loch", "ref": "T7"},
-        {"name": "Kintail Hut", "quote": "Kintail Hut", "ref": "T13"},
-        {"name": "Kintail Stream", "quote": "Kintail Stream", "ref": "T14"},
-        {"name": "Centre Pass", "quote": "Centre Pass", "ref": "T3"},
-        {"name": "Warren Burn", "quote": "Warren Burn", "ref": "T28"},
-        {"name": "Upper Spey Hut", "quote": "Upper Spey Hut", "ref": "T27"},
-        {"name": "Spey River", "quote": "Spey River", "ref": "T25"},
-        {"name": "Dashwood Stream", "quote": "Dashwood Stream", "ref": "T4"},
-        {"name": "Wilmot Pass Road (track end)", "quote": "Wilmot Pass Road", "ref": "F1"},
-        {"name": "West Arm Hut", "quote": "West Arm Hut", "ref": "T29"}
-      ],
-      "direction": null,
-      "time": "8- 10 days",
-      "distance": "84 km one way",
-      "evidence": [
-        "The Dusky Track can be walked in either direction - from Lake Hauroko to Lake Manapouri (as described below), or the other way.",
-        "To start from the south (Lake Hauroko), a scheduled boat service on Lake Hauroko leads to the start of the track at the head of the lake.",
-        "The first 40 minutes from Hauroko Burn Hut (10 bunks) is flat, with attractive views of the river.",
-        "From the track end (sign posted on the left hand side of the road, 20 minutes past the Mica Burn) follow the Wilmot Pass Road to West Arm, Lake Manapouri."
-      ]
+     "name": "Hauroko Burn",
+     "quote": "Hauroko Burn",
+     "ref": "T10"
+    },
+    {
+     "name": "Halfway Hut",
+     "quote": "Halfway Hut",
+     "ref": "T9"
+    },
+    {
+     "name": "Lake Roe Hut",
+     "quote": "Lake Roe Hut",
+     "ref": "T18"
+    },
+    {
+     "name": "Furkert Pass",
+     "quote": "Furkert Pass",
+     "ref": "T6"
+    },
+    {
+     "name": "Lake Horizon",
+     "quote": "Lake Horizon",
+     "ref": "T15"
+    },
+    {
+     "name": "Pleasant Range",
+     "quote": "Pleasant Range",
+     "ref": "T23"
+    },
+    {
+     "name": "Loch Maree",
+     "quote": "Loch Maree",
+     "ref": "T19"
+    },
+    {
+     "name": "Loch Maree Hut",
+     "quote": "Loch Maree Hut",
+     "ref": "T20"
+    },
+    {
+     "name": "Deadwood Creek",
+     "quote": "Deadwood Creek",
+     "ref": "T5"
+    },
+    {
+     "name": "Kenneth Burn",
+     "quote": "Kenneth Burn",
+     "ref": "T12"
+    },
+    {
+     "name": "Gair Loch",
+     "quote": "Gair Loch",
+     "ref": "T7"
+    },
+    {
+     "name": "Kintail Hut",
+     "quote": "Kintail Hut",
+     "ref": "T13"
+    },
+    {
+     "name": "Kintail Stream",
+     "quote": "Kintail Stream",
+     "ref": "T14"
+    },
+    {
+     "name": "Centre Pass",
+     "quote": "Centre Pass",
+     "ref": "T3"
+    },
+    {
+     "name": "Warren Burn",
+     "quote": "Warren Burn",
+     "ref": "T28"
+    },
+    {
+     "name": "Upper Spey Hut",
+     "quote": "Upper Spey Hut",
+     "ref": "T27"
+    },
+    {
+     "name": "Spey River",
+     "quote": "Spey River",
+     "ref": "T25"
+    },
+    {
+     "name": "Dashwood Stream",
+     "quote": "Dashwood Stream",
+     "ref": "T4"
+    },
+    {
+     "name": "Wilmot Pass Road (track end)",
+     "quote": "Wilmot Pass Road",
+     "ref": "F1"
+    },
+    {
+     "name": "West Arm Hut",
+     "quote": "West Arm Hut",
+     "ref": "T29"
     }
-  ],
-  "access_points": [
-    {"name": "Supper Cove (by floatplane or helicopter)", "quote": "Supper Cove in Tamatea/Dusky Sound", "ref": null, "onto": "Loch Maree Hut to Supper Cove Hut track"}
-  ],
-  "side_trips": [
-    {"name": "Supper Cove", "quote": "Supper Cove in Tamatea/Dusky Sound", "ref": null, "from": "Loch Maree Hut"},
-    {"name": "Mt Memphis", "quote": "Mt Memphis", "ref": "T22", "from": "Centre Pass"},
-    {"name": "Lake Roe", "quote": "Lake Roe", "ref": "T17", "from": "Lake Roe Hut"}
-  ],
-  "huts": [
-    {"name": "Hauroko Burn Hut", "quote": "Hauroko Burn Hut", "ref": "T11"},
-    {"name": "Halfway Hut", "quote": "Halfway Hut", "ref": "T9"},
-    {"name": "Lake Roe Hut", "quote": "Lake Roe Hut", "ref": "T18"},
-    {"name": "Loch Maree Hut", "quote": "Loch Maree Hut", "ref": "T20"},
-    {"name": "Kintail Hut", "quote": "Kintail Hut", "ref": "T13"},
-    {"name": "Upper Spey Hut", "quote": "Upper Spey Hut", "ref": "T27"},
-    {"name": "West Arm Hut", "quote": "West Arm Hut", "ref": "T29"}
-  ],
-  "not_on_route": [
-    {"name": "Supper Cove Hut", "quote": "Supper Cove Hut", "ref": null, "why": "side trip"},
-    {"name": "Tripod Hill", "quote": "Tripod Hill", "ref": "T26", "why": "view"}
-  ],
-  "doubts": "The start is described as Lake Hauroko (boat to the head of the lake); I placed it at Hauroko Burn Hut, from which the first section is timed, but no entry is Lake Hauroko itself. The end, West Arm on Lake Manapouri, has no entry; the walking track meets Wilmot Pass Road at F1 and the last 45 min follow the road, with West Arm Hut 'half an hour along the road' (unclear whether the hut is at West Arm itself). Kintail Hut is five minutes along a side-track but is the stage stop. The walk can be done in either direction; described from Lake Hauroko. Supper Cove (fly in/out) is reached by a two-day optional detour from Loch Maree Hut."
+   ],
+   "direction": null,
+   "time": "8- 10 days",
+   "distance": "84 km one way",
+   "evidence": [
+    "The Dusky Track can be walked in either direction - from Lake Hauroko to Lake Manapouri (as described below), or the other way.",
+    "To start from the south (Lake Hauroko), a scheduled boat service on Lake Hauroko leads to the start of the track at the head of the lake.",
+    "The first 40 minutes from Hauroko Burn Hut (10 bunks) is flat, with attractive views of the river.",
+    "From the track end (sign posted on the left hand side of the road, 20 minutes past the Mica Burn) follow the Wilmot Pass Road to West Arm, Lake Manapouri."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Supper Cove (by floatplane or helicopter)",
+   "quote": "Supper Cove in Tamatea/Dusky Sound",
+   "ref": null,
+   "onto": "Loch Maree Hut to Supper Cove Hut track"
+  }
+ ],
+ "side_trips": [
+  {
+   "name": "Supper Cove",
+   "quote": "Supper Cove in Tamatea/Dusky Sound",
+   "ref": null,
+   "from": "Loch Maree Hut"
+  },
+  {
+   "name": "Mt Memphis",
+   "quote": "Mt Memphis",
+   "ref": "T22",
+   "from": "Centre Pass"
+  },
+  {
+   "name": "Lake Roe",
+   "quote": "Lake Roe",
+   "ref": "T17",
+   "from": "Lake Roe Hut"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Hauroko Burn Hut",
+   "quote": "Hauroko Burn Hut",
+   "ref": "T11"
+  },
+  {
+   "name": "Halfway Hut",
+   "quote": "Halfway Hut",
+   "ref": "T9"
+  },
+  {
+   "name": "Lake Roe Hut",
+   "quote": "Lake Roe Hut",
+   "ref": "T18"
+  },
+  {
+   "name": "Loch Maree Hut",
+   "quote": "Loch Maree Hut",
+   "ref": "T20"
+  },
+  {
+   "name": "Kintail Hut",
+   "quote": "Kintail Hut",
+   "ref": "T13"
+  },
+  {
+   "name": "Upper Spey Hut",
+   "quote": "Upper Spey Hut",
+   "ref": "T27"
+  },
+  {
+   "name": "West Arm Hut",
+   "quote": "West Arm Hut",
+   "ref": "T29"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Supper Cove Hut",
+   "quote": "Supper Cove Hut",
+   "ref": null,
+   "why": "side trip"
+  },
+  {
+   "name": "Tripod Hill",
+   "quote": "Tripod Hill",
+   "ref": "T26",
+   "why": "view"
+  }
+ ],
+ "doubts": "The start is described as Lake Hauroko (boat to the head of the lake); I placed it at Hauroko Burn Hut, from which the first section is timed, but no entry is Lake Hauroko itself. The end, West Arm on Lake Manapouri, has no entry; the walking track meets Wilmot Pass Road at F1 and the last 45 min follow the road, with West Arm Hut 'half an hour along the road' (unclear whether the hut is at West Arm itself). Kintail Hut is five minutes along a side-track but is the stage stop. The walk can be done in either direction; described from Lake Hauroko. Supper Cove (fly in/out) is reached by a two-day optional detour from Loch Maree Hut."
 }

@@ -1,41 +1,98 @@
 {
-  "guid": "b6276005-9ce3-4a5b-8927-6c86da8ff3e8",
-  "kind": "unclear",
-  "ways": [
+ "guid": "b6276005-9ce3-4a5b-8927-6c86da8ff3e8",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Kitchener Track to Aspiring Flats",
+   "shape": "one_way",
+   "start": {
+    "name": "Camerons Flat",
+    "quote": "This track starts on the opposite side of the Matukituki River from Camerons Flat.",
+    "ref": "T5"
+   },
+   "end": {
+    "name": "Aspiring Flats",
+    "quote": "and ends at Aspiring Flats",
+    "ref": "T4"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Camerons Flat to Aspiring Flats",
-      "shape": null,
-      "start": {"name": "Camerons Flat", "quote": "Ford the Matukituki River at Camerons Flat", "ref": "T5"},
-      "end": {"name": "Aspiring Flats", "quote": "ends at Aspiring Flats", "ref": "T4"},
-      "via": [
-        {"name": "Matukituki River ford", "quote": "Ford the Matukituki River", "ref": null},
-        {"name": "East Matukituki valley", "quote": "The track leads up the East Matukituki valley", "ref": "T1"},
-        {"name": "Glacier Burn", "quote": "After reaching and crossing the Glacier Burn", "ref": "T6"},
-        {"name": "Junction Flat", "quote": "until it reaches Junction Flat and the Kitchener River", "ref": "T7"},
-        {"name": "Kitchener River (true right)", "quote": "This track follows the true right of the Kitchener River", "ref": "T8"},
-        {"name": "top of the gorge", "quote": "The track passes through beech forest to the top of the gorge", "ref": null}
-      ],
-      "direction": null,
-      "time": "8–10 hr",
-      "distance": null,
-      "evidence": [
-        "This track starts on the opposite side of the Matukituki River from Camerons Flat.",
-        "Ford the Matukituki River at Camerons Flat.",
-        "The track passes through beech forest to the top of the gorge and ends at Aspiring Flats."
-      ]
+     "name": "Matukituki River",
+     "quote": "Ford the Matukituki River at Camerons Flat.",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Glacier Burn",
+     "quote": "After reaching and crossing the Glacier Burn",
+     "ref": "T6"
+    },
+    {
+     "name": "East Matukituki River",
+     "quote": "undulates alongside the East Matukituki River until it reaches Junction Flat",
+     "ref": null
+    },
+    {
+     "name": "Junction Flat",
+     "quote": "until it reaches Junction Flat and the Kitchener River",
+     "ref": "T7"
+    },
+    {
+     "name": "Kitchener River",
+     "quote": "This track follows the true right of the Kitchener River",
+     "ref": "T8"
     }
-  ],
-  "access_points": [
-    {"name": "Otago Boys' High Bridge at MacPherson Creek", "quote": "park by the Otago Boys' High Bridge at MacPherson Creek. Use the bridge to cross the West Matukituki and walk for an hour to join the East Matukituki track", "ref": null, "onto": "East Matukituki track"}
-  ],
-  "side_trips": [],
-  "huts": [],
-  "not_on_route": [
-    {"name": "Rock of Ages Biv", "quote": "The rock biv is 30 minutes further on from where the track reaches the flats", "ref": null, "why": "other"},
-    {"name": "Kitchener Cirque", "quote": "There are spectacular views of the Kitchener Cirque from Aspiring Flats", "ref": null, "why": "view"},
-    {"name": "Glacier Burn Track", "quote": "at the turn off for the Glacier Burn Track", "ref": "L1", "why": "other walk"}
-  ],
-  "doubts": "The page never says how the walk is finished: the track ends at Aspiring Flats and the legs total 4 hr while DOC's time is 8–10 hr, which suggests a return the same way, but this is not stated, so shape is null and kind unclear. The start is the Camerons Flat ford (T5); the Camerons Flat car park could not be matched confidently to any road end feature (F1/F2 are on Cameron Flat Road, F3 on Wanaka-Mount Aspiring Road), and the MacPherson Creek alternative start is also left without a ref. The Rock of Ages Biv lies 30 min beyond where the track reaches the flats, off any marked track."
+   ],
+   "direction": null,
+   "time": "8–10 hr",
+   "distance": null,
+   "evidence": [
+    "This track starts on the opposite side of the Matukituki River from Camerons Flat.",
+    "Ford the Matukituki River at Camerons Flat.",
+    "After reaching and crossing the Glacier Burn the track undulates alongside the East Matukituki River until it reaches Junction Flat and the Kitchener River.",
+    "This track follows the true right of the Kitchener River and climbs an old unstable slip which is narrow.",
+    "The track passes through beech forest to the top of the gorge and ends at Aspiring Flats."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Otago Boys' High Bridge at MacPherson Creek",
+   "quote": "park by the Otago Boys' High Bridge at MacPherson Creek",
+   "ref": null,
+   "onto": "East Matukituki track"
+  }
+ ],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Rock of Ages Biv",
+   "quote": "The Rock of Ages rock biv is a large leaning rock in the Kitchener Valley.",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "Kitchener Cirque",
+   "quote": "spectacular views of the Kitchener Cirque from Aspiring Flats",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Glacier Burn Track",
+   "quote": "at the turn off for the Glacier Burn Track",
+   "ref": "L1",
+   "why": "other walk"
+  },
+  {
+   "name": "Raspberry Creek",
+   "quote": "drive 2.5 km further along the road towards Raspberry Creek",
+   "ref": "T10",
+   "why": "nearby"
+  }
+ ],
+ "doubts": "Shape is one_way because the text says the track 'ends at Aspiring Flats' and gives no return; DOC's time 8–10 hr is the page summary and is not split by leg. The start is Camerons Flat (valley T5) because the car park is across the river from the track start; the two road-end features where East Matukituki Track meets Cameron Flat Road are not clearly the start, so no road-end ref is used. Glacier Burn crossing is not said to be bridged or unbridged, so no how is given there. The Rock of Ages biv is 30 minutes beyond where the track reaches the flats, so it is not on the main way and is not in huts. The alternative access by the Otago Boys' High Bridge is recorded as an access point, not a way."
 }

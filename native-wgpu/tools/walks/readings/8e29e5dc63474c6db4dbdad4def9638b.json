@@ -1,94 +1,259 @@
 {
-  "guid": "8e29e5dc-6347-4c6d-b4db-dad4def9638b",
-  "kind": "network",
-  "ways": [
+ "guid": "8e29e5dc-6347-4c6d-b4db-dad4def9638b",
+ "kind": "network",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "1000 Acre Plateau: Lake Matiri Hut to Larrikins Creek Hut via Poor Petes Hut",
+   "shape": "one_way",
+   "start": {
+    "name": "Lake Matiri Hut",
+    "quote": "Lake Matiri Hut to Poor Petes Hut",
+    "ref": "T7"
+   },
+   "end": {
+    "name": "Larrikins Creek Hut",
+    "quote": "clearings where Larrikins Creek Hut sits",
+    "ref": null
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "1000 Acre Plateau: Lake Matiri Hut to Larrikins Creek Hut via Poor Petes Hut",
-      "shape": "one_way",
-      "start": {"name": "Lake Matiri Hut", "quote": "Lake Matiri Hut to Poor Petes Hut", "ref": "T7"},
-      "end": {"name": "Larrikins Creek Hut", "quote": "clearings where Larrikins Creek Hut sits", "ref": null},
-      "via": [
-        {"name": "Fork in the track beyond Bay Creek", "quote": "From the fork in the track just beyond Bay Creek", "ref": "T3"},
-        {"name": "Plateau rim", "quote": "The plateau rim is reached in about two hours from Lake Matiri Hut", "ref": null},
-        {"name": "Poor Petes Hut", "quote": "a marked route sets out across the boggy-in-places plateau to Poor Petes Hut", "ref": null}
-      ],
-      "direction": null,
-      "time": null,
-      "distance": null,
-      "evidence": [
-        "From the DOC carpark at Matiri roadend follow the Lake Matiri Hut Track for 1.5 hr to Lake Matiri Hut.",
-        "From the fork in the track just beyond Bay Creek a tramping track climbs abruptly up a spur.",
-        "Beyond the rim a marked route sets out across the boggy-in-places plateau to Poor Petes Hut.",
-        "Maintain the level gradient through the forest on a marked route before merging into clearings where Larrikins Creek Hut sits."
-      ]
+     "name": "fork in the track just beyond Bay Creek",
+     "quote": "From the fork in the track just beyond Bay Creek a tramping track climbs abruptly up a spur",
+     "ref": null
     },
     {
-      "id": "W2",
-      "main": false,
-      "label": "Upper Matiri Valley: Lake Matiri Hut to Hurricane Hut via McConchies Hut",
-      "shape": "one_way",
-      "start": {"name": "Lake Matiri Hut", "quote": "Lake Matiri Hut to McConchies Hut", "ref": "T7"},
-      "end": {"name": "Hurricane Hut", "quote": "to reach Hurricane Hut", "ref": "T4"},
-      "via": [
-        {"name": "Lake Matiri western shore", "quote": "Sidle around the western shore of the lake", "ref": "T6"},
-        {"name": "Bay Creek", "quote": "where Bay Creek flows into the lake", "ref": "T3"},
-        {"name": "McConchies Hut", "quote": "McConchies Hut is about half way up Matiri Valley", "ref": "T10"},
-        {"name": "Forested saddle", "quote": "climb over a forested saddle", "ref": null},
-        {"name": "Matiri River", "quote": "rejoin the Matiri River", "ref": "T9"},
-        {"name": "Lake Jeanette", "quote": "A short climb leads to Lake Jeanette", "ref": "T5"}
-      ],
-      "direction": null,
-      "time": null,
-      "distance": null,
-      "evidence": [
-        "Sidle around the western shore of the lake through beautiful beech forest.",
-        "McConchies Hut is about half way up Matiri Valley.",
-        "Sidle the western shore of the lake and the western side of the now flat valley floor to reach Hurricane Hut."
-      ]
+     "name": "plateau rim",
+     "quote": "The plateau rim is reached in about two hours from Lake Matiri Hut",
+     "ref": null
     },
     {
-      "id": "W3",
-      "main": false,
-      "label": "From Hurricane Hut to Wangapeka Saddle",
-      "shape": "one_way",
-      "start": {"name": "Hurricane Hut", "quote": "From Hurricane Hut to Wangapeka Saddle", "ref": "T4"},
-      "end": {"name": "Wangapeka Saddle", "quote": "Most of the distance to the Wangapeka Saddle is above the bushline", "ref": null},
-      "via": [
-        {"name": "Point 1442", "quote": "A marked route climbs to point 1442 above Hurricane Hut", "ref": null}
-      ],
-      "direction": null,
-      "time": "10-11 hr",
-      "distance": null,
-      "evidence": [
-        "This ridge top route should only be attempted by experienced parties with map and compass skills.",
-        "A marked route climbs to point 1442 above Hurricane Hut.",
-        "Most of the distance to the Wangapeka Saddle is above the bushline with only one tarn (north of point 1398) for a water stop."
-      ]
+     "name": "Poor Petes Hut",
+     "quote": "a marked route sets out across the boggy-in-places plateau to Poor Petes Hut",
+     "ref": null
+    },
+    {
+     "name": "high point of 1115 metres",
+     "quote": "The marked route from Poor Petes climbs to a high point of 1115 metres",
+     "ref": null
+    },
+    {
+     "name": "Larrikins Creek",
+     "quote": "occasionally crossing limestone creek beds",
+     "ref": null
     }
-  ],
-  "access_points": [
-    {"name": "DOC carpark at Matiri roadend", "quote": "From the DOC carpark at Matiri roadend follow the Lake Matiri Hut Track", "ref": null, "onto": "Lake Matiri Hut Track"}
-  ],
-  "side_trips": [
-    {"name": "Devils Dining Table / Hundred Acre Plateau", "quote": "the Devils Dining Table (or the Hundred Acre Plateau as it is also known)", "ref": null, "from": "Larrikins Creek Hut"},
-    {"name": "Mt Misery", "quote": "On the western rim is a bump called Mt Misery", "ref": "T11", "from": "Larrikins Creek Hut"},
-    {"name": "The Needle", "quote": "The Needle can be climbed either from the plateau or by continuing to the ridge above the tarns", "ref": "T13", "from": "Larrikins Creek Hut"},
-    {"name": "The Haystack", "quote": "a ridge traverse is possible from The Needle to The Haystack", "ref": "T12", "from": "Larrikins Creek Hut"}
-  ],
-  "huts": [
-    {"name": "Lake Matiri Hut", "quote": "Lake Matiri Hut", "ref": "T7"},
-    {"name": "Poor Petes Hut", "quote": "Poor Petes Hut", "ref": null},
-    {"name": "Larrikins Creek Hut", "quote": "Larrikins Creek Hut", "ref": null},
-    {"name": "McConchies Hut", "quote": "McConchies Hut", "ref": "T10"},
-    {"name": "Hurricane Hut", "quote": "Hurricane Hut", "ref": "T4"}
-  ],
-  "not_on_route": [
-    {"name": "Mokihinui River", "quote": "Larrikins Creek provides access to the Mokihinui River and exit options to either Seddonville or Lyell", "ref": null, "why": "other"},
-    {"name": "Unmarked route to the tops near The Haystack", "quote": "an unnamed side creek provides an arduous, unmarked route through bluffs to the tops near The Haystack", "ref": null, "why": "other"},
-    {"name": "Matiri Range", "quote": "the broken limestone Matiri Range", "ref": "T8", "why": "view"},
-    {"name": "Mt Owen massif, Mt Patriarch and Mt Kendal", "quote": "distant ranges of the Mt Owen massif, Mt Patriarch and Mt Kendal", "ref": null, "why": "view"}
-  ],
-  "doubts": "This page describes two tramping tracks (1000 Acre Plateau; Upper Matiri Valley) in hut-to-hut legs rather than one walk, so it is recorded as a network. Both tracks are reached from the DOC carpark at Matiri roadend by the Lake Matiri Hut Track (1.5 hr to Lake Matiri Hut), which has no road-end feature in the packet; the ways are started at Lake Matiri Hut as the section headings do. The page does not say whether trampers return the same way or exit elsewhere, so 'one_way' reflects only that each is described from A to B. Per-leg times are given (3 hr + 3 hr; 9 hr + 10+ hr) but not a whole-way time. Poor Petes Hut, Larrikins Creek Hut and Wangapeka Saddle have no packet entry. W3 (Hurricane Hut to Wangapeka Saddle) is an unmarked ridge-top route described under the Upper Matiri Valley heading; it could instead be considered an extension of W2. Huts lists the huts on all the described ways (McConchies Hut and Hurricane Hut are on W2, not the main way). Exits down Larrikins Creek to the Mokihinui River (to Seddonville or Lyell) are mentioned only as options for experienced trampers."
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "From the fork in the track just beyond Bay Creek a tramping track climbs abruptly up a spur.",
+    "Beyond the rim a marked route sets out across the boggy-in-places plateau to Poor Petes Hut.",
+    "The marked route from Poor Petes climbs to a high point of 1115 metres and then gradually descends a broad, undulating ridge, occasionally crossing limestone creek beds.",
+    "Maintain the level gradient through the forest on a marked route before merging into clearings where Larrikins Creek Hut sits."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Upper Matiri Valley: Lake Matiri Hut to Hurricane Hut via McConchies Hut",
+   "shape": "one_way",
+   "start": {
+    "name": "Lake Matiri Hut",
+    "quote": "Lake Matiri Hut to McConchies Hut",
+    "ref": "T7"
+   },
+   "end": {
+    "name": "Hurricane Hut",
+    "quote": "to reach Hurricane Hut",
+    "ref": "T4"
+   },
+   "via": [
+    {
+     "name": "Lake Matiri western shore",
+     "quote": "Sidle around the western shore of the lake",
+     "ref": "T6"
+    },
+    {
+     "name": "Bay Creek flats",
+     "quote": "Just beyond the open flats where Bay Creek flows into the lake",
+     "ref": "T3"
+    },
+    {
+     "name": "Matiri Valley river flats",
+     "quote": "Continue up-valley on river flats for several kilometres",
+     "ref": null
+    },
+    {
+     "name": "McConchies Hut",
+     "quote": "McConchies Hut is about half way up Matiri Valley",
+     "ref": "T10"
+    },
+    {
+     "name": "forested saddle",
+     "quote": "climb over a forested saddle",
+     "ref": null
+    },
+    {
+     "name": "Matiri River",
+     "quote": "follow it down to rejoin the Matiri River",
+     "ref": "T9"
+    },
+    {
+     "name": "Lake Jeanette",
+     "quote": "A short climb leads to Lake Jeanette",
+     "ref": "T5"
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "Sidle around the western shore of the lake through beautiful beech forest.",
+    "McConchies Hut is about half way up Matiri Valley.",
+    "Sidle the western shore of the lake and the western side of the now flat valley floor to reach Hurricane Hut."
+   ]
+  },
+  {
+   "id": "W3",
+   "main": false,
+   "label": "From Hurricane Hut to Wangapeka Saddle",
+   "shape": "one_way",
+   "start": {
+    "name": "Hurricane Hut",
+    "quote": "From Hurricane Hut to Wangapeka Saddle",
+    "ref": "T4"
+   },
+   "end": {
+    "name": "Wangapeka Saddle",
+    "quote": "Most of the distance to the Wangapeka Saddle is above the bushline",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "point 1442",
+     "quote": "A marked route climbs to point 1442 above Hurricane Hut",
+     "ref": null
+    },
+    {
+     "name": "tarn north of point 1398",
+     "quote": "only one tarn (north of point 1398) for a water stop",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "10-11 hr",
+   "distance": null,
+   "evidence": [
+    "Time: 10-11 hr",
+    "A marked route climbs to point 1442 above Hurricane Hut.",
+    "Most of the distance to the Wangapeka Saddle is above the bushline with only one tarn (north of point 1398) for a water stop."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "DOC carpark at Matiri roadend",
+   "quote": "From the DOC carpark at Matiri roadend follow the Lake Matiri Hut Track for 1.5 hr to Lake Matiri Hut.",
+   "ref": null,
+   "onto": "Lake Matiri Hut Track"
+  }
+ ],
+ "exits": [
+  {
+   "name": "Seddonville",
+   "quote": "exit options to either Seddonville or Lyell",
+   "ref": null,
+   "from": "Larrikins Creek Hut",
+   "how": "other"
+  },
+  {
+   "name": "Lyell",
+   "quote": "exit options to either Seddonville or Lyell",
+   "ref": null,
+   "from": "Larrikins Creek Hut",
+   "how": "other"
+  }
+ ],
+ "side_trips": [
+  {
+   "name": "Hundred Acre Plateau (Devils Dining Table)",
+   "quote": "To reach the Hundred Acre Plateau climb the bushy gully to the north of the hut",
+   "ref": null,
+   "from": "Larrikins Creek Hut"
+  },
+  {
+   "name": "Mt Misery",
+   "quote": "On the western rim is a bump called Mt Misery",
+   "ref": "T11",
+   "from": "Larrikins Creek Hut"
+  },
+  {
+   "name": "The Needle",
+   "quote": "The Needle can be climbed either from the plateau or by continuing to the ridge above the tarns",
+   "ref": "T13",
+   "from": "Larrikins Creek Hut"
+  },
+  {
+   "name": "The Haystack",
+   "quote": "For the agile a ridge traverse is possible from The Needle to The Haystack",
+   "ref": "T12",
+   "from": null
+  }
+ ],
+ "huts": [
+  {
+   "name": "Lake Matiri Hut",
+   "quote": "Lake Matiri Hut to Poor Petes Hut",
+   "ref": "T7"
+  },
+  {
+   "name": "Poor Petes Hut",
+   "quote": "a marked route sets out across the boggy-in-places plateau to Poor Petes Hut",
+   "ref": null
+  },
+  {
+   "name": "Larrikins Creek Hut",
+   "quote": "clearings where Larrikins Creek Hut sits",
+   "ref": null
+  },
+  {
+   "name": "McConchies Hut",
+   "quote": "McConchies Hut is about half way up Matiri Valley",
+   "ref": "T10"
+  },
+  {
+   "name": "Hurricane Hut",
+   "quote": "to reach Hurricane Hut",
+   "ref": "T4"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Lake Matiri Hut Track",
+   "quote": "follow the Lake Matiri Hut Track for 1.5 hr to Lake Matiri Hut",
+   "ref": "L1",
+   "why": "other walk"
+  },
+  {
+   "name": "unmarked route to the tops near The Haystack",
+   "quote": "an unnamed side creek provides an arduous, unmarked route through bluffs to the tops near The Haystack",
+   "ref": null,
+   "why": "other"
+  },
+  {
+   "name": "Matiri Range",
+   "quote": "the broken limestone Matiri Range",
+   "ref": "T8",
+   "why": "view"
+  },
+  {
+   "name": "Mt Owen massif, Mt Patriarch and Mt Kendal",
+   "quote": "distant ranges of the Mt Owen massif, Mt Patriarch and Mt Kendal",
+   "ref": null,
+   "why": "view"
+  }
+ ],
+ "doubts": "This page describes two tracks (1000 Acre Plateau; Upper Matiri Valley) plus the Hurricane Hut to Wangapeka Saddle section, each with its own heading, so kind is network. The 1000 Acre Plateau main way has leg times of 3 hr (Lake Matiri Hut to Poor Petes Hut) and 3 hr (Poor Petes Hut to Larrikins Creek Hut), but no whole-way time, so time is null. The Upper Matiri Valley way has leg times of 9 hr and 10+ hr, and no whole-way time, so time is null. The Lake Matiri Hut is the start of both ways (its ref T7 is the hut name). The DOC carpark at Matiri roadend has no road-end feature, so it has no ref. The fork just beyond Bay Creek is not a named place, so its ref is null. Poor Petes Hut, Larrikins Creek Hut and Wangapeka Saddle have no packet entry, so their refs are null. The Haystack side trip is described from The Needle by a ridge traverse, so from is null. Huts include McConchies Hut and Hurricane Hut, which are on the Upper Matiri Valley way rather than the main 1000 Acre Plateau way. The Upper Matiri way's 'unmarked' side-creek route to the tops is not a described way. Exits to Seddonville or Lyell are options for experienced trampers only and are recorded as exits from Larrikins Creek Hut with how 'other' because the page does not say how they are reached."
 }

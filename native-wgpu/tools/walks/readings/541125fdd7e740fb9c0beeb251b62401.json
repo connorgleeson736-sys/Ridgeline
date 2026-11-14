@@ -1,144 +1,283 @@
 {
-  "guid": "541125fd-d7e7-40fb-9c0b-eeb251b62401",
-  "kind": "network",
-  "ways": [
+ "guid": "541125fd-d7e7-40fb-9c0b-eeb251b62401",
+ "kind": "network",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Clements Mill Road to Oamaru Hut via Te Iringa",
+   "shape": "one_way",
+   "start": {
+    "name": "car park 5 km along Clements Mill Road",
+    "quote": "the car park 5 km along Clements Mill Road",
+    "ref": null
+   },
+   "end": {
+    "name": "Oamaru Hut",
+    "quote": "Oamaru Hut",
+    "ref": "T12"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Clements Mill Road to Oamaru Hut via Te Iringa",
-      "shape": "one_way",
-      "start": {"name": "car park 5 km along Clements Mill Road", "quote": "This track leaves from the car park 5 km along Clements Mill Road", "ref": null},
-      "end": {"name": "Oamaru Hut", "quote": "follow the true right of the Kaipo River down to Oamaru Hut", "ref": "T12"},
-      "via": [
-        {"name": "clearing where Te Iringa Hut used to be", "quote": "It climbs to a clearing where the Te Iringa Hut used to be", "ref": null},
-        {"name": "Mt Te Iringa", "quote": "skirts around Mt Te Iringa", "ref": "T14"},
-        {"name": "Tikitiki Stream/Kaipo River junction swingbridge", "quote": "the Tikitiki Stream/Kaipo River junction where the track forks at a swingbridge", "ref": null},
-        {"name": "Kaipo River", "quote": "follow the true right of the Kaipo River", "ref": "T9"}
-      ],
-      "direction": null,
-      "time": "6 - 8 hr",
-      "distance": "19 km",
-      "evidence": [
-        "This track leaves from the car park 5 km along Clements Mill Road.",
-        "It climbs to a clearing where the Te Iringa Hut used to be (1-2 hours), then skirts around Mt Te Iringa (1241 m), before dropping down to the Tikitiki Stream/Kaipo River junction where the track forks at a swingbridge.",
-        "Take the main track straight ahead and follow the true right of the Kaipo River down to Oamaru Hut, situated near the confluence of the Kaipo and Oamaru rivers."
-      ]
+     "name": "clearing where the Te Iringa Hut used to be",
+     "quote": "a clearing where the Te Iringa Hut used to be",
+     "ref": null
     },
     {
-      "id": "W2",
-      "main": false,
-      "label": "Taharua Road to Oamaru Hut",
-      "shape": "one_way",
-      "start": {"name": "Taharua roadend car park", "quote": "Park in the car park beside the helicopter hanger at the Taharua roadend", "ref": "F1"},
-      "end": {"name": "Oamaru Hut", "quote": "a new track links from the end of the poled route to Oamaru Hut", "ref": "T12"},
-      "via": [
-        {"name": "poled route through Poronui Station", "quote": "Follow the poled route through Poronui Station", "ref": null},
-        {"name": "Kaipō River crossing", "quote": "via a crossing of the Kaipō River", "ref": "T9"}
-      ],
-      "direction": null,
-      "time": "4 hr",
-      "distance": "12 km",
-      "evidence": [
-        "Park in the car park beside the helicopter hanger at the Taharua roadend. Follow the poled route through Poronui Station.",
-        "From near the Mohaka River a new track links from the end of the poled route to Oamaru Hut via a crossing of the Kaipō River."
-      ]
+     "name": "Mt Te Iringa",
+     "quote": "Mt Te Iringa",
+     "ref": "T14"
     },
     {
-      "id": "W3",
-      "main": false,
-      "label": "Oamaru Hut - Boyd Hut",
-      "shape": "one_way",
-      "start": {"name": "Oamaru Hut", "quote": "From Oamaru Hut the track follows the true left bank of the Oamaru River", "ref": "T12"},
-      "end": {"name": "Boyd Hut", "quote": "Boyd Hut is obscured by beech forest behind the airstrip", "ref": "T4"},
-      "via": [
-        {"name": "Oamaru River", "quote": "the true left bank of the Oamaru River", "ref": "T17"},
-        {"name": "Waitawhero Stream", "quote": "following the Waitawhero Stream up to a saddle", "ref": "T16"},
-        {"name": "saddle", "quote": "up to a saddle", "ref": "T15"},
-        {"name": "Boyd airstrip", "quote": "the Boyd airstrip", "ref": null}
-      ],
-      "direction": null,
-      "time": "4 - 6 hr",
-      "distance": "16 km",
-      "evidence": [
-        "From Oamaru Hut the track follows the true left bank of the Oamaru River before crossing the headwaters and following the Waitawhero Stream up to a saddle.",
-        "Across the valley the Boyd airstrip can be seen. Boyd Hut is obscured by beech forest behind the airstrip."
-      ]
+     "name": "Tikitiki Stream/Kaipo River junction swingbridge",
+     "quote": "the Tikitiki Stream/Kaipo River junction",
+     "ref": null
     },
     {
-      "id": "W4",
-      "main": false,
-      "label": "Boyd Hut to Cascade Hut via Maungaorangi",
-      "shape": "one_way",
-      "start": {"name": "Boyd Hut", "quote": "This strenuous track from Boyd Hut", "ref": "T4"},
-      "end": {"name": "Cascade Hut", "quote": "on down to Cascade Hut", "ref": "T5"},
-      "via": [
-        {"name": "Waitawhero Saddle", "quote": "Waitawhero Saddle", "ref": "T15"},
-        {"name": "confluence of the Waitawhero and Oamaru streams", "quote": "Near the confluence of the Waitawhero and Oamaru streams", "ref": null},
-        {"name": "Maungaorangi", "quote": "a long, steep ridge up Maungaorangi", "ref": "T11"},
-        {"name": "Te Waiotupuritia Saddle", "quote": "Te Waiotupuritia Saddle", "ref": null}
-      ],
-      "direction": null,
-      "time": "10 - 12 hr",
-      "distance": "22 km",
-      "evidence": [
-        "This strenuous track from Boyd Hut follows the track over Waitawhero Saddle towards Oamaru Hut.",
-        "Near the confluence of the Waitawhero and Oamaru streams the route turns left onto a long, steep ridge up Maungaorangi.",
-        "It then descends to Te Waiotupuritia Saddle and on down to Cascade Hut."
-      ]
-    },
-    {
-      "id": "W5",
-      "main": false,
-      "label": "Te Iringa / Oamaru Hut Track - Cascade Hut (Upper Kaipo Valley Route / Kaipo Track)",
-      "shape": "one_way",
-      "start": {"name": "swingbridge on the Te Iringa/Oamaru Track", "quote": "the swingbridge on the Te Iringa/Oamaru Track", "ref": null},
-      "end": {"name": "Cascade Hut", "quote": "The right-hand track heads downstream for another 30 minutes to Cascade Hut", "ref": "T5"},
-      "via": [
-        {"name": "upper Kaipo River", "quote": "In the upper reaches of the Kaipo River", "ref": "T9"},
-        {"name": "ridge just south of Kaipo Saddle", "quote": "a ridge just south of Kaipo Saddle", "ref": null},
-        {"name": "Cascade Stream track junction", "quote": "Descend off the ridge to Cascade Stream and the track junction", "ref": "T6"}
-      ],
-      "direction": null,
-      "time": "6 - 9 hr",
-      "distance": "13 km",
-      "evidence": [
-        "A marked route runs from the swingbridge on the Te Iringa/Oamaru Track to Cascade Hut.",
-        "The track then climbs to a ridge just south of Kaipo Saddle. Descend off the ridge to Cascade Stream and the track junction.",
-        "The right-hand track heads downstream for another 30 minutes to Cascade Hut."
-      ]
-    },
-    {
-      "id": "W6",
-      "main": false,
-      "label": "Cascade Hut to Clements Mill Road (Hinemaiaia Track)",
-      "shape": "one_way",
-      "start": {"name": "Cascade Hut", "quote": "Cascade Hut to Clements Mill Road", "ref": "T5"},
-      "end": {"name": "Clements Mill roadend", "quote": "The track drops down to the Clements Mill roadend", "ref": null},
-      "via": [
-        {"name": "Tauranga-Taupo River flats", "quote": "the open river flats of the Tauranga-Taupo River", "ref": null},
-        {"name": "Hinemaiaia Stream", "quote": "following the Hinemaiaia Stream", "ref": "T7"}
-      ],
-      "direction": null,
-      "time": "4 - 5 hr",
-      "distance": "12 km",
-      "evidence": [
-        "The track follows the open river flats of the Tauranga-Taupo River downstream before climbing away from the river up a prominent beech-covered ridge.",
-        "The track drops down to the Clements Mill roadend following the Hinemaiaia Stream and its tributaries."
-      ]
+     "name": "Kaipo River",
+     "quote": "the Kaipo River",
+     "ref": "T9"
     }
-  ],
-  "access_points": [],
-  "side_trips": [
-    {"name": "Taharua River fishing side tracks", "quote": "marked side tracks to the Taharua River", "ref": "T13", "from": "poled route through Poronui Station"}
-  ],
-  "huts": [
-    {"name": "Oamaru Hut", "quote": "Oamaru Hut", "ref": "T12"},
-    {"name": "Boyd Hut", "quote": "Boyd Hut", "ref": "T4"},
-    {"name": "Cascade Hut", "quote": "Cascade Hut", "ref": "T5"}
-  ],
-  "not_on_route": [
-    {"name": "Te Iringa Hut", "quote": "Te Iringa Hut has burnt down and will not be replaced", "ref": null, "why": "other"},
-    {"name": "Mohaka River", "quote": "From near the Mohaka River", "ref": null, "why": "nearby"}
-  ],
-  "doubts": "This page covers several tracks of a hut network, so it is recorded as a network with each described track as its own way; W1 is marked main only because it comes first. No road-end feature exists for Clements Mill Road, so the Clements Mill starts/ends have no ref. F1 is the only road end on Taharua Road and was taken as the Taharua roadend car park, but the text gives no detail to confirm it. The saddle in W3 is taken to be Waitawhero Saddle (T15) because W4 says the Boyd Hut track goes 'over Waitawhero Saddle towards Oamaru Hut'. The text does not say whether trips are one way or return; ways are A-to-B track sections."
+   ],
+   "direction": null,
+   "time": "6 - 8 hr",
+   "distance": "19 km",
+   "evidence": [
+    "This track leaves from the car park 5 km along Clements Mill Road.",
+    "Take the main track straight ahead and follow the true right of the Kaipo River down to Oamaru Hut, situated near the confluence of the Kaipo and Oamaru rivers."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Taharua Road to Oamaru Hut",
+   "shape": "one_way",
+   "start": {
+    "name": "Taharua roadend car park",
+    "quote": "Park in the car park beside the helicopter hanger at the Taharua roadend.",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Oamaru Hut",
+    "quote": "Oamaru Hut",
+    "ref": "T12"
+   },
+   "via": [
+    {
+     "name": "poled route through Poronui Station",
+     "quote": "Follow the poled route through Poronui Station.",
+     "ref": null
+    },
+    {
+     "name": "Kaipō River",
+     "quote": "a crossing of the Kaipō River",
+     "ref": "T9",
+     "how": "ford"
+    }
+   ],
+   "direction": null,
+   "time": "4 hr",
+   "distance": "12 km",
+   "evidence": [
+    "Park in the car park beside the helicopter hanger at the Taharua roadend. Follow the poled route through Poronui Station.",
+    "From near the Mohaka River a new track links from the end of the poled route to Oamaru Hut via a crossing of the Kaipō River."
+   ]
+  },
+  {
+   "id": "W3",
+   "main": false,
+   "label": "Oamaru Hut to Boyd Hut",
+   "shape": "one_way",
+   "start": {
+    "name": "Oamaru Hut",
+    "quote": "From Oamaru Hut",
+    "ref": "T12"
+   },
+   "end": {
+    "name": "Boyd Hut",
+    "quote": "Boyd Hut",
+    "ref": "T4"
+   },
+   "via": [
+    {
+     "name": "Oamaru River",
+     "quote": "the Oamaru River",
+     "ref": "T17"
+    },
+    {
+     "name": "headwaters of the Oamaru River",
+     "quote": "crossing the headwaters",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Waitawhero Stream",
+     "quote": "the Waitawhero Stream",
+     "ref": "T16"
+    },
+    {
+     "name": "saddle",
+     "quote": "a saddle",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "4 - 6 hr",
+   "distance": "16 km",
+   "evidence": [
+    "From Oamaru Hut the track follows the true left bank of the Oamaru River before crossing the headwaters and following the Waitawhero Stream up to a saddle.",
+    "Boyd Hut is obscured by beech forest behind the airstrip."
+   ]
+  },
+  {
+   "id": "W4",
+   "main": false,
+   "label": "Boyd Hut to Cascade Hut via Maungaorangi",
+   "shape": "one_way",
+   "start": {
+    "name": "Boyd Hut",
+    "quote": "Boyd Hut",
+    "ref": "T4"
+   },
+   "end": {
+    "name": "Cascade Hut",
+    "quote": "Cascade Hut",
+    "ref": "T5"
+   },
+   "via": [
+    {
+     "name": "Waitawhero Saddle",
+     "quote": "Waitawhero Saddle",
+     "ref": "T15"
+    },
+    {
+     "name": "confluence of the Waitawhero and Oamaru streams",
+     "quote": "the confluence of the Waitawhero and Oamaru streams",
+     "ref": null
+    },
+    {
+     "name": "Maungaorangi",
+     "quote": "Maungaorangi",
+     "ref": "T11"
+    },
+    {
+     "name": "Te Waiotupuritia Saddle",
+     "quote": "Te Waiotupuritia Saddle",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "10 - 12 hr",
+   "distance": "22 km",
+   "evidence": [
+    "This strenuous track from Boyd Hut follows the track over Waitawhero Saddle towards Oamaru Hut.",
+    "It then descends to Te Waiotupuritia Saddle and on down to Cascade Hut."
+   ]
+  },
+  {
+   "id": "W5",
+   "main": false,
+   "label": "Te Iringa / Oamaru Hut Track to Cascade Hut (Upper Kaipo Valley Route / Kaipo Track)",
+   "shape": "one_way",
+   "start": {
+    "name": "swingbridge on the Te Iringa/Oamaru Track",
+    "quote": "the swingbridge on the Te Iringa/Oamaru Track",
+    "ref": null
+   },
+   "end": {
+    "name": "Cascade Hut",
+    "quote": "Cascade Hut",
+    "ref": "T5"
+   },
+   "via": [
+    {
+     "name": "upper Kaipo River",
+     "quote": "the upper reaches of the Kaipo River",
+     "ref": "T9",
+     "how": "ford"
+    },
+    {
+     "name": "ridge just south of Kaipo Saddle",
+     "quote": "a ridge just south of Kaipo Saddle",
+     "ref": null
+    },
+    {
+     "name": "Cascade Stream",
+     "quote": "Cascade Stream",
+     "ref": "T6"
+    }
+   ],
+   "direction": null,
+   "time": "6 - 9 hr",
+   "distance": "13 km",
+   "evidence": [
+    "A marked route runs from the swingbridge on the Te Iringa/Oamaru Track to Cascade Hut.",
+    "The right-hand track heads downstream for another 30 minutes to Cascade Hut."
+   ]
+  },
+  {
+   "id": "W6",
+   "main": false,
+   "label": "Cascade Hut to Clements Mill Road (Hinemaiaia Track)",
+   "shape": "one_way",
+   "start": {
+    "name": "Cascade Hut",
+    "quote": "Cascade Hut",
+    "ref": "T5"
+   },
+   "end": {
+    "name": "Clements Mill roadend",
+    "quote": "the Clements Mill roadend",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Tauranga-Taupo River",
+     "quote": "the Tauranga-Taupo River",
+     "ref": null
+    },
+    {
+     "name": "Hinemaiaia Stream",
+     "quote": "the Hinemaiaia Stream",
+     "ref": "T7"
+    }
+   ],
+   "direction": null,
+   "time": "4 - 5 hr",
+   "distance": "12 km",
+   "evidence": [
+    "The track follows the open river flats of the Tauranga-Taupo River downstream before climbing away from the river up a prominent beech-covered ridge.",
+    "The track drops down to the Clements Mill roadend following the Hinemaiaia Stream and its tributaries."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Boyd Airstrip",
+   "quote": "Boyd Airstrip",
+   "ref": null,
+   "onto": "Boyd Hut"
+  }
+ ],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Oamaru Hut",
+   "quote": "Oamaru Hut",
+   "ref": "T12"
+  },
+  {
+   "name": "Boyd Hut",
+   "quote": "Boyd Hut",
+   "ref": "T4"
+  },
+  {
+   "name": "Cascade Hut",
+   "quote": "Cascade Hut",
+   "ref": "T5"
+  }
+ ],
+ "not_on_route": [],
+ "doubts": "Page covers several hut tracks of a network; each described track is a way, W1 first as main only by order. Shapes recorded one_way as sections are A to B; page does not say walkers return. F1 is the only road end on Taharua Road and was taken as the Taharua roadend car park (text gives no further detail). No feature for Clements Mill Road car park/roadend. W3 saddle is probably Waitawhero Saddle (W4 mentions it on the Boyd Hut to Oamaru Hut track) but the W3 text just says 'a saddle', so no ref. The headwaters crossing in W3 and the upper Kaipo River crossings in W5 are fords (no bridge mentioned). Te Iringa Hut has burnt down and is not a hut. Boyd Airstrip access point is for aircraft; page does not say it joins Boyd Hut directly, though the airstrip lies near it. The page does not link Boyd Airstrip to a track, so 'onto' is a loose inference."
 }

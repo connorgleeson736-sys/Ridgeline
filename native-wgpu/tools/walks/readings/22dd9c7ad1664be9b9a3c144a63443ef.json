@@ -1,52 +1,149 @@
 {
-  "guid": "22dd9c7a-d166-4be9-b9a3-c144a63443ef",
-  "kind": "one_way",
-  "ways": [
+ "guid": "22dd9c7a-d166-4be9-b9a3-c144a63443ef",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "SH73 near the Mingha confluence over Taruahuna Pass and down the Otehake to SH73 at Aickens",
+   "shape": "one_way",
+   "start": {
+    "name": "SH73, 5 km south of Arthur's Pass village",
+    "quote": "The east-coast end of the track starts beside SH73, 5 km south of Arthur's Pass village, just after the Mingha bluffs.",
+    "ref": "F2"
+   },
+   "end": {
+    "name": "SH73 at Aickens",
+    "quote": "SH73 at Aickens",
+    "ref": "T4"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "SH73 near the Mingha confluence over Taruahuna Pass and down the Otehake to SH73 at Aickens",
-      "shape": "one_way",
-      "start": {"name": "SH73 by the Bealey-Mingha confluence", "quote": "SH73, 5 km south of Arthur's Pass village, just after the Mingha bluffs", "ref": "F2"},
-      "end": {"name": "SH73 at Aickens", "quote": "SH73 at Aickens", "ref": "T4"},
-      "via": [
-        {"name": "Bealey River", "quote": "Bealey River", "ref": null},
-        {"name": "Edwards River East Branch", "quote": "Edwards River East Branch", "ref": "T8"},
-        {"name": "Edwards Hut", "quote": "Edwards Hut", "ref": "T6"},
-        {"name": "Taruahuna Pass", "quote": "Taruahuna Pass", "ref": "T16"},
-        {"name": "Otehake Hut", "quote": "Otehake Hut", "ref": "T13"},
-        {"name": "Whaiti Stream", "quote": "Whaiti Stream", "ref": "T17"},
-        {"name": "Lake Kaurapataka Track", "quote": "Lake Kaurapataka Track", "ref": "T2"},
-        {"name": "Lake Kaurapataka", "quote": "Lake Kaurapataka", "ref": "T10"},
-        {"name": "Pfeifer Creek", "quote": "Pfeifer Creek", "ref": "T14"},
-        {"name": "Taramakau valley", "quote": "Taramakau valley", "ref": null},
-        {"name": "Otira River", "quote": "Otira River", "ref": null}
-      ],
-      "direction": null,
-      "time": "2 - 3 days",
-      "distance": null,
-      "evidence": [
-        "The east-coast end of the track starts beside SH73, 5 km south of Arthur's Pass village, just after the Mingha bluffs. The west-coast end of the track starts beside SH73 at Aickens, where the Taramakau River meets the Otira River.",
-        "Cross the Bealey River just above its confluence with the Mingha River, 5 km south of Arthur’s Pass village.",
-        "The track begins at the bush edge, downstream of the Edwards-Mingha confluence.",
-        "Cross the Otira River (if fordable) over to SH73 at Aickens."
-      ]
+     "name": "Bealey River",
+     "quote": "Cross the Bealey River just above its confluence with the Mingha River",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Edwards River East Branch",
+     "quote": "Cross the east branch of the Edwards River",
+     "ref": "T8",
+     "how": "ford"
+    },
+    {
+     "name": "Edwards Hut",
+     "quote": "Edwards Hut",
+     "ref": "T6"
+    },
+    {
+     "name": "Taruahuna Pass",
+     "quote": "Taruahuna Pass",
+     "ref": "T16"
+    },
+    {
+     "name": "Lake Sally side river",
+     "quote": "Ford this side river",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Otehake Hut",
+     "quote": "Otehake Hut",
+     "ref": "T13"
+    },
+    {
+     "name": "Whaiti Stream",
+     "quote": "Whaiti Stream",
+     "ref": "T17"
+    },
+    {
+     "name": "Lake Kaurapataka Track",
+     "quote": "Follow the Lake Kaurapataka Track along the south side of the lake.",
+     "ref": "T2"
+    },
+    {
+     "name": "Lake Kaurapataka",
+     "quote": "Lake Kaurapataka",
+     "ref": "T10"
+    },
+    {
+     "name": "Pfeifer Creek",
+     "quote": "Cross Pfeifer Creek to the true left",
+     "ref": "T14",
+     "how": "ford"
+    },
+    {
+     "name": "4WD road down the Taramakau valley",
+     "quote": "Follow this road down the Taramakau valley",
+     "ref": null,
+     "how": "road"
+    },
+    {
+     "name": "Otira River",
+     "quote": "Cross the Otira River (if fordable) over to SH73 at Aickens.",
+     "ref": null,
+     "how": "ford"
     }
-  ],
-  "access_points": [
-    {"name": "SH73 at Aickens", "quote": "SH73 at Aickens", "ref": "T4", "onto": null}
-  ],
-  "side_trips": [
-    {"name": "hot sulphur spring", "quote": "hot sulphur spring", "ref": null, "from": "island in the Otehake riverbed"}
-  ],
-  "huts": [
-    {"name": "Edwards Hut", "quote": "Edwards Hut", "ref": "T6"},
-    {"name": "Otehake Hut", "quote": "Otehake Hut", "ref": "T13"}
-  ],
-  "not_on_route": [
-    {"name": "Falling Mountain", "quote": "Falling Mountain", "ref": "T9", "why": "other"},
-    {"name": "Morrison footbridge", "quote": "Morrison footbridge", "ref": null, "why": "other"},
-    {"name": "Arthur's Pass Visitor Centre", "quote": "Arthur's Pass Visitor Centre", "ref": null, "why": "other"}
-  ],
-  "doubts": "Start ref F2 is the road end where the Mingha Track meets West Coast Road (SH73); the text starts by crossing the Bealey River above the Mingha confluence 5 km south of Arthur's Pass village, which appears to be the same place, but the feature is named for the Mingha Track rather than an Edwards track. The end at Aickens has no road end feature, so the Aickens place (T4) is given. Between Taruahuna Pass and the Lake Sally side river, and below the hot springs, the text gives alternative river or track options; only the shared places are listed. The flood track to the Morrison footbridge is an emergency alternative if the Otira River cannot be forded, not recorded as a way. The walk can also be done from the Aickens end ('Parties travelling from North to South'), recorded as an access point."
+   ],
+   "direction": null,
+   "time": "2 - 3 days",
+   "distance": null,
+   "evidence": [
+    "The east-coast end of the track starts beside SH73, 5 km south of Arthur's Pass village, just after the Mingha bluffs. The west-coast end of the track starts beside SH73 at Aickens, where the Taramakau River meets the Otira River.",
+    "Cross the Bealey River just above its confluence with the Mingha River, 5 km south of Arthur’s Pass village.",
+    "Cross the Otira River (if fordable) over to SH73 at Aickens."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [
+  {
+   "name": "Otira River flood track to the Morrison footbridge",
+   "quote": "back-track to the flood track that travels up the true right of the river to the Morrison footbridge",
+   "ref": null,
+   "from": "Otira River",
+   "how": "track"
+  }
+ ],
+ "side_trips": [
+  {
+   "name": "hot sulphur spring",
+   "quote": "a hot sulphur spring in the old riverbed on the far side",
+   "ref": null,
+   "from": "island in the Otehake riverbed"
+  },
+  {
+   "name": "grassy area beside Lake Kaurapataka",
+   "quote": "a short side-track on the right leads to a level grassy area beside the lake",
+   "ref": null,
+   "from": "Lake Kaurapataka"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Edwards Hut",
+   "quote": "Edwards Hut",
+   "ref": "T6"
+  },
+  {
+   "name": "Otehake Hut",
+   "quote": "Otehake Hut",
+   "ref": "T13"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Falling Mountain",
+   "quote": "Falling Mountain",
+   "ref": "T9",
+   "why": "view"
+  },
+  {
+   "name": "Tarn Col",
+   "quote": "Tarn Col",
+   "ref": "T15",
+   "why": "nearby"
+  }
+ ],
+ "doubts": "Start ref F2 (Mingha Track meets West Coast Road) is taken as the SH73 start 5 km south of Arthur's Pass village; the feature is named for the Mingha Track, not this route. Aickens has no road end feature, so T4 (place) is given. Between Taruahuna Pass and the Lake Sally side river, and below the hot springs, the text gives alternative river or track options; only shared places are listed. The page says to cross the Bealey River first and the Otira River 'if fordable'; Otehake itself is not crossed. Whaiti Stream recorded as a plain via (crossing implied, not instructed)."
 }

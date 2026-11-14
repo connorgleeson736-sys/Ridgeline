@@ -1,41 +1,93 @@
 {
-  "guid": "9d81d0d5-44ca-4250-944c-67ee6c13c683",
-  "kind": "one_way",
-  "ways": [
+ "guid": "9d81d0d5-44ca-4250-944c-67ee6c13c683",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Upper Caples junction to Greenstone valley via Steele Creek",
+   "shape": "one_way",
+   "start": {
+    "name": "Upper Caples Valley junction",
+    "quote": "Starting from Upper Caples Valley junction (sign-posted)",
+    "ref": null
+   },
+   "end": {
+    "name": "Greenstone valley",
+    "quote": "until you reach the Greenstone valley",
+    "ref": null
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Steele Creek Track, Upper Caples Valley junction to the Greenstone valley",
-      "shape": "one_way",
-      "start": {"name": "Upper Caples Valley junction", "quote": "Starting from Upper Caples Valley junction (sign-posted)", "ref": null},
-      "end": {"name": "Greenstone valley (Steele Creek and Greenstone Track junction)", "quote": "windfall might be present until you reach the Greenstone valley", "ref": null},
-      "via": [
-        {"name": "Steele Creek pass (saddle)", "quote": "the track climbs steeply through tussocks until reaching the saddle", "ref": null},
-        {"name": "Steele Creek", "quote": "The track then continues from the saddle down to Steele Creek and follows the creek.", "ref": "T8"},
-        {"name": "Steele Creek Hut", "quote": "Once at Steele Creek Hut", "ref": "T9"}
-      ],
-      "direction": null,
-      "time": null,
-      "distance": "15 km one way",
-      "evidence": [
-        "Starting from Upper Caples Valley junction (sign-posted), the track goes uphill through the beech forest.",
-        "Once at Steele Creek Hut, the track descends into the forest, windfall might be present until you reach the Greenstone valley.",
-        "New Zealand Deer Stalkers Association – Southern Lakes have huts that can be booked by the public at Upper Caples and Mid Greenstone where the Steele Creek track intersects with the main Greenstone Caples tracks."
-      ]
+     "name": "saddle (Steele Creek pass)",
+     "quote": "the track climbs steeply through tussocks until reaching the saddle",
+     "ref": null
+    },
+    {
+     "name": "Steele Creek",
+     "quote": "The track then continues from the saddle down to Steele Creek and follows the creek.",
+     "ref": "T8"
+    },
+    {
+     "name": "Steele Creek Hut",
+     "quote": "Once at Steele Creek Hut",
+     "ref": "T9"
     }
-  ],
-  "access_points": [
-    {"name": "Greenstone Road end/car park", "quote": "Greenstone Road end/car park to Upper Caples junction: 5 hr (16 km)", "ref": null, "onto": "Upper Caples junction"},
-    {"name": "The Divide car park", "quote": "The Divide car park (Routeburn Track/Milford Road) to the Upper Caples/Steele Creek Junction via McKellar Saddle: 5-6 hrs (17 km)", "ref": null, "onto": "Upper Caples/Steele Creek Junction"}
-  ],
-  "side_trips": [],
-  "huts": [
-    {"name": "Steele Creek Hut", "quote": "Steele Creek Hut", "ref": "T9"}
-  ],
-  "not_on_route": [
-    {"name": "Fraser and Kay Creeks", "quote": "good views of Fraser and Kay Creeks", "ref": null, "why": "view"},
-    {"name": "NZDA huts at Upper Caples and Mid Greenstone", "quote": "huts that can be booked by the public at Upper Caples and Mid Greenstone", "ref": null, "why": "nearby"},
-    {"name": "McKellar Saddle", "quote": "McKellar Saddle", "ref": "T5", "why": "other"}
-  ],
-  "doubts": "Neither end is a road end: the track runs between the Upper Caples Valley junction and its junction with the Greenstone track in the Greenstone valley, so both refs are null (they are junctions on the Caples Track T1 and Greenstone Track T2, but not those tracks themselves). Shape is from DOC's '15 km one way'; the page does not describe a return. Direction of travel recorded as described (Caples to Greenstone); the getting-there notes imply it can be joined from either end. DOC gives no time. McKellar Saddle lies on the access route from The Divide, not on the Steele Creek Track itself."
+   ],
+   "direction": null,
+   "time": null,
+   "distance": "15 km one way",
+   "evidence": [
+    "Starting from Upper Caples Valley junction (sign-posted), the track goes uphill through the beech forest.",
+    "The track then continues from the saddle down to Steele Creek and follows the creek.",
+    "Once at Steele Creek Hut, the track descends into the forest, windfall might be present until you reach the Greenstone valley."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Greenstone Road end/car park",
+   "quote": "Greenstone Road end/car park to Upper Caples junction: 5 hr (16 km)",
+   "ref": null,
+   "onto": "Upper Caples junction"
+  },
+  {
+   "name": "The Divide car park",
+   "quote": "The Divide car park (Routeburn Track/Milford Road) to the Upper Caples/Steele Creek Junction via McKellar Saddle",
+   "ref": null,
+   "onto": "Steele Creek Track"
+  }
+ ],
+ "exits": [
+  {
+   "name": "Greenstone Road end/car park",
+   "quote": "Greenstone and Steele Creek Track junction to Greenstone Road end/car park: 6 hr (18 km)",
+   "ref": null,
+   "from": "Greenstone valley",
+   "how": "track"
+  }
+ ],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Steele Creek Hut",
+   "quote": "Once at Steele Creek Hut",
+   "ref": "T9"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Upper Caples",
+   "quote": "huts that can be booked by the public at Upper Caples and Mid Greenstone",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "McKellar Saddle",
+   "quote": "via McKellar Saddle",
+   "ref": "T5",
+   "why": "other walk"
+  }
+ ],
+ "doubts": "One way: the track is described from the Upper Caples junction down to the Greenstone valley, so it is recorded as one way. The start and end are given as junctions and a valley with no feature or name entry, so their refs are null. The Greenstone Road end/car park and the Divide car park are the other routes that reach the junctions; they are recorded as access points, and the Greenstone leg from the junction to the road end is recorded as an exit. The page gives no time for the Steele Creek Track itself (the times in Getting there are for the connecting walks), so time is null; the distance of 15 km one way is DOC's summary. The saddle the track climbs to is taken as the Steele Creek pass (1359 m) that the page mentions in winter; it is not matched to McKellar Saddle. The creek crossings are described only as 'multiple creeks, normally low when dry', so none is recorded. Pass Burn and Slip Flat are in the names list but are not walked on this track, so they are left out."
 }
