@@ -48,6 +48,8 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     /** A loop walk's line closed over the map's tracks; see MapLayers.closeWalk. */
     var closeWalk:(List<Coordinate>,Double,Boolean?,(List<Coordinate>?)->Unit)->Unit={_,_,_,cb->cb(null)}
     private val LOOP=Regex("\\b(loop|circuit)\\b",RegexOption.IGNORE_CASE)
+    /** Walks are shown on DOC's own line (as up to 0.1.46), not compiled or rerouted. */
+    private val DOC_ROUTES=true
     /** A walk's start and end options; see MapLayers.walkOptions. */
     var walkOptions:(String,List<DocPages.Leg>,List<DocPages.Start>,String,String,List<List<Coordinate>>,(WalkOptions.Choice?)->Unit)->Unit={_,_,_,_,_,_,cb->cb(null)}
     private val main=Handler(Looper.getMainLooper())
@@ -422,10 +424,10 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
                 if(c!=null)showChoice(id,c,level)else follow()}
             else follow()
             }
-            // The walk as compiled offline from its DOC page (read, followed over the
-            // map's tracks and checked): verified, shown as compiled; flagged, DOC's own
-            // line. Walks DOC has added since are worked out here as before.
-            walkRecord(guid){rec->
+            // The walk as DOC draws it (its own line, as in DOC's GPX): DOC's pieces joined
+            // end to end from where it was tapped, not rerouted. Without a DOC line, the
+            // map's tracks of the walk's name. (Compiled and rerouted walks: [DOC_ROUTES] off.)
+            if(!DOC_ROUTES){walkRecord(guid){rec->
                 if(id!=request)return@walkRecord
                 if(rec==null){runtime();return@walkRecord}
                 pageLegs=DocPages.legs(pageSections);recordHuts=rec.huts
@@ -435,7 +437,10 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
                     if(line.size>=2)lineFound(id,line)
                     else mapLine(name.text.toString(),at){paths->if(id==request)lineFound(id,DocTracks.chain(paths,at))}
                 }
-            }
+            };return@walkRoute}
+            val line=DocTracks.chain(docPaths,at,3000.0)
+            if(line.size>=2)lineFound(id,line)
+            else mapLine(name.text.toString(),at){paths->if(id==request)lineFound(id,DocTracks.chain(paths,at))}
         }
     }
     /** A compiled walk's ways as From and To choices (loops have no To). */
