@@ -1,0 +1,45 @@
+{
+  "guid": "f8ff1a13-d9f1-4313-baa6-c85d6fff76cb",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Mangakukeke Road end to Kawhatau Base and Rangitane Road bridge",
+      "shape": "one_way",
+      "start": {"name": "Mangakukeke Road end", "quote": "Mangakukeke Road end to Purity Hut", "ref": null},
+      "end": {"name": "Rangitane Road bridge", "quote": "Head downstream for approximately 9.5 km to the Rangitane Road bridge", "ref": null},
+      "via": [
+        {"name": "Purity Hut Track", "quote": "Climb the marked Purity Hut Track", "ref": "L1"},
+        {"name": "Purity Hut", "quote": "to Purity Hut, nestled above the bushline", "ref": "T7"},
+        {"name": "Wooden Peg", "quote": "Wooden Peg (1672 m)", "ref": "T9"},
+        {"name": "Iron Peg", "quote": "Iron Peg (1703 m)", "ref": "T3"},
+        {"name": "Mangaweka Trig", "quote": "Mangaweka Trig (1733 m)", "ref": "T5"},
+        {"name": "Hikurangi Range tops", "quote": "the open tussock tops of the Hikurangi Range", "ref": "T2"},
+        {"name": "McKinnon Hut", "quote": "to McKinnon Hut sitting just above the bushline", "ref": "T6"},
+        {"name": "McKinnon Hut Track", "quote": "Walk back on the McKinnon Hut Track", "ref": "L2"},
+        {"name": "cableway across the Kawhatau River", "quote": "the cableway across the Kawhatau River", "ref": null},
+        {"name": "Kawhatau Base", "quote": "From Kawhatau Base, go through the gate and down to the Kawhatau River", "ref": null},
+        {"name": "Kawhatau River", "quote": "Head downstream for approximately 9.5 km", "ref": "T4"}
+      ],
+      "direction": null,
+      "time": "3-4 days",
+      "distance": null,
+      "evidence": [
+        "Climb the marked Purity Hut Track through farmland and forest to Purity Hut, nestled above the bushline on the Hikurangi Range.",
+        "Travel is then possible right along the open tussock tops of the Hikurangi Range to McKinnon Hut sitting just above the bushline down a short side ridge at the northern end.",
+        "Walk back on the McKinnon Hut Track along the crest of the Hikurangi Range from McKinnon Hut and down the long ridge to the cableway across the Kawhatau River.",
+        "From Kawhatau Base, go through the gate and down to the Kawhatau River. Head downstream for approximately 9.5 km to the Rangitane Road bridge.",
+        "You will need to make transport arrangements as the start and end points of this hike are different."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [],
+  "huts": [
+    {"name": "Purity Hut", "quote": "Purity Hut", "ref": "T7"},
+    {"name": "McKinnon Hut", "quote": "McKinnon Hut", "ref": "T6"}
+  ],
+  "not_on_route": [],
+  "doubts": "The walk is named 'Purity to Kawhatau Base', but since vehicle access to Kawhatau Base is no longer available the page adds a final leg down the Kawhatau River to the Rangitane Road bridge, so the end is taken as the bridge (no feature or name entry for it). No road end feature exists for the Mangakukeke Road end start. Mangaweka Trig is matched to the peak 'Mangaweka' (T5) by position along the tops; Kawhatau Base has no entry."
+}

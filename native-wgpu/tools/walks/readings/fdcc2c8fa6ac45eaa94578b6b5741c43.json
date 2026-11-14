@@ -1,0 +1,78 @@
+{
+  "guid": "fdcc2c8f-a6ac-45ea-a945-78b6b5741c43",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Lewis Pass picnic area to Boyle shelter",
+      "shape": "one_way",
+      "start": {"name": "Lewis Pass picnic area", "quote": "the Lewis Pass picnic area", "ref": "F5"},
+      "end": {"name": "Boyle shelter and car park", "quote": "the shelter and car park at SH7by the Boyle settlement", "ref": "F4"},
+      "via": [
+        {"name": "Tarn Nature Walk", "quote": "Tarn Nature Walk", "ref": null},
+        {"name": "Cannibal Gorge", "quote": "Cannibal Gorge", "ref": "T14"},
+        {"name": "swing bridge across Cannibal Gorge", "quote": "A swing bridge crosses Cannibal Gorge", "ref": null},
+        {"name": "Cannibal Gorge Hut", "quote": "Cannibal Gorge Hut", "ref": "T15"},
+        {"name": "Maruia River", "quote": "Maruia River", "ref": null},
+        {"name": "Ada Pass Hut", "quote": "Ada Pass Hut", "ref": "T6"},
+        {"name": "Ada Pass", "quote": "Ada Pass", "ref": "T5"},
+        {"name": "Ada River", "quote": "Ada River", "ref": "T7"},
+        {"name": "Christopher (Ada) Cullers Hut", "quote": "Christopher (Ada) Cullers Hut", "ref": "T16"},
+        {"name": "Christopher Hut", "quote": "Christopher Hut", "ref": "T17"},
+        {"name": "Henry / Waiau valley confluence", "quote": "the Henry / Waiau valley confluence", "ref": null},
+        {"name": "suspension bridge over the Henry River", "quote": "a suspension bridge over the Henry River", "ref": null},
+        {"name": "Anne Hut", "quote": "Anne Hut", "ref": "T8"},
+        {"name": "footbridge over the Anne River", "quote": "a footbridge over the Anne River", "ref": null},
+        {"name": "Anne Saddle", "quote": "Anne Saddle", "ref": "T10"},
+        {"name": "Boyle Flats", "quote": "Boyle Flats", "ref": null},
+        {"name": "Rokeby Hut", "quote": "Rokeby Hut", "ref": "T22"},
+        {"name": "suspension bridge over the Boyle River", "quote": "a suspension bridge over the Boyle River", "ref": null},
+        {"name": "Boyle Flat Hut", "quote": "Boyle Flat Hut", "ref": "T11"},
+        {"name": "Magdalen Hut", "quote": "Magdalen Hut", "ref": "T20"}
+      ],
+      "direction": null,
+      "time": "5 days",
+      "distance": "66 km one way",
+      "evidence": [
+        "This description covers the walk beginning at the Lewis Pass picnic area and ending at the Boyle shelter.",
+        "A vehicle track is joined and followed down the valley to the shelter and car park at SH7by the Boyle settlement.",
+        "If you have your own transport you should begin the walk from the top end of the Lewis Pass and finish at the car park near Boyle settlement."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "Descent into Cannibal Gorge (shorter walk)",
+      "shape": null,
+      "start": {"name": "Lewis Pass picnic area", "quote": "the Lewis Pass picnic area", "ref": "F5"},
+      "end": {"name": "Cannibal Gorge", "quote": "Cannibal Gorge", "ref": "T14"},
+      "via": [
+        {"name": "Tarn Nature Walk", "quote": "Tarn Nature Walk", "ref": null}
+      ],
+      "direction": null,
+      "time": null,
+      "distance": null,
+      "evidence": [
+        "For family groups the descent into Cannibal Gorge provides an invigorating shorter walk along a well formed, boardwalked track."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [],
+  "huts": [
+    {"name": "Cannibal Gorge Hut", "quote": "Cannibal Gorge Hut", "ref": "T15"},
+    {"name": "Ada Pass Hut", "quote": "Ada Pass Hut", "ref": "T6"},
+    {"name": "Christopher (Ada) Cullers Hut", "quote": "Christopher (Ada) Cullers Hut", "ref": "T16"},
+    {"name": "Christopher Hut", "quote": "Christopher Hut", "ref": "T17"},
+    {"name": "Anne Hut", "quote": "Anne Hut", "ref": "T8"},
+    {"name": "Rokeby Hut", "quote": "Rokeby Hut", "ref": "T22"},
+    {"name": "Boyle Flat Hut", "quote": "Boyle Flat Hut", "ref": "T11"},
+    {"name": "Magdalen Hut", "quote": "Magdalen Hut", "ref": "T20"}
+  ],
+  "not_on_route": [
+    {"name": "Ada homestead", "quote": "Ada homestead", "ref": null, "why": "nearby"},
+    {"name": "Boyle River Outdoor Education Centre", "quote": "Boyle River Outdoor Education Centre", "ref": null, "why": "nearby"}
+  ],
+  "doubts": "Start ref F5 is the road end on SH7 at Lewis Pass, but the feature is named for the Lewis Tops Track whereas the text says the walk leaves the picnic area on the Tarn Nature Walk; it is the only road end at Lewis Pass in the packet. End ref F4 is where the Saint James Walkway meets Magdalen Valley Road near Boyle; the text says the shelter and car park are at SH7 (F2, an unnamed track meeting Lewis Pass Road, is close by and could be the car park instead). Magdalen Hut is said to be 30 minutes from the second Boyle River bridge and the section from Magdalen Hut to Boyle village is mentioned, so it is taken as on the way, but this is not stated outright. The shorter family walk into Cannibal Gorge gives no end point, time or whether it returns, so its end is only 'Cannibal Gorge' and its shape is null. Christopher (Ada) Cullers Hut is a historic hut the track passes, not one of the listed places to stay."
+}

@@ -1,0 +1,45 @@
+{
+  "guid": "5c6e12af-e845-4601-a1b8-22cbd369d6a6",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Taipo River Track to Harman Pass",
+      "shape": "one_way",
+      "start": {"name": "car park at SH73", "quote": "the car park at SH73", "ref": null},
+      "end": {"name": "Harman Pass", "quote": "Harman Pass", "ref": "T4"},
+      "via": [
+        {"name": "Seven Mile Creek", "quote": "Seven Mile Creek", "ref": "T9"},
+        {"name": "Dillon Hut", "quote": "Dillon Hut", "ref": "T2"},
+        {"name": "Scotties 3 Wire", "quote": "Scotties 3 Wire", "ref": null},
+        {"name": "Dunns Creek", "quote": "Dunns Creek", "ref": "T3"},
+        {"name": "Hura Creek", "quote": "Hura Creek", "ref": "T5"},
+        {"name": "Mid Taipo Hut", "quote": "Mid Taipo Hut", "ref": "T8"},
+        {"name": "Mid Taipo Swing Bridge", "quote": "Mid Taipo Swing Bridge", "ref": null},
+        {"name": "Tumbledown Creek", "quote": "Tumbledown Creek", "ref": "T11"},
+        {"name": "Julia Hut", "quote": "Julia Hut", "ref": "T6"},
+        {"name": "Mary Creek Swing Bridge", "quote": "Mary Creek Swing Bridge", "ref": null},
+        {"name": "Mary Creek", "quote": "Mary Creek", "ref": "T7"}
+      ],
+      "direction": null,
+      "time": "2 days",
+      "distance": null,
+      "evidence": [
+        "Walking from the car park at SH73 to Dillon Hut will take you 2-3 hours following the 4WD road.",
+        "Keep following the marker poles, dropping into and crossing Mary Creek above the gorge and climbing through easy bluffs to Harman Pass."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [
+    {"name": "hot springs", "quote": "some hot springs can be located on the river’s edge", "ref": null, "from": "Julia Hut"}
+  ],
+  "huts": [
+    {"name": "Dillon Hut", "quote": "Dillon Hut", "ref": "T2"},
+    {"name": "Mid Taipo Hut", "quote": "Mid Taipo Hut", "ref": "T8"},
+    {"name": "Julia Hut", "quote": "Julia Hut", "ref": "T6"}
+  ],
+  "not_on_route": [],
+  "doubts": "The page describes the route leg by leg from the SH73 car park to Harman Pass and does not say whether walkers return the same way or continue beyond the pass; shape recorded as one_way to the pass as described. The SH73 car park has no feature in the packet, so the start ref is null. The hot springs downstream of Julia Hut are recorded as a side trip though the page does not call them that."
+}

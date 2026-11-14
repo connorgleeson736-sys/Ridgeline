@@ -1,0 +1,78 @@
+{
+  "guid": "db4d10ed-d91d-4ad5-8fea-aa3ce0c143b5",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "St Arnaud to Boyle settlement",
+      "shape": "one_way",
+      "start": {"name": "Eastern end of Kerr Bay", "quote": "the eastern end of Kerr Bay", "ref": "F6"},
+      "end": {"name": "Shelter and car park at SH7 by the Boyle settlement", "quote": "the shelter and car park at SH7 by the Boyle settlement", "ref": "F4"},
+      "via": [
+        {"name": "Lakehead Track", "quote": "Lakehead Track", "ref": "T7"},
+        {"name": "Lakehead Hut", "quote": "Lakehead Hut", "ref": "T36"},
+        {"name": "Travers River", "quote": "Travers River", "ref": "T49"},
+        {"name": "Hopeless Creek", "quote": "Hopeless Creek", "ref": "T29"},
+        {"name": "John Tait Hut", "quote": "John Tait Hut", "ref": "T30"},
+        {"name": "Cupola Creek chasm", "quote": "Cupola Creek chasm", "ref": "T27"},
+        {"name": "Upper Travers Hut", "quote": "Upper Travers Hut", "ref": "T51"},
+        {"name": "Poukirikiri/Travers Saddle", "quote": "Poukirikiri/Travers Saddle", "ref": "T40"},
+        {"name": "East Branch Sabine River bridge", "quote": "East Branch Sabine River", "ref": null},
+        {"name": "West Sabine Hut", "quote": "West Sabine Hut", "ref": "T54"},
+        {"name": "Blue Lake Hut", "quote": "Blue Lake Hut", "ref": "T21"},
+        {"name": "Rotopohueroa/Lake Constance", "quote": "Rotopohueroa/Lake Constance", "ref": "T45"},
+        {"name": "Waiau Pass", "quote": "Waiau Pass", "ref": "T53"},
+        {"name": "Waiau Pass Route", "quote": "Waiau Pass Route", "ref": "T14"},
+        {"name": "Waiau Forks", "quote": "Waiau Forks", "ref": null},
+        {"name": "Caroline Creek", "quote": "Caroline Creek", "ref": "T25"},
+        {"name": "Waiau Hut", "quote": "Waiau Hut", "ref": "T52"},
+        {"name": "Ada River", "quote": "Ada River", "ref": "T16"},
+        {"name": "St James Walkway", "quote": "St James Walkway", "ref": "T12"},
+        {"name": "Henry River valley", "quote": "Henry River valley", "ref": "T28"},
+        {"name": "Anne Hut", "quote": "Anne Hut", "ref": "T17"},
+        {"name": "Anne River", "quote": "Anne River", "ref": "T18"},
+        {"name": "Anne Saddle", "quote": "Anne Saddle", "ref": "T19"},
+        {"name": "Rokeby Hut", "quote": "Rokeby Hut", "ref": "T42"},
+        {"name": "Boyle River", "quote": "Boyle River", "ref": "T23"},
+        {"name": "Boyle Flat Hut", "quote": "Boyle Flat Hut", "ref": "T22"}
+      ],
+      "direction": null,
+      "time": "8-9 days",
+      "distance": null,
+      "evidence": [
+        "Beginning at the eastern end of Kerr Bay, the Lakehead Track wanders through forest, crossing several shallow streams and shingle screes.",
+        "Turn off SH63 at St Arnaud onto Kerr Bay Road and continue on to Kerr Bay.",
+        "The track starts at the eastern end of the bay.",
+        "A vehicle track is joined and followed down the valley to the shelter and car park at SH7 by the Boyle settlement."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "Boyle village", "quote": "Boyle village", "ref": "T24", "onto": null}
+  ],
+  "side_trips": [
+    {"name": "Travers Falls", "quote": "Travers Falls", "ref": "T48", "from": "Cupola Creek chasm"}
+  ],
+  "huts": [
+    {"name": "Lakehead Hut", "quote": "Lakehead Hut", "ref": "T36"},
+    {"name": "John Tait Hut", "quote": "John Tait Hut", "ref": "T30"},
+    {"name": "Upper Travers Hut", "quote": "Upper Travers Hut", "ref": "T51"},
+    {"name": "West Sabine Hut", "quote": "West Sabine Hut", "ref": "T54"},
+    {"name": "Blue Lake Hut", "quote": "Blue Lake Hut", "ref": "T21"},
+    {"name": "Waiau Hut", "quote": "Waiau Hut", "ref": "T52"},
+    {"name": "Anne Hut", "quote": "Anne Hut", "ref": "T17"},
+    {"name": "Rokeby Hut", "quote": "Rokeby Hut", "ref": "T42"},
+    {"name": "Boyle Flat Hut", "quote": "Boyle Flat Hut", "ref": "T22"}
+  ],
+  "not_on_route": [
+    {"name": "Coldwater Hut", "quote": "Coldwater Hut", "ref": "T26", "why": "other"},
+    {"name": "Rotomaninitua/Lake Angelus", "quote": "Rotomaninitua/Lake Angelus", "ref": "T44", "why": "other walk"},
+    {"name": "Mount Travers", "quote": "Mount Travers", "ref": "T39", "why": "view"},
+    {"name": "Rotomairewhenua/Blue Lake", "quote": "Rotomairewhenua/Blue Lake", "ref": "T43", "why": "nearby"},
+    {"name": "Magdalen Hut", "quote": "Magdalen Hut", "ref": "T38", "why": "nearby"},
+    {"name": "Ada homestead", "quote": "Ada homestead", "ref": null, "why": "nearby"},
+    {"name": "Caroline Creek Bivvy (removed)", "quote": "Caroline Creek Bivvy", "ref": null, "why": "other"}
+  ],
+  "doubts": "Start ref F6 is the road end where Kerr Bay Track meets Kerr Bay Road; the text says the Lakehead Track starts at the eastern end of Kerr Bay off Kerr Bay Road, which I take to be that road end, but the track named there is Kerr Bay Track, not Lakehead Track. End ref F4 (Saint James Walkway meets Magdalen Valley Road, by Boyle Village) chosen because the way follows the walkway to the car park; the text says the car park is 'at SH7' (Lewis Pass Rd), and F2 (unnamed track meets Lewis Pass Road) is the other candidate. The first leg is headed 'St Arnaud to Lakehead Hut/Coldwater Hut' and 'The track from Coldwater Hut' is mentioned, so Coldwater Hut may be an alternative first-night hut; the text does not describe walking to it, so it is not in the way. Whether Magdalen Hut ('30 minutes from this second bridge') is on the way or off it is not stated. The Boyle village access point is the southern 'entrance/exit', i.e. the same place as the end, given for walking the route in reverse. Lake Constance ref T45 chosen for the text's 'Rotopohueroa/Lake Constance' (the route follows its shoreline). No whole-route distance given."
+}

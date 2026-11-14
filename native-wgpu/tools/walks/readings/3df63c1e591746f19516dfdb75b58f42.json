@@ -1,0 +1,56 @@
+{
+  "guid": "3df63c1e-5917-46f1-9516-dfdb75b58f42",
+  "kind": "loop",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Rakiura Track circuit",
+      "shape": "loop",
+      "start": {"name": "Lee Bay", "quote": "The official entrance to Rakiura National Park at Lee Bay", "ref": "F2"},
+      "end": {"name": "Lee Bay", "quote": "Lee Bay", "ref": "F2"},
+      "via": [
+        {"name": "Little River", "quote": "Little River", "ref": "T10"},
+        {"name": "Peter's Point", "quote": "Peter’s Point", "ref": null},
+        {"name": "Maori Beach", "quote": "Maori Beach", "ref": "T12"},
+        {"name": "Maori Beach Campsite", "quote": "Maori Beach campsite", "ref": "L3"},
+        {"name": "intersection with the track to North Arm", "quote": "the intersection with the track to North Arm", "ref": null},
+        {"name": "Port William Campsite", "quote": "the campsite above Magnetic Beach in Port William/Potirepo", "ref": "L5"},
+        {"name": "Port William Hut", "quote": "Port William Hut", "ref": "L1"},
+        {"name": "North Arm Hut", "quote": "North Arm Hut", "ref": "L2"},
+        {"name": "Sawdust Bay", "quote": "Sawdust Bay", "ref": "T22"},
+        {"name": "Kidney Fern Arm", "quote": "Kidney Fern Arm", "ref": "T8"},
+        {"name": "Kaipipi Bay", "quote": "Kaipipi Bay", "ref": "T7"},
+        {"name": "Fern Gully car park", "quote": "Fern Gully car park", "ref": "F1"},
+        {"name": "Oban township", "quote": "Oban township", "ref": null},
+        {"name": "Horseshoe Bay", "quote": "Horseshoe Bay", "ref": "T6"}
+      ],
+      "direction": null,
+      "time": "3 days",
+      "distance": "32 km loop",
+      "evidence": [
+        "The circuit follows open coastline, crosses forested interior and meanders along the sheltered shores of Paterson Inlet.",
+        "The Rakiura Track can be walked in either direction, starting from two locations:",
+        "The official entrance to Rakiura National Park at Lee Bay, 5 km from Oban.",
+        "Trampers usually stay the night at Port William Hut and then backtrack the 40 minutes to the turn-off.",
+        "it is another 2 km along the road (turn left into Main Rd) to get back to Oban township."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "Fern Gully car park", "quote": "The Fern Gully car park, 2 km beyond the Rakiura National Park Visitor Centre", "ref": "F1", "onto": null},
+    {"name": "Oban", "quote": "If walking from the DOC visitor centre in Oban", "ref": null, "onto": "Lee Bay"},
+    {"name": "North Arm Hut by boat", "quote": "Access to North Arm hut by boat is dependent on tides.", "ref": "L2", "onto": null}
+  ],
+  "side_trips": [
+    {"name": "rusting steam boiler", "quote": "A track leading to a rusting steam boiler", "ref": null, "from": "Maori Beach"}
+  ],
+  "huts": [
+    {"name": "Port William Hut", "quote": "Port William Hut", "ref": "L1"},
+    {"name": "North Arm Hut", "quote": "North Arm Hut", "ref": "L2"}
+  ],
+  "not_on_route": [
+    {"name": "Prices Inlet", "quote": "Prices Inlet", "ref": "T21", "why": "other"}
+  ],
+  "doubts": "The Description sections run Oban township - Lee Bay - Port William Hut - North Arm Hut - Fern Gully car park - Oban township, while Getting there says the track itself starts at Lee Bay or Fern Gully car park and can be walked in either direction; I placed the start at the Lee Bay road end (F2, North West Circuit Track meets Lee Bay Road) with Oban township and the road back to Lee Bay via Horseshoe Bay closing the loop. The Oban end has no feature, so Oban is null. Fern Gully car park taken as F1 (track meets Main Road; the text names Main Road) - fairly but not fully certain. Port William Hut is reached by a 40 min spur that walkers backtrack to the North Arm turn-off. The page's sections total more than DOC's 32 km loop, which may exclude the road sections."
+}

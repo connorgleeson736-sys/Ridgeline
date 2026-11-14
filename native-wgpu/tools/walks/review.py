@@ -3,7 +3,7 @@
 way orange, other ways blue, huts red, start green), its status, flags and
 notes, so every walk can be checked by eye.
 
-Usage: python3 -I review.py DATA_DIR REPORT_JSON WALKS_JSON_GZ OUT_HTML [only-flagged|all]
+Usage: python3 -I review.py DATA_DIR REPORT_JSON WALKS_JSON OUT_HTML [only-flagged|all]
 """
 import gzip, html, json, math, os, sys
 
@@ -53,7 +53,7 @@ def svg(doc, ways, huts, tried=(), w=320, h=220):
 
 def main(data, report, asset, out, which="all"):
     rep = json.load(open(report))
-    recs = json.loads(gzip.open(asset).read())["walks"]
+    recs = json.loads((gzip.open if asset.endswith(".gz") else open)(asset, "rb").read())["walks"]
     rows = []
     n_ok = sum(1 for r in rep if r["status"] == "verified")
     for r in sorted(rep, key=lambda r: (r["status"] == "verified", r["name"])):

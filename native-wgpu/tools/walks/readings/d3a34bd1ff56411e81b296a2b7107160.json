@@ -1,0 +1,36 @@
+{
+  "guid": "d3a34bd1-ff56-411e-81b2-96a2b7107160",
+  "kind": "out_and_back",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Taranaki Maunga Summit Climb from North Egmont",
+      "shape": "out_and_back",
+      "start": {"name": "North Egmont road end", "quote": "The track starts in North Egmont", "ref": "F1"},
+      "end": {"name": "summit of Taranaki Maunga", "quote": "the summit of Taranaki Maunga", "ref": "T2"},
+      "via": [
+        {"name": "Tahurangi Lodge", "quote": "The only toilet is 100 m below Tahurangi Lodge – use it when you go past", "ref": null},
+        {"name": "numbered marker poles to the summit", "quote": "Above Tahurangi Lodge, numbered marker poles lead to the summit", "ref": null}
+      ],
+      "direction": null,
+      "time": "Up 5–6 hr | down 3–4 hr",
+      "distance": "6.3 km one way return via same track",
+      "evidence": [
+        "The track starts in North Egmont.",
+        "Turn onto Egmont Road and follow this up the mountain to North Egmont.",
+        "Above Tahurangi Lodge, numbered marker poles lead to the summit and give you an indication of how far you have to go.",
+        "This will help make sure you have enough time to get back down the mountain before dark."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "Stratford Plateau car park on Pembroke Road", "quote": "starting the trail from the Stratford Plateau car park on Pembroke Road, Stratford", "ref": null, "onto": "Summit Climb (via ski field toward Tahurangi Lodge)"}
+  ],
+  "side_trips": [],
+  "huts": [
+    {"name": "Tahurangi Lodge", "quote": "Tahurangi Lodge", "ref": null}
+  ],
+  "not_on_route": [],
+  "doubts": "Shape taken from DOC's distance '6.3 km one way return via same track'; the text itself does not describe the descent route. Tahurangi Lodge has no ref in the packet and the text does not say it has bunks; listed as a hut because the climb passes it. The Stratford Plateau start joins the Summit Climb near Tahurangi Lodge; no feature for it."
+}

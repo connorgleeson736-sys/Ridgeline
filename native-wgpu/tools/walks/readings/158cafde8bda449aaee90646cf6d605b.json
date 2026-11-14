@@ -1,0 +1,99 @@
+{
+  "guid": "158cafde-8bda-449a-aee9-0646cf6d605b",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Flora car park to Rolling Junction road end, exiting east on the Wangapeka Track",
+      "shape": "one_way",
+      "start": {"name": "Flora car park", "quote": "Flora car park", "ref": "F2"},
+      "end": {"name": "Rolling Junction road end", "quote": "Rolling Junction road end", "ref": "F1"},
+      "via": [
+        {"name": "Flora Saddle", "quote": "Flora Saddle", "ref": "T18"},
+        {"name": "Flora Hut", "quote": "Flora Hut", "ref": "T17"},
+        {"name": "Salisbury Lodge", "quote": "Salisbury Lodge", "ref": "T29"},
+        {"name": "Splugeons Rock Shelter", "quote": "Splugeons Rock Shelter", "ref": "T33"},
+        {"name": "Leslie River swingbridge", "quote": "crossing via a swingbridge", "ref": null},
+        {"name": "Karamea Bend Hut", "quote": "Karamea Bend Hut", "ref": "T20"},
+        {"name": "Slippery Creek", "quote": "Slippery Creek", "ref": "T31"},
+        {"name": "Crow River swingbridge", "quote": "Crow River swingbridge", "ref": null},
+        {"name": "Crow Hut", "quote": "Crow Hut", "ref": "T15"},
+        {"name": "Venus Hut", "quote": "Venus Hut", "ref": "T40"},
+        {"name": "Mercury Creek", "quote": "Mercury Creek", "ref": "T25"},
+        {"name": "Atlas Creek", "quote": "Atlas Creek", "ref": "T10"},
+        {"name": "Thor Hut", "quote": "Thor Hut", "ref": "T38"},
+        {"name": "Moonstone Lake", "quote": "Moonstone Lake", "ref": "T26"},
+        {"name": "Kendall Creek", "quote": "Kendall Creek", "ref": "T21"},
+        {"name": "Trevor Carter Hut", "quote": "Trevor Carter Hut", "ref": "T39"},
+        {"name": "Tabernacle Lookout", "quote": "Tabernacle Lookout", "ref": null},
+        {"name": "Wangapeka Track", "quote": "Wangapeka Track", "ref": "L1"},
+        {"name": "Helicopter Flat Hut", "quote": "Helicopter Flat Hut", "ref": "T19"},
+        {"name": "Wangapeka Saddle", "quote": "Wangapeka Saddle", "ref": "T41"},
+        {"name": "Stone Hut", "quote": "Stone Hut", "ref": "T34"}
+      ],
+      "direction": null,
+      "time": "6 to 9 days one way",
+      "distance": "91 km one way",
+      "evidence": [
+        "It is a 3–4 day link through the earthquake-torn Karamea Valley, between Flora Car Park and the Wangapeka Track; 6–9 days are needed to get from road end to road end.",
+        "From the car park at the road end (36 km from Motueka), the track leads over Flora Saddle, past Flora Hut and up to Salisbury Lodge on the Tablelands.",
+        "Follows the true right of the Karamea River, crossing below Saxon Falls and climbing to the Wangapeka Track at Tabernacle Lookout.",
+        "From Wangapeka Saddle follow the Wangapeka River all the way to the road end."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "Flora car park to the West Coast, exiting west on the Wangapeka Track",
+      "shape": "one_way",
+      "start": {"name": "Flora car park", "quote": "Flora car park", "ref": "F2"},
+      "end": {"name": "Little Wanganui road end", "quote": "Over the saddle the track drops into the Little Wanganui, following it to the road end.", "ref": null},
+      "via": [
+        {"name": "Salisbury Lodge", "quote": "Salisbury Lodge", "ref": "T29"},
+        {"name": "Karamea Bend Hut", "quote": "Karamea Bend Hut", "ref": "T20"},
+        {"name": "Crow Hut", "quote": "Crow Hut", "ref": "T15"},
+        {"name": "Venus Hut", "quote": "Venus Hut", "ref": "T40"},
+        {"name": "Thor Hut", "quote": "Thor Hut", "ref": "T38"},
+        {"name": "Trevor Carter Hut", "quote": "Trevor Carter Hut", "ref": "T39"},
+        {"name": "Helicopter Flat Hut", "quote": "Helicopter Flat Hut", "ref": "T19"},
+        {"name": "Tabernacle Lookout", "quote": "Tabernacle Lookout", "ref": null},
+        {"name": "Taipo swingbridge", "quote": "Taipo swingbridge", "ref": null},
+        {"name": "Taipo Hut", "quote": "Taipo Hut", "ref": "T35"},
+        {"name": "Little Wanganui Saddle", "quote": "Little Wanganui Saddle", "ref": null}
+      ],
+      "direction": null,
+      "time": null,
+      "distance": null,
+      "evidence": [
+        "Head down the Karamea River to Tabernacle Lookout and around a ridge to the Taipo swingbridge.",
+        "The track goes up the true left of the Taipo River to just above Taipo Hut, where it crosses the river and climbs steeply (past an emergency shelter) to Little Wanganui Saddle (1110 m).",
+        "Over the saddle the track drops into the Little Wanganui, following it to the road end."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "Cobb Valley", "quote": "From the head of the Cobb Reservoir a track climbs up to Cobb Ridge", "ref": "T14", "onto": "Salisbury Lodge"},
+    {"name": "Baton road end", "quote": "Baton road end", "ref": null, "onto": "Karamea Bend Hut"}
+  ],
+  "side_trips": [],
+  "huts": [
+    {"name": "Flora Hut", "quote": "Flora Hut", "ref": "T17"},
+    {"name": "Salisbury Lodge", "quote": "Salisbury Lodge", "ref": "T29"},
+    {"name": "Karamea Bend Hut", "quote": "Karamea Bend Hut", "ref": "T20"},
+    {"name": "Crow Hut", "quote": "Crow Hut", "ref": "T15"},
+    {"name": "Venus Hut", "quote": "Venus Hut", "ref": "T40"},
+    {"name": "Thor Hut", "quote": "Thor Hut", "ref": "T38"},
+    {"name": "Trevor Carter Hut", "quote": "Trevor Carter Hut", "ref": "T39"},
+    {"name": "Helicopter Flat Hut", "quote": "Helicopter Flat Hut", "ref": "T19"},
+    {"name": "Stone Hut", "quote": "Stone Hut", "ref": "T34"}
+  ],
+  "not_on_route": [
+    {"name": "Balloon Hut", "quote": "Balloon Hut", "ref": "T11", "why": "other"},
+    {"name": "Lake Peel", "quote": "Lake Peel", "ref": "T22", "why": "other"},
+    {"name": "Flanagans Hut", "quote": "Flanagans Hut", "ref": "T16", "why": "other"},
+    {"name": "Baton Saddle", "quote": "Baton Saddle", "ref": "T12", "why": "other"},
+    {"name": "Mt Kendall", "quote": "Mt Kendall", "ref": "T27", "why": "view"}
+  ],
+  "doubts": "The page calls the track a 3–4 day link between Flora car park and the Wangapeka Track, with 6–9 days road end to road end; I recorded the road-end-to-road-end trip with the eastern exit (listed first) as main and the western exit as W2. DOC's 91 km / 6 to 9 days is not tied to either exit; given to W1 only. The route from Trevor Carter Hut to the Wangapeka Track has four options (Lost Valley Creek to Helicopter Flat Hut, Karamea River to Tabernacle Lookout, Taipo swingbridge, Biggs Tops to Wangapeka Saddle); W1's via uses Tabernacle Lookout then upstream past Helicopter Flat Hut as the east exit text describes, and W2's order (Helicopter Flat Hut then down to Tabernacle Lookout) follows the west exit text, but which option is used is not fixed. Flora car park taken as F2 (Flora Hut Walk meets Graham Valley South Branch Road; text says Graham Valley Road climbs to Flora car park). Rolling Junction road end taken as F1 (Wangapeka Track meets Wangapeka River Road, eastern end near Prices Creek). The western road end, Tabernacle Lookout, Little Wanganui Saddle and Baton road end have no entries. Splugeons Rock Shelter is a shelter with no bunks stated, so not in huts; Taipo Hut is on the west exit only. Cobb Valley and Baton road end are 'other entry points'; Balloon Hut, Lake Peel, Flanagans Hut and Baton Saddle are on those entry tracks only."
+}

@@ -1,0 +1,93 @@
+{
+  "guid": "1aafceec-8207-4d4b-967d-97c3eacde6da",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Hacket road end to Wairoa road end via the Alpine Route",
+      "shape": "one_way",
+      "start": {"name": "Hacket road end", "quote": "Hacket road end", "ref": "F1"},
+      "end": {"name": "Wairoa road end", "quote": "Wairoa road end", "ref": null},
+      "via": [
+        {"name": "junction of the Miner River", "quote": "a picnic area at the junction of the Miner River", "ref": "T17"},
+        {"name": "junction of the Browning Stream", "quote": "at the junction of the Browning Stream", "ref": "T9"},
+        {"name": "Hacket Hut", "quote": "Hacket Hut", "ref": "T13"},
+        {"name": "Starveall Hut", "quote": "Starveall Hut", "ref": "T27"},
+        {"name": "Slaty Hut", "quote": "Slaty Hut", "ref": "T25"},
+        {"name": "Ada Flat", "quote": "Ada Flat", "ref": "T6"},
+        {"name": "Old Man Peak", "quote": "summit of Old Man Peak", "ref": "T20"},
+        {"name": "Old Man Hut", "quote": "Old Man Hut", "ref": "T21"},
+        {"name": "Little Rintoul", "quote": "Little Rintoul", "ref": null},
+        {"name": "Mt Rintoul summit", "quote": "Mt Rintoul summit", "ref": "T18"},
+        {"name": "Rintoul Hut", "quote": "Rintoul Hut", "ref": null},
+        {"name": "Purple Top", "quote": "Purple Top", "ref": "T22"},
+        {"name": "Tarn Hut", "quote": "Tarn Hut", "ref": "T28"},
+        {"name": "junction shortly before Bushy Top", "quote": "a sign-posted junction shortly before Bushy Top", "ref": null},
+        {"name": "Mid Wairoa Hut", "quote": "Mid Wairoa Hut", "ref": "T16"}
+      ],
+      "direction": null,
+      "time": null,
+      "distance": null,
+      "evidence": [
+        "Most trampers start from the Hacket road-end, 29 km south of Nelson and walk through to Starveall Hut to begin the Alpine Route.",
+        "From Tarn Hut, they complete the trip by descending to either Wairoa road-end, inland from Wakefield, or to the Goulter road-end, on the north bank of the Wairau River.",
+        "From here, the track leads down the ridge to a sign-posted junction shortly before Bushy Top, with the right-hand track leading to the Wairoa road end.",
+        "The track follows the Wairoa River which has steep difficult sidles to negotiate, before opening out onto a forestry road, which must be followed for about 4 km, right down to a locked gate."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "Hacket road end to Goulter road end via the Alpine Route",
+      "shape": "one_way",
+      "start": {"name": "Hacket road end", "quote": "Hacket road end", "ref": "F1"},
+      "end": {"name": "Goulter road end", "quote": "Goulter road end", "ref": null},
+      "via": [
+        {"name": "Hacket Hut", "quote": "Hacket Hut", "ref": "T13"},
+        {"name": "Starveall Hut", "quote": "Starveall Hut", "ref": "T27"},
+        {"name": "Slaty Hut", "quote": "Slaty Hut", "ref": "T25"},
+        {"name": "Old Man Hut", "quote": "Old Man Hut", "ref": "T21"},
+        {"name": "Rintoul Hut", "quote": "Rintoul Hut", "ref": null},
+        {"name": "Tarn Hut", "quote": "Tarn Hut", "ref": "T28"},
+        {"name": "Bushy Top", "quote": "The track climbs over Bushy Top", "ref": "T10"},
+        {"name": "Lower Goulter Hut", "quote": "Lower Goulter Hut", "ref": "T15"}
+      ],
+      "direction": null,
+      "time": null,
+      "distance": null,
+      "evidence": [
+        "There are two options from Tarn Hut to leave Alpine Route:",
+        "At the sign-posted junction shortly before Bushy Top (see above), the left-hand branch leads to the Goulter road end.",
+        "The track climbs over Bushy Top (1257 m) before descending down a prominent spur to the Goulter River opposite the Lower Goulter Hut.",
+        "From the hut, the track carries on for 45 minutes to a 4WD road end."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "Goulter River", "quote": "The Alpine Route is also accessible on tracks from the Goulter River", "ref": "T11", "onto": null},
+    {"name": "Lake Chalice", "quote": "Lake Chalice", "ref": "T14", "onto": null},
+    {"name": "Te Hoiere/Pelorus River", "quote": "Te Hoiere/Pelorus River", "ref": null, "onto": null}
+  ],
+  "side_trips": [
+    {"name": "Mt Starveall summit", "quote": "It is possible to detour to the Mt Starveall summit", "ref": "T19", "from": "Mt Starveall summit ridge"}
+  ],
+  "huts": [
+    {"name": "Hacket Hut", "quote": "Hacket Hut", "ref": "T13"},
+    {"name": "Starveall Hut", "quote": "Starveall Hut", "ref": "T27"},
+    {"name": "Slaty Hut", "quote": "Slaty Hut", "ref": "T25"},
+    {"name": "Old Man Hut", "quote": "Old Man Hut", "ref": "T21"},
+    {"name": "Rintoul Hut", "quote": "Rintoul Hut", "ref": null},
+    {"name": "Tarn Hut", "quote": "Tarn Hut", "ref": "T28"},
+    {"name": "Mid Wairoa Hut", "quote": "Mid Wairoa Hut", "ref": "T16"}
+  ],
+  "not_on_route": [
+    {"name": "Browning Hut", "quote": "a sign-posted track leads to Browning Hut", "ref": "T8", "why": "nearby"},
+    {"name": "Top Wairoa Hut", "quote": "Top Wairoa Hut", "ref": "T30", "why": "nearby"},
+    {"name": "Red Hills Route", "quote": "Red Hills Route", "ref": "L1", "why": "other walk"},
+    {"name": "Richmond Ranges Te Araroa Route", "quote": "Richmond Ranges Te Araroa Route", "ref": "L2", "why": "other walk"},
+    {"name": "Waimea Plains", "quote": "Waimea Plains", "ref": null, "why": "view"},
+    {"name": "Tiphead Stream", "quote": "Tiphead Stream", "ref": "T29", "why": "other"}
+  ],
+  "doubts": "DOC gives no overall time or distance. The page offers two exits from Tarn Hut (Wairoa road end, listed first, and Goulter road end); W1 takes the Wairoa exit as main and W2 the Goulter exit. Neither road end has a feature entry, so both ends are null; the Wairoa end is a locked gate after about 4 km of forestry road, and the Goulter end is a 4WD road end 45 min past Lower Goulter Hut, with Tiphead Stream a further two hours (road shut as of July 2023). Rintoul Hut has no name entry (null). Lower Goulter Hut is on the Goulter exit only, so it is not in the main way's huts. The page also mentions heading directly down to the Goulter River from Old Man Hut, and walking the route in reverse from the Wairoa or the Goulter, but describes neither as its own way. Pelorus River access ref left null (T5 Pelorus Track is a map track, not clearly the access meant)."
+}

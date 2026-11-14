@@ -1,0 +1,61 @@
+{
+  "guid": "cf97299e-e180-4fc7-bfa2-659db32f733b",
+  "kind": "network",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Denniston Brakehead Walk",
+      "shape": "loop",
+      "start": {"name": "Main Denniston car park", "quote": "Denniston Brakehead Walk starts at the main Denniston car park, by the large shelter.", "ref": null},
+      "end": {"name": "Main Denniston car park", "quote": "The loop track takes you back to the car park", "ref": null},
+      "via": [
+        {"name": "Top of the Denniston Incline (brakehouse remains)", "quote": "The track descends from the car park down to the top of the incline.", "ref": null},
+        {"name": "The Camp (site of Denniston's first settlement)", "quote": "The Camp", "ref": null},
+        {"name": "Rope road haulage system", "quote": "rope road", "ref": null},
+        {"name": "Coal workshops and powerhouse", "quote": "coal workshops and powerhouse", "ref": null}
+      ],
+      "direction": null,
+      "time": "1 hr",
+      "distance": "2 km (loop)",
+      "evidence": [
+        "1 hr / 2 km (loop)",
+        "Denniston Brakehead Walk starts at the main Denniston car park, by the large shelter.",
+        "The loop track takes you back to the car park via the historic ‘rope road’ haulage system, coal workshops and powerhouse."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "Lower car park to Denniston Incline viewpoint",
+      "shape": "out_and_back",
+      "start": {"name": "Lower car park shelter", "quote": "The track begins at the lower car park shelter.", "ref": null},
+      "end": {"name": "Denniston Incline viewpoint", "quote": "Denniston Incline viewpoint", "ref": null},
+      "via": [],
+      "direction": null,
+      "time": "5 min",
+      "distance": "150 m (return)",
+      "evidence": [
+        "5 min / 150 m (return)",
+        "The track begins at the lower car park shelter.",
+        "A gravel track with boardwalk sections leads to the viewing platform.",
+        "Return to the shelter the same way you came."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [
+    {"name": "Incline viewpoint", "quote": "Take a side trip to the incline viewpoint", "ref": null, "from": "top of the incline"},
+    {"name": "Banbury Arches", "quote": "Banbury Arches", "ref": null, "from": null}
+  ],
+  "huts": [],
+  "not_on_route": [
+    {"name": "Banbury Mine", "quote": "Banbury Mine", "ref": null, "why": "other"},
+    {"name": "Tasman Sea", "quote": "Tasman Sea", "ref": null, "why": "view"},
+    {"name": "Denniston Bridle Track", "quote": "Denniston Bridle Track", "ref": "L1", "why": "other walk"},
+    {"name": "Denniston Plateau mountain biking tracks", "quote": "Denniston Plateau mountain biking tracks", "ref": null, "why": "other walk"},
+    {"name": "Waimangaroa", "quote": "Waimangaroa", "ref": "T6", "why": "nearby"},
+    {"name": "Westport", "quote": "Westport", "ref": null, "why": "nearby"}
+  ],
+  "doubts": "The page describes two separate walks (the 1 hr Denniston Brakehead Walk loop and the 5 min accessible walk from the lower car park to the Denniston Incline viewpoint), so I recorded it as a network with the Brakehead Walk as main; it could instead be read as one loop walk. Neither the main Denniston car park (reached via Boswell Street) nor the lower car park clearly matches any road-end feature (the features name Young Street, Burnetts Face Road and Denniston Road, not Boswell Street), so starts and ends are null. The text does not say exactly where the Banbury Arches side trip leaves the loop (it is described after The Camp)."
+}

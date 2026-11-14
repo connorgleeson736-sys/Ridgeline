@@ -1,0 +1,68 @@
+{
+  "guid": "69bc21c3-4b8b-4fb2-ac98-2ac21d38cc25",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Routeburn Shelter to The Divide",
+      "shape": "one_way",
+      "start": {"name": "Routeburn Shelter", "quote": "The track begins at Routeburn Shelter", "ref": "F1"},
+      "end": {"name": "The Divide", "quote": "The Divide on the Milford Highway", "ref": "F3"},
+      "via": [
+        {"name": "Route Burn", "quote": "Route Burn", "ref": "T22"},
+        {"name": "Sugarloaf Stream", "quote": "Sugarloaf Stream", "ref": null},
+        {"name": "Bridal Veil Waterfall", "quote": "Bridal Veil Waterfall", "ref": null},
+        {"name": "Routeburn Flats Hut", "quote": "Routeburn Flats Hut", "ref": "T25"},
+        {"name": "Routeburn Falls Hut", "quote": "Routeburn Falls Hut", "ref": "T24"},
+        {"name": "Lake Harris (bluffs above)", "quote": "Lake Harris", "ref": "T17"},
+        {"name": "Harris Saddle/Tarahaka Whakatipu", "quote": "Harris Saddle/Tarahaka Whakatipu", "ref": "T13"},
+        {"name": "Harris Saddle Shelter", "quote": "Harris Saddle Shelter", "ref": null},
+        {"name": "Hollyford Face", "quote": "Hollyford Face", "ref": null},
+        {"name": "Lake Mackenzie Hut", "quote": "Lake Mackenzie Hut", "ref": "T20"},
+        {"name": "The Orchard", "quote": "Orchard", "ref": "T27"},
+        {"name": "Earland Falls", "quote": "Earland Falls", "ref": "T11"},
+        {"name": "Lake Howden", "quote": "Lake Howden", "ref": "T18"},
+        {"name": "Key Summit Track turn-off", "quote": "Key Summit Track turn-off", "ref": null}
+      ],
+      "direction": null,
+      "time": "2-4 days",
+      "distance": "33 km one way",
+      "evidence": [
+        "The Routeburn Track can be walked in either direction.",
+        "The track begins at Routeburn Shelter, gently winding alongside the crystal-clear Route Burn (river).",
+        "From the Key Summit turn-off, the gradual downhill walk is through silver beech forest to The Divide on the Milford Highway.",
+        "Routeburn Track can be accessed from both ends: Routeburn Shelter, 25 km from Glenorchy along a partially unsealed road, and The Divide Shelter, 85 km from Te Anau.",
+        "The road distance between each end of the track is 325 km – transport is needed at each end."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "The Divide Shelter", "quote": "The Divide Shelter", "ref": "F3", "onto": "Routeburn Track"}
+  ],
+  "side_trips": [
+    {"name": "Conical Hill", "quote": "Conical Hill", "ref": "T10", "from": "Harris Saddle"},
+    {"name": "Key Summit", "quote": "Key Summit", "ref": "T16", "from": "Key Summit Track turn-off"}
+  ],
+  "huts": [
+    {"name": "Routeburn Flats Hut", "quote": "Routeburn Flats Hut", "ref": "T25"},
+    {"name": "Routeburn Falls Hut", "quote": "Routeburn Falls Hut", "ref": "T24"},
+    {"name": "Lake Mackenzie Hut", "quote": "Lake Mackenzie Hut", "ref": "T20"}
+  ],
+  "not_on_route": [
+    {"name": "Greenstone and Caples Tracks", "quote": "Greenstone and Caples Tracks", "ref": "L1", "why": "other walk"},
+    {"name": "Earland Falls Track", "quote": "Earland Falls Track", "ref": "L2", "why": "other walk"},
+    {"name": "Key Summit Track", "quote": "Key Summit Track", "ref": "L3", "why": "other walk"},
+    {"name": "Lake Howden Track", "quote": "Lake Howden Track", "ref": "L4", "why": "other walk"},
+    {"name": "Routeburn Nature Walk", "quote": "Routeburn Nature Walk", "ref": "L5", "why": "other walk"},
+    {"name": "Routeburn Falls", "quote": "Routeburn Falls cascade", "ref": "T23", "why": "nearby"},
+    {"name": "Humboldt Mountains", "quote": "Humboldt Mountains", "ref": "T15", "why": "view"},
+    {"name": "Darran Mountains", "quote": "Darran Mountains", "ref": null, "why": "view"},
+    {"name": "Hollyford Valley", "quote": "Hollyford Valley", "ref": null, "why": "view"},
+    {"name": "Lake McKerrow", "quote": "Lake McKerrow", "ref": null, "why": "view"},
+    {"name": "Lake Howden Hut (destroyed)", "quote": "Lake Howden Hut was destroyed by storm damage in February 2020", "ref": null, "why": "other"},
+    {"name": "Glenorchy", "quote": "Glenorchy", "ref": null, "why": "nearby"},
+    {"name": "Te Anau", "quote": "Te Anau", "ref": null, "why": "nearby"}
+  ],
+  "doubts": "Start ref F1 is the only road end at the Routeburn end, but it is where the Routeburn Nature Walk (not the Routeburn Track) meets Routeburn Road; I take it as the Routeburn Shelter trailhead. The page says the track can be walked in either direction; the main way follows the order the page describes (Routeburn Shelter to The Divide), and The Divide Shelter is listed as the other access end. The circuit via the Greenstone and Caples Tracks is an extension onto another walk, not recorded as a way."
+}

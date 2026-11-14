@@ -1,0 +1,42 @@
+{
+  "guid": "cf43ce27-0dfb-4d05-b99d-357d5ac16fd9",
+  "kind": "out_and_back",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Flora car park to Mt Arthur Summit",
+      "shape": "out_and_back",
+      "start": {"name": "Flora car park", "quote": "Flora car park", "ref": null},
+      "end": {"name": "Mt Arthur Summit", "quote": "Mt Arthur Summit", "ref": "T10"},
+      "via": [
+        {"name": "Mt Arthur Hut Walk", "quote": "Mt Arthur Hut Walk", "ref": "L1"},
+        {"name": "Mt Arthur Hut", "quote": "Mt Arthur Hut", "ref": "T11"},
+        {"name": "Wharepapa/Arthur Range", "quote": "Wharepapa/Arthur Range", "ref": "T13"},
+        {"name": "junction with the route across Horseshoe Basin", "quote": "junction", "ref": null},
+        {"name": "saddle", "quote": "saddle", "ref": null},
+        {"name": "track junction just below Winter Peak", "quote": "another track junction", "ref": null}
+      ],
+      "direction": null,
+      "time": "3 hr 30 min - 4 hr 30 min one way",
+      "distance": "9.2 km one way return via same track",
+      "evidence": [
+        "Follow the Mt Arthur Hut Walk from Flora car park to Mt Arthur Hut.",
+        "The Mt Arthur Summit Route skirts around the back of Winter Peak, then climbs steeply to the Mt Arthur Summit – expect to be scrambling up rocky terrain."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [],
+  "huts": [
+    {"name": "Mt Arthur Hut", "quote": "Mt Arthur Hut", "ref": "T11"}
+  ],
+  "not_on_route": [
+    {"name": "Horseshoe Basin", "quote": "Horseshoe Basin", "ref": "T9", "why": "nearby"},
+    {"name": "Pyramid Ridge", "quote": "Pyramid Ridge", "ref": "T12", "why": "other"},
+    {"name": "Gordons Pyramid", "quote": "Gordons Pyramid", "ref": "T8", "why": "other"},
+    {"name": "Ellis Basin Route", "quote": "Ellis Basin Route", "ref": "T1", "why": "other walk"},
+    {"name": "Ellis Hut", "quote": "Ellis Hut", "ref": "T7", "why": "other"}
+  ],
+  "doubts": "No feature for Flora car park, so the start has no ref. Shape out and back from DOC's distance 'return via same track'. The route skirts around the back of Winter Peak rather than over it, so Winter Peak itself is not listed in via."
+}

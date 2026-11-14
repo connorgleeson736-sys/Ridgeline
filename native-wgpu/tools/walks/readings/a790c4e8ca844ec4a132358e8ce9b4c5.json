@@ -1,0 +1,46 @@
+{
+  "guid": "a790c4e8-ca84-4ec4-a132-358e8ce9b4c5",
+  "kind": "out_and_back",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Copland Track from the carpark beside Rough Creek to Welcome Flat Hut",
+      "shape": "out_and_back",
+      "start": {"name": "Copland carpark beside Rough Creek", "quote": "Copland Track starts at a carpark beside Rough Creek", "ref": null},
+      "end": {"name": "Welcome Flat Hut", "quote": "emerging at Welcome Flat Hut", "ref": "T15"},
+      "via": [
+        {"name": "Rough Creek crossing", "quote": "cross Rough Creek if conditions are safe to do so", "ref": "T11"},
+        {"name": "Copland Track", "quote": "Copland Track", "ref": "T1"},
+        {"name": "Architect Creek Hut", "quote": "Architect Creek Hut", "ref": "T4"},
+        {"name": "Architect Creek", "quote": "the track continues upstream to Architect Creek", "ref": "T3"},
+        {"name": "Palaver Creek", "quote": "climbs very gradually towards Palaver Creek", "ref": "T10"},
+        {"name": "Open Creek", "quote": "once you have crossed Open Creek", "ref": "T9"},
+        {"name": "Shiels Creek bridge", "quote": "After crossing the Shiels Creek bridge", "ref": "T12"}
+      ],
+      "direction": null,
+      "time": "7 hr one way",
+      "distance": "18 km one way",
+      "evidence": [
+        "Copland Track starts at a carpark beside Rough Creek, accessed from SH6 beside the bridge over Karangarua River.",
+        "The track zigzags to its highest point, then descends through forest before emerging at Welcome Flat Hut.",
+        "Follow Copland Track back down the valley to the car park."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [
+    {"name": "Welcome Flat natural hot pools", "quote": "The hot pools are just a short stroll from the hut.", "ref": null, "from": "Welcome Flat Hut"}
+  ],
+  "huts": [
+    {"name": "Architect Creek Hut", "quote": "Architect Creek Hut", "ref": "T4"},
+    {"name": "Welcome Flat Hut", "quote": "Welcome Flat Hut", "ref": "T15"}
+  ],
+  "not_on_route": [
+    {"name": "Sierra Range", "quote": "fine views of the Sierra Range", "ref": "T13", "why": "view"},
+    {"name": "Rough Creek flood bridge", "quote": "Use the flood bridge about 30 minutes upstream instead.", "ref": null, "why": "other"},
+    {"name": "Karangarua River", "quote": "Karangarua River", "ref": "T8", "why": "other"},
+    {"name": "The Hermitage lodge", "quote": "The Hermitage lodge at Aoraki/Mount Cook", "ref": null, "why": "other"}
+  ],
+  "doubts": "The car park start has no road-end feature in the packet, so null. DOC's time and distance are given 'one way', but the page's 'Return journey' section says to follow the Copland Track back down the valley to the car park, so the shape is out and back; time and distance are DOC's one-way figures. The order of Palaver Creek and Open Creek follows the text's wording. The Rough Creek flood bridge is only for exiting when the creek is flooded."
+}

@@ -18,4 +18,11 @@ class WalkRecordsTest{
         assertEquals(listOf("Car park","Summit","Car park"),a.ways[0].stops.map{it.first});assertEquals("Greenstone Hut",a.huts[0].name)
         val b=r["g2"]!!;assertFalse(b.verified);assertTrue(b.ways.isEmpty());assertEquals(1,b.flags.size)
     }
+    /** The asset the app ships: it must be at the name the app opens and parse. */
+    @Test fun shippedRecordsLoad(){
+        val r=WalkRecords.parse(java.io.File("src/main/assets/${WalkRecords.ASSET}").readText())
+        assertTrue(r.size>100);assertTrue(r.values.count{it.verified}>50)
+        for(w in r.values.filter{it.verified}){assertTrue(w.ways.count{it.main}==1);assertTrue(w.ways.all{it.line.size>=2})}
+        assertEquals(setOf("Mid Caples Hut","Mckellar Hut","Greenstone Hut"),r["cb036644-8249-42e1-9485-4614f7cdcc1d"]!!.huts.map{it.name}.toSet())
+    }
 }

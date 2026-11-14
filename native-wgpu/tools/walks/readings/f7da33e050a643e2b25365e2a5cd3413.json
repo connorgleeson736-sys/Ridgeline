@@ -1,0 +1,54 @@
+{
+  "guid": "f7da33e0-50a6-43e2-b253-65e2a5cd3413",
+  "kind": "loop",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Kepler Track full track",
+      "shape": "loop",
+      "start": {"name": "Kepler Track car park", "quote": "Kepler Track carpark", "ref": null},
+      "end": {"name": "Kepler Track car park", "quote": "Kepler Track car park", "ref": null},
+      "via": [
+        {"name": "Brod Bay", "quote": "Brod Bay", "ref": "T4"},
+        {"name": "Luxmore Hut", "quote": "Luxmore Hut", "ref": "T10"},
+        {"name": "Iris Burn Hut", "quote": "Iris Burn Hut", "ref": "T9"},
+        {"name": "Rocky Point", "quote": "Rocky Point", "ref": null},
+        {"name": "Moturau Hut", "quote": "Moturau Hut", "ref": "T12"},
+        {"name": "Rainbow Reach", "quote": "swing bridge at Rainbow Reach", "ref": "T14"}
+      ],
+      "direction": null,
+      "time": "3-4 days",
+      "distance": "60 km loop",
+      "evidence": [
+        "The track begins with a stroll through the beech forest along the shore of Lake Te Anau, the largest body of fresh water in Australasia, to Brod Bay.",
+        "The track then follows the Waiau River terrace to the swing bridge at Rainbow Reach.",
+        "Continue alongside the Waiau River to the Kepler Track car park."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "Fiordland National Park Visitor Centre", "quote": "Fiordland National Park Visitor Centre: 50 min walk along the lakefront to the entrance of the track", "ref": null, "onto": "entrance of the track"},
+    {"name": "Rainbow Reach car park", "quote": "Rainbow Reach car park", "ref": "F1", "onto": null},
+    {"name": "Brod Bay", "quote": "A scheduled boat service also offers transport to Brod Bay.", "ref": "T4", "onto": null}
+  ],
+  "side_trips": [
+    {"name": "Luxmore Cave", "quote": "Luxmore Cave", "ref": null, "from": "Luxmore Hut"},
+    {"name": "Luxmore summit", "quote": "Luxmore summit", "ref": "T13", "from": null}
+  ],
+  "huts": [
+    {"name": "Luxmore Hut", "quote": "Luxmore Hut", "ref": "T10"},
+    {"name": "Iris Burn Hut", "quote": "Iris Burn Hut", "ref": "T9"},
+    {"name": "Moturau Hut", "quote": "Moturau Hut", "ref": "T12"}
+  ],
+  "not_on_route": [
+    {"name": "Murchison Mountains", "quote": "Murchison Mountains", "ref": null, "why": "view"},
+    {"name": "South Fiord of Lake Te Anau", "quote": "south fiord of Lake Te Anau", "ref": "T16", "why": "view"},
+    {"name": "Te Anau", "quote": "catch a shuttle bus to Te Anau", "ref": "T17", "why": "nearby"},
+    {"name": "Kepler Track: Carpark to Dock Bay and Brod Bay", "quote": "Kepler Track carpark to Dock Bay and Brod Bay", "ref": "L1", "why": "other walk"},
+    {"name": "Kepler Track: Carpark to Rainbow Reach", "quote": "Kepler Track carpark to Rainbow Reach", "ref": "L2", "why": "other walk"},
+    {"name": "Kepler Track: Rainbow Reach to Shallow Bay or Moturau Hut", "quote": "Rainbow Reach to Shallow Bay or Moturau Hut", "ref": "L3", "why": "other walk"},
+    {"name": "Kepler Track carpark to Luxmore Hut", "quote": "Kepler Track carpark to Luxmore Hut", "ref": "L4", "why": "other walk"}
+  ],
+  "doubts": "No feature or name entry is the Kepler Track car park, so the start/end ref is null. Direction is not stated as clockwise/anticlockwise, though the page describes the track car park - Brod Bay - Luxmore - Iris Burn - Moturau - Rainbow Reach order. The four linked day walks are separate DOC walk pages covering parts of this track; listed as other walks rather than ways. Luxmore Cave side trip is reached by a signposted track from the hut (possibly T2 Luxmore Caves Track) but its ref is left null. Luxmore summit taken as Mount Luxmore (T13). Rainbow Reach in via referenced to the river name T14; the Rainbow Reach car park access point to road end F1 on Rainbow Reach Road. Shelters at Forest Burn, Hanging Valley and Rocky Point are not listed as huts (no bunks stated)."
+}

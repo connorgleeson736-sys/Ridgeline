@@ -1,0 +1,45 @@
+{
+  "guid": "16fda832-0dec-4f44-b5c2-99c9900bb8f6",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Mt Robert car park to Angelus Hut via Pinchgut Track and Robert Ridge Route",
+      "shape": "one_way",
+      "start": {"name": "Mt Robert car park", "quote": "From the Mt Robert car park, a steep zigzag track (the Pinchgut Track) climbs up", "ref": "F2"},
+      "end": {"name": "Angelus Hut", "quote": "Follow the poles down to the lake and hut.", "ref": "T10"},
+      "via": [
+        {"name": "Pinchgut Track", "quote": "the Pinchgut Track", "ref": "T6"},
+        {"name": "junction with Paddys Track", "quote": "the junction with Paddys Track", "ref": null},
+        {"name": "Robert Ridge Route (poled ridge route)", "quote": "the route along the ridge is marked with poles", "ref": "T7"},
+        {"name": "Julius Summit", "quote": "Julius Summit (1794 m)", "ref": null},
+        {"name": "junction with the Speargrass Creek Route", "quote": "the junction with the Speargrass Creek Route (30 min from Angelus Hut)", "ref": null},
+        {"name": "ridge overlooking the Angelus basin", "quote": "onto the ridge overlooking the Angelus basin", "ref": null},
+        {"name": "the lake", "quote": "the lake", "ref": null}
+      ],
+      "direction": null,
+      "time": "6 hr",
+      "distance": "12.2 km one way",
+      "evidence": [
+        "From the Mt Robert car park, a steep zigzag track (the Pinchgut Track) climbs up to the junction with Paddys Track (Bushline Hut is 30 min from junction).",
+        "Follow the poles down to the lake and hut.",
+        "Follow this for 4.9 km to the car park at the end."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [],
+  "huts": [
+    {"name": "Angelus Hut", "quote": "Angelus Hut", "ref": "T10"}
+  ],
+  "not_on_route": [
+    {"name": "Bushline Hut", "quote": "Bushline Hut is 30 min from junction", "ref": "L1", "why": "nearby"},
+    {"name": "Lakehead Hut", "quote": "Lakehead Hut", "ref": "T13", "why": "other walk"},
+    {"name": "Coldwater Hut", "quote": "Coldwater Hut", "ref": "T12", "why": "other walk"},
+    {"name": "Sabine Hut", "quote": "Sabine Hut", "ref": "T17", "why": "other walk"},
+    {"name": "St Arnaud", "quote": "From St Arnaud", "ref": "T19", "why": "nearby"},
+    {"name": "Rotoiti/Nelson Lakes Visitor Centre", "quote": "Rotoiti/Nelson Lakes Visitor Centre", "ref": null, "why": "nearby"}
+  ],
+  "doubts": "The page does not describe a return; recorded as one way from DOC's '12.2 km one way'. Start ref F2 is where the Pinchgut Track (the first track) meets Mt Robert Road at the car park. The ridge route is given the Robert Ridge Route ref (T7) from the page title; the text itself calls it 'the route along the ridge'. The lake is not named."
+}

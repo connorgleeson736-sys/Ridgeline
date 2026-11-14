@@ -1,0 +1,41 @@
+{
+  "guid": "f73f8cf3-e0ee-4526-ba6f-454fc2b4dfad",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Burtton's Track from Scotts Road to Mangahao Road carpark",
+      "shape": "one_way",
+      "start": {"name": "Scotts Road carpark at the entrance to Gordon Kear Forest", "quote": "The track starts at the entrance to Gordon Kear Forest. There is a carpark on Scotts Road.", "ref": null},
+      "end": {"name": "Mangahao Road Carpark", "quote": "The DOC track ends at the carpark just off the Mangahao Road", "ref": null},
+      "via": [
+        {"name": "bridge over the Kahuterawa Stream", "quote": "the bridge over the Kahuterawa Stream", "ref": "T1"},
+        {"name": "metalled forestry road", "quote": "following the metalled forestry road alongside the Kahuterawa Stream", "ref": null},
+        {"name": "DOC Boundary", "quote": "DOC Boundary", "ref": null},
+        {"name": "No 1 Stream", "quote": "The track crosses the No 1 stream", "ref": null},
+        {"name": "Tokomaru River", "quote": "follows the eastern side of the Tokomaru River", "ref": "T2"},
+        {"name": "Burtton's Whare site", "quote": "Burtton’s Whare site", "ref": null},
+        {"name": "former Tokomaru Valley Road", "quote": "along the former Tokomaru Valley Road", "ref": null}
+      ],
+      "direction": null,
+      "time": "6 hr going south, 7 hr going north",
+      "distance": "17 km one way",
+      "evidence": [
+        "The track can be walked from either direction. Walking south from Scotts Road is easiest for the steepest gradient is then downhill.",
+        "The following track description applies to the walk when undertaken from north to south.",
+        "The track starts at the entrance to Gordon Kear Forest. There is a carpark on Scotts Road.",
+        "The DOC track ends at the carpark just off the Mangahao Road 7.7 km from the Mangahao Power Station.",
+        "From here you have the option of arranging transport, walking down Mangahao Road towards Shannon, or continuing up the road towards the dams to the Mangahao-Makahika Track."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [],
+  "huts": [],
+  "not_on_route": [
+    {"name": "Mangahao-Makahika Track", "quote": "Mangahao-Makahika Track", "ref": null, "why": "other walk"},
+    {"name": "Mangahao Power Station", "quote": "Mangahao Power Station", "ref": null, "why": "nearby"}
+  ],
+  "doubts": "The packet has no road-end features, so start and end have no refs. The track can be walked in either direction; the page's description is north to south, so that is the main way. The mountain biking section mentions riding from 'Kahuterawa Rd or Scott's Rd' and on to Mangahao Power station; not recorded as a separate walking way or access point."
+}

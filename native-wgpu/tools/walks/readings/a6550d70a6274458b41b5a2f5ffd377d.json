@@ -1,0 +1,32 @@
+{
+  "guid": "a6550d70-a627-4458-b41b-5a2f5ffd377d",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Track from Hakatere Potts Road to Mt Potts Conservation Area boundary",
+      "shape": "one_way",
+      "start": {"name": "Hakatere Potts Road", "quote": "The track starts on Hakatere Potts Road", "ref": "F1"},
+      "end": {"name": "Mt Potts Conservation Area boundary", "quote": "The track ends at the boundary of Mt Potts Conservation Area.", "ref": null},
+      "via": [],
+      "direction": null,
+      "time": "30 min one way",
+      "distance": null,
+      "evidence": [
+        "The track starts on Hakatere Potts Road, then climbs steadily up the hill.",
+        "The track ends at the boundary of Mt Potts Conservation Area.",
+        "There is no DOC-maintained track beyond this point."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [],
+  "huts": [],
+  "not_on_route": [
+    {"name": "Erewhon Hut", "quote": "Erewhon Hut", "ref": null, "why": "nearby"},
+    {"name": "Mt Sunday Track car park", "quote": "Mt Sunday Track car park", "ref": "F2", "why": "nearby"},
+    {"name": "Lake Clearwater", "quote": "Lake Clearwater", "ref": null, "why": "nearby"}
+  ],
+  "doubts": "Shape is one_way from DOC's '30 min one way' and the track ending at the conservation area boundary; the text does not say how walkers come back (presumably the same way). No feature or name marks the boundary, so the end has no ref. Erewhon Hut is a private hut somewhere within the conservation area, not on this track."
+}

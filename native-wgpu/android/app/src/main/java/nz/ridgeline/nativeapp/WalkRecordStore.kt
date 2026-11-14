@@ -13,7 +13,7 @@ internal class WalkRecordStore(private val assets:AssetManager){
     private val waiting=ArrayList<Pair<String,(WalkRecords.Walk?)->Unit>>()
     init{
         Executors.newSingleThreadExecutor{Thread(it,"ridgeline-walks").apply{isDaemon=true;priority=Thread.MIN_PRIORITY}}.execute{
-            val read=runCatching{assets.open(WalkRecords.ASSET).use{java.util.zip.GZIPInputStream(it).readBytes()}.let{WalkRecords.parse(String(it,Charsets.UTF_8))}}.getOrElse{emptyMap()}
+            val read=runCatching{assets.open(WalkRecords.ASSET).use{it.readBytes()}.let{WalkRecords.parse(String(it,Charsets.UTF_8))}}.getOrElse{emptyMap()}
             main.post{records=read;val w=waiting.toList();waiting.clear();for((g,cb) in w)cb(read[g])}
         }
     }

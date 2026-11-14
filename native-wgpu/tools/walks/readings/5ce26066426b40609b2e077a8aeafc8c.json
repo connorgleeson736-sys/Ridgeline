@@ -1,0 +1,42 @@
+{
+  "guid": "5ce26066-426b-4060-9b2e-077a8aeafc8c",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Tongariro Alpine Crossing, Mangatepōpō to Ketetahi Road",
+      "shape": "one_way",
+      "start": {"name": "Mangatepōpō Road end", "quote": "Mangatepōpō Road end", "ref": "F1"},
+      "end": {"name": "Ketetahi Road", "quote": "The track ends at Ketetahi Road at an altitude of 760 m.", "ref": null},
+      "via": [
+        {"name": "Mangatepōpō Valley", "quote": "Mangatepōpō Valley", "ref": null},
+        {"name": "Soda Springs Walk (shared first 5.4 km)", "quote": "The initial 5.4 kilometres share the track with the Soda Springs Walk.", "ref": "L1"},
+        {"name": "South Crater", "quote": "a short plateau in South Crater", "ref": null},
+        {"name": "Red Crater", "quote": "the ascent to Red Crater", "ref": null},
+        {"name": "Ngā Rotopounamu-Emerald Lakes", "quote": "Ngā Rotopounamu-Emerald Lakes", "ref": "T3"},
+        {"name": "Blue Lake", "quote": "Blue Lake - Te Wai Whakaata o Te Rangihīroa", "ref": "T2"}
+      ],
+      "direction": null,
+      "time": "Nov-Apr: 7-8 hr | May-Oct: 9 hr",
+      "distance": "20.2 km one way",
+      "evidence": [
+        "This challenging trip begins at 1120 m following a well-formed boardwalk in a gradual climb through the Mangatepōpō Valley.",
+        "The track ends at Ketetahi Road at an altitude of 760 m.",
+        "There is a private carpark near the end of the hike at Ketetahi."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [],
+  "huts": [],
+  "not_on_route": [
+    {"name": "Soda Springs Walk", "quote": "Soda Springs Walk is an easy 2 hr return", "ref": "L1", "why": "other walk"},
+    {"name": "Taranaki Falls Walking Track", "quote": "Taranaki Falls Walking Track", "ref": "L2", "why": "other walk"},
+    {"name": "Tama Lakes Track", "quote": "Tama Lakes Track", "ref": "L3", "why": "other walk"},
+    {"name": "Lake Rotoaira", "quote": "views over Lake Rotoaira", "ref": "T4", "why": "view"},
+    {"name": "Lake Taupō", "quote": "Lake Taupō", "ref": null, "why": "view"},
+    {"name": "Ketetahi private carpark", "quote": "There is a private carpark near the end of the hike at Ketetahi.", "ref": null, "why": "nearby"}
+  ],
+  "doubts": "The start is not named in the track description itself ('begins at 1120 m ... through the Mangatepōpō Valley'); F1 (where Tongariro Crossing meets Mangatepopo Road) is taken as the start from 'Mangatepōpō Road end' and 'Mangatepopo car park'. No feature exists for the Ketetahi Road end, so the end ref is null. The page does not say 'one way' in the text, but the track begins in the Mangatepōpō Valley and ends at Ketetahi Road, and DOC's distance says one way. Soda Springs Walk is listed both as the shared first part of the way (via) and as another walk."
+}

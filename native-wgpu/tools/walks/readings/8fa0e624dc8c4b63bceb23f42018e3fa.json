@@ -1,0 +1,64 @@
+{
+  "guid": "8fa0e624-dc8c-4b63-bceb-23f42018e3fa",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Toaroha roadend to Whitcombe road end via Toaroha and Frew saddles",
+      "shape": "one_way",
+      "start": {"name": "Toaroha Valley road end car park", "quote": "Roadend", "ref": "F2"},
+      "end": {"name": "Road end (Whitcombe Valley side)", "quote": "Road End", "ref": null},
+      "via": [
+        {"name": "Toaroha Canyon", "quote": "Toaroha Canyon", "ref": "T18"},
+        {"name": "Cedar Flat Bridge", "quote": "Cedar Flat Bridge", "ref": "F1"},
+        {"name": "Cedar Flat Hut", "quote": "Cedar Flat Hut", "ref": "T5"},
+        {"name": "Toaroha River", "quote": "Toaroha riverbed", "ref": "T19"},
+        {"name": "Top Toaroha Hut", "quote": "Top Toaroha Hut", "ref": "T21"},
+        {"name": "Bannatyne Creek", "quote": "Bannatyne Creek", "ref": "T3"},
+        {"name": "Toaroha Saddle Bivouac", "quote": "Toaroha Saddle Bivouac", "ref": null},
+        {"name": "Mungo River", "quote": "Mungo River", "ref": "T13"},
+        {"name": "Poet Hut", "quote": "Poet Hut", "ref": "T15"},
+        {"name": "Poet Creek", "quote": "Poet Creek", "ref": "T14"},
+        {"name": "Bluff Swing Bridge", "quote": "Bluff Swing Bridge", "ref": null},
+        {"name": "Bluff Hut", "quote": "Bluff Hut", "ref": "T4"},
+        {"name": "Hokitika River", "quote": "Hokitika River", "ref": "T10"},
+        {"name": "Frew Saddle", "quote": "Frew Saddle", "ref": "T9"},
+        {"name": "Frew Saddle Bivouac", "quote": "Frew Saddle Bivouac", "ref": null},
+        {"name": "Frew Creek", "quote": "Frew Creek", "ref": "T7"},
+        {"name": "Frew Hut", "quote": "Frew Hut", "ref": "T8"},
+        {"name": "Collier Gorge", "quote": "Collier Gorge", "ref": "T6"},
+        {"name": "Rapid Creek", "quote": "Rapid Creek", "ref": "T16"},
+        {"name": "Rapid Creek Hut", "quote": "Rapid Creek Hut", "ref": "T17"},
+        {"name": "cableway across the Hokitika River", "quote": "cableway across the Hokitika River", "ref": null}
+      ],
+      "direction": null,
+      "time": "4 - 5 days",
+      "distance": "48 km one way",
+      "evidence": [
+        "From the car park follow the rough farm road down to river level, then pick up the orange triangular markers and follow these across the open flats to the bush line and the start of the track.",
+        "Cross this and follow the benched track, dropping to the Hokitika riverbed some 600 m from the road end.",
+        "From the road end there is approximately 5 km of rough farm road to follow before the Hokitika Gorge Road is reached.",
+        "Alternatively access can be gained from the Whitcombe Valley Road (Hokitika Gorge Road) and the route walked in the reverse order to that described."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [
+    {"name": "hot springs up Wren Creek", "quote": "Wren Creek", "ref": "T22", "from": "Cedar Flat Hut"}
+  ],
+  "huts": [
+    {"name": "Cedar Flat Hut", "quote": "Cedar Flat Hut", "ref": "T5"},
+    {"name": "Top Toaroha Hut", "quote": "Top Toaroha Hut", "ref": "T21"},
+    {"name": "Toaroha Saddle Bivouac", "quote": "Toaroha Saddle Bivouac", "ref": null},
+    {"name": "Poet Hut", "quote": "Poet Hut", "ref": "T15"},
+    {"name": "Bluff Hut", "quote": "Bluff Hut", "ref": "T4"},
+    {"name": "Frew Saddle Bivouac", "quote": "Frew Saddle Bivouac", "ref": null},
+    {"name": "Frew Hut", "quote": "Frew Hut", "ref": "T8"},
+    {"name": "Rapid Creek Hut", "quote": "Rapid Creek Hut", "ref": "T17"}
+  ],
+  "not_on_route": [
+    {"name": "Toaroha Saddle (true saddle)", "quote": "true Toaroha Saddle", "ref": "T20", "why": "other"}
+  ],
+  "doubts": "Start: the text says only 'car park'/'Roadend' reached from the Kokatahi/Lake Kaniere road over the Kokatahi River; F2 (track meets Middlebranch Road) is the only road-end feature on the Toaroha side, but the text does not name that road. End: the Whitcombe-side road end (5 km of farm road from Hokitika Gorge Road) has no matching feature. F1 is labelled a road end but is where a track meets Cedar Flat Bridge, which the text says is crossed to the huts; used as a via. The route does not go over the true Toaroha Saddle (T20) but a low saddle to the west. Route can be walked in reverse from Whitcombe Valley Road."
+}

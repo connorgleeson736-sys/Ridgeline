@@ -5,7 +5,7 @@ import org.junit.Test
 import java.io.File
 
 /** Offline tool (WALKS_DATA, WALKS_PACKETS, WALKS_READINGS, WALKS_TILES,
- * WALKS_ASSET=output walks.json.gz, WALKS_REPORT=output report JSON;
+ * WALKS_ASSET=output walks.json, WALKS_REPORT=output report JSON;
  * WALKS_ONLY=guids without dashes, | separated, optional): compiles every
  * walk that has a valid reading (WalkCompiler) into the app's walk records. */
 class WalkCompileTest{
@@ -52,7 +52,7 @@ class WalkCompileTest{
                 .put("attempted",JSONArray().apply{for(w in res.attempted)put(JSONObject().put("label",w.label).put("main",w.main).put("km",DocTracks.length(w.line)/1000).put("line",WalkRecords.encode(DocTracks.simplify(w.line,1500))))}))
         }
         val root=JSONObject().put("v",1).put("walks",records)
-        System.getenv("WALKS_ASSET")?.let{p->File(p).parentFile?.mkdirs();java.util.zip.GZIPOutputStream(File(p).outputStream()).use{it.write(root.toString().toByteArray())}}
+        System.getenv("WALKS_ASSET")?.let{p->File(p).parentFile?.mkdirs();File(p).writeText(root.toString())}
         File(System.getenv("WALKS_REPORT")!!).writeText(report.toString(1))
     }
 }

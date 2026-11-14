@@ -1,0 +1,108 @@
+{
+  "guid": "96e5a687-e3c4-4aad-b8fc-60d9eb09d364",
+  "kind": "network",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Road end – Hunters Hut",
+      "shape": "one_way",
+      "start": {"name": "Road end", "quote": "Road end", "ref": null},
+      "end": {"name": "Hunters Hut", "quote": "Hunters Hut", "ref": "T8"},
+      "via": [
+        {"name": "Shearers Flat", "quote": "Shearers Flat", "ref": "T13"},
+        {"name": "Hendes Creek", "quote": "Hendes Creek", "ref": "T7"},
+        {"name": "Mystie Flat", "quote": "Mystie Flat", "ref": "T11"},
+        {"name": "Steep Creek", "quote": "Steep Creek", "ref": "T16"},
+        {"name": "Annoyance Bluff", "quote": "Annoyance Bluff", "ref": "T3"},
+        {"name": "Jones Flat", "quote": "Jones Flat", "ref": "T9"},
+        {"name": "cableway across the Wanganui River", "quote": "the cableway across the Wanganui River", "ref": null}
+      ],
+      "direction": null,
+      "time": "5 hr",
+      "distance": null,
+      "evidence": [
+        "The track begins by crossing a couple of paddocks and joining the access road to the rock quarry.",
+        "Once across the cableway, an easy 10 min walk downstream on the true left bank takes you to Hunters Hut (six bunks).",
+        "Access is 8 km north of Harihari on SH6 (on the northern side of the Wanganui River bridge) where a small side road takes you to the start of the track."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "Lambert Tops Route",
+      "shape": "one_way",
+      "start": {"name": "Hunters Hut", "quote": "Hunters Hut", "ref": "T8"},
+      "end": {"name": "two yellow and orange deer posts", "quote": "the two yellow and orange deer posts", "ref": null},
+      "via": [
+        {"name": "Gorge Track", "quote": "Gorge Track", "ref": null},
+        {"name": "Lambert River", "quote": "Lambert River", "ref": "T10"},
+        {"name": "sign-posted junction", "quote": "sign-posted junction", "ref": null},
+        {"name": "Lambert Tops Route", "quote": "Lambert Tops Route", "ref": "T2"}
+      ],
+      "direction": null,
+      "time": "4 hr to bush edge from Hunters Hut",
+      "distance": null,
+      "evidence": [
+        "Follow the Gorge Track from Hunters Hut to the Lambert River.",
+        "Follow the track to the sign-posted junction before turning left and climbing steeply up a ridgeline, following a spur that runs alongside Lambert Gorge.",
+        "The marked route ends at the two yellow and orange deer posts."
+      ]
+    },
+    {
+      "id": "W3",
+      "main": false,
+      "label": "Blue Lookout Route",
+      "shape": "one_way",
+      "start": {"name": "Hunters Hut", "quote": "Hunters Hut", "ref": "T8"},
+      "end": {"name": "two yellow and orange deer posts", "quote": "the two yellow and orange deer posts", "ref": null},
+      "via": [
+        {"name": "Benighted Creek", "quote": "Benighted Creek", "ref": "T4"},
+        {"name": "Blue Lookout Route", "quote": "Blue Lookout Route", "ref": "T1"}
+      ],
+      "direction": null,
+      "time": "3 hr 30 min to bush edge from Hunters Hut",
+      "distance": null,
+      "evidence": [
+        "From Hunters Hut follow the track towards the Lambert River.",
+        "The route to Blue Lookout is sign-posted at Benighted Creek.",
+        "The marked route ends at the two yellow and orange deer posts."
+      ]
+    },
+    {
+      "id": "W4",
+      "main": false,
+      "label": "Hunters Hut – Smyth Hut tramping track",
+      "shape": "one_way",
+      "start": {"name": "Hunters Hut", "quote": "Hunters Hut", "ref": "T8"},
+      "end": {"name": "Smyth Hut", "quote": "Smyth Hut", "ref": "T14"},
+      "via": [
+        {"name": "Poker Bluff", "quote": "Poker Bluff", "ref": "T12"},
+        {"name": "Devastation Creek", "quote": "Devastation Creek", "ref": "T6"}
+      ],
+      "direction": null,
+      "time": "6 hr",
+      "distance": null,
+      "evidence": [
+        "The tramping track to Smyth Hut is on the true left of the Wanganui River.",
+        "Smyth Hut (six bunks) is perched on a terrace opposite the Smyth River."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [
+    {"name": "hot pools near Smyth Hut", "quote": "Impressive hot pools can be found nestled amongst massive boulders in the riverbed near Smyth Hut", "ref": null, "from": "Smyth Hut"},
+    {"name": "Amethyst hot springs", "quote": "Amethyst hot springs", "ref": null, "from": "road-end car park"}
+  ],
+  "huts": [
+    {"name": "Hunters Hut", "quote": "Hunters Hut", "ref": "T8"},
+    {"name": "Smyth Hut", "quote": "Smyth Hut", "ref": "T14"}
+  ],
+  "not_on_route": [
+    {"name": "Blue Lookout", "quote": "Blue Lookout", "ref": "T5", "why": "other"},
+    {"name": "Adams Wilderness Area", "quote": "Adams Wilderness Area", "ref": null, "why": "nearby"},
+    {"name": "Smyth River", "quote": "Smyth River", "ref": "T15", "why": "view"},
+    {"name": "Harihari", "quote": "Harihari", "ref": null, "why": "nearby"}
+  ],
+  "doubts": "This page describes a network of tracks and routes, each given as a one-way section; the text does not say whether they are walked out and back, so one_way only records the section as described. The road end has no matching feature (vehicles park by the powerhouse because of road erosion). The Lambert Tops and Blue Lookout routes end at deer posts with no map entry; Blue Lookout itself lies beyond the marked route. Smyth Hut is on the Hunters Hut – Smyth Hut track (W4), not on W1. The Gorge Track has no matching entry. Access to the Smyth Hut track is said to be difficult due to flood damage."
+}

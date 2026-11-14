@@ -1,0 +1,51 @@
+{
+  "guid": "83d92bf9-7e0f-429f-aacb-07bad80c0f0f",
+  "kind": "loop",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Billygoat Circuit",
+      "shape": "loop",
+      "start": {"name": "road end car park", "quote": "From the road end car park", "ref": "F2"},
+      "end": {"name": "road end car park", "quote": "Walk 300 m north along the road to get back to the road end car park", "ref": "F2"},
+      "via": [
+        {"name": "swing bridge over the Kauaeranga River", "quote": "walk to the swing bridge to cross the Kauaeranga River", "ref": null},
+        {"name": "Billygoat Landing", "quote": "Take the first track on your right which leads you for 5 minutes to Billygoat Landing", "ref": null},
+        {"name": "Webb Creek – Moss Creek junction", "quote": "Follow the track to the Webb Creek – Moss Creek junction", "ref": null},
+        {"name": "Webb Creek Track", "quote": "Follow the Webb Creek Track to Hydro Camp", "ref": null},
+        {"name": "Hydro Camp junction", "quote": "From the Hydro Camp junction", "ref": null},
+        {"name": "Billygoat Track", "quote": "take the Billygoat Track", "ref": "T2"},
+        {"name": "saddle", "quote": "a steady 30 minute climb leads to a saddle", "ref": null},
+        {"name": "Billygoat Basin", "quote": "Dropdown into Billygoat Basin and cross a bridged stream", "ref": null},
+        {"name": "Billygoat Basin Campsite", "quote": "passing through Billygoat Basin Campsite", "ref": "T5"},
+        {"name": "junction for the Tarawaere and Hihi tramping tracks", "quote": "pass the junction for the Tarawaere and Hihi tramping tracks", "ref": null},
+        {"name": "hauler site at the top of the incline", "quote": "Near the hauler site at the top of the incline", "ref": null},
+        {"name": "Kauaeranga River crossing", "quote": "requires crossing the Kauaeranga River", "ref": null},
+        {"name": "Tarawaere car park", "quote": "to the Tarawaere car park", "ref": "F3"},
+        {"name": "Kauaeranga Valley Road", "quote": "Walk 300 m north along the road", "ref": null}
+      ],
+      "direction": null,
+      "time": "4–5 hr",
+      "distance": "10.5 km loop",
+      "evidence": [
+        "From the road end car park, walk to the swing bridge to cross the Kauaeranga River.",
+        "From here it is another 40 mins downhill to the Kauaeranga Valley Road which requires crossing the Kauaeranga River to the Tarawaere car park.",
+        "Walk 300 m north along the road to get back to the road end car park."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [
+    {"name": "site of collapsed long trestle bridge", "quote": "a 50 m side track overlooks the site of a collapsed long trestle bridge", "ref": null, "from": "Billygoat Basin Campsite"}
+  ],
+  "huts": [],
+  "not_on_route": [
+    {"name": "Billygoat Falls", "quote": "good views of the Billygoat Falls (180 m high)", "ref": null, "why": "view"},
+    {"name": "Hauraki Plains", "quote": "excellent views down the Kauaeranga Valley to the Hauraki Plains", "ref": null, "why": "view"},
+    {"name": "Kauaeranga Kauri Trail (Pinnacles Walk)", "quote": "continue on the Kauaeranga Kauri Trail (Pinnacles Walk)", "ref": "L1", "why": "other walk"},
+    {"name": "Pinnacles Hut", "quote": "Check the weather for Pinnacles Hut", "ref": "T9", "why": "nearby"},
+    {"name": "Cookson Kauri Walk", "quote": "Cookson Kauri Walk is a good wet weather alternative", "ref": "T3", "why": "other walk"}
+  ],
+  "doubts": "The road end car park is taken as F2 (the unnamed track meeting Kauaeranga Valley Road at the furthest point up the road) and the Tarawaere car park as F3 (where Billygoat Walk meets the road); the text says they are 300 m apart, while F2 and F3 are somewhat further apart, so F2 is not certain. It is unclear whether Billygoat Landing is on the circuit or a short spur off it. No direction is stated, although the description runs via Webb Creek first."
+}

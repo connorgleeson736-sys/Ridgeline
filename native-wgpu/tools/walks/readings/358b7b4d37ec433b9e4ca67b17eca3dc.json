@@ -1,0 +1,59 @@
+{
+  "guid": "358b7b4d-37ec-433b-9e4c-a67b17eca3dc",
+  "kind": "unclear",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Car park to Whitcombe Pass",
+      "shape": null,
+      "start": {"name": "Whitcombe road end car park", "quote": "Whitcombe road end", "ref": null},
+      "end": {"name": "Whitcombe Pass", "quote": "Whitcombe Pass", "ref": "T18"},
+      "via": [
+        {"name": "Hokitika River", "quote": "follow the marked 4WD road to the Hokitika River", "ref": "T7"},
+        {"name": "Rapid Creek cableway", "quote": "Rapid Creek cableway", "ref": null},
+        {"name": "Rapid Creek Hut", "quote": "Rapid Creek Hut", "ref": "T13"},
+        {"name": "Rapid Creek", "quote": "Once across Rapid Creek", "ref": "T12"},
+        {"name": "Hokitika/Whitcombe Junction", "quote": "Hokitika/Whitcombe Junction", "ref": null},
+        {"name": "Collier Gorge Swing Bridge", "quote": "Collier Gorge Swing Bridge", "ref": null},
+        {"name": "Dick Creek", "quote": "Dick Creek", "ref": "T4"},
+        {"name": "Frew Hut", "quote": "Frew Hut", "ref": "T6"},
+        {"name": "Frew Creek", "quote": "drop down to Frew creek and cross it", "ref": "T5"},
+        {"name": "Vincent Creek swing bridge", "quote": "Vincent Creek swing bridge", "ref": null},
+        {"name": "Price Flat", "quote": "Price Flat", "ref": "T10"},
+        {"name": "Price Flat Hut", "quote": "Price Flat Hut", "ref": "T11"},
+        {"name": "Cataract Creek", "quote": "crossing Cataract Creek", "ref": "T2"},
+        {"name": "Chairman Creek", "quote": "Chairman Creek", "ref": null},
+        {"name": "Cave Camp", "quote": "Cave Camp", "ref": null},
+        {"name": "Neave Creek Hut", "quote": "Neave Creek Hut", "ref": null},
+        {"name": "The Gateway", "quote": "the Gateway", "ref": "T15"}
+      ],
+      "direction": null,
+      "time": "3-4 days to Whitcombe Pass",
+      "distance": null,
+      "evidence": [
+        "A side road to the left some 100 m past the second bridge leads to the Whitcombe road end.",
+        "Once at the road end drop down to the riverbed and walk upstream along the river’s edge for 15-20 minutes to where rock cairns and orange markers show the way to the cut track.",
+        "From Neave Creek Hut the track leads through alpine scrub to the Whitcombe River near the Gateway. From here travel to the Pass is via the riverbed, crossing the river where convenient."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [
+    {"name": "Wilkinson Hut", "quote": "Wilkinson Hut", "ref": "T20", "from": "main valley track between Chairman Creek and Cave Camp"}
+  ],
+  "huts": [
+    {"name": "Rapid Creek Hut", "quote": "Rapid Creek Hut", "ref": "T13"},
+    {"name": "Frew Hut", "quote": "Frew Hut", "ref": "T6"},
+    {"name": "Price Flat Hut", "quote": "Price Flat Hut", "ref": "T11"},
+    {"name": "Neave Creek Hut", "quote": "Neave Creek Hut", "ref": null}
+  ],
+  "not_on_route": [
+    {"name": "Wilkinson Hut", "quote": "Wilkinson Hut", "ref": "T20", "why": "side trip"},
+    {"name": "Mt Evans", "quote": "Mt Evans", "ref": "T8", "why": "view"},
+    {"name": "Wilkinson Ice Fall", "quote": "Wilkinson Ice Fall", "ref": null, "why": "view"},
+    {"name": "Shelf Glacier", "quote": "Shelf Glacier", "ref": "T14", "why": "view"},
+    {"name": "Hokitika Gorge", "quote": "Hokitika Gorge", "ref": null, "why": "nearby"}
+  ],
+  "doubts": "The page describes the way only as far as Whitcombe Pass (DOC time '3-4 days to Whitcombe Pass') and does not say whether walkers return the same way or cross the pass, so the shape is left null. The start is the Whitcombe road end car park; the packet has no road end feature, so its ref is null. Neave Creek Hut has no name entry (T9 is the creek), so its ref is null. The historic slab hut on Price Flat is also habitable but the text gives Price Flat Hut as the hut."
+}

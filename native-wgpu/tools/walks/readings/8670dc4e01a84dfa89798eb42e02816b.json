@@ -1,0 +1,100 @@
+{
+  "guid": "8670dc4e-01a8-4dfa-8979-8eb42e02816b",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Whakahoro to Mangapurua Landing",
+      "shape": "one_way",
+      "start": {"name": "Whakahoro (Kaiwhakauka Track road end)", "quote": "Whakahoro", "ref": "F1"},
+      "end": {"name": "Mangapurua Landing", "quote": "Mangapurua Landing", "ref": "T5"},
+      "via": [
+        {"name": "Kaiwhakauka Track", "quote": "Kaiwhakauka Track", "ref": "T1"},
+        {"name": "Retaruke Station", "quote": "Retaruke Station", "ref": null},
+        {"name": "Kaiwhakauka Stream", "quote": "Kaiwhakauka Stream", "ref": "T3"},
+        {"name": "Whanganui National Park boundary", "quote": "Whanganui National Park boundary", "ref": null},
+        {"name": "Mosley homestead site near the Waione Stream", "quote": "Mosley’s", "ref": null},
+        {"name": "Cootes’ homestead", "quote": "Cootes’ homestead", "ref": null},
+        {"name": "Mangapurua/Kaiwhakauka junction", "quote": "Mangapurua/Kaiwhakauka junction", "ref": null},
+        {"name": "Mangapurua Trig", "quote": "Mangapurua Trig", "ref": null},
+        {"name": "Slippery Creek swing bridge", "quote": "Slippery Creek", "ref": null},
+        {"name": "Johnson’s", "quote": "Johnson’s", "ref": null},
+        {"name": "Bettjeman’s", "quote": "Bettjeman’s", "ref": null},
+        {"name": "Bartrum’s swingbridge", "quote": "Bartrum’s swingbridge", "ref": null},
+        {"name": "Hellawell’s", "quote": "Hellawell’s", "ref": null},
+        {"name": "Mangapurua Stream", "quote": "Mangapurua Stream", "ref": "T6"},
+        {"name": "Battleship Bluff", "quote": "Battleship Bluff", "ref": null},
+        {"name": "Bridge to Nowhere", "quote": "Bridge to Nowhere", "ref": null},
+        {"name": "Hunter’s Clearing", "quote": "Hunter’s Clearing", "ref": null}
+      ],
+      "direction": null,
+      "time": "13 hours",
+      "distance": null,
+      "evidence": [
+        "Whakahoro to Mangapurua Landing: 13 hours (6 hours to Mangapurua/Kaiwhakauka junction)",
+        "Follow the Kaiwhakauka Track along a farm road through Retaruke Station (private land), following the true right of the Kaiwhakauka Stream to the large stock and pedestrian bridge.",
+        "Note: River transport is necessary to and from the Mangapurua Landing and jetboats can be hired to carry your party either to Pipiriki or back to Whakahoro."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "Ruatītī Road end to Mangapurua Landing",
+      "shape": "one_way",
+      "start": {"name": "Ruatītī Road end", "quote": "Ruatītī Road end", "ref": "F4"},
+      "end": {"name": "Mangapurua Landing", "quote": "Mangapurua Landing", "ref": "T5"},
+      "via": [
+        {"name": "Mangapurua/Kaiwhakauka junction", "quote": "Mangapurua/Kaiwhakauka junction", "ref": null},
+        {"name": "Mangapurua Trig", "quote": "Mangapurua Trig", "ref": null},
+        {"name": "Johnson’s", "quote": "Johnson’s", "ref": null},
+        {"name": "Bettjeman’s", "quote": "Bettjeman’s", "ref": null},
+        {"name": "Hellawell’s", "quote": "Hellawell’s", "ref": null},
+        {"name": "Bridge to Nowhere", "quote": "Bridge to Nowhere", "ref": null}
+      ],
+      "direction": null,
+      "time": "11 hours",
+      "distance": null,
+      "evidence": [
+        "Ruatītī Road end to Mangapurua Landing: 11 hours 4 hours to Mangapurua/Kaiwhakauka junction)",
+        "Accessed from Ruatītī Road, the track climbs gently from the gate at the road end through private farmland, regenerating scrub and pockets of native bush."
+      ]
+    },
+    {
+      "id": "W3",
+      "main": false,
+      "label": "Cycle option: Ruatītī Road over to Whakahoro via the Kaiwhakauka Track",
+      "shape": "one_way",
+      "start": {"name": "Ruatītī Road end", "quote": "Ruatītī Road", "ref": "F4"},
+      "end": {"name": "Whakahoro", "quote": "Whakahoro", "ref": "F1"},
+      "via": [
+        {"name": "Mangapurua/Kaiwhakauka junction", "quote": "Mangapurua/Kaiwhakauka junction", "ref": null},
+        {"name": "Kaiwhakauka Track", "quote": "Kaiwhakauka Track", "ref": "T1"}
+      ],
+      "direction": null,
+      "time": null,
+      "distance": null,
+      "evidence": [
+        "From Ruatītī Road over to Whakahoro via the Kaiwhakauka Track or vice versa."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "Mangapurua Landing (by boat from the Whanganui River)", "quote": "The track can also be accessed by boat from the Whanganui River at the Mangapurua Landing.", "ref": "T5", "onto": null}
+  ],
+  "side_trips": [
+    {"name": "Cleared viewpoint", "quote": "A sidetrack leads up to a cleared viewpoint.", "ref": null, "from": "Mangapurua Trig"},
+    {"name": "Waterfall up Waterfall Creek", "quote": "A 1.5 km side trip up the true left of the creek provides views of the waterfall.", "ref": null, "from": "Hellawell’s"}
+  ],
+  "huts": [],
+  "not_on_route": [
+    {"name": "Tongariro National Park", "quote": "Tongariro National Park", "ref": null, "why": "view"},
+    {"name": "Mt Taranaki", "quote": "Mt Taranaki", "ref": null, "why": "view"},
+    {"name": "Tobin homestead", "quote": "The old Tobin homestead", "ref": null, "why": "view"},
+    {"name": "Pipiriki", "quote": "Pipiriki", "ref": null, "why": "other"},
+    {"name": "Owhango", "quote": "Owhango", "ref": null, "why": "nearby"},
+    {"name": "Raurimu", "quote": "Raurimu", "ref": null, "why": "nearby"},
+    {"name": "Raetihi", "quote": "Raetihi", "ref": null, "why": "nearby"}
+  ],
+  "doubts": "W1 start: the text says Whakahoro and that the walk follows the Kaiwhakauka Track along a farm road; I gave F1, where Kaiwhakauka Track meets Te Mata Road, which is some way south of the Whakahoro place (T11) and F2/F3 on Oio Road; the text does not say where the farm road begins. W2 start: Ruatītī Road end is taken as F4 (Mangapurua Track at Crotons Road); the road name in the feature differs from the text. DOC's distance '35.5 | 40 km one way' covers both ways but is not split per way in the text, so per-way distance is null; the per-way times come from the summary list. The tracks can be walked either direction; only these directions are described. W3 is a one-day mountain-bike option given in the page; included as another way, but it is a cycling option. The Mangapurua Trig may correspond to the peak 'Mangapurua' (T4) but this is not certain."
+}

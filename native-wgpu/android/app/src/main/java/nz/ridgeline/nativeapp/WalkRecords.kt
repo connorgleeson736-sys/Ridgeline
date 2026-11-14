@@ -7,11 +7,11 @@ import kotlin.math.roundToLong
  * its DOC page (where it starts and ends, the places and tracks it goes
  * through, loop or out and back, the way round, its huts), followed over the
  * map's tracks and checked against DOC's own line and time. Bundled as
- * assets/walks/walks.json.gz. A walk is [Walk.verified] only when every check
+ * assets/walks/walks.json. A walk is [Walk.verified] only when every check
  * passed; the app then shows it as compiled, and otherwise DOC's own line.
  * Pure Kotlin (org.json), unit tested. */
 internal object WalkRecords {
-    const val ASSET="walks/walks.json.gz"
+    const val ASSET="walks/walks.json"
     /** One way to walk it: [from] to [to] ([shape]: one_way, out_and_back or
      * loop; an out-and-back [line] is the way out), DOC's [time] and
      * [distance] for it when the page gives them. */

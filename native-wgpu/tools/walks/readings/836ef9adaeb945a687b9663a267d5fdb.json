@@ -1,0 +1,48 @@
+{
+  "guid": "836ef9ad-aeb9-45a6-87b9-663a267d5fdb",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Inland Pack Track from Waikori Road car park to Fox River car park",
+      "shape": "one_way",
+      "start": {"name": "Waikori Road car park", "quote": "The Inland Pack Track traditionally starts from the Waikori Road car park", "ref": "F1"},
+      "end": {"name": "Fox River car park", "quote": "leading back to the Fox River car park", "ref": null},
+      "via": [
+        {"name": "suspension bridge (Punakaiki River)", "quote": "the crossing of a large suspension bridge", "ref": null},
+        {"name": "Pororari River Valley", "quote": "drops back down into the Pororari River Valley", "ref": null},
+        {"name": "Pororari River Track junction", "quote": "From where the Pororari River Track and Inland pack track meet", "ref": null},
+        {"name": "Paparoa Track", "quote": "continue up the Paparoa Track for a few minutes", "ref": "T4"},
+        {"name": "Lower Pororari Swing Bridge", "quote": "Lower Pororari Swing Bridge", "ref": null},
+        {"name": "old Bullock Creek Farm", "quote": "old Bullock Creek Farm", "ref": null},
+        {"name": "Bullock Creek", "quote": "There is no bridge across Bullock Creek", "ref": "T7"},
+        {"name": "Fossil Creek", "quote": "Follow Fossil Creek downstream", "ref": "T10"},
+        {"name": "Dilemma Creek", "quote": "Dilemma Creek, which is also followed downstream to Fox River", "ref": "T9"},
+        {"name": "Fox River", "quote": "a formed track again on the true left of Fox River", "ref": "T11"}
+      ],
+      "direction": null,
+      "time": "2-3 days",
+      "distance": "25 km one way",
+      "evidence": [
+        "The Inland Pack Track traditionally starts from the Waikori Road car park with the crossing of a large suspension bridge.",
+        "Orange markers take you back into a forested track section leading back to the Fox River car park.",
+        "The Inland Pack Track is recommended South to North following Fossil and Dilemma Creek downstream, but can also be done in reverse from the Fox River car park."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "Pororari River Track car park", "quote": "From the Pororari River Track car park, 1 km north of the Paparoa National Park Visitor Centre.", "ref": "L2", "onto": "Pororari River Track"},
+    {"name": "Bullock Creek road end car park", "quote": "An alternative access is the car park at the end of Bullock Creek road.", "ref": "F2", "onto": null}
+  ],
+  "side_trips": [
+    {"name": "Ballroom Overhang", "quote": "The Ballroom Overhang is a side track from here.", "ref": "T6", "from": "Fox River / Dilemma Creek junction"}
+  ],
+  "huts": [],
+  "not_on_route": [
+    {"name": "Ballroom Overhang", "quote": "Track to the Ballroom Overhang", "ref": "L1", "why": "side trip"},
+    {"name": "Cave Creek Memorial track", "quote": "Cave Creek Memorial track", "ref": "L3", "why": "other walk"},
+    {"name": "Paparoa National Park Visitor Centre", "quote": "Paparoa National Park Visitor Centre", "ref": null, "why": "other"}
+  ],
+  "doubts": "The Fox River car park end has no road-end feature, so null. The Pororari River Track access ref is the linked walk L2 (its car park has no feature). The page says the walk can also be done in reverse from the Fox River car park; recorded only in the described south-to-north direction. Bullock Creek is crossed near the old farm; the Bullock Creek Road end (F2) is an alternative access point. 'here' for the Ballroom Overhang side track is taken to be the Fox River / Dilemma Creek junction at the end of that section."
+}

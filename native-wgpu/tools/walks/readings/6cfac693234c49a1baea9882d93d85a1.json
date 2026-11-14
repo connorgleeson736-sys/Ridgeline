@@ -1,0 +1,39 @@
+{
+  "guid": "6cfac693-234c-49a1-baea-9882d93d85a1",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Māori Saddle Route from the Cattle Track turn off to Mataketake Hut",
+      "shape": "one_way",
+      "start": {"name": "Historic Haast to Paringa Cattle Track", "quote": "Māori Saddle Route is started from the Historic Haast to Paringa Cattle Track", "ref": "L1"},
+      "end": {"name": "Mataketake Hut", "quote": "follow the poled route for about 20 minutes to Mataketake Hut", "ref": "L3"},
+      "via": [
+        {"name": "Māori Saddle Hut", "quote": "signposted 10 min after Māori Saddle Hut on the Historic Haast to Paringa Cattle Track", "ref": "L2"},
+        {"name": "Turn off to Māori Saddle Route", "quote": "The turn off to Māori Saddle Route is signposted", "ref": null},
+        {"name": "Bush edge pole markers", "quote": "you reach the pole markers at the edge of the open tops", "ref": null}
+      ],
+      "direction": null,
+      "time": "9 hrs one way from SH6",
+      "distance": null,
+      "evidence": [
+        "Māori Saddle Route is started from the Historic Haast to Paringa Cattle Track.",
+        "The turn off to Māori Saddle Route is signposted 10 min after Māori Saddle Hut on the Historic Haast to Paringa Cattle Track.",
+        "From the bush edge markers, follow the poled route for about 20 minutes to Mataketake Hut.",
+        "Return to the Haast to Paringa Cattle Track via the Māori Saddle Route or Mica Mine Tops Route dependant on weather conditions."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [],
+  "huts": [
+    {"name": "Māori Saddle Hut", "quote": "Māori Saddle Hut", "ref": "L2"},
+    {"name": "Mataketake Hut", "quote": "Mataketake Hut", "ref": "L3"}
+  ],
+  "not_on_route": [
+    {"name": "Lake Dime", "quote": "This gives you a great view of Lake Dime on a clear day", "ref": "T4", "why": "view"},
+    {"name": "Mica Mine Tops Route", "quote": "Return to the Haast to Paringa Cattle Track via the Māori Saddle Route or Mica Mine Tops Route", "ref": "L4", "why": "other walk"}
+  ],
+  "doubts": "The route proper begins at a signposted turn off 10 min past Māori Saddle Hut on the Cattle Track; that junction has no entry, so the start is given as the Cattle Track walk (L1), reached from SH6 (DOC time '9 hrs one way from SH6'). Māori Saddle Hut is on the way only when walking in from SH6. Shape one_way follows DOC's 'one way'; the page says to return to the Cattle Track by this route or the Mica Mine Tops Route, so it is in practice a return trip or a circuit, which the text leaves to weather."
+}

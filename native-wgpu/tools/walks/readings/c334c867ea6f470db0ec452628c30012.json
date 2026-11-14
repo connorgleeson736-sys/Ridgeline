@@ -1,0 +1,61 @@
+{
+  "guid": "c334c867-ea6f-470d-b0ec-452628c30012",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Pouākai Crossing, North Taranaki Visitor Centre to Mangorei Road end",
+      "shape": "one_way",
+      "start": {"name": "North Egmont (North Taranaki Visitor Centre)", "quote": "starting at North Egmont", "ref": "T13"},
+      "end": {"name": "Mangorei Road end", "quote": "Mangorei Road end", "ref": "F2"},
+      "via": [
+        {"name": "Veronica Loop Track", "quote": "Veronica Loop Track", "ref": "T8"},
+        {"name": "Camphouse", "quote": "Camphouse", "ref": null},
+        {"name": "Ambury Monument", "quote": "Ambury Monument", "ref": null},
+        {"name": "junction, track signposted towards Holly Hut", "quote": "take the track signposted towards Holly Hut", "ref": null},
+        {"name": "lookout", "quote": "you will come to a lookout", "ref": null},
+        {"name": "Dieffenbach Cliffs", "quote": "Dieffenbach Cliffs", "ref": null},
+        {"name": "Boomerang Slip", "quote": "Boomerang Slip", "ref": "T9"},
+        {"name": "Kōkōwai Track junction", "quote": "track junction with Kōkōwai Track", "ref": null},
+        {"name": "Ahukawakawa Track junction", "quote": "Ahukawakawa Track junction", "ref": null},
+        {"name": "Minarapa Stream", "quote": "Minarapa Stream", "ref": "T12"},
+        {"name": "Holly Hut", "quote": "Holly Hut", "ref": "T10"},
+        {"name": "Ahukawakawa alpine swamp boardwalk", "quote": "follow the boardwalk across Ahukawakawa, alpine swamp", "ref": null},
+        {"name": "bridge over the Hangatahua River", "quote": "curved wooden bridge over the Hangatahua River", "ref": null},
+        {"name": "Pouākai Track junction", "quote": "Pouākai Track junction", "ref": null},
+        {"name": "Hump", "quote": "Hump", "ref": "T11"},
+        {"name": "Mangorei Track junction", "quote": "Mangorei Track junction", "ref": null},
+        {"name": "Pouākai tarns", "quote": "Pouākai tarns", "ref": null},
+        {"name": "Mangorei Track", "quote": "Backtrack to the junction with Mangorei Track and head downhill to Pouākai Hut", "ref": "T6"},
+        {"name": "Pouākai Hut", "quote": "Pouākai Hut", "ref": null}
+      ],
+      "direction": null,
+      "time": "7 hr 30 min - 9 hr 30 min",
+      "distance": "19 km one way",
+      "evidence": [
+        "You can walk the track in either direction, but there is less climbing if you walk from the North Taranaki Visitor Centre to Mangorei Road.",
+        "The Pouākai Crossing begins on the Veronica Loop Track, starting at North Egmont.",
+        "Pouākai Hut to Mangorei Road end",
+        "The long descent to the road end winds through cool forest dripping with mosses and lichens",
+        "This is a one-way track so you need to arrange transport to and from one end."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [
+    {"name": "Te Rere-o-Tahurangi Falls", "quote": "Te Rere-o-Tahurangi Falls", "ref": "T18", "from": "Holly Hut"},
+    {"name": "Pouākai Trig", "quote": "Pouākai Trig", "ref": "T15", "from": "Pouākai Track junction"}
+  ],
+  "huts": [
+    {"name": "Holly Hut", "quote": "Holly Hut", "ref": "T10"},
+    {"name": "Pouākai Hut", "quote": "Pouākai Hut", "ref": null}
+  ],
+  "not_on_route": [
+    {"name": "Taranaki Maunga", "quote": "Taranaki Maunga", "ref": "T16", "why": "view"},
+    {"name": "Egmont Road (via Kōkōwai Track)", "quote": "take Kōkōwai Track to Egmont Road", "ref": null, "why": "other"},
+    {"name": "Mangorei Track to Pouākai tarns day walk", "quote": "day walk from Mangorei Road", "ref": "L1", "why": "other walk"},
+    {"name": "Te Papa-Kura-o-Taranaki", "quote": "Te Papa-Kura-o-Taranaki", "ref": "T17", "why": "other"}
+  ],
+  "doubts": "No road end feature at North Egmont, so the start is given as the North Egmont place (T13), which the text names as the start alongside the North Taranaki Visitor Centre. The page says the walk can be done in either direction; recorded as described (Visitor Centre to Mangorei Road). The tarns are on the described way (out and back from the Mangorei Track junction); the page also suggests skipping them and going straight to Pouākai Hut if tired, not recorded as a separate way. Time and distance are DOC's summary; the text says 'a 19km track' taking '7 hr 30 mins and 9 hr 30 mins'. Pouākai Trig ref T15 (peak Pouākai) assumed to be the trig the text names."
+}

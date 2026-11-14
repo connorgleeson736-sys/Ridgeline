@@ -1,0 +1,119 @@
+{
+  "guid": "b570f10e-e00e-4696-8180-7d6678c667df",
+  "kind": "network",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Nevis-Gibbston Track from Nevis Crossing to the boundary gate",
+      "shape": "one_way",
+      "start": {"name": "Nevis Crossing", "quote": "Beginning from Nevis Crossing on Nevis Road", "ref": "T5"},
+      "end": {"name": "boundary gate", "quote": "it descends to its end point at a boundary gate", "ref": null},
+      "via": [
+        {"name": "Doolans Saddle", "quote": "the 993 m Doolans Saddle", "ref": "T4"}
+      ],
+      "direction": null,
+      "time": "2 hr one way",
+      "distance": "8 km",
+      "evidence": [
+        "Beginning from Nevis Crossing on Nevis Road, the track gradually winds its way up rutted sections of farm road until the 993 m Doolans Saddle.",
+        "From there it descends to its end point at a boundary gate."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "River Face Track from Nevis Road to the Nevis River",
+      "shape": "one_way",
+      "start": {"name": "Nevis Road", "quote": "one way from Nevis Road", "ref": null},
+      "end": {"name": "Nevis River", "quote": "descends down a moderately steep farm road to the Nevis River", "ref": "T6"},
+      "via": [
+        {"name": "Nevis-Gibbston Track", "quote": "Branching off the Nevis-Gibbston Track", "ref": null},
+        {"name": "River Face Track", "quote": "the River Face Track", "ref": "T2"}
+      ],
+      "direction": null,
+      "time": "2–2 hr 30 min one way from Nevis Road",
+      "distance": "9 km",
+      "evidence": [
+        "Time: 2–2 hr 30 min one way from Nevis Road",
+        "Branching off the Nevis-Gibbston Track, the River Face Track descends down a moderately steep farm road to the Nevis River."
+      ]
+    },
+    {
+      "id": "W3",
+      "main": false,
+      "label": "Dark Elliots Track from Nevis Road to the conservation area boundary",
+      "shape": "one_way",
+      "start": {"name": "Nevis Road", "quote": "2–3 hr one way from Nevis Road", "ref": null},
+      "end": {"name": "conservation area boundary", "quote": "For 5 km the track continues climbing a farm road to the conservation area boundary.", "ref": null},
+      "via": [
+        {"name": "Nevis Gibbston Track", "quote": "Follow the Nevis Gibbston Track for 2 km (30–45 minutes) until the track sign on the left.", "ref": null},
+        {"name": "Dark Elliots Track", "quote": "Dark Elliots Track", "ref": "T1"}
+      ],
+      "direction": null,
+      "time": "2–3 hr one way from Nevis Road",
+      "distance": "7 km",
+      "evidence": [
+        "Follow the Nevis Gibbston Track for 2 km (30–45 minutes) until the track sign on the left.",
+        "For 5 km the track continues climbing a farm road to the conservation area boundary."
+      ]
+    },
+    {
+      "id": "W4",
+      "main": false,
+      "label": "Sunny Elliots Track from Nevis Road to the conservation area boundary",
+      "shape": "one_way",
+      "start": {"name": "Nevis Road", "quote": "3–4 hr one way from Nevis Road", "ref": null},
+      "end": {"name": "conservation area boundary", "quote": "It's a steady climb to the conservation area boundary.", "ref": null},
+      "via": [
+        {"name": "Nevis Gibbston Track", "quote": "Follow the Nevis Gibbston Track for 8 km (2–2 hours 30 minutes) to a sign that marks the start of the track, 500 m from Doolans Saddle.", "ref": null},
+        {"name": "Sunny Elliots Track", "quote": "Sunny Elliots Track", "ref": "T3"}
+      ],
+      "direction": null,
+      "time": "3–4 hr one way from Nevis Road",
+      "distance": "12 km",
+      "evidence": [
+        "Follow the Nevis Gibbston Track for 8 km (2–2 hours 30 minutes) to a sign that marks the start of the track, 500 m from Doolans Saddle.",
+        "It's a steady climb to the conservation area boundary."
+      ]
+    },
+    {
+      "id": "W5",
+      "main": false,
+      "label": "Ryders Track from Nevis Road to the conservation area boundary",
+      "shape": "one_way",
+      "start": {"name": "sign on Nevis Road", "quote": "From the sign on Nevis Road", "ref": null},
+      "end": {"name": "conservation area boundary", "quote": "climbing steadily to the conservation area boundary", "ref": null},
+      "via": [],
+      "direction": null,
+      "time": "1 hr 30 min – 2 hr one way",
+      "distance": "4.5 km",
+      "evidence": [
+        "From the sign on Nevis Road, the track follows a farm road, climbing steadily to the conservation area boundary."
+      ]
+    },
+    {
+      "id": "W6",
+      "main": false,
+      "label": "Scotchmans Creek Track from Nevis Road to the knoll",
+      "shape": "one_way",
+      "start": {"name": "Nevis Road", "quote": "1 hr one way from Nevis Road", "ref": null},
+      "end": {"name": "small knoll", "quote": "This track climbs up onto a small knoll", "ref": null},
+      "via": [
+        {"name": "Ryders Track", "quote": "Follow the Ryders Track for 2.5 km until the signed start of the Scotchmans Creek Track.", "ref": null}
+      ],
+      "direction": null,
+      "time": "1 hr one way from Nevis Road",
+      "distance": "3.5 km",
+      "evidence": [
+        "Follow the Ryders Track for 2.5 km until the signed start of the Scotchmans Creek Track.",
+        "This track climbs up onto a small knoll, which is a small independent section of the Remarkables Conservation Area."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [],
+  "huts": [],
+  "not_on_route": [],
+  "doubts": "This page describes several separate tracks in the Nevis Valley, so it is a network. The packet has no road-end features, so the Nevis Road starts and the conservation-area boundary ends have no ref; for River Face, Dark Elliots and Sunny Elliots the start is only implied as Nevis Road (presumably Nevis Crossing, where the Nevis-Gibbston Track begins, but the text does not say so). Where the River Face Track branches off the Nevis-Gibbston Track is not stated. All shapes are one_way from DOC's 'one way' times; the text does not say how walkers return. The Nevis-Gibbston and Ryders tracks have no map-track entry in the names, so they have no ref. The dogs note about Boundary Creek Track appears unrelated to this page's tracks."
+}

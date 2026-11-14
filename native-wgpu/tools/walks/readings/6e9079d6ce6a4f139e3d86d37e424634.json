@@ -1,0 +1,65 @@
+{
+  "guid": "6e9079d6-ce6a-4f13-9e3d-86d37e424634",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Mt Robert car park to Angelus Hut via Speargrass Track and Speargrass Creek Route",
+      "shape": "one_way",
+      "start": {"name": "Mt Robert car park", "quote": "From the Mt Robert car park follow Speargrass Track", "ref": "F1"},
+      "end": {"name": "Angelus Hut", "quote": "Follow the poles to the lake and hut.", "ref": "T9"},
+      "via": [
+        {"name": "Speargrass Track", "quote": "follow Speargrass Track", "ref": "T8"},
+        {"name": "Speargrass Creek Route junction", "quote": "the Speargrass Creek Route junction approximately 5 min before Speargrass Hut", "ref": null},
+        {"name": "Speargrass Creek Route", "quote": "Speargrass Creek Route", "ref": "T7"},
+        {"name": "Te Horowai/Speargrass Creek", "quote": "up Te Horowai/Speargrass Creek", "ref": "T18"},
+        {"name": "intersection with Robert Ridge Route", "quote": "it intersects with the Mt Robert Ridge Route 10 minutes short of the view overlooking the Angelus basin", "ref": null},
+        {"name": "the lake", "quote": "the lake", "ref": null}
+      ],
+      "direction": null,
+      "time": "6 hr",
+      "distance": "11.2 km one way",
+      "evidence": [
+        "From the Mt Robert car park follow Speargrass Track to the Speargrass Creek Route junction approximately 5 min before Speargrass Hut.",
+        "Follow the poles to the lake and hut.",
+        "Follow this for 4.9 km to the car park at the end."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "Loop returning to Mt Robert car park via Pinchgut Track and Robert Ridge Route",
+      "shape": "loop",
+      "start": {"name": "Mt Robert car park", "quote": "Mt Robert car park", "ref": "F1"},
+      "end": {"name": "Mt Robert car park", "quote": "returning to the Mt Robert carpark", "ref": "F1"},
+      "via": [
+        {"name": "Speargrass Track", "quote": "Speargrass Track", "ref": "T8"},
+        {"name": "Speargrass Creek Route", "quote": "Speargrass Creek Route", "ref": "T7"},
+        {"name": "Angelus Hut", "quote": "Angelus Hut", "ref": "T9"},
+        {"name": "Angelus Hut via Pinchgut Track and Robert Ridge Route", "quote": "Angelus Hut via Pinchgut Track and Robert Ridge Route", "ref": "L3"}
+      ],
+      "direction": null,
+      "time": null,
+      "distance": null,
+      "evidence": [
+        "You can turn this into a loop by returning to the Mt Robert carpark on the Angelus Hut via Pinchgut Track and Robert Ridge Route."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [],
+  "huts": [
+    {"name": "Angelus Hut", "quote": "Angelus Hut", "ref": "T9"}
+  ],
+  "not_on_route": [
+    {"name": "Speargrass Hut", "quote": "Speargrass Hut", "ref": "L2", "why": "nearby"},
+    {"name": "Angelus basin view", "quote": "the view overlooking the Angelus basin", "ref": null, "why": "view"},
+    {"name": "Lakehead Hut", "quote": "Lakehead Hut", "ref": "T11", "why": "other walk"},
+    {"name": "Coldwater Hut", "quote": "Coldwater Hut", "ref": "T10", "why": "other walk"},
+    {"name": "Mt Cedric Track", "quote": "Mt Cedric Track via Sabine Hut", "ref": "T4", "why": "other walk"},
+    {"name": "St Arnaud", "quote": "From St Arnaud", "ref": "T17", "why": "nearby"},
+    {"name": "Rotoiti/Nelson Lakes Visitor Centre", "quote": "Rotoiti/Nelson Lakes Visitor Centre", "ref": null, "why": "nearby"}
+  ],
+  "doubts": "The page does not say the main way returns; DOC's distance says 'one way', so it is recorded as one way ending at Angelus Hut. Start ref F1 is where Speargrass Track (the first track) meets Mt Robert Road at the car park. For the loop (W2), the return on Pinchgut Track reaches Mt Robert Road at a different road end (F2); the text says it returns to the same Mt Robert carpark, so F1 is used for both start and end. The lake is not named."
+}

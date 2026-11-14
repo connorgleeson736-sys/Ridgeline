@@ -1,0 +1,48 @@
+{
+  "guid": "0e4b10bd-a463-415d-906c-529238268484",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Queensberry car park to the conservation area boundary before Mitre Rocks",
+      "shape": "one_way",
+      "start": {"name": "Queensberry car park", "quote": "Start at Queensberry car park", "ref": "F1"},
+      "end": {"name": "Pisa Range Conservation Area boundary before Mitre Rocks", "quote": "terminates at the Pisa Range Conservation Area boundary just before Mitre Rocks", "ref": null},
+      "via": [
+        {"name": "Pisa Range Ridge Track", "quote": "climb the Pisa Range Ridge Track", "ref": "T4"},
+        {"name": "Alfern Creek Conservation Area", "quote": "up past the Alfern Creek Conservation Area", "ref": null},
+        {"name": "trig at 1,444 m", "quote": "follow the farm track towards the trig at 1,444 m altitude", "ref": null},
+        {"name": "junction with Locharburn Track", "quote": "staying right at the junction with Locharburn Track", "ref": "T3"},
+        {"name": "Lake McKay", "quote": "The next point of interest is Lake McKay", "ref": "T8"},
+        {"name": "junction with Kirtle Burn Track", "quote": "At the junction with Kirtle Burn Track, veer left towards Mt Pisa", "ref": "T2"},
+        {"name": "Mt Pisa", "quote": "At 1963 metres, Mt Pisa is the highest peak in the range", "ref": "T11"},
+        {"name": "junction for Tinwald Burn Ridge Track", "quote": "keep right at the junction for Tinwald Burn Ridge Track", "ref": "T5"},
+        {"name": "Mt Dottrel", "quote": "The track continues past Mt Dottrel at 1690 metres", "ref": "T10"}
+      ],
+      "direction": null,
+      "time": "10 hr one way",
+      "distance": "29.24 km one way",
+      "evidence": [
+        "Start at Queensberry car park and climb the Pisa Range Ridge Track.",
+        "The track continues past Mt Dottrel at 1690 metres, and terminates at the Pisa Range Conservation Area boundary just before Mitre Rocks.",
+        "Note: There is no exit on the Mitre Rocks/Lowburn side, trampers must return same way or use alternate exits described here."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "Tinwald Burn Ridge Track", "quote": "Tinwald Burn Ridge Track", "ref": "L1", "onto": "Pisa Range Ridge Track"},
+    {"name": "Locharburn Track", "quote": "Locharburn Track", "ref": "T3", "onto": "Pisa Range Ridge Track"},
+    {"name": "Kirtle Burn Track via Snow Farm", "quote": "Kirtle Burn Track via Snow Farm", "ref": "T2", "onto": "Pisa Range Ridge Track"},
+    {"name": "Cardrona-Cromwell Pack Track", "quote": "Cardrona-Cromwell Pack Track", "ref": "L2", "onto": null}
+  ],
+  "side_trips": [],
+  "huts": [],
+  "not_on_route": [
+    {"name": "The Column Rocks", "quote": "Soon you will see The Column Rocks", "ref": "T7", "why": "view"},
+    {"name": "Mitre Rocks", "quote": "just before Mitre Rocks", "ref": "T9", "why": "nearby"},
+    {"name": "Deep Creek Hut", "quote": "Deep Creek Hut", "ref": null, "why": "nearby"},
+    {"name": "Rock Peak Track", "quote": "Entry to Pisa Conservation Area with a firearm is only allowed via Rock Peak Track", "ref": "L3", "why": "other walk"}
+  ],
+  "doubts": "DOC gives '10 hr one way', but there is no exit at the end (near Mitre Rocks), so trampers must return the same way or leave by one of the alternate exits; shape is recorded as one_way for the track itself. Lake McKay is described as a point of interest/view and may only be seen rather than passed; The Column Rocks are only said to be seen. The Cardrona-Cromwell Pack Track connection is not described as to where it joins the ridge (the Mitre Rocks link is on private property)."
+}

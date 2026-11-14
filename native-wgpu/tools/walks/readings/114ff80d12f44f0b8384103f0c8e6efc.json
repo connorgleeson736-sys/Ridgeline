@@ -1,0 +1,88 @@
+{
+  "guid": "114ff80d-12f4-4f0b-8384-103f0c8e6efc",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Marahau to Wainui",
+      "shape": "one_way",
+      "start": {"name": "Marahau", "quote": "Marahau is the southern gateway", "ref": "F3"},
+      "end": {"name": "Wainui car park", "quote": "follows the estuary edge to the car park", "ref": null},
+      "via": [
+        {"name": "Marahau causeway", "quote": "Marahau causeway", "ref": null},
+        {"name": "Anchorage Hut", "quote": "Anchorage Hut", "ref": "L9"},
+        {"name": "Torrent Bay estuary", "quote": "Torrent Bay estuary", "ref": null},
+        {"name": "Falls River", "quote": "Falls River", "ref": "T33"},
+        {"name": "Bark Bay Hut", "quote": "Bark Bay Hut", "ref": "L12"},
+        {"name": "Bark Bay estuary", "quote": "Bark Bay estuary", "ref": null},
+        {"name": "Tonga Quarry", "quote": "Tonga Quarry", "ref": "T50"},
+        {"name": "Onetahuti Bay", "quote": "Onetahuti Bay", "ref": null},
+        {"name": "Tonga Saddle", "quote": "Tonga Saddle", "ref": "T51"},
+        {"name": "Venture Creek", "quote": "Venture Creek", "ref": "T57"},
+        {"name": "Awaroa Hut", "quote": "Awaroa Hut", "ref": "L16"},
+        {"name": "Awaroa Inlet", "quote": "Awaroa Inlet", "ref": "T26"},
+        {"name": "Tōtaranui", "quote": "Tōtaranui", "ref": "T55"},
+        {"name": "Whariwharangi Hut", "quote": "Whariwharangi Hut", "ref": "L22"},
+        {"name": "saddle overlooking Wainui Inlet", "quote": "a saddle overlooking the serene Wainui Inlet", "ref": null}
+      ],
+      "direction": null,
+      "time": "3–5 days one way",
+      "distance": "60 km one way",
+      "evidence": [
+        "You’ll begin your journey as you cross the estuary over the Marahau causeway, and follow the track, first through open country, then lush beech forest with large kānuka trees.",
+        "The track winds down to the shore and follows the estuary edge to the car park.",
+        "Wainui is the northern entrance",
+        "Most visitors only walk in one direction on the Coast Track and get a water taxi in the other direction."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "Whariwharangi Bay to Tōtaranui",
+      "shape": "one_way",
+      "start": {"name": "Whariwharangi Hut", "quote": "From Whariwharangi Hut", "ref": "L22"},
+      "end": {"name": "Tōtaranui", "quote": "back down to Tōtaranui", "ref": "T55"},
+      "via": [
+        {"name": "low saddle overlooking Wainui Inlet", "quote": "a low saddle overlooking Wainui Inlet", "ref": null},
+        {"name": "Gibbs Hill Track", "quote": "Gibbs Hill Track", "ref": null},
+        {"name": "Gibbs Hill", "quote": "Gibbs Hill", "ref": "T34"}
+      ],
+      "direction": null,
+      "time": "3 hr",
+      "distance": "9 km",
+      "evidence": [
+        "From Whariwharangi Hut follow a small stream, then climb out of the bay to a low saddle overlooking Wainui Inlet.",
+        "At this point take a left turn onto the Gibbs Hill Track.",
+        "This track will take you over the steep Gibbs Hill then back down to Tōtaranui.",
+        "Visitors travelling beyond Totaranui use the Gibbs Hill Track to make a loop in the Northern end of the Park."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "Totaranui", "quote": "Totaranui is 160 km from Nelson", "ref": "T55", "onto": null},
+    {"name": "Kaiteretere", "quote": "Kaiteretere is 61 km from Nelson", "ref": "T36", "onto": null}
+  ],
+  "side_trips": [
+    {"name": "Tinline Bay Nature Walk", "quote": "Side trip: Tinline Bay Nature Walk", "ref": null, "from": null},
+    {"name": "Cascade Falls", "quote": "Side trip: Cascade Falls", "ref": "T30", "from": null},
+    {"name": "Cleopatra's Pool", "quote": "Side trip: Cleopatra's Pool", "ref": null, "from": null}
+  ],
+  "huts": [
+    {"name": "Anchorage Hut", "quote": "Anchorage Hut", "ref": "L9"},
+    {"name": "Bark Bay Hut", "quote": "Bark Bay Hut", "ref": "L12"},
+    {"name": "Awaroa Hut", "quote": "Awaroa Hut", "ref": "L16"},
+    {"name": "Whariwharangi Hut", "quote": "Whariwharangi Hut", "ref": "L22"}
+  ],
+  "not_on_route": [
+    {"name": "Tinline Bay Nature Walk", "quote": "Tinline Bay Nature Walk", "ref": null, "why": "side trip"},
+    {"name": "Cascade Falls", "quote": "Cascade Falls", "ref": "T30", "why": "side trip"},
+    {"name": "Cleopatra's Pool", "quote": "Cleopatra's Pool", "ref": null, "why": "side trip"},
+    {"name": "Mosquito Bay Campsite", "quote": "Mosquito Bay campsite can only be accessed by private boat, such as a kayak.", "ref": "L13", "why": "other"},
+    {"name": "Awaroa Bay", "quote": "a lookout point over Awaroa Bay", "ref": "T23", "why": "view"},
+    {"name": "Tonga Island Marine Reserve", "quote": "Tonga Island Marine Reserve", "ref": null, "why": "view"},
+    {"name": "Abel Tasman Inland Track", "quote": "Abel Tasman Inland Track", "ref": null, "why": "other walk"},
+    {"name": "Awaroa estuary road", "quote": "It is also possible to access Awaroa estuary on a road that is 31 km from Takaka.", "ref": null, "why": "other"}
+  ],
+  "doubts": "The page says the track can be walked in either direction; it is recorded south to north (Marahau to Wainui) as the sections describe it. Start ref F3 (Coast Track meets Harvey Road) is the only southern Coast Track road end among the features; the text names the place only as Marahau, not the road. No feature is clearly the Wainui car park (F1 is the Taupo Point Track, not the Coast Track), so the end ref is null. The Anchorage to Bark Bay leg has a high tide track and a low tide crossing of Torrent Bay estuary; the Bark Bay estuary also has an all-tide track; near Awaroa there is a non-DOC track to the beach for water taxis; these alternatives are not recorded as separate ways. W2 (Whariwharangi Bay to Tōtaranui over Gibbs Hill) is recorded as an alternative ending; its time and distance are for that section only; 'Gibbs Hill Track' may be map track T7 'Gibbs Track' but this is not certain. Water taxi pickup locations (Apple Tree Bay, Anchorage, Medlands Bay, Bark Bay, Tonga Quarry, Onetahuti, Awaroa, Totaranui) could also be places to join the walk but are not recorded as access points. Kaiteretere is listed as an entrance but by kayak or water taxi only. The 5-7 day circuit using the Inland Track is treated as another walk."
+}

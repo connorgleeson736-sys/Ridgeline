@@ -1,0 +1,36 @@
+{
+  "guid": "885769f9-ea1d-44c5-9dc1-bffa4c931df4",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Remutaka Rail Trail, Kaitoke to Cross Creek",
+      "shape": "one_way",
+      "start": {"name": "Kaitoke", "quote": "Kaitoke", "ref": null},
+      "end": {"name": "Cross Creek Road end", "quote": "Cross Creek Road end", "ref": "F1"},
+      "via": [
+        {"name": "Ladle Bend", "quote": "Ladle Bend", "ref": null},
+        {"name": "Summit", "quote": "Summit", "ref": "T7"},
+        {"name": "Cross Creek Station", "quote": "Cross Creek Station", "ref": null}
+      ],
+      "direction": null,
+      "time": "4 hr 30 min walk from Kaitoke",
+      "distance": "18 km (Kaitoke to Cross Creek carpark) one way",
+      "evidence": [
+        "The section from Kaitoke to Cross Creek Station is wide and well maintained.",
+        "Cross Creek Station to Cross Creek Road end is an easy walking track but is elevated to an Intermediate: Grade 3 mountain biking track due to some steep drop offs."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "Remutaka Forest Park from Featherston (Cross Creek Road)", "quote": "Remutaka Forest Park from Featherston", "ref": "F1", "onto": null}
+  ],
+  "side_trips": [],
+  "huts": [],
+  "not_on_route": [
+    {"name": "Pakuratahi River", "quote": "Pakuratahi River", "ref": "T4", "why": "nearby"},
+    {"name": "Fell Locomotive Museum", "quote": "Fell Locomotive Museum", "ref": null, "why": "other"}
+  ],
+  "doubts": "The Kaitoke start (Pakuratahi Forest carpark off SH 2) has no road end feature in the packet, so its ref is null. The Featherston end is listed as an access point because the page says access is from either end. Ladle Bend has no entry in the packet; Cross Creek Station was not matched to the Cross Creek area entry because it is unclear whether they are the same place."
+}

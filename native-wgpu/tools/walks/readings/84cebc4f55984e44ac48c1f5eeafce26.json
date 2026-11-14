@@ -1,0 +1,55 @@
+{
+  "guid": "84cebc4f-5598-4e44-ac48-c1f5eeafce26",
+  "kind": "loop",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Andrews Shelter over Casey Saddle to Casey Hut, down the Poulter and over Binser Saddle back to Andrews Shelter",
+      "shape": "loop",
+      "start": {"name": "Andrews Shelter on Mt White Road", "quote": "Andrews Shelter", "ref": "F1"},
+      "end": {"name": "Andrews Shelter on Mt White Road", "quote": "Andrews Shelter", "ref": "F1"},
+      "via": [
+        {"name": "Andrews Track", "quote": "Andrews Track", "ref": null},
+        {"name": "Hallelujah Flat", "quote": "Hallelujah Flat", "ref": "T11"},
+        {"name": "Casey Saddle", "quote": "Casey Saddle", "ref": "T7"},
+        {"name": "Surprise Stream", "quote": "Surprise Stream", "ref": "T21"},
+        {"name": "Casey Stream", "quote": "Casey Stream", "ref": "T8"},
+        {"name": "Casey Hut", "quote": "Casey Hut", "ref": "T6"},
+        {"name": "Poulter valley", "quote": "Poulter valley", "ref": null},
+        {"name": "Rabbit Flat", "quote": "Rabbit Flat", "ref": "T20"},
+        {"name": "Mt Brown Creek", "quote": "Mt Brown Creek", "ref": "T14"},
+        {"name": "Pete Stream", "quote": "Pete Stream", "ref": "T17"},
+        {"name": "Binser Saddle", "quote": "Binser Saddle", "ref": "T5"},
+        {"name": "Lower Farm Stream", "quote": "Lower Farm Stream", "ref": "T13"}
+      ],
+      "direction": null,
+      "time": "2 days",
+      "distance": null,
+      "evidence": [
+        "The track starts at Andrews Shelter on Mt White Road; turn off SH 73, 24 km east of Arthur's Pass village.",
+        "The track ends are within 30 minutes walk of each other on Mt White Road.",
+        "After crossing a side stream it wends through more storm-ravaged forest and drops steeply down to the Waimakariri River flats, emerging just east of Lower Farm Stream.",
+        "It is another 30 minutes to Andrews Shelter."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [
+    {"name": "Trust/Poulter Hut", "quote": "Trust/Poulter Hut", "ref": "T23", "from": "original Casey Hut site"}
+  ],
+  "huts": [
+    {"name": "Casey Hut", "quote": "Casey Hut", "ref": "T6"}
+  ],
+  "not_on_route": [
+    {"name": "Trust/Poulter Hut", "quote": "Trust/Poulter Hut", "ref": "T23", "why": "side trip"},
+    {"name": "Mt Morrison", "quote": "Mt Morrison", "ref": null, "why": "view"},
+    {"name": "Poulter Range", "quote": "Poulter Range", "ref": "T19", "why": "view"},
+    {"name": "Peveril Peak", "quote": "Peveril Peak", "ref": "T18", "why": "view"},
+    {"name": "Aeroplane Flat", "quote": "Aeroplane Flat", "ref": "T3", "why": "view"},
+    {"name": "Cleland Stream", "quote": "Cleland Stream", "ref": "T10", "why": "view"},
+    {"name": "Lake Letitia", "quote": "Lake Letitia", "ref": "T12", "why": "other"},
+    {"name": "Arthur's Pass village", "quote": "Arthur's Pass village", "ref": null, "why": "nearby"}
+  ],
+  "doubts": "Shape: the route goes from Andrews Shelter over Casey Saddle and Binser Saddle and exits on Mt White Road just east of Lower Farm Stream; the page says the two track ends are within 30 minutes of each other and ends 'It is another 30 minutes to Andrews Shelter', so I recorded a loop back to Andrews Shelter, but it could be read as one_way ending at the Binser track end (possibly F2, an unnamed track at Mt White Road, not named in the text). Start F1 is where Andrews Valley Track meets Mt White Road, taken as Andrews Shelter; the text calls it the Andrews Track. The Andrews streambed and the Casey Stream gorge are optional alternatives to the tracks for parts of the first section and are not recorded as separate ways. Trust/Poulter Hut is an alternative from the original Casey Hut site, recorded as a side trip. Direction is not stated."
+}

@@ -1,0 +1,108 @@
+{
+  "guid": "8b3acd2b-93c9-4668-8bac-8ce9b109c736",
+  "kind": "network",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Tawarau Falls Loop Track from Appletree Road end",
+      "shape": "loop",
+      "start": {"name": "Appletree Road end", "quote": "Appletree Road end", "ref": null},
+      "end": {"name": "Appletree Road end", "quote": "Appletree Road end", "ref": null},
+      "via": [
+        {"name": "Tawarau River", "quote": "drops to the Tawarau River", "ref": "T8"}
+      ],
+      "direction": null,
+      "time": "3 hr to complete loop",
+      "distance": null,
+      "evidence": [
+        "From the Appletree Road end and heading to the Tawarau Falls the track climbs briefly then drops to the Tawarau River.",
+        "The track continues on to complete the loop or you can return the way you came."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "Return to Tawarau Falls the way you came",
+      "shape": "out_and_back",
+      "start": {"name": "Appletree Road end", "quote": "Appletree Road end", "ref": null},
+      "end": {"name": "Tawarau Falls", "quote": "Tawarau Falls", "ref": "T7"},
+      "via": [
+        {"name": "Tawarau River", "quote": "drops to the Tawarau River", "ref": "T8"}
+      ],
+      "direction": null,
+      "time": "2 hr return to Tawarau Falls",
+      "distance": null,
+      "evidence": [
+        "Time: 3 hr to complete loop or 2 hr return to Tawarau Falls",
+        "The track continues on to complete the loop or you can return the way you came."
+      ]
+    },
+    {
+      "id": "W3",
+      "main": false,
+      "label": "Double Falls Track from Appletree Road end",
+      "shape": null,
+      "start": {"name": "Appletree Road end", "quote": "Appletree Road end", "ref": null},
+      "end": {"name": "Double Falls", "quote": "Double Falls", "ref": "T4"},
+      "via": [],
+      "direction": null,
+      "time": "2 hr from Appletree Road end",
+      "distance": null,
+      "evidence": [
+        "You can reach these beautiful and secluded falls from Appletree Road end, or along the Gorge Track.",
+        "From Appletree Road end, a well-formed track takes you through regenerating native forest and then through a pine block on a forestry road for a short section.",
+        "The last 20 minutes is a steep descent to the falls."
+      ]
+    },
+    {
+      "id": "W4",
+      "main": false,
+      "label": "Double Falls from Were Road along the Gorge Track",
+      "shape": null,
+      "start": {"name": "Were Road end", "quote": "Were Road end", "ref": "F1"},
+      "end": {"name": "Double Falls", "quote": "Double Falls", "ref": "T4"},
+      "via": [
+        {"name": "Gorge Track", "quote": "Gorge Track", "ref": "T2"},
+        {"name": "swingbridge", "quote": "the Tawarau/Double Falls track branches off the Gorge Track across a swingbridge", "ref": "F2"}
+      ],
+      "direction": null,
+      "time": "3 hr 30 min from Were Road",
+      "distance": null,
+      "evidence": [
+        "Time: 3 hr 30 min from Were Road or 2 hr from Appletree Road end",
+        "From Were Road end, the Tawarau/Double Falls track branches off the Gorge Track across a swingbridge, after approximately 2 hours."
+      ]
+    },
+    {
+      "id": "W5",
+      "main": false,
+      "label": "Gorge Track from Were Road to Speedies Road",
+      "shape": "one_way",
+      "start": {"name": "Were Road end", "quote": "Were Road end", "ref": "F1"},
+      "end": {"name": "Speedies Road", "quote": "The main track continues down the river to Speedies Road.", "ref": "F3"},
+      "via": [
+        {"name": "Mangaohae Stream", "quote": "This track follows Mangaohae Stream", "ref": "T6"},
+        {"name": "Tawarau/Double Falls track junction", "quote": "Tawarau/Double Falls track junction", "ref": "F2"},
+        {"name": "Tawarau River", "quote": "enters the Tawarau River", "ref": "T8"}
+      ],
+      "direction": null,
+      "time": "3 hr 30 min",
+      "distance": null,
+      "evidence": [
+        "Access this track from either Were Road or Speedies Road.",
+        "This track follows Mangaohae Stream until it flows through a spectacular limestone gorge and enters the Tawarau River.",
+        "The main track continues down the river to Speedies Road."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "Speedies Road end", "quote": "From Speedies Road end, the Tawarau/Double Falls track junction is about 1 hour 30 minutes.", "ref": "F3", "onto": "Gorge Track"}
+  ],
+  "side_trips": [
+    {"name": "Tawarau Falls", "quote": "A sign marks the entrance to the falls located 5 minutes off the main track.", "ref": "T7", "from": "Tawarau Falls Loop Track"}
+  ],
+  "huts": [],
+  "not_on_route": [],
+  "doubts": "This page describes three separate tracks, so it is recorded as a network. No feature in the packet is at Appletree Road end, so those starts have no ref. The Double Falls ways are given only one-way times ('from Appletree Road end', 'from Were Road') and the text does not say whether you return the same way, so their shape is null. The Gorge Track is described from Were Road down the river to Speedies Road, but the text does not say it is walked one way (no transport mentioned) and its 3 hr 30 min time is not marked one way or return; shape one_way is from the description only. F2 ('where Double Falls Track meets Tawarau Swingbridge') is taken as the swingbridge junction off the Gorge Track. Blackberry Flat campsite, 500 m north of the junction, may or may not be on the Gorge Track, so it is not recorded. Tawarau Falls is both a side trip off the loop and the turning point of the 2 hr return option."
+}

@@ -1,0 +1,84 @@
+{
+  "guid": "ebcd19a9-125f-42fa-9c72-5ec8e19de8e3",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Full Whanganui Journey, Taumarunui to Pipiriki",
+      "shape": "one_way",
+      "start": {"name": "Ngāhuinga (Cherry Grove) Domain, Taumarunui", "quote": "Taumarunui", "ref": "T18"},
+      "end": {"name": "Pipiriki", "quote": "Pipiriki village", "ref": "T14"},
+      "via": [
+        {"name": "Ohinepane Campsite", "quote": "Ohinepane Campsite", "ref": "L1"},
+        {"name": "Poukaria Campsite", "quote": "Poukaria Campsite", "ref": "L2"},
+        {"name": "Maharanui Campsite", "quote": "Maharanui Campsite", "ref": "L3"},
+        {"name": "Whakahoro Campsite", "quote": "Whakahoro Campsite", "ref": "L4"},
+        {"name": "Mangapapa Campsite", "quote": "Mangapapa Campsite", "ref": "L5"},
+        {"name": "Kirikiriroa Peninsula", "quote": "Kirikiriroa Peninsula", "ref": null},
+        {"name": "Ohauora Campsite", "quote": "Ohauora Campsite", "ref": "L6"},
+        {"name": "Ōtaihanga Reach", "quote": "Ōtaihanga Reach", "ref": "T13"},
+        {"name": "John Coull Hut", "quote": "John Coull Hut", "ref": "L7"},
+        {"name": "Mangawaiiti Campsite", "quote": "Mangawaiiti Campsite", "ref": "L8"},
+        {"name": "Mangapurua Campsite", "quote": "Mangapurua Campsite", "ref": "L9"},
+        {"name": "Mangapurua Landing", "quote": "Mangapurua Landing", "ref": "T6"},
+        {"name": "Tīeke Kāinga", "quote": "Tīeke Kāinga", "ref": "L10"},
+        {"name": "Ngaporo Campsite", "quote": "Ngaporo Campsite", "ref": "L13"}
+      ],
+      "direction": null,
+      "time": "an average of 5 days",
+      "distance": "145 km",
+      "evidence": [
+        "The full Whanganui Journey is 145 km, from Taumarunui to Pipiriki.",
+        "Start at Ngāhuinga (Cherry Grove) Domain, off Cherry Grove Road in Taumarunui.",
+        "The Whanganui Journey ends at Pipiriki village."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "Shorter version, Whakahoro to Pipiriki",
+      "shape": "one_way",
+      "start": {"name": "Whakahoro", "quote": "Whakahoro", "ref": "T23"},
+      "end": {"name": "Pipiriki", "quote": "Pipiriki village", "ref": "T14"},
+      "via": [
+        {"name": "Mangapapa Campsite", "quote": "Mangapapa Campsite", "ref": "L5"},
+        {"name": "Kirikiriroa Peninsula", "quote": "Kirikiriroa Peninsula", "ref": null},
+        {"name": "Ohauora Campsite", "quote": "Ohauora Campsite", "ref": "L6"},
+        {"name": "Ōtaihanga Reach", "quote": "Ōtaihanga Reach", "ref": "T13"},
+        {"name": "John Coull Hut", "quote": "John Coull Hut", "ref": "L7"},
+        {"name": "Mangawaiiti Campsite", "quote": "Mangawaiiti Campsite", "ref": "L8"},
+        {"name": "Mangapurua Campsite", "quote": "Mangapurua Campsite", "ref": "L9"},
+        {"name": "Mangapurua Landing", "quote": "Mangapurua Landing", "ref": "T6"},
+        {"name": "Tīeke Kāinga", "quote": "Tīeke Kāinga", "ref": "L10"},
+        {"name": "Ngaporo Campsite", "quote": "Ngaporo Campsite", "ref": "L13"}
+      ],
+      "direction": null,
+      "time": "an average of 3 days",
+      "distance": "88 km",
+      "evidence": [
+        "A popular shorter version is 88 km, from Whakahoro to Pipiriki.",
+        "Whakahoro is the last road access point before the end of the Whanganui Journey at Pipiriki. Many people start their trip here."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "Ohinepane Campsite", "quote": "Ohinepane Campsite, accessed from Whanganui River Road (State Highway 43).", "ref": "L1", "onto": "Whanganui River"}
+  ],
+  "side_trips": [
+    {"name": "Ōhura Falls", "quote": "Take a short trip up the Ōhura River to see the Ōhura Falls.", "ref": null, "from": null},
+    {"name": "Bridge to Nowhere Walk", "quote": "Bridge to Nowhere Walk", "ref": "L11", "from": "Mangapurua Landing"}
+  ],
+  "huts": [
+    {"name": "Whakahoro Bunkroom", "quote": "Whakahoro Bunkroom", "ref": null},
+    {"name": "John Coull Hut", "quote": "John Coull Hut", "ref": "L7"},
+    {"name": "Tīeke Kāinga", "quote": "Tīeke Kāinga", "ref": "L10"}
+  ],
+  "not_on_route": [
+    {"name": "Puketotara Hut", "quote": "There is alternative hut accommodation at Puketotara Hut on the Matemateaonga Range, a 1 hour 30 min hike up a track opposite Tīeke Kāinga.", "ref": "L12", "why": "nearby"},
+    {"name": "Bridge to Nowhere", "quote": "Bridge to Nowhere", "ref": null, "why": "side trip"},
+    {"name": "Ōhura Falls", "quote": "Ōhura Falls", "ref": null, "why": "side trip"},
+    {"name": "Tamatea's Cave", "quote": "Do not enter the cave as it is wāhi tapu (a sacred place).", "ref": null, "why": "other"}
+  ],
+  "doubts": "This is a canoe trip down the Whanganui River, not a walk; the way is the river, which has no entry in names or links. The start is Ngāhuinga (Cherry Grove) Domain in Taumarunui; there are no road end features, so the start ref is the Taumarunui place entry (T18), not the domain itself. Times 'an average of 5 days' and 'an average of 3 days' come from the trip length list, not a 'Time:' heading. The Whakahoro start of the shorter version could be the Whakahoro place (T23) or Whakahoro Campsite (L4); the place was given. The Whakahoro Bunkroom is named as accommodation but has no link. Puketotara Hut is alternative accommodation reached by a 1 hr 30 min track and is not on the river. Businesses' 1- and 2-day trips and jet boat trips are not recorded as ways because the page gives no start or end for them."
+}

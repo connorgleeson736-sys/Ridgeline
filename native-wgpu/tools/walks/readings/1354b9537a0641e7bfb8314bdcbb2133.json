@@ -1,0 +1,75 @@
+{
+  "guid": "1354b953-7a06-41e7-bfb8-314bdcbb2133",
+  "kind": "network",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Upper Mangōraukawa / Lake Dive Track",
+      "shape": "one_way",
+      "start": {"name": "Dawson Falls road end", "quote": "From the road end at Dawson Falls", "ref": "T3"},
+      "end": {"name": "Mangōraukawa / Lake Dive", "quote": "before descending steeply down to the lake", "ref": "T5"},
+      "via": [
+        {"name": "Panitahi and Syme Hut Track", "quote": "follows Panitahi and Syme Hut Track through forest", "ref": "L1"},
+        {"name": "Junction with the Lower Mangōraukawa / Lake Dive Track", "quote": "to the junction with the Lower Mangōraukawa / Lake Dive Track", "ref": null},
+        {"name": "Hilary Seat", "quote": "past the Hilary Seat", "ref": null},
+        {"name": "Hooker Shelter", "quote": "Hooker Shelter", "ref": null},
+        {"name": "Kapuni Lodge Track junction", "quote": "Kapuni Lodge Track to approximately 1500 m altitude", "ref": null}
+      ],
+      "direction": null,
+      "time": "3-4 hr",
+      "distance": "4.2 km",
+      "evidence": [
+        "From the road end at Dawson Falls the Upper Mangōraukawa / Lake Dive Track follows Panitahi and Syme Hut Track through forest to the junction with the Lower Mangōraukawa / Lake Dive Track.",
+        "At the junction, the Mangōraukawa / Lake Dive Track heads left to follow marker poles across exposed alpine tussock slopes before descending steeply down to the lake."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "Lower Mangōraukawa / Lake Dive Track",
+      "shape": "one_way",
+      "start": {"name": "Dawson Falls road end", "quote": "From Dawson Falls Road end", "ref": "T3"},
+      "end": {"name": "Mangōraukawa / Lake Dive", "quote": "before arriving at the lake", "ref": "T5"},
+      "via": [
+        {"name": "Panitahi and Syme Hut Track", "quote": "the Lower Mangōraukawa / Lake Dive Track follows Panitahi and Syme Hut Track", "ref": "L1"},
+        {"name": "Junction (branch left)", "quote": "branches left at the junction", "ref": null},
+        {"name": "Hastie’s Hill", "quote": "passing Hastie’s Hill", "ref": null}
+      ],
+      "direction": null,
+      "time": "3-4 hr",
+      "distance": "6.2 km",
+      "evidence": [
+        "From Dawson Falls Road end, the Lower Mangōraukawa / Lake Dive Track follows Panitahi and Syme Hut Track then branches left at the junction, passing Hastie’s Hill, undulating through forest and crossing many unbridged streams before arriving at the lake."
+      ]
+    },
+    {
+      "id": "W3",
+      "main": false,
+      "label": "Upper and lower tracks combined as a loop",
+      "shape": "loop",
+      "start": {"name": "Dawson Falls road end", "quote": "Start this track from the Dawson Falls road end", "ref": "T3"},
+      "end": {"name": "Dawson Falls road end", "quote": "Start this track from the Dawson Falls road end", "ref": "T3"},
+      "via": [
+        {"name": "Upper Mangōraukawa / Lake Dive Track", "quote": "Upper Mangōraukawa / Lake Dive Track", "ref": null},
+        {"name": "Mangōraukawa / Lake Dive", "quote": "Mangōraukawa / Lake Dive", "ref": "T5"},
+        {"name": "Lower Mangōraukawa / Lake Dive Track", "quote": "Lower Mangōraukawa / Lake Dive Track", "ref": null}
+      ],
+      "direction": null,
+      "time": "loop 7-8 hr",
+      "distance": "13 km",
+      "evidence": [
+        "There are two options to get to Mangōraukawa / Lake Dive – the upper and lower tracks. You can combine the tracks to make a 13 km loop track.",
+        "It is better to return on the lower track during this time of year."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [],
+  "huts": [],
+  "not_on_route": [
+    {"name": "Kapuni Lodge Track", "quote": "Kapuni Lodge Track", "ref": null, "why": "other walk"},
+    {"name": "Beehive", "quote": "lies at the foot of the upper Beehive", "ref": null, "why": "view"}
+  ],
+  "doubts": "The page ('Lake Dive tracks') offers two tracks to the same lake and a loop combining them; kind network was chosen, with the upper track (listed first) as main, though the loop could equally be seen as the main walk. The tracks are given as one_way to the lake (DOC's 'one way' distances); the text does not say whether walkers return the same way, only that in winter it is better to return on the lower track. The loop's direction is not stated (W3 via order is up the upper track, back the lower track only as suggested for winter). Start ref is the Dawson Falls place (T3), next to the road end; none of the road-end features is named as the Panitahi and Syme Hut Track's start (F1 Hasties Hill Track is closest to T3). Hooker Shelter may not be a hut with bunks, so huts is empty. Whether Hastie's Hill turn off is the same as the lower track junction is unclear."
+}

@@ -1,0 +1,41 @@
+{
+  "guid": "7d8f8b98-f8a9-468e-bf9b-871859ce8828",
+  "kind": "out_and_back",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Aoraki/Mount Cook Village via Sealy Tarns to Mueller Hut and back",
+      "shape": "out_and_back",
+      "start": {"name": "Aoraki/Mount Cook Village", "quote": "Aoraki/Mount Cook Village", "ref": "T2"},
+      "end": {"name": "Mueller Hut", "quote": "Mueller Hut", "ref": "T7"},
+      "via": [
+        {"name": "Sealy Tarns Track", "quote": "Sealy Tarns Track", "ref": "L1"},
+        {"name": "Sealy Tarns", "quote": "Sealy Tarns", "ref": "T8"}
+      ],
+      "direction": null,
+      "time": "4 hr one way",
+      "distance": "5.2 km one way",
+      "evidence": [
+        "Follow the Sealy Tarns Track to Sealy Tarns.",
+        "Follow the orange markers through the basin until you see Mueller Hut – about 20 minutes along the ridge.",
+        "Descend back to the village the same way as you came up.",
+        "The track to Mueller Hut starts near the White Horse Hill car park."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "White Horse Hill car park", "quote": "White Horse Hill car park", "ref": null, "onto": null}
+  ],
+  "side_trips": [
+    {"name": "Mt Ollivier", "quote": "Mt Ollivier", "ref": "T4", "from": "Mueller Hut"}
+  ],
+  "huts": [
+    {"name": "Mueller Hut", "quote": "Mueller Hut", "ref": "T7"}
+  ],
+  "not_on_route": [
+    {"name": "Mueller Glacier", "quote": "Mueller Glacier", "ref": "T6", "why": "view"},
+    {"name": "Mount Sefton", "quote": "Mount Sefton", "ref": "T5", "why": "view"}
+  ],
+  "doubts": "The section headings start and end at Aoraki/Mount Cook Village, but Getting there says the track starts near the White Horse Hill car park; the village is taken as the start and the car park as an access point. Neither road end feature (F1 Kea Point Track at Terrace Road, F2 Ribbonwood Path at Bowen Drive) is named by the text, so the village place (T2) is given rather than a road end. DOC's time and distance are one way to the hut; the page says to descend the same way. The route from the village to Sealy Tarns is only given as 'Follow the Sealy Tarns Track'."
+}

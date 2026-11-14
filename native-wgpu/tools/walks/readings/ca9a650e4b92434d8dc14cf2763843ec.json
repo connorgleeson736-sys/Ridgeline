@@ -1,0 +1,62 @@
+{
+  "guid": "ca9a650e-4b92-434d-8dc1-4cf2763843ec",
+  "kind": "loop",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Neill Winchcombe Circuit from Waiohine Road End",
+      "shape": "loop",
+      "start": {"name": "Waiohine Road End", "quote": "The track starts from Waiohine Road End and Campsite.", "ref": null},
+      "end": {"name": "Waiohine Road End", "quote": "Cone Hut to Waiohine Road End", "ref": null},
+      "via": [
+        {"name": "suspension bridge over the Waiohine River", "quote": "cross the high suspension bridge over the Waiohine River", "ref": null},
+        {"name": "Cone Saddle", "quote": "Cone Saddle", "ref": "T12"},
+        {"name": "Cone", "quote": "the track climbs to the Cone summit", "ref": "T10"},
+        {"name": "Neill Saddle", "quote": "The track descends to Neill Saddle", "ref": "T22"},
+        {"name": "Neill", "quote": "the Neill high point (1158 m)", "ref": "T20"},
+        {"name": "Neill Ridge", "quote": "Follow the track along Neill Ridge.", "ref": "T21"},
+        {"name": "Winchcombe Bivouac", "quote": "Winchcombe Bivouac", "ref": null},
+        {"name": "Winchcombe Peak", "quote": "passing Winchcombe Peak", "ref": "T24"},
+        {"name": "Mt Hector", "quote": "At the Mt Hector summit, you join the Southern Crossing track.", "ref": "T19"},
+        {"name": "Southern Crossing", "quote": "continue south along the Southern Crossing", "ref": "L1"},
+        {"name": "Dress Circle", "quote": "The exposed ridge of the Dress Circle", "ref": "T13"},
+        {"name": "Aston", "quote": "the top of Aston", "ref": "T8"},
+        {"name": "Alpha", "quote": "over Alpha (1361 m)", "ref": "T6"},
+        {"name": "Alpha Hut", "quote": "Alpha Hut", "ref": "T7"},
+        {"name": "Hells Gate", "quote": "the saddle at Hells Gate", "ref": "T17"},
+        {"name": "Marchant Ridge", "quote": "The track climbs from the saddle to Marchant Ridge.", "ref": null},
+        {"name": "Bull Mound Track", "quote": "the Bull Mound Track", "ref": "T1"},
+        {"name": "Bull Mound", "quote": "Bull Mound (1060 m)", "ref": "T9"},
+        {"name": "Tauwharenīkau River crossing", "quote": "Cross the river to the true left, where you will meet the Tauwharenīkau Track.", "ref": null},
+        {"name": "Tauwharenīkau Track", "quote": "Tauwharenīkau Track", "ref": "T5"},
+        {"name": "Cone Hut", "quote": "Cone Hut", "ref": "T11"},
+        {"name": "bridge over the Waiohine River", "quote": "Cross the bridge over the river, then you will reach the road end.", "ref": null}
+      ],
+      "direction": null,
+      "time": "3 days",
+      "distance": null,
+      "evidence": [
+        "The track starts from Waiohine Road End and Campsite.",
+        "From Waiohine Road End and Campsite, cross the high suspension bridge over the Waiohine River and follow the track signposted towards Cone Hut.",
+        "Again, take the right hand track towards Waiohine Road End (the track you came up on), rather than going towards Cone Saddle.",
+        "The track follows the ridge, then descends all the way into the Waiohine Valley. Cross the bridge over the river, then you will reach the road end."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [
+    {"name": "Kime Hut", "quote": "you can follow the Southern Crossing track down to Kime Hut", "ref": "T18", "from": "Mt Hector"}
+  ],
+  "huts": [
+    {"name": "Winchcombe Bivouac", "quote": "Winchcombe Bivouac", "ref": null},
+    {"name": "Alpha Hut", "quote": "Alpha Hut", "ref": "T7"},
+    {"name": "Cone Hut", "quote": "Cone Hut", "ref": "T11"}
+  ],
+  "not_on_route": [
+    {"name": "Kime Hut", "quote": "Kime Hut", "ref": "T18", "why": "side trip"},
+    {"name": "Elder Hut", "quote": "Elder Hut", "ref": "L2", "why": "nearby"},
+    {"name": "Field Peak", "quote": "Field Peak", "ref": "T16", "why": "side trip"}
+  ],
+  "doubts": "The start and end (Waiohine Road End and Campsite) have no road-end feature in the packet, so the ref is null. Kime Hut is offered as an optional overnight stop off Mt Hector (the next leg can start from Kime Hut over Field Peak), recorded as a side trip rather than part of the main way. The order of Neill Ridge relative to Neill Saddle and Neill is not entirely clear from the text. No direction is named. The page also mentions exiting via Marchant Ridge down the Southern Crossing Track as an alternative way out if the river is high; not recorded as a way."
+}

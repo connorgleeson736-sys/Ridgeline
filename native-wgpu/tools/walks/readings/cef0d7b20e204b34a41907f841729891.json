@@ -1,0 +1,67 @@
+{
+  "guid": "cef0d7b2-0e20-4b34-a419-07f841729891",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Aickens over Harper Pass to Windy Point on the Lewis Pass Highway",
+      "shape": "one_way",
+      "start": {"name": "Aickens car park", "quote": "Aickens car park", "ref": "T7"},
+      "end": {"name": "Windy Point shelter and car park", "quote": "the shelter and car park at Windy Point", "ref": "F3"},
+      "via": [
+        {"name": "Otira River", "quote": "Otira River", "ref": null},
+        {"name": "Pfeifer Creek", "quote": "Pfeifer Creek", "ref": "T22"},
+        {"name": "Otehake River", "quote": "Otehake River", "ref": "T21"},
+        {"name": "Taramakau", "quote": "Taramakau", "ref": null},
+        {"name": "Kiwi Hut", "quote": "Kiwi Hut", "ref": null},
+        {"name": "Locke Stream Hut", "quote": "Locke Stream Hut", "ref": "T20"},
+        {"name": "Harper Pass", "quote": "Harper Pass", "ref": "T10"},
+        {"name": "Harper Pass Bivvy", "quote": "Harper Pass Bivvy", "ref": "T11"},
+        {"name": "Camerons Hut", "quote": "Camerons Hut", "ref": "T9"},
+        {"name": "Cameron Stream", "quote": "Cameron Stream", "ref": "T8"},
+        {"name": "Hurunui No 3 Hut", "quote": "Hurunui No 3 Hut", "ref": "T15"},
+        {"name": "hot spring", "quote": "hot spring", "ref": null},
+        {"name": "Hurunui Hut", "quote": "Hurunui Hut", "ref": "T14"},
+        {"name": "Hurunui River", "quote": "Hurunui River", "ref": null},
+        {"name": "Three Mile Stream", "quote": "Three Mile Stream", "ref": "T23"},
+        {"name": "Kiwi Saddle", "quote": "Kiwi Saddle", "ref": "T17"},
+        {"name": "Kiwi River", "quote": "Kiwi River", "ref": "T16"},
+        {"name": "Hope Kiwi Lodge", "quote": "Hope Kiwi Lodge", "ref": "T13"},
+        {"name": "Hope River swing bridge", "quote": "Hope River swing bridge", "ref": null},
+        {"name": "Hope Halfway Hut", "quote": "Hope Halfway Hut", "ref": "T12"},
+        {"name": "Boyle River gorge", "quote": "Boyle River gorge", "ref": null}
+      ],
+      "direction": null,
+      "time": "4-5 days",
+      "distance": null,
+      "evidence": [
+        "This trip starts at Aickens car park beside SH73, 5 km west of Otira township.",
+        "If Otira River is safe to cross, start from the Aickens car park, cross the stile and follow the fence line to the river.",
+        "The trip finishes at the shelter and car park at Windy Point, just off Lewis Pass Highway on SH7."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [
+    {"name": "Kiwi Hut", "quote": "short side-track to Kiwi Hut", "ref": null, "from": "Taramakau true right about a kilometre above the Otehake"},
+    {"name": "lookout across the lake", "quote": "lookout across the lake", "ref": null, "from": "Kiwi Saddle"},
+    {"name": "Lake Kaurapataka", "quote": "Lake Kaurapataka", "ref": "T18", "from": "Pfeifer Creek"}
+  ],
+  "huts": [
+    {"name": "Kiwi Hut", "quote": "Kiwi Hut", "ref": null},
+    {"name": "Locke Stream Hut", "quote": "Locke Stream Hut", "ref": "T20"},
+    {"name": "Harper Pass Bivvy", "quote": "Harper Pass Bivvy", "ref": "T11"},
+    {"name": "Camerons Hut", "quote": "Camerons Hut", "ref": "T9"},
+    {"name": "Hurunui No 3 Hut", "quote": "Hurunui No 3 Hut", "ref": "T15"},
+    {"name": "Hurunui Hut", "quote": "Hurunui Hut", "ref": "T14"},
+    {"name": "Hope Kiwi Lodge", "quote": "Hope Kiwi Lodge", "ref": "T13"},
+    {"name": "Hope Halfway Hut", "quote": "Hope Halfway Hut", "ref": "T12"}
+  ],
+  "not_on_route": [
+    {"name": "Morrison footbridge", "quote": "Morrison footbridge", "ref": null, "why": "other"},
+    {"name": "Lake Sumner", "quote": "Lake Sumner", "ref": "T19", "why": "view"},
+    {"name": "Amuri Area School Outdoor Education Centre", "quote": "Amuri Area School Outdoor Education Centre", "ref": null, "why": "nearby"}
+  ],
+  "doubts": "Start: two road end features (F1, F2) where unnamed tracks meet the Otira Highway lie about 1 km from the Aickens place and 250 m apart; the text does not let me tell which is the track from Aickens car park, so the Aickens place (T7) is given instead. End: F3, where an unnamed track meets Lewis Pass Road about 800 m from Windy Point (T24), is taken as the Windy Point shelter and car park; the text says the car park is 5 minutes down the shingle road at Windy Point, so this is likely but not certain. Kiwi Hut is reached by a short side-track and ends the first section, so it is listed both on the way and as a hut. The 'Lake Kaurapataka side trip or round trip' section (6–7 hours or 1–2 days return, with a 1–2 hour loop via the Otehake) has its own heading and time but is a trip to a different destination off the route, so it is recorded as a side trip from Pfeifer Creek rather than a way of doing the Harper Pass Route. The eastern side is also described on the Harper Pass Track page (L1). The emergency flood track to the Morrison footbridge is not a way."
+}

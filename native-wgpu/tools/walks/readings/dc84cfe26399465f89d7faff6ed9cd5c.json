@@ -1,0 +1,53 @@
+{
+  "guid": "dc84cfe2-6399-465f-89d7-faff6ed9cd5c",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Styx Road End to Arahura road end via Styx Saddle",
+      "shape": "one_way",
+      "start": {"name": "Styx Road End car park, Dorothy Falls Road", "quote": "Styx Road End", "ref": "F2"},
+      "end": {"name": "Road end near Milltown Bridge", "quote": "Road End", "ref": "F1"},
+      "via": [
+        {"name": "Styx River", "quote": "Styx River", "ref": "T20"},
+        {"name": "Tyndall Creek", "quote": "Tyndall Creek", "ref": "T23"},
+        {"name": "Mid Styx Hut", "quote": "Mid Styx Hut", "ref": "T14"},
+        {"name": "Grassy Flat Hut", "quote": "Grassy Flat Hut", "ref": "T7"},
+        {"name": "Styx Saddle", "quote": "Styx Saddle", "ref": "T21"},
+        {"name": "Arahura River", "quote": "Arahura River", "ref": "T3"},
+        {"name": "Mudflats Hut", "quote": "Mudflats Hut", "ref": "T16"},
+        {"name": "Visitor Creek", "quote": "Visitor Creek", "ref": null},
+        {"name": "Lower Arahura Hut", "quote": "Lower Arahura Hut", "ref": "T13"},
+        {"name": "swing bridge at The Cesspool", "quote": "The Cesspool", "ref": "T22"}
+      ],
+      "direction": null,
+      "time": "2–4 days",
+      "distance": "11 km one way",
+      "evidence": [
+        "From the carpark the route initially follows an old farm track.",
+        "The track begins at a car park about 500 m along the Dorothy Falls Road from the last road bridge across the Styx River and initially follows a rough 4WD route.",
+        "Once reached, cross this bridge to the true right bank of the Arahura River and follow the old logging road and river flats through private farmland before reaching the public road near the Milltown Bridge."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [
+    {"name": "Harman Hut", "quote": "Harman Hut", "ref": "T8", "from": "Styx Saddle"},
+    {"name": "Lake Browning/Whakarewa", "quote": "Lake Browning/Whakarewa", "ref": "T11", "from": "Styx Saddle"},
+    {"name": "Browning Pass/Noti Raureka", "quote": "Browning Pass/Noti Raureka", "ref": "T5", "from": "Styx Saddle"}
+  ],
+  "huts": [
+    {"name": "Mid Styx Hut", "quote": "Mid Styx Hut", "ref": "T14"},
+    {"name": "Grassy Flat Hut", "quote": "Grassy Flat Hut", "ref": "T7"},
+    {"name": "Mudflats Hut", "quote": "Mudflats Hut", "ref": "T16"},
+    {"name": "Lower Arahura Hut", "quote": "Lower Arahura Hut", "ref": "T13"}
+  ],
+  "not_on_route": [
+    {"name": "Newton Creek Hut", "quote": "Newton Creek Hut", "ref": "T18", "why": "nearby"},
+    {"name": "Harman Hut", "quote": "Harman Hut", "ref": "T8", "why": "side trip"},
+    {"name": "Arthur's Pass: Three Passes Route", "quote": "Arthur's Pass: Three Passes Route", "ref": "L1", "why": "other walk"},
+    {"name": "Lake Kaniere", "quote": "Lake Kaniere", "ref": "T12", "why": "nearby"}
+  ],
+  "doubts": "The page is titled as valley tracks, but describes one sequential trip from the Styx road end over Styx Saddle down the Arahura to the road end near Milltown Bridge, so I recorded it as one_way. The text does not say whether the trip can be walked in reverse. Start ref F2 (unnamed track at Dorothy Falls Road) chosen over F3, which is the Lake Kaniere Walkway. End ref F1 (track meets Milltown Road) matches 'public road near the Milltown Bridge'. The 'Extended trip' to Harman Hut, Lake Browning/Whakarewa and Browning Pass/Noti Raureka is an added day from the Styx Saddle junction, recorded as side trips. DOC's '11 km one way' seems short for the described trip."
+}

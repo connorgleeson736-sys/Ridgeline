@@ -1,0 +1,66 @@
+{
+  "guid": "b9c5aaf1-3ef4-409d-8d22-d16235dd7842",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Lakehead Hut to Angelus Hut via the Cascade Track",
+      "shape": "one_way",
+      "start": {"name": "Lakehead Hut", "quote": "From Lakehead Hut it is also 2 hr to the Cascade Track junction.", "ref": "L1"},
+      "end": {"name": "Angelus Hut", "quote": "Climb the steep poled route to Angelus Hut.", "ref": "T6"},
+      "via": [
+        {"name": "Travers River (unbridged crossing)", "quote": "crossing the unbridged Travers River", "ref": "T13"},
+        {"name": "Cascade Track junction", "quote": "Cascade Track junction", "ref": null},
+        {"name": "Cascade Track alongside the Hukere Stream", "quote": "From the Cascade Track junction it’s a steady climb for 4 hr alongside the Hukere Stream.", "ref": "T1"},
+        {"name": "Hukere Stream", "quote": "the Hukere Stream", "ref": "T8"},
+        {"name": "bush edge", "quote": "The track ends at the bush edge.", "ref": null}
+      ],
+      "direction": null,
+      "time": "6 hr",
+      "distance": "9.4 km one way",
+      "evidence": [
+        "From Lakehead Hut it is also 2 hr to the Cascade Track junction. Note this includes crossing the unbridged Travers River.",
+        "From the Cascade Track junction it’s a steady climb for 4 hr alongside the Hukere Stream.",
+        "The track ends at the bush edge. Climb the steep poled route to Angelus Hut."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "Coldwater Hut to Angelus Hut via the Cascade Track",
+      "shape": "one_way",
+      "start": {"name": "Coldwater Hut", "quote": "From Coldwater Hut to the Cascade Track junction it is 2 hr.", "ref": "L2"},
+      "end": {"name": "Angelus Hut", "quote": "Climb the steep poled route to Angelus Hut.", "ref": "T6"},
+      "via": [
+        {"name": "Cascade Track junction", "quote": "Cascade Track junction", "ref": null},
+        {"name": "Cascade Track alongside the Hukere Stream", "quote": "From the Cascade Track junction it’s a steady climb for 4 hr alongside the Hukere Stream.", "ref": "T1"},
+        {"name": "Hukere Stream", "quote": "the Hukere Stream", "ref": "T8"},
+        {"name": "bush edge", "quote": "The track ends at the bush edge.", "ref": null}
+      ],
+      "direction": null,
+      "time": null,
+      "distance": null,
+      "evidence": [
+        "From Coldwater Hut to the Cascade Track junction it is 2 hr.",
+        "From the Cascade Track junction it’s a steady climb for 4 hr alongside the Hukere Stream.",
+        "The track ends at the bush edge. Climb the steep poled route to Angelus Hut."
+      ]
+    }
+  ],
+  "access_points": [
+    {"name": "St Arnaud", "quote": "From St Arnaud the options are to walk to either Lakehead Hut (9 km, 3 hr) or Coldwater Hut (12 km, 4 hr).", "ref": null, "onto": "Lakehead Hut or Coldwater Hut"}
+  ],
+  "side_trips": [],
+  "huts": [
+    {"name": "Lakehead Hut", "quote": "Lakehead Hut", "ref": "L1"},
+    {"name": "Angelus Hut", "quote": "Angelus Hut", "ref": "T6"}
+  ],
+  "not_on_route": [
+    {"name": "Travers River swingbridge", "quote": "If the Travers River is in flood a swingbridge is located 1 hr 30 min upstream.", "ref": null, "why": "other"},
+    {"name": "Robert Ridge Route", "quote": "Robert Ridge Route", "ref": "T5", "why": "other walk"},
+    {"name": "Mt Cedric Track", "quote": "Mt Cedric Track", "ref": "T4", "why": "other walk"},
+    {"name": "Sabine Hut", "quote": "Sabine Hut", "ref": "T12", "why": "other walk"}
+  ],
+  "doubts": "The page starts the description at St Arnaud but DOC's '6 hr' and '9.4 km one way' fit the hut-to-Angelus section, so the ways start at Lakehead Hut and Coldwater Hut, with St Arnaud recorded as an access point. Which hut is the main start is not stated; Lakehead Hut is taken because it is named first. It is not certain whether the unbridged Travers River crossing applies only to the Lakehead Hut approach. Coldwater Hut is on W2 only, so it is not listed under huts for the main way."
+}

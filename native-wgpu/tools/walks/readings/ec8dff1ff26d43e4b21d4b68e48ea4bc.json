@@ -1,0 +1,101 @@
+{
+  "guid": "ec8dff1f-f26d-43e4-b21d-4b68e48ea4bc",
+  "kind": "one_way",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Matemateāonga Track, Kohi Saddle to the Whanganui River",
+      "shape": "one_way",
+      "start": {"name": "Kohi Saddle", "quote": "The track begins at Kohi Saddle", "ref": "F1"},
+      "end": {"name": "Whanganui River", "quote": "steeply winds down through bush to the banks of the Whanganui River", "ref": null},
+      "via": [
+        {"name": "Matemateāonga Range", "quote": "the crest of the Matemateāonga Range", "ref": "T2"},
+        {"name": "Omaru Hut", "quote": "Omaru Hut", "ref": "T5"},
+        {"name": "Humphries' Clearing", "quote": "Humphries’ Clearing is a further 30 minute walk", "ref": null},
+        {"name": "Pouri Hut", "quote": "Pouri Hut is one hour further along the track", "ref": "T6"},
+        {"name": "Ngapurua Hut", "quote": "Ngapurua Hut", "ref": "T4"},
+        {"name": "Puketotara Hut", "quote": "Puketotara Hut", "ref": "T7"}
+      ],
+      "direction": null,
+      "time": "3 - 5 days",
+      "distance": "42 km one way",
+      "evidence": [
+        "The track begins at Kohi Saddle in regenerating bush but reaches thick bush as the track ascends a spur to the crest of the Matemateāonga Range.",
+        "From the hut, follow the track as it drops abruptly off the Matemateāonga Range and steeply winds down through bush to the banks of the Whanganui River.",
+        "A large sign marks the rendezvous point with the jet boat and the beginning of the river journey to Pipiriki.",
+        "Transport by jet boat must be arranged with a transport operator, to either pick up or drop off your party at the river end of the track."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "Kohi Saddle – Omaru Hut day walk",
+      "shape": "out_and_back",
+      "start": {"name": "Kohi Saddle", "quote": "Kohi Saddle – Omaru Hut", "ref": "F1"},
+      "end": {"name": "Omaru Hut", "quote": "Omaru Hut provides a pleasant lunch stop before returning to the road end.", "ref": "T5"},
+      "via": [],
+      "direction": null,
+      "time": "3 hr return",
+      "distance": null,
+      "evidence": [
+        "Omaru Hut provides a pleasant lunch stop before returning to the road end.",
+        "The section from Kohi Road to Omaru Hut is usually in good condition and is often used by school and family groups as a day trip."
+      ]
+    },
+    {
+      "id": "W3",
+      "main": false,
+      "label": "Kohi Saddle – Whakaihuwaka Maunga – Omaru Hut – Kohi Saddle overnight",
+      "shape": "out_and_back",
+      "start": {"name": "Kohi Saddle road end", "quote": "Kohi Saddle road end", "ref": "F1"},
+      "end": {"name": "Whakaihuwaka Maunga", "quote": "to the top of Whakaihuwaka Maunga (732 m)", "ref": "T8"},
+      "via": [
+        {"name": "Omaru Hut", "quote": "Omaru Hut", "ref": "T5"}
+      ],
+      "direction": null,
+      "time": null,
+      "distance": null,
+      "evidence": [
+        "It is a relatively easy 5 hour walk from Kohi Saddle road end to the top of Whakaihuwaka Maunga (732 m).",
+        "On your return, stay overnight at Omaru Hut before a leisurely walk back to the road the next day."
+      ]
+    },
+    {
+      "id": "W4",
+      "main": false,
+      "label": "Whanganui River end – Puketotara Hut overnight (from Pipiriki by jet boat)",
+      "shape": "out_and_back",
+      "start": {"name": "end of the Matemateāonga Track at the Whanganui River", "quote": "the end of the Matemateāonga Track", "ref": null},
+      "end": {"name": "Puketotara Hut", "quote": "walk up the ridge 1 hour 30 minutes to Puketotara Hut", "ref": "T7"},
+      "via": [],
+      "direction": null,
+      "time": null,
+      "distance": null,
+      "evidence": [
+        "Afterwards jet boat down river to the end of the Matemateāonga Track, walk up the ridge 1 hour 30 minutes to Puketotara Hut, to spend the night in podocarp splendour, with expansive views of the Whanganui River, the bush clad hills of Whanganui National Park and the volcanoes of the Central Plateau.",
+        "The following day return to the river before jet boating back to Pipiriki."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [
+    {"name": "Whakaihuwaka Maunga", "quote": "a signposted track branches off the main track to the summit of Whakaihuwaka Maunga (732 m)", "ref": "T8", "from": null}
+  ],
+  "huts": [
+    {"name": "Omaru Hut", "quote": "Omaru Hut", "ref": "T5"},
+    {"name": "Pouri Hut", "quote": "Pouri Hut", "ref": "T6"},
+    {"name": "Ngapurua Hut", "quote": "Ngapurua Hut", "ref": "T4"},
+    {"name": "Puketotara Hut", "quote": "Puketotara Hut", "ref": "T7"}
+  ],
+  "not_on_route": [
+    {"name": "Bridge to Nowhere Lodge", "quote": "Bridge to Nowhere Lodge", "ref": null, "why": "nearby"},
+    {"name": "Bridge to Nowhere", "quote": "walk into the historic Bridge to Nowhere", "ref": null, "why": "other walk"},
+    {"name": "Mangapurua Landing", "quote": "Mangapurua Landing", "ref": null, "why": "other"},
+    {"name": "Pipiriki", "quote": "the beginning of the river journey to Pipiriki", "ref": null, "why": "other"},
+    {"name": "Puniwhakau Road – 'The Letter Boxes' – Puniwhakau Link Track – Kohi Saddle", "quote": "Puniwhakau Road – 'The Letter Boxes' – Puniwhakau Link Track – Kohi Saddle", "ref": null, "why": "other walk"},
+    {"name": "Tongariro National Park", "quote": "the volcanoes of Tongariro National Park", "ref": null, "why": "view"},
+    {"name": "Strathmore", "quote": "SH 43 at Strathmore", "ref": null, "why": "nearby"}
+  ],
+  "doubts": "Kohi Saddle start: F1 and F2 are both 'where Matemateaonga Track meets UPPER MANGAEHU ROAD' and lie about 150 m apart; I gave F1 but either may be the road end. The river end has no packet entry, so its ref is null. The side trip to Whakaihuwaka Maunga leaves the track about 3 hr 30 min from Omaru Hut at an unnamed junction. W3 (overnight to Whakaihuwaka Maunga) and W4 (jet boat to the river end, up to Puketotara Hut and back) are included as shorter options the page offers; W4 also involves jet boating from Pipiriki and a visit to the Bridge to Nowhere, which are not part of this track. The Puniwhakau Road route to Kohi Saddle is a connecting route and I listed it as another walk rather than an access point."
+}

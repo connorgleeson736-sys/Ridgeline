@@ -1,0 +1,84 @@
+{
+  "guid": "1bfcd6a5-7d80-46d7-aab1-6a38a5deeb64",
+  "kind": "network",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Ram Hill carpark to Monument Hut",
+      "shape": "one_way",
+      "start": {"name": "Ram Hill carpark", "quote": "Ram Hill carpark", "ref": "F1"},
+      "end": {"name": "Monument Hut", "quote": "Monument Hut", "ref": "T14"},
+      "via": [],
+      "direction": null,
+      "time": "2 - 3 hr",
+      "distance": "9 km",
+      "evidence": [
+        "Follow the 4wd track from Ram Hill carpark on the true right of the valley. You don't need to cross any rivers to reach the hut.",
+        "Park your car at the Ram Hill carpark at the road end, or if you have a 4WD vehicle carry on to Monument Hut."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "Monument Hut - Dasler Biv",
+      "shape": "one_way",
+      "start": {"name": "Monument Hut", "quote": "Monument Hut", "ref": "T14"},
+      "end": {"name": "Dasler Biv", "quote": "Dasler Biv", "ref": "T6"},
+      "via": [
+        {"name": "Huxley River", "quote": "Huxley River", "ref": "T13"},
+        {"name": "Hopkins River", "quote": "Hopkins River", "ref": "T12"},
+        {"name": "Red Hut", "quote": "Red Hut", "ref": "T17"},
+        {"name": "Dasler Biv Track", "quote": "Dasler Biv Track", "ref": null}
+      ],
+      "direction": null,
+      "time": null,
+      "distance": null,
+      "evidence": [
+        "From Monument Hut it is usually easiest to stay on the true right until after crossing the Huxley River before crossing the main Hopkins River to reach Red Hut on the true left.",
+        "From Red Hut follow the old 4WD track to the start of Dasler Biv Track."
+      ]
+    },
+    {
+      "id": "W3",
+      "main": false,
+      "label": "Monument Hut - Richardson Rock Biv",
+      "shape": "one_way",
+      "start": {"name": "Monument Hut", "quote": "Monument Hut", "ref": "T14"},
+      "end": {"name": "Richardson Rock Biv", "quote": "Richardson Rock Biv", "ref": null},
+      "via": [
+        {"name": "Elcho Hut", "quote": "Elcho Hut", "ref": "T9"},
+        {"name": "Elcho Stream", "quote": "Elcho Stream", "ref": "T10"},
+        {"name": "Cullers Hut", "quote": "Cullers Hut", "ref": "T5"},
+        {"name": "Apricot flat", "quote": "Apricot flat", "ref": "T4"},
+        {"name": "Hopkins River", "quote": "Hopkins River", "ref": "T12"},
+        {"name": "Dodger Hut", "quote": "Dodger Hut", "ref": "T7"},
+        {"name": "Erceg Hut", "quote": "Erceg Hut", "ref": "T11"}
+      ],
+      "direction": null,
+      "time": null,
+      "distance": null,
+      "evidence": [
+        "There is an unmarked route from Huxley gorge via Elcho hut to Cullers and Dodger and on to Erceg and Richardson Rock bivvy at the head of the valley.",
+        "From Erceg Hut stay on the true left to reach the rock biv."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [],
+  "huts": [
+    {"name": "Monument Hut", "quote": "Monument Hut", "ref": "T14"},
+    {"name": "Red Hut", "quote": "Red Hut", "ref": "T17"},
+    {"name": "Dasler Biv", "quote": "Dasler Biv", "ref": "T6"},
+    {"name": "Elcho Hut", "quote": "Elcho Hut", "ref": "T9"},
+    {"name": "Cullers Hut", "quote": "Cullers Hut", "ref": "T5"},
+    {"name": "Dodger Hut", "quote": "Dodger Hut", "ref": "T7"},
+    {"name": "Erceg Hut", "quote": "Erceg Hut", "ref": "T11"},
+    {"name": "Richardson Rock Biv", "quote": "Richardson Rock Biv", "ref": null}
+  ],
+  "not_on_route": [
+    {"name": "North Elcho Stream Route", "quote": "North Elcho Stream Route", "ref": "T3", "why": "other walk"},
+    {"name": "Huxley gorge swing bridge", "quote": "Huxley gorge swing bridge", "ref": null, "why": "other"}
+  ],
+  "doubts": "Network page for the Hopkins valley; ways are taken from the page's group headings (Ram Hill carpark to Monument Hut, Monument Hut - Dasler Biv, Monument Hut - Richardson Rock Biv), each made of one-way legs. DOC's summary is contradictory ('one way' time, 'return via same track' distance; 21 and 35 km match the one-way totals to Dasler Biv and Richardson Rock Biv), so whether walkers return the same way is not stated; shapes recorded as one_way as the headings describe them. The Richardson Rock route is described as starting from Huxley gorge in one sentence and from Monument Hut in the heading. Richardson Rock Biv and Dasler Biv Track have no entries in the packet. Mountain bikers' option (same track to Monument Hut) is not recorded separately."
+}

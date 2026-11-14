@@ -1,0 +1,75 @@
+{
+  "guid": "6db41893-784a-488a-808f-3d7f0560f04e",
+  "kind": "loop",
+  "ways": [
+    {
+      "id": "W1",
+      "main": true,
+      "label": "Full loop via the upper suspension bridge",
+      "shape": "loop",
+      "start": {"name": "Hokitika Gorge car park", "quote": "Hokitika Gorge car park", "ref": null},
+      "end": {"name": "Hokitika Gorge car park", "quote": "Hokitika Gorge car park", "ref": null},
+      "via": [
+        {"name": "First viewing platform", "quote": "the viewing platform", "ref": null},
+        {"name": "Swing bridge across the Hokitika River", "quote": "the swing bridge across the Hokitika River", "ref": null},
+        {"name": "Junction before the second viewing platform", "quote": "the junction just before the second viewing platform", "ref": null},
+        {"name": "Upper Hokitika Gorge suspension bridge", "quote": "The upper Hokitika Gorge suspension bridge", "ref": null},
+        {"name": "Viewpoint over the river and Hokitika Valley farmland", "quote": "A viewpoint on the way overlooks the river and farmland of the Hokitika Valley", "ref": null}
+      ],
+      "direction": null,
+      "time": "1 hr 30 min",
+      "distance": "1.6 km loop",
+      "evidence": [
+        "complete the full loop via the upper suspension bridge.",
+        "From the car park, follow the signposted track through pristine West Coast rainforest to the viewing platform.",
+        "Continue along the track and boardwalks to reach the swing bridge across the Hokitika River.",
+        "At the junction just before the second viewing platform, follow the signs to Upper Hokitika Gorge.",
+        "After crossing the bridge, it’s a 30 min walk back to the car park through rainforest, with some ups and downs."
+      ]
+    },
+    {
+      "id": "W2",
+      "main": false,
+      "label": "Car park to viewing platform and return",
+      "shape": "out_and_back",
+      "start": {"name": "Hokitika Gorge car park", "quote": "Hokitika Gorge car park", "ref": null},
+      "end": {"name": "First viewing platform", "quote": "the first viewing platform", "ref": null},
+      "via": [],
+      "direction": null,
+      "time": "4 min",
+      "distance": "150 m (one way)",
+      "evidence": [
+        "walk to the first viewing platform or lower swing bridge and return",
+        "4 min / 150 m (one way)"
+      ]
+    },
+    {
+      "id": "W3",
+      "main": false,
+      "label": "Car park to lower swing bridge and return",
+      "shape": "out_and_back",
+      "start": {"name": "Hokitika Gorge car park", "quote": "Hokitika Gorge car park", "ref": null},
+      "end": {"name": "Lower swing bridge", "quote": "lower swing bridge", "ref": null},
+      "via": [
+        {"name": "First viewing platform", "quote": "the viewing platform", "ref": null}
+      ],
+      "direction": null,
+      "time": null,
+      "distance": null,
+      "evidence": [
+        "walk to the first viewing platform or lower swing bridge and return",
+        "Continue along the track and boardwalks to reach the swing bridge across the Hokitika River."
+      ]
+    }
+  ],
+  "access_points": [],
+  "side_trips": [
+    {"name": "Second viewing platform", "quote": "a second viewing platform", "ref": null, "from": "junction after the swing bridge"},
+    {"name": "Rocky beach by the river", "quote": "a rocky beach by the river", "ref": null, "from": "second viewing platform"}
+  ],
+  "huts": [],
+  "not_on_route": [
+    {"name": "Southern Alps/Kā Tiritiri o te Moana", "quote": "Southern Alps/Kā Tiritiri o te Moana", "ref": null, "why": "view"}
+  ],
+  "doubts": "Two road-end features (F1, F2) are both unnamed tracks meeting Whitcombe Valley Road and the text does not say which is the car park (the loop may use both), so the start ref is null. Loop direction is not named; the text describes it via the lower swing bridge first, then the upper suspension bridge. W3's end: the page's option says the lower swing bridge, while its section continues 5 min past the bridge to the second viewing platform. W3 has no stated total time (its section gives only 6 min / 300 m from the viewing platform)."
+}
