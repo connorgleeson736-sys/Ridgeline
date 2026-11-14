@@ -119,12 +119,12 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
         progress.addView(progressLabel,LinearLayout.LayoutParams(0,-2,1f));progress.addView(button("Stop"){loader.cancelDownload()},LinearLayout.LayoutParams(-2,dp(40)))
         progressRow=progress;content.addView(progress);showProgress()
         // Tabs in the heading.
-        val tabs=LinearLayout(activity).apply{background=NativeUi.background(activity,android.graphics.Color.rgb(232,236,229),9);setPadding(dp(3),dp(3),dp(3),dp(3))}
+        val tabs=LinearLayout(activity).apply{background=NativeUi.background(activity,NativeUi.chip,9);setPadding(dp(3),dp(3),dp(3),dp(3))}
         val tabViews=listOf("Paint","Region").map{label->TextView(activity).apply{text=label;textSize=13f;gravity=Gravity.CENTER;isClickable=true;setPadding(dp(14),0,dp(14),0)}}
         fun select(topo:Boolean){
             topoTab=topo
             for((i,v)in tabViews.withIndex()){val on=(i==1)==topo
-                v.setTextColor(if(on)android.graphics.Color.WHITE else NativeUi.ink);v.setTypeface(null,if(on)android.graphics.Typeface.BOLD else android.graphics.Typeface.NORMAL)
+                v.setTextColor(if(on)NativeUi.onInk else NativeUi.ink);v.setTypeface(null,if(on)android.graphics.Typeface.BOLD else android.graphics.Typeface.NORMAL)
                 v.background=if(on)NativeUi.background(activity,NativeUi.ink,7)else NativeUi.pressable(activity,null)}
             paintPane.visibility=if(topo)View.GONE else View.VISIBLE;topoPane.visibility=if(topo)View.VISIBLE else View.GONE
             if(topo){stopPainting();openTopo(topoPane)}else{removeFrame();restoreStyle();topoPane.removeAllViews();startPainting()}
@@ -157,11 +157,11 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
             for(region in rows)list.addView(regionCard(region,close))
         }
     }
-    private fun link(text:String,action:()->Unit)=TextView(activity).apply{this.text=text;textSize=13f;setTextColor(android.graphics.Color.rgb(196,104,46));gravity=Gravity.CENTER_VERTICAL;setPadding(0,0,dp(14),0);isClickable=true;isFocusable=true;background=NativeUi.pressable(activity,null);setOnClickListener{action()}}
+    private fun link(text:String,action:()->Unit)=TextView(activity).apply{this.text=text;textSize=13f;setTextColor(NativeUi.link);gravity=Gravity.CENTER_VERTICAL;setPadding(0,0,dp(14),0);isClickable=true;isFocusable=true;background=NativeUi.pressable(activity,null);setOnClickListener{action()}}
     private fun regionCard(region:OfflineStore.Region,close:()->Unit):View{
         val view=NativeUi.column(activity).apply{setPadding(0,dp(10),0,dp(2))}
         val heading=LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL}
-        val image=ImageView(activity).apply{scaleType=ImageView.ScaleType.CENTER_CROP;clipToOutline=true;contentDescription="Overview of ${region.name}";background=NativeUi.background(activity,android.graphics.Color.rgb(237,241,233),8,true)}
+        val image=ImageView(activity).apply{scaleType=ImageView.ScaleType.CENTER_CROP;clipToOutline=true;contentDescription="Overview of ${region.name}";background=NativeUi.background(activity,NativeUi.chip,8,true)}
         heading.addView(image,LinearLayout.LayoutParams(dp(50),dp(42)))
         val details=NativeUi.column(activity)
         details.addView(NativeUi.text(activity,region.name,13.5f).apply{setTypeface(null,android.graphics.Typeface.BOLD);maxLines=2})
@@ -243,8 +243,8 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
     private fun hint(text:String){
         root.removeCallbacks(hideHint)
         val view=hintView?:TextView(activity).apply{
-            textSize=12f;setPadding(dp(10),dp(6),dp(10),dp(6));setTextColor(android.graphics.Color.rgb(40,55,48));elevation=dp(4).toFloat()
-            background=NativeUi.background(activity,android.graphics.Color.argb(240,255,255,255),14)
+            textSize=12f;setPadding(dp(10),dp(6),dp(10),dp(6));setTextColor(NativeUi.ink);elevation=dp(4).toFloat()
+            background=NativeUi.background(activity,NativeUi.glass,14)
             root.addView(this,FrameLayout.LayoutParams(-2,-2,Gravity.TOP or Gravity.CENTER_HORIZONTAL).apply{topMargin=dp(62)})
         }.also{hintView=it}
         view.text=text;view.animate().cancel();view.alpha=0f;view.animate().alpha(1f).setDuration(200).start()
@@ -318,7 +318,7 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
         cursor?.color=if(erasing)android.graphics.Color.WHITE else PaintedArea.COLORS[brush]
     }
     private fun chipBackground(selected:Boolean)=android.graphics.drawable.GradientDrawable().apply{
-        cornerRadius=dp(9).toFloat();setColor(if(selected)android.graphics.Color.WHITE else android.graphics.Color.TRANSPARENT)
+        cornerRadius=dp(9).toFloat();setColor(if(selected)NativeUi.surface else android.graphics.Color.TRANSPARENT)
         setStroke(dp(if(selected)2 else 1),if(selected)NativeUi.ink else NativeUi.line)
     }
     private fun startPainting(){

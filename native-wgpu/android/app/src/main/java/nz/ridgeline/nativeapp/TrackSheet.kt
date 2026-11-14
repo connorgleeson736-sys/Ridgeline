@@ -16,8 +16,9 @@ import kotlin.math.*
 /** The summary of a tapped track name, from DOC: photo, name, difficulty and
  * time, distance, ascent, descent and highest point, the elevation profile
  * with huts marked, DOC's introduction, track facts, huts along the way and
- * DOC's page. Rests compact over the map; drag or tap the grip to expand,
- * drag down to close. */
+ * DOC's page. Rests compact over the map; drag or tap the grip to expand.
+ * It stays open until its X: a map tap or a drag down does not close it. A hut
+ * opened from a track or walk returns to it when closed. */
 internal class TrackSheet(private val activity:Activity,private val root:FrameLayout,private val loader:TileLoader,private val map:FrameLayout){
     /** The tapped track ([line]) and the section in view ([part]) on the map. */
     var onLine:(List<Coordinate>?,List<Coordinate>?)->Unit={_,_->}
@@ -97,7 +98,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     private val parts=ArrayList<Part>()
     /** Where the walk in view starts and ends, when DOC gives choices. */
     private fun optionChip()=TextView(activity).apply{textSize=12.5f;setTextColor(NativeUi.ink);setTypeface(null,Typeface.BOLD);maxLines=1;setPadding(dp(12),dp(7),dp(12),dp(7))
-        background=NativeUi.pressable(activity,NativeUi.background(activity,Color.rgb(236,240,232),14))}
+        background=NativeUi.pressable(activity,NativeUi.background(activity,NativeUi.chip,14))}
     private val fromChip=optionChip();private val toChip=optionChip()
     private val optionScroll=HorizontalScrollView(activity).apply{isHorizontalScrollBarEnabled=false;visibility=View.GONE
         addView(LinearLayout(activity).apply{orientation=LinearLayout.HORIZONTAL
@@ -131,7 +132,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     }
     init{
         grip.addView(View(activity).apply{background=NativeUi.background(activity,0xff8a9691.toInt(),3)},FrameLayout.LayoutParams(dp(32),dp(4),Gravity.CENTER))
-        grip.addView(NativeUi.button(activity,"×"){hide()}.apply{contentDescription="Close track summary";background=null;textSize=19f;setPadding(0,0,0,0)},FrameLayout.LayoutParams(dp(46),dp(28),Gravity.END))
+        grip.addView(NativeUi.button(activity,"×"){closeOrReturn()}.apply{contentDescription="Close track summary";background=null;textSize=19f;setPadding(0,0,0,0)},FrameLayout.LayoutParams(dp(46),dp(28),Gravity.END))
         grip.setOnClickListener{settle(if(level<2)level+1 else 1)}
         header.isClickable=true;header.setOnClickListener{settle(if(level<2)level+1 else 1)}
         val top=LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL}
@@ -144,7 +145,8 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         titles.addView(line,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(2)})
         top.addView(titles,LinearLayout.LayoutParams(0,-2,1f))
         header.addView(top,LinearLayout.LayoutParams(-1,-2))
-        header.addView(LinearLayout(activity).apply{for((i,v) in stats.withIndex())addView(v,LinearLayout.LayoutParams(0,dp(40),1f).apply{if(i>0)marginStart=dp(8)})},LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(10)})
+        // Stats size to their text (two lines, larger phone fonts too) and line up by their tops.
+        header.addView(LinearLayout(activity).apply{isBaselineAligned=false;for((i,v) in stats.withIndex())addView(v.apply{minHeight=dp(40);maxLines=2},LinearLayout.LayoutParams(0,-2,1f).apply{if(i>0)marginStart=dp(8)})},LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(10)})
         body.addView(optionScroll,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(8)})
         fromChip.setOnClickListener{pickOption(it,true)};toChip.setOnClickListener{pickOption(it,false)}
         body.addView(chart,LinearLayout.LayoutParams(-1,dp(230)))
@@ -198,7 +200,6 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     private fun finish(rawY:Float){
         if(!dragging)return;dragging=false
         val shown=full()-panel.translationY
-        if(shown<compact()-dp(48)){hide();return}
         val nearest=(0..2).minByOrNull{abs(stop(it)-shown)}!!
         val moved=startY-rawY
         settle(when{moved>dp(32)&&nearest<=level->level+1;moved< -dp(32)&&nearest>=level->level-1;else->nearest})
@@ -224,6 +225,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     }
     /** [walkOf]: the walk the map gives this track (a section of a large walk). */
     fun show(trackName:String,at:Coordinate,walkOf:String?=null){
+        remember({show(trackName,at,walkOf)},false)
         val id=begin(trackName,false);fitNext=false
         var walk:DocTracks.Walk?=null;var track:DocTracks.Track?=null;var walkDone=false;var trackDone=false;var lineStarted=false
         var mapped:List<Coordinate>?=null;var nameDone=false;var placeStarted=false
@@ -304,19 +306,37 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
             trackDone=true;describe(walk,track);decide()
         }
     }
+    /** What is shown now (again, to come back to it) and whether it is a hut. */
+    private var current:(()->Unit)?=null;private var currentIsHut=false
+    /** The track or walk a hut was opened from: its X goes back there. */
+    private var returnTo:(()->Unit)?=null
+    private var restoring=false
+    private fun remember(again:()->Unit,hut:Boolean){
+        if(restoring)restoring=false
+        else if(hut){if(visible&&!currentIsHut&&current!=null)returnTo=current else if(!visible)returnTo=null}
+        else returnTo=null
+        current=again;currentIsHut=hut
+    }
+    /** The X (and back at the lowest stop): to the track a hut was opened from, else closed. */
+    fun closeOrReturn(){
+        val again=returnTo
+        if(again!=null&&visible){returnTo=null;restoring=true;again()}else hide()
+    }
     fun hide(){
+        returnTo=null
         if(!visible)return
         visible=false;request++;loader.cancelTrackProfile();onLine(null,null);onPoint(null);onRange(emptyList());chart.clearInspection()
         if(map.layoutParams.height!=-1)map.layoutParams=map.layoutParams.apply{height=-1}
         onCover(0);onClosed()
         panel.animate().translationY(full().toFloat()).setDuration(160).withEndAction{if(!visible)panel.visibility=View.GONE}.start()
     }
-    fun back():Boolean{if(!visible)return false;if(level>0)settle(level-1)else hide();return true}
+    fun back():Boolean{if(!visible)return false;if(level>0)settle(level-1)else closeOrReturn();return true}
 
     /** A track section named by its large DOC walk (a circuit): the walk's own
      * details and line, followed on the map's tracks. */
     /** [mapName]: the map's name for the tapped track (it can differ from DOC's: "Mt Iron Track"). */
     fun showWalk(guid:String,label:String,at:Coordinate,fit:Boolean=false,mapName:String?=null){
+        remember({showWalk(guid,label,at,false,mapName)},false)
         val info=walkInfo(guid)
         val id=begin(info?.name?.takeIf{it.isNotBlank()}?:label,false);fitNext=fit
         if(info!=null)setSubtitle(listOf(info.difficulty,info.time).filter{it.isNotBlank()}.joinToString(" · "))
@@ -498,6 +518,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     /** A hut or bivouac: DOC's category, bunks, bookings, walk from the road
      * end, facilities, photo, page text, and its elevation. */
     fun showHut(hutName:String,at:Coordinate){
+        remember({showHut(hutName,at)},true)
         val id=begin(hutName,true);fitNext=false
         onPoint(at)
         loader.trackProfile(listOf(at,Coordinate(at.longitude+.00002,at.latitude))){values,_->
@@ -525,7 +546,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
             thumbnail(id,found.thumbnail)
         }
     }
-    private fun chip(v:String)=TextView(activity).apply{text=v;textSize=12f;setTextColor(NativeUi.ink);setPadding(dp(10),dp(5),dp(10),dp(5));background=NativeUi.background(activity,Color.rgb(236,240,232),14)}
+    private fun chip(v:String)=TextView(activity).apply{text=v;textSize=12f;setTextColor(NativeUi.ink);setPadding(dp(10),dp(5),dp(10),dp(5));background=NativeUi.background(activity,NativeUi.chip,14)}
     /** DOC's page text (and, for huts, its lead paragraph as the introduction). */
     private fun pageText(id:Long,url:String,lead:Boolean=false){
         if(!url.startsWith("https://"))return
@@ -617,7 +638,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     /** The header line for the whole line (kept while a part is shown). */
     private fun setSubtitle(text:CharSequence){wholeSubtitle=text;if(selected<0){subtitle.text=text;subtitle.visibility=if(text.isEmpty())View.GONE else View.VISIBLE}}
     private fun styleChips(){for(i in 0 until partRow.childCount){val c=partRow.getChildAt(i) as TextView;val on=i-1==selected
-        c.setTextColor(if(on)Color.WHITE else NativeUi.ink);c.background=NativeUi.background(activity,if(on)NativeUi.ink else Color.rgb(236,240,232),14)}}
+        c.setTextColor(if(on)NativeUi.onInk else NativeUi.ink);c.background=NativeUi.background(activity,if(on)NativeUi.ink else NativeUi.chip,14)}}
     /** Shows part [i] alone (-1: the whole line): chart zoomed and shaded,
      * its stats, DOC's time and distance for a leg, its DOC text, and on the map. */
     private fun select(i:Int,move:Boolean){
@@ -751,7 +772,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
             shape.lineTo(cx+r*.8f,cy+r);shape.lineTo(cx-r*.8f,cy+r);shape.lineTo(cx-r*.8f,cy-r*.15f);shape.close()
         }
         override fun onDraw(c:Canvas){
-            paint.color=Color.rgb(236,240,232);c.drawCircle(width/2f,height/2f,width/2f,paint)
+            paint.color=NativeUi.chip;c.drawCircle(width/2f,height/2f,width/2f,paint)
             paint.color=NativeUi.ink;c.drawPath(shape,paint)
         }
     }

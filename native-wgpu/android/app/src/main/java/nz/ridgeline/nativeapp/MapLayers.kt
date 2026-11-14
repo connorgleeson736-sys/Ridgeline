@@ -20,6 +20,14 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         const val SELECTION_MILLIS=50L
         /** Hunting permit area outline and name colours (blaze orange). */
         val HUNTING_LINE=0xF0FF6A13.toInt();val HUNTING_TEXT=0xFFFFA25F.toInt()
+        /** Hunting areas shaded by translucent blaze-orange hatching under their outline. */
+        val HUNTING_HATCH=0x73FF6A13
+        /** DOC's walks drawn from this zoom, until the map's own tracks start (its
+         * vector tiles carry tracks from zoom 12 only): lines only, no names. */
+        const val FAR_TRACKS_ZOOM=9.0
+        const val NEAR_TRACKS_ZOOM=12.0
+        /** The map's track style at its first zoom (topography-style.json nz-tracks, -halo). */
+        val TRACK_HALO=0xCC0F1E1F.toInt();val TRACK_LINE=0xFFF6DB94.toInt()
         /** Styled zoom bands kept per tile. */
         const val STYLES_PER_TILE=3
         /** Map tiles followed for a tapped track's line (zoom 14, ~1.7 km in NZ). */
@@ -383,15 +391,21 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
     // lines per zoom-10 data tile in view.
     @Volatile private var docInfos:Map<String,DocWalks.Info> = emptyMap()
     private var docListLoading=false;private var docListRetry=0L
-    private val docTiles=object:LinkedHashMap<GpuUploadQueue.Id,DocWalks.Index>(16,.75f,true){override fun removeEldestEntry(e:MutableMap.MutableEntry<GpuUploadQueue.Id,DocWalks.Index>)=size>24}
+    private val docTiles=object:LinkedHashMap<GpuUploadQueue.Id,DocWalks.Index>(16,.75f,true){override fun removeEldestEntry(e:MutableMap.MutableEntry<GpuUploadQueue.Id,DocWalks.Index>)=size>40}
     private val docLeases=HashMap<GpuUploadQueue.Id,TileTransport.Consumer>()
     private val docRetry=HashMap<GpuUploadQueue.Id,Long>()
     private var docWanted=emptyList<GpuUploadQueue.Id>()
     private var docRevision=0L
     private fun releaseDoc(){for((_,owned)in docLeases)owned.release(true);docLeases.clear()}
+    /** DOC's walks drawn as lines where the map's tracks are not yet (zoom 9 to 12). */
+    private fun farTracks(state:MapSettings.State,zoom:Double)=state.tracks&&state.overlays()&&zoom>=FAR_TRACKS_ZOOM&&zoom<NEAR_TRACKS_ZOOM
     private fun updateDocWalks(on:Boolean,view:List<GpuUploadQueue.Id>){
         val z=DocWalks.DATA_ZOOM
-        val wanted=if(!on)emptyList()else view.filter{it.z>=z}.map{GpuUploadQueue.Id(z,it.x shr(it.z-z),it.y shr(it.z-z))}.distinct().take(8)
+        // Coarser view tiles (zoomed out past zoom 10): their zoom-10 data tiles.
+        val wanted=if(!on)emptyList()else view.flatMap{id->
+            if(id.z>=z)listOf(GpuUploadQueue.Id(z,id.x shr(id.z-z),id.y shr(id.z-z)))
+            else{val f=1 shl(z-id.z);buildList{for(dy in 0 until f)for(dx in 0 until f)add(GpuUploadQueue.Id(z,id.x*f+dx,id.y*f+dy))}}
+        }.distinct().take(24)
         if(wanted!=docWanted){docWanted=wanted
             for((id,owned)in docLeases.entries.toList())if(id !in wanted){docLeases.remove(id);owned.release(true)}}
         pumpDocWalks()
@@ -415,7 +429,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
             }}.onFailure{owned.close()}}}
         }
         for(id in docWanted){
-            if(docLeases.size>=2)break
+            if(docLeases.size>=3)break
             if(id in docTiles||id in docLeases||(docRetry[id]?:0)>now)continue
             val owned=loader.layerConsumer(10)
             val body=startLeased(owned){loader.layerBody(owned,DocWalks.linesUrl(id.z,id.x,id.y))}?:run{docRetry[id]=now+REFUSED_RETRY_MILLIS;null}?:continue
@@ -443,7 +457,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         val state=loader.mapSettings.state
         if(state!=displayState){displayState=state;lastKey=null;schedulePublication()}
         // Overlays off and already cleared: no selection, fetching or publishing.
-        if(current.isEmpty()&&tiles.isEmpty()&&leases.isEmpty()&&mask(state).isEmpty()&&!(state.borders&&state.base==MapSettings.Base.LINZ)&&!state.hunting&&huntingTiles.isEmpty())return@execute
+        if(current.isEmpty()&&tiles.isEmpty()&&leases.isEmpty()&&mask(state).isEmpty()&&!(state.borders&&state.base==MapSettings.Base.LINZ)&&!state.hunting&&huntingTiles.isEmpty()&&!farTracks(state,view.planningPose.zoom))return@execute
         // Leading-edge throttle (was a 180 ms debounce that every camera frame
         // restarted, so tiles for new ground were not even selected until the
         // finger paused). A pending selection already reads the latest camera.
@@ -457,7 +471,8 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         if(closed||!active||view.width==0||view.height==0)return
         val state=loader.mapSettings.state;val pose=view.planningPose
         val hunting=state.hunting&&pose.zoom>=HuntingAreas.MIN_ZOOM
-        if(mask(state).isEmpty()&&!(state.borders&&state.base==MapSettings.Base.LINZ&&pose.zoom>=8)&&!hunting){releaseAll();current=emptyList();tiles.clear();huntingWanted=emptyList();lastKey=null;schedulePublication();return}
+        val farTracks=farTracks(state,pose.zoom)
+        if(mask(state).isEmpty()&&!(state.borders&&state.base==MapSettings.Base.LINZ&&pose.zoom>=8)&&!hunting&&!farTracks){releaseAll();current=emptyList();tiles.clear();huntingWanted=emptyList();lastKey=null;schedulePublication();return}
         val flat=if(!state.threeD)FlatSelection.plan((view.width/view.pixelScale).roundToInt(),(view.height/view.pixelScale).roundToInt(),pose,512.0,24,VECTOR_MAX_ZOOM)else null
         val wanted=if(flat!=null)flat.map{GpuUploadQueue.Id(it.z,it.x,it.y)}else{
             plan.rewind();val focus=view.surfaceFocusFor(pose)
@@ -468,24 +483,27 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         current=wanted
         if(mask(state).isEmpty()){for((id,owned)in leases.entries.toList())if(leases.remove(id,owned))owned.release(true);leaseStarted.clear();tiles.clear()}
         updateHunting(if(hunting)HuntingAreas.dataZoom(pose.zoom)else -1,wanted)
-        updateDocWalks(state.tracks&&state.overlays()&&pose.zoom>=DocWalks.MIN_ZOOM,wanted)
+        updateDocWalks(state.tracks&&state.overlays()&&pose.zoom>=DocWalks.MIN_ZOOM||farTracks,wanted)
         schedulePublication();pump()
     }
     // ---- DOC hunting permit areas: served live by DOC (HuntingAreas), one
     // query per data tile, cached by the map transport like other tiles. ----
-    private val huntingTiles=object:LinkedHashMap<GpuUploadQueue.Id,List<HuntingAreas.Area>>(16,.75f,true){override fun removeEldestEntry(e:MutableMap.MutableEntry<GpuUploadQueue.Id,List<HuntingAreas.Area>>)=size>48}
+    private val huntingTiles=object:LinkedHashMap<GpuUploadQueue.Id,List<HuntingAreas.Area>>(16,.75f,true){override fun removeEldestEntry(e:MutableMap.MutableEntry<GpuUploadQueue.Id,List<HuntingAreas.Area>>)=size>128}
     private val huntingLeases=HashMap<GpuUploadQueue.Id,TileTransport.Consumer>()
     private val huntingRetry=HashMap<GpuUploadQueue.Id,Long>()
     private var huntingWanted=emptyList<GpuUploadQueue.Id>()
     private val huntingGroups=HashMap<GpuUploadQueue.Id,LineGroup>()
+    private val farGroups=HashMap<GpuUploadQueue.Id,LineGroup>()
     private var huntingRevision=0L;private var huntingFailures=0L
     private fun releaseHunting(){for((_,owned)in huntingLeases)owned.release(true);huntingLeases.clear()}
-    /** The data tiles (at [dataZoom], or none) covering the visible [view] tiles. */
+    /** The data tiles covering the visible [view] tiles: a finer view tile's parent at
+     * [dataZoom], a coarser one itself (a distant part of a tilted view). View tiles do
+     * not overlap, so neither do these; none is dropped (expanding each distant tile
+     * into dataZoom tiles made 64 of them, cut at 32: distant areas never loaded). */
     private fun updateHunting(dataZoom:Int,view:List<GpuUploadQueue.Id>){
-        val wanted=if(dataZoom<0)emptyList() else view.flatMap{id->
-            if(id.z>=dataZoom)listOf(GpuUploadQueue.Id(dataZoom,id.x shr(id.z-dataZoom),id.y shr(id.z-dataZoom)))
-            else{val f=1 shl(dataZoom-id.z);buildList{for(dy in 0 until f)for(dx in 0 until f)add(GpuUploadQueue.Id(dataZoom,id.x*f+dx,id.y*f+dy))}}
-        }.distinct().take(32)
+        val wanted=if(dataZoom<0)emptyList() else view.map{id->
+            if(id.z>=dataZoom)GpuUploadQueue.Id(dataZoom,id.x shr(id.z-dataZoom),id.y shr(id.z-dataZoom)) else id
+        }.distinct().take(96)
         if(wanted!=huntingWanted){huntingWanted=wanted;lastKey=null
             for((id,owned)in huntingLeases.entries.toList())if(id !in wanted){huntingLeases.remove(id);owned.release(true)}}
         pumpHunting()
@@ -588,13 +606,28 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
                 if(zoom>=11)for(clipped in fragments)if(clipped.size>1){val p=clipped[clipped.size/2];labels.add(TopographyStyle.Label(p,"LINZ imagery | Esri World Imagery",10f,0xffdddddd.toInt(),85.0,key="boundary:${p.x}:${p.y}"))}
             }
         }else borderGroups.clear()
-        // Hunting permit areas: dashed blaze-orange outlines, names when closer.
+        // DOC's walks where the map's tracks are not drawn yet: the track style, no names.
+        if(farTracks(state,zoom)){
+            farGroups.keys.retainAll(docWanted.toSet())
+            for(id in docWanted){val index=docTiles[id]?:continue
+                groups.add(farGroups.getOrPut(id){
+                    val b=id.bounds;val lines=ArrayList<TopographyStyle.Line>()
+                    for(line in index.lines)for(path in line.paths)for(part in clip(path,b))if(part.size>=2){
+                        lines.add(TopographyStyle.Line(part,TRACK_HALO,2.6f,0f,0f,7))
+                        lines.add(TopographyStyle.Line(part,TRACK_LINE,1.2f,3.6f,2.4f,8))}
+                    group(id.z+192,id.x,id.y,b,lines)
+                })
+            }
+        }else farGroups.clear()
+        // Hunting permit areas: hatched blaze orange inside a bolder dashed outline, names when closer.
         if(state.hunting&&zoom>=HuntingAreas.MIN_ZOOM){
             huntingGroups.keys.retainAll(huntingWanted.toSet());val named=HashSet<Long>()
             for(id in huntingWanted){val areas=huntingTiles[id]?:continue
                 groups.add(huntingGroups.getOrPut(id){
                     val b=id.bounds;val lines=ArrayList<TopographyStyle.Line>()
-                    for(area in areas)for(ring in area.rings)for(part in clip(ring,b))if(part.size>=2)lines.add(TopographyStyle.Line(part,HUNTING_LINE,2.2f,7f,4f))
+                    val spacing=HuntingAreas.hatchSpacing(id.z)
+                    for(area in areas)for(part in HuntingAreas.hatch(area,b,spacing))lines.add(TopographyStyle.Line(part,HUNTING_HATCH,1.3f,0f,0f,Int.MAX_VALUE-1))
+                    for(area in areas)for(ring in area.rings)for(part in clip(ring,b))if(part.size>=2)lines.add(TopographyStyle.Line(part,HUNTING_LINE,2.8f,8f,4f))
                     group(id.z+128,id.x,id.y,b,lines)
                 })
                 if(zoom>=HuntingAreas.NAME_ZOOM)for(area in areas)if(area.name.isNotBlank()&&named.add(area.id))area.anchor?.let{p->

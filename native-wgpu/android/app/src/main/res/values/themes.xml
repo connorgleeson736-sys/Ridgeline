@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Light: dialogs and system widgets follow the phone's light theme. -->
+    <color name="ridgeline_paper">#FAFAF5</color>
+    <style name="RidgelineTheme" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/ridgeline_paper</item>
+        <item name="android:statusBarColor">@color/ridgeline_paper</item>
+        <item name="android:navigationBarColor">@color/ridgeline_paper</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>
