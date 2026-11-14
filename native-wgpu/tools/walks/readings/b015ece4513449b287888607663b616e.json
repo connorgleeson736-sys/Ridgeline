@@ -1,65 +1,143 @@
 {
-  "guid": "b015ece4-5134-49b2-8788-8607663b616e",
-  "kind": "one_way",
-  "ways": [
+ "guid": "b015ece4-5134-49b2-8788-8607663b616e",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Avalanche Peak - Crow River Route",
+   "shape": "one_way",
+   "start": {
+    "name": "Arthur's Pass village",
+    "quote": "The trip starts from Arthur's Pass village on SH73, 150 km from Christchurch.",
+    "ref": "T4"
+   },
+   "end": {
+    "name": "Klondyke Corner",
+    "quote": "It finishes at Klondyke Corner",
+    "ref": "T11"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Arthur's Pass village over Avalanche Peak and down the Crow River to Klondyke Corner",
-      "shape": "one_way",
-      "start": {"name": "Arthur's Pass village", "quote": "The trip starts from Arthur's Pass village on SH73", "ref": "T4"},
-      "end": {"name": "Klondyke Corner", "quote": "It finishes at Klondyke Corner 8 km south of Arthur’s Pass village.", "ref": "T11"},
-      "via": [
-        {"name": "Avalanche Peak Route (Avalanche Peak Track or Scotts Track)", "quote": "See Avalanche Peak Route", "ref": "L1"},
-        {"name": "Avalanche Peak", "quote": "Avalanche Peak summit", "ref": "T7"},
-        {"name": "shingle scree", "quote": "drop down the south side of Avalanche Peak onto the top of a shingle scree", "ref": null},
-        {"name": "saddle between Avalanche Peak and the main Rolleston ridge", "quote": "a saddle between Avalanche Peak and the main Rolleston ridge", "ref": null},
-        {"name": "main ridge towards Mount Rolleston", "quote": "the main ridge towards Mount Rolleston", "ref": null},
-        {"name": "marked descent point into the Crow valley", "quote": "a marked point indicating the descent point into the Crow valley", "ref": null},
-        {"name": "Crow River", "quote": "a scree slope takes you all the way to the Crow River", "ref": "T9"},
-        {"name": "Crow Hut", "quote": "Crow Hut", "ref": "T8"},
-        {"name": "Waimakariri River flats", "quote": "the grassy Waimakariri flats", "ref": null},
-        {"name": "end of the road into Waimakariri valley", "quote": "the end of the road into Waimakariri valley", "ref": null}
-      ],
-      "direction": null,
-      "time": "2 days",
-      "distance": null,
-      "evidence": [
-        "The trip starts from Arthur's Pass village on SH73, 150 km from Christchurch.",
-        "It finishes at Klondyke Corner 8 km south of Arthur’s Pass village.",
-        "A gravel road takes you the final short distance to Klondyke Corner."
-      ]
+     "name": "Avalanche Peak",
+     "quote": "Two tracks head to Avalanche Peak",
+     "ref": "T7"
     },
     {
-      "id": "W2",
-      "main": false,
-      "label": "Finish via Turkey Flat to the road bridge at Bealey",
-      "shape": "one_way",
-      "start": {"name": "Arthur's Pass village", "quote": "Arthur's Pass village", "ref": "T4"},
-      "end": {"name": "road bridge at Bealey on SH73", "quote": "the road bridge at Bealey on SH73", "ref": null},
-      "via": [
-        {"name": "Avalanche Peak", "quote": "Avalanche Peak", "ref": "T7"},
-        {"name": "Crow Hut", "quote": "Crow Hut", "ref": "T8"},
-        {"name": "Crow River", "quote": "Crow River", "ref": "T9"},
-        {"name": "Turkey Flat", "quote": "the huge scrub-covered fan (Turkey Flat) opposite the Crow confluence", "ref": "T14"}
-      ],
-      "direction": null,
-      "time": null,
-      "distance": null,
-      "evidence": [
-        "In these circumstances it is possible to traverse the huge scrub-covered fan (Turkey Flat) opposite the Crow confluence to join the marked track that climbs above the river and descends to the road bridge at Bealey on SH73."
-      ]
+     "name": "saddle between Avalanche Peak and the main Rolleston ridge",
+     "quote": "to a saddle between Avalanche Peak and the main Rolleston ridge.",
+     "ref": null
+    },
+    {
+     "name": "shingle scree",
+     "quote": "drop down the south side of Avalanche Peak onto the top of a shingle scree",
+     "ref": null
+    },
+    {
+     "name": "main ridge towards Mount Rolleston",
+     "quote": "down to the main ridge towards Mount Rolleston",
+     "ref": null
+    },
+    {
+     "name": "Crow River",
+     "quote": "a scree slope takes you all the way to the Crow River.",
+     "ref": "T9"
+    },
+    {
+     "name": "Crow Hut",
+     "quote": "From here you can see Crow Hut on the true right bank of Crow River.",
+     "ref": "T8"
+    },
+    {
+     "name": "Crow River",
+     "quote": "Cross Crow River where it opens out before joining the Waimakariri River.",
+     "ref": "T9",
+     "how": "ford"
+    },
+    {
+     "name": "Waimakariri flats",
+     "quote": "to the grassy Waimakariri flats.",
+     "ref": null
+    },
+    {
+     "name": "Waimakariri River",
+     "quote": "you must cross the river then re-cross to reach the end of the road into Waimakariri valley",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "gravel road into Waimakariri valley",
+     "quote": "A gravel road takes you the final short distance to Klondyke Corner.",
+     "ref": null,
+     "how": "road"
     }
-  ],
-  "access_points": [],
-  "side_trips": [],
-  "huts": [
-    {"name": "Crow Hut", "quote": "Crow Hut", "ref": "T8"}
-  ],
-  "not_on_route": [
-    {"name": "Mount Rolleston", "quote": "Mount Rolleston", "ref": "T13", "why": "view"},
-    {"name": "Devils Punchbowl Falls", "quote": "Devils Punchbowl Falls", "ref": "T10", "why": "view"},
-    {"name": "McGrath Creek basins", "quote": "McGrath Creek", "ref": "T12", "why": "other"}
-  ],
-  "doubts": "The village start is given as the place Arthur's Pass (T4) rather than a road-end feature because the climb can begin on either Avalanche Peak Track or Scotts Track (only Scotts Track has a road-end feature, F2), and the text does not pick one. W2 is a contingency finish the page offers when the lower Waimakariri crossing is difficult; it is not a separately timed option. The Waimakariri River has no name entry, so its ref is null."
+   ],
+   "direction": null,
+   "time": "2 days",
+   "distance": null,
+   "evidence": [
+    "The trip starts from Arthur's Pass village on SH73, 150 km from Christchurch. It finishes at Klondyke Corner 8 km south of Arthur’s Pass village.",
+    "Two tracks head to Avalanche Peak: Avalanche Peak Track is steeper and more direct; Scotts Track climbs more gradually, has better views, and is easier on the knees.",
+    "The route leaves the ridge and a scree slope takes you all the way to the Crow River.",
+    "From here you can see Crow Hut on the true right bank of Crow River.",
+    "Cross Crow River where it opens out before joining the Waimakariri River.",
+    "A gravel road takes you the final short distance to Klondyke Corner."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Crow Hut",
+   "quote": "From here you can see Crow Hut on the true right bank of Crow River.",
+   "ref": "T8"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Avalanche Peak Route",
+   "quote": "See Avalanche Peak Route",
+   "ref": "L1",
+   "why": "other walk"
+  },
+  {
+   "name": "Avalanche Peak Track",
+   "quote": "Avalanche Peak Track is steeper and more direct",
+   "ref": "T1",
+   "why": "other"
+  },
+  {
+   "name": "Scotts Track",
+   "quote": "Scotts Track climbs more gradually",
+   "ref": "T3",
+   "why": "other"
+  },
+  {
+   "name": "Devils Punchbowl Falls",
+   "quote": "The full drop of Devils Punchbowl Falls is visible on opposite slopes",
+   "ref": "T10",
+   "why": "view"
+  },
+  {
+   "name": "Mount Rolleston",
+   "quote": "the large glaciated peak, Mount Rolleston, is to the north",
+   "ref": "T13",
+   "why": "view"
+  },
+  {
+   "name": "Turkey Flat",
+   "quote": "the huge scrub-covered fan (Turkey Flat) opposite the Crow confluence",
+   "ref": "T14",
+   "why": "other"
+  },
+  {
+   "name": "Bealey road bridge on SH73",
+   "quote": "descends to the road bridge at Bealey on SH73",
+   "ref": null,
+   "why": "other"
+  }
+ ],
+ "doubts": "The page describes one route from Arthur's Pass village to Klondyke Corner, so kind and shape are one_way; the text says the trip finishes at Klondyke Corner and gives no return. DOC's time is '2 days'; the leg times (3–4 hours, 1 hour, 1 hour 30 minutes, 4 hours) are not summed. Start ref T4 is the place 'Arthur's Pass' near the village; this is inferred, not certain, and no road end matches it. The end ref T11 is the Klondyke Corner place. Two tracks go to Avalanche Peak (Avalanche Peak Track and Scotts Track) and the text does not say which is the main way, so neither is a via and both are in not_on_route. The 'See Avalanche Peak Route' link is treated as another walk, not as this way's leg. Crossings: 'Cross Crow River' and the Waimakariri crossings are marked as fords because the text gives no bridge, but whether they are fordable without a bridge is not fully stated. The Waimakariri ford has no name entry, so its ref is null. Alternatives in the text (crossing further downstream where Crow River joins the Waimakariri; the Turkey Flat traverse and track to the Bealey road bridge on SH73) are not recorded as separate ways because they have no heading or time of their own. The shuttle bus and car at Klondyke Corner are not recorded as exits."
 }

@@ -20,7 +20,9 @@ internal object WalkRecords {
               val stops:List<Pair<String,Double>> = emptyList())
     /** A hut on the walk, from DOC's own link on the page. */
     class Hut(val name:String,val point:Coordinate,val link:String)
-    class Walk(val guid:String,val verified:Boolean,val flags:List<String>,val kind:String,val ways:List<Way>,val huts:List<Hut>)
+    /** [line]: for a walk that is not verified, the way along DOC's own line that passes
+     * the places its page names (chosen when compiled), else empty. */
+    class Walk(val guid:String,val verified:Boolean,val flags:List<String>,val kind:String,val ways:List<Way>,val huts:List<Hut>,val line:List<Coordinate> = emptyList())
 
     fun parse(json:String):Map<String,Walk>{
         val root=JSONObject(json);val walks=root.getJSONObject("walks");val out=HashMap<String,Walk>()
@@ -30,7 +32,7 @@ internal object WalkRecords {
                     x.optJSONArray("stops")?.let{st->(0 until st.length()).map{st.getJSONObject(it).let{o->o.getString("name") to o.getDouble("at")}}}.orEmpty())}}.orEmpty()
             val huts=w.optJSONArray("huts")?.let{a->(0 until a.length()).map{a.getJSONObject(it)}.map{h->Hut(h.getString("name"),Coordinate(h.getDouble("lon"),h.getDouble("lat")),h.optString("link"))}}.orEmpty()
             val flags=w.optJSONArray("flags")?.let{a->(0 until a.length()).map{a.getString(it)}}.orEmpty()
-            out[guid]=Walk(guid,w.optString("status")=="verified",flags,w.optString("kind"),ways,huts)
+            out[guid]=Walk(guid,w.optString("status")=="verified",flags,w.optString("kind"),ways,huts,decode(w.optString("line")))
         }
         return out
     }

@@ -1,100 +1,253 @@
 {
-  "guid": "e57f2343-e606-41ff-9ccc-9c8cc0df1824",
-  "kind": "one_way",
-  "ways": [
+ "guid": "e57f2343-e606-41ff-9ccc-9c8cc0df1824",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Rees-Dart Track, Muddy Creek over Rees Saddle and down the Dart to Chinamans Bluff (Option 3, helicopter over the slip)",
+   "shape": "one_way",
+   "start": {
+    "name": "Muddy Creek car park",
+    "quote": "there is a car park at Muddy Creek",
+    "ref": "T23"
+   },
+   "end": {
+    "name": "Chinamans Bluff",
+    "quote": "Chinamans Bluff",
+    "ref": "T8"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Rees-Dart Track, Muddy Creek over Rees Saddle and down the Dart to Chinamans Bluff (Option 3, helicopter over the slip)",
-      "shape": "one_way",
-      "start": {"name": "Muddy Creek car park", "quote": "there is a car park at Muddy Creek", "ref": "T23"},
-      "end": {"name": "Chinamans Bluff", "quote": "Chinamans Bluff", "ref": "T8"},
-      "via": [
-        {"name": "Rees Track", "quote": "Rees track", "ref": "T5"},
-        {"name": "Arthurs Creek", "quote": "Arthurs Creek", "ref": "T7"},
-        {"name": "swing bridge on the national park boundary", "quote": "the swing bridge on the national park boundary", "ref": null},
-        {"name": "Clarke Slip", "quote": "Clarke Slip", "ref": "T9"},
-        {"name": "Shelter Rock Hut", "quote": "Shelter Rock Hut", "ref": "T28"},
-        {"name": "Rees Saddle", "quote": "Rees Saddle", "ref": "T25"},
-        {"name": "upper Snowy Creek", "quote": "upper Snowy Creek", "ref": "T30"},
-        {"name": "Dart Hut", "quote": "Dart Hut", "ref": "T14"},
-        {"name": "Dart Track", "quote": "Dart Track", "ref": "T3"},
-        {"name": "Daleys Flat Hut", "quote": "Daleys Flat Hut", "ref": "T12"},
-        {"name": "Dredge Flat", "quote": "Top of Dredge Flat", "ref": "T17"},
-        {"name": "Surveyors Flat", "quote": "Surveyors Flat", "ref": "T31"}
-      ],
-      "direction": null,
-      "time": "4-5 days one way",
-      "distance": "63 km one way",
-      "evidence": [
-        "A large slip in Dart Valley between Daleys Flat Hut and Chinamans Bluff has made the Rees-Dart Track circuit impassable for trampers.",
-        "Option 3: Helicopter transfer with Heli Glenorchy over the affected section of track (Top of Dredge Flat to Surveyors Flat – one hour walk from Chinamans Bluff).",
-        "The Rees track begins 68 km from Queenstown, via Glenorchy, and there is a car park at Muddy Creek.",
-        "The Dart track begins 76 km from Queenstown via Glenorchy. A 2WD road extends to Chinamans Bluff, however, this is a fine weather road only and subject to washouts and flooded creeks."
-      ]
+     "name": "Rees Track",
+     "quote": "Rees track",
+     "ref": "T5"
     },
     {
-      "id": "W2",
-      "main": false,
-      "label": "Option 1: Muddy Creek to Dart Hut and back out the same way (just Rees Valley)",
-      "shape": "out_and_back",
-      "start": {"name": "Muddy Creek car park", "quote": "Muddy Creek", "ref": "T23"},
-      "end": {"name": "Dart Hut", "quote": "Dart Hut", "ref": "T14"},
-      "via": [
-        {"name": "Arthurs Creek", "quote": "Arthurs Creek", "ref": "T7"},
-        {"name": "swing bridge on the national park boundary", "quote": "the swing bridge on the national park boundary", "ref": null},
-        {"name": "Clarke Slip", "quote": "Clarke Slip", "ref": "T9"},
-        {"name": "Shelter Rock Hut", "quote": "Shelter Rock Hut", "ref": "T28"},
-        {"name": "Rees Saddle", "quote": "Rees Saddle", "ref": "T25"},
-        {"name": "upper Snowy Creek", "quote": "upper Snowy Creek", "ref": "T30"}
-      ],
-      "direction": null,
-      "time": null,
-      "distance": null,
-      "evidence": [
-        "Option 1: Walk from Muddy Creek to Dart Hut and back out the same way (just Rees Valley)",
-        "Take the vehicle track from Muddy Creek and follow the marker poles across the boggy section beyond Arthurs Creek.",
-        "The Dart Hut is on Snowy Creek's true left and can be reached via a swing bridge."
-      ]
+     "name": "Arthurs Creek",
+     "quote": "Arthurs Creek",
+     "ref": "T7"
     },
     {
-      "id": "W3",
-      "main": false,
-      "label": "Option 2: over Cascade Saddle to Dart Hut and out along Rees Valley",
-      "shape": "one_way",
-      "start": {"name": "Cascade Saddle", "quote": "Cascade Saddle", "ref": null},
-      "end": {"name": "Muddy Creek", "quote": "Muddy Creek", "ref": "T23"},
-      "via": [
-        {"name": "Dart Glacier lateral moraines", "quote": "lateral moraines of the Dart Glacier", "ref": null},
-        {"name": "true left bank of the Dart River/Te Awa Whakatipu", "quote": "Dart River/Te Awa Whakatipu", "ref": "T16"},
-        {"name": "Dart Hut", "quote": "Dart Hut", "ref": "T14"},
-        {"name": "Rees Saddle", "quote": "Rees Saddle", "ref": "T25"},
-        {"name": "Shelter Rock Hut", "quote": "Shelter Rock Hut", "ref": "T28"}
-      ],
-      "direction": null,
-      "time": null,
-      "distance": null,
-      "evidence": [
-        "Option 2: Walk over Cascade Saddle to Dart Hut and out along Rees Valley",
-        "The route to both the Dart and Rees valleys veers off to the left, just before you reach Cascade Saddle.",
-        "Slightly upstream from the confluence of the Dart and Snowy Creek, a bridge over the creek leads to Dart Hut."
-      ]
+     "name": "swing bridge on the national park boundary",
+     "quote": "the swing bridge on the national park boundary",
+     "ref": null
+    },
+    {
+     "name": "Clarke Slip",
+     "quote": "Clarke Slip",
+     "ref": "T9"
+    },
+    {
+     "name": "Shelter Rock Hut",
+     "quote": "Shelter Rock Hut",
+     "ref": "T28"
+    },
+    {
+     "name": "Rees Saddle",
+     "quote": "Rees Saddle",
+     "ref": "T25"
+    },
+    {
+     "name": "upper Snowy Creek",
+     "quote": "upper Snowy Creek",
+     "ref": "T30"
+    },
+    {
+     "name": "Dart Hut",
+     "quote": "Dart Hut",
+     "ref": "T14"
+    },
+    {
+     "name": "Dart Track",
+     "quote": "Dart Track",
+     "ref": "T3"
+    },
+    {
+     "name": "Daleys Flat Hut",
+     "quote": "Daleys Flat Hut",
+     "ref": "T12"
+    },
+    {
+     "name": "Dredge Flat",
+     "quote": "Top of Dredge Flat",
+     "ref": "T17"
+    },
+    {
+     "name": "Surveyors Flat",
+     "quote": "Surveyors Flat",
+     "ref": "T31"
     }
-  ],
-  "access_points": [],
-  "side_trips": [
-    {"name": "Kea Basin", "quote": "A side trip to the Kea Basin begins on the other side of the Rees River north of the picturesque Lennox Falls.", "ref": "L1", "from": null}
-  ],
-  "huts": [
-    {"name": "Shelter Rock Hut", "quote": "Shelter Rock Hut", "ref": "T28"},
-    {"name": "Dart Hut", "quote": "Dart Hut", "ref": "T14"},
-    {"name": "Daleys Flat Hut", "quote": "Daleys Flat Hut", "ref": "T12"}
-  ],
-  "not_on_route": [
-    {"name": "Lennox Falls", "quote": "Lennox Falls", "ref": "T19", "why": "view"},
-    {"name": "Kea Basin", "quote": "Kea Basin", "ref": "L1", "why": "side trip"},
-    {"name": "Te Korokā (Dart/Slip Stream) Specially Protected Area", "quote": "Te Korokā (Dart/Slip Stream) Specially Protected Area", "ref": null, "why": "other"},
-    {"name": "Mount Earnslaw/Pikirakatahi", "quote": "Mount Earnslaw/Pikirakatahi", "ref": "T22", "why": "other"}
-  ],
-  "doubts": "The Dart Track is closed indefinitely by a slip between Daleys Flat Hut and Chinamans Bluff; the page offers three options and describes only the Rees Valley (Muddy Creek to Dart Hut) and Cascade Saddle to Dart Hut sections in detail. I recorded the full track (DOC's 4-5 days / 63 km one way, Option 3 with a helicopter over Dredge Flat to Surveyors Flat) as the main way, but its course down the Dart valley (Dart Hut to Daleys Flat Hut to Chinamans Bluff) and its end at Chinamans Bluff are pieced together from the closure notice and Getting there, not from a described route; the page calls it a 'circuit' while DOC says one way. Muddy Creek is given as T23 (the creek) since the car park is 'at Muddy Creek' and there is no road end feature. Option 2's start is near Cascade Saddle, reached by another route the page does not describe; its 4-5 hr / 10 km covers only Cascade Saddle to Dart Hut, so no time or distance was given for the whole option. Option 1's section times are given per section only. The Kea Basin side trip leaves from across the Rees River north of Lennox Falls; no exact place on the way is named."
+   ],
+   "direction": null,
+   "time": "4-5 days one way",
+   "distance": "63 km one way",
+   "evidence": [
+    "A large slip in Dart Valley between Daleys Flat Hut and Chinamans Bluff has made the Rees-Dart Track circuit impassable for trampers.",
+    "Option 3: Helicopter transfer with Heli Glenorchy over the affected section of track (Top of Dredge Flat to Surveyors Flat – one hour walk from Chinamans Bluff).",
+    "The Rees track begins 68 km from Queenstown, via Glenorchy, and there is a car park at Muddy Creek.",
+    "The Dart track begins 76 km from Queenstown via Glenorchy. A 2WD road extends to Chinamans Bluff, however, this is a fine weather road only and subject to washouts and flooded creeks."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Option 1: Muddy Creek to Dart Hut and back out the same way (just Rees Valley)",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Muddy Creek car park",
+    "quote": "Muddy Creek",
+    "ref": "T23"
+   },
+   "end": {
+    "name": "Dart Hut",
+    "quote": "Dart Hut",
+    "ref": "T14"
+   },
+   "via": [
+    {
+     "name": "Arthurs Creek",
+     "quote": "Arthurs Creek",
+     "ref": "T7"
+    },
+    {
+     "name": "swing bridge on the national park boundary",
+     "quote": "the swing bridge on the national park boundary",
+     "ref": null
+    },
+    {
+     "name": "Clarke Slip",
+     "quote": "Clarke Slip",
+     "ref": "T9"
+    },
+    {
+     "name": "Shelter Rock Hut",
+     "quote": "Shelter Rock Hut",
+     "ref": "T28"
+    },
+    {
+     "name": "Rees Saddle",
+     "quote": "Rees Saddle",
+     "ref": "T25"
+    },
+    {
+     "name": "upper Snowy Creek",
+     "quote": "upper Snowy Creek",
+     "ref": "T30"
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "Option 1: Walk from Muddy Creek to Dart Hut and back out the same way (just Rees Valley)",
+    "Take the vehicle track from Muddy Creek and follow the marker poles across the boggy section beyond Arthurs Creek.",
+    "The Dart Hut is on Snowy Creek's true left and can be reached via a swing bridge."
+   ]
+  },
+  {
+   "id": "W3",
+   "main": false,
+   "label": "Option 2: over Cascade Saddle to Dart Hut and out along Rees Valley",
+   "shape": "one_way",
+   "start": {
+    "name": "Cascade Saddle",
+    "quote": "Cascade Saddle",
+    "ref": null
+   },
+   "end": {
+    "name": "Muddy Creek",
+    "quote": "Muddy Creek",
+    "ref": "T23"
+   },
+   "via": [
+    {
+     "name": "Dart Glacier lateral moraines",
+     "quote": "lateral moraines of the Dart Glacier",
+     "ref": null
+    },
+    {
+     "name": "true left bank of the Dart River/Te Awa Whakatipu",
+     "quote": "Dart River/Te Awa Whakatipu",
+     "ref": "T16"
+    },
+    {
+     "name": "Dart Hut",
+     "quote": "Dart Hut",
+     "ref": "T14"
+    },
+    {
+     "name": "Rees Saddle",
+     "quote": "Rees Saddle",
+     "ref": "T25"
+    },
+    {
+     "name": "Shelter Rock Hut",
+     "quote": "Shelter Rock Hut",
+     "ref": "T28"
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "Option 2: Walk over Cascade Saddle to Dart Hut and out along Rees Valley",
+    "The route to both the Dart and Rees valleys veers off to the left, just before you reach Cascade Saddle.",
+    "Slightly upstream from the confluence of the Dart and Snowy Creek, a bridge over the creek leads to Dart Hut."
+   ]
+  }
+ ],
+ "access_points": [],
+ "side_trips": [
+  {
+   "name": "Kea Basin",
+   "quote": "A side trip to the Kea Basin begins on the other side of the Rees River north of the picturesque Lennox Falls.",
+   "ref": "L1",
+   "from": null
+  }
+ ],
+ "huts": [
+  {
+   "name": "Shelter Rock Hut",
+   "quote": "Shelter Rock Hut",
+   "ref": "T28"
+  },
+  {
+   "name": "Dart Hut",
+   "quote": "Dart Hut",
+   "ref": "T14"
+  },
+  {
+   "name": "Daleys Flat Hut",
+   "quote": "Daleys Flat Hut",
+   "ref": "T12"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Lennox Falls",
+   "quote": "Lennox Falls",
+   "ref": "T19",
+   "why": "view"
+  },
+  {
+   "name": "Kea Basin",
+   "quote": "Kea Basin",
+   "ref": "L1",
+   "why": "side trip"
+  },
+  {
+   "name": "Te Korokā (Dart/Slip Stream) Specially Protected Area",
+   "quote": "Te Korokā (Dart/Slip Stream) Specially Protected Area",
+   "ref": null,
+   "why": "other"
+  },
+  {
+   "name": "Mount Earnslaw/Pikirakatahi",
+   "quote": "Mount Earnslaw/Pikirakatahi",
+   "ref": "T22",
+   "why": "other"
+  }
+ ],
+ "doubts": "The Dart Track is closed indefinitely by a slip between Daleys Flat Hut and Chinamans Bluff; the page offers three options and describes only the Rees Valley (Muddy Creek to Dart Hut) and Cascade Saddle to Dart Hut sections in detail. I recorded the full track (DOC's 4-5 days / 63 km one way, Option 3 with a helicopter over Dredge Flat to Surveyors Flat) as the main way, but its course down the Dart valley (Dart Hut to Daleys Flat Hut to Chinamans Bluff) and its end at Chinamans Bluff are pieced together from the closure notice and Getting there, not from a described route; the page calls it a 'circuit' while DOC says one way. Muddy Creek is given as T23 (the creek) since the car park is 'at Muddy Creek' and there is no road end feature. Option 2's start is near Cascade Saddle, reached by another route the page does not describe; its 4-5 hr / 10 km covers only Cascade Saddle to Dart Hut, so no time or distance was given for the whole option. Option 1's section times are given per section only. The Kea Basin side trip leaves from across the Rees River north of Lennox Falls; no exact place on the way is named."
 }

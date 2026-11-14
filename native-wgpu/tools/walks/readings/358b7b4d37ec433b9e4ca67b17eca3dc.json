@@ -1,59 +1,161 @@
 {
-  "guid": "358b7b4d-37ec-433b-9e4c-a67b17eca3dc",
-  "kind": "unclear",
-  "ways": [
+ "guid": "358b7b4d-37ec-433b-9e4c-a67b17eca3dc",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Whitcombe Pass Track",
+   "shape": "one_way",
+   "start": {
+    "name": "Whitcombe road end car park",
+    "quote": "leads to the Whitcombe road end",
+    "ref": null
+   },
+   "end": {
+    "name": "Whitcombe Pass",
+    "quote": "Whitcombe Pass",
+    "ref": "T18"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Car park to Whitcombe Pass",
-      "shape": null,
-      "start": {"name": "Whitcombe road end car park", "quote": "Whitcombe road end", "ref": null},
-      "end": {"name": "Whitcombe Pass", "quote": "Whitcombe Pass", "ref": "T18"},
-      "via": [
-        {"name": "Hokitika River", "quote": "follow the marked 4WD road to the Hokitika River", "ref": "T7"},
-        {"name": "Rapid Creek cableway", "quote": "Rapid Creek cableway", "ref": null},
-        {"name": "Rapid Creek Hut", "quote": "Rapid Creek Hut", "ref": "T13"},
-        {"name": "Rapid Creek", "quote": "Once across Rapid Creek", "ref": "T12"},
-        {"name": "Hokitika/Whitcombe Junction", "quote": "Hokitika/Whitcombe Junction", "ref": null},
-        {"name": "Collier Gorge Swing Bridge", "quote": "Collier Gorge Swing Bridge", "ref": null},
-        {"name": "Dick Creek", "quote": "Dick Creek", "ref": "T4"},
-        {"name": "Frew Hut", "quote": "Frew Hut", "ref": "T6"},
-        {"name": "Frew Creek", "quote": "drop down to Frew creek and cross it", "ref": "T5"},
-        {"name": "Vincent Creek swing bridge", "quote": "Vincent Creek swing bridge", "ref": null},
-        {"name": "Price Flat", "quote": "Price Flat", "ref": "T10"},
-        {"name": "Price Flat Hut", "quote": "Price Flat Hut", "ref": "T11"},
-        {"name": "Cataract Creek", "quote": "crossing Cataract Creek", "ref": "T2"},
-        {"name": "Chairman Creek", "quote": "Chairman Creek", "ref": null},
-        {"name": "Cave Camp", "quote": "Cave Camp", "ref": null},
-        {"name": "Neave Creek Hut", "quote": "Neave Creek Hut", "ref": null},
-        {"name": "The Gateway", "quote": "the Gateway", "ref": "T15"}
-      ],
-      "direction": null,
-      "time": "3-4 days to Whitcombe Pass",
-      "distance": null,
-      "evidence": [
-        "A side road to the left some 100 m past the second bridge leads to the Whitcombe road end.",
-        "Once at the road end drop down to the riverbed and walk upstream along the river’s edge for 15-20 minutes to where rock cairns and orange markers show the way to the cut track.",
-        "From Neave Creek Hut the track leads through alpine scrub to the Whitcombe River near the Gateway. From here travel to the Pass is via the riverbed, crossing the river where convenient."
-      ]
+     "name": "marked 4WD road",
+     "quote": "follow the marked 4WD road to the Hokitika River",
+     "ref": null,
+     "how": "road"
+    },
+    {
+     "name": "Hokitika River",
+     "quote": "walk upstream along the river’s edge",
+     "ref": "T7"
+    },
+    {
+     "name": "Rapid Creek cableway",
+     "quote": "follow this benched track to the Rapid Creek cableway",
+     "ref": null
+    },
+    {
+     "name": "Rapid Creek Hut",
+     "quote": "brings you to Rapid Creek Hut",
+     "ref": "T13"
+    },
+    {
+     "name": "Rapid Creek",
+     "quote": "Once across Rapid Creek",
+     "ref": "T12",
+     "how": "ford"
+    },
+    {
+     "name": "Whitcombe River",
+     "quote": "to join the Whitcombe River just above the Hokitika/Whitcombe Junction",
+     "ref": "T19"
+    },
+    {
+     "name": "Collier Gorge Swing Bridge",
+     "quote": "Cross Collier Gorge Bridge to the true right",
+     "ref": null
+    },
+    {
+     "name": "Dick Creek",
+     "quote": "travel is via the riverbed to Dick Creek",
+     "ref": "T4"
+    },
+    {
+     "name": "Frew Hut",
+     "quote": "Frew Hut is reached by following a short track",
+     "ref": "T6"
+    },
+    {
+     "name": "Frew Creek",
+     "quote": "drop down to Frew creek and cross it",
+     "ref": "T5",
+     "how": "ford"
+    },
+    {
+     "name": "Vincent Creek swing bridge",
+     "quote": "to lead to Vincent Creek swing bridge",
+     "ref": null
+    },
+    {
+     "name": "Price Flat Hut",
+     "quote": "Price Flat Hut has 6 bunks and a wood stove.",
+     "ref": "T11"
+    },
+    {
+     "name": "Cataract Creek",
+     "quote": "crossing Cataract Creek",
+     "ref": "T2"
+    },
+    {
+     "name": "Cave Camp",
+     "quote": "passing Cave Camp at the Wilkinson river/Whitcombe River confluence",
+     "ref": null
+    },
+    {
+     "name": "Neave Creek Hut",
+     "quote": "Neave Creek Hut has 6 bunks and a wood stove.",
+     "ref": null
+    },
+    {
+     "name": "The Gateway",
+     "quote": "to the Whitcombe River near the Gateway",
+     "ref": "T15"
+    },
+    {
+     "name": "Whitcombe River",
+     "quote": "crossing the river where convenient",
+     "ref": "T19",
+     "how": "ford"
     }
-  ],
-  "access_points": [],
-  "side_trips": [
-    {"name": "Wilkinson Hut", "quote": "Wilkinson Hut", "ref": "T20", "from": "main valley track between Chairman Creek and Cave Camp"}
-  ],
-  "huts": [
-    {"name": "Rapid Creek Hut", "quote": "Rapid Creek Hut", "ref": "T13"},
-    {"name": "Frew Hut", "quote": "Frew Hut", "ref": "T6"},
-    {"name": "Price Flat Hut", "quote": "Price Flat Hut", "ref": "T11"},
-    {"name": "Neave Creek Hut", "quote": "Neave Creek Hut", "ref": null}
-  ],
-  "not_on_route": [
-    {"name": "Wilkinson Hut", "quote": "Wilkinson Hut", "ref": "T20", "why": "side trip"},
-    {"name": "Mt Evans", "quote": "Mt Evans", "ref": "T8", "why": "view"},
-    {"name": "Wilkinson Ice Fall", "quote": "Wilkinson Ice Fall", "ref": null, "why": "view"},
-    {"name": "Shelf Glacier", "quote": "Shelf Glacier", "ref": "T14", "why": "view"},
-    {"name": "Hokitika Gorge", "quote": "Hokitika Gorge", "ref": null, "why": "nearby"}
-  ],
-  "doubts": "The page describes the way only as far as Whitcombe Pass (DOC time '3-4 days to Whitcombe Pass') and does not say whether walkers return the same way or cross the pass, so the shape is left null. The start is the Whitcombe road end car park; the packet has no road end feature, so its ref is null. Neave Creek Hut has no name entry (T9 is the creek), so its ref is null. The historic slab hut on Price Flat is also habitable but the text gives Price Flat Hut as the hut."
+   ],
+   "direction": null,
+   "time": "3-4 days to Whitcombe Pass",
+   "distance": null,
+   "evidence": [
+    "The Whitcombe Pass Track takes you through the very rugged bush clad valleys of the lower Hokitika and Whitcombe Rivers to the Main Divide.",
+    "From here travel to the Pass is via the riverbed, crossing the river where convenient."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Wilkinson Hut",
+   "quote": "a sign posted side track which leads to Wilkinson Hut",
+   "ref": "T20",
+   "from": "Whitcombe River"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Rapid Creek Hut",
+   "quote": "Rapid Creek Hut",
+   "ref": "T13"
+  },
+  {
+   "name": "Frew Hut",
+   "quote": "Frew Hut",
+   "ref": "T6"
+  },
+  {
+   "name": "Price Flat Hut",
+   "quote": "Price Flat Hut",
+   "ref": "T11"
+  },
+  {
+   "name": "Neave Creek Hut",
+   "quote": "Neave Creek Hut",
+   "ref": null
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Hokitika Gorge Walk",
+   "quote": "the Hokitika Gorge",
+   "ref": null,
+   "why": "nearby"
+  }
+ ],
+ "doubts": "Page does not say whether walkers return; time is 'to Whitcombe Pass' with no return, so taken as one_way (could be out and back). Start: the road end car park is not any feature, so null. Cataract Creek crossing: the text says only 'crossing Cataract Creek' (a Cataract Creek swing bridge is mentioned earlier), so no ford how is given. The Rapid Creek cableway crossing is listed as a via without a how. Cataract Creek's ref T2 is the river entry. Hokitika Gorge Walk is not named on the page (only 'the Hokitika Gorge'), so ref null."
 }

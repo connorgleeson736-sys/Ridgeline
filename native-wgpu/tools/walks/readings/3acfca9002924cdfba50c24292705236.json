@@ -1,45 +1,130 @@
 {
-  "guid": "3acfca90-0292-4cdf-ba50-c24292705236",
-  "kind": "one_way",
-  "ways": [
+ "guid": "3acfca90-0292-4cdf-ba50-c24292705236",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Middle Fiord to George Sound Hut",
+   "shape": "one_way",
+   "start": {
+    "name": "Middle Fiord of Lake Te Anau",
+    "quote": "The track from the Middle Fiord of Lake Te Anau to Lake Hankinson is signposted from the beach",
+    "ref": null
+   },
+   "end": {
+    "name": "George Sound Hut",
+    "quote": "The route from Lake Katherine to George Sound Hut (6 bunks)",
+    "ref": "T2"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Middle Fiord of Lake Te Anau to George Sound Hut",
-      "shape": "one_way",
-      "start": {"name": "Middle Fiord of Lake Te Anau (beach)", "quote": "The track from the Middle Fiord of Lake Te Anau to Lake Hankinson is signposted from the beach", "ref": null},
-      "end": {"name": "George Sound Hut", "quote": "The route from Lake Katherine to George Sound Hut (6 bunks) takes between 1 and 2 hours", "ref": "T2"},
-      "via": [
-        {"name": "Lake Hankinson (boat crossing)", "quote": "boat travel (20 minutes) across the lake is required", "ref": "T5"},
-        {"name": "Hankinson Hut", "quote": "Hankinson Hut (11 bunks) is a five minute walk from the head of the lake", "ref": "T6"},
-        {"name": "first three-wire crossing", "quote": "the first three-wire crossing", "ref": null},
-        {"name": "second three-wire crossing", "quote": "the second three-wire crossing", "ref": null},
-        {"name": "Lake Thomson (north side)", "quote": "the route follows around the north side of Lake Thomson to its head", "ref": "T8"},
-        {"name": "Wapiti River flats", "quote": "Wapiti River flats", "ref": "T10"},
-        {"name": "Thomson Hut", "quote": "Thomson Hut (8 bunks)", "ref": null},
-        {"name": "Henry Pass", "quote": "to Henry Pass (830 m)", "ref": "T3"},
-        {"name": "Katherine Creek", "quote": "then follows Katherine Creek to Lake Katherine", "ref": "T4"},
-        {"name": "Lake Katherine", "quote": "to Lake Katherine, taking around four hours", "ref": "T7"}
-      ],
-      "direction": null,
-      "time": "3-4 days one way",
-      "distance": "17.8 km one way",
-      "evidence": [
-        "The track from the Middle Fiord of Lake Te Anau to Lake Hankinson is signposted from the beach and takes 15 minutes.",
-        "The route from Lake Katherine to George Sound Hut (6 bunks) takes between 1 and 2 hours.",
-        "A boat operator takes groups to or from the track end on the Middle Fiord of Lake Te Anau and also provide boat transport on Lake Hankinson."
-      ]
+     "name": "Lake Hankinson",
+     "quote": "boat travel (20 minutes) across the lake is required",
+     "ref": "T5"
+    },
+    {
+     "name": "Hankinson Hut",
+     "quote": "Hankinson Hut (11 bunks) is a five minute walk from the head of the lake.",
+     "ref": "T6"
+    },
+    {
+     "name": "first three-wire crossing",
+     "quote": "five minutes from the hut to the first three-wire crossing",
+     "ref": null
+    },
+    {
+     "name": "second three-wire crossing",
+     "quote": "one hour to the second three-wire crossing",
+     "ref": null
+    },
+    {
+     "name": "Lake Thomson",
+     "quote": "the route follows around the north side of Lake Thomson to its head",
+     "ref": "T8"
+    },
+    {
+     "name": "Wapiti River flats",
+     "quote": "to the Wapiti River flats and to the Thomson Hut (8 bunks)",
+     "ref": "T10"
+    },
+    {
+     "name": "Thomson Hut",
+     "quote": "Thomson Hut (8 bunks)",
+     "ref": null
+    },
+    {
+     "name": "Henry Pass",
+     "quote": "to Henry Pass (830 m)",
+     "ref": "T3"
+    },
+    {
+     "name": "Deadwood Lagoon",
+     "quote": "The route around Deadwood Lagoon is very boggy",
+     "ref": "T1"
+    },
+    {
+     "name": "Katherine Creek",
+     "quote": "follows Katherine Creek to Lake Katherine",
+     "ref": "T4"
+    },
+    {
+     "name": "Lake Katherine",
+     "quote": "It is necessary to wade into the lake in one place.",
+     "ref": "T7"
     }
-  ],
-  "access_points": [],
-  "side_trips": [],
-  "huts": [
-    {"name": "Hankinson Hut", "quote": "Hankinson Hut", "ref": "T6"},
-    {"name": "Thomson Hut", "quote": "Thomson Hut", "ref": null},
-    {"name": "George Sound Hut", "quote": "George Sound Hut", "ref": "T2"}
-  ],
-  "not_on_route": [
-    {"name": "Mt Elwood mica mine", "quote": "The route to Mt.Elwood mica mine is not maintained", "ref": null, "why": "other"}
-  ],
-  "doubts": "Lake Hankinson is crossed by boat (20 min) rather than walked. Thomson Hut has no name entry. The page does not place Deadwood Lagoon in the order of the route (it says only that the route around it is boggy), so it is left out of via. The route can also be done from George Sound (reached by boat, float plane or helicopter), but the page describes it from Lake Te Anau."
+   ],
+   "direction": null,
+   "time": "3-4 days one way",
+   "distance": "17.8 km one way",
+   "evidence": [
+    "The George Sound Route requires transport across Lake Te Anau",
+    "The route from Lake Katherine to George Sound Hut (6 bunks) takes between 1 and 2 hours."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [
+  {
+   "name": "boat from George Sound",
+   "quote": "George Sound is accessible by boat, float plane and helicopter.",
+   "ref": null,
+   "from": "George Sound Hut",
+   "how": "boat"
+  },
+  {
+   "name": "float plane or helicopter from George Sound",
+   "quote": "George Sound is accessible by boat, float plane and helicopter.",
+   "ref": null,
+   "from": "George Sound Hut",
+   "how": "fly"
+  }
+ ],
+ "side_trips": [
+  {
+   "name": "Mt.Elwood mica mine",
+   "quote": "The route to Mt.Elwood mica mine is not maintained but has old markers still in place.",
+   "ref": null,
+   "from": "Thomson Hut"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Hankinson Hut",
+   "quote": "Hankinson Hut (11 bunks)",
+   "ref": "T6"
+  },
+  {
+   "name": "Thomson Hut",
+   "quote": "Thomson Hut (8 bunks)",
+   "ref": null
+  },
+  {
+   "name": "George Sound Hut",
+   "quote": "George Sound Hut (6 bunks)",
+   "ref": "T2"
+  }
+ ],
+ "not_on_route": [],
+ "doubts": "The start is the track end on the Middle Fiord reached by boat across Lake Te Anau; no feature for it. The crossing of Lake Hankinson is by boat (or kayak) and is listed as a via without a how. The two 'three-wire' crossings are unnamed wire crossings (not recorded as fords). Katherine Creek is unbridged but the text only says to follow it. The text says George Sound is accessible by boat, float plane and helicopter; recorded as exits from the end hut."
 }

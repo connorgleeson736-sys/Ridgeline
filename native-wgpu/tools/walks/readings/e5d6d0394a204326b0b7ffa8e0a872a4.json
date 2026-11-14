@@ -1,37 +1,74 @@
 {
-  "guid": "e5d6d039-4a20-4326-b0b7-ffa8e0a872a4",
-  "kind": "one_way",
-  "ways": [
+ "guid": "e5d6d039-4a20-4326-b0b7-ffa8e0a872a4",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "South Face Track from Woolshed Creek car park to Sharplin Falls car park",
+   "shape": "one_way",
+   "start": {
+    "name": "Woolshed Creek car park",
+    "quote": "From Woolshed Creek car park",
+    "ref": null
+   },
+   "end": {
+    "name": "Sharplin Falls car park",
+    "quote": "Sharplin Falls car park is at the end of Flynns Road, Staveley.",
+    "ref": "F1"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "South Face Track from Woolshed Creek car park",
-      "shape": "one_way",
-      "start": {"name": "Woolshed Creek car park", "quote": "From Woolshed Creek car park", "ref": null},
-      "end": {"name": "Sharplin Falls car park", "quote": "Sharplin Falls car park is at the end of Flynns Road, Staveley.", "ref": "F1"},
-      "via": [
-        {"name": "Woolshed Creek", "quote": "cross Woolshed Creek", "ref": "T8"},
-        {"name": "Acland Shelter", "quote": "Acland Shelter", "ref": null},
-        {"name": "junction of the Mount Somers summit hike", "quote": "the junction of the Mount Somers summit hike", "ref": null}
-      ],
-      "direction": null,
-      "time": "7 hr",
-      "distance": "11.6 km one way",
-      "evidence": [
-        "From Woolshed Creek car park, cross Woolshed Creek and climb steeply up a rocky ridge.",
-        "The track then travels around the southern face of Mount Somers through a mix of open grassland and forest.",
-        "The final steep downhill section is through regenerating forest areas but is open enough to continue to provide interesting views to the east.",
-        "If you intend to walk only one way from Woolshed Creek car park and require vehicle transport, a local service is available"
-      ]
+     "name": "Woolshed Creek",
+     "quote": "cross Woolshed Creek",
+     "ref": "T8",
+     "how": "ford"
+    },
+    {
+     "name": "Acland Shelter",
+     "quote": "You pass Acland Shelter",
+     "ref": null
+    },
+    {
+     "name": "junction of the Mount Somers summit hike",
+     "quote": "at the junction of the Mount Somers summit hike",
+     "ref": null
     }
-  ],
-  "access_points": [],
-  "side_trips": [],
-  "huts": [],
-  "not_on_route": [
-    {"name": "Mount Somers summit hike", "quote": "Mount Somers summit hike", "ref": "L1", "why": "other walk"},
-    {"name": "Woolshed Creek Hut", "quote": "Woolshed Creek Hut", "ref": "T9", "why": "other walk"},
-    {"name": "Mount Somers Track", "quote": "Mount Somers Track", "ref": "T2", "why": "other walk"}
-  ],
-  "doubts": "The description never names where the track ends; the end is taken as Sharplin Falls car park only because 'Getting there' lists it alongside Woolshed Creek car park and F1 is where the South Face Track meets Flynns Road. No feature in the packet is at Woolshed Creek car park (Jig Road end), so the start has no ref. Acland Shelter is a day shelter 'not intended to be used overnight', so it is not listed as a hut. The junction with the summit hike is a via point without its own ref."
+   ],
+   "direction": null,
+   "time": "7 hr",
+   "distance": "11.6 km one way",
+   "evidence": [
+    "From Woolshed Creek car park, cross Woolshed Creek and climb steeply up a rocky ridge.",
+    "This section of track eventually rises to its highest point (1080 m) at the junction of the Mount Somers summit hike.",
+    "Sharplin Falls car park is at the end of Flynns Road, Staveley.",
+    "If you intend to walk only one way from Woolshed Creek car park and require vehicle transport, a local service is available"
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Mount Somers summit hike",
+   "quote": "Mount Somers summit hike",
+   "ref": "L1",
+   "why": "other walk"
+  },
+  {
+   "name": "Woolshed Creek Hut",
+   "quote": "a day walk to Woolshed Creek Hut on the Mt Somers Track",
+   "ref": "T9",
+   "why": "other walk"
+  },
+  {
+   "name": "Mount Somers Track",
+   "quote": "more challenging than the Mount Somers Track",
+   "ref": "T2",
+   "why": "other walk"
+  }
+ ],
+ "doubts": "The page never states where the South Face Track ends in words; the end is taken as Sharplin Falls car park because 'Getting there' places it at the end of Flynns Road and the one-way transport note implies a different end from Woolshed Creek car park, and F1 is where the South Face Track meets Flynns Road. Woolshed Creek car park (Jig Road end) has no packet feature, so its start has no ref. Woolshed Creek is marked as a ford because the text says to cross it with no bridge mentioned there (the page says there are unbridged stream crossings in general). Acland Shelter is a day shelter 'not intended to be used overnight', so it is not in huts. The 7 hr and 11.6 km are DOC's summary figures for the whole track."
 }

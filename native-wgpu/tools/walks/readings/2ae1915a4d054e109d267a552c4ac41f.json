@@ -1,84 +1,213 @@
 {
-  "guid": "2ae1915a-4d05-4e10-9d26-7a552c4ac41f",
-  "kind": "one_way",
-  "ways": [
+ "guid": "2ae1915a-4d05-4e10-9d26-7a552c4ac41f",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Aotea Track from the Kaitoke Hot Springs Track to Whangaparapara Road",
+   "shape": "one_way",
+   "start": {
+    "name": "Whangaparapara Road (Kaitoke Hot Springs Track)",
+    "quote": "Starting from Whangaparapara Road, the Kaitoke Hot Springs Track begins flat and easy",
+    "ref": "F2"
+   },
+   "end": {
+    "name": "Whangaparapara Road",
+    "quote": "or exit onto Whangaparapara Road",
+    "ref": "F7"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Aotea Track from the Kaitoke Hot Springs Track to Whangaparapara Road",
-      "shape": "one_way",
-      "start": {"name": "Whangaparapara Road (Kaitoke Hot Springs Track)", "quote": "Starting from Whangaparapara Road, the Kaitoke Hot Springs Track begins flat and easy", "ref": "F2"},
-      "end": {"name": "Whangaparapara Road", "quote": "exit onto Whangaparapara Road", "ref": "F7"},
-      "via": [
-        {"name": "Kaitoke Hot Springs Track", "quote": "Kaitoke Hot Springs Track", "ref": "T3"},
-        {"name": "Kaitoke Wetlands", "quote": "Kaitoke Wetlands", "ref": null},
-        {"name": "Kaitoke Hot Springs", "quote": "Kaitoke Hot Springs", "ref": null},
-        {"name": "Tramline Track North", "quote": "join Tramline Track North", "ref": "T7"},
-        {"name": "Peach Tree Track", "quote": "Peach Tree Track", "ref": "T5"},
-        {"name": "Mt Heale Hut", "quote": "Mt Heale Hut", "ref": "T13"},
-        {"name": "Kaiaraara Track", "quote": "Follow the signs to Kaiaraara Track", "ref": "T2"},
-        {"name": "Kaiaraara Hut", "quote": "Kaiaraara Hut", "ref": "T9"},
-        {"name": "Forest Road", "quote": "following Forest Road", "ref": "T1"},
-        {"name": "Tramline Track", "quote": "follow the historic Tramline Track", "ref": null},
-        {"name": "The Green campsite", "quote": "The Green campsite", "ref": "T14"}
-      ],
-      "direction": null,
-      "time": "2-3 days",
-      "distance": null,
-      "evidence": [
-        "Starting from Whangaparapara Road, the Kaitoke Hot Springs Track begins flat and easy, following an ancient shoreline.",
-        "### Kaiaraara Hut to Whangaparapara Road",
-        "From Forest Road follow the historic Tramline Track to The Green campsite.",
-        "You can camp at The Green campsite at Whangaparapara or exit onto Whangaparapara Road."
-      ]
+     "name": "Kaitoke Hot Springs Track",
+     "quote": "the Kaitoke Hot Springs Track begins flat and easy",
+     "ref": "T3"
     },
     {
-      "id": "W2",
-      "main": false,
-      "label": "Alternative start from Aotea Road via Windy Canyon to Mt Heale Hut, then on to Whangaparapara Road",
-      "shape": "one_way",
-      "start": {"name": "Aotea Road at the top of Whangapoua Hill (Palmers Track)", "quote": "accessed from Aotea Road at the top of Whangapoua Hill", "ref": "F3"},
-      "end": {"name": "Whangaparapara Road", "quote": "exit onto Whangaparapara Road", "ref": "F7"},
-      "via": [
-        {"name": "Windy Canyon", "quote": "Windy Canyon", "ref": null},
-        {"name": "Palmers Track", "quote": "Palmers Track", "ref": "T4"},
-        {"name": "the summit", "quote": "leads you to the summit", "ref": null},
-        {"name": "South Fork Track", "quote": "take South Fork Track along and down to Mt Heale Hut", "ref": "T6"},
-        {"name": "Mt Heale Hut", "quote": "Mt Heale Hut", "ref": "T13"},
-        {"name": "Kaiaraara Track", "quote": "Follow the signs to Kaiaraara Track", "ref": "T2"},
-        {"name": "Kaiaraara Hut", "quote": "Kaiaraara Hut", "ref": "T9"},
-        {"name": "Forest Road", "quote": "following Forest Road", "ref": "T1"},
-        {"name": "Tramline Track", "quote": "follow the historic Tramline Track", "ref": null},
-        {"name": "The Green campsite", "quote": "The Green campsite", "ref": "T14"}
-      ],
-      "direction": null,
-      "time": null,
-      "distance": null,
-      "evidence": [
-        "Alternative access to the Mt Heale Hut is possible from the east, via Windy Canyon and Palmers Track, accessed from Aotea Road at the top of Whangapoua Hill.",
-        "This section is fully bridged and is the shortest and easiest option for the first day.",
-        "From here take South Fork Track along and down to Mt Heale Hut."
-      ]
+     "name": "Kaitoke Wetlands",
+     "quote": "Follow the boardwalks across the unique Kaitoke Wetlands",
+     "ref": null
+    },
+    {
+     "name": "Kaitoke Hot Springs",
+     "quote": "Enjoy the hotpools but take care",
+     "ref": null
+    },
+    {
+     "name": "Tramline Track North",
+     "quote": "join Tramline Track North",
+     "ref": "T7"
+    },
+    {
+     "name": "Peach Tree Track",
+     "quote": "Peach Tree Track soon appears on the left",
+     "ref": "T5"
+    },
+    {
+     "name": "Mt Heale Hut",
+     "quote": "to reach Mt Heale Hut",
+     "ref": "T13"
+    },
+    {
+     "name": "Kaiaraara Track",
+     "quote": "Follow the signs to Kaiaraara Track",
+     "ref": "T2"
+    },
+    {
+     "name": "Kaiaraara Hut",
+     "quote": "Mt Heale Hut to Kaiaraara Hut",
+     "ref": "T9"
+    },
+    {
+     "name": "Maungapiko Lookout",
+     "quote": "Maungapiko Lookout",
+     "ref": null
+    },
+    {
+     "name": "Kauri Tree Route",
+     "quote": "Kauri Tree Route",
+     "ref": null
+    },
+    {
+     "name": "Forest Road",
+     "quote": "following Forest Road",
+     "ref": "T1"
+    },
+    {
+     "name": "historic Tramline Track",
+     "quote": "follow the historic Tramline Track to The Green campsite",
+     "ref": null
+    },
+    {
+     "name": "The Green campsite",
+     "quote": "The Green campsite",
+     "ref": "T14"
     }
-  ],
-  "access_points": [],
-  "side_trips": [
-    {"name": "Mt Hobson (Hirakimata) summit", "quote": "Mt Hobson (Hirakimata) summit", "ref": "T12", "from": null},
-    {"name": "Kauri Falls", "quote": "a 5 minute detour to Kauri Falls", "ref": null, "from": "Tramline Track"}
-  ],
-  "huts": [
-    {"name": "Mt Heale Hut", "quote": "Mt Heale Hut", "ref": "T13"},
-    {"name": "Kaiaraara Hut", "quote": "Kaiaraara Hut", "ref": "T9"}
-  ],
-  "not_on_route": [
-    {"name": "Hauturu/Little Barrier Island", "quote": "Hauturu/Little Barrier Island", "ref": null, "why": "view"},
-    {"name": "Okiwi Basin", "quote": "Okiwi Basin", "ref": null, "why": "view"},
-    {"name": "Whangapoua estuary", "quote": "Whangapoua estuary", "ref": null, "why": "view"},
-    {"name": "Kaitoke and Medlands Bay", "quote": "Kaitoke and Medlands Bay", "ref": null, "why": "view"},
-    {"name": "Maungapiko Lookout", "quote": "Maungapiko Lookout", "ref": null, "why": "view"},
-    {"name": "Kauri Tree Route", "quote": "Kauri Tree Route", "ref": null, "why": "view"},
-    {"name": "Kaiaraara Bay", "quote": "Kaiaraara Bay", "ref": null, "why": "other"},
-    {"name": "Claris airfield", "quote": "Claris airfield", "ref": "T8", "why": "other"}
-  ],
-  "doubts": "The page says the track can also be walked in reverse; the main way is recorded in the direction described. The end ref F7 assumes the 'historic Tramline Track' to The Green campsite is the Tramline Track South that meets Whangaparapara Road there; the text only says 'exit onto Whangaparapara Road'. W2 is the alternative first day from Aotea Road (its 3 hr - 3 hr 30 min time covers only the section to Mt Heale Hut, so time is left null); it is assumed to continue as the main way. 'the summit' on the Windy Canyon section is not named (possibly Mt Hobson/Hirakimata), so no ref. Maungapiko Lookout and Kauri Tree Route are said to be 'on route' but may be roadside viewpoints or short detours; not placed in via. The Mt Hobson summit side trip's departure point is not stated. The Claris ref is for the place, the text names the airfield."
+   ],
+   "direction": null,
+   "time": "2-3 days",
+   "distance": null,
+   "evidence": [
+    "Starting from Whangaparapara Road, the Kaitoke Hot Springs Track begins flat and easy, following an ancient shoreline.",
+    "After a brief steep climb and descent, join Tramline Track North, which harbours reminders of the toil of loggers 80 years ago.",
+    "Peach Tree Track soon appears on the left and you climb steadily through the regenerating forest to reach Mt Heale Hut.",
+    "The last day is an easy grade route with no major climbs following Forest Road.",
+    "From Forest Road follow the historic Tramline Track to The Green campsite.",
+    "You can camp at The Green campsite at Whangaparapara or exit onto Whangaparapara Road."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Windy Canyon from Aotea Road to Mt Heale Hut",
+   "shape": "one_way",
+   "start": {
+    "name": "Aotea Road at the top of Whangapoua Hill (Palmers Track)",
+    "quote": "accessed from Aotea Road at the top of Whangapoua Hill",
+    "ref": "F3"
+   },
+   "end": {
+    "name": "Mt Heale Hut",
+    "quote": "take South Fork Track along and down to Mt Heale Hut",
+    "ref": "T13"
+   },
+   "via": [
+    {
+     "name": "Palmers Track",
+     "quote": "via Windy Canyon and Palmers Track",
+     "ref": "T4"
+    },
+    {
+     "name": "Windy Canyon",
+     "quote": "takes you through the sheer rock faces of Windy Canyon",
+     "ref": null
+    },
+    {
+     "name": "summit",
+     "quote": "leads you to the summit",
+     "ref": null
+    },
+    {
+     "name": "South Fork Track",
+     "quote": "take South Fork Track along and down to Mt Heale Hut",
+     "ref": "T6"
+    }
+   ],
+   "direction": null,
+   "time": "3 hr - 3 hr 30 min",
+   "distance": null,
+   "evidence": [
+    "Alternative access to the Mt Heale Hut is possible from the east, via Windy Canyon and Palmers Track, accessed from Aotea Road at the top of Whangapoua Hill.",
+    "This section is fully bridged and is the shortest and easiest option for the first day.",
+    "From here take South Fork Track along and down to Mt Heale Hut."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Mt Hobson (Hirakimata) summit",
+   "quote": "Mt Hobson (Hirakimata) summit",
+   "ref": "T12",
+   "from": null
+  },
+  {
+   "name": "Kauri Falls",
+   "quote": "a 5 minute detour to Kauri Falls",
+   "ref": null,
+   "from": "historic Tramline Track"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Mt Heale Hut",
+   "quote": "to reach Mt Heale Hut",
+   "ref": "T13"
+  },
+  {
+   "name": "Kaiaraara Hut",
+   "quote": "Mt Heale Hut to Kaiaraara Hut",
+   "ref": "T9"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Hauturu/Little Barrier Island",
+   "quote": "striking sunsets over Hauturu/Little Barrier Island",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Okiwi Basin",
+   "quote": "superb views of Okiwi Basin",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Whangapoua estuary",
+   "quote": "Whangapoua estuary to the north",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Kaitoke and Medlands Bay",
+   "quote": "Kaitoke and Medlands Bay to the east",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Kaiaraara Bay",
+   "quote": "into Kaiaraara Bay",
+   "ref": null,
+   "why": "other"
+  },
+  {
+   "name": "Claris airfield",
+   "quote": "to Claris airfield on the island daily",
+   "ref": "T8",
+   "why": "other"
+  }
+ ],
+ "doubts": "W1 is the main way, from Kaitoke Hot Springs Track at Whangaparapara Road to Whangaparapara Road by Forest Road and the historic Tramline Track. Its end is F7 (where Tramline Track South meets Whangaparapara Road): the text says only 'exit onto Whangaparapara Road' after the Tramline Track to The Green campsite, so this is an inference from the feature. The page says the track can be walked in reverse; that is the same walk the other way, not a separate way. W2 is the Windy Canyon section, with its own heading and time; it ends at Mt Heale Hut, and the main way continues from there, since the page says it is the first day's alternative to Mt Heale Hut. Its time (3 hr - 3 hr 30 min) covers only that section. The summit on the Windy Canyon section is not named (possibly Mt Hobson), so it has no ref. The Mt Hobson side trip's departure point is not stated, so from is null. The Tramline Track name 'historic Tramline Track' does not match a named entry, so its ref is null. Maungapiko Lookout and Kauri Tree Route are named as 'on route' in the text, so they are recorded as via places; they may be short detours, and the page does not place them. Getting to the island by boat or plane, and Claris airfield, are not part of the walk; Claris is recorded as not on route. DOC's time '2-3 days' is copied for the main way."
 }

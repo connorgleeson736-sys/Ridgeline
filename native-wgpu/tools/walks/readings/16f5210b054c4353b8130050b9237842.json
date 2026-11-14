@@ -1,37 +1,58 @@
 {
-  "guid": "16f5210b-054c-4353-b813-0050b9237842",
-  "kind": "one_way",
-  "ways": [
+ "guid": "16f5210b-054c-4353-b813-0050b9237842",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Skyline Track, Roys Peak Track carpark to Cardrona Valley Road at Spotts Creek",
+   "shape": "one_way",
+   "start": {
+    "name": "Roys Peak Track carpark",
+    "quote": "The track starts at the Roys Peak Track carpark on the Mt Aspiring road",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Cardrona Valley Road at Spotts Creek",
+    "quote": "It ends on the Cardrona Valley Road,10 km from Wānaka township",
+    "ref": "F2"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Roys Peak Track carpark to Cardrona Valley Road",
-      "shape": "one_way",
-      "start": {"name": "Roys Peak Track carpark", "quote": "Roys Peak Track carpark", "ref": "F1"},
-      "end": {"name": "Cardrona Valley Road carpark at Spotts Creek", "quote": "Cardrona Valley Road", "ref": "F2"},
-      "via": [
-        {"name": "Roys Peak Track", "quote": "Roys Peak", "ref": "L1"},
-        {"name": "Roys Peak", "quote": "Roys Peak", "ref": "T3"},
-        {"name": "Mt Alpha", "quote": "Mt Alpha", "ref": "T2"},
-        {"name": "4WD farm track", "quote": "4WD farm track", "ref": null},
-        {"name": "signed junction", "quote": "signed junction", "ref": null},
-        {"name": "Spotts Creek", "quote": "Spotts Creek", "ref": "T4"}
-      ],
-      "direction": null,
-      "time": "10-11 hrs",
-      "distance": "23 km one way",
-      "evidence": [
-        "This strenuous hike begins with the track to Roys Peak (1578 m), leading through farmland and up into the tussock tops.",
-        "A poled track from this junction drops down into Spotts Creek then out to the Cardrona Valley Road and carpark.",
-        "The track starts at the Roys Peak Track carpark on the Mt Aspiring road, 6 km from the Wanaka township.",
-        "It ends on the Cardrona Valley Road,10 km from Wānaka township (look for a small carpark next to a deer fence at Spotts Creek).",
-        "The Skyline Track can be walked in either direction."
-      ]
+     "name": "Roys Peak",
+     "quote": "This strenuous hike begins with the track to Roys Peak (1578 m)",
+     "ref": "T3"
+    },
+    {
+     "name": "Mt Alpha",
+     "quote": "Mt Alpha",
+     "ref": "T2"
+    },
+    {
+     "name": "signed junction",
+     "quote": "before reaching a signed junction",
+     "ref": null
+    },
+    {
+     "name": "Spotts Creek",
+     "quote": "drops down into Spotts Creek",
+     "ref": "T4"
     }
-  ],
-  "access_points": [],
-  "side_trips": [],
-  "huts": [],
-  "not_on_route": [],
-  "doubts": "The track can be walked in either direction; it is recorded as described, from Roys Peak Track carpark to Cardrona Valley Road. The first via entry is the track to Roys Peak, i.e. the linked Roys Peak Track (L1); the text names it as 'the track to Roys Peak' rather than by the link's name. Whether the route goes over the summit of Mt Alpha is not stated ('From Mt Alpha, the track descends')."
+   ],
+   "direction": null,
+   "time": "10-11 hrs",
+   "distance": "23 km one way",
+   "evidence": [
+    "The track starts at the Roys Peak Track carpark on the Mt Aspiring road, 6 km from the Wanaka township. It ends on the Cardrona Valley Road,10 km from Wānaka township (look for a small carpark next to a deer fence at Spotts Creek).",
+    "A poled track from this junction drops down into Spotts Creek then out to the Cardrona Valley Road and carpark.",
+    "The Skyline Track can be walked in either direction."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [],
+ "doubts": "Page says it can be walked in either direction; recorded as one way (not a separate way)."
 }

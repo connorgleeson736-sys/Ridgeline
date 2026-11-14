@@ -1,0 +1,29 @@
+{
+  "artifact": "Ridgeline-Native-Walk-Fords-0.1.58-Base.apk",
+  "bytes": 34613155,
+  "sha256": "8c4f54af283dfb33d3aafb00560559c807333c70a32455b4b3c8d987df414a5f",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.58-walk-fords",
+  "versionCode": 59,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.57 Full Audit (same package and signer)",
+  "changes": [
+    "A walk that fails its compile checks is shown on the part of DOC's line its page describes: the way between two ends of DOC's line passing the places the reading names, else the app's own choice (Gillespie Pass Circuit no longer runs up the upper Wilkin instead of down to Makarora). Survey of all 52 such walks: only Gillespie changed.",
+    "Reading rules: a circuit startable from several places gets a way per start; fords and road sections are marked on the way; exits (fly out, boat, track or road out) are recorded.",
+    "Compiler: roads are walked only where the page says (at three times their length); a named ford is crossed where the map has no track, up to 1 km; a place whose nearest point is across a river is passed on the route's own side; exits become 'To ...' ways along the main way; a shorter return walk to a point on a main return walk also continues to its end (Ben Lomond: gondola top to the summit); coverage of DOC's line counts all ways the page describes and access tracks, the main way at least half.",
+    "194 walks read (191 re-read under the new rules by Claude Sonnet and Haiku agents, 4 by hand); per walk the older reading is kept where only it passes the checks, and huts it names that the route passes are kept. 128 verified (93 in 0.1.57); no walk verified before is flagged now.",
+    "Gillespie Pass Circuit: 55.7 km loop from Makarora (DOC 56 km), fording the Makarora River both ways, out along Wilkin Road, Young, Siberia and Kerin Forks huts, exits by plane from Siberia Hut and jet boat from Kerin Forks. Rees-Dart keeps Shelter Rock, Dart and Daleys Flat huts."
+  ],
+  "dataChecks": "compile-report.json and review.html (every compiled walk on a map); comparisons against 0.1.57 and both readings in the session.",
+  "tests": {
+    "kotlinJvm": "all pass (new: compiler fords, roads and exits on a made-up map; shipped records: Gillespie, Ben Lomond, Rees-Dart, Greenstone)",
+    "rust": "unchanged"
+  },
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

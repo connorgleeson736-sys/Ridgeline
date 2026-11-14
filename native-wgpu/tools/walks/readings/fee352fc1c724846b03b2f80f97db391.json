@@ -1,43 +1,114 @@
 {
-  "guid": "fee352fc-1c72-4846-b03b-2f80f97db391",
-  "kind": "one_way",
-  "ways": [
+ "guid": "fee352fc-1c72-4846-b03b-2f80f97db391",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Okahu Road end to River Road car park",
+   "shape": "one_way",
+   "start": {
+    "name": "Okahu Road end",
+    "quote": "Begin at the Okahu Road end",
+    "ref": null
+   },
+   "end": {
+    "name": "River Road car park",
+    "quote": "Walk among the giant trees until you end at the River Rd carpark",
+    "ref": null
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Okahu Road end to River Road car park",
-      "shape": "one_way",
-      "start": {"name": "Okahu Road end", "quote": "Begin at the Okahu Road end", "ref": null},
-      "end": {"name": "River Rd carpark", "quote": "Walk among the giant trees until you end at the River Rd carpark", "ref": null},
-      "via": [
-        {"name": "Skips Hut (Whangatawhia)", "quote": "Skips Hut (Whangatawhia)", "ref": "T8"},
-        {"name": "saddle", "quote": "From Skips Hut the track climbs up over a saddle", "ref": null},
-        {"name": "Rogers Hut (Te Wairoa)", "quote": "Rogers Hut (Te Wairoa)", "ref": "T7"},
-        {"name": "Moerangi Stream", "quote": "up the Moerangi Stream", "ref": "T6"},
-        {"name": "Moerangi Hut", "quote": "Rogers Hut to Moerangi Hut", "ref": "T5"},
-        {"name": "Moerangi Saddle", "quote": "a big climb over the Moerangi Saddle", "ref": null},
-        {"name": "Whirinaki River", "quote": "dropping down to the Whirinaki River", "ref": "T11"},
-        {"name": "Te Whaiti Nui A Toi Canyon", "quote": "From Te Whaiti Nui A Toi Canyon it is a short climb to the River Rd car park", "ref": "T9"}
-      ],
-      "direction": null,
-      "time": "3 days",
-      "distance": "35 km one way",
-      "evidence": [
-        "Begin at the Okahu Road end; its 2 hr (7 km) from there to Skips Hut (Whangatawhia).",
-        "Walk among the giant trees until you end at the River Rd carpark.",
-        "The bike track starts from Okahu Valley Rd and ends at River Road car park."
-      ]
+     "name": "Whangatawhia Stream",
+     "quote": "following the Whangatawhia Stream for a further 6 km",
+     "ref": "T10"
+    },
+    {
+     "name": "Skips Hut (Whangatawhia)",
+     "quote": "Skips Hut (Whangatawhia)",
+     "ref": "T8"
+    },
+    {
+     "name": "Saddle between Skips Hut and Rogers Hut",
+     "quote": "climbs up over a saddle",
+     "ref": null
+    },
+    {
+     "name": "Rogers Hut (Te Wairoa)",
+     "quote": "Rogers Hut (Te Wairoa)",
+     "ref": "T7"
+    },
+    {
+     "name": "Moerangi Stream",
+     "quote": "up the Moerangi Stream",
+     "ref": "T6"
+    },
+    {
+     "name": "Moerangi Hut",
+     "quote": "Moerangi Hut",
+     "ref": "T5"
+    },
+    {
+     "name": "Moerangi Saddle",
+     "quote": "a big climb over the Moerangi Saddle",
+     "ref": null
+    },
+    {
+     "name": "Whirinaki River",
+     "quote": "dropping down to the Whirinaki River",
+     "ref": "T11"
+    },
+    {
+     "name": "Te Whaiti Nui A Toi Canyon",
+     "quote": "From Te Whaiti Nui A Toi Canyon it is a short climb to the River Rd car park",
+     "ref": "T9"
     }
-  ],
-  "access_points": [],
-  "side_trips": [],
-  "huts": [
-    {"name": "Skips Hut (Whangatawhia)", "quote": "Skips Hut (Whangatawhia)", "ref": "T8"},
-    {"name": "Rogers Hut (Te Wairoa)", "quote": "Rogers Hut (Te Wairoa)", "ref": "T7"},
-    {"name": "Moerangi Hut", "quote": "Moerangi Hut", "ref": "T5"}
-  ],
-  "not_on_route": [
-    {"name": "Rangitaiki Plains", "quote": "spectacular views of the Rangitaiki Plains far below", "ref": null, "why": "view"}
-  ],
-  "doubts": "No road end features are given, so the Okahu Road end and River Rd car park have no refs. Moerangi Hut is the Day 2 destination but sits about 500 m up a detour from the main track; it is listed as via and as a hut on the way."
+   ],
+   "direction": null,
+   "time": "3 days",
+   "distance": "35 km one way",
+   "evidence": [
+    "Begin at the Okahu Road end; its 2 hr (7 km) from there to Skips Hut (Whangatawhia).",
+    "From Skips Hut the track climbs up over a saddle before tracking down to Rogers Hut.",
+    "From Rogers it's an easy walk to the next overnight destination: Moerangi Hut.",
+    "The final day of walking includes a big climb over the Moerangi Saddle.",
+    "Walk among the giant trees until you end at the River Rd carpark."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Skips Hut (Whangatawhia)",
+   "quote": "Skips Hut (Whangatawhia)",
+   "ref": "T8"
+  },
+  {
+   "name": "Rogers Hut (Te Wairoa)",
+   "quote": "Rogers Hut (Te Wairoa)",
+   "ref": "T7"
+  },
+  {
+   "name": "Moerangi Hut",
+   "quote": "Moerangi Hut",
+   "ref": "T5"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Rangitaiki Plains",
+   "quote": "spectacular views of the Rangitaiki Plains far below",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Whirinaki Te Pua-a-Tāne Conservation Park",
+   "quote": "Whirinaki Te Pua-a-Tāne Conservation Park is 90 km south east of Rotorua",
+   "ref": null,
+   "why": "nearby"
+  }
+ ],
+ "doubts": "Moerangi Hut: the page calls it a detour about 500 m up from the main track ('a slight detour', and the mountain bike section says 'the short detour to Moerangi Hut'), but the Day 2 heading makes it the overnight destination of the walk, so it is treated as on the way and as a hut on the route, with the detour noted here. Start and end: the page names the Okahu Road end and the River Rd carpark, but no road end feature in the packet matches either, so both refs are null. The Moerangi Saddle and the saddle between Skips Hut and Rogers Hut are unnamed on the map, so the second has no ref. The mountain bike section describes the same track from Okahu Valley Rd to River Road car park, so it is not recorded as a separate way. The DOC time '3 days' is the whole way's time; the day times (3 hr 30 min, 3 hr, 4 hr 30 min) are not summed."
 }

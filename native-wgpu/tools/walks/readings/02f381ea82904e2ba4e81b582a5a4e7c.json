@@ -1,81 +1,170 @@
 {
-  "guid": "02f381ea-8290-4e2b-a4e8-1b582a5a4e7c",
-  "kind": "one_way",
-  "ways": [
+ "guid": "02f381ea-8290-4e2b-a4e8-1b582a5a4e7c",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "South Coast Track, Rarakau carpark to Big River",
+   "shape": "one_way",
+   "start": {
+    "name": "Rarakau carpark",
+    "quote": "Rarakau carpark",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Big River",
+    "quote": "Big River",
+    "ref": null
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "South Coast Track from Rarakau carpark to Big River",
-      "shape": "one_way",
-      "start": {"name": "Rarakau carpark", "quote": "This track starts from the Rarakau carpark", "ref": "F1"},
-      "end": {"name": "Big River", "quote": "Waitutu Hut to Big River", "ref": null},
-      "via": [
-        {"name": "old road over suspension bridges", "quote": "the track follows an old road over several suspension bridges", "ref": null},
-        {"name": "Hump Ridge Track Okaka Lodge turnoff", "quote": "Passing the Hump Ridge Track Okaka Lodge turnoff", "ref": null},
-        {"name": "Blowholes Beach", "quote": "Blowholes Beach", "ref": null},
-        {"name": "Breakneck Creek", "quote": "Breakneck Creek", "ref": "T3"},
-        {"name": "Port Craig School Hut", "quote": "Port Craig School Hut", "ref": "T8"},
-        {"name": "old logging tramline", "quote": "The track follows an old logging tramline", "ref": null},
-        {"name": "Sandhill viaduct", "quote": "The Sandhill and Percy Burn viaducts are reached", "ref": null},
-        {"name": "Percy Burn viaduct", "quote": "The Sandhill and Percy Burn viaducts are reached", "ref": null},
-        {"name": "Edwin Burn viaduct", "quote": "Edwin Burn", "ref": "T4"},
-        {"name": "Francis Burn viaduct", "quote": "Francis Burn viaducts", "ref": "T5"},
-        {"name": "Wairaurahiri Hut", "quote": "Wairaurahiri Hut", "ref": "T11"},
-        {"name": "bridge over the Wairaurahiri River", "quote": "Cross the Wairaurahiri River over the bridge next to the hut", "ref": null},
-        {"name": "Waitutu River suspension bridge", "quote": "meeting the Waitutu River, where a suspension bridge gives access to the Waitutu Hut", "ref": "T13"},
-        {"name": "Waitutu Hut", "quote": "Waitutu Hut", "ref": "T12"}
-      ],
-      "direction": null,
-      "time": "7 hr to Port Craig, 4 days to Big River",
-      "distance": null,
-      "evidence": [
-        "This track starts from the Rarakau carpark, Bluecliffs Beach in Te Waewae Bay, southern Fiordland.",
-        "From the Rarakau carpark, the track follows an old road over several suspension bridges and past beachside baches.",
-        "From here the track climbs over another headland to Breakneck Creek, where it re-enters the forest before arriving at the historic Port Craig School Hut (DOC) and Port Craig Lodge (private).",
-        "At the end of the tramline the track enters mature bush and descends through three river terraces to a clearing on the banks of the Wairaurahiri River, and the Wairaurahiri Hut.",
-        "This track winds through private Māori land and bush clad coastal terraces until meeting the Waitutu River, where a suspension bridge gives access to the Waitutu Hut (200 m upstream on the true right bank).",
-        "From the Waitutu Hut, the track is a marked route and is recommended for experienced trampers only."
-      ]
+     "name": "Blowholes Beach",
+     "quote": "Blowholes Beach",
+     "ref": null
     },
     {
-      "id": "W2",
-      "main": false,
-      "label": "Rarakau carpark to Port Craig School Hut",
-      "shape": null,
-      "start": {"name": "Rarakau carpark", "quote": "From the Rarakau carpark", "ref": "F1"},
-      "end": {"name": "Port Craig School Hut", "quote": "the historic Port Craig School Hut", "ref": "T8"},
-      "via": [
-        {"name": "Hump Ridge Track Okaka Lodge turnoff", "quote": "Passing the Hump Ridge Track Okaka Lodge turnoff", "ref": null},
-        {"name": "Blowholes Beach", "quote": "Blowholes Beach", "ref": null},
-        {"name": "Breakneck Creek", "quote": "Breakneck Creek", "ref": "T3"}
-      ],
-      "direction": null,
-      "time": "7 hours",
-      "distance": "20 km",
-      "evidence": [
-        "The first section, an easy, family-friendly walk to Port Craig School Hut, can be done as an overnight trip with beautiful coastal views and a taste of history.",
-        "From the Rarakau carpark, the track follows an old road over several suspension bridges and past beachside baches.",
-        "From here the track climbs over another headland to Breakneck Creek, where it re-enters the forest before arriving at the historic Port Craig School Hut (DOC) and Port Craig Lodge (private)."
-      ]
+     "name": "Breakneck Creek",
+     "quote": "Breakneck Creek",
+     "ref": "T3"
+    },
+    {
+     "name": "Port Craig School Hut",
+     "quote": "Port Craig School Hut",
+     "ref": "T8"
+    },
+    {
+     "name": "Sandhill viaduct",
+     "quote": "Sandhill",
+     "ref": null
+    },
+    {
+     "name": "Percy Burn viaduct",
+     "quote": "Percy Burn",
+     "ref": "T6"
+    },
+    {
+     "name": "Edwin Burn viaduct",
+     "quote": "Edwin Burn",
+     "ref": "T4"
+    },
+    {
+     "name": "Francis Burn viaduct",
+     "quote": "Francis Burn",
+     "ref": "T5"
+    },
+    {
+     "name": "Wairaurahiri Hut",
+     "quote": "Wairaurahiri Hut",
+     "ref": "T11"
+    },
+    {
+     "name": "Waitutu River suspension bridge",
+     "quote": "Waitutu River",
+     "ref": "T13"
+    },
+    {
+     "name": "Waitutu Hut",
+     "quote": "Waitutu Hut",
+     "ref": "T12"
     }
-  ],
-  "access_points": [],
-  "side_trips": [
-    {"name": "Westies Hut", "quote": "Westies Hut is located in a sea cave at Prices Harbour, signposted from the track about 2 km east of Big River", "ref": "T14", "from": "track about 2 km east of Big River"}
-  ],
-  "huts": [
-    {"name": "Port Craig School Hut", "quote": "Port Craig School Hut", "ref": "T8"},
-    {"name": "Tuatapere Port Craig Viaducts Trust hut", "quote": "The Tuatapere Port Craig Viaducts Trust hut is sited at Percy Burn", "ref": null},
-    {"name": "Wairaurahiri Hut", "quote": "Wairaurahiri Hut", "ref": "T11"},
-    {"name": "Waitutu Hut", "quote": "Waitutu Hut", "ref": "T12"}
-  ],
-  "not_on_route": [
-    {"name": "Westies Hut", "quote": "Westies Hut", "ref": "T14", "why": "side trip"},
-    {"name": "Port Craig Lodge", "quote": "Port Craig Lodge", "ref": null, "why": "nearby"},
-    {"name": "Waitutu Lodge", "quote": "The privately owned Waitutu Lodge", "ref": null, "why": "nearby"},
-    {"name": "Okaka Lodge", "quote": "Okaka Lodge", "ref": null, "why": "nearby"},
-    {"name": "Teal Bay to South Coast Track", "quote": "Teal Bay to South Coast Track", "ref": "L1", "why": "other walk"},
-    {"name": "Hump Ridge Track", "quote": "Hump Ridge Track", "ref": "L2", "why": "other walk"}
-  ],
-  "doubts": "The text does not say how trampers return from Big River (or from Port Craig); the main way is recorded one_way to Big River per DOC's '4 days to Big River'. The Port Craig section 'can be done as an overnight trip', which suggests a return the same way, but this is not stated, so W2's shape is null. Big River has no entry in the packet. F2 ('where South Coast Track meets Percy Burn Viaduct') was not used for the Percy Burn viaduct because it is a road-end feature. Waitutu Hut is 200 m upstream via a suspension bridge, so it may be just off the main line."
+   ],
+   "direction": null,
+   "time": "7 hr to Port Craig, 4 days to Big River",
+   "distance": null,
+   "evidence": [
+    "This track starts from the Rarakau carpark, Bluecliffs Beach in Te Waewae Bay, southern Fiordland.",
+    "### Waitutu Hut to Big River",
+    "From the Rarakau carpark, the track follows an old road over several suspension bridges and past beachside baches."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Rarakau carpark to Port Craig School Hut",
+   "shape": null,
+   "start": {
+    "name": "Rarakau carpark",
+    "quote": "Rarakau carpark",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Port Craig School Hut",
+    "quote": "Port Craig School Hut",
+    "ref": "T8"
+   },
+   "via": [
+    {
+     "name": "Blowholes Beach",
+     "quote": "Blowholes Beach",
+     "ref": null
+    },
+    {
+     "name": "Breakneck Creek",
+     "quote": "Breakneck Creek",
+     "ref": "T3"
+    }
+   ],
+   "direction": null,
+   "time": "7 hours",
+   "distance": "20 km",
+   "evidence": [
+    "The first section, an easy, family-friendly walk to Port Craig School Hut, can be done as an overnight trip with beautiful coastal views and a taste of history.",
+    "From here the track climbs over another headland to Breakneck Creek, where it re-enters the forest before arriving at the historic Port Craig School Hut (DOC) and Port Craig Lodge (private)."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Port Craig School Hut",
+   "quote": "Port Craig School Hut",
+   "ref": "T8"
+  },
+  {
+   "name": "Wairaurahiri Hut",
+   "quote": "Wairaurahiri Hut",
+   "ref": "T11"
+  },
+  {
+   "name": "Waitutu Hut",
+   "quote": "Waitutu Hut",
+   "ref": "T12"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Port Craig Lodge",
+   "quote": "Port Craig Lodge",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "Waitutu Lodge",
+   "quote": "Waitutu Lodge",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "Westies Hut",
+   "quote": "Westies Hut",
+   "ref": "T14",
+   "why": "nearby"
+  },
+  {
+   "name": "Teal Bay to South Coast Track",
+   "quote": "Teal Bay to South Coast Track",
+   "ref": "L1",
+   "why": "other walk"
+  },
+  {
+   "name": "Hump Ridge Track",
+   "quote": "Hump Ridge Track",
+   "ref": "L2",
+   "why": "other walk"
+  }
+ ],
+ "doubts": "Rarakau carpark ref F1 (road end on Papatotara Coast Road) is likely but not certain. W2 shape unclear (overnight trip, return not stated). Westies Hut is signposted from the track near Big River; treated as not on route. Waitutu Hut is reached via suspension bridge 200 m upstream. Big River end has no entry."
 }

@@ -431,7 +431,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
                 pageLegs=DocPages.legs(pageSections);recordHuts=rec.huts
                 if(rec.verified&&rec.ways.isNotEmpty())showRecord(id,rec,level)
                 else{
-                    val line=WalkRoutes.walkLine(null,docPaths,overview?.distance.orEmpty())
+                    val line=rec.line.takeIf{it.size>=2}?:WalkRoutes.walkLine(null,docPaths,overview?.distance.orEmpty())
                     if(line.size>=2)lineFound(id,line)
                     else mapLine(name.text.toString(),at){paths->if(id==request)lineFound(id,DocTracks.chain(paths,at))}
                 }

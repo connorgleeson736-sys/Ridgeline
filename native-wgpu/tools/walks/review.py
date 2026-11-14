@@ -67,6 +67,9 @@ def main(data, report, asset, out, which="all"):
                 doc += [[tuple(p) for p in path] for path in (f.get("geometry") or {}).get("paths", [])]
         rec = recs.get(r["guid"], {})
         ways = [{"main": w["main"], "pts": decode(w["line"])} for w in rec.get("ways", [])]
+        if not ways and rec.get("line"):
+            # A walk that failed its checks: the way along DOC's line the app shows.
+            ways = [{"main": True, "pts": decode(rec["line"])}]
         wl = "".join(f"<li><b>{html.escape(w['label'])}</b> · {w['shape'] or '?'} · {w['km']:.2f} km{' · main' if w['main'] else ''}</li>" for w in r["ways"])
         fl = "".join(f"<li class='flag'>{html.escape(f)}</li>" for f in r["flags"])
         nt = "".join(f"<li class='note'>{html.escape(n)}</li>" for n in r["notes"])
@@ -87,7 +90,7 @@ main{{padding:12px 16px;display:grid;gap:12px}}.walk{{display:flex;flex-wrap:wra
 .map svg{{max-width:100%;height:auto;border-radius:6px}}.info{{flex:1;min-width:240px}}h2{{font-size:15px;margin:2px 0}}h2 a{{color:inherit}}
 .badge{{font-size:11px;padding:2px 7px;border-radius:9px;background:var(--map);color:var(--muted)}}.flagged .badge{{color:var(--flag)}}
 .meta{{color:var(--muted);margin:2px 0 6px}}ul{{margin:0;padding-left:18px}}.flag{{color:var(--flag)}}.note{{color:var(--muted)}}
-</style></head><body><header><h1>Walk compile review</h1><p class='meta'>{len(rep)} walks · {n_ok} verified · {len(rep) - n_ok} flagged. Grey: DOC's line · orange: main way · blue: other ways · green: start · red squares: huts · dashed red: a route that failed its checks.</p>
+</style></head><body><header><h1>Walk compile review</h1><p class='meta'>{len(rep)} walks · {n_ok} verified · {len(rep) - n_ok} flagged. Grey: DOC's line · orange: main way (for a flagged walk, the part of DOC's line the app shows) · blue: other ways · green: start · red squares: huts · dashed red: a route that failed its checks.</p>
 <input id='q' placeholder='Filter by name' oninput="for(const a of document.querySelectorAll('.walk'))a.style.display=a.dataset.name.includes(this.value.toLowerCase())?'':'none'"></header>
 <main>{''.join(rows)}</main></body></html>"""
     open(out, "w").write(page)

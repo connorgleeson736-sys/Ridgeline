@@ -45,10 +45,16 @@ class WalkCompileTest{
                     .put("time",w.time).put("distance",w.distance).put("line",WalkRecords.encode(DocTracks.simplify(w.line,4000)))
                     .put("stops",JSONArray().apply{for((n,at) in w.stops)put(JSONObject().put("name",n).put("at",Math.round(at)))}))})
                 .put("huts",JSONArray().apply{for(h in res.huts)put(JSONObject().put("name",h.name).put("lon",h.point.longitude).put("lat",h.point.latitude).put("link",h.link))})
+            var fallbackWhy="";var shown=emptyList<Coordinate>();var own=emptyList<Coordinate>()
+            if(!res.verified){val reading=JSONObject(File(readings,"$g.json").readText())
+                val (line,why)=WalkCompiler.docFallback(WalkCompiler.Input(packet,reading,line(g),WalkOptions.Area(emptyList()),gazetteer,{emptyList()},hutTable))
+                fallbackWhy=why;if(line.size>=2)rec.put("line",WalkRecords.encode(DocTracks.simplify(line,4000)))
+                shown=line;own=WalkRoutes.walkLine(null,line(g),packet.optString("distance"))}
             records.put(guid,rec)
-            report.put(JSONObject().put("guid",guid).put("name",packet.optString("name")).put("status",rec.getString("status")).put("flags",JSONArray(res.flags)).put("notes",JSONArray(res.notes))
+            report.put(JSONObject().put("guid",guid).put("name",packet.optString("name")).put("status",rec.getString("status")).put("flags",JSONArray(res.flags)).put("notes",JSONArray(res.notes+listOfNotNull(fallbackWhy.ifBlank{null})))
                 .put("ways",JSONArray().apply{for(w in res.ways)put(JSONObject().put("label",w.label).put("shape",w.shape).put("main",w.main).put("km",DocTracks.length(w.line)/1000))})
                 .put("huts",JSONArray(res.huts.map{it.name})).put("docLineKm",packet.optDouble("docLineKm"))
+                .put("shown",WalkRecords.encode(DocTracks.simplify(shown,1500))).put("own",WalkRecords.encode(DocTracks.simplify(own,1500)))
                 .put("attempted",JSONArray().apply{for(w in res.attempted)put(JSONObject().put("label",w.label).put("main",w.main).put("km",DocTracks.length(w.line)/1000).put("line",WalkRecords.encode(DocTracks.simplify(w.line,1500))))}))
         }
         val root=JSONObject().put("v",1).put("walks",records)

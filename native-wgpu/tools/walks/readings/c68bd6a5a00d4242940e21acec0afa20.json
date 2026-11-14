@@ -1,64 +1,190 @@
 {
-  "guid": "c68bd6a5-a00d-4242-940e-21acec0afa20",
-  "kind": "one_way",
-  "ways": [
+ "guid": "c68bd6a5-a00d-4242-940e-21acec0afa20",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Motukarara to Little River",
+   "shape": "one_way",
+   "start": {
+    "name": "Motukarara Railway Station",
+    "quote": "Beginning at the restored Motukarara Railway Station",
+    "ref": "T7"
+   },
+   "end": {
+    "name": "Little River",
+    "quote": "The township of Little River offers a craft and information centre",
+    "ref": "T6"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Motukarara to Little River",
-      "shape": "one_way",
-      "start": {"name": "Motukarara Railway Station", "quote": "Motukarara", "ref": "T7"},
-      "end": {"name": "Little River township", "quote": "Little River", "ref": "F9"},
-      "via": [
-        {"name": "Kaituna Quarry Reserve", "quote": "Kaituna Quarry Reserve", "ref": null},
-        {"name": "Kaituna Lagoon", "quote": "Kaituna Lagoon", "ref": "T5"},
-        {"name": "Kaitorete Spit", "quote": "Kaitorete Spit", "ref": null},
-        {"name": "Lake Forsyth", "quote": "Lake Forsyth", "ref": null},
-        {"name": "Catons Bay picnic spot", "quote": "Catons Bay", "ref": null}
-      ],
-      "direction": null,
-      "time": null,
-      "distance": "20 km one way",
-      "evidence": [
-        "Beginning at the restored Motukarara Railway Station, the trail follows the line of the old railway through open paddocks.",
-        "After this there's a short on road section just before Little River.",
-        "The township of Little River offers a craft and information centre, pub, cafe, gallery and accommodation."
-      ]
+     "name": "Te Waihora (Lake Ellesmere)",
+     "quote": "Te Waihora (Lake Ellesmere)",
+     "ref": null
     },
     {
-      "id": "W2",
-      "main": false,
-      "label": "Christchurch (Hornby) to Motukarara section",
-      "shape": "one_way",
-      "start": {"name": "Hornby (Christchurch)", "quote": "Hornby (Christchurch)", "ref": null},
-      "end": {"name": "Motukarara", "quote": "Motukarara", "ref": "T7"},
-      "via": [
-        {"name": "Prebbleton", "quote": "Prebbleton", "ref": null},
-        {"name": "Lincoln", "quote": "Lincoln", "ref": null},
-        {"name": "Neills Rd", "quote": "Neills Rd", "ref": null},
-        {"name": "Halswell Canal", "quote": "Halswell Canal", "ref": null}
-      ],
-      "direction": null,
-      "time": null,
-      "distance": "26 km",
-      "evidence": [
-        "This 26 km section is not maintained by DOC.",
-        "The Hornby (Christchurch) to Prebbleton section (3.5k m) is an off-road track that runs alongside Shands Rd and Marshes Rd.",
-        "Neills Rd to Motukarara (6 km) is an off-road track that mostly runs adjacent to the Halswell Canal."
-      ]
+     "name": "Kaituna Quarry Reserve",
+     "quote": "The trail passes the Kaituna Quarry Reserve",
+     "ref": null
+    },
+    {
+     "name": "Kaituna Lagoon",
+     "quote": "the Kaituna Lagoon",
+     "ref": "T5"
+    },
+    {
+     "name": "Kaitorete Spit",
+     "quote": "Kaitorete Spit",
+     "ref": null
+    },
+    {
+     "name": "Lake Forsyth",
+     "quote": "Contininuing on the track there is Lake Forsyth",
+     "ref": null
+    },
+    {
+     "name": "Catons Bay picnic spot",
+     "quote": "a picnci spot at Catons Bay",
+     "ref": null
+    },
+    {
+     "name": "road section just before Little River",
+     "quote": "After this there's a short on road section just before Little River.",
+     "ref": null,
+     "how": "road"
     }
-  ],
-  "access_points": [
-    {"name": "Ataahua", "quote": "Ataahua", "ref": "T3", "onto": null},
-    {"name": "Cantons Bay", "quote": "Cantons Bay", "ref": null, "onto": null}
-  ],
-  "side_trips": [
-    {"name": "Birdlings Flat", "quote": "Birdlings Flat", "ref": "T4", "from": null}
-  ],
-  "huts": [],
-  "not_on_route": [
-    {"name": "Te Waihora (Lake Ellesmere)", "quote": "Te Waihora (Lake Ellesmere)", "ref": null, "why": "view"},
-    {"name": "WWII radar station remains", "quote": "WWII radar station", "ref": null, "why": "nearby"}
-  ],
-  "doubts": "DOC's '20 km one way' fits the Motukarara to Little River section the page describes as its walk; the Christchurch to Motukarara section (26 km, not maintained by DOC) is recorded as a second way since the page title covers Christchurch, but it may be better seen as an extension. The start is the Motukarara Railway Station at the Fiddlers Road entrance; no feature names Fiddlers Road, so I used the place Motukarara (T7) rather than the Park Road road ends (F7/F8). End F9 is where the rail trail meets Christchurch Akaroa Road at Little River (same point as the place Little River); the text mentions a short on-road section just before Little River, so the exact trail end is not certain. The text does not say whether the trail returns the same way. Access points are from a list of toilets and parking after 'There are a number of entry points onto the rail trail'; Cantons Bay is probably the Catons Bay picnic spot on the way. The Birdlings Flat detour's leaving point is not stated."
+   ],
+   "direction": null,
+   "time": null,
+   "distance": "20 km one way",
+   "evidence": [
+    "Beginning at the restored Motukarara Railway Station, the trail follows the line of the old railway through open paddocks.",
+    "After this there's a short on road section just before Little River.",
+    "The township of Little River offers a craft and information centre, pub, cafe, gallery and accommodation."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Christchurch (Hornby) to Motukarara section",
+   "shape": "one_way",
+   "start": {
+    "name": "Hornby (Christchurch)",
+    "quote": "The Hornby (Christchurch) to Prebbleton section",
+    "ref": null
+   },
+   "end": {
+    "name": "Motukarara",
+    "quote": "Neills Rd to Motukarara",
+    "ref": "T7"
+   },
+   "via": [
+    {
+     "name": "Prebbleton",
+     "quote": "Prebbleton",
+     "ref": null
+    },
+    {
+     "name": "Lincoln",
+     "quote": "The section between Prebbleton and Lincoln",
+     "ref": null
+    },
+    {
+     "name": "Edward St",
+     "quote": "Edward St",
+     "ref": null,
+     "how": "road"
+    },
+    {
+     "name": "Ellesmere Rd",
+     "quote": "Ellesmere Rd",
+     "ref": null,
+     "how": "road"
+    },
+    {
+     "name": "River Rd",
+     "quote": "River Rd",
+     "ref": null,
+     "how": "road"
+    },
+    {
+     "name": "Neills Rd",
+     "quote": "Neills Rd",
+     "ref": null
+    },
+    {
+     "name": "Halswell Canal",
+     "quote": "adjacent to the Halswell Canal",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": "26 km",
+   "evidence": [
+    "This 26 km section is not maintained by DOC.",
+    "The Hornby (Christchurch) to Prebbleton section (3.5k m) is an off-road track that runs alongside Shands Rd and Marshes Rd.",
+    "The section between Lincoln and Neills Rd (9.3 km) is still under development but follows Edward St, Ellesmere Rd and River Rd.",
+    "Neills Rd to Motukarara (6 km) is an off-road track that mostly runs adjacent to the Halswell Canal."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Prebbleton",
+   "quote": "Prebbleton",
+   "ref": null,
+   "onto": null
+  },
+  {
+   "name": "Lincoln",
+   "quote": "Lincoln",
+   "ref": null,
+   "onto": null
+  },
+  {
+   "name": "Ataahua",
+   "quote": "Ataahua",
+   "ref": "T3",
+   "onto": null
+  },
+  {
+   "name": "Birdlings Flat",
+   "quote": "Birdlings Flat",
+   "ref": "T4",
+   "onto": null
+  },
+  {
+   "name": "Cantons Bay",
+   "quote": "Cantons Bay",
+   "ref": null,
+   "onto": null
+  }
+ ],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Birdlings Flat",
+   "quote": "Here there is a short detour to Birdlings Flat",
+   "ref": "T4",
+   "from": null
+  }
+ ],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Southern Alps",
+   "quote": "the distant Southern Alps",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "WWII radar station remains",
+   "quote": "the concrete remains of a WWII radar station",
+   "ref": null,
+   "why": "nearby"
+  }
+ ],
+ "doubts": "The page title covers Christchurch to Little River, but DOC's '20 km one way' fits the section DOC maintains (Motukarara to Little River), so that is the main way (W1). Its time is not given (the packet time is empty), and its distance is DOC's summary figure rather than a figure in the text. The Christchurch (Hornby) to Motukarara section (W2) is a separate way because it has its own heading and a 26 km distance; the page says it is not maintained by DOC. W1 start is the Motukarara Railway Station (ref T7, the place Motukarara). No feature matches Fiddlers Road, so no road end is used. W1 end is Little River (T6); the text does not say where on the Christchurch to Akaroa road the trail ends, so no road end feature (F9 or others) is used. The text does not say whether the trail returns the same way. The Birdlings Flat detour's leaving point is not stated, so side trip from is null. Hornby has no feature entry, so the W2 start ref is null."
 }

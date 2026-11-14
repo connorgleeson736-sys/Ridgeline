@@ -1,100 +1,113 @@
 {
-  "guid": "74cdb6aa-a822-4137-ad14-7108b59899e0",
-  "kind": "loop",
-  "ways": [
+ "guid": "74cdb6aa-a822-4137-ad14-7108b59899e0",
+ "kind": "loop",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Kirtle Burn Track loop",
+   "shape": "loop",
+   "start": {
+    "name": "western end of the Pisa Conservation Area",
+    "quote": "Kirtle Burn Track starts at the western end of the Pisa Conservation Area",
+    "ref": null
+   },
+   "end": {
+    "name": "western end of the Pisa Conservation Area",
+    "quote": "Kirtle Burn Track starts at the western end of the Pisa Conservation Area",
+    "ref": null
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Kirtle Burn Track loop via Kirtle Burn Hut",
-      "shape": "loop",
-      "start": {
-        "name": "Pisa Conservation Area boundary (western end)",
-        "quote": "the western end of the Pisa Conservation Area",
-        "ref": null
-      },
-      "end": {
-        "name": "Pisa Conservation Area boundary (western end)",
-        "quote": "the western end of the Pisa Conservation Area",
-        "ref": null
-      },
-      "via": [
-        {
-          "name": "Upper loop zig-zag track and ridge line",
-          "quote": "a ridge line that can be followed most of the way to Mt Pisa",
-          "ref": null
-        },
-        {
-          "name": "Turn-off to Kirtle Burn Hut",
-          "quote": "A turn-off from the track drops down to Kirtle Burn Hut",
-          "ref": null
-        },
-        {
-          "name": "Kirtle Burn Hut",
-          "quote": "Kirtle Burn Hut",
-          "ref": "T3"
-        },
-        {
-          "name": "Lower trail along Roaring Meg/Kirtle Burn",
-          "quote": "the lower trail following the Roaring Meg/Kirtle Burn",
-          "ref": null
-        }
-      ],
-      "direction": null,
-      "time": "6 hr return",
-      "distance": "12.38 km loop",
-      "evidence": [
-        "Kirtle Burn Track starts at the western end of the Pisa Conservation Area.",
-        "The upper loop of the track starts with a steep zig-zag track, gaining a ridge line that can be followed most of the way to Mt Pisa. A turn-off from the track drops down to Kirtle Burn Hut. From the hut, the lower trail following the Roaring Meg/Kirtle Burn can be used to finish the loop, returning to the Pisa Conservation Area boundary."
-      ]
-    }
-  ],
-  "access_points": [
-    {
-      "name": "Snow Farm",
-      "quote": "Snow Farm",
-      "ref": null,
-      "onto": "Pisa Conservation Area"
+     "name": "steep zig-zag track",
+     "quote": "a steep zig-zag track",
+     "ref": null
     },
     {
-      "name": "Southern Hemisphere Proving Grounds",
-      "quote": "Southern Hemisphere Proving Grounds",
-      "ref": null,
-      "onto": "Pisa Conservation Area"
-    }
-  ],
-  "side_trips": [],
-  "huts": [
-    {
-      "name": "Kirtle Burn Hut",
-      "quote": "Kirtle Burn Hut",
-      "ref": "T3"
-    }
-  ],
-  "not_on_route": [
-    {
-      "name": "Mt Pisa",
-      "quote": "Mt Pisa",
-      "ref": "T4",
-      "why": "nearby"
+     "name": "ridge line",
+     "quote": "a ridge line",
+     "ref": null
     },
     {
-      "name": "Pisa Range Ridge Track",
-      "quote": "Pisa Range Ridge Track",
-      "ref": "L1",
-      "why": "other walk"
+     "name": "turn-off to Kirtle Burn Hut",
+     "quote": "A turn-off from the track drops down to Kirtle Burn Hut.",
+     "ref": null
     },
     {
-      "name": "Rock Peak Track",
-      "quote": "Rock Peak Track",
-      "ref": "L2",
-      "why": "other walk"
+     "name": "Kirtle Burn Hut",
+     "quote": "Kirtle Burn Hut",
+     "ref": "T3"
     },
     {
-      "name": "Crown Saddle car park",
-      "quote": "Crown Saddle car park",
-      "ref": null,
-      "why": "other"
+     "name": "lower trail along the Roaring Meg/Kirtle Burn",
+     "quote": "the lower trail following the Roaring Meg/Kirtle Burn",
+     "ref": null
+    },
+    {
+     "name": "stream (first crossing)",
+     "quote": "crosses the stream twice",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "stream (second crossing)",
+     "quote": "crosses the stream twice",
+     "ref": null,
+     "how": "ford"
     }
-  ],
-  "doubts": "The start is described only as the western end of / the boundary of the Pisa Conservation Area, reached through Snow Farm or the Southern Hemisphere Proving Grounds; no feature or name in the packet matches it, so start/end refs are null. Direction is not named as clockwise or anticlockwise; the text describes going up the upper (ridge) loop first and returning via the lower trail. DOC's time says 'return' but the distance and text say loop."
+   ],
+   "direction": null,
+   "time": "6 hr return",
+   "distance": "12.38 km loop",
+   "evidence": [
+    "Kirtle Burn Track starts at the western end of the Pisa Conservation Area.",
+    "The upper loop of the track starts with a steep zig-zag track, gaining a ridge line that can be followed most of the way to Mt Pisa.",
+    "From the hut, the lower trail following the Roaring Meg/Kirtle Burn can be used to finish the loop, returning to the Pisa Conservation Area boundary."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Snow Farm",
+   "quote": "Access is either through Snow Farm trails or the Southern Hemisphere Proving Grounds.",
+   "ref": null,
+   "onto": "Pisa Conservation Area"
+  },
+  {
+   "name": "Southern Hemisphere Proving Grounds",
+   "quote": "Access is either through Snow Farm trails or the Southern Hemisphere Proving Grounds.",
+   "ref": null,
+   "onto": "Pisa Conservation Area"
+  }
+ ],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Kirtle Burn Hut",
+   "quote": "Kirtle Burn Hut",
+   "ref": "T3"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Mt Pisa",
+   "quote": "Mt Pisa",
+   "ref": "T4",
+   "why": "nearby"
+  },
+  {
+   "name": "Pisa Range Ridge Track",
+   "quote": "Pisa Range Ridge Track",
+   "ref": "L1",
+   "why": "other walk"
+  },
+  {
+   "name": "Rock Peak Track",
+   "quote": "Rock Peak Track",
+   "ref": "L2",
+   "why": "other walk"
+  }
+ ],
+ "doubts": "The start is only 'the western end of the Pisa Conservation Area' reached through Snow Farm or the Southern Hemisphere Proving Grounds; no packet entry matches, so refs null. Direction not stated as clockwise/anticlockwise (described upper loop first, finishing by the lower trail). DOC's time says 'return' but distance and text say loop. The two stream crossings on the lower trail are not named."
 }

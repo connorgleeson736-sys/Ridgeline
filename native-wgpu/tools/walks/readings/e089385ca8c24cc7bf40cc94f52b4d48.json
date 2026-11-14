@@ -1,53 +1,172 @@
 {
-  "guid": "e089385c-a8c2-4cc7-bf40-cc94f52b4d48",
-  "kind": "loop",
-  "ways": [
+ "guid": "e089385c-a8c2-4cc7-bf40-cc94f52b4d48",
+ "kind": "loop",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Hump Ridge Track loop from Rarakau car park via Ōkaka Lodge and Port Craig Lodge",
+   "shape": "loop",
+   "start": {
+    "name": "Rarakau car park",
+    "quote": "The Hump Ridge Great Walk begins at Rarakau car park.",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Rarakau car park",
+    "quote": "and back to Rarakau car park",
+    "ref": "F1"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Hump Ridge Track from Rarakau car park via Ōkaka Lodge and Port Craig Lodge",
-      "shape": "loop",
-      "start": {"name": "Rarakau car park", "quote": "The Hump Ridge Great Walk begins at Rarakau car park.", "ref": "F1"},
-      "end": {"name": "Rarakau car park", "quote": "back to Rarakau car park", "ref": "F1"},
-      "via": [
-        {"name": "South Coast Track", "quote": "Follow the South Coast Track around the coast of Te Waewae Bay", "ref": "T2"},
-        {"name": "Waikōau River", "quote": "Waikōau River", "ref": null},
-        {"name": "Hump Burn (Stoney Creek)", "quote": "Hump Burn (Stoney Creek)", "ref": "T5"},
-        {"name": "Waikoko Stream", "quote": "Waikoko Stream", "ref": "T12"},
-        {"name": "Pipi Tuaraki Stream (Flat Creek)", "quote": "Pipi Tuaraki Stream (Flat Creek)", "ref": "T8"},
-        {"name": "Hump Ridge Track", "quote": "you turn right onto the Hump Ridge Track", "ref": "T1"},
-        {"name": "Ōkaka Lodge", "quote": "Ōkaka Lodge", "ref": null},
-        {"name": "Hump Ridge", "quote": "following the Hump Ridge", "ref": "T6"},
-        {"name": "Tītahi (Luncheon Rock)", "quote": "Tītahi (Luncheon Rock) is a good place for a break.", "ref": null},
-        {"name": "South Coast Track", "quote": "the track descends through forest to meet the South Coast Track", "ref": "T2"},
-        {"name": "Edwin Burn viaduct", "quote": "Edwin Burn", "ref": "T3"},
-        {"name": "Percy Burn viaduct", "quote": "Percy Burn", "ref": "F2"},
-        {"name": "Sand Hill viaduct", "quote": "Sand Hill viaducts", "ref": null},
-        {"name": "Port Craig Lodge", "quote": "The day ends at Port Craig Lodge.", "ref": null},
-        {"name": "Te Waewae Bay", "quote": "The track leads around the edge of Te Waewae Bay and back to Rarakau car park.", "ref": null}
-      ],
-      "direction": null,
-      "time": "3 days/2 nights",
-      "distance": "61.5 km loop",
-      "evidence": [
-        "The Hump Ridge Great Walk begins at Rarakau car park.",
-        "The Hump Ridge Track starts from the Rarakau car park near Tuatapere in southern Fiordland.",
-        "Continue north on the South Coast Track. The track leads around the edge of Te Waewae Bay and back to Rarakau car park."
-      ]
+     "name": "South Coast Track",
+     "quote": "Follow the South Coast Track around the coast of Te Waewae Bay",
+     "ref": "T2"
+    },
+    {
+     "name": "Waikōau River",
+     "quote": "crossing Waikōau River",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Hump Burn (Stoney Creek)",
+     "quote": "Hump Burn (Stoney Creek)",
+     "ref": "T5",
+     "how": "ford"
+    },
+    {
+     "name": "Waikoko Stream",
+     "quote": "Waikoko Stream",
+     "ref": "T12",
+     "how": "ford"
+    },
+    {
+     "name": "Pipi Tuaraki Stream (Flat Creek)",
+     "quote": "Shortly after crossing Pipi Tuaraki Stream (Flat Creek)",
+     "ref": "T8",
+     "how": "ford"
+    },
+    {
+     "name": "Hump Ridge Track",
+     "quote": "you turn right onto the Hump Ridge Track",
+     "ref": "T1"
+    },
+    {
+     "name": "Ōkaka Lodge",
+     "quote": "towards Ōkaka Lodge",
+     "ref": null
+    },
+    {
+     "name": "Hump Ridge",
+     "quote": "following the Hump Ridge",
+     "ref": "T6"
+    },
+    {
+     "name": "Tītahi (Luncheon Rock)",
+     "quote": "Tītahi (Luncheon Rock) is a good place for a break.",
+     "ref": null
+    },
+    {
+     "name": "South Coast Track",
+     "quote": "the track descends through forest to meet the South Coast Track",
+     "ref": "T2"
+    },
+    {
+     "name": "Edwin Burn viaduct",
+     "quote": "historic Edwin Burn, Percy Burn and Sand Hill viaducts",
+     "ref": "T3"
+    },
+    {
+     "name": "Percy Burn viaduct",
+     "quote": "Percy Burn and Sand Hill viaducts",
+     "ref": "F2"
+    },
+    {
+     "name": "Sand Hill viaduct",
+     "quote": "Sand Hill viaducts",
+     "ref": null
+    },
+    {
+     "name": "Port Craig Lodge",
+     "quote": "The day ends at Port Craig Lodge.",
+     "ref": null
+    },
+    {
+     "name": "South Coast Track",
+     "quote": "Continue north on the South Coast Track.",
+     "ref": "T2"
     }
-  ],
-  "access_points": [],
-  "side_trips": [
-    {"name": "Ōkaka loop walk", "quote": "There is a boardwalk loop from Ōkaka Lodge, encircling tors and tarns on Hump Ridge.", "ref": null, "from": "Ōkaka Lodge"},
-    {"name": "Port Craig settlement and wharf", "quote": "From Port Craig Lodge, explore the remains of the Port Craig settlement.", "ref": "T9", "from": "Port Craig Lodge"}
-  ],
-  "huts": [
-    {"name": "Ōkaka Lodge", "quote": "Ōkaka Lodge", "ref": null},
-    {"name": "Port Craig Lodge", "quote": "Port Craig Lodge", "ref": null}
-  ],
-  "not_on_route": [
-    {"name": "Tuatapere", "quote": "near Tuatapere in southern Fiordland", "ref": null, "why": "nearby"},
-    {"name": "Blow Holes Beach high tide track", "quote": "a High Tide track is available at Blow Holes Beach", "ref": null, "why": "other"}
-  ],
-  "doubts": "The loop is a lollipop: days 1 and 3 both follow the South Coast Track along Te Waewae Bay between Rarakau car park and the Hump Ridge Track junction / Port Craig; the text does not name a direction (clockwise/anticlockwise). Rarakau car park taken as F1 (where South Coast Track meets Papatotara Coast Road), the only road end in the packet. Percy Burn viaduct given as F2 (the feature named for the viaduct); Edwin Burn given as the river T3 crossed by its viaduct. Ōkaka Lodge and Port Craig Lodge have no lodge entries (T13 Ōkākā is a ridge, T9 Port Craig a place), so their refs are null except where the Port Craig settlement side trip is meant."
+   ],
+   "direction": null,
+   "time": "3 days/2 nights",
+   "distance": "61.5 km loop",
+   "evidence": [
+    "The Hump Ridge Great Walk begins at Rarakau car park.",
+    "The Hump Ridge Track starts from the Rarakau car park near Tuatapere in southern Fiordland.",
+    "The track leads around the edge of Te Waewae Bay and back to Rarakau car park."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Ōkaka loop walk",
+   "quote": "There is a boardwalk loop from Ōkaka Lodge",
+   "ref": null,
+   "from": "Ōkaka Lodge"
+  },
+  {
+   "name": "Port Craig settlement and wharf",
+   "quote": "From Port Craig Lodge, explore the remains of the Port Craig settlement.",
+   "ref": "T9",
+   "from": "Port Craig Lodge"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Ōkaka Lodge",
+   "quote": "Day 1: Rarakau car park to Ōkaka Lodge 20.6 km",
+   "ref": null
+  },
+  {
+   "name": "Port Craig Lodge",
+   "quote": "Day 2: Ōkaka Lodge to Port Craig Lodge 20.7 km",
+   "ref": null
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Tuatapere",
+   "quote": "near Tuatapere in southern Fiordland",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "Invercargill Airport",
+   "quote": "Tuatapere is 1.15 hr from Invercargill Airport",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "Te Anau",
+   "quote": "1.5 hr from Te Anau",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "Queenstown",
+   "quote": "2.5 hr from Queenstown",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "Blow Holes Beach high tide track",
+   "quote": "a High Tide track is available at Blow Holes Beach",
+   "ref": null,
+   "why": "other"
+  }
+ ],
+ "doubts": "The walk is a loop: it goes from Rarakau car park along the South Coast Track to the Hump Ridge Track, over the lodges, and back along the South Coast Track to the car park. No direction is given. Rarakau car park is taken as F1 (where South Coast Track meets Papatotara Coast Road), the only road-end feature in the packet; the text does not name the road. The fords are recorded where the text says the route crosses the river or stream; the text does not say whether a bridge is there, so those are a judgement. Ōkaka Lodge and Port Craig Lodge have no link and no lodge entry, so their refs are null. Ōkākā ridge (T13) is not used for the lodge. The Blow Holes Beach high tide track is an alternative during tidal surges, not a way of the walk. The Percy Burn viaduct is taken as the road end feature F2, which the packet names for that viaduct."
 }

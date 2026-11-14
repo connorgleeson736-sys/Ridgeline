@@ -1,53 +1,107 @@
 {
-  "guid": "bc50e273-b6a3-4b05-8d36-d13005d7d135",
-  "kind": "out_and_back",
-  "ways": [
+ "guid": "bc50e273-b6a3-4b05-8d36-d13005d7d135",
+ "kind": "out_and_back",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Silica Rapids Walk from Whakapapa Village",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Whakapapa Village",
+    "quote": "The track is near Whakapapa Village on SH48.",
+    "ref": "T7"
+   },
+   "end": {
+    "name": "Silica Rapids",
+    "quote": "the famous Silica Rapids",
+    "ref": "T3"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "From Whakapapa Village to Silica Rapids",
-      "shape": "out_and_back",
-      "start": {"name": "Whakapapa Village", "quote": "Whakapapa Village", "ref": "T7"},
-      "end": {"name": "Silica Rapids", "quote": "Silica Rapids", "ref": "T3"},
-      "via": [
-        {"name": "Whakapapanui Stream", "quote": "Whakapapanui Stream", "ref": "T8"},
-        {"name": "Whakapapanui Track turn-off", "quote": "Whakapapanui Track turn-off", "ref": null},
-        {"name": "Whakapapaiti Track turn-off", "quote": "Whakapapaiti Track turn-off", "ref": null},
-        {"name": "Punaruku Falls", "quote": "Punaruku Falls", "ref": "T2"}
-      ],
-      "direction": null,
-      "time": "2 hr 30 min return from Whakapapa Village",
-      "distance": "6 km return from Whakapapa Village",
-      "evidence": [
-        "After crossing Whakapapanui Stream at the top end of the Whakapapa Holiday Park, the track meanders through beech forest.",
-        "It starts 250 m above the Tongariro National Park Visitor Centre.",
-        "A little further up the hill the stream bed widens and forms a series of shallow terraces coated in creamy white deposits – the famous Silica Rapids."
-      ]
+     "name": "Whakapapanui Stream",
+     "quote": "After crossing Whakapapanui Stream at the top end of the Whakapapa Holiday Park",
+     "ref": "T8"
     },
     {
-      "id": "W2",
-      "main": false,
-      "label": "From Bruce Road car park to Silica Rapids",
-      "shape": "out_and_back",
-      "start": {"name": "Bruce Road car park", "quote": "Bruce Road", "ref": "F2"},
-      "end": {"name": "Silica Rapids", "quote": "rapids", "ref": "T3"},
-      "via": [],
-      "direction": null,
-      "time": "1 hr 30 min return from Bruce Road car park",
-      "distance": "3 km return from Bruce Road car park",
-      "evidence": [
-        "Heading towards the rapids, the track climbs onto a tussock-covered lava flow.",
-        "Head back to your vehicle the way you came."
-      ]
+     "name": "Whakapapanui Track turn-off",
+     "quote": "Pass the Whakapapanui Track turn-off",
+     "ref": null
+    },
+    {
+     "name": "Whakapapaiti Track turn-off",
+     "quote": "After passing the Whakapapaiti Track turn-off",
+     "ref": null
+    },
+    {
+     "name": "Punaruku Falls",
+     "quote": "the track follows the stream up through dense bush to Punaruku Falls",
+     "ref": "T2"
     }
-  ],
-  "access_points": [],
-  "side_trips": [],
-  "huts": [],
-  "not_on_route": [
-    {"name": "Whakapapanui Track", "quote": "Whakapapanui Track", "ref": "L1", "why": "other walk"},
-    {"name": "Whakapapa Holiday Park", "quote": "Whakapapa Holiday Park", "ref": "T6", "why": "nearby"},
-    {"name": "Tongariro National Park Visitor Centre", "quote": "Tongariro National Park Visitor Centre", "ref": null, "why": "nearby"}
-  ],
-  "doubts": "The village start is given as the place Whakapapa Village (T7); the exact trailhead is '250 m above the Tongariro National Park Visitor Centre' and may be the road end F1 (Upper Whakapapanui Track at SH48), but the text does not name the track so I did not pick a road end. The Bruce Road section does not say exactly where it joins the village route."
+   ],
+   "direction": null,
+   "time": "2 hr 30 min return from Whakapapa Village",
+   "distance": "6 km return from Whakapapa Village",
+   "evidence": [
+    "After crossing Whakapapanui Stream at the top end of the Whakapapa Holiday Park, the track meanders through beech forest.",
+    "A little further up the hill the stream bed widens and forms a series of shallow terraces coated in creamy white deposits – the famous Silica Rapids.",
+    "The track is near Whakapapa Village on SH48. It starts 250 m above the Tongariro National Park Visitor Centre."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Silica Rapids from Bruce Road car park",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Bruce Road car park",
+    "quote": "From Bruce Road",
+    "ref": "F2"
+   },
+   "end": {
+    "name": "Silica Rapids",
+    "quote": "Heading towards the rapids",
+    "ref": "T3"
+   },
+   "via": [],
+   "direction": null,
+   "time": "1 hr 30 min return from Bruce Road car park",
+   "distance": "3 km return from Bruce Road car park",
+   "evidence": [
+    "Heading towards the rapids, the track climbs onto a tussock-covered lava flow.",
+    "Head back to your vehicle the way you came."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Whakapapanui Track",
+   "quote": "Pass the Whakapapanui Track turn-off",
+   "ref": null,
+   "why": "other walk"
+  },
+  {
+   "name": "Whakapapa Holiday Park",
+   "quote": "at the top end of the Whakapapa Holiday Park",
+   "ref": "T6",
+   "why": "nearby"
+  },
+  {
+   "name": "Tongariro National Park Visitor Centre",
+   "quote": "It starts 250 m above the Tongariro National Park Visitor Centre.",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "Tawhainui Stream",
+   "quote": "Tawhainui Stream tumbles over the edge of an ancient lava flow",
+   "ref": "T4",
+   "why": "view"
+  }
+ ],
+ "doubts": "The main way is the Whakapapa Village section, which the page lists first. Its start is the village (T7); the text gives the trailhead as '250 m above the Tongariro National Park Visitor Centre' with no road end named, so no road-end ref is used. Its end is Silica Rapids. The DOC summary distance and time say 'return' from Whakapapa Village, so shape is out_and_back. The Bruce Road start is ref F2 (where the Silica Rapids Upper Track meets Bruce Road), which is a judgment because the text does not name the track; the Bruce Road section says to head back the way you came, so it is out_and_back. Time and distance for both ways are DOC's summary wording for each start, copied from the packet. The Whakapapanui Track turn-off has no entry in the names list, so ref is null."
 }

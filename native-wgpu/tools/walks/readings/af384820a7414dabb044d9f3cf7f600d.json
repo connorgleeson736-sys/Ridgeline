@@ -1,15 +1,37 @@
 {
-  "guid": "af384820-a741-4dab-b044-d9f3cf7f600d",
-  "kind": "network",
-  "ways": [],
-  "access_points": [
-    {"name": "reserve entrance on Pakaututu Road", "quote": "the reserve entrance has picnic shelters", "ref": "F1", "onto": null}
-  ],
-  "side_trips": [],
-  "huts": [],
-  "not_on_route": [
-    {"name": "Puketitiri", "quote": "5 km from Puketitiri", "ref": "T3", "why": "nearby"},
-    {"name": "Kaweka Forest Park", "quote": "near Kaweka Forest Park", "ref": null, "why": "nearby"}
-  ],
-  "doubts": "The page describes a network of walking tracks in Balls Clearing Scenic Reserve (10 to 40 min) without naming any individual track, its start, end or shape, so no ways are recorded. The reserve entrance is taken as road end F1 (where Balls Clearing Track meets Pakaututu Road), the only road end; the text does not explicitly say the tracks start there."
+ "guid": "af384820-a741-4dab-b044-d9f3cf7f600d",
+ "kind": "network",
+ "ways": [],
+ "access_points": [
+  {
+   "name": "reserve entrance on Pakaututu Road",
+   "quote": "the reserve entrance has picnic shelters",
+   "ref": "F1",
+   "onto": null
+  }
+ ],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Puketitiri",
+   "quote": "Balls Clearing Scenic Reserve is located 5 km from Puketitiri",
+   "ref": "T3",
+   "why": "nearby"
+  },
+  {
+   "name": "Kaweka Forest Park",
+   "quote": "near Kaweka Forest Park",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "Napier",
+   "quote": "It is around one hour's drive from Napier",
+   "ref": null,
+   "why": "nearby"
+  }
+ ],
+ "doubts": "The page describes a network of walking tracks in Balls Clearing Scenic Reserve (10 to 40 min) without naming any individual track, and gives no start, end or shape for any track, so kind is network and no ways are recorded. The reserve entrance on Pakaututu Road is taken as an access point, ref F1 (the only road end, where Balls Clearing Track meets Pakaututu Road); the text does not explicitly say the tracks start at that feature, so this ref is inferred. The onto field is null because the text does not say which track the entrance joins."
 }

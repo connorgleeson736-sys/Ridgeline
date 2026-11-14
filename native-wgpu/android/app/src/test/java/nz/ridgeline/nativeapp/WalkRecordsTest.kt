@@ -27,5 +27,18 @@ class WalkRecordsTest{
         // DOC's hut data lists many huts twice; each named hut must still be found once.
         assertEquals(setOf("Shelter Rock Hut","Dart Hut","Daleys Flat Hut"),r["e57f2343-e606-41ff-9ccc-9c8cc0df1824"]!!.huts.map{it.name}.toSet())
         assertEquals(3,r["e57f2343-e606-41ff-9ccc-9c8cc0df1824"]!!.huts.size)
+        // Gillespie Pass Circuit: the loop from Makarora, fording the Makarora both ways and out
+        // along Wilkin Road (DOC: 56 km), with its fly-out and jet-boat exits.
+        val gillespie=r["515e0210-ba1a-4750-8297-a892aba9a23e"]!!
+        assertTrue(gillespie.verified)
+        val loop=gillespie.ways.single{it.main}
+        assertEquals("loop",loop.shape);assertEquals(55.7,DocTracks.length(loop.line)/1000,1.0)
+        assertEquals(2,loop.stops.count{it.first.endsWith("(ford)")});assertTrue(loop.stops.any{it.first=="Wilkin Road (road)"})
+        assertEquals(setOf("Young Hut","Siberia Hut","Kerin Forks Hut"),gillespie.huts.map{it.name}.toSet())
+        assertEquals(setOf("Fly out of Siberia Valley","Jet boat from Kerin Forks"),gillespie.ways.filter{!it.main}.map{it.to}.toSet())
+        // Ben Lomond: from the gondola top as well as from town, to the summit.
+        val ben=r["7a9c364e-36aa-4b4b-af32-dcdfeda9ebd1"]!!
+        assertTrue(ben.ways.any{it.from=="Skyline Gondola top complex"&&it.to=="Ben Lomond summit"})
+        assertTrue(ben.ways.single{it.main}.let{it.from=="Skyline Gondola base"&&it.to=="Ben Lomond summit"})
     }
 }

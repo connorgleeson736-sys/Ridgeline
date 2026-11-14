@@ -1,62 +1,139 @@
 {
-  "guid": "fd215e48-ea01-469f-9667-bd927fdb3ce4",
-  "kind": "loop",
-  "ways": [
+ "guid": "fd215e48-ea01-469f-9667-bd927fdb3ce4",
+ "kind": "loop",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Lake Matheson Circuit",
+   "shape": "loop",
+   "start": {
+    "name": "Lake Matheson car park",
+    "quote": "From Lake Matheson car park",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Lake Matheson car park",
+    "quote": "35 min to the car park",
+    "ref": "F1"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Lake Matheson Circuit",
-      "shape": "loop",
-      "start": {"name": "Lake Matheson car park", "quote": "Lake Matheson car park", "ref": "F1"},
-      "end": {"name": "Lake Matheson car park", "quote": "the car park", "ref": "F1"},
-      "via": [
-        {"name": "Suspension bridge over Clearwater Stream", "quote": "the suspension bridge over Clearwater Stream", "ref": null},
-        {"name": "Jetty Lookout", "quote": "Jetty Lookout", "ref": null},
-        {"name": "Reflection Island", "quote": "Reflection Island", "ref": null},
-        {"name": "Wetland at the eastern end of the lake", "quote": "the wetland at the eastern end of the lake", "ref": null}
-      ],
-      "direction": null,
-      "time": "1 hr 30 min",
-      "distance": "4.4 km (loop)",
-      "evidence": [
-        "From Lake Matheson car park, it’s a short walk to the beginning of the track and the suspension bridge over Clearwater Stream.",
-        "From here, you can return to the car park or complete Lake Matheson Circuit.",
-        "Most people complete Lake Matheson Circuit clockwise, but you can walk it in either direction.",
-        "From Reflection Island, it’s 35 min to the car park via the wetland at the eastern end of the lake."
-      ]
+     "name": "Suspension bridge over Clearwater Stream",
+     "quote": "the suspension bridge over Clearwater Stream",
+     "ref": null
     },
     {
-      "id": "W2",
-      "main": false,
-      "label": "Car park to Jetty Lookout",
-      "shape": "out_and_back",
-      "start": {"name": "Lake Matheson car park", "quote": "Lake Matheson car park", "ref": "F1"},
-      "end": {"name": "Jetty Lookout", "quote": "Jetty Lookout", "ref": null},
-      "via": [
-        {"name": "Suspension bridge over Clearwater Stream", "quote": "the suspension bridge over Clearwater Stream", "ref": null}
-      ],
-      "direction": null,
-      "time": "45 min",
-      "distance": "2.4 km (return)",
-      "evidence": [
-        "45 min / 2.4 km (return)",
-        "The gravel path to Jetty Lookout takes you through the magnificent native rainforest of Westland Tai Poutini National Park.",
-        "From here, you can return to the car park or complete Lake Matheson Circuit."
-      ]
+     "name": "Jetty Lookout",
+     "quote": "Jetty Lookout",
+     "ref": null
+    },
+    {
+     "name": "Reflection Island",
+     "quote": "Reflection Island",
+     "ref": null
+    },
+    {
+     "name": "Wetland at the eastern end of the lake",
+     "quote": "the wetland at the eastern end of the lake",
+     "ref": null
     }
-  ],
-  "access_points": [],
-  "side_trips": [
-    {"name": "View of Views Lookout", "quote": "View of Views Lookout", "ref": null, "from": "top end of the lake, between Jetty Lookout and Reflection Island"}
-  ],
-  "huts": [],
-  "not_on_route": [
-    {"name": "Aoraki/Mount Cook", "quote": "Aoraki/Mount Cook", "ref": null, "why": "view"},
-    {"name": "Mount Tasman/Te Horokōau", "quote": "Mount Tasman/Te Horokōau", "ref": null, "why": "view"},
-    {"name": "Southern Alps/Kā Tiritiri o te Moana", "quote": "Southern Alps/Kā Tiritiri o te Moana", "ref": null, "why": "view"},
-    {"name": "Gillespies Beach Campsite", "quote": "Gillespies Beach Campsite", "ref": "L1", "why": "nearby"},
-    {"name": "Otto/MacDonalds Campsite", "quote": "Otto/MacDonalds Campsite", "ref": "L2", "why": "nearby"},
-    {"name": "Fox Glacier", "quote": "Fox Glacier", "ref": "T2", "why": "nearby"}
-  ],
-  "doubts": "Direction: the page says most people walk the circuit clockwise and that either direction is fine, but does not say the description is clockwise, so direction is null. The timing text is slightly inconsistent ('another 5 min from Jetty Lookout to Reflection Island' after describing View of Views Lookout). Reflection Island is treated as on the way (steps down to a platform)."
+   ],
+   "direction": null,
+   "time": "1 hr 30 min",
+   "distance": "4.4 km (loop)",
+   "evidence": [
+    "From Lake Matheson car park, it’s a short walk to the beginning of the track and the suspension bridge over Clearwater Stream.",
+    "From Jetty Lookout, walk for 15 min through forest to View of Views Lookout at the top end of the lake.",
+    "From Reflection Island, it’s 35 min to the car park via the wetland at the eastern end of the lake."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Car park to Jetty Lookout",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Lake Matheson car park",
+    "quote": "From Lake Matheson car park",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Jetty Lookout",
+    "quote": "Jetty Lookout",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Suspension bridge over Clearwater Stream",
+     "quote": "the suspension bridge over Clearwater Stream",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "45 min",
+   "distance": "2.4 km (return)",
+   "evidence": [
+    "45 min / 2.4 km (return)",
+    "From Lake Matheson car park, it’s a short walk to the beginning of the track and the suspension bridge over Clearwater Stream.",
+    "From here, you can return to the car park or complete Lake Matheson Circuit."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "View of Views Lookout",
+   "quote": "View of Views Lookout",
+   "ref": null,
+   "from": "Jetty Lookout"
+  }
+ ],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Aoraki/Mount Cook",
+   "quote": "Aoraki/Mount Cook",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Mount Tasman/Te Horokōau",
+   "quote": "Mount Tasman/Te Horokōau",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Southern Alps/Kā Tiritiri o te Moana",
+   "quote": "the Southern Alps/Kā Tiritiri o te Moana",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Gillespies Beach Campsite",
+   "quote": "Gillespies Beach Campsite",
+   "ref": "L1",
+   "why": "nearby"
+  },
+  {
+   "name": "Otto/MacDonalds Campsite",
+   "quote": "Otto/MacDonalds Campsite",
+   "ref": "L2",
+   "why": "nearby"
+  },
+  {
+   "name": "Fox Glacier",
+   "quote": "Fox Glacier",
+   "ref": "T2",
+   "why": "nearby"
+  },
+  {
+   "name": "Franz Josef",
+   "quote": "Franz Josef (30 min)",
+   "ref": null,
+   "why": "nearby"
+  }
+ ],
+ "doubts": "Direction: the page says most people walk the circuit clockwise and that either direction is fine, but does not say the description is clockwise, so direction is null. View of Views Lookout is treated as a side trip because the text calls it a signposted side track with steps; its exact position in the order of the circuit is only roughly stated. Reflection Island is treated as on the way (steps down to a viewing platform, and the circuit returns to the car park from it). The timing text is slightly inconsistent ('another 5 min from Jetty Lookout to Reflection Island' after describing View of Views Lookout)."
 }

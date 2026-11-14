@@ -1,62 +1,99 @@
 {
-  "guid": "a24c756b-0172-4865-bb3e-f57c82e08406",
-  "kind": "out_and_back",
-  "ways": [
+ "guid": "a24c756b-0172-4865-bb3e-f57c82e08406",
+ "kind": "out_and_back",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Rangitoto Wharf to Summit Lookout and back",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Rangitoto Wharf",
+    "quote": "From Rangitoto Wharf, Rangitoto Summit Track takes you up the dormant volcano of Rangitoto to Summit Lookout.",
+    "ref": null
+   },
+   "end": {
+    "name": "Rangitoto Summit Lookout",
+    "quote": "From here, it’s 2 min to Rangitoto Summit Lookout",
+    "ref": null
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Rangitoto Wharf to Summit Lookout and back",
-      "shape": "out_and_back",
-      "start": {"name": "Rangitoto Wharf", "quote": "From Rangitoto Wharf, Rangitoto Summit Track takes you up the dormant volcano of Rangitoto to Summit Lookout.", "ref": null},
-      "end": {"name": "Rangitoto Summit Lookout", "quote": "Rangitoto Summit Lookout", "ref": "T6"},
-      "via": [
-        {"name": "waharoa/carved gateway", "quote": "pass through the waharoa/carved gateway", "ref": null},
-        {"name": "orientation kiosk", "quote": "the orientation kiosk", "ref": null},
-        {"name": "historic Scouts bach", "quote": "just past the historic Scouts bach", "ref": null},
-        {"name": "Rangitoto Summit Track", "quote": "Take the signposted track on your left", "ref": "T3"},
-        {"name": "viewing platform at the junction with Crater Rim Track", "quote": "A viewing platform at the junction with Crater Rim Track", "ref": null}
-      ],
-      "direction": null,
-      "time": "2 hr return",
-      "distance": "7 km return via same track",
-      "evidence": [
-        "From Rangitoto Wharf, Rangitoto Summit Track takes you up the dormant volcano of Rangitoto to Summit Lookout.",
-        "From here, it’s 2 min to Rangitoto Summit Lookout – a great picnic spot.",
-        "You can complete the Crater Rim Track before returning to Rangitoto Wharf the same way you came."
-      ]
+     "name": "summit/tihi of Rangitoto",
+     "quote": "to the summit/tihi of Rangitoto",
+     "ref": "T6"
     },
     {
-      "id": "W2",
-      "main": false,
-      "label": "Alternative route to Summit Lookout via Wilson’s Park Track",
-      "shape": null,
-      "start": {"name": "Rangitoto Wharf", "quote": "Rangitoto Wharf", "ref": null},
-      "end": {"name": "Rangitoto Summit Lookout", "quote": "Summit Lookout", "ref": "T6"},
-      "via": [
-        {"name": "Rangitoto Summit Track", "quote": "Wilson’s Park Track is signposted from Summit Track on your left (going up).", "ref": "T3"},
-        {"name": "Wilson’s Park Track", "quote": "Wilson’s Park Track", "ref": "T4"}
-      ],
-      "direction": null,
-      "time": null,
-      "distance": null,
-      "evidence": [
-        "Wilson’s Park Track is signposted from Summit Track on your left (going up). The turnoff is 40 min from Rangitoto Wharf.",
-        "The track is an alternative, longer route to Summit Lookout and has good shade for hot days."
-      ]
+     "name": "Crater Rim Track junction",
+     "quote": "A viewing platform at the junction with Crater Rim Track",
+     "ref": "T1"
     }
-  ],
-  "access_points": [],
-  "side_trips": [
-    {"name": "Crater Rim Track", "quote": "Crater Rim Track", "ref": "T1", "from": "viewing platform at the junction with Crater Rim Track"},
-    {"name": "Lava Caves Track", "quote": "Lava Caves Track is signposted from Summit Track on your right (going up).", "ref": "T2", "from": "Summit Track, 45 min from Rangitoto Wharf"}
-  ],
-  "huts": [],
-  "not_on_route": [
-    {"name": "lava caves", "quote": "natural tunnels and caves", "ref": null, "why": "side trip"},
-    {"name": "Auckland/Tāmaki Makaurau", "quote": "Auckland/Tāmaki Makaurau", "ref": null, "why": "view"},
-    {"name": "Hauraki Gulf/Tīkapa Moana", "quote": "Hauraki Gulf/Tīkapa Moana", "ref": null, "why": "view"},
-    {"name": "Rangitoto Island longer walks", "quote": "Rangitoto Island longer walks", "ref": "L1", "why": "other walk"},
-    {"name": "Islington Wharf", "quote": "Islington Wharf", "ref": null, "why": "nearby"}
-  ],
-  "doubts": "Rangitoto Wharf has no feature or name entry, so the start ref is null. The end, Summit Lookout on the summit/tihi of Rangitoto, is given the peak Rangitoto (T6). W2 (Wilson's Park Track) is described only as 'an alternative, longer route to Summit Lookout' branching 40 min from the wharf; the page does not say whether it is walked up, down or both, so its shape is null, and its own '1 hr / 1.4 km (one way)' covers only that track, not the whole way."
+   ],
+   "direction": null,
+   "time": "2 hr return",
+   "distance": "7 km return via same track",
+   "evidence": [
+    "From Rangitoto Wharf, Rangitoto Summit Track takes you up the dormant volcano of Rangitoto to Summit Lookout.",
+    "2 hr / 7 km (return)",
+    "You can complete the Crater Rim Track before returning to Rangitoto Wharf the same way you came."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Wilson's Park Track alternative to Summit Lookout",
+   "shape": "one_way",
+   "start": {
+    "name": "Wilson's Park Track turnoff",
+    "quote": "The turnoff is 40 min from Rangitoto Wharf.",
+    "ref": null
+   },
+   "end": {
+    "name": "Summit Lookout",
+    "quote": "The track is an alternative, longer route to Summit Lookout",
+    "ref": null
+   },
+   "via": [],
+   "direction": null,
+   "time": "1 hr",
+   "distance": "1.4 km",
+   "evidence": [
+    "Wilson’s Park Track is signposted from Summit Track on your left (going up). The turnoff is 40 min from Rangitoto Wharf.",
+    "The track is an alternative, longer route to Summit Lookout and has good shade for hot days."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Rangitoto Island longer walks",
+   "quote": "For access to Summit Lookout from other parts of the island, see Rangitoto Island longer walks.",
+   "ref": "L1",
+   "onto": "Summit Lookout"
+  }
+ ],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Crater Rim Track",
+   "quote": "Circle Rangitoto’s volcanic crater on this rewarding side trip.",
+   "ref": "T1",
+   "from": "Crater Rim Track junction"
+  },
+  {
+   "name": "Lava Caves Track",
+   "quote": "Lava Caves Track is signposted from Summit Track on your right (going up).",
+   "ref": "T2",
+   "from": null
+  }
+ ],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Islington Bay",
+   "quote": "He fought a major battle on Rangitoto at Islington Bay",
+   "ref": "T5",
+   "why": "other"
+  }
+ ],
+ "doubts": "Out and back: the page gives the Rangitoto Summit Track as 2 hr / 7 km return, and says to return to the wharf the same way, so the main way is out and back, with the Crater Rim Track loop and the Lava Caves Track recorded as side trips. Wilson's Park Track is the page's own alternative route to Summit Lookout, with its own heading, time and distance, so it is recorded as W2, one way from its turnoff (40 min from the wharf) to Summit Lookout; its return is not described. Rangitoto Wharf and Summit Lookout have no feature or name entry, so their refs are null. The summit/tihi is matched to the peak entry Rangitoto (T6); this is a judgement. The Lava Caves Track turnoff is 45 min from the wharf and 15 min from the summit, but the turnoff itself is not named, so its from is null. The historic Scouts bach near the start is not recorded as a via, since the text mentions it only as a landmark near the start. The page's longer walks link (L1) is recorded as an access point to Summit Lookout, not as a not-on-route place. The time and distance for the main way are DOC's summary (2 hr return; 7 km return via same track)."
 }

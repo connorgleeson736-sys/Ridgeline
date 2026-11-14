@@ -1,55 +1,146 @@
 {
-  "guid": "e144357a-461d-43f0-9970-1a430c7aaffc",
-  "kind": "one_way",
-  "ways": [
+ "guid": "e144357a-461d-43f0-9970-1a430c7aaffc",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Akatarawa Saddle to Kaitoke via Renata, Elder and Alpha huts",
+   "shape": "one_way",
+   "start": {
+    "name": "Akatarawa Saddle",
+    "quote": "This route begins at Akatarawa Saddle",
+    "ref": "T9"
+   },
+   "end": {
+    "name": "Kiwi Ranch Road car park, Kaitoke",
+    "quote": "the track turn-off into the Kiwi Ranch Road car park, where the track finishes",
+    "ref": null
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Akatarawa Saddle to Kaitoke via Renata, Elder and Alpha huts",
-      "shape": "one_way",
-      "start": {"name": "Akatarawa Saddle", "quote": "Akatarawa Saddle", "ref": "T9"},
-      "end": {"name": "Kiwi Ranch Road car park, Kaitoke", "quote": "the Kiwi Ranch Road car park", "ref": null},
-      "via": [
-        {"name": "Waiotauru 4WD Road (Odlin's Road)", "quote": "Waiotauru 4WD Road (also known as Odlin’s Road)", "ref": null},
-        {"name": "Maymorn Junction", "quote": "Maymorn Junction", "ref": "T20"},
-        {"name": "Renata Hut", "quote": "Renata Hut", "ref": "T23"},
-        {"name": "Renata Ridge Track", "quote": "Renata Ridge Track", "ref": "T5"},
-        {"name": "Renata high point", "quote": "the Renata high point (924 m)", "ref": "T22"},
-        {"name": "Elder Hut", "quote": "Elder Hut", "ref": "T15"},
-        {"name": "Aston high point", "quote": "the Aston high point", "ref": "T12"},
-        {"name": "Southern Crossing route", "quote": "the Southern Crossing route", "ref": null},
-        {"name": "Alpha", "quote": "Alpha (1361 m)", "ref": "T10"},
-        {"name": "Alpha Hut", "quote": "Alpha Hut", "ref": "T11"},
-        {"name": "Hells Gate", "quote": "the saddle at Hells Gate", "ref": "T16"},
-        {"name": "Marchant Ridge", "quote": "Marchant Ridge", "ref": "T18"},
-        {"name": "Smith Creek Shelter junction", "quote": "the Smith Creek Shelter junction", "ref": null},
-        {"name": "Dobson Loop Track", "quote": "Dobson Loop Track", "ref": "T2"}
-      ],
-      "direction": null,
-      "time": "3–4 days",
-      "distance": null,
-      "evidence": [
-        "This route begins at Akatarawa Saddle, on the Akatarawa Road between Upper Hutt and Waikanae.",
-        "At Maymorn Junction, take the ridge track signposted for Renata Hut.",
-        "Continue along the Southern Crossing route over Alpha (1361 m) and descend to Alpha Hut, just below the bush line.",
-        "Look carefully for the track turn-off into the Kiwi Ranch Road car park, where the track finishes."
-      ]
+     "name": "Waiotauru 4WD Road (Odlin's Road)",
+     "quote": "Waiotauru 4WD Road (also known as Odlin’s Road) starts on the eastern side of the road at the saddle",
+     "ref": null
+    },
+    {
+     "name": "Maymorn Junction",
+     "quote": "At Maymorn Junction, take the ridge track signposted for Renata Hut.",
+     "ref": "T20"
+    },
+    {
+     "name": "Renata Ridge Track",
+     "quote": "Continue along the Renata Ridge Track from Renata Hut.",
+     "ref": "T5"
+    },
+    {
+     "name": "Renata high point",
+     "quote": "The track climbs gradually to the Renata high point (924 m).",
+     "ref": "T22"
+    },
+    {
+     "name": "Elder Hut",
+     "quote": "reaching Elder Hut just before the Elder high point",
+     "ref": "T15"
+    },
+    {
+     "name": "Aston high point",
+     "quote": "climbs to the Aston high point",
+     "ref": "T12"
+    },
+    {
+     "name": "Southern Crossing route",
+     "quote": "Continue along the Southern Crossing route over Alpha (1361 m)",
+     "ref": null
+    },
+    {
+     "name": "Alpha",
+     "quote": "over Alpha (1361 m)",
+     "ref": "T10"
+    },
+    {
+     "name": "Hells Gate",
+     "quote": "to the saddle at Hells Gate",
+     "ref": "T16"
+    },
+    {
+     "name": "Marchant Ridge",
+     "quote": "climb up to Marchant Ridge",
+     "ref": "T18"
+    },
+    {
+     "name": "Smith Creek Shelter junction",
+     "quote": "The section from the Smith Creek Shelter junction",
+     "ref": null
+    },
+    {
+     "name": "Dobson Loop Track",
+     "quote": "along Dobson Loop Track has mobile phone reception",
+     "ref": "T2"
     }
-  ],
-  "access_points": [
-    {"name": "Kiwi Ranch Road car park, Kaitoke", "quote": "from Kaitoke, at the Kiwi Ranch Road car park", "ref": null, "onto": null}
-  ],
-  "side_trips": [],
-  "huts": [
-    {"name": "Renata Hut", "quote": "Renata Hut", "ref": "T23"},
-    {"name": "Elder Hut", "quote": "Elder Hut", "ref": "T15"},
-    {"name": "Alpha Hut", "quote": "Alpha Hut", "ref": "T11"}
-  ],
-  "not_on_route": [
-    {"name": "Bull Mound track", "quote": "Bull Mound", "ref": "T1", "why": "other"},
-    {"name": "Omega track", "quote": "Omega", "ref": "T4", "why": "other"},
-    {"name": "Block 16 track", "quote": "Block 16", "ref": null, "why": "other"},
-    {"name": "Tauwharenīkau valley", "quote": "Tauwharenīkau valley", "ref": null, "why": "other"}
-  ],
-  "doubts": "No road-end feature is in the packet, so the finish at the Kiwi Ranch Road car park has no ref. Waiotauru 4WD Road may correspond to map track T8 (Waiotauru Track) but I am not sure, so ref null. The Kaitoke end is listed as an access point because the page says the track can be started from either end. The Bull Mound, Omega and Block 16 turn-offs are passed on Marchant Ridge; the tracks themselves are alternatives not walked."
+   ],
+   "direction": null,
+   "time": "3–4 days",
+   "distance": null,
+   "evidence": [
+    "This route begins at Akatarawa Saddle, on the Akatarawa Road between Upper Hutt and Waikanae.",
+    "Continue along the Southern Crossing route over Alpha (1361 m) and descend to Alpha Hut, just below the bush line.",
+    "Look carefully for the track turn-off into the Kiwi Ranch Road car park, where the track finishes."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Kiwi Ranch Road car park, Kaitoke",
+   "quote": "or from Kaitoke, at the Kiwi Ranch Road car park",
+   "ref": null,
+   "onto": null
+  }
+ ],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Renata Hut",
+   "quote": "then arrives at Renata Hut",
+   "ref": "T23"
+  },
+  {
+   "name": "Elder Hut",
+   "quote": "reaching Elder Hut just before the Elder high point",
+   "ref": "T15"
+  },
+  {
+   "name": "Alpha Hut",
+   "quote": "descend to Alpha Hut",
+   "ref": "T11"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Bull Mound track",
+   "quote": "passing the Bull Mound, Omega and Block 16 track turn-offs",
+   "ref": "T1",
+   "why": "other"
+  },
+  {
+   "name": "Omega track",
+   "quote": "passing the Bull Mound, Omega and Block 16 track turn-offs",
+   "ref": "T4",
+   "why": "other"
+  },
+  {
+   "name": "Block 16 track",
+   "quote": "passing the Bull Mound, Omega and Block 16 track turn-offs",
+   "ref": null,
+   "why": "other"
+  },
+  {
+   "name": "Tauwharenīkau valley",
+   "quote": "These tracks into the Tauwharenīkau valley offer alternative routes to Marchant Ridge",
+   "ref": null,
+   "why": "other"
+  }
+ ],
+ "doubts": "The way runs from Akatarawa Saddle to the Kiwi Ranch Road car park at Kaitoke, the end given only as a turn-off with no road-end feature, so the end ref is null. The page says the track can be started from Akatarawa Saddle or from Kaitoke; the Kaitoke start is recorded as an access point for the same way. Waiotauru 4WD Road may match map track T8 (Waiotauru Track), but the name is not certain, so ref null. The Southern Crossing route is not in the names list, so ref null. Dobson Loop Track is recorded as walked, since the text describes the section along it from the Smith Creek Shelter junction. The Bull Mound, Omega and Block 16 turn-offs are passed on Marchant Ridge; those tracks are alternatives and are not walked. DOC's '3–4 days' is copied; no whole-way distance is given."
 }

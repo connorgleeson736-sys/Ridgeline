@@ -1,83 +1,207 @@
 {
-  "guid": "eacea5aa-ee1c-4ece-9b2b-91c3df282d15",
-  "kind": "loop",
-  "ways": [
+ "guid": "eacea5aa-ee1c-4ece-9b2b-91c3df282d15",
+ "kind": "loop",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Kaikōura Peninsula Walkway: town centre along the clifftop to South Bay and back via Toms Track",
+   "shape": "loop",
+   "start": {
+    "name": "Kaikōura town centre",
+    "quote": "The walkway starts from Kaikōura township.",
+    "ref": "T3"
+   },
+   "end": {
+    "name": "Kaikōura town centre",
+    "quote": "return to Kaikōura town centre",
+    "ref": "T3"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Whole walkway: Kaikōura town centre over the peninsula clifftop to South Bay and back via Toms Track",
-      "shape": "loop",
-      "start": {"name": "Kaikōura town centre", "quote": "Kaikōura town centre", "ref": "T3"},
-      "end": {"name": "Kaikōura town centre", "quote": "Kaikōura town centre", "ref": "T3"},
-      "via": [
-        {"name": "The Esplanade", "quote": "The Esplanade", "ref": null},
-        {"name": "Avoca Street", "quote": "Avoca Street", "ref": null},
-        {"name": "Fyffe Quay", "quote": "Fyffe Quay", "ref": null},
-        {"name": "Armers Beach", "quote": "Armers Beach", "ref": "T2"},
-        {"name": "Point Kean car park", "quote": "Point Kean car park", "ref": "F1"},
-        {"name": "Point Kean viewpoint", "quote": "Point Kean viewpoint", "ref": null},
-        {"name": "Whalers Bay viewpoint", "quote": "Whalers Bay viewpoint", "ref": null},
-        {"name": "South Bay viewpoint", "quote": "South Bay viewpoint", "ref": null},
-        {"name": "South Bay carpark", "quote": "South Bay carpark", "ref": null},
-        {"name": "South Bay Parade", "quote": "South Bay Parade", "ref": null},
-        {"name": "South Bay Track", "quote": "South Bay Track", "ref": null},
-        {"name": "Scarborough Street", "quote": "Scarborough Street", "ref": null},
-        {"name": "Toms Track", "quote": "Toms Track", "ref": null}
-      ],
-      "direction": null,
-      "time": null,
-      "distance": null,
-      "evidence": [
-        "The track crosses the peninsula’s clifftop, with excellent views of the Seaward Kaikōura Range, ocean and coastline, to South Bay. It returns to the township via South Bay and Toms Track.",
-        "From the town centre, follow the footpath and road verge along The Esplanade, Avoca Street and Fyffe Quay to Point Kean.",
-        "From the South Bay shelter, return to Kaikōura town centre by following the marker posts along the coast towards the marina.",
-        "Follow the marker posts to South Bay Parade and cross to South Bay Track, walk up the hill, cross Scarborough Street and walk down Toms Track to return to The Esplanade."
-      ]
+     "name": "The Esplanade",
+     "quote": "follow the footpath and road verge along The Esplanade",
+     "ref": null,
+     "how": "road"
     },
     {
-      "id": "W2",
-      "main": false,
-      "label": "South Bay car park to Limestone Bay",
-      "shape": null,
-      "start": {"name": "South Bay car park", "quote": "South Bay car park", "ref": null},
-      "end": {"name": "Limestone Bay", "quote": "Limestone Bay", "ref": null},
-      "via": [],
-      "direction": null,
-      "time": "5 min",
-      "distance": "250 m",
-      "evidence": [
-        "At South Bay, a fully accessible path from the carpark takes you to Limestone Bay."
-      ]
+     "name": "Avoca Street",
+     "quote": "Avoca Street and Fyffe Quay",
+     "ref": null,
+     "how": "road"
     },
     {
-      "id": "W3",
-      "main": false,
-      "label": "Limestone Bay to South Bay viewpoint",
-      "shape": null,
-      "start": {"name": "Limestone Bay", "quote": "Limestone Bay", "ref": null},
-      "end": {"name": "South Bay viewpoint", "quote": "South Bay viewpoint", "ref": null},
-      "via": [],
-      "direction": null,
-      "time": "10 min",
-      "distance": "350 m",
-      "evidence": [
-        "This climb up to a viewpoint on the clifftop rewards you with superb views of tidal platforms, cliff formations and Haumuri Bluffs to the south."
-      ]
+     "name": "Fyffe Quay",
+     "quote": "Fyffe Quay to Point Kean",
+     "ref": null,
+     "how": "road"
+    },
+    {
+     "name": "Fyffe House",
+     "quote": "situated on the way to the northern end of the Walkway",
+     "ref": null
+    },
+    {
+     "name": "Armers Beach",
+     "quote": "At nearby Armers Beach",
+     "ref": "T2"
+    },
+    {
+     "name": "Point Kean car park",
+     "quote": "Point Kean car park to Point Kean viewpoint",
+     "ref": "F1"
+    },
+    {
+     "name": "Point Kean viewpoint",
+     "quote": "Point Kean viewpoint to Whalers Bay viewpoint",
+     "ref": null
+    },
+    {
+     "name": "Whalers Bay viewpoint",
+     "quote": "Whalers Bay viewpoint to South Bay viewpoint",
+     "ref": null
+    },
+    {
+     "name": "South Bay viewpoint",
+     "quote": "South Bay viewpoint to South Bay carpark",
+     "ref": null
+    },
+    {
+     "name": "South Bay carpark",
+     "quote": "South Bay viewpoint to South Bay carpark",
+     "ref": null
+    },
+    {
+     "name": "South Bay shelter",
+     "quote": "leads to an information shelter and toilets at South Bay",
+     "ref": null
+    },
+    {
+     "name": "South Bay Parade",
+     "quote": "Follow the marker posts to South Bay Parade",
+     "ref": null
+    },
+    {
+     "name": "South Bay Track",
+     "quote": "cross to South Bay Track",
+     "ref": null
+    },
+    {
+     "name": "Scarborough Street",
+     "quote": "cross Scarborough Street",
+     "ref": null
+    },
+    {
+     "name": "Toms Track",
+     "quote": "walk down Toms Track",
+     "ref": null
     }
-  ],
-  "access_points": [],
-  "side_trips": [
-    {"name": "Whalers Bay", "quote": "Whalers Bay side-trip", "ref": null, "from": "Whalers Bay viewpoint"}
-  ],
-  "huts": [],
-  "not_on_route": [
-    {"name": "Whalers Bay shoreline", "quote": "Whalers Bay", "ref": null, "why": "side trip"},
-    {"name": "the Sugarloaf", "quote": "the Sugarloaf", "ref": null, "why": "view"},
-    {"name": "Seaward Kaikōura Range", "quote": "Seaward Kaikōura Range", "ref": null, "why": "view"},
-    {"name": "Goose Bay", "quote": "Goose Bay", "ref": null, "why": "view"},
-    {"name": "Haumuri Bluffs", "quote": "Haumuri Bluffs", "ref": null, "why": "view"},
-    {"name": "Fyffe House", "quote": "Fyffe House", "ref": null, "why": "nearby"},
-    {"name": "Takahanga Marae", "quote": "Takahanga Marae", "ref": "T8", "why": "nearby"}
-  ],
-  "doubts": "Start/end: the walk starts and returns to Kaikōura town centre; I gave the place Kaikōura (T3) since no road end feature is in the town centre (the first section follows roads to Point Kean car park, which I took to be F1, where Clifftop Walk meets Fyffe Quay). South Bay carpark, South Bay Track and the Scarborough Street crossing may correspond to F4, F3 and F2 but the packet does not make this certain, so they are null. W1 has no single stated time or distance (the page says allow at least three hours; DOC's 11.7 km is the top of 'Various'), so both are null. W2 and W3 are the 'Other options/short walks' sections; the text does not say whether they return the same way, so their shape is null. Direction is not stated."
+   ],
+   "direction": null,
+   "time": "allow at least three hours to complete the whole walkway",
+   "distance": null,
+   "evidence": [
+    "The track crosses the peninsula’s clifftop, with excellent views of the Seaward Kaikōura Range, ocean and coastline, to South Bay. It returns to the township via South Bay and Toms Track.",
+    "From the town centre, follow the footpath and road verge along The Esplanade, Avoca Street and Fyffe Quay to Point Kean.",
+    "From the South Bay shelter, return to Kaikōura town centre by following the marker posts along the coast towards the marina.",
+    "Follow the marker posts to South Bay Parade and cross to South Bay Track, walk up the hill, cross Scarborough Street and walk down Toms Track to return to The Esplanade."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "South Bay car park to Limestone Bay (short walk)",
+   "shape": "one_way",
+   "start": {
+    "name": "South Bay car park",
+    "quote": "South Bay car park to Limestone Bay",
+    "ref": null
+   },
+   "end": {
+    "name": "Limestone Bay",
+    "quote": "takes you to Limestone Bay",
+    "ref": null
+   },
+   "via": [],
+   "direction": null,
+   "time": "5 min",
+   "distance": "250 m",
+   "evidence": [
+    "At South Bay, a fully accessible path from the carpark takes you to Limestone Bay."
+   ]
+  },
+  {
+   "id": "W3",
+   "main": false,
+   "label": "Limestone Bay to South Bay viewpoint (short walk)",
+   "shape": "one_way",
+   "start": {
+    "name": "Limestone Bay",
+    "quote": "Limestone Bay to South Bay viewpoint",
+    "ref": null
+   },
+   "end": {
+    "name": "South Bay viewpoint",
+    "quote": "This climb up to a viewpoint on the clifftop",
+    "ref": null
+   },
+   "via": [],
+   "direction": null,
+   "time": "10 min",
+   "distance": "350 m",
+   "evidence": [
+    "This climb up to a viewpoint on the clifftop rewards you with superb views of tidal platforms, cliff formations and Haumuri Bluffs to the south."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Whalers Bay",
+   "quote": "Whalers Bay side-trip",
+   "ref": null,
+   "from": "Whalers Bay viewpoint"
+  }
+ ],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Whalers Bay shoreline",
+   "quote": "follows a former whalers’ route down the cliff to the shoreline",
+   "ref": null,
+   "why": "side trip"
+  },
+  {
+   "name": "the Sugarloaf",
+   "quote": "the Sugarloaf",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Seaward Kaikōura Range",
+   "quote": "Seaward Kaikōura Range",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Goose Bay",
+   "quote": "Goose Bay",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Haumuri Bluffs",
+   "quote": "Haumuri Bluffs",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Takahanga Marae",
+   "quote": "Takahanga Marae",
+   "ref": null,
+   "why": "nearby"
+  }
+ ],
+ "doubts": "Start and end: the walkway starts and returns to Kaikōura township, so I used the place Kaikōura (T3). Point Kean car park is F1 (where Clifftop Walk meets Fyffe Quay), the best match for the car park at the end of the Fyffe Quay road section, but the text does not name it that way. F2, F3 and F4 are not matched to any named place in the text (South Bay carpark, South Bay Parade and Scarborough Street are given without refs). The order of Fyffe House and Armers Beach is taken from the text's 'near Fyffe House' and 'nearby Armers Beach' on the way to Point Kean, so their exact order is uncertain. Fyffe House is on the way per the text but has no packet entry. The whole walkway's time is the text's 'allow at least three hours to complete the whole walkway', copied as the time; the distance is not stated for the whole way (section distances sum to about 11.7 km, not written). The two short walks in 'Other options/short walks' have their own headings and times, so they are recorded as separate one-way ways. Whalers Bay is a side trip from the Whalers Bay viewpoint and its shoreline return is not a DOC maintained track. Direction is not stated."
 }

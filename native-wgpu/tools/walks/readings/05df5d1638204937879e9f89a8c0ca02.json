@@ -1,40 +1,67 @@
 {
-  "guid": "05df5d16-3820-4937-879e-9f89a8c0ca02",
-  "kind": "out_and_back",
-  "ways": [
+ "guid": "05df5d16-3820-4937-879e-9f89a8c0ca02",
+ "kind": "out_and_back",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Tama Lakes Track from Whakapapa Village to Tama Saddle",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Whakapapa Village",
+    "quote": "Whakapapa Village",
+    "ref": "T11"
+   },
+   "end": {
+    "name": "Tama Saddle",
+    "quote": "Tama Saddle",
+    "ref": null
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Tama Lakes Track to Tama Saddle",
-      "shape": "out_and_back",
-      "start": {"name": "Whakapapa Village", "quote": "Whakapapa Village", "ref": "T11"},
-      "end": {"name": "Tama Saddle", "quote": "Tama Saddle", "ref": null},
-      "via": [
-        {"name": "Taranaki Falls Walking Track", "quote": "Taranaki Falls Walking Track", "ref": "L1"},
-        {"name": "Taranaki Falls", "quote": "Taranaki Falls", "ref": "T8"},
-        {"name": "junction with the Tongariro Northern Circuit Great Walk", "quote": "the junction with the Tongariro Northern Circuit Great Walk", "ref": null}
-      ],
-      "direction": null,
-      "time": "5-6 hr (to Lower Tama Lake)",
-      "distance": "17. 6 km return via same track",
-      "evidence": [
-        "Start this track from Whakapapa Village, on the Taranaki Falls Walking Track.",
-        "The track ends at a wide, flat clearing on Tama Saddle, with spectacular views of Lower Tama Lake, Mt Ngauruhoe and Mt Ruapehu."
-      ]
+     "name": "Taranaki Falls Walking Track",
+     "quote": "Taranaki Falls Walking Track",
+     "ref": null
+    },
+    {
+     "name": "Taranaki Falls",
+     "quote": "Taranaki Falls",
+     "ref": "T8"
     }
-  ],
-  "access_points": [],
-  "side_trips": [
-    {"name": "Upper Tama Lake viewpoint", "quote": "Upper Tama Lake viewpoint", "ref": null, "from": "Tama Saddle (end of the Tama Lakes Track)"}
-  ],
-  "huts": [],
-  "not_on_route": [
-    {"name": "Lower Tama Lake", "quote": "Lower Tama Lake", "ref": "T5", "why": "view"},
-    {"name": "Mt Ngauruhoe", "quote": "Mt Ngauruhoe", "ref": "T6", "why": "view"},
-    {"name": "Mt Ruapehu", "quote": "Mt Ruapehu", "ref": null, "why": "view"},
-    {"name": "Upper Tama Lake viewpoint", "quote": "Upper Tama Lake viewpoint", "ref": null, "why": "side trip"},
-    {"name": "Tongariro Alpine Crossing", "quote": "Tongariro Alpine Crossing", "ref": "L3", "why": "other walk"},
-    {"name": "Tongariro Northern Circuit Great Walk", "quote": "Tongariro Northern Circuit Great Walk", "ref": "L2", "why": "other walk"}
-  ],
-  "doubts": "The start is given as Whakapapa Village (T11); the exact trailhead is on the Taranaki Falls Walking Track 100 m below the Visitor Centre on Ngauruhoe Place, but the two road end features are on Ngauruhoe Terrace and cannot be told apart, so no road end ref is given. Tama Saddle has no entry in the packet. DOC's time says '(to Lower Tama Lake)' though the text says there is no formed track down to the lakes; the end is taken as Tama Saddle where the text says the track ends. The Tongariro Northern Circuit junction is passed near the end but the circuit itself is another walk."
+   ],
+   "direction": null,
+   "time": "5-6 hr (to Lower Tama Lake)",
+   "distance": "17. 6 km return via same track",
+   "evidence": [
+    "Start this track from Whakapapa Village, on the Taranaki Falls Walking Track.",
+    "The track ends at a wide, flat clearing on Tama Saddle, with spectacular views of Lower Tama Lake, Mt Ngauruhoe and Mt Ruapehu."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Upper Tama Lake viewpoint",
+   "quote": "Upper Tama Lake viewpoint",
+   "ref": null,
+   "from": "Tama Saddle"
+  }
+ ],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Lower Tama Lake",
+   "quote": "Lower Tama Lake",
+   "ref": "T5",
+   "why": "view"
+  },
+  {
+   "name": "Tongariro Alpine Crossing",
+   "quote": "Tongariro Alpine Crossing",
+   "ref": "L3",
+   "why": "other walk"
+  }
+ ],
+ "doubts": "Start given as Whakapapa Village (place); the text's Taranaki Falls Walking Track start near Ngauruhoe Place is not clearly one road end feature. Shape from DOC distance 'return via same track'. Junction with the Tongariro Northern Circuit mentioned only as where a toilet is."
 }

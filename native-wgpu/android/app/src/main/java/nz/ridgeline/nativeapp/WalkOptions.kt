@@ -169,6 +169,30 @@ internal object WalkOptions {
                     if(d+w<dist[v]){dist[v]=d+w;prev[v]=u;queue.add(dist[v] to v)}}}
             return dist to prev
         }
+        /** Plain distances from several points at once (Dijkstra). */
+        fun fromAll(sources:Collection<Int>):Pair<DoubleArray,IntArray>{
+            val dist=DoubleArray(points.size){Double.MAX_VALUE};val prev=IntArray(points.size){-1}
+            val queue=java.util.PriorityQueue<Pair<Double,Int>>(compareBy{it.first});for(s in sources){dist[s]=0.0;queue.add(0.0 to s)}
+            while(queue.isNotEmpty()){val (d,u)=queue.poll();if(d>dist[u])continue
+                for((v,w,_) in edges[u])if(d+w<dist[v]){dist[v]=d+w;prev[v]=u;queue.add(dist[v] to v)}}
+            return dist to prev
+        }
+        /** A ford the map has no track over: the straight crossing of [maxMeters] or less,
+         * counted [factor] times its length, from a point reached at [reached] distances to a
+         * point [toTarget] distances from the target, that makes the way there cheapest;
+         * (from, to, cost) or null. */
+        fun crossing(reached:DoubleArray,toTarget:DoubleArray,maxMeters:Double,factor:Double):Triple<Int,Int,Double>?{
+            val cell=maxMeters;val grid=HashMap<Long,MutableList<Int>>()
+            fun key(c:Coordinate)=(floor(x(c)/cell).toLong() shl 32) or (floor(y(c)/cell).toLong() and 0xffffffffL)
+            for(v in points.indices)if(toTarget[v]<Double.MAX_VALUE)grid.getOrPut(key(points[v])){ArrayList()}.add(v)
+            var best:Triple<Int,Int,Double>?=null
+            for(u in points.indices){if(reached[u]==Double.MAX_VALUE)continue
+                val cx=floor(x(points[u])/cell).toLong();val cy=floor(y(points[u])/cell).toLong()
+                for(dx in -1..1)for(dy in -1..1)for(v in grid[((cx+dx) shl 32) or ((cy+dy) and 0xffffffffL)]?:continue){
+                    val d=hypot(x(points[u])-x(points[v]),y(points[u])-y(points[v]));if(d>maxMeters)continue
+                    val c=reached[u]+factor*d+toTarget[v];if(best==null||c<best.third)best=Triple(u,v,c)}}
+            return best
+        }
         fun step(a:Int,b:Int)=(min(a,b).toLong() shl 32) or max(a,b).toLong()
         fun path(prev:IntArray,to:Int):List<Int>{val out=ArrayList<Int>();var v=to;while(v>=0){out.add(v);v=prev[v]};return out.reversed()}
         /** The named tracks a path of points follows. */

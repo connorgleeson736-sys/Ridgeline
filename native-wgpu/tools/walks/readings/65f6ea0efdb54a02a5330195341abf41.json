@@ -1,61 +1,120 @@
 {
-  "guid": "65f6ea0e-fdb5-4a02-a533-0195341abf41",
-  "kind": "loop",
-  "ways": [
+ "guid": "65f6ea0e-fdb5-4a02-a533-0195341abf41",
+ "kind": "unclear",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Kaitoke Road End to Smith Creek Shelter via Puffer Saddle",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Kaitoke Road End",
+    "quote": "Kaitoke Road End",
+    "ref": "F2"
+   },
+   "end": {
+    "name": "Smith Creek Shelter",
+    "quote": "Smith Creek Shelter",
+    "ref": null
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Dobson Loop Track full loop tramp",
-      "shape": "loop",
-      "start": {"name": "Kiwi Ranch Road", "quote": "Kiwi Ranch Road", "ref": "F2"},
-      "end": {"name": "Kiwi Ranch Road", "quote": "Kiwi Ranch Road", "ref": "F2"},
-      "via": [
-        {"name": "Southern Crossing turnoff", "quote": "a turnoff with the Southern Crossing track", "ref": null},
-        {"name": "Turnoff near old Dobson Hut site", "quote": "a turnoff near the old Dobson Hut site", "ref": null},
-        {"name": "Tauwharenīkau River", "quote": "Tauwharenīkau River", "ref": "T8"},
-        {"name": "Smith Creek Shelter", "quote": "Smith Creek Shelter", "ref": null},
-        {"name": "Smith Creek valley", "quote": "Smith Creek valley", "ref": "T6"},
-        {"name": "Puffer Saddle", "quote": "Puffer Saddle", "ref": "T5"},
-        {"name": "Southern Crossing turnoff", "quote": "the turnoff with the Southern Crossing", "ref": null}
-      ],
-      "direction": "clockwise",
-      "time": null,
-      "distance": "11.5 km",
-      "evidence": [
-        "The track begins on Kiwi Ranch Road. It climbs steadily towards Puffer Saddle, then reaches a turnoff with the Southern Crossing track. For a clockwise loop (described here), take this track.",
-        "The track emerges near Smith Creek Shelter, near the confluence of Smith Creek with the Tauwharenīkau River.",
-        "The track climbs out of Smith Creek valley to Puffer Saddle, then descends towards Kaitoke. It meets the turnoff with the Southern Crossing, then the track continues down to Kiwi Ranch Road."
-      ]
+     "name": "Kiwi Ranch Road",
+     "quote": "The track begins on Kiwi Ranch Road",
+     "ref": null
     },
     {
-      "id": "W2",
-      "main": false,
-      "label": "Kaitoke Road End to Smith Creek Shelter via Puffer Saddle and return",
-      "shape": "out_and_back",
-      "start": {"name": "Kaitoke Road End (Kiwi Ranch Road)", "quote": "Kiwi Ranch Road", "ref": "F2"},
-      "end": {"name": "Smith Creek Shelter", "quote": "Smith Creek Shelter", "ref": null},
-      "via": [
-        {"name": "Southern Crossing turnoff", "quote": "a turnoff to the Southern Crossing", "ref": null},
-        {"name": "Puffer Saddle", "quote": "Puffer Saddle", "ref": "T5"},
-        {"name": "Smith Creek valley", "quote": "Smith Creek valley", "ref": "T6"}
-      ],
-      "direction": null,
-      "time": "4 - 5.5 hours",
-      "distance": "13 km",
-      "evidence": [
-        "### Kaitoke Road End to Smith Creek Shelter via Puffer Saddle – returning back on the same track (13 km, 4 - 5.5 hours; walking track)",
-        "The track begins on Kiwi Ranch Road. It climbs steadily towards Puffer Saddle, passing a turnoff to the Southern Crossing on the way.",
-        "Return back to the road end the way you came, following the track up Smith Creek and over Puffer Saddle."
-      ]
+     "name": "Puffer Saddle",
+     "quote": "Puffer Saddle",
+     "ref": "T5"
+    },
+    {
+     "name": "Smith Creek",
+     "quote": "Smith Creek",
+     "ref": "T6"
     }
-  ],
-  "access_points": [],
-  "side_trips": [
-    {"name": "Marchant Creek", "quote": "Marchant Creek", "ref": null, "from": "Smith Creek Shelter"}
-  ],
-  "huts": [],
-  "not_on_route": [
-    {"name": "Southern Crossing", "quote": "Southern Crossing", "ref": null, "why": "other walk"}
-  ],
-  "doubts": "Main way chosen as the full loop because the page is named Dobson Loop Track; DOC's summary time (5.5 hr return to Smith Creek Shelter) is for the out-and-back option W2. On the loop, part of the Southern Crossing track is walked up to the old Dobson Hut site turnoff; I listed the Southern Crossing as other walk since only that section is used. Smith Creek Shelter is not said to have bunks, so it is not listed under huts. Marchant Creek has no matching entry (T4 is a peak)."
+   ],
+   "direction": null,
+   "time": "4 - 5.5 hours",
+   "distance": "13 km",
+   "evidence": [
+    "Kaitoke Road End to Smith Creek Shelter via Puffer Saddle – returning back on the same track (13 km, 4 - 5.5 hours; walking track)",
+    "Return back to the road end the way you came, following the track up Smith Creek and over Puffer Saddle."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Dobson Loop Track – full loop tramp",
+   "shape": "loop",
+   "start": {
+    "name": "Kaitoke Road End",
+    "quote": "Kaitoke Road End",
+    "ref": "F2"
+   },
+   "end": {
+    "name": "Kaitoke Road End",
+    "quote": "Kaitoke Road End",
+    "ref": "F2"
+   },
+   "via": [
+    {
+     "name": "Puffer Saddle",
+     "quote": "Puffer Saddle",
+     "ref": "T5"
+    },
+    {
+     "name": "Southern Crossing turnoff",
+     "quote": "turnoff with the Southern Crossing track",
+     "ref": null
+    },
+    {
+     "name": "old Dobson Hut site",
+     "quote": "old Dobson Hut site",
+     "ref": null
+    },
+    {
+     "name": "Smith Creek Shelter",
+     "quote": "Smith Creek shelter",
+     "ref": null
+    },
+    {
+     "name": "Smith Creek",
+     "quote": "Smith Creek valley",
+     "ref": "T6"
+    },
+    {
+     "name": "Puffer Saddle",
+     "quote": "Puffer Saddle",
+     "ref": "T5"
+    },
+    {
+     "name": "Southern Crossing turnoff",
+     "quote": "turnoff with the Southern Crossing",
+     "ref": null
+    }
+   ],
+   "direction": "clockwise",
+   "time": null,
+   "distance": "11.5 km",
+   "evidence": [
+    "Dobson Loop Track – full loop tramp (11.5 km; tramping track)",
+    "For a clockwise loop (described here), take this track.",
+    "It meets the turnoff with the Southern Crossing, then the track continues down to Kiwi Ranch Road."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Marchant Creek",
+   "quote": "Marchant Creek",
+   "ref": null,
+   "from": "Smith Creek Shelter"
+  }
+ ],
+ "huts": [],
+ "not_on_route": [],
+ "doubts": "Page presents two ways under one name; DOC's time (5.5 hr return to Smith Creek Shelter) matches the first, so it is main, though the walk is named Dobson Loop Track, hence kind unclear. Carpark is about 500 m along Kiwi Ranch Road; F2 (track meets Kiwi Ranch Road) taken as the start. Smith Creek Shelter is a shelter, not listed as hut (no bunks stated). Unbridged stream crossings along Smith Creek are not named so not recorded as fords."
 }

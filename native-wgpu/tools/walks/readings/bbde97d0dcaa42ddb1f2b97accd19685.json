@@ -1,66 +1,161 @@
 {
-  "guid": "bbde97d0-dcaa-42dd-b1f2-b97accd19685",
-  "kind": "one_way",
-  "ways": [
+ "guid": "bbde97d0-dcaa-42dd-b1f2-b97accd19685",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Full route: SH73 to Hawdon Shelter via Edwards Hut, Tarn Col and Walker Pass",
+   "shape": "one_way",
+   "start": {
+    "name": "SH73, 5 km south of Arthur's Pass village",
+    "quote": "SH73",
+    "ref": "F2"
+   },
+   "end": {
+    "name": "Hawdon Shelter at the road end",
+    "quote": "Hawdon Shelter",
+    "ref": null
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Full route: SH73 to Hawdon Shelter via Edwards Hut, Tarn Col and Walker Pass",
-      "shape": "one_way",
-      "start": {"name": "SH73, 5 km south of Arthur's Pass village", "quote": "SH73", "ref": "F2"},
-      "end": {"name": "Hawdon Shelter at the road end", "quote": "Hawdon Shelter", "ref": null},
-      "via": [
-        {"name": "Bealey River crossing", "quote": "Bealey River", "ref": null},
-        {"name": "Edwards River", "quote": "Edwards River", "ref": "T11"},
-        {"name": "East Branch of the Edwards River", "quote": "East Branch of the Edwards River", "ref": null},
-        {"name": "Edwards Hut", "quote": "Edwards Hut", "ref": "T10"},
-        {"name": "Taruahuna Pass", "quote": "Taruahuna Pass", "ref": "T18"},
-        {"name": "Tarn Col", "quote": "Tarn Col", "ref": "T17"},
-        {"name": "Otehake River East Branch", "quote": "Otehake River East Branch", "ref": "T16"},
-        {"name": "Walker Pass", "quote": "Walker Pass", "ref": "T19"},
-        {"name": "Twin Falls", "quote": "Twin Falls", "ref": null},
-        {"name": "Hawdon River", "quote": "Hawdon River", "ref": "T14"},
-        {"name": "Hawdon Hut", "quote": "Hawdon Hut", "ref": "T13"},
-        {"name": "Hawdon Hut Track", "quote": "Hawdon Hut Track", "ref": "T2"},
-        {"name": "East Hawdon Stream", "quote": "East Hawdon Stream", "ref": "T9"}
-      ],
-      "direction": null,
-      "time": "2-3 days",
-      "distance": null,
-      "evidence": [
-        "The Edwards valley end of the track starts beside SH73, 5 km south of Arthur’s Pass village, close to Greyneys Shelter.",
-        "5 km south of Arthur’s Pass village, cross the Bealey River just above its confluence with the Mingha River.",
-        "Recross the Hawdon and follow the river down the bush edge where a last crossing of the river is needed to reach the Hawdon Shelter at the road end."
-      ]
+     "name": "Bealey River crossing",
+     "quote": "Bealey River",
+     "ref": null
     },
     {
-      "id": "W2",
-      "main": false,
-      "label": "Easier overnight option: Hawdon Shelter to Hawdon Hut",
-      "shape": null,
-      "start": {"name": "Hawdon Shelter", "quote": "Hawdon Shelter", "ref": null},
-      "end": {"name": "Hawdon Hut", "quote": "Hawdon Hut", "ref": "T13"},
-      "via": [
-        {"name": "Hawdon Hut Track", "quote": "Hawdon Hut Track", "ref": "T2"}
-      ],
-      "direction": null,
-      "time": null,
-      "distance": null,
-      "evidence": [
-        "For people with low-moderate tramping experience, the walk from Hawdon Shelter to Hawdon Hut is an easier overnight option."
-      ]
+     "name": "Edwards River",
+     "quote": "Edwards River",
+     "ref": "T11"
+    },
+    {
+     "name": "East Branch of the Edwards River",
+     "quote": "East Branch of the Edwards River",
+     "ref": null
+    },
+    {
+     "name": "Edwards Hut",
+     "quote": "Edwards Hut",
+     "ref": "T10"
+    },
+    {
+     "name": "Taruahuna Pass",
+     "quote": "Taruahuna Pass",
+     "ref": "T18"
+    },
+    {
+     "name": "Tarn Col",
+     "quote": "Tarn Col",
+     "ref": "T17"
+    },
+    {
+     "name": "Otehake River East Branch",
+     "quote": "Otehake River East Branch",
+     "ref": "T16"
+    },
+    {
+     "name": "Walker Pass",
+     "quote": "Walker Pass",
+     "ref": "T19"
+    },
+    {
+     "name": "Twin Falls",
+     "quote": "Twin Falls",
+     "ref": null
+    },
+    {
+     "name": "Hawdon River",
+     "quote": "Hawdon River",
+     "ref": "T14"
+    },
+    {
+     "name": "Hawdon Hut",
+     "quote": "Hawdon Hut",
+     "ref": "T13"
+    },
+    {
+     "name": "Hawdon Hut Track",
+     "quote": "Hawdon Hut Track",
+     "ref": "T2"
+    },
+    {
+     "name": "East Hawdon Stream",
+     "quote": "East Hawdon Stream",
+     "ref": "T9"
     }
-  ],
-  "access_points": [],
-  "side_trips": [],
-  "huts": [
-    {"name": "Edwards Hut", "quote": "Edwards Hut", "ref": "T10"},
-    {"name": "Hawdon Hut", "quote": "Hawdon Hut", "ref": "T13"}
-  ],
-  "not_on_route": [
-    {"name": "Falling Mountain", "quote": "Falling Mountain", "ref": "T12", "why": "other"},
-    {"name": "Amber Col", "quote": "Amber Col", "ref": "T5", "why": "other"},
-    {"name": "Greyneys Shelter", "quote": "Greyneys Shelter", "ref": null, "why": "nearby"}
-  ],
-  "doubts": "Start: the text says the route starts beside SH73 close to Greyneys Shelter and crosses the Bealey River above the Mingha confluence; F2 (Mingha Track meets SH73) seems to be that crossing point but the text does not name the Mingha Track as the start, and F1 (Old Coach Road) is nearby. End: Hawdon Shelter at the road end has no feature (Mount White Road side). DOC gives no distance. W2's shape is not stated (an 'overnight option', presumably returning, but not said) and it has no time of its own; the 'Hawdon Hut site to Hawdon Shelter' section (3 hr) is that stretch walked the other way. The text recommends the Edwards-to-Hawdon direction but does not frame it as clockwise/anticlockwise."
+   ],
+   "direction": null,
+   "time": "2-3 days",
+   "distance": null,
+   "evidence": [
+    "The Edwards valley end of the track starts beside SH73, 5 km south of Arthur’s Pass village, close to Greyneys Shelter.",
+    "5 km south of Arthur’s Pass village, cross the Bealey River just above its confluence with the Mingha River.",
+    "Recross the Hawdon and follow the river down the bush edge where a last crossing of the river is needed to reach the Hawdon Shelter at the road end."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Easier overnight option: Hawdon Shelter to Hawdon Hut",
+   "shape": null,
+   "start": {
+    "name": "Hawdon Shelter",
+    "quote": "Hawdon Shelter",
+    "ref": null
+   },
+   "end": {
+    "name": "Hawdon Hut",
+    "quote": "Hawdon Hut",
+    "ref": "T13"
+   },
+   "via": [
+    {
+     "name": "Hawdon Hut Track",
+     "quote": "Hawdon Hut Track",
+     "ref": "T2"
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "For people with low-moderate tramping experience, the walk from Hawdon Shelter to Hawdon Hut is an easier overnight option."
+   ]
+  }
+ ],
+ "access_points": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Edwards Hut",
+   "quote": "Edwards Hut",
+   "ref": "T10"
+  },
+  {
+   "name": "Hawdon Hut",
+   "quote": "Hawdon Hut",
+   "ref": "T13"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Falling Mountain",
+   "quote": "Falling Mountain",
+   "ref": "T12",
+   "why": "other"
+  },
+  {
+   "name": "Amber Col",
+   "quote": "Amber Col",
+   "ref": "T5",
+   "why": "other"
+  },
+  {
+   "name": "Greyneys Shelter",
+   "quote": "Greyneys Shelter",
+   "ref": null,
+   "why": "nearby"
+  }
+ ],
+ "doubts": "Start: the text says the route starts beside SH73 close to Greyneys Shelter and crosses the Bealey River above the Mingha confluence; F2 (Mingha Track meets SH73) seems to be that crossing point but the text does not name the Mingha Track as the start, and F1 (Old Coach Road) is nearby. End: Hawdon Shelter at the road end has no feature (Mount White Road side). DOC gives no distance. W2's shape is not stated (an 'overnight option', presumably returning, but not said) and it has no time of its own; the 'Hawdon Hut site to Hawdon Shelter' section (3 hr) is that stretch walked the other way. The text recommends the Edwards-to-Hawdon direction but does not frame it as clockwise/anticlockwise."
 }

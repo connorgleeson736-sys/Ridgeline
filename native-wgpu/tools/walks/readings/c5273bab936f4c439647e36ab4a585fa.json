@@ -1,100 +1,286 @@
 {
-  "guid": "c5273bab-936f-4c43-9647-e36ab4a585fa",
-  "kind": "loop",
-  "ways": [
+ "guid": "c5273bab-936f-4c43-9647-e36ab4a585fa",
+ "kind": "loop",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Southern Circuit from Freshwater Hut via Freds Camp, Rakeahua, Doughboy Bay and Mason Bay",
+   "shape": "loop",
+   "start": {
+    "name": "Freshwater Hut",
+    "quote": "The track starts directly opposite Freshwater Hut",
+    "ref": "L2"
+   },
+   "end": {
+    "name": "Freshwater Hut",
+    "quote": "to Freshwater River and Freshwater Hut",
+    "ref": "L2"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Southern Circuit from Freshwater Hut via Freds Camp, Rakeahua, Doughboy Bay and Mason Bay",
-      "shape": "loop",
-      "start": {"name": "Freshwater Hut", "quote": "The track starts directly opposite Freshwater Hut", "ref": "L2"},
-      "end": {"name": "Freshwater Hut", "quote": "Freshwater River and Freshwater Hut", "ref": "L2"},
-      "via": [
-        {"name": "Freshwater valley", "quote": "the swampy Freshwater valley", "ref": null},
-        {"name": "Tolson River swing bridge", "quote": "Tolson River", "ref": "T36"},
-        {"name": "Freds Camp Hut", "quote": "Freds Camp Hut", "ref": "L3"},
-        {"name": "South West Arm of Paterson Inlet", "quote": "Paterson Inlet’s South West Arm", "ref": "T35"},
-        {"name": "Rakeahua River", "quote": "the banks of the Rakeahua River", "ref": "T31"},
-        {"name": "Rakeahua Hut", "quote": "Rakeahua Hut", "ref": "L4"},
-        {"name": "Rakeahua valley", "quote": "The track climbs gradually up the Rakeahua valley", "ref": null},
-        {"name": "Doughboy Bay", "quote": "steeply descends into Doughboy Bay", "ref": "T8"},
-        {"name": "Doughboy Bay Hut", "quote": "Doughboy Bay Hut", "ref": "L5"},
-        {"name": "Adams Hill", "quote": "The track climbs steeply up Adams Hill", "ref": "T6"},
-        {"name": "Cavalier Creek on Mason Bay", "quote": "Cavalier Creek on Mason Bay", "ref": "T7"},
-        {"name": "Mason Bay beach", "quote": "Walk north along the beach to Duck Creek.", "ref": "T22"},
-        {"name": "Duck Creek", "quote": "Duck Creek", "ref": null},
-        {"name": "Mason Bay Hut", "quote": "Mason Bay Hut", "ref": "L6"},
-        {"name": "Island Hill homestead", "quote": "the Island Hill homestead", "ref": null},
-        {"name": "Freshwater River", "quote": "Freshwater River", "ref": "T16"}
-      ],
-      "direction": null,
-      "time": "4 - 6 days round trip from Freshwater landing",
-      "distance": "71.5 km loop",
-      "evidence": [
-        "The track traverses the low-lying Freshwater and Rakeahua Valleys, then heads across to Doughboy and Mason Bay.",
-        "The easiest way to start and finish the Southern Circuit is to arrange a water-taxi pick-up or drop-off at Freshwater Landing, Freds Camp or Rakeahua Hut.",
-        "The track starts directly opposite Freshwater Hut and travels down the swampy Freshwater valley to Tolson River",
-        "Follow the track to the Island Hill homestead and then over flat tussock and mānuka country to Freshwater River and Freshwater Hut."
-      ]
+     "name": "Freshwater valley",
+     "quote": "travels down the swampy Freshwater valley to Tolson River",
+     "ref": null
     },
     {
-      "id": "W2",
-      "main": false,
-      "label": "Southern Circuit to and from Halfmoon Bay/Oban via North Arm Hut",
-      "shape": "loop",
-      "start": {"name": "Halfmoon Bay/Oban", "quote": "You can also walk the circuit to and from Halfmoon Bay/Oban", "ref": "T18"},
-      "end": {"name": "Halfmoon Bay/Oban", "quote": "From there it follows the former Kaipipi Road to Halfmoon Bay.", "ref": "T18"},
-      "via": [
-        {"name": "Rakiura National Park Visitor Centre", "quote": "From Rakiura National Park Visitor Centre", "ref": null},
-        {"name": "Main Road", "quote": "follow Main Road", "ref": null},
-        {"name": "Kaipipi Road", "quote": "Turn right along Kaipipi Road", "ref": null},
-        {"name": "Kaipipi Bay", "quote": "Continue until just before Kaipipi Bay.", "ref": "T20"},
-        {"name": "North Arm Hut", "quote": "North Arm Hut", "ref": "L1"},
-        {"name": "Thompson Ridge", "quote": "crossing over Thompson Ridge", "ref": null},
-        {"name": "Freshwater Hut", "quote": "Freshwater Hut", "ref": "L2"},
-        {"name": "Freds Camp Hut", "quote": "Freds Camp Hut", "ref": "L3"},
-        {"name": "Rakeahua Hut", "quote": "Rakeahua Hut", "ref": "L4"},
-        {"name": "Doughboy Bay Hut", "quote": "Doughboy Bay Hut", "ref": "L5"},
-        {"name": "Mason Bay Hut", "quote": "Mason Bay Hut", "ref": "L6"},
-        {"name": "Freshwater Hut", "quote": "Freshwater Hut to North Arm Hut", "ref": "L2"},
-        {"name": "Thompson Ridge", "quote": "It crosses over Thompson Ridge to the North Arm of Paterson Inlet.", "ref": null},
-        {"name": "North Arm Hut", "quote": "North Arm Hut to Halfmoon Bay", "ref": "L1"},
-        {"name": "Sawdust Bay", "quote": "The track traverses above North Arm to Sawdust Bay.", "ref": "T34"},
-        {"name": "Kidney Fern Arm in Prices Inlet", "quote": "Kidney Fern Arm in Prices Inlet", "ref": "T21"},
-        {"name": "Kaipipi Bay", "quote": "emerging at Kaipipi Bay", "ref": "T20"},
-        {"name": "former Kaipipi Road", "quote": "the former Kaipipi Road", "ref": null}
-      ],
-      "direction": null,
-      "time": null,
-      "distance": null,
-      "evidence": [
-        "You can also walk the circuit to and from Halfmoon Bay/Oban but need to allow another 2–4 days to complete it.",
-        "Halfmoon Bay to North Arm Hut",
-        "North Arm Hut to Halfmoon Bay",
-        "From there it follows the former Kaipipi Road to Halfmoon Bay."
-      ]
+     "name": "Tolson River swing bridge",
+     "quote": "After crossing the river by swing bridge",
+     "ref": "T36"
+    },
+    {
+     "name": "Freds Camp Hut",
+     "quote": "Freds Camp Hut",
+     "ref": "L3"
+    },
+    {
+     "name": "South West Arm",
+     "quote": "follows close to the shore of Paterson Inlet’s South West Arm",
+     "ref": "T35"
+    },
+    {
+     "name": "Rakeahua River",
+     "quote": "then the banks of the Rakeahua River",
+     "ref": "T31"
+    },
+    {
+     "name": "Rakeahua Hut",
+     "quote": "Rakeahua Hut",
+     "ref": "L4"
+    },
+    {
+     "name": "Rakeahua valley",
+     "quote": "The track climbs gradually up the Rakeahua valley",
+     "ref": null
+    },
+    {
+     "name": "Doughboy Bay",
+     "quote": "then steeply descends into Doughboy Bay",
+     "ref": "T8"
+    },
+    {
+     "name": "Doughboy Bay Hut",
+     "quote": "Doughboy Bay Hut",
+     "ref": "L5"
+    },
+    {
+     "name": "Adams Hill",
+     "quote": "The track climbs steeply up Adams Hill",
+     "ref": "T6"
+    },
+    {
+     "name": "Cavalier Creek",
+     "quote": "descending through forest to Cavalier Creek on Mason Bay",
+     "ref": "T7"
+    },
+    {
+     "name": "Mason Bay",
+     "quote": "Walk north along the beach to Duck Creek.",
+     "ref": "T22"
+    },
+    {
+     "name": "Mason Bay Hut",
+     "quote": "Mason Bay Hut",
+     "ref": "L6"
+    },
+    {
+     "name": "Island Hill homestead",
+     "quote": "Follow the track to the Island Hill homestead",
+     "ref": null
+    },
+    {
+     "name": "Freshwater River",
+     "quote": "to Freshwater River and Freshwater Hut",
+     "ref": "T16"
     }
-  ],
-  "access_points": [
-    {"name": "Freshwater Landing", "quote": "Freshwater Landing", "ref": null, "onto": "Freshwater Hut"},
-    {"name": "Freds Camp", "quote": "Freds Camp", "ref": "T13", "onto": null},
-    {"name": "Rakeahua Hut", "quote": "Rakeahua Hut", "ref": "L4", "onto": null}
-  ],
-  "side_trips": [
-    {"name": "Mt Rakeahua", "quote": "Side trip: Mt Rakeahua", "ref": "T24", "from": "Rakeahua Hut"},
-    {"name": "Rocky Mountain Track", "quote": "Side trip: Rocky Mountain Track", "ref": "T4", "from": "Freshwater Hut"}
-  ],
-  "huts": [
-    {"name": "Freshwater Hut", "quote": "Freshwater Hut", "ref": "L2"},
-    {"name": "Freds Camp Hut", "quote": "Freds Camp Hut", "ref": "L3"},
-    {"name": "Rakeahua Hut", "quote": "Rakeahua Hut", "ref": "L4"},
-    {"name": "Doughboy Bay Hut", "quote": "Doughboy Bay Hut", "ref": "L5"},
-    {"name": "Mason Bay Hut", "quote": "Mason Bay Hut", "ref": "L6"}
-  ],
-  "not_on_route": [
-    {"name": "Freshwater Flats and Paterson inlet", "quote": "panoramic views over the Freshwater Flats and Paterson inlet", "ref": null, "why": "view"},
-    {"name": "North Arm Campsite", "quote": "North Arm Campsite", "ref": "L7", "why": "nearby"},
-    {"name": "Ryan's Creek and Fern Gully tracks", "quote": "Ryan's Creek, Fern Gully", "ref": null, "why": "other walk"}
-  ],
-  "doubts": "DOC's time is 'round trip from Freshwater landing' and the 71.5 km loop matches the sum of the section distances from Freshwater Hut round to Freshwater Hut, so the main loop is recorded starting and ending at Freshwater Hut; Freshwater Landing itself has no entry and is recorded as an access point. The text does not say whether Freds Camp and Rakeahua Hut water-taxi points lead onto anything beyond the circuit. Direction (clockwise/anticlockwise) is not stated; recorded in the order described. W2 (from Halfmoon Bay/Oban) has no total time or distance; its start ref is the Halfmoon Bay / Oban place (T18), since the walk starts at the Rakiura National Park Visitor Centre and follows roads with no matching road end feature. North Arm Hut is passed only on W2, so it is not in huts. Duck Creek has two river entries (T10, T11), so its ref is null."
+   ],
+   "direction": null,
+   "time": "4 - 6 days round trip from Freshwater landing",
+   "distance": "71.5 km loop",
+   "evidence": [
+    "The track starts directly opposite Freshwater Hut and travels down the swampy Freshwater valley to Tolson River – this area is prone to flooding.",
+    "The track climbs steeply up Adams Hill and across the swampy summit before descending through forest to Cavalier Creek on Mason Bay.",
+    "Follow the track to the Island Hill homestead and then over flat tussock and mānuka country to Freshwater River and Freshwater Hut.",
+    "The easiest way to start and finish the Southern Circuit is to arrange a water-taxi pick-up or drop-off at Freshwater Landing, Freds Camp or Rakeahua Hut."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Southern Circuit to and from Halfmoon Bay/Oban via North Arm Hut",
+   "shape": "loop",
+   "start": {
+    "name": "Halfmoon Bay/Oban",
+    "quote": "walk the circuit to and from Halfmoon Bay/Oban",
+    "ref": "T18"
+   },
+   "end": {
+    "name": "Halfmoon Bay/Oban",
+    "quote": "follows the former Kaipipi Road to Halfmoon Bay",
+    "ref": "T18"
+   },
+   "via": [
+    {
+     "name": "Main Road",
+     "quote": "turn left and follow Main Road",
+     "ref": null,
+     "how": "road"
+    },
+    {
+     "name": "Kaipipi Road",
+     "quote": "Turn right along Kaipipi Road",
+     "ref": null,
+     "how": "road"
+    },
+    {
+     "name": "North Arm Hut",
+     "quote": "North Arm Hut",
+     "ref": "L1"
+    },
+    {
+     "name": "Thompson Ridge",
+     "quote": "crossing over Thompson Ridge",
+     "ref": null
+    },
+    {
+     "name": "Freshwater Hut",
+     "quote": "Freshwater Hut",
+     "ref": "L2"
+    },
+    {
+     "name": "Freds Camp Hut",
+     "quote": "Freds Camp Hut",
+     "ref": "L3"
+    },
+    {
+     "name": "Rakeahua Hut",
+     "quote": "Rakeahua Hut",
+     "ref": "L4"
+    },
+    {
+     "name": "Doughboy Bay Hut",
+     "quote": "Doughboy Bay Hut",
+     "ref": "L5"
+    },
+    {
+     "name": "Mason Bay Hut",
+     "quote": "Mason Bay Hut",
+     "ref": "L6"
+    },
+    {
+     "name": "Sawdust Bay",
+     "quote": "The track traverses above North Arm to Sawdust Bay.",
+     "ref": "T34"
+    },
+    {
+     "name": "Kidney Fern Arm",
+     "quote": "reach Kidney Fern Arm in Prices Inlet",
+     "ref": "T21"
+    },
+    {
+     "name": "Kaipipi Bay",
+     "quote": "emerging at Kaipipi Bay",
+     "ref": "T20"
+    },
+    {
+     "name": "former Kaipipi Road",
+     "quote": "follows the former Kaipipi Road to Halfmoon Bay",
+     "ref": null,
+     "how": "road"
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "You can also walk the circuit to and from Halfmoon Bay/Oban but need to allow another 2–4 days to complete it.",
+    "Halfmoon Bay to North Arm Hut",
+    "North Arm Hut to Halfmoon Bay",
+    "From there it follows the former Kaipipi Road to Halfmoon Bay."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Freshwater Landing",
+   "quote": "Freshwater Landing",
+   "ref": null,
+   "onto": null
+  },
+  {
+   "name": "Freds Camp",
+   "quote": "Freds Camp",
+   "ref": "T13",
+   "onto": null
+  },
+  {
+   "name": "Rakeahua Hut",
+   "quote": "Rakeahua Hut",
+   "ref": "L4",
+   "onto": null
+  }
+ ],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Mt Rakeahua",
+   "quote": "Side trip: Mt Rakeahua",
+   "ref": "T24",
+   "from": "Rakeahua Hut"
+  },
+  {
+   "name": "Rocky Mountain Track",
+   "quote": "Side trip: Rocky Mountain Track",
+   "ref": "T4",
+   "from": "Freshwater Hut"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Freshwater Hut",
+   "quote": "Freshwater Hut",
+   "ref": "L2"
+  },
+  {
+   "name": "Freds Camp Hut",
+   "quote": "Freds Camp Hut",
+   "ref": "L3"
+  },
+  {
+   "name": "Rakeahua Hut",
+   "quote": "Rakeahua Hut",
+   "ref": "L4"
+  },
+  {
+   "name": "Doughboy Bay Hut",
+   "quote": "Doughboy Bay Hut",
+   "ref": "L5"
+  },
+  {
+   "name": "Mason Bay Hut",
+   "quote": "Mason Bay Hut",
+   "ref": "L6"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Freshwater Flats and Paterson inlet",
+   "quote": "panoramic views over the Freshwater Flats and Paterson inlet",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "North Arm Campsite",
+   "quote": "North Arm has a Great Walk hut and campsite",
+   "ref": "L7",
+   "why": "nearby"
+  },
+  {
+   "name": "Ryan's Creek and Fern Gully tracks",
+   "quote": "Ryan's Creek, Fern Gully, Kaipipi Bay and North Arm tracks",
+   "ref": null,
+   "why": "other walk"
+  }
+ ],
+ "doubts": "The page describes the circuit in sections from Halfmoon Bay, but DOC's time '4 - 6 days round trip from Freshwater landing' and distance '71.5 km loop' match only the Freshwater Hut loop (the five sections Freshwater Hut to Freds Camp Hut, Rakeahua Hut, Doughboy Bay Hut, Mason Bay Hut and back to Freshwater Hut sum to 71.5 km). The main way is therefore that loop, starting and ending at Freshwater Hut, with Freshwater Landing, Freds Camp and Rakeahua Hut as water-taxi access points. The Halfmoon Bay/Oban circuit is W2, a separate loop described in its own sections; the page gives no total time or distance for it, only 'allow another 2–4 days', so its time is null. North Arm Hut is passed only on W2, so it is not listed under the main way's huts. Water-taxi pick-up or drop-off points are recorded as access points (the page does not say whether they lead onto anything beyond the circuit). Direction is not stated. Freshwater Landing has no feature or name entry, so its ref is null. Duck Creek has two river entries (T10, T11), so no Duck Creek ref is given."
 }

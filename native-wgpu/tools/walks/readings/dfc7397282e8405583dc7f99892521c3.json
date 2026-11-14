@@ -1,65 +1,144 @@
 {
-  "guid": "dfc73972-82e8-4055-83dc-7f99892521c3",
-  "kind": "out_and_back",
-  "ways": [
+ "guid": "dfc73972-82e8-4055-83dc-7f99892521c3",
+ "kind": "out_and_back",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Pylon Peak Summit Track to the North South Track junction and return",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Carpark at the end of Waiorongomai Valley Road",
+    "quote": "which starts at the carpark at the end of Waiorongomai Valley Road",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Junction with the North South Track",
+    "quote": "After around 2 hour 30 min, you reach the junction with the North South Track.",
+    "ref": null
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Pylon Peak Summit Track to the North South Track junction and return",
-      "shape": "out_and_back",
-      "start": {"name": "Carpark at the end of Waiorongomai Valley Road", "quote": "the carpark at the end of Waiorongomai Valley Road", "ref": "F1"},
-      "end": {"name": "Junction with the North South Track", "quote": "the junction with the North South Track", "ref": null},
-      "via": [
-        {"name": "Low-Level Track", "quote": "Low-Level Track", "ref": null},
-        {"name": "Signposted junction about 130 m along the Low-Level Track", "quote": "the signposted junction about 130 m along the Low-Level Track", "ref": null},
-        {"name": "Pylon Peak Summit Track", "quote": "Pylon Peak Summit Track", "ref": "T2"},
-        {"name": "Old water race", "quote": "an old water race", "ref": null}
-      ],
-      "direction": null,
-      "time": null,
-      "distance": "4.4 km to the summit",
-      "evidence": [
-        "The Pylon Peak Summit Track is accessed from the Low-Level Track, which starts at the carpark at the end of Waiorongomai Valley Road.",
-        "After around 2 hour 30 min, you reach the junction with the North South Track.",
-        "From here, return down the Pylon Peak Summit Track the way you came."
-      ]
+     "name": "Low-Level Track",
+     "quote": "The Pylon Peak Summit Track is accessed from the Low-Level Track",
+     "ref": null
     },
     {
-      "id": "W2",
-      "main": false,
-      "label": "Loop alternative via the North South Track and Waiorongomai Valley",
-      "shape": "loop",
-      "start": {"name": "Carpark at the end of Waiorongomai Valley Road", "quote": "the carpark at the end of Waiorongomai Valley Road", "ref": "F1"},
-      "end": {"name": "Carpark at the end of Waiorongomai Valley Road", "quote": "the carpark at the end of Waiorongomai Valley Road", "ref": "F1"},
-      "via": [
-        {"name": "Low-Level Track", "quote": "Low-Level Track", "ref": null},
-        {"name": "Pylon Peak Summit Track", "quote": "Pylon Peak Summit Track", "ref": "T2"},
-        {"name": "Junction with the North South Track", "quote": "the junction with the North South Track", "ref": null},
-        {"name": "North South Track", "quote": "North South Track", "ref": "L1"},
-        {"name": "Junction with Waipapa Track", "quote": "the junction with Waipapa Track", "ref": null},
-        {"name": "Waipapa Track", "quote": "Waipapa Track", "ref": "T5"},
-        {"name": "Waiorongomai Saddle", "quote": "Waiorongomai Saddle", "ref": null},
-        {"name": "Te Aroha Link track", "quote": "Te Aroha Link track", "ref": "T3"},
-        {"name": "Waiorongomai Valley", "quote": "Waiorongomai Valley", "ref": null}
-      ],
-      "direction": null,
-      "time": null,
-      "distance": "13.7 km loop",
-      "evidence": [
-        "You can take a loop by following the North South Track, Waipapa Track/Crimson Thread Track and Waiorongomai Valley tracks.",
-        "From the junction of the Pylon Peak Summit Track and the North South Track, take the left-hand branch of the North South Track and follow it along the Kaimai range (towards Mt Te Aroha).",
-        "Follow this track as it descends to the Waiorongomai Saddle.",
-        "From the saddle, turn off the ridge and descend into Waiorongomai Valley on the Te Aroha Link track. Follow the signposts to return back to the car park (there are various track options through Waiorongomai Valley)."
-      ]
+     "name": "Signposted junction about 130 m along the Low-Level Track",
+     "quote": "the signposted junction about 130 m along the Low-Level Track",
+     "ref": null
+    },
+    {
+     "name": "Pylon Peak Summit Track",
+     "quote": "winding up the hill to the ridge and summit",
+     "ref": "T2"
     }
-  ],
-  "access_points": [],
-  "side_trips": [],
-  "huts": [],
-  "not_on_route": [
-    {"name": "Mt Te Aroha", "quote": "Mt Te Aroha", "ref": "T7", "why": "view"},
-    {"name": "Hauraki Plains", "quote": "Hauraki Plains", "ref": null, "why": "view"},
-    {"name": "Waitawheta Hut", "quote": "Waitawheta Hut", "ref": "T9", "why": "nearby"}
-  ],
-  "doubts": "The page is named 'Summit Loop' and DOC's distance gives both '4.4 km to the summit' and '13.7 km loop', but the text presents the return-the-same-way summit walk as the walk and the loop as an 'alternative (more advanced and longer option)', so the out-and-back is main. DOC's '6-7 hr' is not clearly tied to either way, so times are null (the loop is '4-5 hours from the junction with the North South Track' plus about 2 hr 30 min up). The turnaround is the North South Track junction (the text implies it is at the summit ridge); no entry matches it. T2 'Pylon Peak Track' taken as the Pylon Peak Summit Track. The Low-Level Track has no names entry (F1 calls it Low Level Drive Track)."
+   ],
+   "direction": null,
+   "time": null,
+   "distance": "4.4 km to the summit",
+   "evidence": [
+    "The Pylon Peak Summit Track is accessed from the Low-Level Track, which starts at the carpark at the end of Waiorongomai Valley Road.",
+    "After around 2 hour 30 min, you reach the junction with the North South Track.",
+    "From here, return down the Pylon Peak Summit Track the way you came."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Loop alternative via the North South Track, Waipapa Track and Waiorongomai Valley",
+   "shape": "loop",
+   "start": {
+    "name": "Carpark at the end of Waiorongomai Valley Road",
+    "quote": "which starts at the carpark at the end of Waiorongomai Valley Road",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Carpark at the end of Waiorongomai Valley Road",
+    "quote": "Follow the signposts to return back to the car park",
+    "ref": "F1"
+   },
+   "via": [
+    {
+     "name": "Low-Level Track",
+     "quote": "The Pylon Peak Summit Track is accessed from the Low-Level Track",
+     "ref": null
+    },
+    {
+     "name": "Pylon Peak Summit Track",
+     "quote": "winding up the hill to the ridge and summit",
+     "ref": "T2"
+    },
+    {
+     "name": "Junction with the North South Track",
+     "quote": "After around 2 hour 30 min, you reach the junction with the North South Track.",
+     "ref": null
+    },
+    {
+     "name": "North South Track",
+     "quote": "take the left-hand branch of the North South Track",
+     "ref": "L1"
+    },
+    {
+     "name": "Waipapa Track",
+     "quote": "the junction with Waipapa Track",
+     "ref": "T5"
+    },
+    {
+     "name": "Waiorongomai Saddle",
+     "quote": "as it descends to the Waiorongomai Saddle",
+     "ref": null
+    },
+    {
+     "name": "Te Aroha Link track",
+     "quote": "descend into Waiorongomai Valley on the Te Aroha Link track",
+     "ref": "T3"
+    },
+    {
+     "name": "Waiorongomai Valley",
+     "quote": "there are various track options through Waiorongomai Valley",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": "13.7 km loop",
+   "evidence": [
+    "You can take a loop by following the North South Track, Waipapa Track/Crimson Thread Track and Waiorongomai Valley tracks. It is 4-5 hours from the junction with the North South Track, taking this loop option.",
+    "From the junction of the Pylon Peak Summit Track and the North South Track, take the left-hand branch of the North South Track and follow it along the Kaimai range (towards Mt Te Aroha).",
+    "From the saddle, turn off the ridge and descend into Waiorongomai Valley on the Te Aroha Link track. Follow the signposts to return back to the car park (there are various track options through Waiorongomai Valley)."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Mt Te Aroha",
+   "quote": "views of Mt Te Aroha and Hauraki Plains",
+   "ref": "T7",
+   "why": "view"
+  },
+  {
+   "name": "Hauraki Plains",
+   "quote": "views of Mt Te Aroha and Hauraki Plains",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Old power pylons",
+   "quote": "look out for the remains of the old power pylons",
+   "ref": null,
+   "why": "other"
+  },
+  {
+   "name": "Waitawheta Hut",
+   "quote": "not towards Waitawheta Hut",
+   "ref": "T9",
+   "why": "nearby"
+  }
+ ],
+ "doubts": "The page is named 'Summit Loop' and DOC's summary gives '4.4 km to the summit' and '13.7 km loop'. The text presents the return-the-same-way summit walk as the main walk and the loop as an 'alternative (more advanced and longer option)', so the out-and-back is main and the loop is W2. DOC's '6-7 hr' is not tied in the text to either way, so both times are null. The main way turns at the junction with the North South Track, which the text reaches after around 2 hour 30 min; the text does not call it the summit, so it is not recorded as one. The loop is recorded from the car park, although the text describes it from the junction. The Pylon Peak Summit Track is matched to the map track 'Pylon Peak Track' (T2) by name. The Low-Level Track has no map entry (the feature is 'Low Level Drive Track'). The unnamed stream crossed after the signposted junction is not listed."
 }

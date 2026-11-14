@@ -1,63 +1,68 @@
 {
-  "guid": "5e354688-3464-4d9c-8ba3-a49ecc02a95e",
-  "kind": "one_way",
-  "ways": [
+ "guid": "5e354688-3464-4d9c-8ba3-a49ecc02a95e",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Mōtū Road to Pakihi road end",
+   "shape": "one_way",
+   "start": {
+    "name": "Mōtū Road",
+    "quote": "Mōtū Road",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Pakihi road end",
+    "quote": "Pakihi road end",
+    "ref": "F2"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Mōtū Road to Pakihi road end",
-      "shape": "one_way",
-      "start": {"name": "Mōtū Road", "quote": "the start of the Pakihi Track is from the Mōtū Road", "ref": "F1"},
-      "end": {"name": "Pakihi road end", "quote": "Pakihi road end", "ref": "F2"},
-      "via": [
-        {"name": "12 wooden bridges", "quote": "you cross 12 wooden bridges", "ref": null},
-        {"name": "Pakihi Hut", "quote": "Pakihi Hut", "ref": "T4"},
-        {"name": "Pakihi stream suspension bridge", "quote": "Pakihi stream suspension bridge", "ref": null},
-        {"name": "Pakihi stream", "quote": "following the Pakihi stream all the way", "ref": "T5"}
-      ],
-      "direction": null,
-      "time": "6 - 7 hr",
-      "distance": "20.7 km one way",
-      "evidence": [
-        "The cycling direction is one-way only, starting from Motu Road.",
-        "For cyclists, the start of the Pakihi Track is from the Mōtū Road, at close to 600 m altitude.",
-        "The top half of the track is a steady descent, dropping over 400 m to the Pakihi Hut.",
-        "Around 1 km after the hut you reach the Pakihi stream suspension bridge, a spectacular 32-m structure that spans a pretty gorge.",
-        "At the end of the track, there is a shelter, car park and toilet.",
-        "Cycling is one-way from Mōtū Road to Pakihi Road."
-      ]
+     "name": "Pakihi Hut",
+     "quote": "Pakihi Hut",
+     "ref": "T4"
     },
     {
-      "id": "W2",
-      "main": false,
-      "label": "Walk from the Pakihi road end up and back",
-      "shape": "out_and_back",
-      "start": {"name": "Pakihi road end", "quote": "Hunters, walkers and trail runners often start from the Pakihi road end, going up and back", "ref": "F2"},
-      "end": {"name": "Mōtū Road junction", "quote": "the Mōtū Road junction", "ref": "F1"},
-      "via": [
-        {"name": "Pakihi stream", "quote": "following the Pakihi stream all the way", "ref": "T5"},
-        {"name": "Pakihi stream suspension bridge", "quote": "Pakihi stream suspension bridge", "ref": null},
-        {"name": "Pakihi Hut", "quote": "Pakihi Hut", "ref": "T4"}
-      ],
-      "direction": null,
-      "time": null,
-      "distance": null,
-      "evidence": [
-        "For walking or running, you can go both ways, with most doing an out-and-back trip.",
-        "Hunters, walkers and trail runners often start from the Pakihi road end, going up and back.",
-        "A popular walk is from the Pakihi road to the Mōtū Road junction, then turn around and head to Pakihi Hut for the night."
-      ]
+     "name": "Pakihi stream suspension bridge",
+     "quote": "Pakihi stream suspension bridge",
+     "ref": null
     }
-  ],
-  "access_points": [],
-  "side_trips": [],
-  "huts": [
-    {"name": "Pakihi Hut", "quote": "Pakihi Hut", "ref": "T4"}
-  ],
-  "not_on_route": [
-    {"name": "Boulders Campsite", "quote": "Boulders Campsite", "ref": "L1", "why": "nearby"},
-    {"name": "Weka Wilds", "quote": "Weka Wilds offers accommodation", "ref": null, "why": "nearby"},
-    {"name": "Mōtū Road Trail", "quote": "Mōtū Road Trail is a good alternative", "ref": null, "why": "other walk"}
-  ],
-  "doubts": "The page is written mainly for cyclists (one-way Mōtū Road to Pakihi Road); for walkers it says most do an out-and-back from the Pakihi road end, recorded as W2. Pakihi Hut is the section boundary in the headings, but the text says 'two side-tracks down to the Pakihi Hut and the stream', so the hut may sit just off the main track. The popular walkers' version (to Mōtū Road junction then back to the hut overnight, 30 km + 10 km) has no single stated time for W2."
+   ],
+   "direction": null,
+   "time": "6 - 7 hr",
+   "distance": "20.7 km one way",
+   "evidence": [
+    "The cycling direction is one-way only, starting from Motu Road.",
+    "### Mōtū Road to Pakihi Hut (10 km)",
+    "### Pakihi Hut to Pakihi road end (9 km)",
+    "Cycling is one-way from Mōtū Road to Pakihi Road."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Pakihi Hut",
+   "quote": "Pakihi Hut",
+   "ref": "T4"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Boulders Campsite",
+   "quote": "Boulders Campsite",
+   "ref": "L1",
+   "why": "nearby"
+  },
+  {
+   "name": "Mōtū Road Trail",
+   "quote": "Mōtū Road Trail",
+   "ref": null,
+   "why": "other walk"
+  }
+ ],
+ "doubts": "Page is a mountain-bike page; walkers may go either way, most out-and-back from the Pakihi road end, but no separate way is described, so only the Mōtū Road to Pakihi road end direction is recorded. Pakihi Road end ref F2 is where the track meets Pakihi Road."
 }

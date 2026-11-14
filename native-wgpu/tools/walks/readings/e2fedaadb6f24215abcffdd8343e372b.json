@@ -1,116 +1,254 @@
 {
-  "guid": "e2fedaad-b6f2-4215-abcf-fdd8343e372b",
-  "kind": "network",
-  "ways": [
+ "guid": "e2fedaad-b6f2-4215-abcf-fdd8343e372b",
+ "kind": "network",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Waiohine Road End to Cone Saddle",
+   "shape": "one_way",
+   "start": {
+    "name": "Waiohine Road End and Campsite",
+    "quote": "From Waiohine Road End and Campsite",
+    "ref": null
+   },
+   "end": {
+    "name": "Cone Saddle",
+    "quote": "The track descends gently before reaching Cone Saddle at 566 m.",
+    "ref": "T6"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Waiohine Road End to Cone Saddle",
-      "shape": "one_way",
-      "start": {"name": "Waiohine Road End and Campsite", "quote": "From Waiohine Road End and Campsite", "ref": null},
-      "end": {"name": "Cone Saddle", "quote": "The track descends gently before reaching Cone Saddle at 566 m", "ref": "T6"},
-      "via": [
-        {"name": "Suspension bridge over the Waiohine River", "quote": "cross the high suspension bridge over the Waiohine River", "ref": null},
-        {"name": "Track junction, left down the valley", "quote": "Take the left hand track, going down the valley", "ref": null},
-        {"name": "Track junction, right up the hill", "quote": "This time take the right hand track, leading up the hill", "ref": null},
-        {"name": "High point 572 m", "quote": "coming to a high point at 572 m", "ref": null},
-        {"name": "High point 682 m", "quote": "reaching another high point at 682 m", "ref": null},
-        {"name": "Junction to Cone Hut", "quote": "you will come to another track junction", "ref": null}
-      ],
-      "direction": null,
-      "time": "2-3 hours",
-      "distance": "4.23 km to Cone Saddle",
-      "evidence": [
-        "From Waiohine Road End and Campsite, cross the high suspension bridge over the Waiohine River.",
-        "If you are going to Cone Saddle rather than Cone Hut, continue along the main ridge track.",
-        "The track descends gently before reaching Cone Saddle at 566 m."
-      ]
+     "name": "Waiohine River suspension bridge",
+     "quote": "cross the high suspension bridge over the Waiohine River",
+     "ref": null
     },
     {
-      "id": "W2",
-      "main": false,
-      "label": "Waiohine Road End to Cone Hut",
-      "shape": "one_way",
-      "start": {"name": "Waiohine Road End and Campsite", "quote": "Waiohine Road End to Cone Hut/Cone Saddle", "ref": null},
-      "end": {"name": "Cone Hut", "quote": "It is around 1 km down this track to Cone Hut", "ref": "T4"},
-      "via": [
-        {"name": "Suspension bridge over the Waiohine River", "quote": "the high suspension bridge over the Waiohine River", "ref": null},
-        {"name": "High point 572 m", "quote": "a high point at 572 m", "ref": null},
-        {"name": "High point 682 m", "quote": "another high point at 682 m", "ref": null},
-        {"name": "Junction, left hand track down to Cone Hut", "quote": "Here you have the option to take the left hand track and descend steeply to Cone Hut", "ref": null}
-      ],
-      "direction": null,
-      "time": null,
-      "distance": null,
-      "evidence": [
-        "Approximately halfway between the 682 high point and Cone Saddle, you will come to another track junction.",
-        "Here you have the option to take the left hand track and descend steeply to Cone Hut.",
-        "It is around 1 km down this track to Cone Hut, which is situated on a pretty terrace above the Tauwharenīkau River."
-      ]
+     "name": "Track junction (left, down the valley)",
+     "quote": "Take the left hand track, going down the valley.",
+     "ref": null
     },
     {
-      "id": "W3",
-      "main": false,
-      "label": "Cone Ridge Track, from Cone Saddle to Totara Flats Hut (via Cone and Cone Ridge)",
-      "shape": "one_way",
-      "start": {"name": "Cone Saddle", "quote": "From Cone Saddle, the track climbs steadily to Mount Cone", "ref": "T6"},
-      "end": {"name": "Totara Flats Hut", "quote": "The hut is a few minutes downstream from the bridge", "ref": "T13"},
-      "via": [
-        {"name": "Junction to Neill Saddle (take right)", "quote": "Take the right hand track to follow Cone Ridge", "ref": null},
-        {"name": "Cone high point", "quote": "the Cone high point", "ref": "T3"},
-        {"name": "Cone Ridge", "quote": "continues along the relatively flat Cone Ridge", "ref": "T5"},
-        {"name": "Junction to Neill Forks Hut", "quote": "Partway along Cone Ridge (5.13 km from Cone Saddle), you will reach a track junction", "ref": null},
-        {"name": "Tauwharenīkau Valley", "quote": "the track follows a long ridge down into the Tauwharenīkau Valley", "ref": null},
-        {"name": "Suspension bridge (not crossed)", "quote": "passing but not crossing a suspension bridge", "ref": null}
-      ],
-      "direction": null,
-      "time": null,
-      "distance": null,
-      "evidence": [
-        "From Cone Saddle, the track climbs steadily to Mount Cone, gaining around 500 m in elevation.",
-        "To go to Totara Flats Hut, take the right hand track that continues straight ahead along the ridge.",
-        "The track emerges onto a river terrace not far upstream from Totara Flats Hut.",
-        "The hut is a few minutes downstream from the bridge."
-      ]
+     "name": "Track junction (right, up the hill)",
+     "quote": "This time take the right hand track, leading up the hill.",
+     "ref": null
     },
     {
-      "id": "W4",
-      "main": false,
-      "label": "Totara Flats Hut to Neill Forks Hut, via Cone Ridge",
-      "shape": "one_way",
-      "start": {"name": "Totara Flats Hut", "quote": "From Totara Flats Hut, follow the track upstream", "ref": "T13"},
-      "end": {"name": "Neill Forks Hut", "quote": "you come to Neill Forks Hut, near the confluence of Hector River and Neill Creek", "ref": "T10"},
-      "via": [
-        {"name": "Suspension bridge (not crossed)", "quote": "Shortly after the hut you will pass a suspension bridge – do not cross this bridge", "ref": null},
-        {"name": "Tauwharenīkau River true right", "quote": "continue following the track up the true right of the Tauwharenīkau River", "ref": null},
-        {"name": "Cone Ridge", "quote": "Finally the track flattens out as you arrive on Cone Ridge", "ref": "T5"},
-        {"name": "Junction to Neill Forks Hut", "quote": "Take the right hand track to Neill Forks Hut", "ref": null},
-        {"name": "Hector River valley", "quote": "dropping down into the Hector River valley", "ref": null},
-        {"name": "Neill Creek", "quote": "the track reaches Neill Creek", "ref": "T9"}
-      ],
-      "direction": null,
-      "time": "4-5 hours",
-      "distance": "5.54 km",
-      "evidence": [
-        "From Totara Flats Hut, follow the track upstream.",
-        "Follow the track along Cone Ridge, until you come to a track junction.",
-        "Take the right hand track to Neill Forks Hut.",
-        "After the second Neill Creek crossing, you come to Neill Forks Hut, near the confluence of Hector River and Neill Creek."
-      ]
+     "name": "Track junction halfway to Cone Saddle",
+     "quote": "Approximately halfway between the 682 high point and Cone Saddle, you will come to another track junction.",
+     "ref": null
     }
-  ],
-  "access_points": [],
-  "side_trips": [],
-  "huts": [
-    {"name": "Cone Hut", "quote": "Cone Hut", "ref": "T4"},
-    {"name": "Totara Flats Hut", "quote": "Totara Flats Hut", "ref": "T13"},
-    {"name": "Neill Forks Hut", "quote": "Neill Forks Hut", "ref": "T10"}
-  ],
-  "not_on_route": [
-    {"name": "Cone Saddle to Cone Hut or Waiohine Valley tracks", "quote": "These tracks are described as part of the Holdsworth-Kaitoke Track web page", "ref": "L1", "why": "other walk"},
-    {"name": "Neill Saddle and Neill Ridge", "quote": "the left-hand track leads to Neill Saddle and Neill Ridge", "ref": "T12", "why": "other"},
-    {"name": "Mount Holdsworth", "quote": "that track leads towards Mount Holdsworth", "ref": null, "why": "other"},
-    {"name": "Carterton and Greytown", "quote": "nearest towns Carterton and Greytown", "ref": null, "why": "nearby"}
-  ],
-  "doubts": "This page describes several tracks around Cone Ridge as separate legs, so it is a network; W1 is taken as main only because it comes first. Waiohine Road End has no road-end feature in the packet, so W1 and W2 starts have no ref. The page does not say whether walkers return the same way; each leg is recorded as one_way only because it is described from A to B. W2 (to Cone Hut) is the option offered under the same heading 'Waiohine Road End to Cone Hut/Cone Saddle' and has no separate time. Huts lists the huts on all the described ways (none is on W1 itself). The Cone Saddle to Cone Hut or Waiohine Valley tracks are covered on the Holdsworth-Kaitoke Track page. Map tracks T1 (Cone Saddle Track) and T2 (Tauwharenikau Track) are not named in the text, so they are not used."
+   ],
+   "direction": null,
+   "time": "2-3 hours",
+   "distance": "4.23 km to Cone Saddle",
+   "evidence": [
+    "From Waiohine Road End and Campsite, cross the high suspension bridge over the Waiohine River.",
+    "If you are going to Cone Saddle rather than Cone Hut, continue along the main ridge track.",
+    "The track descends gently before reaching Cone Saddle at 566 m."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Waiohine Road End to Cone Hut, by the descent from the junction halfway to Cone Saddle",
+   "shape": "one_way",
+   "start": {
+    "name": "Waiohine Road End and Campsite",
+    "quote": "From Waiohine Road End and Campsite",
+    "ref": null
+   },
+   "end": {
+    "name": "Cone Hut",
+    "quote": "It is around 1 km down this track to Cone Hut",
+    "ref": "T4"
+   },
+   "via": [
+    {
+     "name": "Waiohine River suspension bridge",
+     "quote": "cross the high suspension bridge over the Waiohine River",
+     "ref": null
+    },
+    {
+     "name": "Track junction (left, down the valley)",
+     "quote": "Take the left hand track, going down the valley.",
+     "ref": null
+    },
+    {
+     "name": "Track junction (right, up the hill)",
+     "quote": "This time take the right hand track, leading up the hill.",
+     "ref": null
+    },
+    {
+     "name": "Track junction halfway to Cone Saddle",
+     "quote": "Here you have the option to take the left hand track and descend steeply to Cone Hut.",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "Here you have the option to take the left hand track and descend steeply to Cone Hut.",
+    "It is around 1 km down this track to Cone Hut, which is situated on a pretty terrace above the Tauwharenīkau River."
+   ]
+  },
+  {
+   "id": "W3",
+   "main": false,
+   "label": "Cone Ridge Track, from Cone Saddle to Totara Flats Hut via Cone and Cone Ridge",
+   "shape": "one_way",
+   "start": {
+    "name": "Cone Saddle",
+    "quote": "From Cone Saddle, the track climbs steadily to Mount Cone",
+    "ref": "T6"
+   },
+   "end": {
+    "name": "Totara Flats Hut",
+    "quote": "The hut is a few minutes downstream from the bridge.",
+    "ref": "T13"
+   },
+   "via": [
+    {
+     "name": "Track junction before Cone (left to Neill Saddle, right to Cone Ridge)",
+     "quote": "Just before Cone there is a track junction",
+     "ref": null
+    },
+    {
+     "name": "Mount Cone",
+     "quote": "the track climbs steadily to Mount Cone",
+     "ref": "T3"
+    },
+    {
+     "name": "Cone Ridge",
+     "quote": "continues along the relatively flat Cone Ridge",
+     "ref": "T5"
+    },
+    {
+     "name": "Track junction on Cone Ridge (take the right hand track straight ahead)",
+     "quote": "Partway along Cone Ridge (5.13 km from Cone Saddle), you will reach a track junction.",
+     "ref": null
+    },
+    {
+     "name": "Tauwharenīkau Valley",
+     "quote": "the track follows a long ridge down into the Tauwharenīkau Valley",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "From Cone Saddle, the track climbs steadily to Mount Cone, gaining around 500 m in elevation.",
+    "To go to Totara Flats Hut, take the right hand track that continues straight ahead along the ridge.",
+    "The track emerges onto a river terrace not far upstream from Totara Flats Hut.",
+    "The hut is a few minutes downstream from the bridge."
+   ]
+  },
+  {
+   "id": "W4",
+   "main": false,
+   "label": "Totara Flats Hut to Neill Forks Hut via Cone Ridge",
+   "shape": "one_way",
+   "start": {
+    "name": "Totara Flats Hut",
+    "quote": "From Totara Flats Hut, follow the track upstream.",
+    "ref": "T13"
+   },
+   "end": {
+    "name": "Neill Forks Hut",
+    "quote": "you come to Neill Forks Hut, near the confluence of Hector River and Neill Creek.",
+    "ref": "T10"
+   },
+   "via": [
+    {
+     "name": "Tauwharenīkau River",
+     "quote": "continue following the track up the true right of the Tauwharenīkau River",
+     "ref": null
+    },
+    {
+     "name": "Cone Ridge",
+     "quote": "Finally the track flattens out as you arrive on Cone Ridge.",
+     "ref": "T5"
+    },
+    {
+     "name": "Track junction on Cone Ridge (take the right hand track to Neill Forks Hut)",
+     "quote": "Take the right hand track to Neill Forks Hut.",
+     "ref": null
+    },
+    {
+     "name": "Hector River valley",
+     "quote": "dropping down into the Hector River valley",
+     "ref": "T7"
+    },
+    {
+     "name": "Neill Creek",
+     "quote": "It crosses the creek twice without a bridge.",
+     "ref": "T9",
+     "how": "ford"
+    }
+   ],
+   "direction": null,
+   "time": "4-5 hours",
+   "distance": "5.54 km",
+   "evidence": [
+    "From Totara Flats Hut, follow the track upstream.",
+    "Shortly before the hut, the track reaches Neill Creek. It crosses the creek twice without a bridge.",
+    "After the second Neill Creek crossing, you come to Neill Forks Hut, near the confluence of Hector River and Neill Creek."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Cone Hut",
+   "quote": "descend steeply to Cone Hut",
+   "ref": "T4"
+  },
+  {
+   "name": "Totara Flats Hut",
+   "quote": "Totara Flats Hut",
+   "ref": "T13"
+  },
+  {
+   "name": "Neill Forks Hut",
+   "quote": "you come to Neill Forks Hut",
+   "ref": "T10"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Holdsworth-Kaitoke Track",
+   "quote": "described as part of the Holdsworth-Kaitoke Track web page",
+   "ref": "L1",
+   "why": "other walk"
+  },
+  {
+   "name": "Neill Saddle and Neill Ridge",
+   "quote": "the left-hand track leads to Neill Saddle and Neill Ridge",
+   "ref": "T12",
+   "why": "other"
+  },
+  {
+   "name": "Mount Holdsworth",
+   "quote": "that track leads towards Mount Holdsworth",
+   "ref": null,
+   "why": "other"
+  },
+  {
+   "name": "Waiohine Valley",
+   "quote": "descending to Waiohine Valley or Cone Hut",
+   "ref": null,
+   "why": "other"
+  },
+  {
+   "name": "Carterton and Greytown",
+   "quote": "nearest towns Carterton and Greytown",
+   "ref": null,
+   "why": "nearby"
+  }
+ ],
+ "doubts": "The page describes several tracks as separate sections with their own headings, so it is a network. W1 is marked main only because it comes first and runs from the road end. W2 is the Cone Hut descent offered at the junction halfway to Cone Saddle; it has no time or distance of its own. W3 and W4 are the Cone Ridge legs, each with its own heading. The Cone Saddle to Cone Hut or Waiohine Valley tracks are described on the Holdsworth-Kaitoke Track page, so they are not walked here. The Waiohine Road End has no road-end feature in the packet, so the starts have null refs. The Cone Saddle junction before Cone is recorded as a junction without a name. The Tauwharenīkau River is followed on W4 but is not in the names list, so its ref is null. Neill Creek is recorded as a ford because the text says it is crossed twice without a bridge. The huts list includes Cone Hut, which is the end of W2, and Totara Flats and Neill Forks, the ends of W3 and W4; the main way W1 passes no hut. The page does not give times for W2 or W3."
 }

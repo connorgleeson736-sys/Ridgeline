@@ -1,36 +1,86 @@
 {
-  "guid": "885769f9-ea1d-44c5-9dc1-bffa4c931df4",
-  "kind": "one_way",
-  "ways": [
+ "guid": "885769f9-ea1d-44c5-9dc1-bffa4c931df4",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Remutaka Rail Trail from Kaitoke to Cross Creek",
+   "shape": "one_way",
+   "start": {
+    "name": "Kaitoke",
+    "quote": "The section from Kaitoke to Cross Creek Station is wide and well maintained.",
+    "ref": null
+   },
+   "end": {
+    "name": "Cross Creek Road end",
+    "quote": "Cross Creek Station to Cross Creek Road end",
+    "ref": "F1"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Remutaka Rail Trail, Kaitoke to Cross Creek",
-      "shape": "one_way",
-      "start": {"name": "Kaitoke", "quote": "Kaitoke", "ref": null},
-      "end": {"name": "Cross Creek Road end", "quote": "Cross Creek Road end", "ref": "F1"},
-      "via": [
-        {"name": "Ladle Bend", "quote": "Ladle Bend", "ref": null},
-        {"name": "Summit", "quote": "Summit", "ref": "T7"},
-        {"name": "Cross Creek Station", "quote": "Cross Creek Station", "ref": null}
-      ],
-      "direction": null,
-      "time": "4 hr 30 min walk from Kaitoke",
-      "distance": "18 km (Kaitoke to Cross Creek carpark) one way",
-      "evidence": [
-        "The section from Kaitoke to Cross Creek Station is wide and well maintained.",
-        "Cross Creek Station to Cross Creek Road end is an easy walking track but is elevated to an Intermediate: Grade 3 mountain biking track due to some steep drop offs."
-      ]
+     "name": "Summit",
+     "quote": "A bike ride from Kaitoke to the Summit takes about an hour.",
+     "ref": "T7"
+    },
+    {
+     "name": "Siberia Tunnels",
+     "quote": "between the Summit and Siberia Tunnels",
+     "ref": null
+    },
+    {
+     "name": "Cross Creek Station",
+     "quote": "Cross Creek Station to Cross Creek Road end is an easy walking track",
+     "ref": null
     }
-  ],
-  "access_points": [
-    {"name": "Remutaka Forest Park from Featherston (Cross Creek Road)", "quote": "Remutaka Forest Park from Featherston", "ref": "F1", "onto": null}
-  ],
-  "side_trips": [],
-  "huts": [],
-  "not_on_route": [
-    {"name": "Pakuratahi River", "quote": "Pakuratahi River", "ref": "T4", "why": "nearby"},
-    {"name": "Fell Locomotive Museum", "quote": "Fell Locomotive Museum", "ref": null, "why": "other"}
-  ],
-  "doubts": "The Kaitoke start (Pakuratahi Forest carpark off SH 2) has no road end feature in the packet, so its ref is null. The Featherston end is listed as an access point because the page says access is from either end. Ladle Bend has no entry in the packet; Cross Creek Station was not matched to the Cross Creek area entry because it is unclear whether they are the same place."
+   ],
+   "direction": null,
+   "time": "4 hr 30 min walk from Kaitoke",
+   "distance": "18 km (Kaitoke to Cross Creek carpark) one way",
+   "evidence": [
+    "The rail trail is a gently graded 18 km walk or mountain bike ride.",
+    "The section from Kaitoke to Cross Creek Station is wide and well maintained.",
+    "Cross Creek Station to Cross Creek Road end is an easy walking track but is elevated to an Intermediate: Grade 3 mountain biking track due to some steep drop offs.",
+    "A bike ride from Kaitoke to the Summit takes about an hour."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Remutaka Forest Park",
+   "quote": "Access is from either Remutaka Forest Park from Featherston",
+   "ref": null,
+   "onto": "Cross Creek Road"
+  },
+  {
+   "name": "Pakuratahi Forest",
+   "quote": "or Pakuratahi Forest from Upper Hutt",
+   "ref": null,
+   "onto": null
+  }
+ ],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Ladle Bend",
+   "quote": "The camping area at Ladle Bend lies below the Rail Trail",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "Pakuratahi River",
+   "quote": "swimming and fishing in the nearby Pakuratahi River",
+   "ref": "T4",
+   "why": "nearby"
+  },
+  {
+   "name": "Fell Locomotive Museum",
+   "quote": "Visit the Fell Locomotive Museum in Featherston.",
+   "ref": null,
+   "why": "nearby"
+  }
+ ],
+ "doubts": "Kaitoke is named in the text but has no name or feature entry, so the start has no ref. The end is the Cross Creek Road end, matched to the road end feature F1 where the Remutaka Rail Trail meets Cross Creek Road. The Summit (T7) is taken as the trail's summit named in the text. Siberia Tunnels are placed between the Summit and Cross Creek from the viewing platform sentence, which is an inference. Ladle Bend is described as lying below the Rail Trail, so it is not_on_route rather than a via. The Pakuratahi Forest access (from Upper Hutt) has no stated road end or onto, and it is not known whether it is the Kaitoke start. The time and distance are DOC's."
 }

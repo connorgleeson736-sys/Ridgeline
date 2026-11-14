@@ -4,6 +4,7 @@ step when DOC changes pages; the first readings were made in a Claude Code
 session with the same instructions).
 
 Usage: ANTHROPIC_API_KEY=... python3 extract.py PACKETS_DIR READINGS_DIR [g ...]
+       (WALKS_MODEL, WALKS_EFFORT: model and effort, default Sonnet at medium)
 Requires: pip install anthropic
 
 Each packet is sent with READING.md as the instructions; the answer is
@@ -18,7 +19,10 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from validate import check  # noqa: E402
 
-MODEL = "claude-opus-5-5"
+# Sonnet at medium effort by default (the readings' checks catch what it gets wrong);
+# WALKS_MODEL and WALKS_EFFORT override.
+MODEL = os.environ.get("WALKS_MODEL", "claude-sonnet-5-5")
+EFFORT = os.environ.get("WALKS_EFFORT", "medium")
 INSTRUCTIONS = open(os.path.join(HERE, "READING.md"), encoding="utf-8").read()
 
 
@@ -28,7 +32,7 @@ def ask(client, messages):
         max_tokens=16000,
         betas=["server-side-fallback-2026-07-01"],
         fallbacks="default",
-        output_config={"effort": "high"},
+        output_config={"effort": EFFORT},
         system=[{"type": "text", "text": INSTRUCTIONS, "cache_control": {"type": "ephemeral"}}],
         messages=messages,
     )

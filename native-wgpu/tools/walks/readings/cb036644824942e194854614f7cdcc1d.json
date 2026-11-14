@@ -1,68 +1,141 @@
 {
-  "guid": "cb036644-8249-42e1-9485-4614f7cdcc1d",
-  "kind": "loop",
-  "ways": [
+ "guid": "cb036644-8249-42e1-9485-4614f7cdcc1d",
+ "kind": "loop",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Caples then Greenstone Track",
+   "shape": "loop",
+   "start": {
+    "name": "Greenstone road end",
+    "quote": "Greenstone road end",
+    "ref": null
+   },
+   "end": {
+    "name": "Greenstone road end",
+    "quote": "Greenstone road end",
+    "ref": null
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Caples then Greenstone Track from Greenstone road end",
-      "shape": "loop",
-      "start": {"name": "Greenstone road end car park", "quote": "Greenstone road end", "ref": "F2"},
-      "end": {"name": "Greenstone road end car park", "quote": "Greenstone road end", "ref": "F2"},
-      "via": [
-        {"name": "Greenstone/Caples Track", "quote": "Greenstone/Caples Track", "ref": null},
-        {"name": "Caples and Greenstone confluence", "quote": "confluence of the Caples and Greenstone rivers", "ref": null},
-        {"name": "Caples Track", "quote": "Caples Track", "ref": "T1"},
-        {"name": "Caples River", "quote": "Caples River", "ref": "T9"},
-        {"name": "Mid Caples Hut", "quote": "Mid Caples Hut", "ref": "L2"},
-        {"name": "Steele Creek and Fraser/Kay Tracks junctions", "quote": "junctions with Steele Creek and Fraser/Kay Tracks", "ref": null},
-        {"name": "McKellar Saddle", "quote": "McKellar Saddle", "ref": "T19"},
-        {"name": "track junction upstream from Lake McKellar", "quote": "track junction is reached upstream from Lake McKellar", "ref": null},
-        {"name": "McKellar Hut", "quote": "McKellar Hut", "ref": "L3"},
-        {"name": "Steele Creek", "quote": "Steele Creek", "ref": "T29"},
-        {"name": "Steele Creek Lodge", "quote": "Steele Creek Lodge", "ref": null},
-        {"name": "Mid Greenstone Hut", "quote": "Mid Greenstone Hut", "ref": null},
-        {"name": "Greenstone Hut", "quote": "Greenstone Hut", "ref": "L4"},
-        {"name": "Greenstone Track", "quote": "Greenstone Track", "ref": "T2"},
-        {"name": "Slip Flat", "quote": "Slip Flat", "ref": "T27"},
-        {"name": "confluence with the Caples River", "quote": "confluence with the Caples River", "ref": null},
-        {"name": "Caples Track", "quote": "Caples Track", "ref": "T1"}
-      ],
-      "direction": null,
-      "time": "4 days",
-      "distance": null,
-      "evidence": [
-        "These tracks can be walked in either direction.",
-        "This description details the Caples then the Greenstone Track.",
-        "The Caples and Greenstone tracks start from the carpark at the end of Greenstone Road, 86 km from Queenstown, via Glenorchy.",
-        "Follow the Greenstone/Caples Track from the car park.",
-        "Here you join the Caples Track.",
-        "Trampers wishing to walk out to the car park should follow the track downstream for 30 minutes."
-      ]
+     "name": "Caples Track",
+     "quote": "Caples Track",
+     "ref": "T1"
+    },
+    {
+     "name": "Mid Caples Hut",
+     "quote": "Mid Caples Hut",
+     "ref": "L2"
+    },
+    {
+     "name": "McKellar Saddle",
+     "quote": "McKellar Saddle (945 m)",
+     "ref": "T19"
+    },
+    {
+     "name": "McKellar Hut",
+     "quote": "McKellar Hut",
+     "ref": "L3"
+    },
+    {
+     "name": "Mid Greenstone Hut",
+     "quote": "Mid Greenstone Hut",
+     "ref": null
+    },
+    {
+     "name": "Greenstone Hut",
+     "quote": "Greenstone Hut (20 bunks)",
+     "ref": "L4"
+    },
+    {
+     "name": "Greenstone Track",
+     "quote": "On the Greenstone Track",
+     "ref": "T2"
+    },
+    {
+     "name": "Slip Flat",
+     "quote": "Slip Flat",
+     "ref": "T27"
     }
-  ],
-  "access_points": [
-    {"name": "Lake Howden outlet", "quote": "Lake Howden outlet", "ref": "T16", "onto": "track to the junction upstream from Lake McKellar"},
-    {"name": "The Divide", "quote": "the Divide on State Highway 94", "ref": "F1", "onto": "Routeburn Track"}
-  ],
-  "side_trips": [
-    {"name": "Lake Howden", "quote": "McKellar Hut to Lake Howden", "ref": "T16", "from": "McKellar Hut"},
-    {"name": "Greenstone Hut via Steele Creek", "quote": "Caples/Steele Creek Junction to Greenstone Hut via Steele Creek", "ref": null, "from": "Caples/Steele Creek Junction"},
-    {"name": "Mavora-Greenstone Walkway", "quote": "Mavora-Greenstone Walkway", "ref": "L8", "from": "Greenstone Hut"}
-  ],
-  "huts": [
-    {"name": "Mid Caples Hut", "quote": "Mid Caples Hut", "ref": "L2"},
-    {"name": "Upper Caples Hut", "quote": "Upper Caples Hut", "ref": null},
-    {"name": "McKellar Hut", "quote": "McKellar Hut", "ref": "L3"},
-    {"name": "Mid Greenstone Hut", "quote": "Mid Greenstone Hut", "ref": null},
-    {"name": "Greenstone Hut", "quote": "Greenstone Hut", "ref": "L4"}
-  ],
-  "not_on_route": [
-    {"name": "Routeburn Track", "quote": "Routeburn Track", "ref": "L1", "why": "other walk"},
-    {"name": "Lake Rere Track", "quote": "Lake Rere Track", "ref": null, "why": "other walk"},
-    {"name": "Lake McKellar", "quote": "Lake McKellar", "ref": "T17", "why": "side trip"},
-    {"name": "Mavora Lakes", "quote": "Mavora Lakes", "ref": null, "why": "other walk"},
-    {"name": "Lake Howden Hut", "quote": "Lake Howden Hut", "ref": null, "why": "other"}
-  ],
-  "doubts": "The start/end is 'the carpark at the end of Greenstone Road'; F2 is a road end on GREENSTONE STATION ROAD with an unnamed track, taken as that car park, but the road names differ slightly. The page says the tracks can be walked in either direction and describes Caples then Greenstone; whether that is clockwise or anticlockwise is not stated. No total distance is given (DOC distance is empty). Upper Caples Hut is listed as on this track but its position along the way is not described, so it is not placed in via. Steele Creek Lodge is a private hut the track passes close to. Lake Howden outlet on the Routeburn Track is given as an alternative start, reached in one hour from the Divide; the Divide ref F1 is the road end where the Routeburn Track meets the highway. The McKellar Hut to Lake Howden side trip is the same track the Lake Howden access uses."
+   ],
+   "direction": null,
+   "evidence": [
+    "This description details the Caples then the Greenstone Track.",
+    "Follow the Greenstone/Caples Track from the car park.",
+    "To continue down the Greenstone Valley to the Greenstone Carpark return to the junction via the bridge over the gorge",
+    "Here you join the Caples Track. Trampers wishing to walk out to the car park should follow the track downstream for 30 minutes."
+   ],
+   "time": "4 days"
+  }
+ ],
+ "access_points": [],
+ "side_trips": [
+  {
+   "name": "Lake Howden",
+   "quote": "McKellar Hut to Lake Howden",
+   "ref": "T16",
+   "from": "McKellar Hut"
+  },
+  {
+   "name": "Steele Creek route to Greenstone Hut",
+   "quote": "Caples/Steele Creek Junction to Greenstone Hut via Steele Creek",
+   "ref": null,
+   "from": "Caples/Steele Creek Junction"
+  },
+  {
+   "name": "Mavora-Greenstone Walkway",
+   "quote": "Mavora-Greenstone Walkway",
+   "ref": "L8",
+   "from": "Greenstone Hut"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Mid Caples Hut",
+   "quote": "Mid Caples Hut",
+   "ref": "L2"
+  },
+  {
+   "name": "McKellar Hut",
+   "quote": "McKellar Hut",
+   "ref": "L3"
+  },
+  {
+   "name": "Greenstone Hut",
+   "quote": "Greenstone Hut",
+   "ref": "L4"
+  },
+  {
+   "name": "Mid Greenstone Hut",
+   "quote": "Mid Greenstone Hut",
+   "ref": null
+  },
+  {
+   "name": "Upper Caples Hut",
+   "quote": "Upper Caples Hut",
+   "ref": null
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Routeburn Track",
+   "quote": "Routeburn Track",
+   "ref": "L1",
+   "why": "other walk"
+  },
+  {
+   "name": "Lake Rere Track",
+   "quote": "Lake Rere Track",
+   "ref": null,
+   "why": "other walk"
+  },
+  {
+   "name": "Steele Creek Lodge",
+   "quote": "Steele Creek Lodge",
+   "ref": null,
+   "why": "nearby"
+  }
+ ],
+ "doubts": "The tracks can be walked in either direction; the description goes up the Caples and down the Greenstone, which is the order recorded. Upper Caples Hut is said to be on this track (NZ Deerstalkers' Association) but the text does not say where."
 }

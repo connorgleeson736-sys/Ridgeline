@@ -1,40 +1,76 @@
 {
-  "guid": "6ab975ca-78f0-41b3-bdc4-36db75aeace8",
-  "kind": "out_and_back",
-  "ways": [
+ "guid": "6ab975ca-78f0-41b3-bdc4-36db75aeace8",
+ "kind": "out_and_back",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Mautohe Cathedral Cove Track",
+   "shape": "out_and_back",
+   "start": {
+    "name": "top of Grange Road, Hahei",
+    "quote": "the top of Grange Road, Hahei",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Mares Leg Cove",
+    "quote": "Mares Leg Cove",
+    "ref": "T8"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Grange Road, Hahei to Mares Leg Cove and back",
-      "shape": "out_and_back",
-      "start": {"name": "Top of Grange Road, Hahei", "quote": "Mautohe Cathedral Cove Track starts at the top of Grange Road, Hahei.", "ref": "F1"},
-      "end": {"name": "Mares Leg Cove", "quote": "the track descends steeply to Mares Leg Cove", "ref": "T8"},
-      "via": [
-        {"name": "junction with Cathedral Cove Gateway Trail", "quote": "After the junction with the private Cathedral Cove Gateway Trail", "ref": null}
-      ],
-      "direction": null,
-      "time": "1 hr 30 min return",
-      "distance": "5 km return via same track",
-      "evidence": [
-        "Mautohe Cathedral Cove Track starts at the top of Grange Road, Hahei.",
-        "After the junction with the private Cathedral Cove Gateway Trail, the track descends steeply to Mares Leg Cove.",
-        "Return to the car park the same way you came."
-      ]
+     "name": "Cathedral Cove Gateway Trail junction",
+     "quote": "junction with the private Cathedral Cove Gateway Trail",
+     "ref": null
     }
-  ],
-  "access_points": [
-    {"name": "Hahei Visitor Car Park", "quote": "Hahei Visitor Car Park", "ref": null, "onto": "track entrance on Grange Road"},
-    {"name": "Cathedral Cove Gateway Trail car park", "quote": "Cathedral Cove Gateway Trail car park at 150 Lees Road, Hahei", "ref": null, "onto": "Mautohe Cathedral Cove Track"}
-  ],
-  "side_trips": [
-    {"name": "Tokawhakairo McHands Lookout", "quote": "Tokawhakairo McHands Lookout", "ref": null, "from": null}
-  ],
-  "huts": [],
-  "not_on_route": [
-    {"name": "Waimata/Gemstone Bay", "quote": "Waimata/Gemstone Bay", "ref": "T4", "why": "view"},
-    {"name": "Te Karaka/Stingray Bay", "quote": "Te Karaka/Stingray Bay", "ref": "T10", "why": "view"},
-    {"name": "Te Hoho", "quote": "Te Hoho", "ref": null, "why": "view"},
-    {"name": "Te Whanganui-o-Hei/Mercury Bay", "quote": "Te Whanganui-o-Hei/Mercury Bay", "ref": "T9", "why": "view"}
-  ],
-  "doubts": "The text ends the track at Mares Leg Cove, where the rock archway leads through to Mautohe Cathedral Cove beach; the end is recorded as Mares Leg Cove, though walkers may pass through the archway to Cathedral Cove (T3). The text says 'Return to the car park' although there is no parking at the Grange Road entrance. The lookout side trip is 'signposted off' the track without saying where."
+   ],
+   "direction": null,
+   "time": "1 hr 30 min return",
+   "distance": "5 km return via same track",
+   "evidence": [
+    "Mautohe Cathedral Cove Track starts at the top of Grange Road, Hahei.",
+    "After the junction with the private Cathedral Cove Gateway Trail, the track descends steeply to Mares Leg Cove.",
+    "Return to the car park the same way you came."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Hahei Visitor Car Park",
+   "quote": "Hahei Visitor Car Park",
+   "ref": null,
+   "onto": "Mautohe Cathedral Cove Track"
+  },
+  {
+   "name": "Cathedral Cove Gateway Trail car park",
+   "quote": "Cathedral Cove Gateway Trail car park at 150 Lees Road, Hahei",
+   "ref": null,
+   "onto": "Mautohe Cathedral Cove Track"
+  }
+ ],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Tokawhakairo McHands Lookout",
+   "quote": "Tokawhakairo McHands Lookout",
+   "ref": null,
+   "from": "Mautohe Cathedral Cove Track"
+  }
+ ],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Gemstone Bay",
+   "quote": "Gemstone Bay",
+   "ref": "T4",
+   "why": "view"
+  },
+  {
+   "name": "Stingray Bay",
+   "quote": "Stingray Bay",
+   "ref": "T10",
+   "why": "view"
+  }
+ ],
+ "doubts": "Hahei Visitor Car Park and the Gateway Trail car park are given as places to park/walk from to reach the track entrance (30 min walk or shuttle), recorded as access points. Boat/kayak access to the cove is not a way out of the walk."
 }

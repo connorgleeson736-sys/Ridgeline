@@ -1,56 +1,93 @@
 {
-  "guid": "6b493d71-745c-4ca8-8ed5-912cc3388292",
-  "kind": "out_and_back",
-  "ways": [
+ "guid": "6b493d71-745c-4ca8-8ed5-912cc3388292",
+ "kind": "out_and_back",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Graveyard Gully to Doctors Point",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Graveyard Gully Monument",
+    "quote": "Graveyard Gully Monument",
+    "ref": "F3"
+   },
+   "end": {
+    "name": "Doctors Point",
+    "quote": "Doctors Point",
+    "ref": "T5"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Graveyard Gully to Doctors Point",
-      "shape": "out_and_back",
-      "start": {"name": "Graveyard Gully Monument", "quote": "The walkway starts at the Graveyard Gully Monument", "ref": "F3"},
-      "end": {"name": "Doctors Point", "quote": "Butchers Point to Doctors Point", "ref": "T5"},
-      "via": [
-        {"name": "Colemans Gully stone huts", "quote": "drops down to a cluster of stone huts at Colemans Gully", "ref": null},
-        {"name": "Butchers Point", "quote": "Beyond Butchers Point the track becomes a lot rougher", "ref": "T4"},
-        {"name": "Maltese Cross cottage", "quote": "at the start of a big bend in the river is the Maltese Cross cottage", "ref": null}
-      ],
-      "direction": null,
-      "time": "7–10 hr",
-      "distance": "20 km return via same track",
-      "evidence": [
-        "The walkway starts at the Graveyard Gully Monument.",
-        "Butchers Point to Doctors Point",
-        "Advanced tramping track: 4–7 hr return",
-        "A couple of hours will be needed to fully explore the extensive Doctors Point workings which extend about 500 m along the edge of the lake and 200 m up-slope from the shoreline."
-      ]
+     "name": "Butchers Creek",
+     "quote": "mouth of Butchers Creek",
+     "ref": "T3"
     },
     {
-      "id": "W2",
-      "main": false,
-      "label": "Graveyard Gully to Butchers Point",
-      "shape": "out_and_back",
-      "start": {"name": "Graveyard Gully Monument", "quote": "The walkway starts at the Graveyard Gully Monument", "ref": "F3"},
-      "end": {"name": "Butchers Point", "quote": "Graveyard Gully to Butchers Point", "ref": "T4"},
-      "via": [
-        {"name": "Colemans Gully stone huts", "quote": "drops down to a cluster of stone huts at Colemans Gully", "ref": null}
-      ],
-      "direction": null,
-      "time": "3 hr return",
-      "distance": null,
-      "evidence": [
-        "Graveyard Gully to Butchers Point",
-        "Easy walking track: 3 hr return",
-        "The walkway starts at the Graveyard Gully Monument."
-      ]
+     "name": "Colemans Gully",
+     "quote": "Colemans Gully",
+     "ref": null
+    },
+    {
+     "name": "Butchers Point",
+     "quote": "Butchers Point",
+     "ref": "T4"
+    },
+    {
+     "name": "Maltese Cross cottage",
+     "quote": "Maltese Cross cottage",
+     "ref": null
     }
-  ],
-  "access_points": [],
-  "side_trips": [],
-  "huts": [],
-  "not_on_route": [
-    {"name": "Butchers Creek mouth", "quote": "Opposite the mouth of Butchers Creek", "ref": "T3", "why": "view"},
-    {"name": "Blackman’s Cave", "quote": "Directly behind is a rock shelter known as Blackman’s Cave", "ref": null, "why": "nearby"},
-    {"name": "Shanty Creek", "quote": "two high level stone riveted races from Shanty Creek", "ref": "T7", "why": "other"}
-  ],
-  "doubts": "The page gives two sections (Graveyard Gully to Butchers Point, 3 hr return; Butchers Point to Doctors Point, 4–7 hr return); the full walk to Doctors Point is taken as the main way with DOC's '7–10 hr' and '20 km return via same track', and the Butchers Point walk as a shorter way. Return the same way is implied by the 'return' times and DOC's distance rather than stated in the text. DOC's '10 km' is not clearly tied to either way, so W2's distance is null. The stone huts (Leaky Lodge, Mary Ann's, Maltese Cross cottage) are historic mining huts, not huts to stay in, so huts is empty. Colemans Gully is assumed to be before Butchers Point since it is described in that section."
+   ],
+   "direction": null,
+   "time": "7–10 hr",
+   "distance": "20 km return via same track",
+   "evidence": [
+    "The walkway starts at the Graveyard Gully Monument.",
+    "Beyond Butchers Point the track becomes a lot rougher and is sometimes poorly defined as it traverses rocky sections, exposed sidles on loose stones and a bluff where the track is narrow with steep drop offs.",
+    "A couple of hours will be needed to fully explore the extensive Doctors Point workings which extend about 500 m along the edge of the lake and 200 m up-slope from the shoreline."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Graveyard Gully to Butchers Point",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Graveyard Gully Monument",
+    "quote": "Graveyard Gully Monument",
+    "ref": "F3"
+   },
+   "end": {
+    "name": "Butchers Point",
+    "quote": "Butchers Point",
+    "ref": "T4"
+   },
+   "via": [
+    {
+     "name": "Butchers Creek",
+     "quote": "mouth of Butchers Creek",
+     "ref": "T3"
+    },
+    {
+     "name": "Colemans Gully",
+     "quote": "Colemans Gully",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "3 hr return",
+   "distance": "10 km",
+   "evidence": [
+    "The walkway starts at the Graveyard Gully Monument.",
+    "Easy walking track: 3 hr return"
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [],
+ "doubts": "The text does not say 'return the same way' but DOC's distance says 20 km return via same track. W1 time and distance are DOC's summary figures (7–10 hr, 20 km), not stated in a heading; the page's own heading times are 3 hr return and 4–7 hr return (Butchers Point to Doctors Point). W2 distance 10 km is DOC's summary figure paired with 3 hr. Order of Colemans Gully relative to Butchers Point is inferred from the text. The ruined huts are not recorded as huts."
 }

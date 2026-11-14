@@ -1,38 +1,72 @@
 {
-  "guid": "1f1fae93-54c9-4de2-b959-61b07bef21c9",
-  "kind": "one_way",
-  "ways": [
+ "guid": "1f1fae93-54c9-4de2-b959-61b07bef21c9",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Mica Mine Tops Route from the Cattle Track turn off to Mataketake Hut",
+   "shape": "one_way",
+   "start": {
+    "name": "Historic Haast to Paringa Cattle Track",
+    "quote": "Mica Mine Tops Route is started from the Historic Haast to Paringa Cattle Track",
+    "ref": "L1"
+   },
+   "end": {
+    "name": "Mataketake Hut",
+    "quote": "the route follows the dips and hollows of the range to Mataketake Hut",
+    "ref": "T6"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Mica Mine Tops Route from the Cattle Track turn off to Mataketake Hut",
-      "shape": "one_way",
-      "start": {"name": "Historic Haast to Paringa Cattle Track", "quote": "Mica Mine Tops Route is started from the Historic Haast to Paringa Cattle Track", "ref": "L1"},
-      "end": {"name": "Mataketake Hut", "quote": "the route follows the dips and hollows of the range to Mataketake Hut", "ref": "T6"},
-      "via": [
-        {"name": "Blowfly Hut", "quote": "around 2 hours after Blowfly Hut on the Historic Haast to Paringa Cattle Track", "ref": "L2"},
-        {"name": "Turn off to Mica Mine Tops Route", "quote": "The turn off to Mica Mine Tops Route is signposted", "ref": null},
-        {"name": "Mataketake Range", "quote": "meanders southwest along the Mataketake Range", "ref": null}
-      ],
-      "direction": null,
-      "time": "8 hr from SH6",
-      "distance": null,
-      "evidence": [
-        "Mica Mine Tops Route is started from the Historic Haast to Paringa Cattle Track.",
-        "The turn off to Mica Mine Tops Route is signposted around 2 hours after Blowfly Hut on the Historic Haast to Paringa Cattle Track.",
-        "The Mica Mine Tops Route leaves the main Cattle Track and zig zags through 23 corners up to 960 m high.",
-        "On a clear day, there are excellent views from mountains to sea as the route follows the dips and hollows of the range to Mataketake Hut."
-      ]
+     "name": "zig zags through 23 corners",
+     "quote": "zig zags through 23 corners up to 960 m high",
+     "ref": null
+    },
+    {
+     "name": "bushline",
+     "quote": "spur to the bushline",
+     "ref": null
+    },
+    {
+     "name": "Mataketake Range",
+     "quote": "meanders southwest along the Mataketake Range",
+     "ref": null
     }
-  ],
-  "access_points": [],
-  "side_trips": [],
-  "huts": [
-    {"name": "Blowfly Hut", "quote": "Blowfly Hut", "ref": "L2"},
-    {"name": "Mataketake Hut", "quote": "Mataketake Hut", "ref": "T6"}
-  ],
-  "not_on_route": [
-    {"name": "Māori Saddle Route", "quote": "We recommend going up to the hut via the Māori Saddle Route", "ref": "T2", "why": "other walk"}
-  ],
-  "doubts": "The route itself starts at a signposted turn off on the Historic Haast to Paringa Cattle Track about 2 hours after Blowfly Hut; that junction has no entry, so the start is given as the Cattle Track walk (L1), which is reached from SH6 (DOC time '8 hr from SH6'). Blowfly Hut is only on the way if walked from SH6 along the Cattle Track. The text does not say whether one returns the same way or continues (e.g. via Māori Saddle Route), so shape one_way is the route as described, ending at Mataketake Hut. The page also calls it 'Mataketake Tops Route'; the map track 'Mica Mine Route' (T3) may be this route but the text names 'Mica Mine Route' as a separate way to the hut, so it is not used."
+   ],
+   "direction": null,
+   "time": "8 hr from SH6",
+   "distance": null,
+   "evidence": [
+    "Mica Mine Tops Route is started from the Historic Haast to Paringa Cattle Track.",
+    "The turn off to Mica Mine Tops Route is signposted around 2 hours after Blowfly Hut on the Historic Haast to Paringa Cattle Track.",
+    "The Mica Mine Tops Route leaves the main Cattle Track and zig zags through 23 corners up to 960 m high.",
+    "On a clear day, there are excellent views from mountains to sea as the route follows the dips and hollows of the range to Mataketake Hut."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Blowfly Hut",
+   "quote": "Blowfly Hut",
+   "ref": "L2"
+  },
+  {
+   "name": "Mataketake Hut",
+   "quote": "Mataketake Hut",
+   "ref": "T6"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Māori Saddle Route",
+   "quote": "We recommend going up to the hut via the Māori Saddle Route.",
+   "ref": "T2",
+   "why": "other walk"
+  }
+ ],
+ "doubts": "The start is the signposted turn off on the Historic Haast to Paringa Cattle Track about 2 hours after Blowfly Hut. The turn off has no feature or entry, so the start is the Cattle Track walk (L1). DOC's time '8 hr from SH6' covers the approach from SH6, which passes Blowfly Hut on the Cattle Track before the turn off, so Blowfly Hut is listed in huts; the page does not say the way passes it itself. The text does not say whether one returns the same way, so the shape is one_way, ending at Mataketake Hut. The page says Mataketake Hut can be reached via Mica Mine Route; it is not clear whether that is this route, so it is not recorded. Māori Saddle Route is the recommended way up to the hut and is not described as its own way on this page."
 }

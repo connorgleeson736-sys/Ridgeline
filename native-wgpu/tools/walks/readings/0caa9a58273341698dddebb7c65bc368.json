@@ -1,73 +1,92 @@
 {
-  "guid": "0caa9a58-2733-4169-8ddd-ebb7c65bc368",
-  "kind": "unclear",
-  "ways": [
+ "guid": "0caa9a58-2733-4169-8ddd-ebb7c65bc368",
+ "kind": "unclear",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Upper Copland Valley Track, car park to the alpine basin",
+   "shape": null,
+   "start": {
+    "name": "Car park",
+    "quote": "Car park to Welcome Flat Hut",
+    "ref": null
+   },
+   "end": {
+    "name": "alpine basin",
+    "quote": "The route ends at the alpine basin.",
+    "ref": null
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Car park to Douglas Rock Hut",
-      "shape": null,
-      "start": {"name": "Car park", "quote": "Car park to Welcome Flat Hut", "ref": null},
-      "end": {"name": "Douglas Rock Hut", "quote": "Douglas Rock Hut (eight bunks) is nestled in a forest glade just across the bridge.", "ref": "T5"},
-      "via": [
-        {"name": "Copland Track", "quote": "Copland Track to Welcome Flat Hut", "ref": "L1"},
-        {"name": "Architect Creek Hut", "quote": "via Architect Creek Hut", "ref": "T3"},
-        {"name": "Welcome Flat Hut", "quote": "Welcome Flat Hut", "ref": "T13"},
-        {"name": "suspension bridge across the Copland River", "quote": "The suspension bridge near Welcome Flat Hut leads across to the true left of the Copland River", "ref": null},
-        {"name": "Scott Creek", "quote": "crossing the multiple channels of Scott Creek", "ref": "T8"},
-        {"name": "Tekano Creek swing-bridge", "quote": "the swing-bridge across Tekano Creek", "ref": "T9"}
-      ],
-      "direction": null,
-      "time": null,
-      "distance": null,
-      "evidence": [
-        "Follow Copland Track to Welcome Flat Hut via Architect Creek Hut.",
-        "The suspension bridge near Welcome Flat Hut leads across to the true left of the Copland River and onto a series of extensive grassy river flats.",
-        "Eventually you will reach the swing-bridge across Tekano Creek and the views to the upper valley will open out in front of you. Douglas Rock Hut (eight bunks) is nestled in a forest glade just across the bridge."
-      ]
+     "name": "Copland Track",
+     "quote": "Copland Track",
+     "ref": "T1"
     },
     {
-      "id": "W2",
-      "main": false,
-      "label": "Marked route above Douglas Rock Hut to the alpine basin",
-      "shape": null,
-      "start": {"name": "Car park", "quote": "Car park to Welcome Flat Hut", "ref": null},
-      "end": {"name": "alpine basin below Copland Pass", "quote": "The route ends at the alpine basin.", "ref": null},
-      "via": [
-        {"name": "Copland Track", "quote": "Copland Track to Welcome Flat Hut", "ref": "L1"},
-        {"name": "Architect Creek Hut", "quote": "via Architect Creek Hut", "ref": "T3"},
-        {"name": "Welcome Flat Hut", "quote": "Welcome Flat Hut", "ref": "T13"},
-        {"name": "Scott Creek", "quote": "crossing the multiple channels of Scott Creek", "ref": "T8"},
-        {"name": "Tekano Creek swing-bridge", "quote": "the swing-bridge across Tekano Creek", "ref": "T9"},
-        {"name": "Douglas Rock Hut", "quote": "Past Douglas Rock Hut, a marked route continues up the Copland Valley.", "ref": "T5"},
-        {"name": "Fiddian Creek", "quote": "near Fiddian Creek", "ref": null}
-      ],
-      "direction": null,
-      "time": null,
-      "distance": null,
-      "evidence": [
-        "Past Douglas Rock Hut, a marked route continues up the Copland Valley.",
-        "The route continues to sidle until directly below Copland Pass, at which point it zigzags its way up the steep slopes into an alpine basin.",
-        "The route ends at the alpine basin."
-      ]
+     "name": "Architect Creek Hut",
+     "quote": "Architect Creek Hut",
+     "ref": "T3"
+    },
+    {
+     "name": "Welcome Flat Hut",
+     "quote": "Welcome Flat Hut",
+     "ref": "T13"
+    },
+    {
+     "name": "Scott Creek",
+     "quote": "Scott Creek",
+     "ref": "T8",
+     "how": "ford"
+    },
+    {
+     "name": "Tekano Creek",
+     "quote": "Tekano Creek",
+     "ref": "T9"
+    },
+    {
+     "name": "Douglas Rock Hut",
+     "quote": "Douglas Rock Hut",
+     "ref": "T5"
     }
-  ],
-  "access_points": [],
-  "side_trips": [],
-  "huts": [
-    {"name": "Architect Creek Hut", "quote": "Architect Creek Hut", "ref": "T3"},
-    {"name": "Welcome Flat Hut", "quote": "Welcome Flat Hut", "ref": "T13"},
-    {"name": "Douglas Rock Hut", "quote": "Douglas Rock Hut", "ref": "T5"}
-  ],
-  "not_on_route": [
-    {"name": "Copland Pass", "quote": "Do not attempt to climb to and cross Copland Pass", "ref": null, "why": "other"},
-    {"name": "Ruera Valley", "quote": "fine views into the Ruera Valley", "ref": null, "why": "view"},
-    {"name": "Navigator Range", "quote": "the Navigator Range beyond", "ref": "T7", "why": "view"},
-    {"name": "Mount Sefton", "quote": "Mount Sefton", "ref": "T6", "why": "view"},
-    {"name": "The Footstool", "quote": "the Footstool", "ref": "T10", "why": "view"},
-    {"name": "The Sierra Range", "quote": "The Sierra Range", "ref": "T11", "why": "view"},
-    {"name": "Aoraki/Mount Cook", "quote": "Aoraki/Mount Cook coming into view", "ref": null, "why": "view"},
-    {"name": "Hermitage", "quote": "the Hermitage, a popular lodge at Mt Cook", "ref": null, "why": "other"}
-  ],
-  "doubts": "The page does not say how the walk returns (no 'return' in DOC's time '3 days +'), so shape and kind are left unclear; crossing Copland Pass is strongly discouraged, so it is presumably walked back, but the text does not say so. The start is just 'Car park' with no road-end feature in the packet, so its ref is null. I took Douglas Rock Hut as the main way's end (the last timed leg) and the marked route above it to the alpine basin as a second way; the page could also be read as ending at the alpine basin. Total time/distance for each way is not given (legs are 7 hr/18 km and 3 hr/7 km)."
+   ],
+   "direction": null,
+   "time": "3 days +",
+   "distance": null,
+   "evidence": [
+    "Follow Copland Track to Welcome Flat Hut via Architect Creek Hut.",
+    "Past Douglas Rock Hut, a marked route continues up the Copland Valley.",
+    "The route ends at the alpine basin."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Architect Creek Hut",
+   "quote": "Architect Creek Hut",
+   "ref": "T3"
+  },
+  {
+   "name": "Welcome Flat Hut",
+   "quote": "Welcome Flat Hut",
+   "ref": "T13"
+  },
+  {
+   "name": "Douglas Rock Hut",
+   "quote": "Douglas Rock Hut",
+   "ref": "T5"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Copland Pass",
+   "quote": "Copland Pass",
+   "ref": null,
+   "why": "other"
+  }
+ ],
+ "doubts": "Car park is not described or located. Return is not stated so shape is null. Whether the main way ends at Douglas Rock Hut or the alpine basin is a judgement; chose the basin where the page says the route ends. Scott Creek is crossed (multiple channels, no bridge mentioned)."
 }

@@ -1,65 +1,215 @@
 {
-  "guid": "a144cba2-2bea-411e-a4b8-023c828689d2",
-  "kind": "one_way",
-  "ways": [
+ "guid": "a144cba2-2bea-411e-a4b8-023c828689d2",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Mangatepopo Carpark to Whakapapa Village (lower waterfall return)",
+   "shape": "one_way",
+   "start": {
+    "name": "Mangatepopo Carpark",
+    "quote": "For the 2026/27 Great Walk season the track starts at Mangatepopo Carpark and ends in Whakapapa Village.",
+    "ref": "F5"
+   },
+   "end": {
+    "name": "Whakapapa Village",
+    "quote": "ends in Whakapapa Village",
+    "ref": "T22"
+   },
+   "via": [
     {
-      "id": "W1",
-      "main": true,
-      "label": "Mangatepopo Carpark to Whakapapa Village (2026/27 season)",
-      "shape": "one_way",
-      "start": {"name": "Mangatepopo Carpark", "quote": "Mangatepopo Carpark", "ref": "F5"},
-      "end": {"name": "Whakapapa Village", "quote": "Whakapapa Village", "ref": "T22"},
-      "via": [
-        {"name": "Mangatepopo Hut", "quote": "Mangatepopo Hut", "ref": "T11"},
-        {"name": "Mangatepopo stream", "quote": "Mangatepopo stream", "ref": null},
-        {"name": "Mangatepopo Saddle", "quote": "Mangatepopo Saddle", "ref": null},
-        {"name": "South Crater", "quote": "South Crater", "ref": null},
-        {"name": "Red Crater", "quote": "Red Crater", "ref": null},
-        {"name": "Emerald Lakes", "quote": "Emerald Lakes", "ref": "T9"},
-        {"name": "Oturere Valley", "quote": "Oturere Valley", "ref": null},
-        {"name": "Oturere Hut", "quote": "Oturere Hut", "ref": "T13"},
-        {"name": "Waihohonu Stream", "quote": "Waihohonu Stream", "ref": "T20"},
-        {"name": "Waihohonu Hut", "quote": "Waihohonu Hut", "ref": "T19"},
-        {"name": "Tama Saddle", "quote": "Tama Saddle", "ref": null},
-        {"name": "Tama Lakes junction", "quote": "Tama Lakes junction", "ref": null},
-        {"name": "Taranaki Falls loop walk", "quote": "Taranaki Falls loop walk", "ref": "T6"}
-      ],
-      "direction": null,
-      "time": "3-4 days",
-      "distance": "35.5 km one way",
-      "evidence": [
-        "For the 2026/27 Great Walk season the track starts at Mangatepopo Carpark and ends in Whakapapa Village.",
-        "This section of track is closed due to the 2025 Tongariro fire and will not be available for the 2026/27 Great Walk season.",
-        "The map has been updated to show this change and the distance reduced to 35.5 km from 44.9 km.",
-        "We recommend starting your walk from the Mangatepopo Carpark.",
-        "There are two options to return to the village, both take about an hour."
-      ]
+     "name": "Mangatepopo Hut",
+     "quote": "It is just 25 minutes’ walk on a well-formed track from Mangatepopo car park to the hut",
+     "ref": "T11"
+    },
+    {
+     "name": "Mangatepopo stream",
+     "quote": "The track follows Mangatepopo stream up the valley",
+     "ref": null
+    },
+    {
+     "name": "Mangatepopo Saddle",
+     "quote": "The steep climb required to reach the Mangatepopo Saddle",
+     "ref": null
+    },
+    {
+     "name": "South Crater",
+     "quote": "From the saddle the track crosses South Crater",
+     "ref": null
+    },
+    {
+     "name": "Red Crater",
+     "quote": "The main track continues on past the rim of Red Crater itself.",
+     "ref": null
+    },
+    {
+     "name": "Emerald Lakes",
+     "quote": "A loose, rocky ridge leads down to the spectacular Emerald Lakes",
+     "ref": "T9"
+    },
+    {
+     "name": "Oturere Valley",
+     "quote": "From Emerald Lakes the track descends steeply into the Oturere Valley",
+     "ref": null
+    },
+    {
+     "name": "Oturere Hut",
+     "quote": "The Oturere Hut is nestled on the eastern edge of these flows.",
+     "ref": "T13"
+    },
+    {
+     "name": "Waihohonu Stream",
+     "quote": "crossing one of the branches of the Waihohonu Stream",
+     "ref": "T20"
+    },
+    {
+     "name": "Waihohonu Hut",
+     "quote": "Waihohonu Hut is in the next valley.",
+     "ref": "T19"
+    },
+    {
+     "name": "Tama Saddle",
+     "quote": "gradually climbs to Tama Saddle",
+     "ref": null
+    },
+    {
+     "name": "Taranaki Falls loop walk junction",
+     "quote": "After the first hour the track meets the Taranaki Falls loop walk",
+     "ref": null
+    },
+    {
+     "name": "Taranaki Falls",
+     "quote": "To view the waterfall, follow the lower section of the track down the steps to its base",
+     "ref": "T15"
+    },
+    {
+     "name": "Wairere Stream",
+     "quote": "then follow the Wairere stream through beautiful mountain beech forest back to the village.",
+     "ref": "T21"
     }
-  ],
-  "access_points": [],
-  "side_trips": [
-    {"name": "Soda Springs", "quote": "Soda Springs", "ref": null, "from": "head of the Mangatepopo valley"},
-    {"name": "Ohinepango Springs", "quote": "Ohinepango Springs", "ref": null, "from": "Waihohonu Hut"},
-    {"name": "Historic Waihohonu Hut", "quote": "Historic Waihohonu Hut", "ref": null, "from": "Waihohonu Hut"},
-    {"name": "Lower Tama", "quote": "Lower Tama", "ref": "T10", "from": "Tama Lakes junction"},
-    {"name": "Upper Tama", "quote": "Upper Tama", "ref": "T17", "from": "Tama Lakes junction"}
-  ],
-  "huts": [
-    {"name": "Mangatepopo Hut", "quote": "Mangatepopo Hut", "ref": "T11"},
-    {"name": "Oturere Hut", "quote": "Oturere Hut", "ref": "T13"},
-    {"name": "Waihohonu Hut", "quote": "Waihohonu Hut", "ref": "T19"}
-  ],
-  "not_on_route": [
-    {"name": "Blue Lake", "quote": "Blue Lake", "ref": "T8", "why": "view"},
-    {"name": "North Crater", "quote": "North Crater", "ref": null, "why": "view"},
-    {"name": "Mt Taranaki", "quote": "Mt Taranaki", "ref": null, "why": "view"},
-    {"name": "Kaimanawa Ranges", "quote": "Kaimanawa Ranges", "ref": null, "why": "view"},
-    {"name": "Tongariro Alpine Crossing", "quote": "Tongariro Alpine Crossing", "ref": null, "why": "other walk"},
-    {"name": "Ketetahi Road", "quote": "Ketetahi Road", "ref": null, "why": "other walk"},
-    {"name": "Ohinepango Stream", "quote": "Ohinepango Stream", "ref": "T12", "why": "side trip"},
-    {"name": "Round the Mountain Track", "quote": "Round the Mountain Track", "ref": null, "why": "side trip"},
-    {"name": "Rangipo Hut", "quote": "Rangipo Hut", "ref": null, "why": "nearby"},
-    {"name": "Waimarino (National Park Village)", "quote": "Waimarino (National Park Village)", "ref": null, "why": "nearby"}
-  ],
-  "doubts": "Although named a circuit, the page says that for 2026/27 the Whakapapa Village to Mangatepopo Hut section is closed (2025 fire) and the track starts at Mangatepopo Carpark and ends in Whakapapa Village, so it is recorded as one way; the closed section is not recorded as a way. The circuit 'can be walked either direction' but no direction is named. The end, Whakapapa Village, is reached by one of two options (lower Taranaki Falls/Wairere stream section or upper tussock section of the Taranaki Falls loop); two road ends of the Taranaki Falls Track on Ngauruhoe Terrace (F2, F3) fit, so the village name T22 is given instead of guessing which. Mangatepopo Carpark is taken as F5, where the Tongariro Crossing meets Mangatepopo Road. The Waihohonu Stream is both crossed (a branch) and followed; it is listed once."
+   ],
+   "direction": null,
+   "time": "3-4 days",
+   "distance": "35.5 km one way",
+   "evidence": [
+    "For the 2026/27 Great Walk season the track starts at Mangatepopo Carpark and ends in Whakapapa Village.",
+    "To view the waterfall, follow the lower section of the track down the steps to its base, then follow the Wairere stream through beautiful mountain beech forest back to the village."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Taranaki Falls loop junction to Whakapapa Village by the upper section",
+   "shape": "one_way",
+   "start": {
+    "name": "Taranaki Falls loop walk junction",
+    "quote": "After the first hour the track meets the Taranaki Falls loop walk",
+    "ref": null
+   },
+   "end": {
+    "name": "Whakapapa Village",
+    "quote": "Alternatively take the upper section of track through open tussock and shrubland back to the village.",
+    "ref": "T22"
+   },
+   "via": [
+    {
+     "name": "upper section of track",
+     "quote": "Alternatively take the upper section of track through open tussock and shrubland back to the village.",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "about an hour",
+   "distance": null,
+   "evidence": [
+    "There are two options to return to the village, both take about an hour.",
+    "Alternatively take the upper section of track through open tussock and shrubland back to the village."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Ohinepango Springs",
+   "quote": "Side trip: Ohinepango Springs",
+   "ref": null,
+   "from": "Waihohonu Hut"
+  },
+  {
+   "name": "Historic Waihohonu Hut",
+   "quote": "Side trip: Historic Waihohonu Hut",
+   "ref": null,
+   "from": "Waihohonu Hut"
+  },
+  {
+   "name": "Tama Lakes",
+   "quote": "From the saddle there is a very worthwhile side trip to the striking Tama Lakes",
+   "ref": null,
+   "from": "Tama Saddle"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Mangatepopo Hut",
+   "quote": "It is just 25 minutes’ walk on a well-formed track from Mangatepopo car park to the hut",
+   "ref": "T11"
+  },
+  {
+   "name": "Oturere Hut",
+   "quote": "The Oturere Hut is nestled on the eastern edge of these flows.",
+   "ref": "T13"
+  },
+  {
+   "name": "Waihohonu Hut",
+   "quote": "Waihohonu Hut is in the next valley.",
+   "ref": "T19"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Lower Tama",
+   "quote": "The lower lake (at 1200 m), is 10 minutes from the junction.",
+   "ref": "T10",
+   "why": "side trip"
+  },
+  {
+   "name": "Upper Tama",
+   "quote": "The upper lake (at 1314 m) is a further 40 minutes up a steep ridge.",
+   "ref": "T17",
+   "why": "side trip"
+  },
+  {
+   "name": "Historic Waihohonu Hut",
+   "quote": "Side trip: Historic Waihohonu Hut",
+   "ref": null,
+   "why": "side trip"
+  },
+  {
+   "name": "Ohinepango Springs",
+   "quote": "Side trip: Ohinepango Springs",
+   "ref": null,
+   "why": "side trip"
+  },
+  {
+   "name": "Rangipo Hut",
+   "quote": "heading south towards Rangipo Hut",
+   "ref": null,
+   "why": "other"
+  },
+  {
+   "name": "Blue Lake",
+   "quote": "Blue Lake is visible from the top of Red Crater",
+   "ref": "T8",
+   "why": "view"
+  },
+  {
+   "name": "Mt Taranaki",
+   "quote": "if clear, Mt Taranaki to the west",
+   "ref": null,
+   "why": "view"
+  }
+ ],
+ "doubts": "The page says the track starts at Mangatepopo Carpark and ends in Whakapapa Village for the 2026/27 Great Walk season, and that the circuit can be walked either direction. The main way follows the page's own order from Mangatepopo, with the reverse not a separate way. Mangatepopo Carpark is matched to road end F5 (where the Tongariro Crossing meets Mangatepopo Road); the text does not name a feature, so this is a judgement. The Whakapapa Village to Mangatepopo Hut section is closed for the 2026/27 season, so it is not in the via. The two return options from the Taranaki Falls loop junction are recorded: the lower waterfall route is the main way (it is presented first), and the upper section is W2 with its own 'about an hour' time. The Taranaki Falls loop junction has no feature or name entry, so its ref is null. Whakapapa Village is matched to the place entry T22, not the two identical Taranaki Falls road ends on Ngauruhoe Terrace, which are not certain to be the village end. The Soda Springs detour at the head of the valley has no place on the way it leaves from, so its from is null. The Mangatepopo Saddle, South Crater, Red Crater and Tama Saddle are not in the names list, so their refs are null. The time (3-4 days) and distance (35.5 km one way) are DOC's summary."
 }
