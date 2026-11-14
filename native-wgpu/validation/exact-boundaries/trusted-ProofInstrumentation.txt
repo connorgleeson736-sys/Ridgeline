@@ -1,0 +1,3 @@
+INSTRUMENTATION_RESULT: failure=java.lang.IllegalStateException: Timed out: first native frame and six pack reads
+INSTRUMENTATION_RESULT: nativeDataProof=PASS: exact Float64 route storage, CRUD order, transaction limit rollback, database reopen, native GPX round trip
+INSTRUMENTATION_CODE: 0

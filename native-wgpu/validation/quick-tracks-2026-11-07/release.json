@@ -1,0 +1,30 @@
+{
+  "artifact": "Ridgeline-Native-Quick-Tracks-0.1.26-Base.apk",
+  "bytes": 32861799,
+  "sha256": "8bfc7aaba9834f4aff1d24d95d5bc5502f51e1f92cd2a2eb7900ea0f9a370325",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.26-quick-tracks",
+  "versionCode": 27,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.25 Full Audit (same package and signer)",
+  "changes": [
+    "topographic vector tile downloads ranked with visible imagery and terrain (nearest two at 5-6 after the focus imagery, the rest 64+ by view order) instead of 800, behind all visible imagery, terrain and profile requests",
+    "line labels (roads, rivers, tracks, contours): one candidate per name per source tile, and the same name is not placed closer than the layer's symbol-spacing on screen (MapLibre spaces them along the line)"
+  ],
+  "rendererUnchangedFrom": "0.1.25 (identical libridgeline_renderer.so)",
+  "tests": {
+    "kotlinJvm": "180 tests, 0 failures (new road-name spacing and one-name-per-tile tests)",
+    "rust": "unchanged since 0.1.25",
+    "gpu": "unchanged since 0.1.25"
+  },
+  "lintErrors": 0,
+  "originalAssetsIdentical": 623,
+  "jniExportsPerAbi": 46,
+  "loadAlignment": "0x4000",
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

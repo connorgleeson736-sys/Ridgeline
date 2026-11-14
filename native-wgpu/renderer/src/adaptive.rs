@@ -1,0 +1,170 @@
+//! Conservative0.18screen-error selection. Original samples stay GPU resident.
+use crate::{Tile, TileId, selection::View};
+use glam::{Mat4, Vec4};
+use std::time::Instant;
+#[derive(Clone, Copy)]
+pub(crate) struct State {
+    initialized: bool,
+    step: u8,
+    target: u8,
+    since: Instant,
+}
+impl State {
+    pub fn new() -> Self {
+        Self {
+            initialized: false,
+            step: 1,
+            target: 1,
+            since: Instant::now(),
+        }
+    }
+}
+pub(crate) fn choose(
+    tile: &Tile,
+    id: TileId,
+    matrix: Mat4,
+    view: &View,
+    ppm: f32,
+    now: Instant,
+    exact: bool,
+    relief: f32,
+) -> (u8, Option<u64>) {
+    if relief == 0. && !exact {
+        return (4, None);
+    }
+    let old = tile.adaptive_state.get();
+    let metrics = if exact {
+        None
+    } else {
+        tile.adaptive_profile.and_then(|errors| {
+            let b = id.bounds();
+            let world = 512. * 2f64.powf(view.zoom);
+            let mut min_w = f64::INFINITY;
+            let mut nx = 0f64;
+            let mut ny = 0f64;
+            let mut x0 = f64::INFINITY;
+            let mut x1 = f64::NEG_INFINITY;
+            let mut y0 = f64::INFINITY;
+            let mut y1 = f64::NEG_INFINITY;
+            for x in [b[0], b[2]] {
+                for y in [b[1], b[3]] {
+                    for h in [tile.field.min, tile.field.max] {
+                        let clip = matrix
+                            * Vec4::new(
+                                ((x - view.center[0]) * world) as f32,
+                                ((view.center[1] - y) * world) as f32,
+                                (h * relief - view.elevation) * ppm,
+                                1.,
+                            );
+                        if !clip.is_finite() || clip.w <= view.height as f32 / 50. || clip.z < 0. {
+                            return None;
+                        }
+                        let w = clip.w as f64;
+                        min_w = min_w.min(w);
+                        nx = nx.max(
+                            ((matrix.z_axis.x as f64 * w - matrix.z_axis.w as f64 * clip.x as f64)
+                                * view.width as f64
+                                * 0.5)
+                                .abs(),
+                        );
+                        ny = ny.max(
+                            ((matrix.z_axis.y as f64 * w - matrix.z_axis.w as f64 * clip.y as f64)
+                                * view.height as f64
+                                * 0.5)
+                                .abs(),
+                        );
+                        let px = clip.x as f64 / w * view.width as f64 * 0.5;
+                        let py = clip.y as f64 / w * view.height as f64 * 0.5;
+                        x0 = x0.min(px);
+                        x1 = x1.max(px);
+                        y0 = y0.min(py);
+                        y1 = y1.max(py);
+                    }
+                }
+            }
+            Some((
+                errors,
+                nx.hypot(ny) / (min_w * min_w) * ppm as f64 * relief as f64,
+                (x1 - x0).max(y1 - y0),
+            ))
+        })
+    };
+    let level = |limit: f64, cell: f64| -> u8 {
+        if let Some((errors, pixels, span)) = metrics {
+            for (step, error) in [(4, errors[0]), (2, errors[1])] {
+                if error * pixels <= limit && span / (128 / step) as f64 <= cell {
+                    return step;
+                }
+            }
+        }
+        1
+    };
+    let mut target = level(0.6, 10.);
+    if old.initialized && old.step > target && level(0.9, 13.) >= old.step {
+        target = old.step;
+    }
+    let state = advance(old, target, now, exact || metrics.is_some());
+    tile.adaptive_state.set(state);
+    let wake = if state.step != state.target {
+        Some(
+            350u64
+                .saturating_sub(now.duration_since(state.since).as_millis() as u64)
+                .max(1),
+        )
+    } else {
+        None
+    };
+    (state.step, wake)
+}
+
+fn advance(old: State, target: u8, now: Instant, qualified: bool) -> State {
+    if !old.initialized || target <= old.step {
+        State {
+            initialized: old.initialized || qualified,
+            step: target,
+            target,
+            since: now,
+        }
+    } else if target != old.target {
+        State {
+            initialized: true,
+            step: old.step,
+            target,
+            since: now,
+        }
+    } else if now.duration_since(old.since).as_millis() >= 350 {
+        State {
+            initialized: true,
+            step: target,
+            target,
+            since: now,
+        }
+    } else {
+        old
+    }
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn additional_adaptive_cold_start_and_hysteresis() {
+        let t = Instant::now();
+        let cold = advance(State::new(), 4, t, true);
+        assert_eq!(cold.step, 4);
+        assert_eq!(cold.target, 4);
+        let exact = advance(State::new(), 1, t, true);
+        let waiting = advance(exact, 4, t, true);
+        assert_eq!(waiting.step, 1);
+        assert_eq!(
+            advance(waiting, 4, t + std::time::Duration::from_millis(349), true).step,
+            1
+        );
+        assert_eq!(
+            advance(waiting, 4, t + std::time::Duration::from_millis(350), true).step,
+            4
+        );
+        assert_eq!(advance(cold, 1, t, true).step, 1);
+        assert!(!advance(State::new(), 1, t, false).initialized);
+        assert!(advance(cold, 1, t, false).initialized);
+    }
+}

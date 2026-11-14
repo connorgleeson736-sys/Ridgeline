@@ -1,3 +1,17 @@
+> **Capacitor full latency audit APK: 0.21.0 Full Audit Base.** [Download and installation details](checkpoints/README.md). A separate app signed with a new key; installs alongside the Audit app. Cancels obsolete off-screen reloads, uses WebP seam masks (89% fewer bytes, identical alpha), restores full detail at the end of movement, and speeds up launch and the first South Island tiles. Imagery, engine, shaders and detail preserved; no phone speedup measured. [Audit and evidence](PERFORMANCE-FULL-AUDIT-2026-11-06.md).
+
+> **Capacitor border-recovery APK: 0.20.3 Audit Base.** [Download and installation details](checkpoints/README.md). Removes unused Esri waits and false fallback metadata from LINZ-only border tiles, bypasses unnecessary border dependencies nationwide, and replaces the nominal dotted outlines with measured mask contours. Updates 0.20.2 Audit in place; data retained. Original imagery, MapLibre engine, shaders and detail preserved. [Implementation, controlled replay and limits](BORDER-RECOVERY-0.20.3.md).
+
+> **Capacitor LINZ border-fix APK: 0.20.2 Audit Base.** [Download and installation details](checkpoints/README.md). Fixes the Android gateway rejecting decimal survey names at imagery borders; all 46 catalogue survey names now route correctly. Same Audit package/signer, app data preserved. Renderer/masks/assets unchanged from 0.20.1. [Cause and focused evidence](LINZ-BORDER-FIX-0.20.2.md).
+
+> **Capacitor sharpening-fix APK: 0.20.1 Audit Base.** [Download and installation details](checkpoints/README.md). Updates 0.20.0/0.19.0 Audit in place. Fixes coarse covers blocking finer imagery. Retains the audit improvements and 0–1 GB original-response disk-cache slider; no new prepared terrain cache. No phone speedup has been measured.
+
+> **Latest Performance build: 0.18.0 Full.** [Additional selection CPU findings, exact quality checks and measurement limits](PERFORMANCE-0.18.0.md). All original overview imagery is included; updates the existing Performance app with its data retained. No phone speedup is established.
+
+> **Full Performance build:** [packaging and verification](PERFORMANCE-0.17.0-FULL.md). It includes all six overview imagery packs and updates the Performance Base app using the same signer.
+
+> **0.17.0 Performance comparison build:** see [changes, verification, installation and speed-estimate limits](PERFORMANCE-0.17.0.md). Use the `performance` Gradle variant for the separate `nz.ridgeline.mobile.performance` app; it preserves the normal installed preview and its private data.
+
 # Ridgeline 3D for Android
 
 This Capacitor app packages the website's own patched MapLibre GL JS 6.14.0 renderer, UI, route editor, and elevation chart. **Original + Direct is the only renderer.** Terrain is a real elevation mesh rendered with WebGL inside Android WebView. This is a web renderer in a native Android shell, rather than MapLibre Native. The existing native app in `../android` remains a separate application.

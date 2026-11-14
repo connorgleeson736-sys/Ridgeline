@@ -1,0 +1,164 @@
+{
+ "guid": "48d6ce80-a64b-4e50-818a-8fa0dd9afee8",
+ "kind": "loop",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Te Pua-a-Tāne Circuit from River Road car park",
+   "shape": "loop",
+   "start": {
+    "name": "River Road car park",
+    "quote": "River Road car park",
+    "ref": null
+   },
+   "end": {
+    "name": "River Road car park",
+    "quote": "River Road car park",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Whirinaki Waterfall",
+     "quote": "Whirinaki Waterfall",
+     "ref": null
+    },
+    {
+     "name": "Vern’s Camp",
+     "quote": "Vern’s Camp",
+     "ref": null
+    },
+    {
+     "name": "Central Whirinaki Hut",
+     "quote": "Central Whirinaki Hut",
+     "ref": "T8"
+    },
+    {
+     "name": "Whirinaki River",
+     "quote": "Whirinaki River",
+     "ref": "T17"
+    },
+    {
+     "name": "Taumutu bridge",
+     "quote": "Taumutu bridge",
+     "ref": null
+    },
+    {
+     "name": "Taumutu Stream",
+     "quote": "Taumutu Stream",
+     "ref": "T14"
+    },
+    {
+     "name": "Upper Whirinaki Hut",
+     "quote": "Upper Whirinaki Hut",
+     "ref": "T16"
+    },
+    {
+     "name": "Upper Te Hoe Hut",
+     "quote": "Upper Te Hoe Hut",
+     "ref": "T15"
+    },
+    {
+     "name": "Te Hoe bluffs",
+     "quote": "Te Hoe bluffs",
+     "ref": null
+    },
+    {
+     "name": "Te Hoe suspension bridge",
+     "quote": "Te Hoe suspension bridge",
+     "ref": null
+    },
+    {
+     "name": "Central Te Hoe Hut",
+     "quote": "Central Te Hoe Hut",
+     "ref": "T7"
+    },
+    {
+     "name": "Parallel Creek",
+     "quote": "Cross the creek below the bridge",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Mangakahika Hut",
+     "quote": "Mangakahika Hut",
+     "ref": "T9"
+    },
+    {
+     "name": "saddle",
+     "quote": "saddle",
+     "ref": null
+    },
+    {
+     "name": "Rogers Hut",
+     "quote": "Rogers Hut",
+     "ref": null
+    },
+    {
+     "name": "Moerangi Stream",
+     "quote": "Moerangi Stream",
+     "ref": "T13"
+    },
+    {
+     "name": "Moerangi Hut",
+     "quote": "Moerangi Hut",
+     "ref": "T12"
+    },
+    {
+     "name": "Moerangi saddle",
+     "quote": "Moerangi saddle",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "5 days",
+   "distance": "78.7 km loop",
+   "evidence": [
+    "Begin at the River Road car park and travel towards the Whirinaki Waterfall, then Vern’s Camp, and stay overnight at Central Whirinaki Hut.",
+    "Finish where you started at the River Road car park."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Central Whirinaki Hut",
+   "quote": "Central Whirinaki Hut",
+   "ref": "T8"
+  },
+  {
+   "name": "Upper Whirinaki Hut",
+   "quote": "Upper Whirinaki Hut",
+   "ref": "T16"
+  },
+  {
+   "name": "Upper Te Hoe Hut",
+   "quote": "Upper Te Hoe Hut",
+   "ref": "T15"
+  },
+  {
+   "name": "Central Te Hoe Hut",
+   "quote": "Central Te Hoe Hut",
+   "ref": "T7"
+  },
+  {
+   "name": "Mangakahika Hut",
+   "quote": "Mangakahika Hut",
+   "ref": "T9"
+  },
+  {
+   "name": "Rogers Hut",
+   "quote": "Rogers Hut",
+   "ref": null
+  },
+  {
+   "name": "Moerangi Hut",
+   "quote": "Moerangi Hut",
+   "ref": "T12"
+  }
+ ],
+ "not_on_route": [],
+ "doubts": "No feature for River Road car park, so start/end have no ref. Central Te Hoe Hut is a short out-and-back within day 3 via the Te Hoe suspension bridge; kept in via and huts. Parallel Creek crossing is a ford because its bridge is closed (a temporary marked track crosses the creek). Rogers Hut and Vern's Camp have no name entries. Direction not stated."
+}

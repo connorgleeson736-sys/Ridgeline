@@ -7,6 +7,9 @@ import java.util.regex.Pattern;
 
 /** An allowlisted resource address, independent of API keys and UI grading. */
 public final class TileAddress {
+  // LINZ uses decimal resolutions in survey IDs, e.g. canterbury-2015-2016-0.3m.
+  // Keep one bounded path-segment rule for parsing and reconstructing addresses.
+  private static final String SURVEY_NAME = "[a-z0-9][a-z0-9.-]{0,100}";
   private static final Pattern LINZ =
       Pattern.compile(
           "/v1/tiles/(aerial|elevation|topo-raster)/WebMercatorQuad/(\\d+)/(\\d+)/(\\d+)\\.(webp|png)");
@@ -14,7 +17,12 @@ public final class TileAddress {
       Pattern.compile("/v1/tiles/topographic-v2/3857/(\\d+)/(\\d+)/(\\d+)\\.pbf");
   private static final Pattern SURVEY =
       Pattern.compile(
-          "/v1/tiles/([a-z0-9][a-z0-9-]{0,100})/WebMercatorQuad/(\\d+)/(\\d+)/(\\d+)\\.png");
+          "/v1/tiles/(" + SURVEY_NAME + ")/WebMercatorQuad/(\\d+)/(\\d+)/(\\d+)\\.png");
+  // Seam masks use only the survey's alpha. LINZ WebP alpha is lossless and was
+  // verified identical to PNG on 1,064 tiles across all 46 catalogue surveys.
+  private static final Pattern MASK =
+      Pattern.compile(
+          "/v1/tiles/(" + SURVEY_NAME + ")/WebMercatorQuad/(\\d+)/(\\d+)/(\\d+)\\.webp");
   private static final Pattern FONT =
       Pattern.compile("/v1/fonts/Open Sans Regular/(\\d+)-(\\d+)\\.pbf");
   private static final Pattern ESRI =
@@ -71,7 +79,18 @@ public final class TileAddress {
         path = "/terrarium/" + z + "/" + x + "/" + y + ".png";
         break;
       default:
-        if (kind.startsWith("survey-") && kind.substring(7).matches("[a-z0-9][a-z0-9-]{0,100}"))
+        if (kind.startsWith("mask-") && kind.substring(5).matches(SURVEY_NAME))
+          path =
+              "/v1/tiles/"
+                  + kind.substring(5)
+                  + "/WebMercatorQuad/"
+                  + z
+                  + "/"
+                  + x
+                  + "/"
+                  + y
+                  + ".webp";
+        else if (kind.startsWith("survey-") && kind.substring(7).matches(SURVEY_NAME))
           path =
               "/v1/tiles/"
                   + kind.substring(7)
@@ -123,6 +142,13 @@ public final class TileAddress {
               Integer.parseInt(m.group(2)),
               Integer.parseInt(m.group(3)),
               Integer.parseInt(m.group(4)));
+        m = MASK.matcher(p);
+        if (m.matches())
+          return tile(
+              "mask-" + m.group(1),
+              Integer.parseInt(m.group(2)),
+              Integer.parseInt(m.group(3)),
+              Integer.parseInt(m.group(4)));
         m = VECTOR.matcher(p);
         if (m.matches())
           return tile(
@@ -157,6 +183,15 @@ public final class TileAddress {
     return null;
   }
 
+  /**
+   * The address under which saved maps store this resource. A WebP seam mask is
+   * saved as the same survey's PNG, which has identical alpha; everything else
+   * is saved under its own address. Saved-map identifiers never change.
+   */
+  public TileAddress saved() {
+    return kind.startsWith("mask-") ? tile("survey-" + kind.substring(5), z, x, y) : this;
+  }
+
   public String id() {
     return kind + "_" + z + "_" + x + "_" + y;
   }
@@ -167,7 +202,8 @@ public final class TileAddress {
 
   public String mime() {
     return raster()
-        ? kind.equals("elevation") || kind.equals("mapzen") ? "image/png" : "image/webp"
+        ? kind.equals("elevation") || kind.equals("mapzen") || kind.startsWith("survey-")
+            ? "image/png" : "image/webp"
         : "application/x-protobuf";
   }
 

@@ -1,0 +1,95 @@
+{
+ "guid": "5452c5bf-723f-4c0e-8ccc-4b6cdee26cb9",
+ "kind": "out_and_back",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Major Hornbrook Track, Ross Terrace to Mt Pleasant Saddle",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Ross Terrace parking bay",
+    "quote": "the track starts high up on Ross Terrace, where there is a small parking and turning bay",
+    "ref": "F10"
+   },
+   "end": {
+    "name": "Mt Pleasant Saddle",
+    "quote": "Mt Pleasant Saddle",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Major Hornbrook Reserve",
+     "quote": "Major Hornbrook Reserve",
+     "ref": null
+    },
+    {
+     "name": "Lyttelton Scenic Reserve",
+     "quote": "Lyttelton Scenic Reserve",
+     "ref": "T7"
+    }
+   ],
+   "direction": null,
+   "time": "1 hr",
+   "distance": "1 km return via same track",
+   "evidence": [
+    "This track is a one-hour return walk.",
+    "The track tops out at the tussock covered Mt Pleasant Saddle, at a height of 396 metres, with easy access to the Summit Road.",
+    "From the saddle, walkers can retrace their steps back to Lyttelton or continue exploring the City Council's network of tracks, including the Crater Rim Walkway."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Two-hour loop combined with the Bridle Path",
+   "shape": "loop",
+   "start": {
+    "name": "Ross Terrace parking bay",
+    "quote": "the track starts high up on Ross Terrace, where there is a small parking and turning bay",
+    "ref": "F10"
+   },
+   "end": {
+    "name": "Ross Terrace parking bay",
+    "quote": "the track starts high up on Ross Terrace, where there is a small parking and turning bay",
+    "ref": "F10"
+   },
+   "via": [
+    {
+     "name": "Mt Pleasant Saddle",
+     "quote": "Mt Pleasant Saddle",
+     "ref": null
+    },
+    {
+     "name": "Crater Rim Walkway",
+     "quote": "the walkway",
+     "ref": "T2"
+    },
+    {
+     "name": "Bridle Path",
+     "quote": "the Bridle Path",
+     "ref": "T1"
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "For a longer walk it can be combined with the Bridle Path to create an interesting two-hour loop return with great views over Lyttelton Harbour and the Canterbury Plains.",
+    "If followed west, the walkway links with the Bridle Path, which offers an alternative route back to Lyttelton, or on the other side down to the Heathcote Valley and the base of the gondola."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Heathcote Valley",
+   "quote": "Heathcote Valley",
+   "ref": "T4",
+   "why": "view"
+  }
+ ],
+ "doubts": "Start ref F10 is where Major Hornbrook Track meets Somes Road; text puts the start at the parking bay on Ross Terrace reached via Somes Road. Mt Pleasant Saddle has no matching entry (T8 Mount Pleasant is a different place), so ref null. W2: the Bridle Path loop is only outlined; the text says it leads back to Lyttelton, not exactly to Ross Terrace, so the end is assumed to be the start; the Crater Rim Walkway ref is for 'the walkway' mentioned as followed west; time given only as 'two-hour' in prose so left null."
+}

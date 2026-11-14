@@ -1,0 +1,273 @@
+{
+ "guid": "19b3d7cf-cab4-46dc-9532-6eb730c51174",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Mount Somers Track, Sharplin Falls car park to Woolshed Creek car park",
+   "shape": "one_way",
+   "start": {
+    "name": "Sharplin Falls car park",
+    "quote": "Sharplin Falls car park is at the end of Flynns Road, Staveley.",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Woolshed Creek car park",
+    "quote": "Woolshed Creek car park",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Dukes Knob",
+     "quote": "Dukes Knob",
+     "ref": null
+    },
+    {
+     "name": "Bowyers Stream",
+     "quote": "Bowyers Stream",
+     "ref": "T7"
+    },
+    {
+     "name": "Pinnacles Hut",
+     "quote": "Pinnacles Hut",
+     "ref": "T10"
+    },
+    {
+     "name": "Mount Somers saddle",
+     "quote": "Mount Somers saddle (1170 m)",
+     "ref": null
+    },
+    {
+     "name": "Morgan Stream",
+     "quote": "Follow the markers across Morgan Stream and Woolshed Creek to Woolshed Creek Hut.",
+     "ref": "T8",
+     "how": "ford"
+    },
+    {
+     "name": "Woolshed Creek",
+     "quote": "Woolshed Creek",
+     "ref": "T15",
+     "how": "ford"
+    },
+    {
+     "name": "Woolshed Creek Hut",
+     "quote": "Woolshed Creek Hut",
+     "ref": "T16"
+    },
+    {
+     "name": "trig R",
+     "quote": "trig R, 934 m",
+     "ref": null
+    },
+    {
+     "name": "Blackburn Mine",
+     "quote": "old Blackburn Mine",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "2 days",
+   "distance": "17.1 km one way",
+   "evidence": [
+    "Mount Somers Track runs from the Sharplin Falls car park to the Woolshed Creek car park along the northern side of Mount Somers.",
+    "The track is a two-day tramp suitable for families."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Circuit from Sharplin Falls car park via Bus Stop Track and South Face Track",
+   "shape": "loop",
+   "start": {
+    "name": "Sharplin Falls car park",
+    "quote": "Sharplin Falls car park is at the end of Flynns Road, Staveley.",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Sharplin Falls car park",
+    "quote": "Sharplin Falls car park is at the end of Flynns Road, Staveley.",
+    "ref": "F1"
+   },
+   "via": [
+    {
+     "name": "Pinnacles Hut",
+     "quote": "Pinnacles Hut",
+     "ref": "T10"
+    },
+    {
+     "name": "Woolshed Creek Hut",
+     "quote": "Woolshed Creek Hut",
+     "ref": "T16"
+    },
+    {
+     "name": "Bus Stop Overhang",
+     "quote": "Bus Stop Overhang",
+     "ref": null
+    },
+    {
+     "name": "South Face Track",
+     "quote": "South Face Track",
+     "ref": "T6"
+    },
+    {
+     "name": "Acland Shelter",
+     "quote": "Acland Shelter",
+     "ref": null
+    },
+    {
+     "name": "Mount Somers Summit Track junction",
+     "quote": "the junction of the Mount Somers Summit Track",
+     "ref": "T2"
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "You can combine Mount Somers Track with the Bus Stop Track and South Face Track to make a circuit. This circuit starts and ends at Sharplin Falls car park.",
+    "For the circuit, follow Mount Somers Track to Woolshed Creek Hut, as described above. Then take the alternative route described below to loop back to Sharplin Falls car park."
+   ]
+  },
+  {
+   "id": "W3",
+   "main": false,
+   "label": "Overnight return from Woolshed Creek car park to Woolshed Creek Hut",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Woolshed Creek car park",
+    "quote": "Woolshed Creek car park",
+    "ref": null
+   },
+   "end": {
+    "name": "Woolshed Creek Hut",
+    "quote": "Woolshed Creek Hut",
+    "ref": "T16"
+   },
+   "via": [
+    {
+     "name": "Blackburn Mine",
+     "quote": "old Blackburn Mine",
+     "ref": null
+    },
+    {
+     "name": "trig R",
+     "quote": "trig R, 934 m",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "You can also do an overnight return tramp on the track, either from Woolshed Creek car park to Woolshed Creek Hut (an easier option) or from Sharplin Falls car park to Pinnacles Hut (a much more challenging option)."
+   ]
+  },
+  {
+   "id": "W4",
+   "main": false,
+   "label": "Overnight return from Sharplin Falls car park to Pinnacles Hut",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Sharplin Falls car park",
+    "quote": "Sharplin Falls car park is at the end of Flynns Road, Staveley.",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Pinnacles Hut",
+    "quote": "Pinnacles Hut",
+    "ref": "T10"
+   },
+   "via": [
+    {
+     "name": "Dukes Knob",
+     "quote": "Dukes Knob",
+     "ref": null
+    },
+    {
+     "name": "Bowyers Stream",
+     "quote": "Bowyers Stream",
+     "ref": "T7"
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "You can also do an overnight return tramp on the track, either from Woolshed Creek car park to Woolshed Creek Hut (an easier option) or from Sharplin Falls car park to Pinnacles Hut (a much more challenging option).",
+    "The track climbs steeply through mountain beech forest/tawhairauriki to Dukes Knob before following Bowyers Stream to Pinnacles Hut."
+   ]
+  },
+  {
+   "id": "W5",
+   "main": false,
+   "label": "Alternative exit: Woolshed Creek Hut to Woolshed Creek car park via Bus Stop and South Face Tracks",
+   "shape": "one_way",
+   "start": {
+    "name": "Woolshed Creek Hut",
+    "quote": "Woolshed Creek Hut",
+    "ref": "T16"
+   },
+   "end": {
+    "name": "Woolshed Creek car park",
+    "quote": "Woolshed Creek car park",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Bus Stop Overhang",
+     "quote": "Bus Stop Overhang",
+     "ref": null
+    },
+    {
+     "name": "South Face Track",
+     "quote": "South Face Track",
+     "ref": "T6"
+    }
+   ],
+   "direction": null,
+   "time": "3 hr",
+   "distance": "6.4 km",
+   "evidence": [
+    "This is an alternative route for the last day of the Mount Somers Track. It is more challenging than Mount Somers Track.",
+    "From Woolshed Creek Hut, the track climbs some 500 metres to a local feature known as the Bus Stop Overhang. From here, the track crosses the face of Mount Somers to link with South Face Track (2 hr from the track start), which then follows a rocky ridge to Woolshed Creek car park."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "boulder features ('caves')",
+   "quote": "a sign indicates a short side-trip to view some interesting boulder features",
+   "ref": null,
+   "from": "Morgan Stream"
+  },
+  {
+   "name": "Sidewinder Track",
+   "quote": "Alternative route: Sidewinder Track",
+   "ref": "T5",
+   "from": "Blackburn Mine"
+  },
+  {
+   "name": "4WD track",
+   "quote": "you can follow a 4WD track to its junction with the Mt Somers Track below Trig R",
+   "ref": null,
+   "from": "Woolshed Creek Hut"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Pinnacles Hut",
+   "quote": "Pinnacles Hut",
+   "ref": "T10"
+  },
+  {
+   "name": "Woolshed Creek Hut",
+   "quote": "Woolshed Creek Hut",
+   "ref": "T16"
+  }
+ ],
+ "not_on_route": [],
+ "doubts": "F1 (South Face Track meets Flynns Road) used for Sharplin Falls car park: the text says the car park is at the end of Flynns Road and South Face Track loops back to Sharplin Falls car park. Woolshed Creek car park has no feature. Pony Stream not placed in order so not listed as a via. Per-way time/distance for W2-W4 not given for the whole way. Sidewinder and 4WD options treated as variants within the way, listed as side trips."
+}

@@ -1,0 +1,47 @@
+{
+ "guid": "898ac9a8-c1ce-4b05-a9c5-4378e67bf851",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Nga Taonga Nature Walk",
+   "shape": "one_way",
+   "start": {
+    "name": "clearing beside Graces Stream footbridge",
+    "quote": "the clearing beside Graces Stream footbridge on the downhill side of the car park",
+    "ref": null
+   },
+   "end": null,
+   "via": [],
+   "direction": null,
+   "time": "45 min one way",
+   "distance": null,
+   "evidence": [
+    "The track begins in the clearing beside Graces Stream footbridge on the downhill side of the car park.",
+    "It can also be started further down the valley on the opposite side of the road to the toilets.",
+    "Walk through forest and discover information signs describing the plant life."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "further down the valley opposite the toilets",
+   "quote": "further down the valley on the opposite side of the road to the toilets",
+   "ref": null,
+   "onto": null
+  }
+ ],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Wainuiomata",
+   "quote": "Catchpool valley is 12 km south of Wainuiomata",
+   "ref": null,
+   "why": "nearby"
+  }
+ ],
+ "doubts": "The packet has no road-end features, so the start has no ref: the start is the clearing beside Graces Stream footbridge, and T1 (Graces Stream, a river) is not clearly that spot. The text does not name the end. DOC's time is '45 min one way' and the track can also be started further down the valley opposite the toilets, which suggests that lower point is the other end, but the text does not say so, so the end is null and that place is recorded as an access point. The text also says that if the ford is flowing, one should park before it and use the walk to reach the car park; this suggests a link from the lower area to the car park, but it is not clear enough to make a separate way. The shape is one_way from DOC's 'one way' time, with the end unknown. The walk has no named places on the way, so via is empty."
+}

@@ -1,0 +1,262 @@
+{
+ "guid": "ebcd19a9-125f-42fa-9c72-5ec8e19de8e3",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Full Whanganui Journey by canoe, Taumarunui to Pipiriki",
+   "shape": "one_way",
+   "start": {
+    "name": "Ngāhuinga (Cherry Grove) Domain, Taumarunui",
+    "quote": "Start at Ngāhuinga (Cherry Grove) Domain",
+    "ref": "T18"
+   },
+   "end": {
+    "name": "Pipiriki",
+    "quote": "The Whanganui Journey ends at Pipiriki village.",
+    "ref": "T14"
+   },
+   "via": [
+    {
+     "name": "Ohinepane Campsite",
+     "quote": "Ohinepane Campsite",
+     "ref": "L1"
+    },
+    {
+     "name": "Poukaria Campsite",
+     "quote": "you will pass Poukaria Campsite",
+     "ref": "L2"
+    },
+    {
+     "name": "Maharanui Campsite",
+     "quote": "Poukaria to Maharanui Campsite",
+     "ref": "L3"
+    },
+    {
+     "name": "Whakahoro Campsite",
+     "quote": "Maharanui to Whakahoro Campsite and Whakahoro Bunkroom",
+     "ref": "L4"
+    },
+    {
+     "name": "Mangapapa Campsite",
+     "quote": "Whakahoro to Mangapapa Campsite",
+     "ref": "L5"
+    },
+    {
+     "name": "Kirikiriroa Peninsula",
+     "quote": "take a long loop around the Kirikiriroa Peninsula",
+     "ref": null
+    },
+    {
+     "name": "Tarepokiore rapid",
+     "quote": "pass the Tarepokiore (whirlpool) rapid",
+     "ref": null
+    },
+    {
+     "name": "Tamatea's Cave",
+     "quote": "the large overhang known as Tamatea's Cave",
+     "ref": null
+    },
+    {
+     "name": "Ohauora Campsite",
+     "quote": "Mangapapa to Ohauora Campsite",
+     "ref": "L6"
+    },
+    {
+     "name": "Ōtaihanga Reach",
+     "quote": "Ōtaihanga Reach leads you to your overnight stop",
+     "ref": "T13"
+    },
+    {
+     "name": "John Coull Hut",
+     "quote": "your overnight stop at John Coull Hut",
+     "ref": "L7"
+    },
+    {
+     "name": "Mangawaiiti Campsite",
+     "quote": "John Coull Hut to Mangawaiiti Campsite",
+     "ref": "L8"
+    },
+    {
+     "name": "Mangapurua Campsite",
+     "quote": "Mangawaiiti to Mangapurua Campsite",
+     "ref": "L9"
+    },
+    {
+     "name": "Mangapurua Landing",
+     "quote": "past the Mangapurua Landing",
+     "ref": "T6"
+    },
+    {
+     "name": "Tīeke Kāinga",
+     "quote": "continue to Tīeke Kāinga",
+     "ref": "L10"
+    },
+    {
+     "name": "Manganui o te Ao River",
+     "quote": "pass the scenic gorge of the Manganui o te Ao River",
+     "ref": null
+    },
+    {
+     "name": "Ngaporo Campsite",
+     "quote": "Tieke to Ngaporo Campsite",
+     "ref": "L13"
+    }
+   ],
+   "direction": null,
+   "time": "an average of 5 days",
+   "distance": "145 km",
+   "evidence": [
+    "The full Whanganui Journey is 145 km, from Taumarunui to Pipiriki. It takes an average of 5 days to canoe.",
+    "Start at Ngāhuinga (Cherry Grove) Domain, off Cherry Grove Road in Taumarunui.",
+    "The Whanganui Journey ends at Pipiriki village."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Shorter version by canoe, Whakahoro to Pipiriki",
+   "shape": "one_way",
+   "start": {
+    "name": "Whakahoro",
+    "quote": "A popular shorter version is 88 km, from Whakahoro to Pipiriki.",
+    "ref": "T23"
+   },
+   "end": {
+    "name": "Pipiriki",
+    "quote": "The Whanganui Journey ends at Pipiriki village.",
+    "ref": "T14"
+   },
+   "via": [
+    {
+     "name": "Mangapapa Campsite",
+     "quote": "Whakahoro to Mangapapa Campsite",
+     "ref": "L5"
+    },
+    {
+     "name": "Kirikiriroa Peninsula",
+     "quote": "take a long loop around the Kirikiriroa Peninsula",
+     "ref": null
+    },
+    {
+     "name": "Tarepokiore rapid",
+     "quote": "pass the Tarepokiore (whirlpool) rapid",
+     "ref": null
+    },
+    {
+     "name": "Tamatea's Cave",
+     "quote": "the large overhang known as Tamatea's Cave",
+     "ref": null
+    },
+    {
+     "name": "Ohauora Campsite",
+     "quote": "Mangapapa to Ohauora Campsite",
+     "ref": "L6"
+    },
+    {
+     "name": "Ōtaihanga Reach",
+     "quote": "Ōtaihanga Reach leads you to your overnight stop",
+     "ref": "T13"
+    },
+    {
+     "name": "John Coull Hut",
+     "quote": "your overnight stop at John Coull Hut",
+     "ref": "L7"
+    },
+    {
+     "name": "Mangawaiiti Campsite",
+     "quote": "John Coull Hut to Mangawaiiti Campsite",
+     "ref": "L8"
+    },
+    {
+     "name": "Mangapurua Campsite",
+     "quote": "Mangawaiiti to Mangapurua Campsite",
+     "ref": "L9"
+    },
+    {
+     "name": "Mangapurua Landing",
+     "quote": "past the Mangapurua Landing",
+     "ref": "T6"
+    },
+    {
+     "name": "Tīeke Kāinga",
+     "quote": "continue to Tīeke Kāinga",
+     "ref": "L10"
+    },
+    {
+     "name": "Manganui o te Ao River",
+     "quote": "pass the scenic gorge of the Manganui o te Ao River",
+     "ref": null
+    },
+    {
+     "name": "Ngaporo Campsite",
+     "quote": "Tieke to Ngaporo Campsite",
+     "ref": "L13"
+    }
+   ],
+   "direction": null,
+   "time": "an average of 3 days",
+   "distance": "88 km",
+   "evidence": [
+    "A popular shorter version is 88 km, from Whakahoro to Pipiriki.",
+    "Whakahoro is the last road access point before the end of the Whanganui Journey at Pipiriki. Many people start their trip here."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Ohinepane Campsite",
+   "quote": "Ohinepane Campsite, accessed from Whanganui River Road (State Highway 43).",
+   "ref": "L1",
+   "onto": "Whanganui River"
+  }
+ ],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Ōhura Falls",
+   "quote": "Take a short trip up the Ōhura River to see the Ōhura Falls.",
+   "ref": null,
+   "from": null
+  },
+  {
+   "name": "Bridge to Nowhere Walk",
+   "quote": "The Bridge to Nowhere Walk (3km, 1 hour 30 mins return, shared use with cyclists)",
+   "ref": "L11",
+   "from": "Mangapurua Landing"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Whakahoro Bunkroom",
+   "quote": "Whakahoro Campsite and Whakahoro Bunkroom",
+   "ref": null
+  },
+  {
+   "name": "John Coull Hut",
+   "quote": "your overnight stop at John Coull Hut",
+   "ref": "L7"
+  },
+  {
+   "name": "Tīeke Kāinga",
+   "quote": "continue to Tīeke Kāinga, which is a functioning marae as well as a hut",
+   "ref": "L10"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Puketotara Hut",
+   "quote": "alternative hut accommodation at Puketotara Hut on the Matemateaonga Range, a 1 hour 30 min hike up a track opposite Tīeke Kāinga",
+   "ref": "L12",
+   "why": "side trip"
+  },
+  {
+   "name": "Bridge to Nowhere",
+   "quote": "walk to the iconic Bridge to Nowhere",
+   "ref": null,
+   "why": "side trip"
+  }
+ ],
+ "doubts": "This is a canoe trip down the Whanganui River, not a walk; the way is the river, which has no entry in names or links. The main start is the Ngāhuinga (Cherry Grove) Domain in Taumarunui; there is no road-end feature, so the start uses the Taumarunui place entry (T18), as a town start. Pipiriki is the village place (T14). The times 'an average of 5 days' and 'an average of 3 days' are the page's own averages, not a Time heading. The Ohauora Campsite position is inferred from 'Mangapapa to Ohauora Campsite' and 'Ohauora to John Coull Hut', and the Tarepokiore rapid and Tamatea's Cave are passed on the Kirikiriroa loop, so their order is taken from the text. The shorter version starts at Whakahoro (place T23), though Whakahoro Campsite (L4) is also there; the place is used. Ōhura Falls is reached by a short trip up the Ōhura River from the Ohinepane to Whakahoro section, with no leaving point given, so from is null. Puketotara Hut is alternative accommodation reached by a 1 hr 30 min hike and is not on the river, so it is not on the way. Guided and jet boat trips and the 1- and 2-day business trips have no given start or end, so they are not recorded as ways."
+}

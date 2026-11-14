@@ -1,0 +1,282 @@
+{
+  "purpose": "Mask-only inputs: RGB is discarded; exact alpha required",
+  "cases": [
+    {
+      "tile": [
+        17,
+        126961,
+        83596
+      ],
+      "survey": "otago-2017-2019-0.3m",
+      "responses": [
+        {
+          "format": "png",
+          "status": 200,
+          "bytes": 60722,
+          "alphaSha256": "71189f7fb6aed638640078fba3a35fda6c39c8962e74dcc75935aac948da9063",
+          "alphaValues": [
+            255
+          ],
+          "elapsedMs": 1454.2
+        },
+        {
+          "format": "webp",
+          "status": 200,
+          "bytes": 5618,
+          "alphaSha256": "71189f7fb6aed638640078fba3a35fda6c39c8962e74dcc75935aac948da9063",
+          "alphaValues": [
+            255
+          ],
+          "elapsedMs": 1064.2
+        }
+      ],
+      "differentAlphaPixels": 0,
+      "hypotheticalAlphaOnlyPngBytes": 660
+    },
+    {
+      "tile": [
+        17,
+        126961,
+        83598
+      ],
+      "survey": "otago-2017-2019-0.3m",
+      "responses": [
+        {
+          "format": "png",
+          "status": 200,
+          "bytes": 18471,
+          "alphaSha256": "373f2fde97a3ca07799defed9991beb82377d7bf480ad8d39ec5ab2417b7b026",
+          "alphaValues": [
+            0,
+            255
+          ],
+          "elapsedMs": 1454.2
+        },
+        {
+          "format": "webp",
+          "status": 200,
+          "bytes": 2236,
+          "alphaSha256": "373f2fde97a3ca07799defed9991beb82377d7bf480ad8d39ec5ab2417b7b026",
+          "alphaValues": [
+            0,
+            255
+          ],
+          "elapsedMs": 1062.6
+        }
+      ],
+      "differentAlphaPixels": 0,
+      "hypotheticalAlphaOnlyPngBytes": 1396
+    },
+    {
+      "tile": [
+        17,
+        126962,
+        83598
+      ],
+      "survey": "otago-2017-2019-0.3m",
+      "responses": [
+        {
+          "format": "png",
+          "status": 200,
+          "bytes": 46667,
+          "alphaSha256": "874627963f47e47d5bd6efae9cf6dc49840979ca3c1fd8ed4c2c3c3eaf7038ae",
+          "alphaValues": [
+            0,
+            255
+          ],
+          "elapsedMs": 1451.9
+        },
+        {
+          "format": "webp",
+          "status": 200,
+          "bytes": 6350,
+          "alphaSha256": "874627963f47e47d5bd6efae9cf6dc49840979ca3c1fd8ed4c2c3c3eaf7038ae",
+          "alphaValues": [
+            0,
+            255
+          ],
+          "elapsedMs": 1521.9
+        }
+      ],
+      "differentAlphaPixels": 0,
+      "hypotheticalAlphaOnlyPngBytes": 1702
+    },
+    {
+      "tile": [
+        17,
+        126961,
+        83599
+      ],
+      "survey": "otago-2017-2019-0.3m",
+      "responses": [
+        {
+          "format": "png",
+          "status": 200,
+          "bytes": 9490,
+          "alphaSha256": "16bd4298f772ec425e5b388f2b6ae24431e7a88825957bd323436be7335c9da9",
+          "alphaValues": [
+            0,
+            255
+          ],
+          "elapsedMs": 618.2
+        },
+        {
+          "format": "webp",
+          "status": 200,
+          "bytes": 994,
+          "alphaSha256": "16bd4298f772ec425e5b388f2b6ae24431e7a88825957bd323436be7335c9da9",
+          "alphaValues": [
+            0,
+            255
+          ],
+          "elapsedMs": 606.7
+        }
+      ],
+      "differentAlphaPixels": 0,
+      "hypotheticalAlphaOnlyPngBytes": 906
+    },
+    {
+      "tile": [
+        17,
+        126963,
+        83598
+      ],
+      "survey": "otago-2017-2019-0.3m",
+      "responses": [
+        {
+          "format": "png",
+          "status": 200,
+          "bytes": 76201,
+          "alphaSha256": "aed348422e94280132f2fd56c22f3bab6e7d3001550bb4e31ba2c786e01b4f9b",
+          "alphaValues": [
+            0,
+            255
+          ],
+          "elapsedMs": 1021.5
+        },
+        {
+          "format": "webp",
+          "status": 200,
+          "bytes": 9464,
+          "alphaSha256": "aed348422e94280132f2fd56c22f3bab6e7d3001550bb4e31ba2c786e01b4f9b",
+          "alphaValues": [
+            0,
+            255
+          ],
+          "elapsedMs": 1232.3
+        }
+      ],
+      "differentAlphaPixels": 0,
+      "hypotheticalAlphaOnlyPngBytes": 1406
+    },
+    {
+      "tile": [
+        17,
+        127471,
+        83202
+      ],
+      "survey": "canterbury-2015-2016-0.3m",
+      "responses": [
+        {
+          "format": "png",
+          "status": 200,
+          "bytes": 48403,
+          "alphaSha256": "cb5c4631882e42c86e267e3437e72dd7ed53201d3372a0f173d63362ba91b8f9",
+          "alphaValues": [
+            0,
+            255
+          ],
+          "elapsedMs": 136.1
+        },
+        {
+          "format": "webp",
+          "status": 200,
+          "bytes": 5432,
+          "alphaSha256": "cb5c4631882e42c86e267e3437e72dd7ed53201d3372a0f173d63362ba91b8f9",
+          "alphaValues": [
+            0,
+            255
+          ],
+          "elapsedMs": 1633.1
+        }
+      ],
+      "differentAlphaPixels": 0,
+      "hypotheticalAlphaOnlyPngBytes": 926
+    },
+    {
+      "tile": [
+        16,
+        63480,
+        41798
+      ],
+      "survey": "otago-2017-2019-0.3m",
+      "responses": [
+        {
+          "format": "png",
+          "status": 200,
+          "bytes": 92069,
+          "alphaSha256": "0be1bf5a032947fa0cbd3a5bcb87b35bc345b779af6bdb66c3dc212e42b75f1a",
+          "alphaValues": [
+            0,
+            255
+          ],
+          "elapsedMs": 1154.5
+        },
+        {
+          "format": "webp",
+          "status": 200,
+          "bytes": 11038,
+          "alphaSha256": "0be1bf5a032947fa0cbd3a5bcb87b35bc345b779af6bdb66c3dc212e42b75f1a",
+          "alphaValues": [
+            0,
+            255
+          ],
+          "elapsedMs": 632.1
+        }
+      ],
+      "differentAlphaPixels": 0,
+      "hypotheticalAlphaOnlyPngBytes": 984
+    },
+    {
+      "tile": [
+        13,
+        7935,
+        5224
+      ],
+      "survey": "otago-2017-2019-0.3m",
+      "responses": [
+        {
+          "format": "png",
+          "status": 200,
+          "bytes": 133799,
+          "alphaSha256": "67f95fbdc3e348bac27f3fbda027188067780f9895d38fb2c11bd2d628489627",
+          "alphaValues": [
+            0,
+            255
+          ],
+          "elapsedMs": 345.5
+        },
+        {
+          "format": "webp",
+          "status": 200,
+          "bytes": 16934,
+          "alphaSha256": "67f95fbdc3e348bac27f3fbda027188067780f9895d38fb2c11bd2d628489627",
+          "alphaValues": [
+            0,
+            255
+          ],
+          "elapsedMs": 861.8
+        }
+      ],
+      "differentAlphaPixels": 0,
+      "hypotheticalAlphaOnlyPngBytes": 799
+    }
+  ],
+  "identicalAlphaPairs": 8,
+  "totalPairs": 8,
+  "pngBytes": 485822,
+  "webpBytes": 58066,
+  "bandwidthOnlySavingAt5MbpsMs": 684.4,
+  "timingCaveat": "Cloud requests, uncontrolled CDN state; not phone latency",
+  "hypotheticalAlphaOnlyPngBytes": 8779
+}

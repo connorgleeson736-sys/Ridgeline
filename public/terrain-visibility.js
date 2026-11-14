@@ -14,7 +14,7 @@ function attach(map,{engineVersion}={}){
   const getBounds=terrain.getMinMaxElevation,update=manager.update,Revision=root.RidgeDEMRevision||(typeof require==='function'?require('./dem-revision.js'):null);
   const records=new Map(),owners=new Map(),changed=new Set();let full=true;
   const indexed=!!sourceManager._inViewTiles?.getTileById||typeof sourceManager.getTileByID==='function'||typeof sourceManager.getTile==='function';
-  const revision=Revision?.track(sourceManager,{onChange(change){dirty=true;if(!indexed||change.full)full=true;else if(change.tile)changed.add(change.tile);else if(change.dem)for(const tile of owners.get(change.dem)||[])changed.add(tile);else full=true;}});let seenRevision=-1;
+  const revision=Revision?.track(sourceManager,{onChange(change){dirty=true;if(!indexed||change.full)full=true;else if(change.tile)changed.add(change.tile);else if(change.dem)for(const tile of owners.get(change.dem)||[])changed.add(tile);else full=true;}});let seenRevision=-1;let cachedRevision=-1,cachedScale,cache=new Map();
   function remove(tile){const old=records.get(tile);if(!old)return;records.delete(tile);const set=owners.get(old.dem);set.delete(tile);if(!set.size){owners.delete(old.dem);dems.delete(old.dem);revision?.release?.(old.dem);}
    for(const key of old.keys){const node=index.get(key);node.rows.delete(tile);if(!node.rows.size)index.delete(key);else node.dirty=true;}
   }
@@ -36,10 +36,13 @@ function attach(map,{engineVersion}={}){
   }
   function knownAt(key){const node=index.get(key);if(node?.dirty){node.min=Infinity;node.max=-Infinity;for(const row of node.rows.values()){node.min=Math.min(node.min,row.min);node.max=Math.max(node.max,row.max);}node.dirty=false;}return node;}
   function bounds(id){
-   refresh();const native=getBounds.call(this,id),q=id.canonical,known=knownAt(q.z+'/'+q.x+'/'+q.y),scale=terrain.exaggeration;
+   refresh();const sourceTile=manager.getSourceTile(id,true);refresh();const rev=revision?.revision;
+   if(!revision||rev!==cachedRevision||cachedScale!==terrain.exaggeration){cache.clear();cachedRevision=rev;cachedScale=terrain.exaggeration;}
+   const cacheKey=(id.key??[id.wrap||0,id.canonical.z,id.canonical.x,id.canonical.y].join('/'))+'/'+manager.deltaZoom;
+   if(revision&&cache.has(cacheKey))return {...cache.get(cacheKey)};
+   const native=getBounds.call(this,id,sourceTile),q=id.canonical,known=knownAt(q.z+'/'+q.x+'/'+q.y),scale=terrain.exaggeration;
    let min=native.minElevation,max=native.maxElevation;
    if(known){min=Number.isFinite(min)?Math.min(min,known.min*scale):known.min*scale;max=Number.isFinite(max)?Math.max(max,known.max*scale):known.max*scale;}
-   const sourceTile=manager.getSourceTile(id,true);
    if(sourceTile?.dem&&Number.isFinite(min)&&Number.isFinite(max)){
     // A coarse pixel average is not an upper/lower geometric bound. Widen its
     // culling interval by two ground pixels, capped at 800 m, never its heightmap.
@@ -52,7 +55,7 @@ function attach(map,{engineVersion}={}){
     min=-50*scale;max=4000*scale;
    }
    if(min!==native.minElevation||max!==native.maxElevation)expanded++;
-   return{minElevation:min,maxElevation:max};
+   const result={minElevation:min,maxElevation:max};if(revision){cache.set(cacheKey,result);if(cache.size>4096)cache.delete(cache.keys().next().value);}return {...result};
   }
   function onData(){dirty=true;full=true;}
   function run(...args){if(!revision){dirty=true;full=true;}return update.apply(this,args);}

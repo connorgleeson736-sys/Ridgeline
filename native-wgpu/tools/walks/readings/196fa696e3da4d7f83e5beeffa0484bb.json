@@ -1,0 +1,141 @@
+{
+ "guid": "196fa696-e3da-4d7f-83e5-beeffa0484bb",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Mingha - Deception Route, east to west (Greyneys Shelter to Morrisons footbridge)",
+   "shape": "one_way",
+   "start": {
+    "name": "Greyneys Shelter",
+    "quote": "the route starts near Greyneys Shelter on SH73",
+    "ref": "F4"
+   },
+   "end": {
+    "name": "Morrisons footbridge",
+    "quote": "come out at Morrisons footbridge on SH73, near Aickens corner",
+    "ref": "F2"
+   },
+   "via": [
+    {
+     "name": "Bealey River",
+     "quote": "If Bealey River is too high to ford, postpone the trip.",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Mingha River",
+     "quote": "Mingha River",
+     "ref": "T15"
+    },
+    {
+     "name": "Dudley Knob",
+     "quote": "Dudley Knob",
+     "ref": "T9"
+    },
+    {
+     "name": "Mingha Bivvy",
+     "quote": "Mingha Bivvy",
+     "ref": "T14"
+    },
+    {
+     "name": "Mingha River",
+     "quote": "crossing Mingha River where it bends west towards Temple Col",
+     "ref": "T15",
+     "how": "ford"
+    },
+    {
+     "name": "Goat Pass",
+     "quote": "Goat Pass",
+     "ref": "T10"
+    },
+    {
+     "name": "Goat Pass Hut",
+     "quote": "Goat Pass Hut",
+     "ref": "T11"
+    },
+    {
+     "name": "Deception River",
+     "quote": "Deception River",
+     "ref": "T7"
+    },
+    {
+     "name": "Upper Deception Hut",
+     "quote": "Upper Deception Hut",
+     "ref": "T18"
+    },
+    {
+     "name": "Good Luck Creek",
+     "quote": "Good Luck Creek",
+     "ref": "T12"
+    },
+    {
+     "name": "Gorge Creek",
+     "quote": "Gorge Creek",
+     "ref": "T13"
+    },
+    {
+     "name": "Ōtira River",
+     "quote": "The footbridge across the Otira is just north of the confluence",
+     "ref": "T19"
+    }
+   ],
+   "direction": null,
+   "time": "2 - 3 days",
+   "distance": null,
+   "evidence": [
+    "From the eastern side, the route starts near Greyneys Shelter on SH73. It follows the Mingha River, crosses the Main Divide at Goat Pass, then follows the Deception River to come out at Morrisons footbridge on SH73, near Aickens corner."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Morrisons footbridge",
+   "quote": "From the western side, the route starts at Morrisons footbridge on SH73, near Aickens corner.",
+   "ref": "F2",
+   "onto": "Deception River"
+  }
+ ],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Lake Mavis",
+   "quote": "Side trip: Lake Mavis",
+   "ref": null,
+   "from": "Goat Pass"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Mingha Bivvy",
+   "quote": "Mingha Bivvy",
+   "ref": "T14"
+  },
+  {
+   "name": "Goat Pass Hut",
+   "quote": "Goat Pass Hut",
+   "ref": "T11"
+  },
+  {
+   "name": "Upper Deception Hut",
+   "quote": "Upper Deception Hut",
+   "ref": "T18"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Klondike Corner",
+   "quote": "Klondike Corner",
+   "ref": null,
+   "why": "other"
+  },
+  {
+   "name": "Temple Col",
+   "quote": "Temple Col",
+   "ref": "T17",
+   "why": "view"
+  }
+ ],
+ "doubts": "The page describes the route in both directions (east to west, then west to east). Per the rule that walking a crossing the other way round is not another way, only east to west is a way; the western start is an access point. Start F4 (Mingha Track meets West Coast Road) is taken as Greyneys Shelter on SH73 by inference; the text does not name it. End F2 is the Morrison Footbridge by name. Leg times only (5 hr, 8-9 hr), so DOC's 2 - 3 days used; no distance given. Mingha River 'crossing as necessary' not itemised. Bealey River has no entry. Earlier reading made the reverse a W2."
+}

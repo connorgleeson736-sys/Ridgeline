@@ -1,0 +1,20 @@
+{
+  "sourceCheckpoint": "c602395d7f2061a24a2e30a2751f4e8e29881484",
+  "apk": {
+    "bytes": 31684240,
+    "sha256": "18e11cf44922da81a4dfa4b5aafff6bbb4af91e6113ff1f1bc7439e785d9dea1"
+  },
+  "focusedTests": 9,
+  "focusedFailures": 0,
+  "gpuFixtures": [
+    "Vulkan",
+    "GLES"
+  ],
+  "skirtEdgesFlatFixture": {
+    "before": 16,
+    "after": 8
+  },
+  "newAndroidRuntimeRun": false,
+  "phoneFpsClaim": false,
+  "validation": "Nine focused Kotlin tests and Vulkan/GLES terrain fixtures pass; all three optimized JNI ABIs, APK assembly and signing pass. No new phone/emulator run. A20 tilt, peak stability, loading latency and GPU recovery require on-device acceptance; full MapLibre equivalence is not claimed."
+}

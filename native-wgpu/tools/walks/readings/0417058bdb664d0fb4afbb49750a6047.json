@@ -1,0 +1,65 @@
+{
+ "guid": "0417058b-db66-4d0f-b4af-bb49750a6047",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Slapjack Saddle Track to Felton Road car park",
+   "shape": "one_way",
+   "start": {
+    "name": "top of Young Australian Historic Reserve",
+    "quote": "starts at the top of the Young Australian Historic Reserve",
+    "ref": null
+   },
+   "end": {
+    "name": "Felton Road car park",
+    "quote": "Felton Road car park",
+    "ref": "F1"
+   },
+   "via": [
+    {
+     "name": "Slapjack Saddle",
+     "quote": "Slapjack Saddle",
+     "ref": "T14"
+    },
+    {
+     "name": "Long Gully Loop Track",
+     "quote": "Long Gully Loop Track",
+     "ref": "T4"
+    },
+    {
+     "name": "Bannockburn Sluicings Track",
+     "quote": "Bannockburn Sluicings Track",
+     "ref": "T2"
+    }
+   ],
+   "direction": null,
+   "time": "6 hr one way",
+   "distance": "24.5 km one way one way",
+   "evidence": [
+    "It continues on to Felton Road car park via Long Gully Loop Track and Bannockburn Sluicings Track.",
+    "Follow this for 4.5 km to a junction in the road and the start of the Slapjack Saddle Track."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "1220 Track",
+   "quote": "1220 Track",
+   "ref": "T1",
+   "from": "Slapjack Saddle Track"
+  },
+  {
+   "name": "Slapjack Creek Track",
+   "quote": "Slapjack Creek Track",
+   "ref": "T5",
+   "from": "Slapjack Saddle"
+  }
+ ],
+ "huts": [],
+ "not_on_route": [],
+ "doubts": "Start is a junction on the 4WD road at the top of the reserve; no feature matches. Page notes that during lambing closure (1 Oct-30 Nov) you return via the Young Australian Historic Reserve Road; not recorded as a separate way."
+}

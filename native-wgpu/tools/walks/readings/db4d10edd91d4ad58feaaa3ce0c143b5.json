@@ -1,0 +1,321 @@
+{
+ "guid": "db4d10ed-d91d-4ad5-8fea-aa3ce0c143b5",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "St Arnaud to Boyle settlement",
+   "shape": "one_way",
+   "start": {
+    "name": "eastern end of Kerr Bay",
+    "quote": "Beginning at the eastern end of Kerr Bay, the Lakehead Track wanders through forest",
+    "ref": "F6"
+   },
+   "end": {
+    "name": "shelter and car park at SH7 by the Boyle settlement",
+    "quote": "to the shelter and car park at SH7 by the Boyle settlement",
+    "ref": "F2"
+   },
+   "via": [
+    {
+     "name": "Lakehead Track",
+     "quote": "the Lakehead Track wanders through forest",
+     "ref": "T7"
+    },
+    {
+     "name": "head of Lake Rotoiti",
+     "quote": "At the head of Lake Rotoiti, the grassy flats of the lower Travers Valley greet you.",
+     "ref": "T35"
+    },
+    {
+     "name": "Lakehead Hut",
+     "quote": "Lakehead Hut is 15 min on from the jetty.",
+     "ref": "T36"
+    },
+    {
+     "name": "Travers River",
+     "quote": "walk up the Travers River flats through forest and clearings",
+     "ref": "T49"
+    },
+    {
+     "name": "Travers River swing bridge",
+     "quote": "After 1 hr 30 min of easy walking you’ll reach a swing bridge",
+     "ref": null
+    },
+    {
+     "name": "Hopeless Creek",
+     "quote": "Cross the creek on a swing bridge.",
+     "ref": "T29"
+    },
+    {
+     "name": "John Tait Hut",
+     "quote": "emerge to the welcome sight of John Tait Hut",
+     "ref": "T30"
+    },
+    {
+     "name": "Cupola Creek chasm",
+     "quote": "Continue beyond John Tait Hut to Cupola Creek chasm",
+     "ref": "T27"
+    },
+    {
+     "name": "Travers River short bridge",
+     "quote": "eventually the Travers River via a short bridge",
+     "ref": "T49"
+    },
+    {
+     "name": "Upper Travers Hut",
+     "quote": "Upper Travers Hut nestles at the base of the east face of Mount Travers",
+     "ref": "T51"
+    },
+    {
+     "name": "Travers River near Upper Travers Hut",
+     "quote": "Cross the Travers River near the hut",
+     "ref": "T49",
+     "how": "ford"
+    },
+    {
+     "name": "Poukirikiri/Travers Saddle",
+     "quote": "Poukirikiri/Travers Saddle is an alpine pass requiring ice axes and crampons",
+     "ref": "T40"
+    },
+    {
+     "name": "East Branch Sabine River bridge",
+     "quote": "a bridge crosses the deep chasm of the East Branch Sabine River",
+     "ref": null
+    },
+    {
+     "name": "West Branch Sabine River valley",
+     "quote": "descending into the West Branch Sabine River valley",
+     "ref": null
+    },
+    {
+     "name": "West Sabine Hut",
+     "quote": "heading upstream a short distance to West Sabine Hut",
+     "ref": "T54"
+    },
+    {
+     "name": "West Branch Sabine swing bridge",
+     "quote": "Head upstream from the West Branch Sabine swing bridge.",
+     "ref": null
+    },
+    {
+     "name": "Blue Lake Hut",
+     "quote": "Climb steeply in two stages to a high basin containing Blue Lake Hut.",
+     "ref": "T21"
+    },
+    {
+     "name": "Rotopohueroa/Lake Constance",
+     "quote": "The route climbs the moraine which is damming Rotopohueroa/Lake Constance.",
+     "ref": "T45"
+    },
+    {
+     "name": "Waiau Pass",
+     "quote": "starts to climb scree and steep rocky sections to Waiau Pass",
+     "ref": "T53"
+    },
+    {
+     "name": "Upper Waiau Forks",
+     "quote": "It is approximately 4 hours from Waiau Forks to Waiau Hut.",
+     "ref": null
+    },
+    {
+     "name": "Waiau Uwha River west branch",
+     "quote": "the route leads down the west branch of the Waiau Uwha River",
+     "ref": null
+    },
+    {
+     "name": "Waiau Uwha River east branch crossing",
+     "quote": "then crosses the east branch of the river not far above the forks",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Waiau Uwha River true right crossing",
+     "quote": "The route then crosses to the true right of the Waiau Uwha River",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Caroline Creek",
+     "quote": "the largest of which is Caroline Creek",
+     "ref": "T25"
+    },
+    {
+     "name": "Waiau Hut",
+     "quote": "The nearest shelter is one hour downstream from Caroline Creek at Waiau Hut.",
+     "ref": "T52"
+    },
+    {
+     "name": "Ada River",
+     "quote": "Cross Ada River",
+     "ref": "T16",
+     "how": "ford"
+    },
+    {
+     "name": "St James Walkway",
+     "quote": "join the St James Walkway",
+     "ref": "T12"
+    },
+    {
+     "name": "Henry River valley",
+     "quote": "up the Henry River valley to Anne Hut",
+     "ref": "T28"
+    },
+    {
+     "name": "Anne Hut",
+     "quote": "to Anne Hut.",
+     "ref": "T17"
+    },
+    {
+     "name": "Anne River footbridge",
+     "quote": "The track crosses a footbridge over the Anne River",
+     "ref": "T18"
+    },
+    {
+     "name": "Anne Saddle",
+     "quote": "The track continues up and over the Anne Saddle into the Boyle Valley.",
+     "ref": "T19"
+    },
+    {
+     "name": "Rokeby Hut",
+     "quote": "past the basic Rokeby Hut",
+     "ref": "T42"
+    },
+    {
+     "name": "Boyle River suspension bridge",
+     "quote": "The true left bank is followed to a suspension bridge over the Boyle River",
+     "ref": "T23"
+    },
+    {
+     "name": "Boyle Flat Hut",
+     "quote": "100 metres from the Boyle Flat Hut",
+     "ref": "T22"
+    },
+    {
+     "name": "vehicle track down the valley",
+     "quote": "A vehicle track is joined and followed down the valley to the shelter and car park at SH7 by the Boyle settlement.",
+     "ref": null,
+     "how": "road"
+    }
+   ],
+   "direction": null,
+   "time": "8-9 days",
+   "distance": null,
+   "evidence": [
+    "Beginning at the eastern end of Kerr Bay, the Lakehead Track wanders through forest, crossing several shallow streams and shingle screes.",
+    "The track starts at the eastern end of the bay.",
+    "A vehicle track is joined and followed down the valley to the shelter and car park at SH7 by the Boyle settlement."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Boyle village",
+   "quote": "Southern track entrance/exit: Boyle village is on SH7 (Lewis Pass Rd).",
+   "ref": "T24",
+   "onto": "vehicle track to the shelter and car park at SH7"
+  }
+ ],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Travers Falls",
+   "quote": "A sign marks a short side track to Travers Falls, a 20 m cascade",
+   "ref": "T48",
+   "from": "Cupola Creek chasm"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Lakehead Hut",
+   "quote": "Lakehead Hut is 15 min on from the jetty.",
+   "ref": "T36"
+  },
+  {
+   "name": "John Tait Hut",
+   "quote": "emerge to the welcome sight of John Tait Hut",
+   "ref": "T30"
+  },
+  {
+   "name": "Upper Travers Hut",
+   "quote": "Upper Travers Hut nestles at the base of the east face of Mount Travers",
+   "ref": "T51"
+  },
+  {
+   "name": "West Sabine Hut",
+   "quote": "heading upstream a short distance to West Sabine Hut",
+   "ref": "T54"
+  },
+  {
+   "name": "Blue Lake Hut",
+   "quote": "Climb steeply in two stages to a high basin containing Blue Lake Hut.",
+   "ref": "T21"
+  },
+  {
+   "name": "Waiau Hut",
+   "quote": "The nearest shelter is one hour downstream from Caroline Creek at Waiau Hut.",
+   "ref": "T52"
+  },
+  {
+   "name": "Anne Hut",
+   "quote": "to Anne Hut.",
+   "ref": "T17"
+  },
+  {
+   "name": "Rokeby Hut",
+   "quote": "past the basic Rokeby Hut",
+   "ref": "T42"
+  },
+  {
+   "name": "Boyle Flat Hut",
+   "quote": "100 metres from the Boyle Flat Hut",
+   "ref": "T22"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Coldwater Hut",
+   "quote": "The track from Coldwater Hut passes the turnoff to Rotomaninitua/Lake Angelus.",
+   "ref": "T26",
+   "why": "other"
+  },
+  {
+   "name": "Rotomaninitua/Lake Angelus",
+   "quote": "passes the turnoff to Rotomaninitua/Lake Angelus",
+   "ref": "T44",
+   "why": "other walk"
+  },
+  {
+   "name": "Mount Travers",
+   "quote": "Mount Travers can be glimpsed as the track nears Hopeless Creek.",
+   "ref": "T39",
+   "why": "view"
+  },
+  {
+   "name": "Rotomairewhenua/Blue Lake",
+   "quote": "Rotomairewhenua/Blue Lake is thought to be the clearest natural freshwater lake in the world",
+   "ref": "T43",
+   "why": "nearby"
+  },
+  {
+   "name": "Magdalen Hut",
+   "quote": "Magdalen Hut is 30 minutes from this second bridge.",
+   "ref": "T38",
+   "why": "nearby"
+  },
+  {
+   "name": "Ada homestead",
+   "quote": "Ada homestead is privately owned and trampers should avoid this area.",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "Caroline Creek Bivvy (removed)",
+   "quote": "Caroline Creek Bivvy",
+   "ref": null,
+   "why": "other"
+  }
+ ],
+ "doubts": "Start: F6 is the road end where Kerr Bay Track meets Kerr Bay Road; the text says the Lakehead Track starts at the eastern end of Kerr Bay, which is taken to be that road end, but the track named at F6 is Kerr Bay Track, not Lakehead Track. End: the text says the car park is 'at SH7' by the Boyle settlement. F2 (unnamed track meets Lewis Pass Road, which is SH7) is taken as the car park; F4 (Saint James Walkway meets Magdalen Valley Road) and F3 are about 100 m away and were not chosen because the text names SH7, not Magdalen Valley Road. Fords: 'Cross the Travers River near the hut' and the Waiau Uwha crossings and 'Cross Ada River' are recorded as fords since no bridge is stated; the Waiau crossing of the east branch is a ford by the same reasoning. The Caroline Creek crossings are not recorded with a how. Coldwater Hut: the heading 'St Arnaud to Lakehead Hut/Coldwater Hut' and 'The track from Coldwater Hut' suggest it is an alternative first night or a joining track, not walked by the main way, so it is in not_on_route. Magdalen Hut ('30 minutes from this second bridge') is not stated to be on the way, so it is in not_on_route as nearby. The Boyle village access point is the southern 'entrance/exit', the same place as the end. The end 'vehicle track' is recorded as a road way with no ref. Lake Constance (T45) is used for the text's 'Rotopohueroa/Lake Constance'. No whole-route distance is given."
+}

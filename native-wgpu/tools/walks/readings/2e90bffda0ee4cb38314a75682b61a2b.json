@@ -1,0 +1,197 @@
+{
+ "guid": "2e90bffd-a0ee-4cb3-8314-a75682b61a2b",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Andrews Shelter over Minchin Pass to the Otira River and SH73",
+   "shape": "one_way",
+   "start": {
+    "name": "Andrews Shelter",
+    "quote": "The track starts at Andrews Shelter on Mount White Road",
+    "ref": null
+   },
+   "end": {
+    "name": "SH73 at Aickens",
+    "quote": "the track across farmland to SH73",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Andrews Track",
+     "quote": "### Andrews Track",
+     "ref": null
+    },
+    {
+     "name": "Hallelujah Flat",
+     "quote": "re-joins Andrews Stream at Hallelujah Flat",
+     "ref": "T6"
+    },
+    {
+     "name": "Casey Saddle",
+     "quote": "follow the grassy flats over Casey Saddle",
+     "ref": "T4"
+    },
+    {
+     "name": "Surprise Stream",
+     "quote": "keep to the terrace immediately above Surprise Stream",
+     "ref": "T18"
+    },
+    {
+     "name": "Casey Stream",
+     "quote": "emerge from the bush on a large grass flat near Casey Stream",
+     "ref": "T5"
+    },
+    {
+     "name": "old Casey Hut site",
+     "quote": "The original Casey Hut site is back from the stream at the bush edge",
+     "ref": null
+    },
+    {
+     "name": "Casey River",
+     "quote": "take the track north across the Casey River",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Trust/Poulter Hut",
+     "quote": "to reach the Trust/Poulter Hut",
+     "ref": "T21"
+    },
+    {
+     "name": "Poulter River",
+     "quote": "head diagonally across the riverbed",
+     "ref": "T17",
+     "how": "ford"
+    },
+    {
+     "name": "Poulter Hut",
+     "quote": "the start of the track to Lake Minchin and Poulter Hut",
+     "ref": "T16"
+    },
+    {
+     "name": "Lake Minchin",
+     "quote": "leads to the old hut site at Lake Minchin",
+     "ref": "T8"
+    },
+    {
+     "name": "Minchin Stream",
+     "quote": "the route follows Minchin Stream, constantly crossing and re-crossing",
+     "ref": "T13",
+     "how": "ford"
+    },
+    {
+     "name": "Linwood Creek",
+     "quote": "rejoin Minchin Stream at its junction with Linwood Creek",
+     "ref": "T9"
+    },
+    {
+     "name": "Minchin Bivvy",
+     "quote": "Minchin Bivvy stands a little above the river",
+     "ref": "T11"
+    },
+    {
+     "name": "Minchin Pass",
+     "quote": "Minchin Pass is an hour further on from the bivvy",
+     "ref": "T12"
+    },
+    {
+     "name": "Townsend Creek",
+     "quote": "Descend into Townsend Creek along the marked route.",
+     "ref": "T19"
+    },
+    {
+     "name": "Taramakau River",
+     "quote": "From where Townsend Creek enters the Taramakau River",
+     "ref": null
+    },
+    {
+     "name": "Kiwi Hut",
+     "quote": "To go to Kiwi Hut, travel down the Taramakau River",
+     "ref": null
+    },
+    {
+     "name": "Taramakau River",
+     "quote": "crossing and re-crossing the river where necessary",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Otira River",
+     "quote": "Select the best place to cross the Otira River",
+     "ref": null,
+     "how": "ford"
+    }
+   ],
+   "direction": null,
+   "time": "3 - 4 days",
+   "distance": null,
+   "evidence": [
+    "The track starts at Andrews Shelter on Mount White Road, which turns off SH73, 24 km east of Arthur’s Pass.",
+    "The western end is at the Taramakau River valley, which meets Otira River at Aickens beside SH73, 25 km west of Arthur’s Pass.",
+    "Select the best place to cross the Otira River, aiming for the big orange triangle that indicates the track across farmland to SH73."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [
+  {
+   "name": "flood track to the Morrison footbridge",
+   "quote": "back-track to the flood track that travels up the true right of the river to the Morrison footbridge",
+   "ref": null,
+   "from": "Otira River",
+   "how": "track"
+  }
+ ],
+ "side_trips": [
+  {
+   "name": "Casey Hut",
+   "quote": "continue another kilometre along the Casey Stream bed to the Poulter River flats to reach the new Casey Hut",
+   "ref": "T3",
+   "from": "old Casey Hut site"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Trust/Poulter Hut",
+   "quote": "Trust/Poulter Hut",
+   "ref": "T21"
+  },
+  {
+   "name": "Poulter Hut",
+   "quote": "Poulter Hut",
+   "ref": "T16"
+  },
+  {
+   "name": "Minchin Bivvy",
+   "quote": "Minchin Bivvy",
+   "ref": "T11"
+  },
+  {
+   "name": "Kiwi Hut",
+   "quote": "Kiwi Hut",
+   "ref": null
+  },
+  {
+   "name": "Casey Hut",
+   "quote": "Casey Hut",
+   "ref": "T3"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Locke Stream Hut",
+   "quote": "it is about 1 hr either upstream to Locke Stream Hut",
+   "ref": "T10",
+   "why": "other walk"
+  },
+  {
+   "name": "Harper Pass Route",
+   "quote": "Refer to Harper Pass Route for the trip over Harper Pass from here.",
+   "ref": "L1",
+   "why": "other walk"
+  }
+ ],
+ "doubts": "Start: no feature clearly is Andrews Shelter (the only road end F1 is Poulter River Track at Mt White Road, probably too far from Hallelujah Flat), so ref null. End: SH73 at Aickens has no entry. Day 1 ends at Casey Hut or Trust/Poulter Hut; the way is recorded via Trust/Poulter Hut since the next section starts there, and Casey Hut is a side trip. Kiwi Hut has no name entry. Taramakau River crossings are repeated crossings, listed once as a ford. From Townsend Creek the page offers Locke Stream Hut upstream (Harper Pass Route) or Kiwi Hut downstream; downstream taken as the route."
+}

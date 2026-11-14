@@ -1,0 +1,135 @@
+{
+ "guid": "3465fd88-42d7-4a3e-8d05-c7bc8e2bcaf3",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Holdsworth to Kaitoke",
+   "shape": "one_way",
+   "start": {
+    "name": "Holdsworth car park",
+    "quote": "The track begins at the Holdsworth car park at the end of Holdsworth Road.",
+    "ref": null
+   },
+   "end": {
+    "name": "Kaitoke road end carpark",
+    "quote": "the Kaitoke road end carpark, located along Kiwi Ranch Road",
+    "ref": "F3"
+   },
+   "via": [
+    {
+     "name": "Holdsworth Lodge",
+     "quote": "From Holdsworth Lodge, cross the bridge",
+     "ref": null
+    },
+    {
+     "name": "Gentle Annie Track",
+     "quote": "climb the Gentle Annie track towards Mountain House Shelter",
+     "ref": "T3"
+    },
+    {
+     "name": "Totara Creek Track",
+     "quote": "Follow the Totara Creek Track along the ridge",
+     "ref": "T7"
+    },
+    {
+     "name": "Totara Creek",
+     "quote": "heading down towards Totara Creek",
+     "ref": "T23"
+    },
+    {
+     "name": "Totara Flats Hut",
+     "quote": "turn left to Totara Flats Hut",
+     "ref": "T21"
+    },
+    {
+     "name": "Makaka Creek bridge",
+     "quote": "Cross the Makaka Creek bridge",
+     "ref": "T13"
+    },
+    {
+     "name": "Cone Saddle Track",
+     "quote": "Turn right onto the Cone Saddle Track at the junction",
+     "ref": "T1"
+    },
+    {
+     "name": "Clem Creek",
+     "quote": "the track sidles into Clem Creek",
+     "ref": "T8"
+    },
+    {
+     "name": "Cone Saddle",
+     "quote": "climbs to Cone Saddle",
+     "ref": "T11"
+    },
+    {
+     "name": "Cone Hut",
+     "quote": "Descend the track to Cone Hut in the Tauwharenīkau Valley.",
+     "ref": "T10"
+    },
+    {
+     "name": "Tutuwai Hut",
+     "quote": "Tutuwai Hut is about 1 hr walk from Cone Hut.",
+     "ref": "T22"
+    },
+    {
+     "name": "Tauwharenīkau River swing bridge",
+     "quote": "The track then crosses the Tauwharenīkau River on a swing bridge.",
+     "ref": "T20"
+    },
+    {
+     "name": "Smith Creek shelter",
+     "quote": "Smith Creek shelter is reached",
+     "ref": null
+    },
+    {
+     "name": "Dobson Loop Track",
+     "quote": "follows Smith Creek upstream along the Dobson Loop Track",
+     "ref": "T2"
+    },
+    {
+     "name": "Puffer Saddle",
+     "quote": "It climbs to Puffer Saddle",
+     "ref": "T16"
+    }
+   ],
+   "direction": null,
+   "time": "2–3 days",
+   "distance": "36 km one way",
+   "evidence": [
+    "The track begins at the Holdsworth car park at the end of Holdsworth Road.",
+    "It climbs to Puffer Saddle and down to the Kaitoke road end carpark, located along Kiwi Ranch Road."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Totara Flats Hut",
+   "quote": "Totara Flats Hut",
+   "ref": "T21"
+  },
+  {
+   "name": "Cone Hut",
+   "quote": "Cone Hut",
+   "ref": "T10"
+  },
+  {
+   "name": "Tutuwai Hut",
+   "quote": "Tutuwai Hut",
+   "ref": "T22"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Powell Hut",
+   "quote": "Turn left at the signpost onto the track to Powell Hut",
+   "ref": null,
+   "why": "other walk"
+  }
+ ],
+ "doubts": "Start: Holdsworth car park has no feature (F1 is Lower Waiohine Track at Waiohine Gorge Road, not the same place), so null. The Powell Hut quote is from the same sentence, which says to turn left onto the track to Powell Hut and climb the Gentle Annie track; the walk is taken to go up the Gentle Annie track towards Mountain House Shelter rather than to Powell Hut, so Powell Hut is not on route (ref left null). Waiohine River has no name entry (peak Waiohine only) so it is not a via. The page also mentions an all-weather track round a slip below Totara Flats; not recorded as a way or exit since no start or end is given."
+}

@@ -1,0 +1,134 @@
+{
+ "guid": "613a5c42-1771-46ee-8be4-fcefac0c3dfe",
+ "kind": "network",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Karangarua River valley route to Christmas Flat",
+   "shape": "one_way",
+   "start": {
+    "name": "Karangarua River bridge",
+    "quote": "Karangarua River bridge",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Christmas Flat Hut",
+    "quote": "Christmas Flat Hut",
+    "ref": "T5"
+   },
+   "via": [
+    {
+     "name": "Karangarua – Copland junction",
+     "quote": "Karangarua – Copland junction",
+     "ref": null
+    },
+    {
+     "name": "Cassel Flat Hut",
+     "quote": "Cassel Flat Hut",
+     "ref": "T3"
+    },
+    {
+     "name": "Tui Creek",
+     "quote": "Tui Creek",
+     "ref": "T17"
+    },
+    {
+     "name": "Lame Duck Hut",
+     "quote": "Lame Duck Hut",
+     "ref": "T14"
+    },
+    {
+     "name": "Karangarua River",
+     "quote": "Cross the Karangarua River to avoid the bluff",
+     "ref": "T12",
+     "how": "ford"
+    },
+    {
+     "name": "Troyte River",
+     "quote": "cross the Troyte River",
+     "ref": "T16",
+     "how": "ford"
+    }
+   ],
+   "direction": null,
+   "time": "2 days +",
+   "distance": null,
+   "evidence": [
+    "The Karangarua River valley route to Christmas Flat is well marked with orange plastic markers and windfalls are cleared annually.",
+    "### Karangarua River bridge – Cassel Flat Hut",
+    "### Cassel Flat Hut – Lame Duck Hut",
+    "### Lame Duck Hut – Christmas Flat Hut"
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Cassel Flat to Horace Walker via Regina Creek",
+   "shape": "one_way",
+   "start": {
+    "name": "Cassel Flat Hut",
+    "quote": "Cassel Flat Hut",
+    "ref": "T3"
+   },
+   "end": {
+    "name": "Horace Walker Hut",
+    "quote": "Horace Walker Hut",
+    "ref": "T9"
+   },
+   "via": [
+    {
+     "name": "Karangarua River",
+     "quote": "Karangarua River",
+     "ref": "T12"
+    },
+    {
+     "name": "Regina Creek",
+     "quote": "Regina Creek",
+     "ref": "T15"
+    },
+    {
+     "name": "Conical Hill Saddle",
+     "quote": "Conical Hill Saddle",
+     "ref": null
+    },
+    {
+     "name": "Horace Walker River",
+     "quote": "You will need to cross the Horace Walker River to reach the hut.",
+     "ref": null,
+     "how": "ford"
+    }
+   ],
+   "direction": null,
+   "time": "13 hr",
+   "distance": null,
+   "evidence": [
+    "### Cassel Flat to Horace Walker via Regina Creek",
+    "From Cassel Flat Hut cross the flats and use the cableway to cross the Karangarua River to the true right.",
+    "Traverse east to the four bunk Horace Walker Hut."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Cassel Flat Hut",
+   "quote": "Cassel Flat Hut",
+   "ref": "T3"
+  },
+  {
+   "name": "Lame Duck Hut",
+   "quote": "Lame Duck Hut",
+   "ref": "T14"
+  },
+  {
+   "name": "Christmas Flat Hut",
+   "quote": "Christmas Flat Hut",
+   "ref": "T5"
+  }
+ ],
+ "not_on_route": [],
+ "doubts": "Page describes two valley routes (Karangarua to Christmas Flat; Douglas valley branching from Cassel Flat), so kind network. W1 time is DOC's '2 days +'; legs are 6, 7 and 3 hr. Horace Walker Hut is on W2 only. Karangarua River cableway crossing on W2 not marked as ford. Regina Creek crossed by three-wire bridge. The unmarked other Douglas routes are not described."
+}

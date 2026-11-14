@@ -1,0 +1,99 @@
+[
+  {
+    "tile": "17/127471/83202",
+    "source": "aerial",
+    "status": 200,
+    "bytes": 5658,
+    "mime": "image/webp",
+    "cache": "public, max-age=604800, stale-while-revalidate=86400",
+    "dimensions": [
+      256,
+      256
+    ],
+    "seconds": 1.387
+  },
+  {
+    "tile": "17/127471/83202",
+    "source": "canterbury-2015-2016-0.3m",
+    "status": 200,
+    "bytes": 48403,
+    "mime": "image/png",
+    "cache": "public, max-age=604800, stale-while-revalidate=86400",
+    "dimensions": [
+      256,
+      256
+    ],
+    "transparentPixels": 36308,
+    "nonTransparentPixels": 29228,
+    "seconds": 1.616
+  },
+  {
+    "tile": "17/127471/83202",
+    "source": "esri",
+    "status": 200,
+    "bytes": 12601,
+    "mime": "image/jpeg",
+    "cache": "max-age=86400",
+    "dimensions": [
+      256,
+      256
+    ],
+    "seconds": 0.666
+  },
+  {
+    "tile": "17/127469/84542",
+    "source": "aerial",
+    "status": 200,
+    "bytes": 11452,
+    "mime": "image/webp",
+    "cache": "public, max-age=604800, stale-while-revalidate=86400",
+    "dimensions": [
+      256,
+      256
+    ],
+    "seconds": 1.028
+  },
+  {
+    "tile": "17/127469/84542",
+    "source": "southland-central-otago-2013-2014-0.4m",
+    "status": 200,
+    "bytes": 102383,
+    "mime": "image/png",
+    "cache": "public, max-age=604800, stale-while-revalidate=86400",
+    "dimensions": [
+      256,
+      256
+    ],
+    "transparentPixels": 0,
+    "nonTransparentPixels": 65536,
+    "seconds": 0.723
+  },
+  {
+    "tile": "17/127469/84542",
+    "source": "otago-2025-0.2m",
+    "status": 200,
+    "bytes": 125645,
+    "mime": "image/png",
+    "cache": "public, max-age=604800, stale-while-revalidate=86400",
+    "dimensions": [
+      256,
+      256
+    ],
+    "transparentPixels": 0,
+    "nonTransparentPixels": 65536,
+    "seconds": 1.434
+  },
+  {
+    "tile": "17/127469/84542",
+    "source": "esri",
+    "status": 200,
+    "bytes": 16016,
+    "mime": "image/jpeg",
+    "cache": "max-age=86400",
+    "dimensions": [
+      256,
+      256
+    ],
+    "seconds": 0.67
+  }
+]

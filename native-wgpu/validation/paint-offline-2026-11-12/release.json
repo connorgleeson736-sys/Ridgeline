@@ -1,0 +1,35 @@
+{
+  "artifact": "Ridgeline-Native-Paint-Offline-0.1.37-Base.apk",
+  "bytes": 33805626,
+  "sha256": "f72c229a4038ed915d2950b1a6ea7dad10bbc4c8d0339cf63e1c844754006322",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.37-paint-offline",
+  "versionCode": 38,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.36 Full Audit (same package and signer)",
+  "designChoices": "Chosen by the user: one finger paints and two fingers move the map; four detail colours; brush fixed on screen; extras: paint along a route, show what is already stored, undo, live size estimate.",
+  "changes": [
+    "Offline bar has two tabs. Paint: paint the detail you want onto the 2D or 3D map. One finger paints, two fingers pan/zoom/rotate/tilt; a second finger landing within 350 ms (or 24 dp) of a stroke's start turns it into a map gesture and the stroke is reverted.",
+    "Four detail colours: Overview z13 (red), Standard z14 (orange), Detailed z15 (yellow), Maximum z17 (green), and an eraser. Painted areas are stored as zoom-16 cells (about 440 m square in NZ); each downloads every image tile from z0 to its own detail that covers it, plus terrain and (optionally) NZ Topo and overlays.",
+    "Brush fixed on screen (26 dp radius, outline shown under the finger), so zooming out paints broad areas and zooming in paints precise strips.",
+    "Undo (50 strokes; Clear is undoable), Along route (corridor 500 m either side of the open route or a saved route, as one stroke), live size and file estimate off the UI thread, 'Too large' warning above 20,000 image tiles.",
+    "The terrain tint shows painted cells in their colour and areas already stored on the phone faintly in the same colours (cache, saved rectangles and saved painted areas).",
+    "The painting is kept as a draft between sessions. After Download it becomes a saved region (cleared from the canvas, Undo restores it); saved painted regions resume with their own cells, imagery and overlay choices.",
+    "Topo map tab: the page-shaped or custom frame for NZ Topo region downloads and Save as PDF; switches the map to NZ Topo in 2D and restores the previous style when leaving.",
+    "Advanced: imagery for painted downloads (LINZ aerial or Satellite), include NZ Topo & overlays, downloaded maps only, overview imagery packs. Download progress shows tile counts only."
+  ],
+  "tests": {
+    "kotlinJvm": "205 tests, 0 failures (new: PaintedAreaTest x6: strokes/overwrite/erase/undo, cancelled strokes, tiles per detail, encode round trip, route corridor, stored-zoom colours)",
+    "rust": "unchanged from 0.1.36 (native libraries byte-identical)"
+  },
+  "lintErrors": 0,
+  "assetsIdenticalTo0136": "626 of 628; only the generated dexopt baseline profiles differ",
+  "jniExportsPerAbi": 49,
+  "loadAlignment": "0x4000",
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

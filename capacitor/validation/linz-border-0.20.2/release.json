@@ -1,0 +1,33 @@
+{
+  "sourceCommit": "d3e3340533a7b9c62f3f8bd2db1252d8313a0864",
+  "artifact": "Ridgeline-Capacitor-LINZ-Border-Fix-0.20.2-Base.apk",
+  "bytes": 26928608,
+  "sha256": "3f9d38cd8f519fbdf2820e4c78f8a62db4d4045fed66ca2dfac7007719904f75",
+  "versionName": "0.20.2-latency-audit",
+  "versionCode": 25,
+  "applicationId": "nz.ridgeline.mobile.performance.latencyaudit",
+  "label": "Ridgeline Capacitor Audit",
+  "signerSha256": "03ef64214daee8c59cad6571ce5036579237d553c040837ce996f80efa898ae7",
+  "updatesPreviousAuditInPlace": true,
+  "mapAndConfigAssetsByteIdenticalTo0201": 1222,
+  "changedNonPublicAssets": [
+    "assets/dexopt/baseline.prof"
+  ],
+  "artProfilesRegeneratedForNewBytecode": true,
+  "allPublicAssetsByteIdenticalTo0201": 1218,
+  "originalImageryBinaryGeojsonAssetsByteIdentical": 1134,
+  "engineSha256": "418e23a87cf64cbbd02a29a1edd77a8f43ced39184b32d032eec2613762bc5e9",
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "decimalSurveyRuleVerifiedInApkDex": true,
+  "oldRejectingRuleAbsentFromApkDex": true,
+  "focusedAddressTestsPassed": 7,
+  "catalogueSurveyNamesAcceptedBefore": 1,
+  "catalogueSurveyNamesAcceptedAfter": 46,
+  "catalogueSurveyNames": 46,
+  "liveProviderSamplesHttp200": 16,
+  "rendererChanged": false,
+  "physicalDeviceRun": false,
+  "noCacheWipeRequired": true,
+  "report": "../../LINZ-BORDER-FIX-0.20.2.md"
+}

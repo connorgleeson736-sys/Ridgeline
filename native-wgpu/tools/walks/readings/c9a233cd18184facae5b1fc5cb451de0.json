@@ -1,0 +1,136 @@
+{
+ "guid": "c9a233cd-1818-4fac-ae5b-1fc5cb451de0",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Tuohys Gully carpark to Lowburn (Swann Road stile)",
+   "shape": "one_way",
+   "start": {
+    "name": "Tuohys Gully carpark",
+    "quote": "From Tuohys Gully carpark, follow a 4WD track",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "stile on Swann Road",
+    "quote": "to the stile on Swann Road",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Tuohys Saddle",
+     "quote": "up to Tuohys Saddle (1,140 m)",
+     "ref": null
+    },
+    {
+     "name": "Meg Hut",
+     "quote": "descend 200 m to Meg Hut (960 m)",
+     "ref": "L1"
+    },
+    {
+     "name": "Roaring Meg stream",
+     "quote": "you will have to cross the Roaring Meg stream",
+     "ref": "T5",
+     "how": "ford"
+    },
+    {
+     "name": "old water race",
+     "quote": "The track continues alongside an old water race",
+     "ref": null
+    },
+    {
+     "name": "Deep Creek Hut",
+     "quote": "descend a 4WD road to the Deep Creek Hut (1,325 m)",
+     "ref": null
+    },
+    {
+     "name": "farm road up to the ridge",
+     "quote": "From the hut, follow the farm road up to the ridge.",
+     "ref": null,
+     "how": "road"
+    },
+    {
+     "name": "old cattle track",
+     "quote": "sidles along the cattle track",
+     "ref": null
+    },
+    {
+     "name": "ruins of an old stone cottage",
+     "quote": "the ruins of an old stone cottage",
+     "ref": null
+    },
+    {
+     "name": "farm road to the valley floor",
+     "quote": "again follows a farm road down to the valley floor",
+     "ref": null,
+     "how": "road"
+    },
+    {
+     "name": "Low Burn stream",
+     "quote": "Here you cross the Low Burn stream",
+     "ref": "T2",
+     "how": "ford"
+    }
+   ],
+   "direction": null,
+   "time": "9–12 hr one way",
+   "distance": "25 km one way",
+   "evidence": [
+    "From Tuohys Gully carpark, follow a 4WD track climbing steadily up to Tuohys Saddle (1,140 m).",
+    "At the top, follow the track to the left to descend 200 m to Meg Hut (960 m).",
+    "You then descend a 4WD road to the Deep Creek Hut (1,325 m).",
+    "Here you cross the Low Burn stream for one last uphill climb before crossing through farm paddock to the stile on Swann Road."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Lowburn carpark",
+   "quote": "Lowburn carpark",
+   "ref": null,
+   "onto": "stile on Swann Road"
+  }
+ ],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Meg Hut",
+   "quote": "Meg Hut",
+   "ref": "L1"
+  },
+  {
+   "name": "Deep Creek Hut",
+   "quote": "Deep Creek Hut",
+   "ref": null
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Rock Peak Track",
+   "quote": "Rock Peak Track",
+   "ref": "L2",
+   "why": "other walk"
+  },
+  {
+   "name": "Pisa Ridge Track",
+   "quote": "the Pisa Ridge Track",
+   "ref": null,
+   "why": "other walk"
+  },
+  {
+   "name": "Mitre Rocks",
+   "quote": "via Mitre Rocks",
+   "ref": "T4",
+   "why": "other"
+  },
+  {
+   "name": "Pisa Conservation Area",
+   "quote": "Dogs are allowed in the Pisa Conservation Area",
+   "ref": null,
+   "why": "nearby"
+  }
+ ],
+ "doubts": "The start is the Tuohys Gully carpark, matched to F1 (where Meg Hut Pack Track meets Tuohys Gully Road), which the text describes as a carpark in a small paddock at the end of a farm road; this match is likely but not certain. The end is the stile on Swann Road at the Lowburn end, which has no feature entry, so its ref is null; the Lowburn carpark reached by Swann Road is recorded as an access point. Ford is given for the Roaring Meg stream (the text says it must be crossed, and it may be impassable after rain) and for the Low Burn stream (the text says the walk crosses it). The farm roads are recorded as road vias because the page says the route follows them on foot. Time and distance are DOC's summary (9–12 hr one way; 25 km one way), matching the three section distances 7 + 8 + 10 km. The page says the Lowburn section is not maintained by DOC; this is not repeated as a separate way."
+}

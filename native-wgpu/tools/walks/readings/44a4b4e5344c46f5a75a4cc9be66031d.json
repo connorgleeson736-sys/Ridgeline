@@ -1,0 +1,368 @@
+{
+ "guid": "44a4b4e5-344c-46f5-a75a-4cc9be66031d",
+ "kind": "network",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Road end to Whataroa-Perth Track junction",
+   "shape": "one_way",
+   "start": {
+    "name": "car park",
+    "quote": "From the car park",
+    "ref": null
+   },
+   "end": {
+    "name": "Whataroa-Perth Track junction",
+    "quote": "the junction of the Perth River and Whataroa River tracks is signposted",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Big Creek",
+     "quote": "Big Creek",
+     "ref": "T7"
+    },
+    {
+     "name": "Big Bend",
+     "quote": "‘Big Bend’",
+     "ref": null
+    },
+    {
+     "name": "Whataroa-Perth swing bridge",
+     "quote": "Whataroa-Perth swing bridge",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "2 hr",
+   "distance": null,
+   "evidence": [
+    "From the car park the track initially follows the 4WD track and markers up the true left bank.",
+    "A couple of boulder-hopping sections will see you passing opposite the Perth River confluence before reaching the Whataroa-Perth swing bridge.",
+    "Around 100m beyond the bridge the junction of the Perth River and Whataroa River tracks is signposted."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Whataroa-Perth Track junction to Scone Hut",
+   "shape": "one_way",
+   "start": {
+    "name": "Whataroa-Perth Track junction",
+    "quote": "Whataroa-Perth Track junction",
+    "ref": null
+   },
+   "end": {
+    "name": "Scone Hut",
+    "quote": "Scone Hut",
+    "ref": "T22"
+   },
+   "via": [
+    {
+     "name": "Hughes Creek",
+     "quote": "Hughes Creek",
+     "ref": "T14"
+    },
+    {
+     "name": "Nolans Hut",
+     "quote": "Nolans Hut",
+     "ref": "T18"
+    },
+    {
+     "name": "Nolans Flat",
+     "quote": "Nolans Flat",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "6 hr",
+   "distance": null,
+   "evidence": [
+    "Whataroa-Perth Track junction – Scone Hut tramping track",
+    "The track then alternates between bush terraces and boulder hopping to Scone Hut (six bunks), with several notable side creeks needing to be crossed."
+   ]
+  },
+  {
+   "id": "W3",
+   "main": false,
+   "label": "Perth headwaters/Adams Wilderness Area access",
+   "shape": "one_way",
+   "start": {
+    "name": "Scone Hut",
+    "quote": "from Scone Hut",
+    "ref": "T22"
+   },
+   "end": {
+    "name": "end of marked track above Redfield swing bridge",
+    "quote": "The marked track ends approximately 200 m above the Redfield swing bridge.",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Lower Scone swing bridge",
+     "quote": "Lower Scone swing bridge",
+     "ref": null
+    },
+    {
+     "name": "Redfield swing bridge",
+     "quote": "Redfield swing bridge",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "30 min to end of track",
+   "distance": null,
+   "evidence": [
+    "To access the Perth headwaters and Adams Wilderness Area from Scone Hut, follow the track across Lower Scone swing bridge, then to Redfield swing bridge.",
+    "The marked track ends approximately 200 m above the Redfield swing bridge."
+   ]
+  },
+  {
+   "id": "W4",
+   "main": false,
+   "label": "Scone Creek tramping track",
+   "shape": "one_way",
+   "start": {
+    "name": "Scone Hut",
+    "quote": "Follow the track from the hut",
+    "ref": "T22"
+   },
+   "end": {
+    "name": "small clearing downstream of the former Upper Scone swing bridge",
+    "quote": "The marked track ends at the small clearing approximately 300 m downstream of the former Upper Scone swing bridge.",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Lower Scone swing bridge",
+     "quote": "Lower Scone swing bridge",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "1 hr to track end",
+   "distance": null,
+   "evidence": [
+    "Follow the track from the hut past Lower Scone swing bridge (remaining on the true left of Scone Creek) upstream.",
+    "The marked track ends at the small clearing approximately 300 m downstream of the former Upper Scone swing bridge."
+   ]
+  },
+  {
+   "id": "W5",
+   "main": false,
+   "label": "Bettison Route",
+   "shape": "one_way",
+   "start": {
+    "name": "Scone Hut",
+    "quote": "To access the Bettison Route from Scone Hut",
+    "ref": "T22"
+   },
+   "end": {
+    "name": "two yellow and blue deer posts",
+    "quote": "The marked route ends at the two yellow and blue deer posts.",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Lower Scone swing bridge",
+     "quote": "Lower Scone swing bridge",
+     "ref": null
+    },
+    {
+     "name": "sign-posted junction",
+     "quote": "the sign-posted junction",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "2 hr to bush edge",
+   "distance": null,
+   "evidence": [
+    "To access the Bettison Route from Scone Hut follow the track upstream over Lower Scone swing bridge to the sign-posted junction.",
+    "The marked route ends at the two yellow and blue deer posts."
+   ]
+  },
+  {
+   "id": "W6",
+   "main": false,
+   "label": "Whataroa-Perth Track junction to Butler Junction Hut",
+   "shape": "one_way",
+   "start": {
+    "name": "Whataroa-Perth Track junction",
+    "quote": "Whataroa-Perth Track junction",
+    "ref": null
+   },
+   "end": {
+    "name": "Butler Junction Hut",
+    "quote": "Butler Junction Hut",
+    "ref": "T8"
+   },
+   "via": [
+    {
+     "name": "The Twister",
+     "quote": "fording The Twister",
+     "ref": "T23",
+     "how": "ford"
+    },
+    {
+     "name": "Harry Creek",
+     "quote": "Harry Creek",
+     "ref": "T13"
+    },
+    {
+     "name": "Barrowman Flat",
+     "quote": "Barrowman Flat",
+     "ref": "T5"
+    },
+    {
+     "name": "McCormicks swing bridge",
+     "quote": "McCormicks swing bridge",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "5 hr",
+   "distance": null,
+   "evidence": [
+    "The track to Butler Junction continues up the Whataroa valley with several short climbs before dropping steeply down to the beach downstream of The Twister.",
+    "Butler Junction Hut (eight bunks) is reached about ten minutes past McCormicks swing bridge."
+   ]
+  },
+  {
+   "id": "W7",
+   "main": false,
+   "label": "Butler Junction Hut to Whymper Hut",
+   "shape": "one_way",
+   "start": {
+    "name": "Butler Junction Hut",
+    "quote": "Butler Junction Hut",
+    "ref": "T8"
+   },
+   "end": {
+    "name": "Whymper Hut",
+    "quote": "Whymper Hut",
+    "ref": "T27"
+   },
+   "via": [
+    {
+     "name": "Butler Junction swing bridge",
+     "quote": "Butler Junction swing bridge",
+     "ref": null
+    },
+    {
+     "name": "Rocky Creek swing bridge",
+     "quote": "Rocky Creek swing bridge",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "4 hr",
+   "distance": null,
+   "evidence": [
+    "The track follows Butler River on the true right bank before crossing Butler Junction swing bridge.",
+    "The track then emerges onto an obvious open area towards the headwaters before climbing steeply up an old moraine wall on the true left to reach Whymper Hut (six bunks)."
+   ]
+  },
+  {
+   "id": "W8",
+   "main": false,
+   "label": "Butler Junction Hut to Top Butler Hut",
+   "shape": "one_way",
+   "start": {
+    "name": "Butler Junction Hut",
+    "quote": "From the hut the track follows the Butler River",
+    "ref": "T8"
+   },
+   "end": {
+    "name": "Top Butler Hut",
+    "quote": "Top Butler Hut",
+    "ref": "T24"
+   },
+   "via": [],
+   "direction": null,
+   "time": "2 hr",
+   "distance": null,
+   "evidence": [
+    "From the hut the track follows the Butler River up the true right bank before crossing the swing bridge.",
+    "From here the track climbs and sidles across steep hillsides and creeks originating from King Peak, before reaching Top Butler Hut (six bunks)."
+   ]
+  },
+  {
+   "id": "W9",
+   "main": false,
+   "label": "Top Butler to Ice Lake",
+   "shape": "one_way",
+   "start": {
+    "name": "Top Butler Hut",
+    "quote": "Top Butler",
+    "ref": "T24"
+   },
+   "end": {
+    "name": "Ice Lake",
+    "quote": "Ice Lake",
+    "ref": "T15"
+   },
+   "via": [
+    {
+     "name": "Butler River (South Branch)",
+     "quote": "Butler River (South Branch)",
+     "ref": "T10",
+     "how": "ford"
+    }
+   ],
+   "direction": null,
+   "time": "2 hr",
+   "distance": null,
+   "evidence": [
+    "Top Butler to Ice Lake tramping track",
+    "Boulder hop from here up to Ice Lake, where there are great views and small campsites."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Nolans Hut",
+   "quote": "Nolans Hut",
+   "ref": "T18"
+  },
+  {
+   "name": "Scone Hut",
+   "quote": "Scone Hut",
+   "ref": "T22"
+  },
+  {
+   "name": "Butler Junction Hut",
+   "quote": "Butler Junction Hut",
+   "ref": "T8"
+  },
+  {
+   "name": "Whymper Hut",
+   "quote": "Whymper Hut",
+   "ref": "T27"
+  },
+  {
+   "name": "Top Butler Hut",
+   "quote": "Top Butler Hut",
+   "ref": "T24"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Gunn Ridge Route",
+   "quote": "Gunn Ridge Route is closed permanently because of severe erosion.",
+   "ref": "T3",
+   "why": "other walk"
+  },
+  {
+   "name": "Dennistoun Pass",
+   "quote": "Dennistoun Pass",
+   "ref": "T11",
+   "why": "other"
+  }
+ ],
+ "doubts": "Page for a network of valley tracks, not one walk; each described track section is a way, W1 (road end section) listed first as main. No feature entries, so the car park (off SH6) and the Whataroa-Perth Track junction are unplaced. Shapes are recorded one_way as sections are described A to B; page does not say whether walkers return. W3-W5 are dead-end tracks from Scone Hut. Ford of The Twister is explicit; the Butler River (South Branch) bridge is destroyed and crossing on foot 'may be possible in low flow', recorded as a ford. Helicopter operators provide access to remote areas, but no place is named, so no exit/access point."
+}

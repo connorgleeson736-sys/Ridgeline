@@ -1,0 +1,50 @@
+{
+ "guid": "2042f491-c0de-49e6-a251-9b50c33a7603",
+ "kind": "out_and_back",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Truman Track, highway to the lower viewing platform and back",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Truman Track at State Highway 6",
+    "quote": "Truman Track leads from the highway just north of Punakaiki",
+    "ref": "F2"
+   },
+   "end": {
+    "name": "lower viewing platform",
+    "quote": "The walk ends at the lower viewing platform.",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "upper viewing platform",
+     "quote": "the upper platform",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "30 min return",
+   "distance": "1.4 km return via same track",
+   "evidence": [
+    "Truman Track leads from the highway just north of Punakaiki down to the Tasman Sea.",
+    "The walk ends at the lower viewing platform.",
+    "Return to the carpark the same way you came."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Pancake Rocks",
+   "quote": "south to the Pancake Rocks",
+   "ref": "T3",
+   "why": "view"
+  }
+ ],
+ "doubts": "Start ref F2 (Truman Track meets State Highway 6) chosen as the track entrance from the highway; the car park is opposite the entrance."
+}

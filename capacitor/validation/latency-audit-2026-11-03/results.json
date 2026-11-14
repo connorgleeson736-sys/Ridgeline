@@ -1,0 +1,33 @@
+{
+  "referenceSource": "d880143418ac46ece98adff0b3b2fbaedf044d46",
+  "target": "Capacitor Original + Direct",
+  "engineVersion": "6.14.0",
+  "engineSha256": "7bb11f19f43ea39a6327a3e2faa08f09d3a43b438daf84832b2f670a1bcd25b1",
+  "replay": {
+    "draws": 60,
+    "coverageReconciliations": 60,
+    "idealSelections": 10,
+    "sameWithRasterEventEveryFrame": true
+  },
+  "heldDecodeReplay": {
+    "bodiesDeliveredBefore": 8,
+    "bodiesDeliveredAfter": 16,
+    "totalRequested": 24,
+    "stagedItemCap": 16,
+    "stagedByteCap": 16777216,
+    "perInFlightReservationBytes": 1048576,
+    "oversizeBodiesRetainDeliveryPermit": true,
+    "beforeCountFromSuppliedAudit": true
+  },
+  "workerProfilesExact": 3,
+  "liveDEMPixelsUnchanged": true,
+  "existingQueueChecksPassed": 10,
+  "routeChecksPassed": 4,
+  "conservativeBoundsAndAdaptiveGeometryChecksPassed": true,
+  "capacitorBaseWebBuildPassed": true,
+  "phoneBenchmark": false,
+  "apkBuilt": false,
+  "sourceImageResolutionAndTerrainDefaultsUnchanged": true,
+  "fullSuiteOrLintRun": false,
+  "enginePatchReplayAndIdempotencePassed": true
+}

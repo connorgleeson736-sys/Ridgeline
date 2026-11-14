@@ -1,0 +1,16 @@
+{
+  "scope": "Host unit/build checks; not device speed or visual parity",
+  "androidUnitTests": 19,
+  "failures": 0,
+  "errors": 0,
+  "rustTests": 17,
+  "cameraProjectionCases": 1712,
+  "lintErrors": 0,
+  "lintWarnings": 13,
+  "nativeCrossBuilds": [
+    "aarch64-linux-android",
+    "armv7-linux-androideabi",
+    "x86_64-linux-android"
+  ],
+  "gpu": "Software Vulkan controlled fixture: PASS, independent geometry and image LOD, exact crops, 32768 triangles for four child photos on one parent mesh. No real DEM or phone benchmark."
+}

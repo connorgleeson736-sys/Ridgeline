@@ -1,0 +1,32 @@
+{
+  "artifact": "Ridgeline-Native-Lighter-Frames-0.1.22-Base.apk",
+  "bytes": 32779279,
+  "sha256": "7ed82f3d133039ad26a8ea41d2854caef4c27b7f67a5f99060ba9790d3c9f0a8",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.22-lighter-frames",
+  "versionCode": 23,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.21 Full Audit (same package and signer)",
+  "trace": "Exynos 7884B, Android 11, 15 s: ~15 fps, GPU at top clock ~70% of the time, kswapd 4.2 s, 31 direct reclaims",
+  "changes": [
+    "labels drawn in the main pass, reading the previous frame's depth (alternating depth textures) projected with the previous camera",
+    "scale bar updates at most 4 per second while touching plus once on settle",
+    "overlay pool sized by device RAM via NativeBridge.overlayBudget (16/24/40/48 MiB)",
+    "A/B marker projection reuses direct buffers"
+  ],
+  "tests": {
+    "kotlinJvm": "174 tests, 0 failures",
+    "rust": "cargo test --workspace: all pass",
+    "gpu": "label_occlusion incl. moving camera (Vulkan and GLES), overlay_parity, overlay_drape, waypoint_occlusion, route_smoke, progressive_multi pass"
+  },
+  "lintErrors": 0,
+  "originalAssetsIdentical": 623,
+  "jniExportsPerAbi": 44,
+  "loadAlignment": "0x4000",
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

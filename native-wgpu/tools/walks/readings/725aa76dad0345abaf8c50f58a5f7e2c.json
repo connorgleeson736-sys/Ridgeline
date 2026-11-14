@@ -1,0 +1,114 @@
+{
+ "guid": "725aa76d-ad03-45ab-af8c-50f58a5f7e2c",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Waikakaho Valley to Cullen Creek road end",
+   "shape": "one_way",
+   "start": {
+    "name": "end of Waikakaho Road",
+    "quote": "In the south the track begins at the end of Waikakaho Road",
+    "ref": "F3"
+   },
+   "end": {
+    "name": "road end at Cullensville",
+    "quote": "to the road end and the site of the former mining town, Cullensville",
+    "ref": "F1"
+   },
+   "via": [
+    {
+     "name": "parking area beside the Waikakaho River",
+     "quote": "a parking area beside the Waikakaho River",
+     "ref": null
+    },
+    {
+     "name": "Golden Belt Stream",
+     "quote": "Cross Golden Belt Stream",
+     "ref": "T4",
+     "how": "ford"
+    },
+    {
+     "name": "Village Clearing",
+     "quote": "Village Clearing",
+     "ref": null
+    },
+    {
+     "name": "Waikakaho Saddle",
+     "quote": "Waikakaho Saddle",
+     "ref": null
+    },
+    {
+     "name": "small grassy clearing",
+     "quote": "a small grassy clearing",
+     "ref": null
+    },
+    {
+     "name": "private hut",
+     "quote": "a private hut on a terrace high above Cullen Creek",
+     "ref": null
+    },
+    {
+     "name": "Prospector Creek",
+     "quote": "cross Prospector Creek",
+     "ref": "T6",
+     "how": "ford"
+    },
+    {
+     "name": "Cullen Creek",
+     "quote": "crosses Cullen Creek",
+     "ref": "T3",
+     "how": "ford"
+    }
+   ],
+   "direction": null,
+   "time": "5 hr",
+   "distance": "15 km one way",
+   "evidence": [
+    "In the south the track begins at the end of Waikakaho Road.",
+    "It eventually descends and crosses Cullen Creek to the road end and the site of the former mining town, Cullensville.",
+    "Access to the start of the track at the northern end is at Cullen Creek Valley from Linkwater."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Cullen Creek Valley (northern end)",
+   "quote": "Access to the start of the track at the northern end is at Cullen Creek Valley from Linkwater.",
+   "ref": "F1",
+   "onto": "the track from the Cullen Creek end"
+  }
+ ],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "side track to a drive entrance",
+   "quote": "a side track leads to the entrance of a drive which extends over 100 metres into the rock",
+   "ref": null,
+   "from": "Village Clearing"
+  }
+ ],
+ "huts": [
+  {
+   "name": "private hut",
+   "quote": "a private hut on a terrace high above Cullen Creek",
+   "ref": null
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Linkwater",
+   "quote": "Linkwater",
+   "ref": "T5",
+   "why": "nearby"
+  },
+  {
+   "name": "shaft sheds beside the Waikakaho River",
+   "quote": "Each shed covers the entrance to a deep (20 m) shaft.",
+   "ref": null,
+   "why": "nearby"
+  }
+ ],
+ "doubts": "Start: the track begins at the end of Waikakaho Road; two road-end features lie on that road (F2 unnamed track, F3 where Cullen Creek Walkway meets it). F3 chosen because the mapped walkway meets the road there, but F2 could be the road end with the farm road running 2 km on to the parking area. The way is described south to north; the page also calls the northern end a start (reverse walking is not another way). The hut is private, not a DOC hut. Streams at both road ends and those flowing into Cullen Creek are stated unbridged, so the named crossings are marked fords; the crossing 'just before' the parking area is not clearly one."
+}

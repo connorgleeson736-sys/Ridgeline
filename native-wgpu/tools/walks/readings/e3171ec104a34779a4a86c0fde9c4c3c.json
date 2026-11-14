@@ -1,0 +1,235 @@
+{
+ "guid": "e3171ec1-04a3-4779-a4a8-6c0fde9c4c3c",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Meretoto/Ship Cove to Anakiwa along the Queen Charlotte Track",
+   "shape": "one_way",
+   "start": {
+    "name": "Meretoto/Ship Cove",
+    "quote": "it's best to start from Meretoto/Ship Cove",
+    "ref": "T19"
+   },
+   "end": {
+    "name": "Anakiwa",
+    "quote": "At Anakiwa are a carpark, shelter, toilets and phone near the track end",
+    "ref": "F3"
+   },
+   "via": [
+    {
+     "name": "Resolution Bay",
+     "quote": "Beyond the saddle, the track drops into Resolution Bay",
+     "ref": "T25"
+    },
+    {
+     "name": "Schoolhouse Bay Campsite",
+     "quote": "there is a DOC campsite at Schoolhouse Bay",
+     "ref": "L1"
+    },
+    {
+     "name": "Endeavour Inlet",
+     "quote": "follows the shoreline to the head of the inlet",
+     "ref": "T14"
+    },
+    {
+     "name": "Big Bay",
+     "quote": "It rounds Big Bay to Camp Bay",
+     "ref": "T7"
+    },
+    {
+     "name": "Camp Bay Campsite",
+     "quote": "It rounds Big Bay to Camp Bay where there is a DOC campsite",
+     "ref": "L2"
+    },
+    {
+     "name": "Kenepuru Saddle",
+     "quote": "Climb out of Camp Bay to Kenepuru Saddle",
+     "ref": "T15"
+    },
+    {
+     "name": "Bay of Many Coves Campsite",
+     "quote": "Bay of Many Coves Campsite",
+     "ref": "L3"
+    },
+    {
+     "name": "Black Rock Campsite",
+     "quote": "Black Rock Campsite",
+     "ref": "L4"
+    },
+    {
+     "name": "Torea Saddle",
+     "quote": "descends to Torea Saddle between Portage and Torea Bay",
+     "ref": "F1"
+    },
+    {
+     "name": "Cowshed Bay Campsite",
+     "quote": "There is a DOC campsite at Cowshed Bay",
+     "ref": "L5"
+    },
+    {
+     "name": "Te Mahia Saddle",
+     "quote": "just before the descent to Te Mahia Saddle begins",
+     "ref": null
+    },
+    {
+     "name": "Mistletoe Bay",
+     "quote": "At Mistletoe Bay there are private cabins and campsites.",
+     "ref": "T20"
+    },
+    {
+     "name": "Davies Bay Campsite",
+     "quote": "descends to the DOC campsite at Umungata (Davies Bay)",
+     "ref": "L6"
+    }
+   ],
+   "direction": null,
+   "time": "3-5 days",
+   "distance": "73.5 km one way",
+   "evidence": [
+    "You can walk or ride the track in either direction, but it's best to start from Meretoto/Ship Cove.",
+    "The final hour’s walking is on an easy path through mature beech forest to Anakiwa.",
+    "At Anakiwa are a carpark, shelter, toilets and phone near the track end, and a public jetty opposite the Outward Bound school."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Anakiwa",
+   "quote": "Anakiwa, Mistletoe Saddle, Torea Saddle and Kenepuru Saddle are all accessible by road.",
+   "ref": "F3",
+   "onto": "Queen Charlotte Track"
+  },
+  {
+   "name": "Mistletoe Saddle",
+   "quote": "Anakiwa, Mistletoe Saddle, Torea Saddle and Kenepuru Saddle are all accessible by road.",
+   "ref": null,
+   "onto": null
+  },
+  {
+   "name": "Torea Saddle",
+   "quote": "Anakiwa, Mistletoe Saddle, Torea Saddle and Kenepuru Saddle are all accessible by road.",
+   "ref": "F1",
+   "onto": null
+  },
+  {
+   "name": "Kenepuru Saddle",
+   "quote": "Anakiwa, Mistletoe Saddle, Torea Saddle and Kenepuru Saddle are all accessible by road.",
+   "ref": "T15",
+   "onto": null
+  },
+  {
+   "name": "Mistletoe Bay",
+   "quote": "Mistletoe Bay, Torea Bay, Camp Bay, Endeavour Inlet, Resolution Bay and Meretoto/Ship Cove can be accessed by sea.",
+   "ref": "T20",
+   "onto": null
+  },
+  {
+   "name": "Torea Bay",
+   "quote": "Mistletoe Bay, Torea Bay, Camp Bay, Endeavour Inlet, Resolution Bay and Meretoto/Ship Cove can be accessed by sea.",
+   "ref": null,
+   "onto": null
+  },
+  {
+   "name": "Camp Bay",
+   "quote": "Mistletoe Bay, Torea Bay, Camp Bay, Endeavour Inlet, Resolution Bay and Meretoto/Ship Cove can be accessed by sea.",
+   "ref": "T9",
+   "onto": null
+  },
+  {
+   "name": "Endeavour Inlet",
+   "quote": "Mistletoe Bay, Torea Bay, Camp Bay, Endeavour Inlet, Resolution Bay and Meretoto/Ship Cove can be accessed by sea.",
+   "ref": "T14",
+   "onto": null
+  },
+  {
+   "name": "Resolution Bay",
+   "quote": "Mistletoe Bay, Torea Bay, Camp Bay, Endeavour Inlet, Resolution Bay and Meretoto/Ship Cove can be accessed by sea.",
+   "ref": "T25",
+   "onto": null
+  }
+ ],
+ "exits": [
+  {
+   "name": "Bus to Picton",
+   "quote": "Here you can catch a bus or a boat to Picton",
+   "ref": null,
+   "from": "Anakiwa",
+   "how": "road"
+  },
+  {
+   "name": "Boat to Picton",
+   "quote": "Here you can catch a bus or a boat to Picton",
+   "ref": null,
+   "from": "Anakiwa",
+   "how": "boat"
+  }
+ ],
+ "side_trips": [
+  {
+   "name": "Waterfall Track",
+   "quote": "you can take the Waterfall Track to a small waterfall in the forest (40 min return)",
+   "ref": null,
+   "from": "Meretoto/Ship Cove"
+  },
+  {
+   "name": "Antimony Track",
+   "quote": "the Antimony Track leads up to a saddle",
+   "ref": null,
+   "from": "Endeavour Inlet"
+  },
+  {
+   "name": "James Vogel Nature Walk",
+   "quote": "the James Vogel Nature Track allows you to explore the forest behind the picnic and camping area",
+   "ref": "T2",
+   "from": "Mistletoe Bay"
+  },
+  {
+   "name": "Peninsula Walk",
+   "quote": "The Peninsula Walk explores the peninsula between Mistletoe and Waterfall bays",
+   "ref": "T3",
+   "from": null
+  },
+  {
+   "name": "Lookout side walk",
+   "quote": "A side walk leads to a lookout just before the descent to Te Mahia Saddle begins.",
+   "ref": null,
+   "from": null
+  }
+ ],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Motuara Island",
+   "quote": "explore Motuara Island",
+   "ref": "T21",
+   "why": "other"
+  },
+  {
+   "name": "Portage",
+   "quote": "between Portage and Torea Bay",
+   "ref": "T23",
+   "why": "nearby"
+  },
+  {
+   "name": "Te Mahia Bay",
+   "quote": "There is also private accommodation at Te Mahia Bay.",
+   "ref": "T29",
+   "why": "nearby"
+  },
+  {
+   "name": "Kenepuru Sound",
+   "quote": "the ridge separating Queen Charlotte Sound from Kenepuru Sound",
+   "ref": "T16",
+   "why": "view"
+  },
+  {
+   "name": "Kenepuru Road",
+   "quote": "riding along Kenepuru Road between Kenepuru Saddle and Portage",
+   "ref": null,
+   "why": "other"
+  }
+ ],
+ "doubts": "The track is one way from Meretoto/Ship Cove to Anakiwa. The page says it can be walked or ridden in either direction, but that is not a separate way, so the reverse is not recorded. Torea Saddle is taken as the road-end feature F1 (where Queen Charlotte Track meets Torea Road) and Anakiwa as F3 (where Queen Charlotte Track meets Anakiwa Road); the text does not name the features. The Camp Bay bypass by a direct track to Kenepuru Saddle and the mountain bike alternative along Kenepuru Road are not recorded as ways: the first is a bypass with no description of its own, and the second is a bike option. The Cowshed Bay campsite is described in the Camp Bay to Torea Saddle section, but its position on the track is not stated, so it is listed after Torea Saddle. The Te Mahia Saddle is named in the text but is not a map entry. Mistletoe Saddle (access by road) is not in the names list, and Mistletoe Bay in the walk is a different place. Campsites are listed as vias, not huts; the private cabins, hostels and motels are not named DOC huts, so the huts list is empty. The Peninsula Walk is recorded from null because the text does not say where it leaves the track. DOC's '3-5 days' and '73.5 km one way' are copied; the section distances in the text add to about 71 km."
+}

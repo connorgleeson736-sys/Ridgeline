@@ -1,0 +1,246 @@
+{
+ "guid": "139b02cb-ce7c-44fb-9b1f-dcb4520e45dc",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Harman Pass Route, SH73 to SH73 down the Taipo River",
+   "shape": "one_way",
+   "start": {
+    "name": "State Highway 73 south of the Waimakariri road bridge",
+    "quote": "The trip starts at State Highway 73 on the true right of the Waimakariri, just south of the Waimakariri road bridge",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "SH73 about 10 km west of Jacksons Tavern",
+    "quote": "The track ends on SH73 about 10 km west of Jacksons Tavern",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Carrington Hut Route",
+     "quote": "Carrington Hut route guide",
+     "ref": "L1"
+    },
+    {
+     "name": "Carrington Hut",
+     "quote": "Carrington Hut",
+     "ref": "T3"
+    },
+    {
+     "name": "White River",
+     "quote": "White River",
+     "ref": "T21",
+     "how": "ford"
+    },
+    {
+     "name": "Taipoiti River",
+     "quote": "Taipoiti River",
+     "ref": "T19"
+    },
+    {
+     "name": "Harman Pass",
+     "quote": "Harman Pass",
+     "ref": "T7"
+    },
+    {
+     "name": "Mary Creek",
+     "quote": "Mary Creek",
+     "ref": "T15",
+     "how": "ford"
+    },
+    {
+     "name": "swing bridge over Mary Creek",
+     "quote": "the swing bridge that crosses Mary Creek",
+     "ref": null
+    },
+    {
+     "name": "Julia Hut",
+     "quote": "Julia Hut",
+     "ref": "T11"
+    },
+    {
+     "name": "Tumbledown Creek 3-wire bridge",
+     "quote": "the 3-wire bridge across Tumbledown Creek",
+     "ref": "T20"
+    },
+    {
+     "name": "swing bridge across the Taipo",
+     "quote": "the swing bridge across the Taipo",
+     "ref": null
+    },
+    {
+     "name": "Mid Taipo Hut",
+     "quote": "Mid Taipo Hut",
+     "ref": "T16"
+    },
+    {
+     "name": "Hura Creek",
+     "quote": "Hura Creek",
+     "ref": "T8",
+     "how": "ford"
+    },
+    {
+     "name": "Dunns Creek",
+     "quote": "Dunns Creek",
+     "ref": "T6",
+     "how": "ford"
+    },
+    {
+     "name": "3-wire bridge across the Taipo River",
+     "quote": "a new 3-wire bridge that crosses the Taipo River",
+     "ref": null
+    },
+    {
+     "name": "Dillon Hut",
+     "quote": "Dillon Hut",
+     "ref": "T5"
+    },
+    {
+     "name": "Seven Mile Creek",
+     "quote": "Seven Mile Creek",
+     "ref": "T17",
+     "how": "ford"
+    },
+    {
+     "name": "4WD road",
+     "quote": "the 4WD road",
+     "ref": null,
+     "how": "road"
+    }
+   ],
+   "direction": null,
+   "time": "3 - 4 days",
+   "distance": null,
+   "evidence": [
+    "The trip starts at State Highway 73 on the true right of the Waimakariri, just south of the Waimakariri road bridge (about 10 km east of Arthur’s Pass village).",
+    "Finish by climbing up and over Kelly Range or by continuing down the Taipo River to the road.",
+    "The track ends on SH73 about 10 km west of Jacksons Tavern."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Alternative finish over Kelly Range via Kellys Creek",
+   "shape": "one_way",
+   "start": {
+    "name": "State Highway 73 south of the Waimakariri road bridge",
+    "quote": "The trip starts at State Highway 73 on the true right of the Waimakariri, just south of the Waimakariri road bridge",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "main road at Kellys Creek",
+    "quote": "emerges at Kellys Creek, 5 minutes from the main road",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Carrington Hut",
+     "quote": "Carrington Hut",
+     "ref": "T3"
+    },
+    {
+     "name": "Harman Pass",
+     "quote": "Harman Pass",
+     "ref": "T7"
+    },
+    {
+     "name": "Julia Hut",
+     "quote": "Julia Hut",
+     "ref": "T11"
+    },
+    {
+     "name": "Mid Taipo Hut",
+     "quote": "Mid Taipo Hut",
+     "ref": "T16"
+    },
+    {
+     "name": "Dillon Hut",
+     "quote": "Dillon Hut",
+     "ref": "T5"
+    },
+    {
+     "name": "Seven Mile Creek",
+     "quote": "Seven Mile Creek",
+     "ref": "T17"
+    },
+    {
+     "name": "Kelly Range",
+     "quote": "Kelly Range",
+     "ref": "T12"
+    },
+    {
+     "name": "Carroll Hut",
+     "quote": "Carroll Hut",
+     "ref": "T4"
+    },
+    {
+     "name": "Kelly Saddle",
+     "quote": "Kelly Saddle",
+     "ref": "T13"
+    },
+    {
+     "name": "Kellys Creek",
+     "quote": "Kellys Creek",
+     "ref": "T14"
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "Finish by climbing up and over Kelly Range or by continuing down the Taipo River to the road.",
+    "### Alternative route: Seven Mile Creek – SH 73 via Kellys Creek",
+    "Once in the bush it drops more steeply and emerges at Kellys Creek, 5 minutes from the main road."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Hot spring",
+   "quote": "Hot spring",
+   "ref": null,
+   "from": "Julia Hut"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Carrington Hut",
+   "quote": "Carrington Hut",
+   "ref": "T3"
+  },
+  {
+   "name": "Julia Hut",
+   "quote": "Julia Hut",
+   "ref": "T11"
+  },
+  {
+   "name": "Mid Taipo Hut",
+   "quote": "Mid Taipo Hut",
+   "ref": "T16"
+  },
+  {
+   "name": "Dillon Hut",
+   "quote": "Dillon Hut",
+   "ref": "T5"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Ariels Tarns",
+   "quote": "Ariels Tarns",
+   "ref": "T2",
+   "why": "other walk"
+  },
+  {
+   "name": "Whitehorn Pass",
+   "quote": "Whitehorn Pass",
+   "ref": "T22",
+   "why": "other walk"
+  }
+ ],
+ "doubts": "Start ref F1 (road end on West Coast Road) is likely the SH73 start but not certain. W2 time (6 hr) applies only to its last section so is not given. Carroll Hut (no heating) is on the W2 alternative only. Mary Creek crossing and others recorded as fords where the text says to cross them with no bridge."
+}

@@ -1,0 +1,7 @@
+{
+  "filename": "Ridgeline-Capacitor-additional-latency-audit.zip",
+  "sha256": "5045bb3dd3814dbad9bffd3533b59faae8f36916b2bf8c83e7f1d83a5d3de5be",
+  "auditSourceCommit": "d880143418ac46ece98adff0b3b2fbaedf044d46",
+  "appBaseline": "2b9aefb41b1e252def846c6b1e526e42bee5f1e8",
+  "interpretation": "Findings/reference experiments, not external instructions."
+}

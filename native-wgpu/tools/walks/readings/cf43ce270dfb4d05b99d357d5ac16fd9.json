@@ -1,0 +1,110 @@
+{
+ "guid": "cf43ce27-0dfb-4d05-b99d-357d5ac16fd9",
+ "kind": "out_and_back",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Flora car park to Mt Arthur Summit",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Flora car park",
+    "quote": "Flora car park",
+    "ref": null
+   },
+   "end": {
+    "name": "Mt Arthur Summit",
+    "quote": "climbs steeply to the Mt Arthur Summit",
+    "ref": "T10"
+   },
+   "via": [
+    {
+     "name": "Mt Arthur Hut Walk",
+     "quote": "Follow the Mt Arthur Hut Walk from Flora car park to Mt Arthur Hut.",
+     "ref": "L1"
+    },
+    {
+     "name": "Mt Arthur Hut",
+     "quote": "from Flora car park to Mt Arthur Hut.",
+     "ref": "T11"
+    },
+    {
+     "name": "Wharepapa/Arthur Range",
+     "quote": "a marked route follows the Wharepapa/Arthur Range",
+     "ref": "T13"
+    },
+    {
+     "name": "side of Horseshoe Basin",
+     "quote": "climbs more steeply above the side of Horseshoe Basin",
+     "ref": "T9"
+    },
+    {
+     "name": "junction with the route across Horseshoe Basin and Pyramid Ridge",
+     "quote": "Around halfway to the summit, you will reach a junction",
+     "ref": null
+    },
+    {
+     "name": "saddle",
+     "quote": "The route drops to a saddle",
+     "ref": null
+    },
+    {
+     "name": "track junction below Winter Peak",
+     "quote": "Just below Winter Peak you will come to another track junction",
+     "ref": null
+    },
+    {
+     "name": "Winter Peak",
+     "quote": "skirts around the back of Winter Peak",
+     "ref": "T14"
+    }
+   ],
+   "direction": null,
+   "time": "3 hr 30 min - 4 hr 30 min one way",
+   "distance": "9.2 km one way return via same track",
+   "evidence": [
+    "Follow the Mt Arthur Hut Walk from Flora car park to Mt Arthur Hut.",
+    "From Mt Arthur Hut, a marked route follows the Wharepapa/Arthur Range and offers panoramic views and a good look at the rock formations that make this mountain special.",
+    "The route climbs from Mt Arthur Hut onto a ridge, with marker poles showing the way.",
+    "The Mt Arthur Summit Route skirts around the back of Winter Peak, then climbs steeply to the Mt Arthur Summit – expect to be scrambling up rocky terrain."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Mt Arthur Hut",
+   "quote": "Mt Arthur Hut",
+   "ref": "T11"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Pyramid Ridge",
+   "quote": "towards Gordons Pyramid and the Tablelands",
+   "ref": "T12",
+   "why": "other"
+  },
+  {
+   "name": "Gordons Pyramid",
+   "quote": "towards Gordons Pyramid and the Tablelands",
+   "ref": "T8",
+   "why": "other"
+  },
+  {
+   "name": "Ellis Basin Route",
+   "quote": "the Ellis Basin Route drops down to Ellis Hut",
+   "ref": "T1",
+   "why": "other walk"
+  },
+  {
+   "name": "Ellis Hut",
+   "quote": "the Ellis Basin Route drops down to Ellis Hut",
+   "ref": "T7",
+   "why": "other"
+  }
+ ],
+ "doubts": "No road-end feature for Flora car park in the packet, so the start has no ref. Shape is out and back from DOC's distance 'return via same track' (its time says 'one way', which is the way's time). The end is the summit, taken as the Mount Arthur peak (T10). The route passes the back of Winter Peak and above Horseshoe Basin; the junction heading across Horseshoe Basin and Pyramid Ridge is not a way. The Ellis Basin Route is a junction branch, not walked by this way."
+}

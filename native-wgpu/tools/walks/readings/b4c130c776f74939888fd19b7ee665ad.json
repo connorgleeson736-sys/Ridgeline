@@ -1,0 +1,509 @@
+{
+ "guid": "b4c130c7-76f7-4939-888f-d19b7ee665ad",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Richmond Ranges Te Araroa route, from the car park at the end of Mt Richmond Road to Tophouse Road",
+   "shape": "one_way",
+   "start": {
+    "name": "car park at the end of Mt Richmond Road",
+    "quote": "From the car park at the end of Mt Richmond Road",
+    "ref": "F4"
+   },
+   "end": {
+    "name": "Tophouse Road",
+    "quote": "Then the Beebys Knob Road descends for 3.7km to meet Tophouse Road",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Te Hoiere/Pelorus River",
+     "quote": "the track follows Te Hoiere/Pelorus River for an hour to Emerald Pool",
+     "ref": null
+    },
+    {
+     "name": "Emerald Pool",
+     "quote": "to Emerald Pool, an ideal fishing, swimming and picnicking spot",
+     "ref": null
+    },
+    {
+     "name": "Captains Creek Hut",
+     "quote": "and Captains Creek Hut",
+     "ref": "L1"
+    },
+    {
+     "name": "Captain Creek",
+     "quote": "crossing Captain Creek first",
+     "ref": "T15"
+    },
+    {
+     "name": "Fishtail Stream",
+     "quote": "the Pelorus and Fishtail Stream via swing bridges",
+     "ref": "T17"
+    },
+    {
+     "name": "Middy Creek Hut",
+     "quote": "follows it to Middy Creek Hut",
+     "ref": "L2"
+    },
+    {
+     "name": "junction where the Pelorus Track branches left",
+     "quote": "a junction where the Pelorus Track branches left",
+     "ref": null
+    },
+    {
+     "name": "Rocks Track",
+     "quote": "The Rocks Track climbs steadily from the junction for about 600 m up a ridge",
+     "ref": null
+    },
+    {
+     "name": "Rocks Hut",
+     "quote": "meets the Bryant Range near Rocks Hut",
+     "ref": "L3"
+    },
+    {
+     "name": "Rocks Creek",
+     "quote": "It crosses Rocks Creek",
+     "ref": "T39"
+    },
+    {
+     "name": "The Rocks",
+     "quote": "skirts around the side of The Rocks (939m)",
+     "ref": "T46"
+    },
+    {
+     "name": "Tōtara Saddle",
+     "quote": "From Tōtara Saddle, descend steeply for 30 min to Browning Hut",
+     "ref": "T50"
+    },
+    {
+     "name": "Browning Hut",
+     "quote": "to Browning Hut beside Browning Stream",
+     "ref": "L4"
+    },
+    {
+     "name": "Browning Stream",
+     "quote": "Just below Browning Hut cross Browning Stream",
+     "ref": "T12"
+    },
+    {
+     "name": "Hacket Creek",
+     "quote": "down to Hackett Creek",
+     "ref": "T19"
+    },
+    {
+     "name": "Hacket Hut",
+     "quote": "down to Hackett Creek and Hacket Hut",
+     "ref": "L5"
+    },
+    {
+     "name": "Pyramid Rock",
+     "quote": "sidles up towards the impressive Pyramid Rock",
+     "ref": "T37"
+    },
+    {
+     "name": "Starveall Hut",
+     "quote": "zig-zagging the final steep stretch to Starveall Hut",
+     "ref": "L7"
+    },
+    {
+     "name": "Mt Starveall summit ridge",
+     "quote": "leading up to the summit ridge of Mt Starveall",
+     "ref": "T31"
+    },
+    {
+     "name": "Slaty Peak",
+     "quote": "The route sidles across the northern face of Slaty Peak",
+     "ref": "T43"
+    },
+    {
+     "name": "Slaty Hut",
+     "quote": "sidles across the northern face of Slaty Peak to Slaty Hut",
+     "ref": "L8"
+    },
+    {
+     "name": "Old Man Peak",
+     "quote": "which is followed until Old Man Peak",
+     "ref": "T33"
+    },
+    {
+     "name": "Old Man Hut",
+     "quote": "Old Man Hut is in a natural grassy clearing 200 m below the ridge",
+     "ref": "L9"
+    },
+    {
+     "name": "Little Rintoul",
+     "quote": "to the summit of Little Rintoul (1643 m)",
+     "ref": null
+    },
+    {
+     "name": "Mt Rintoul summit",
+     "quote": "to the Mt Rintoul summit (1731 m)",
+     "ref": "T30"
+    },
+    {
+     "name": "Mt Rintoul Hut",
+     "quote": "A short track then leads to Mt Rintoul Hut.",
+     "ref": "L10"
+    },
+    {
+     "name": "Purple Top",
+     "quote": "the scree and rock faces of Purple Top (1532 m)",
+     "ref": "T36"
+    },
+    {
+     "name": "Bishops Cap",
+     "quote": "sidles across the southern face of Bishops Cap (1425 m)",
+     "ref": "T10"
+    },
+    {
+     "name": "Tarn Hut",
+     "quote": "Tarn Hut is located at the edge of a small tarn",
+     "ref": "L11"
+    },
+    {
+     "name": "junction shortly before Bushy Top",
+     "quote": "a sign-posted junction shortly before Bushy Top",
+     "ref": null
+    },
+    {
+     "name": "left branch of the Wairoa River",
+     "quote": "followed to the left branch of the Wairoa River",
+     "ref": "T51"
+    },
+    {
+     "name": "Mid Wairoa Hut",
+     "quote": "At this point, you arrive at Mid Wairoa Hut.",
+     "ref": "L12"
+    },
+    {
+     "name": "Wairoa River",
+     "quote": "The track from Mid Wairoa Hut follows the river.",
+     "ref": null
+    },
+    {
+     "name": "Top Wairoa Hut",
+     "quote": "The track leaves Top Wairoa Hut",
+     "ref": "L13"
+    },
+    {
+     "name": "Mt Ellis",
+     "quote": "climbs through alpine vegetation up to Mt Ellis (1615 m)",
+     "ref": "T29"
+    },
+    {
+     "name": "left branch of the Motueka River",
+     "quote": "The track then descends to the left branch of the Motueka River. It follows the river, then crosses it (unbridged)",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Hunters Hut",
+     "quote": "climbs to Hunters Hut",
+     "ref": "L14"
+    },
+    {
+     "name": "Porters Creek Hut",
+     "quote": "before reaching Porters Creek Hut",
+     "ref": "L15"
+    },
+    {
+     "name": "Lowther Creek",
+     "quote": "The track drops from Porters Creek Hut into Lowther Creek",
+     "ref": "T24"
+    },
+    {
+     "name": "right branch of the Motueka River",
+     "quote": "sidles down to the right branch of the Motueka River and crosses it (unbridged)",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Red Hills Hut",
+     "quote": "The track then sidles and climbs to the Red Hills Hut.",
+     "ref": "L16"
+    },
+    {
+     "name": "Maitland Ridge",
+     "quote": "continues to climb Maitland Ridge for 7.9km to Beebys Knob Road",
+     "ref": null
+    },
+    {
+     "name": "Beebys Knob Road",
+     "quote": "the Beebys Knob Road descends for 3.7km to meet Tophouse Road",
+     "ref": null,
+     "how": "road"
+    }
+   ],
+   "direction": null,
+   "time": "8 days",
+   "distance": null,
+   "evidence": [
+    "From the car park at the end of Mt Richmond Road, the track follows Te Hoiere/Pelorus River for an hour to Emerald Pool, an ideal fishing, swimming and picnicking spot.",
+    "From Red Hills Hut, the Te Araroa Track continues to climb Maitland Ridge for 7.9km to Beebys Knob Road.",
+    "Then the Beebys Knob Road descends for 3.7km to meet Tophouse Road near the Lowther Road turnoff."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Alternative entrance: Hacket Track to Hacket Hut",
+   "shape": "one_way",
+   "start": {
+    "name": "Hacket Track car park",
+    "quote": "You can also start the Richmond Ranges Te Araroa Track from the Hacket Track car park.",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Hacket Hut",
+    "quote": "Continue along Hacket Track to Hacket Hut.",
+    "ref": "L5"
+   },
+   "via": [
+    {
+     "name": "Roding River",
+     "quote": "It crosses a wooden bridge over the Roding River",
+     "ref": "T41"
+    },
+    {
+     "name": "Hacket Creek",
+     "quote": "a suspension bridge across Hacket Creek",
+     "ref": "T19"
+    },
+    {
+     "name": "Miner River",
+     "quote": "reaching a picnic area at the junction of Miner River and Hacket Creek",
+     "ref": "T28"
+    }
+   ],
+   "direction": null,
+   "time": "2 hr",
+   "distance": null,
+   "evidence": [
+    "You can also start the Richmond Ranges Te Araroa Track from the Hacket Track car park.",
+    "Hacket Track starts at the picnic area by the Hacket Track car park.",
+    "Continue along Hacket Track to Hacket Hut."
+   ]
+  },
+  {
+   "id": "W3",
+   "main": false,
+   "label": "Exit option: from Tarn Hut to Goulter road end",
+   "shape": "one_way",
+   "start": {
+    "name": "Tarn Hut",
+    "quote": "From Tarn Hut, exit to Goulter road end",
+    "ref": "L11"
+   },
+   "end": {
+    "name": "Goulter road end",
+    "quote": "the left-hand branch leads to the Goulter road end",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "junction shortly before Bushy Top",
+     "quote": "At the sign-posted junction shortly before Bushy Top (see above)",
+     "ref": null
+    },
+    {
+     "name": "Bushy Top",
+     "quote": "The track climbs over Bushy Top (1257 m)",
+     "ref": "T14"
+    },
+    {
+     "name": "Goulter River",
+     "quote": "to the Goulter River opposite Lower Goulter Hut. The river is not bridged",
+     "ref": "T18",
+     "how": "ford"
+    },
+    {
+     "name": "Lower Goulter Hut",
+     "quote": "opposite Lower Goulter Hut",
+     "ref": "T23"
+    },
+    {
+     "name": "Tiphead Stream",
+     "quote": "It is a further two hours to Tiphead Stream",
+     "ref": "T47"
+    }
+   ],
+   "direction": null,
+   "time": "5-6 hr",
+   "distance": null,
+   "evidence": [
+    "At the sign-posted junction shortly before Bushy Top (see above), the left-hand branch leads to the Goulter road end.",
+    "The track climbs over Bushy Top (1257 m) before descending a prominent spur to the Goulter River opposite Lower Goulter Hut.",
+    "From the hut, the track carries on for 45 minutes to a 4WD road end."
+   ]
+  },
+  {
+   "id": "W4",
+   "main": false,
+   "label": "Exit option: from Mid Wairoa Hut to Wairoa Road end",
+   "shape": "one_way",
+   "start": {
+    "name": "Mid Wairoa Hut",
+    "quote": "From Mid Wairoa Hut, exit to Wairoa Road end",
+    "ref": "L12"
+   },
+   "end": {
+    "name": "Wairoa Road end",
+    "quote": "until you reach the locked gate",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "swing bridge over the Wairoa River",
+     "quote": "A swing bridge crosses the river just downstream from Mid Wairoa Hut.",
+     "ref": null
+    },
+    {
+     "name": "Wairoa River",
+     "quote": "The track follows the Wairoa River which has steep difficult sidles to negotiate",
+     "ref": null
+    },
+    {
+     "name": "forestry road",
+     "quote": "before opening out onto a forestry road",
+     "ref": null,
+     "how": "road"
+    }
+   ],
+   "direction": null,
+   "time": "5 hr",
+   "distance": null,
+   "evidence": [
+    "A swing bridge crosses the river just downstream from Mid Wairoa Hut.",
+    "The track follows the Wairoa River which has steep difficult sidles to negotiate, before opening out onto a forestry road.",
+    "Follow the road for about 4 km until you reach the locked gate."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [
+  {
+   "name": "Lake Chalice",
+   "quote": "the left-hand route leading down to Lake Chalice",
+   "ref": "T22",
+   "from": "Old Man Peak",
+   "how": "track"
+  },
+  {
+   "name": "Forks/Top Valley",
+   "quote": "or to the Forks/Top Valley",
+   "ref": null,
+   "from": "Old Man Peak",
+   "how": "track"
+  },
+  {
+   "name": "Goulter River",
+   "quote": "head directly down to the Goulter River",
+   "ref": "T18",
+   "from": "Old Man Hut",
+   "how": "track"
+  }
+ ],
+ "side_trips": [
+  {
+   "name": "Mt Starveall summit",
+   "quote": "It is possible to detour to the Mt Starveall summit (1,511 m) en route to Slaty Hut",
+   "ref": "T31",
+   "from": null
+  }
+ ],
+ "huts": [
+  {
+   "name": "Captains Creek Hut",
+   "quote": "Captains Creek Hut",
+   "ref": "L1"
+  },
+  {
+   "name": "Middy Creek Hut",
+   "quote": "Middy Creek Hut",
+   "ref": "L2"
+  },
+  {
+   "name": "Rocks Hut",
+   "quote": "Rocks Hut",
+   "ref": "L3"
+  },
+  {
+   "name": "Browning Hut",
+   "quote": "Browning Hut",
+   "ref": "L4"
+  },
+  {
+   "name": "Hacket Hut",
+   "quote": "Hacket Hut",
+   "ref": "L5"
+  },
+  {
+   "name": "Starveall Hut",
+   "quote": "Starveall Hut",
+   "ref": "L7"
+  },
+  {
+   "name": "Slaty Hut",
+   "quote": "Slaty Hut",
+   "ref": "L8"
+  },
+  {
+   "name": "Old Man Hut",
+   "quote": "Old Man Hut",
+   "ref": "L9"
+  },
+  {
+   "name": "Mt Rintoul Hut",
+   "quote": "Mt Rintoul Hut",
+   "ref": "L10"
+  },
+  {
+   "name": "Tarn Hut",
+   "quote": "Tarn Hut",
+   "ref": "L11"
+  },
+  {
+   "name": "Mid Wairoa Hut",
+   "quote": "Mid Wairoa Hut",
+   "ref": "L12"
+  },
+  {
+   "name": "Top Wairoa Hut",
+   "quote": "Top Wairoa Hut",
+   "ref": "L13"
+  },
+  {
+   "name": "Hunters Hut",
+   "quote": "Hunters Hut",
+   "ref": "L14"
+  },
+  {
+   "name": "Porters Creek Hut",
+   "quote": "Porters Creek Hut",
+   "ref": "L15"
+  },
+  {
+   "name": "Red Hills Hut",
+   "quote": "Red Hills Hut",
+   "ref": "L16"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Pelorus Track",
+   "quote": "the Pelorus Track branches left",
+   "ref": "T6",
+   "why": "other walk"
+  },
+  {
+   "name": "Nelson and Tasman Bay",
+   "quote": "magnificent views over Nelson and Tasman Bay",
+   "ref": null,
+   "why": "view"
+  }
+ ],
+ "doubts": "The end is where Beebys Knob Road meets Tophouse Road near the Lowther Road turnoff, which no feature or name entry matches, so the end ref is null. The start is taken as F4, the road end where the Pelorus Track meets Mount Richmond Road, because the text's car park is at the end of Mt Richmond Road; the feature names the Pelorus Track, so this is a judgment. The description is cut off in the packet after the Red Hills Hut to Tophouse Road section, so anything after that is not in the text. The Wairoa crossings (eight, Mid Wairoa to Top Wairoa) are not said to be unbridged, so no how is given. Time 8 days is DOC's summary; no distance for the whole way. The exit options (Tarn Hut to Goulter road end, Mid Wairoa Hut to Wairoa Road end) and the Hacket Track alternative entrance each have their own heading and time, so they are recorded as separate ways below."
+}

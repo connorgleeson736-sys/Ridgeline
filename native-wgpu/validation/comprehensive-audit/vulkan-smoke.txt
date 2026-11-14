@@ -1,0 +1,7 @@
+    Blocking waiting for file lock on build directory
+   Compiling ridgeline-renderer v0.1.0 (/workspace/Ridgeline/native-wgpu/renderer)
+    Finished `release` profile [optimized] target(s) in 43.56s
+     Running `native-wgpu/target/release/examples/gpu_smoke`
+Adaptive plane: 8952 surface triangles, full boundaries, zero skirts, identical pixels
+No-skirt discontinuity control: 0 pixels changed by old skirt-depth setting (expected zero)
+PASS GPU: exact grade, fine-child/coarse-parent ownership, no fallback holes, independent image/geometry LOD and exact crop UV, trilinear mipmap average, bounded 24-tile residency. Synthetic geometry; no phone benchmark or real-terrain parity claim.

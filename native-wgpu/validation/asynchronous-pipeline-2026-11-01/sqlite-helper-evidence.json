@@ -1,0 +1,7 @@
+{
+  "source": "https://android.googlesource.com/platform/frameworks/base/+/android-16.0.0_r1/core/java/android/database/sqlite/SQLiteOpenHelper.java?format=TEXT",
+  "sha256": "19160b7d2ce5a75d945c5965aff31973c83666aec7e9a879ea47767eab63c63a",
+  "excerpt": "public SQLiteDatabase getReadableDatabase() {\n        synchronized (this) {\n            return getDatabaseLocked(false);\n        }\n    }",
+  "retrievedDate": "2026-11-01",
+  "finding": "SQLiteOpenHelper.getReadableDatabase itself synchronizes on the helper instance."
+}

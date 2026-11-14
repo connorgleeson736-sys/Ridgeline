@@ -1,0 +1,78 @@
+{
+ "guid": "c4ded3de-4995-4d28-8096-704c5a7643d1",
+ "kind": "network",
+ "ways": [],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Angelus Hut",
+   "quote": "Angelus Hut",
+   "ref": "T9"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Angelus Hut via Pinchgut Track and Robert Ridge Route",
+   "quote": "Pinchgut Track, Robert Ridge Route",
+   "ref": "L1",
+   "why": "other walk"
+  },
+  {
+   "name": "Angelus Hut via Speargrass Track and Speargrass Creek Route",
+   "quote": "Speargrass Track, Speargrass Creek Route",
+   "ref": "L2",
+   "why": "other walk"
+  },
+  {
+   "name": "Angelus Hut via Travers and Cascade Track/Route",
+   "quote": "Travers – Cascade Track/Route",
+   "ref": "L3",
+   "why": "other walk"
+  },
+  {
+   "name": "Angelus Hut via Mt Cedric Track/Route",
+   "quote": "Mt Cedric Track/Route",
+   "ref": "L4",
+   "why": "other walk"
+  },
+  {
+   "name": "Rotomaninitua/Lake Angelus",
+   "quote": "Rotomaninitua/Lake Angelus",
+   "ref": "T16",
+   "why": "nearby"
+  },
+  {
+   "name": "Lakehead Hut",
+   "quote": "Lakehead Hut",
+   "ref": "T13",
+   "why": "other"
+  },
+  {
+   "name": "Coldwater Hut",
+   "quote": "Coldwater Hut",
+   "ref": "T10",
+   "why": "other"
+  },
+  {
+   "name": "Sabine Hut",
+   "quote": "Sabine Hut",
+   "ref": "T17",
+   "why": "other"
+  },
+  {
+   "name": "Hukere Stream bridge",
+   "quote": "the bridge over the Hukere Stream",
+   "ref": null,
+   "why": "other"
+  },
+  {
+   "name": "Travers–Sabine Circuit",
+   "quote": "Travers–Sabine Circuit",
+   "ref": null,
+   "why": "other"
+  }
+ ],
+ "doubts": "Network page: four options to reach Angelus Hut (Pinchgut Track and Robert Ridge Route, Speargrass Track and Speargrass Creek Route, Travers – Cascade Track/Route, Mt Cedric Track/Route), each linked as its own walk (L1 to L4). The text gives the end (Angelus Hut) but no start place for any option, so no ways are recorded. Angelus Hut is recorded under huts as the place every option reaches, though no main way is given. The winter section mentions Lakehead Hut, Coldwater Hut and Sabine Hut, but which hut belongs to which option is not stated, so they are not linked to any option. The Speargrass option is said to be used to exit Rotomaninitua/Lake Angelus in bad weather; this is not recorded as an exit because the option is not a way of its own here. The page gives DOC's time '2-3 days' for the tramp, but no way it could be attached to."
+}

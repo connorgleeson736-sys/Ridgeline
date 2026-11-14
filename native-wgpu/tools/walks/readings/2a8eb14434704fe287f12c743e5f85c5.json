@@ -1,0 +1,191 @@
+{
+ "guid": "2a8eb144-3470-4fe2-87f1-2c743e5f85c5",
+ "kind": "loop",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Makahu Road Circuit via Makino Hut and Te Puia Lodge",
+   "shape": "loop",
+   "start": {
+    "name": "Makahu Road saddle carpark where the Makino Hut track leaves the road",
+    "quote": "It is from this point the track to Makino Hut leaves the road.",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Makahu Road saddle carpark (starting point)",
+    "quote": "Return to your starting point by following Makahu Road",
+    "ref": "F1"
+   },
+   "via": [
+    {
+     "name": "Makino Track",
+     "quote": "continue on Makino Track",
+     "ref": null
+    },
+    {
+     "name": "Middle Hill turnoff",
+     "quote": "The track continues past the Middle Hill turnoff to the left",
+     "ref": null
+    },
+    {
+     "name": "Makino Hut",
+     "quote": "in a small clearing, is Makino Hut",
+     "ref": "T2"
+    },
+    {
+     "name": "Makino-Te Puia track junction",
+     "quote": "until you reach the track junction to Te Puia Lodge",
+     "ref": null
+    },
+    {
+     "name": "Te Puia Track",
+     "quote": "it joins Te Puia Track",
+     "ref": "T1"
+    },
+    {
+     "name": "Te Puia Lodge",
+     "quote": "until you reach Te Puia Lodge",
+     "ref": null
+    },
+    {
+     "name": "true right of the Mohaka River",
+     "quote": "follow the track down the true right of the Mokaha River to the end of Makahu Road",
+     "ref": null
+    },
+    {
+     "name": "Mangatutu Hot Springs Campsite",
+     "quote": "Mangatutu Hot Springs Campsite is at the end of the track",
+     "ref": "T3"
+    },
+    {
+     "name": "Makahu Road",
+     "quote": "Return to your starting point by following Makahu Road",
+     "ref": null,
+     "how": "road"
+    }
+   ],
+   "direction": null,
+   "time": "6-7 hrs",
+   "distance": null,
+   "evidence": [
+    "A short distance after Makahu Road enters the park it climbs to a saddle. It is from this point the track to Makino Hut leaves the road.",
+    "If you went to Makino Hut, return back down Makino Track until you reach the track junction to Te Puia Lodge.",
+    "From Te Puia Lodge, follow the track down the true right of the Mokaha River to the end of Makahu Road.",
+    "Return to your starting point by following Makahu Road (either walking or arranging transport).",
+    "The whole loop can also be done in reverse: Mangatutu to Te Puia, to Makino then out to the road."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Circuit without Makino Hut, taking the turnoff to Te Puia Lodge",
+   "shape": "loop",
+   "start": {
+    "name": "Makahu Road saddle carpark where the Makino Hut track leaves the road",
+    "quote": "It is from this point the track to Makino Hut leaves the road.",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Makahu Road saddle carpark (starting point)",
+    "quote": "Return to your starting point by following Makahu Road",
+    "ref": "F1"
+   },
+   "via": [
+    {
+     "name": "Middle Hill turnoff",
+     "quote": "The track continues past the Middle Hill turnoff to the left",
+     "ref": null
+    },
+    {
+     "name": "Makino-Te Puia track junction",
+     "quote": "If you are not planning to visit Makino Hut, then take the turnoff to Te Puia Lodge.",
+     "ref": null
+    },
+    {
+     "name": "Te Puia Track",
+     "quote": "it joins Te Puia Track",
+     "ref": "T1"
+    },
+    {
+     "name": "Te Puia Lodge",
+     "quote": "until you reach Te Puia Lodge",
+     "ref": null
+    },
+    {
+     "name": "true right of the Mohaka River",
+     "quote": "follow the track down the true right of the Mokaha River to the end of Makahu Road",
+     "ref": null
+    },
+    {
+     "name": "Mangatutu Hot Springs Campsite",
+     "quote": "Mangatutu Hot Springs Campsite is at the end of the track",
+     "ref": "T3"
+    },
+    {
+     "name": "Makahu Road",
+     "quote": "Return to your starting point by following Makahu Road",
+     "ref": null,
+     "how": "road"
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "If you are not planning to visit Makino Hut, then take the turnoff to Te Puia Lodge.",
+    "Return to your starting point by following Makahu Road (either walking or arranging transport)."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "\"The Gums\" parking area and shelter at the end of Makahu Road",
+   "quote": "\"The Gums\" parking area and shelter",
+   "ref": null,
+   "onto": "Te Puia Track"
+  }
+ ],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Mangatainoka Hot Springs",
+   "quote": "you can continue upstream to visit Mangatainoka Hot Springs",
+   "ref": "L1",
+   "from": "Te Puia Track"
+  },
+  {
+   "name": "Mangatutu Hot Springs",
+   "quote": "A short, steep track descends from the campsite to Mangatutu Hot Springs.",
+   "ref": null,
+   "from": "Mangatutu Hot Springs Campsite"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Makino Hut",
+   "quote": "in a small clearing, is Makino Hut",
+   "ref": "T2"
+  },
+  {
+   "name": "Te Puia Lodge",
+   "quote": "until you reach Te Puia Lodge",
+   "ref": null
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Mangatainoka Hot Springs Campsite",
+   "quote": "The Mangatainoka Hot Springs Campsite is adjacent to the pools.",
+   "ref": null,
+   "why": "side trip"
+  },
+  {
+   "name": "Mohaka valley",
+   "quote": "good views of the Mohaka valley",
+   "ref": null,
+   "why": "view"
+  }
+ ],
+ "doubts": "The start is the small carpark at the saddle where the Makino Hut track leaves Makahu Road, placed at F1 (where an unnamed track meets Makahu Road). This is an inference: F1 is the only road-track meeting that is not a named track, and Te Puia Track meets the road at The Gums, so F1 is taken to be the saddle. The loop returns to the start along Makahu Road, walked or by transport; the page does not say how far, so no distance. The reverse direction is the same circuit walked the other way, so it is not a separate way. W2 is the shorter circuit the page gives as the option when Makino Hut is not visited. The Makino Hut visit is a short out-and-back spur from the Makino Track junction, but the page includes it in the circuit, so it is a via. The Mangatutu Hot Springs descent is not called a side trip in the text; it is recorded as one because it is an optional descent from the campsite. The Mangatainoka side trip is ref L1, the link whose anchor is this sentence, but L1 is a walk page. The text spells the river 'Mokaha' once; the packet's Mohaka is used in the names. Te Puia Lodge has no entry in names or links. DOC's time '6-7 hrs' is copied for the main way and is not given for W2."
+}

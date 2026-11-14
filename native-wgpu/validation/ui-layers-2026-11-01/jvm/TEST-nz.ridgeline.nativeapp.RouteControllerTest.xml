@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="nz.ridgeline.nativeapp.RouteControllerTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-01T20:33:03.567Z" hostname="04cbfa2fe828" time="0.036">
+  <properties/>
+  <testcase name="deletingOneSavedRouteRetriesCurrentUnsavedRouteAtTheLimit" classname="nz.ridgeline.nativeapp.RouteControllerTest" time="0.022"/>
+  <testcase name="failedAutosavePreventsNavigationAndRetryPreservesEdits" classname="nz.ridgeline.nativeapp.RouteControllerTest" time="0.002"/>
+  <testcase name="editsDuringFirstSaveProduceOneRowWithLatestGeometry" classname="nz.ridgeline.nativeapp.RouteControllerTest" time="0.003"/>
+  <testcase name="dragPreviewsDoNotWriteAndOneUndoRestoresPersistedGeometry" classname="nz.ridgeline.nativeapp.RouteControllerTest" time="0.004"/>
+  <testcase name="savedRouteStaysReadOnlyUntilEditAndAnUnmovedTapDoesNotSave" classname="nz.ridgeline.nativeapp.RouteControllerTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

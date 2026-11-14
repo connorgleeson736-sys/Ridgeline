@@ -1,0 +1,163 @@
+{
+ "guid": "ad08faa3-d8fd-41c9-aa75-398c6d23f101",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Road end to Woolshed Creek Hut",
+   "shape": "one_way",
+   "start": {
+    "name": "Woolshed Creek car park",
+    "quote": "The track starts at Woolshed Creek car park at the end of Jig Road.",
+    "ref": null
+   },
+   "end": {
+    "name": "Woolshed Creek Hut",
+    "quote": "descending to Woolshed Creek Hut",
+    "ref": "T7"
+   },
+   "via": [
+    {
+     "name": "historic tramway beside Woolshed Creek",
+     "quote": "Follow a historic tramway that runs beside Woolshed Creek",
+     "ref": null
+    },
+    {
+     "name": "Blackburn Mine",
+     "quote": "The track flattens out at the site of the old Blackburn Mine.",
+     "ref": null
+    },
+    {
+     "name": "trig R",
+     "quote": "the track climbs to a high point (trig R, 934 m)",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "3 hr",
+   "distance": "5.1 km one way",
+   "evidence": [
+    "The track starts at Woolshed Creek car park at the end of Jig Road.",
+    "Follow a historic tramway that runs beside Woolshed Creek, passing through attractive beech forest.",
+    "The track flattens out at the site of the old Blackburn Mine.",
+    "From the mine, the track climbs to a high point (trig R, 934 m) with superb views of the upper Ashburton Gorge, before descending to Woolshed Creek Hut."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Alternative route: 4WD track to Woolshed Creek Hut",
+   "shape": "one_way",
+   "start": null,
+   "end": {
+    "name": "Woolshed Creek Hut",
+    "quote": "You can follow a 4WD track to Woolshed Creek Hut.",
+    "ref": "T7"
+   },
+   "via": [
+    {
+     "name": "Blackburn Mine",
+     "quote": "There is a turnoff onto a 4WD track between Blackburn Mine and trig R.",
+     "ref": null
+    },
+    {
+     "name": "4WD track",
+     "quote": "You can follow a 4WD track to Woolshed Creek Hut.",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "There is a turnoff onto a 4WD track between Blackburn Mine and trig R. You can follow a 4WD track to Woolshed Creek Hut."
+   ]
+  },
+  {
+   "id": "W3",
+   "main": false,
+   "label": "Alternative route: Sidewinder Track",
+   "shape": "one_way",
+   "start": null,
+   "end": {
+    "name": "Blackburn Mine",
+    "quote": "climbs steeply up to and through the tailings of the old Blackburn Mine",
+    "ref": null
+   },
+   "via": [],
+   "direction": null,
+   "time": "45 min",
+   "distance": "1 km",
+   "evidence": [
+    "This steep track provides an alternative route to the climb to Blackburn Mine.",
+    "The track then climbs steeply up to and through the tailings of the old Blackburn Mine, where it links with the main track to Woolshed Creek Hut."
+   ]
+  },
+  {
+   "id": "W4",
+   "main": false,
+   "label": "Optional circuit route: Woolshed Creek Hut to Woolshed Creek car park via Bus Stop and South Face tracks",
+   "shape": "one_way",
+   "start": {
+    "name": "Woolshed Creek Hut",
+    "quote": "From Woolshed Creek Hut, the track climbs 500 m to a local feature known as the Bus Stop Overhang.",
+    "ref": "T7"
+   },
+   "end": {
+    "name": "Woolshed Creek car park",
+    "quote": "which then follows a rocky ridge to Woolshed Creek car park",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Bus Stop Track",
+     "quote": "There is the option of making a circuit by following the Bus Stop and South Face Ttacks.",
+     "ref": "T1"
+    },
+    {
+     "name": "Bus Stop Overhang",
+     "quote": "the track climbs 500 m to a local feature known as the Bus Stop Overhang",
+     "ref": null
+    },
+    {
+     "name": "South Face Track",
+     "quote": "to link with South Face Track (2 hr from the track start)",
+     "ref": "T4"
+    }
+   ],
+   "direction": null,
+   "time": "3 hr",
+   "distance": "6.4 km",
+   "evidence": [
+    "Category: Advanced tramping track",
+    "From Woolshed Creek Hut, the track climbs 500 m to a local feature known as the Bus Stop Overhang. From here, the track crosses the face of Mount Somers to link with South Face Track (2 hr from the track start), which then follows a rocky ridge to Woolshed Creek car park."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Woolshed Creek Hut",
+   "quote": "descending to Woolshed Creek Hut",
+   "ref": "T7"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Mount Somers Track",
+   "quote": "This track is a section of the multi-day Mount Somers Track.",
+   "ref": "L1",
+   "why": "other walk"
+  },
+  {
+   "name": "Ashburton Gorge",
+   "quote": "superb views of the upper Ashburton Gorge",
+   "ref": null,
+   "why": "view"
+  }
+ ],
+ "doubts": "The main way is recorded as one_way from DOC's '5.1 km one way' and the text's one-way route from the car park to the hut. The text also says 'For a day walk, you can do a return walk to Woolshed Creek Hut', which would make it out_and_back by return; that is not recorded as a separate way. No road-end feature is in the packet, so the car park start has no ref. The 4WD track and the Sidewinder Track each have their own heading, so they are separate ways, but the text does not say where either starts, so their starts are null. The Sidewinder Track's end is where it links with the main track at the old Blackburn Mine. The 4WD track has no time or distance of its own ('takes about the same time'). The circuit route (W4) is one-way from the hut to the car park, and it becomes a circuit only together with W1. The text's 'Ttacks' is a typo in the source and is copied as written. Bus Stop Track ref T1 is an inference from the packet's map track name for 'Bus Stop', so it is the least certain ref in the reading."
+}

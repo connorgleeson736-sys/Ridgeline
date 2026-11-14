@@ -1,0 +1,26 @@
+{
+  "scope": "512x512 Mesa GLES, frozen baseline vs shader-only path, same geometry and image bytes. Different backend rasterization is not compared.",
+  "angles": [
+    {
+      "pitch": 0,
+      "changedPixels": 6,
+      "skyRepaired": 6,
+      "newSky": 0,
+      "nonSkyColourChanges": 0
+    },
+    {
+      "pitch": 60,
+      "changedPixels": 1,
+      "skyRepaired": 0,
+      "newSky": 0,
+      "nonSkyColourChanges": 1
+    },
+    {
+      "pitch": 75,
+      "changedPixels": 0,
+      "skyRepaired": 0,
+      "newSky": 0,
+      "nonSkyColourChanges": 0
+    }
+  ]
+}

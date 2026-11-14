@@ -1,0 +1,73 @@
+{
+ "guid": "5d11877d-97dc-4d26-bce7-f6fd2f403609",
+ "kind": "out_and_back",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Fanthams Peak track from Dawson Falls road end to Panitahi and Syme Hut",
+   "shape": "out_and_back",
+   "start": {
+    "name": "road end at Dawson Falls",
+    "quote": "road end at Dawson Falls",
+    "ref": null
+   },
+   "end": {
+    "name": "Syme Hut",
+    "quote": "Syme Hut",
+    "ref": "T9"
+   },
+   "via": [
+    {
+     "name": "Fanthams Peak track",
+     "quote": "Fanthams Peak track",
+     "ref": "T1"
+    },
+    {
+     "name": "Lower Lake Dive Track junction",
+     "quote": "Lower Lake Dive Track",
+     "ref": "T3"
+    },
+    {
+     "name": "Hillary Seat",
+     "quote": "Hillary Seat",
+     "ref": null
+    },
+    {
+     "name": "Hooker Shelter",
+     "quote": "Hooker Shelter",
+     "ref": null
+    },
+    {
+     "name": "Kapuni Lodge Track",
+     "quote": "Kapuni Lodge Track",
+     "ref": null
+    },
+    {
+     "name": "Panitahi",
+     "quote": "Panitahi",
+     "ref": "T8"
+    }
+   ],
+   "direction": null,
+   "time": "5–6 hr return",
+   "distance": null,
+   "evidence": [
+    "The track starts from the road end at Dawson Falls.",
+    "Poles then mark the route up steep scoria slopes to Panitahi (1966 m) and Syme Hut."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Syme Hut",
+   "quote": "Syme Hut",
+   "ref": "T9"
+  }
+ ],
+ "not_on_route": [],
+ "doubts": "Page does not say 'return' in text; out and back inferred from DOC time '5–6 hr return' and the hut being at the top. Road end at Dawson Falls: no feature clearly the Fanthams Peak track start (features are Kapuni Loop / Hasties Hill), so ref null. 'Kapuni Lodge Track' is the page's wording."
+}

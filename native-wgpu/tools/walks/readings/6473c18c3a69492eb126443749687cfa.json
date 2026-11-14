@@ -1,0 +1,381 @@
+{
+ "guid": "6473c18c-3a69-492e-b126-443749687cfa",
+ "kind": "loop",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Around the Mountain Circuit (high tracks)",
+   "shape": "loop",
+   "start": {
+    "name": "North Egmont road end",
+    "quote": "North Egmont Road end",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "North Egmont road end",
+    "quote": "North Egmont Road end",
+    "ref": "F1"
+   },
+   "via": [
+    {
+     "name": "Holly Hut Track",
+     "quote": "Holly Hut Track",
+     "ref": "T7"
+    },
+    {
+     "name": "Around the Mountain Circuit junction",
+     "quote": "junction with the Around the Mountain Circuit",
+     "ref": null
+    },
+    {
+     "name": "Boomerang Slip",
+     "quote": "Boomerang Slip",
+     "ref": "T24"
+    },
+    {
+     "name": "Kokowai Track",
+     "quote": "Kokowai Track",
+     "ref": "T11"
+    },
+    {
+     "name": "Ahukawakawa Track",
+     "quote": "Ahukawakawa Track",
+     "ref": "T1"
+    },
+    {
+     "name": "Holly Hut",
+     "quote": "Holly Hut",
+     "ref": "T31"
+    },
+    {
+     "name": "Holly Flats",
+     "quote": "Holly Flats",
+     "ref": null
+    },
+    {
+     "name": "Bells Falls Track",
+     "quote": "Bells Falls Track",
+     "ref": "T3"
+    },
+    {
+     "name": "Stony River Track",
+     "quote": "Stony River Track",
+     "ref": "T18"
+    },
+    {
+     "name": "Hangatahua River",
+     "quote": "Hangatahua River",
+     "ref": "T30",
+     "how": "ford"
+    },
+    {
+     "name": "Kopoaiaia Track",
+     "quote": "Kopoaiaia Track",
+     "ref": null
+    },
+    {
+     "name": "Puniho Track",
+     "quote": "Puniho Track",
+     "ref": "T15"
+    },
+    {
+     "name": "Kahui Hut",
+     "quote": "Kahui Hut",
+     "ref": "T33"
+    },
+    {
+     "name": "Kahui Track",
+     "quote": "Kahui track",
+     "ref": "T9"
+    },
+    {
+     "name": "Oaonui Track",
+     "quote": "Oaonui Track",
+     "ref": "T14"
+    },
+    {
+     "name": "Ihaia Track",
+     "quote": "Ihaia Track",
+     "ref": "T8"
+    },
+    {
+     "name": "Waiaua Gorge Hut",
+     "quote": "Waiaua Gorge Hut",
+     "ref": "T41"
+    },
+    {
+     "name": "Brames Falls Track",
+     "quote": "Brames Falls Track",
+     "ref": "T4"
+    },
+    {
+     "name": "river in Waiaua Gorge",
+     "quote": "crossing the river",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Mangōraukawa / Lake Dive",
+     "quote": "Mangōraukawa / Lake Dive",
+     "ref": "T36"
+    },
+    {
+     "name": "Upper Lake Dive Track",
+     "quote": "Upper Lake Dive track",
+     "ref": "T20"
+    },
+    {
+     "name": "Fanthams Peak Track",
+     "quote": "Fanthams Peak Track",
+     "ref": "T6"
+    },
+    {
+     "name": "Dawson Falls Visitor Centre",
+     "quote": "Dawson Falls Visitor Centre",
+     "ref": null
+    },
+    {
+     "name": "Wilkies Pools Track",
+     "quote": "Wilkies Pools Track",
+     "ref": "T22"
+    },
+    {
+     "name": "Plateau car park",
+     "quote": "Plateau car park",
+     "ref": null
+    },
+    {
+     "name": "Maunganui ski field",
+     "quote": "Maunganui ski field",
+     "ref": null
+    },
+    {
+     "name": "Tahurangi Lodge",
+     "quote": "Tahurangi Lodge",
+     "ref": null
+    },
+    {
+     "name": "North Taranaki Visitor Centre",
+     "quote": "North Taranaki Visitor Centre",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "4–5 days loop",
+   "distance": "52 km loop",
+   "evidence": [
+    "The Around the Mountain Circuit (AMC) can be accessed from several road ends in Te Papa-Kura-o-Taranaki, but traditionally begins at the North Egmont Road end approximately 30 min drive from New Plymouth.",
+    "In the upper car park at North Egmont road end, take the Holly Hut Track left of the Camphouse.",
+    "From the lodge a 4WD track leads downhill for around 1 hr to North Taranaki Visitor Centre."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Around the Mountain Circuit (low tracks)",
+   "shape": "loop",
+   "start": {
+    "name": "North Egmont road end",
+    "quote": "North Egmont Road end",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "North Egmont road end",
+    "quote": "North Egmont Road end",
+    "ref": "F1"
+   },
+   "via": [
+    {
+     "name": "Holly Hut Track",
+     "quote": "Holly Hut Track",
+     "ref": "T7"
+    },
+    {
+     "name": "Around the Mountain Circuit junction",
+     "quote": "junction with the Around the Mountain Circuit",
+     "ref": null
+    },
+    {
+     "name": "Boomerang Slip",
+     "quote": "Boomerang Slip",
+     "ref": "T24"
+    },
+    {
+     "name": "Kokowai Track",
+     "quote": "Kokowai Track",
+     "ref": "T11"
+    },
+    {
+     "name": "Ahukawakawa Track",
+     "quote": "Ahukawakawa Track",
+     "ref": "T1"
+    },
+    {
+     "name": "Holly Hut",
+     "quote": "Holly Hut",
+     "ref": "T31"
+    },
+    {
+     "name": "Holly Flats",
+     "quote": "Holly Flats",
+     "ref": null
+    },
+    {
+     "name": "Bells Falls Track",
+     "quote": "Bells Falls Track",
+     "ref": "T3"
+    },
+    {
+     "name": "Stony River Track",
+     "quote": "Stony River Track",
+     "ref": "T18"
+    },
+    {
+     "name": "Hangatahua River",
+     "quote": "Hangatahua River",
+     "ref": "T30",
+     "how": "ford"
+    },
+    {
+     "name": "Kopoaiaia Track",
+     "quote": "Kopoaiaia Track",
+     "ref": null
+    },
+    {
+     "name": "Puniho Track",
+     "quote": "Puniho Track",
+     "ref": "T15"
+    },
+    {
+     "name": "Oaonui Track",
+     "quote": "Oaonui Track",
+     "ref": "T14"
+    },
+    {
+     "name": "Ihaia Track",
+     "quote": "Ihaia Track",
+     "ref": "T8"
+    },
+    {
+     "name": "Waiaua Gorge Hut",
+     "quote": "Waiaua Gorge Hut",
+     "ref": "T41"
+    },
+    {
+     "name": "Brames Falls Track",
+     "quote": "Brames Falls Track",
+     "ref": "T4"
+    },
+    {
+     "name": "river in Waiaua Gorge",
+     "quote": "crossing the river",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Taungatara Track",
+     "quote": "Taungatara Track",
+     "ref": null
+    },
+    {
+     "name": "Auroa Track",
+     "quote": "Auroa track",
+     "ref": null
+    },
+    {
+     "name": "Mangōraukawa / Lake Dive",
+     "quote": "Mangōraukawa / Lake Dive",
+     "ref": "T36"
+    },
+    {
+     "name": "Lower Lake Dive Track",
+     "quote": "Lower Lake Dive Track",
+     "ref": "T12"
+    },
+    {
+     "name": "Fanthams Peak Track",
+     "quote": "Fanthams Peak Track",
+     "ref": "T6"
+    },
+    {
+     "name": "Dawson Falls Visitor Centre",
+     "quote": "Dawson Falls Visitor Centre",
+     "ref": null
+    },
+    {
+     "name": "Kapuni Loop Track",
+     "quote": "Kapuni Loop Track",
+     "ref": "T10"
+    },
+    {
+     "name": "Ridge Track",
+     "quote": "Ridge Track",
+     "ref": "T17"
+    },
+    {
+     "name": "Waingongoro Track",
+     "quote": "Waingongoro Track",
+     "ref": "T21"
+    },
+    {
+     "name": "Waingongoro Hut",
+     "quote": "Waingongoro Hut",
+     "ref": "T42"
+    },
+    {
+     "name": "Te Popo car park",
+     "quote": "Te Popo car park",
+     "ref": null
+    },
+    {
+     "name": "Curtis Falls Track",
+     "quote": "Curtis Falls Track",
+     "ref": "T5"
+    },
+    {
+     "name": "Maketawa Hut",
+     "quote": "Maketawa Hut",
+     "ref": "T35"
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "In the upper car park at North Egmont road end, take the Holly Hut Track left of the Camphouse.",
+    "Low track: This section of track is often muddy, eroded and overgrown.",
+    "From the hut, it's a 1 hr 30 min tramp to North Egmont car park."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Holly Hut",
+   "quote": "Holly Hut",
+   "ref": "T31"
+  },
+  {
+   "name": "Kahui Hut",
+   "quote": "Kahui Hut",
+   "ref": "T33"
+  },
+  {
+   "name": "Waiaua Gorge Hut",
+   "quote": "Waiaua Gorge Hut",
+   "ref": "T41"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Dawson Falls",
+   "quote": "Dawson Falls (3 hr)",
+   "ref": null,
+   "why": "other"
+  }
+ ],
+ "doubts": "The page offers high and low options for several sections; W1 follows the high options (page says higher level options are recommended) and W2 the low options. Waingongoro Hut and Maketawa Hut are on the low way only, Kahui Hut on the high way only; Tahurangi Lodge is privately owned so not listed as a hut. Direction not stated. The Waiaua Gorge river crossing is unnamed in the text. Kopoaiaia, Taungatara and Auroa tracks have no exact map track entry (Route entries differ in name) so refs null. Refs F1 for North Egmont road end is likely, not certain."
+}

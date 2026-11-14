@@ -1,0 +1,155 @@
+{
+  "sourceCheckpoint": "150ad30e5db269a549769fb011667c31ec975178",
+  "apk": "Ridgeline-Native-Base.apk",
+  "bytes": 32002808,
+  "sha256": "5c41854d52fc08b6c5496c455593d5969834201c2205bb18d494bf0414358043",
+  "largeOverviewPacks": 0,
+  "coarseImageryFiles": 67,
+  "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86_64"
+  ],
+  "managedSessionCa": false,
+  "addImagery": "Offline / imagery > Add imagery ZIPs; attach original files in place with persistent read access; up to six at once",
+  "changes": [
+    "Linear geographic merge instead of quadratic terrain/imagery cover scan",
+    "Immediate idle demand with unchanged 20Hz movement throttle",
+    "Header-first stale derived-cache rejection",
+    "Shared overlapping original DEM PNG decode",
+    "Dense halo and axis reuse for exact terrain meshes",
+    "Ordered shared-edge sweep and compatible array batching",
+    "Mesh-bounded fragment path with sub-cell photo clipping preserved",
+    "Exact CPU mip normalization and exact tile-bound computation"
+  ],
+  "adaptiveTerrain": {
+    "newErrorPixels": 0.6,
+    "retainedErrorPixels": 0.9,
+    "stableCoarseningMs": 350,
+    "surfaceLevels": [
+      32,
+      64,
+      128
+    ],
+    "routeSourcesFullGeometry": true,
+    "fullSourceHeightsRetained": true
+  },
+  "validation": "37 Rust tests; 69 Android tests passed, 2 skipped; lint passed. Six Vulkan/GLES automatic/CPU-mip/array GPU modes passed. All three optimized JNI ABIs are packaged; signature matches prior checkpoint, ZIP 16KiB and 64-bit ELF load alignment verified. Original 67 coarse images/catalog/gap atlas match. No A20 execution or whole-app speedup claim.",
+  "terrainSkirts": true,
+  "prepareAhead": "Offline / imagery > Prepare nearby terrain while idle; default off",
+  "textureBackend": {
+    "automaticVulkan": "arrays",
+    "automaticGles": "pooled separate textures",
+    "override": "Offline / imagery > GPU textures",
+    "layersPerPage": 8,
+    "maxPagesPerPool": 25
+  },
+  "automaticDiskCache": {
+    "defaultMiB": 1000,
+    "rangeMiB": [
+      0,
+      1000
+    ],
+    "applies": "after app restart",
+    "zero": "disable and clear disposable disk caches at next launch",
+    "savedRegionsAndAttachedZipsSeparate": true,
+    "ramAndGpuSeparate": true
+  },
+  "ramTileCache": {
+    "rangeMiB": [
+      0,
+      1000
+    ],
+    "stepMiB": 1,
+    "applies": "immediately",
+    "zero": "no retained encoded/decoded/prepared tile payloads",
+    "partitionPercent": {
+      "encoded": 25,
+      "decoded": 25,
+      "prepared": 50
+    },
+    "default": "32 MiB low-RAM; otherwise memoryClass/4 clamped 32-96 MiB",
+    "excludes": [
+      "active loading/queued uploads",
+      "object and metadata overhead",
+      "renderer CPU working sets",
+      "GPU resources"
+    ],
+    "highBudgetWarning": true
+  },
+  "seamProtection": {
+    "terrainSkirts": "selective, cached continuity proof",
+    "depth": "MapLibre mean Earth circumference / 2^logicalZoom / 5",
+    "neighbourDem": "actual shared halo samples at pixel centres, immutable full source heights",
+    "missingTiles": "resident parent and complete finer child coverage",
+    "imagery": "exact UV mapping, explicit ClampToEdge, all nine trilinear mip levels and anisotropy",
+    "surfaceDetailReduced": false,
+    "extraGlobalGridBytes": 133128
+  },
+  "parentFallback": {
+    "residentBackdrop": "nearest available ancestor retained even after a fine target arrives",
+    "preparedRam": "nearest prepared ancestor restored for ideal leaves, even when fine GPU tiles are ready; fallback requests do not recursively restore more backgrounds",
+    "uploadAdmission": "ancestors of current targets admitted and prioritized; unrelated demand pruned",
+    "eviction": "owners protected; oldest nonowners or detail with resident ancestor evicted first",
+    "physicalSourceCeilingPerPool": 192,
+    "relatedReplacementTransientSlots": 1,
+    "softCountCoverageDebt": true,
+    "arbitraryHttpCacheHitsRestoredDirectly": false
+  },
+  "versionCode": 2,
+  "versionName": "0.1.1-performance-checkpoint",
+  "signerCertificateSHA256": "9384feb22f692afc35cc8a19d5e95103e4fe47292cfc3c81082eca0dec8492f0",
+  "signerMatchesPreviousCheckpoint": true,
+  "nativeLibraries": {
+    "arm64-v8a": {
+      "sha256": "7afceaaf9dffd6195a2f396eea9f7b45685bea12a2ac2faa6fe6924ff3e4d645",
+      "bytes": 4574136,
+      "elfLoadAlignment": [
+        16384,
+        16384,
+        16384
+      ]
+    },
+    "armeabi-v7a": {
+      "sha256": "b1ff319a03bfc5e16ae12ee24c97b70ad21c960966795326b5742c15ac65318b",
+      "bytes": 3141880,
+      "elfLoadAlignment": [
+        4096,
+        4096,
+        4096
+      ]
+    },
+    "x86_64": {
+      "sha256": "d160c541d05ad53a2eabc4ab86f223b336d6799133e53f18a86b04cb61cdd2bf",
+      "bytes": 5189944,
+      "elfLoadAlignment": [
+        16384,
+        16384,
+        16384
+      ]
+    }
+  },
+  "zipAlignment16KiBVerified": true,
+  "coarseImagesIdenticalToPrevious": 67,
+  "overviewCatalogUnchanged": true,
+  "gapAtlasUnchanged": true,
+  "largePacksBundled": 0,
+  "managedSessionCA": false,
+  "androidUnitTests": {
+    "tests": 71,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 2
+  },
+  "rustTests": [
+    "test result: ok. 30 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 1.11s",
+    "test result: ok. 6 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 1.42s",
+    "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s",
+    "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+    "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+  ],
+  "androidLint": "passed",
+  "gpuModesPassed": 6,
+  "phoneTested": false,
+  "scope": "Optimized signed native Base prototype checkpoint; no A20 FPS, whole-app loading, or installed-device acceptance claim."
+}

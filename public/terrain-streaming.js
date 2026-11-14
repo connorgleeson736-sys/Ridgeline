@@ -36,10 +36,10 @@ function partitionCover(id,entries,{maxTiles=64,maxDepth=8}={}){
  return visit(id,related,0)?result:null;
 }
 function imageReadiness(map){
- const zoom=map.getZoom?.()??0,checks=[];
+ const zoom=map.getZoom?.()??0,checks=[],sources=new Set();
  for(const layer of Object.values(map.style?._layers||{})){
   if(layer.type!=='raster'||!['linz','satellite','topo'].includes(layer.source))continue;
-  const hidden=typeof layer.isHidden==='function'?layer.isHidden(zoom):layer.layout?.visibility==='none';if(hidden)continue;
+  const hidden=typeof layer.isHidden==='function'?layer.isHidden(zoom):layer.layout?.visibility==='none';if(hidden||sources.has(layer.source))continue;sources.add(layer.source);
   const manager=map.style.tileManagers?.[layer.source];if(typeof manager?.getVisibleCoordinates!=='function')continue;
   const ids=manager.getVisibleCoordinates().filter(id=>!!manager.getTile?.(id)?.texture);checks.push(completeCoverage(ids));
  }

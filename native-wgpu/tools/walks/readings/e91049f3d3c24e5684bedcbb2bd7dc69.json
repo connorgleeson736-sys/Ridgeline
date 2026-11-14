@@ -1,0 +1,116 @@
+{
+ "guid": "e91049f3-d3c2-4e56-84be-dcbb2bd7dc69",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Te Whara Track from Ocean Beach car park to Urquharts Bay car park",
+   "shape": "one_way",
+   "start": {
+    "name": "Ocean Beach car park, Ranui Road",
+    "quote": "Te Whara Track starts at Ocean Beach car park on Ranui Road.",
+    "ref": null
+   },
+   "end": {
+    "name": "Urquharts Bay car park",
+    "quote": "The track ends at the Urquharts Bay car park.",
+    "ref": "F1"
+   },
+   "via": [
+    {
+     "name": "picnic table near WWII radar station ruins",
+     "quote": "reaches a picnic table, near the ruins of a WWII radar station",
+     "ref": null
+    },
+    {
+     "name": "Bream Head summit",
+     "quote": "The track then climbs to the Bream Head summit.",
+     "ref": "T5"
+    },
+    {
+     "name": "turnoff to Peach Cove Hut",
+     "quote": "passing the turnoff to Peach Cove Hut",
+     "ref": null
+    },
+    {
+     "name": "Mt Lion summit",
+     "quote": "to the summit of Mt Lion",
+     "ref": "T8"
+    },
+    {
+     "name": "junction with the Smugglers Bay loop track",
+     "quote": "meets the loop track to Smugglers Bay",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "5-6 hr one way",
+   "distance": "7.5 km one way",
+   "evidence": [
+    "Te Whara Track starts at Ocean Beach car park on Ranui Road.",
+    "The track ends at the Urquharts Bay car park.",
+    "The track is not a loop, so you will need to arrange transport.",
+    "You can start the track from either Ocean Beach car park on Ranui Road or Urquharts Bay car park at the end of Urquharts Bay Road."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Urquharts Bay car park",
+   "quote": "Urquharts Bay car park at the end of Urquharts Bay Road",
+   "ref": "F1",
+   "onto": "Te Whara Track"
+  },
+  {
+   "name": "Peach Cove Track entrance",
+   "quote": "you can park at the entrance to Peach Cove Track and enter/exit via that track",
+   "ref": "L2",
+   "onto": "Te Whara Track"
+  }
+ ],
+ "exits": [
+  {
+   "name": "Peach Cove Track",
+   "quote": "enter/exit via that track",
+   "ref": "L2",
+   "from": null,
+   "how": "track"
+  }
+ ],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Peach Cove Hut",
+   "quote": "Peach Cove Hut",
+   "ref": "T12",
+   "why": "nearby"
+  },
+  {
+   "name": "Smugglers Bay Loop Track",
+   "quote": "Smugglers Bay Loop Track is a shorter and easier alternative in the same area",
+   "ref": "L1",
+   "why": "other walk"
+  },
+  {
+   "name": "Cape Brett (Motukokako)",
+   "quote": "Cape Brett (Motukokako)",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Cape Rodney (Tawharanui)",
+   "quote": "Cape Rodney (Tawharanui)",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Te Wahine iti a Manaia",
+   "quote": "Te Wahine iti a Manaia",
+   "ref": null,
+   "why": "other"
+  }
+ ],
+ "doubts": "There is no road-end feature for the Ocean Beach car park on Ranui Road, and the only nearby entry, the place Ocean Beach (T10), is a locality rather than the car park, so the start has no ref. Urquharts Bay car park is F1, the road end where the track meets Urquharts Bay Road. The Peach Cove Track entrance has no feature, so its access point ref is the walk link L2, and it is also given as an exit by track; its junction with the way is not stated, so from is null. The Smugglers Bay loop is a shorter alternative walk, not a way of this track. The Peach Cove Hut is only reached by the turnoff, so it is not on the route. The Urquharts Bay start is described as an alternative start for the same track, so it is an access point, not a second way."
+}

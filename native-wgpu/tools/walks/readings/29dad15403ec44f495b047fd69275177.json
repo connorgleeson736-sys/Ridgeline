@@ -1,0 +1,67 @@
+{
+ "guid": "29dad154-03ec-44f4-95b0-47fd69275177",
+ "kind": "out_and_back",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Mount Bealey Track to the bushline",
+   "shape": "out_and_back",
+   "start": {
+    "name": "end of Mount Bealey Road",
+    "quote": "starts at the end of Mount Bealey Road",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "bushline",
+    "quote": "The track ends at the bushline.",
+    "ref": null
+   },
+   "via": [],
+   "direction": null,
+   "time": "2-4 hours return to the bushline",
+   "distance": "3.2 km (610 m vertical climb) to the bushline return via same track",
+   "evidence": [
+    "Mount Bealey Track starts at the end of Mount Bealey Road in Arthur’s Pass village.",
+    "The track ends at the bushline."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Mount Bealey",
+   "quote": "to the top of Mount Bealey",
+   "ref": "T7",
+   "why": "other"
+  },
+  {
+   "name": "Arthur's Pass views",
+   "quote": "There are good views here of Arthur’s Pass",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Bealey Spur Track and Hut",
+   "quote": "Bealey Spur Track and Hut",
+   "ref": "L1",
+   "why": "other walk"
+  },
+  {
+   "name": "Bealey Valley Track/Bealey Chasm",
+   "quote": "Bealey Valley Track/Bealey Chasm",
+   "ref": "L2",
+   "why": "other walk"
+  },
+  {
+   "name": "Avalanche Peak",
+   "quote": "Avalanche Peak is an alternative trip",
+   "ref": "L3",
+   "why": "other walk"
+  }
+ ],
+ "doubts": "One way only: the page describes the single Mount Bealey Track, which ends at the bushline. The shape is out_and_back from DOC's distance 'return via same track' and time '2-4 hours return to the bushline'; no page sentence says the return in words. The time and distance are DOC's own summary for the way. The end is the bushline, which has no feature or name in the packet, so its ref is null. The Mount Bealey summit is above the bushline with no track or marked route, so it is not part of the way. The 'Arthur's Pass' view is ambiguous between the place and the pass, so no ref."
+}

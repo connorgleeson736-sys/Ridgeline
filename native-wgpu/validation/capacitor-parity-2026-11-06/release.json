@@ -1,0 +1,36 @@
+{
+  "artifact": "Ridgeline-Native-Capacitor-Parity-0.1.17-Base.apk",
+  "bytes": 32706135,
+  "sha256": "05aaa478e5dca9ad5c80bee35cc34956cfe092237e83f4f1f533dad0948607d8",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.17-capacitor-parity",
+  "versionCode": 18,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.16 Full Audit (same package and signer)",
+  "changes": [
+    "vector topography maxzoom 14 (Capacitor source), filters evaluated at tile zoom, 4 parallel foreground tile loads including during gestures",
+    "peak label line of sight sampled every 25 m of ground with a fixed 30 m summit exemption",
+    "route profiles: z13 preview then 5 m samples from z17 LINZ elevation (64-tile budget), 2 m z17 samples in view at zoom 15+, pixel-centre bilinear, ancestor fallback",
+    "Capacitor map UI: kea launcher, locate, 2D/3D switch, compass, layers, scale bar, compact attribution; zoom buttons removed; Map layers panel and Saved routes drawer restyled",
+    "layers cover passes taps through; TileLoader.cameraChanged lock-free; pressed ripples on buttons"
+  ],
+  "tests": {
+    "kotlinJvm": "170 tests, 0 failures (incl. 9 RouteProfileTest, 2 OverlayRulesTest)",
+    "rust": "cargo test --workspace: all pass",
+    "gpuVulkanLavapipe": "overlay_parity (incl. near-summit and single-row ridges) and progressive_multi pass"
+  },
+  "lintErrors": 0,
+  "originalAssetsIdentical": 623,
+  "assetsAdded": [
+    "ui/ridgeline-kea.png (192 px, from Capacitor ridgeline-kea-expanded.png)"
+  ],
+  "jniExportsPerAbi": 43,
+  "loadAlignment": "0x4000",
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false,
+  "uiSeenOnDevice": false
+}

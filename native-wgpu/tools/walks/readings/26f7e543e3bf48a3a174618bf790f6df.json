@@ -1,0 +1,173 @@
+{
+ "guid": "26f7e543-e3bf-48a3-a174-618bf790f6df",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Milford Track, Glade Wharf to Sandfly Point",
+   "shape": "one_way",
+   "start": {
+    "name": "Glade Wharf",
+    "quote": "Glade Wharf",
+    "ref": null
+   },
+   "end": {
+    "name": "Sandfly Point",
+    "quote": "The track finishes at Sandfly Point on Milford Sound.",
+    "ref": "T20"
+   },
+   "via": [
+    {
+     "name": "Clinton River",
+     "quote": "the banks of the Clinton River",
+     "ref": "T7"
+    },
+    {
+     "name": "Clinton Hut",
+     "quote": "Clinton Hut",
+     "ref": "T6"
+    },
+    {
+     "name": "Hirere Falls",
+     "quote": "Hirere Falls",
+     "ref": "T9"
+    },
+    {
+     "name": "Lake Mintaro",
+     "quote": "Lake Mintaro",
+     "ref": "T11"
+    },
+    {
+     "name": "Mintaro Hut",
+     "quote": "Mintaro Hut",
+     "ref": "T17"
+    },
+    {
+     "name": "Omanui/McKinnon Pass",
+     "quote": "Omanui/McKinnon Pass",
+     "ref": "T18"
+    },
+    {
+     "name": "Omanui/McKinnon Pass Shelter",
+     "quote": "Omanui/McKinnon Pass Shelter",
+     "ref": null
+    },
+    {
+     "name": "Roaring Burn River",
+     "quote": "Roaring Burn River",
+     "ref": "T19"
+    },
+    {
+     "name": "Quintin Shelter",
+     "quote": "Quintin Shelter",
+     "ref": null
+    },
+    {
+     "name": "Dumpling Hut",
+     "quote": "Dumpling Hut",
+     "ref": "T8"
+    },
+    {
+     "name": "Arthur River",
+     "quote": "follow Arthur River",
+     "ref": "T3"
+    },
+    {
+     "name": "Boatshed",
+     "quote": "historic Boatshed",
+     "ref": null
+    },
+    {
+     "name": "Mackay Falls",
+     "quote": "Mackay Falls",
+     "ref": "T13"
+    },
+    {
+     "name": "Bell Rock",
+     "quote": "Bell Rock",
+     "ref": "T4"
+    },
+    {
+     "name": "Lake Ada",
+     "quote": "Lake Ada",
+     "ref": "T10"
+    }
+   ],
+   "direction": null,
+   "time": "4 days",
+   "distance": "53.5 km one way",
+   "evidence": [
+    "The Milford Track can only be walked in one direction over 3 nights and 4 days.",
+    "From Te Anau, take a bus or private transport to Te Anau Downs (30 minutes), then a boat trip to Glade Wharf at the head of Lake Te Anau (1 hour 15 minutes).",
+    "The track finishes at Sandfly Point on Milford Sound."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Wetland Walkway",
+   "quote": "Side trip: Wetland Walkway",
+   "ref": null,
+   "from": "Clinton Hut"
+  },
+  {
+   "name": "Sutherland Falls",
+   "quote": "Side trip – Sutherland Falls",
+   "ref": "T22",
+   "from": null
+  }
+ ],
+ "huts": [
+  {
+   "name": "Clinton Hut",
+   "quote": "Clinton Hut",
+   "ref": "T6"
+  },
+  {
+   "name": "Mintaro Hut",
+   "quote": "Mintaro Hut",
+   "ref": "T17"
+  },
+  {
+   "name": "Dumpling Hut",
+   "quote": "Dumpling Hut",
+   "ref": "T8"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Te Anau Downs",
+   "quote": "Te Anau Downs",
+   "ref": null,
+   "why": "other"
+  },
+  {
+   "name": "Pompolona icefield",
+   "quote": "Pompolona icefield",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Clinton Canyon",
+   "quote": "Clinton Canyon",
+   "ref": "T5",
+   "why": "view"
+  },
+  {
+   "name": "Lake Quill",
+   "quote": "Lake Quill",
+   "ref": "T12",
+   "why": "side trip"
+  },
+  {
+   "name": "Milford Sound/Piopiotahi",
+   "quote": "Milford Sound/Piopiotahi",
+   "ref": "T16",
+   "why": "other"
+  }
+ ],
+ "doubts": "Glade Wharf (start, reached by boat) has no matching entry, so start ref is null. Two 'Sandfly Point' entries exist; T20 is the one on Milford Sound (T21 is far south). Order of Hirere Falls and Lake Mintaro within Day 2 follows the paragraph. The text does not say where the Sutherland Falls side trip leaves the track (Day 3 is before Dumpling Hut). The Wetland Walkway leaves 10 min before Clinton Hut. Lake Ada is listed as on the way (rock cuttings alongside Arthur River and Lake Ada). The boat to Milford Sound after Sandfly Point is beyond the track's end; walkers 'may be flown' over avalanche sections only (not an exit)."
+}

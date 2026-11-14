@@ -1,0 +1,53 @@
+{
+ "guid": "6246caac-2b0d-4fee-87c7-7e0ecaeb2440",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Otago Central Rail Trail, Middlemarch to Clyde",
+   "shape": "one_way",
+   "start": {
+    "name": "Middlemarch",
+    "quote": "Middlemarch",
+    "ref": "T12"
+   },
+   "end": {
+    "name": "Clyde",
+    "quote": "Clyde",
+    "ref": "T7"
+   },
+   "via": [
+    {
+     "name": "Hyde",
+     "quote": "Hyde",
+     "ref": "T8"
+    },
+    {
+     "name": "Tiroiti",
+     "quote": "Tiroiti",
+     "ref": "T19"
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": "150 km one way",
+   "evidence": [
+    "The 3-4 day Otago Central Rail Trail is a unique recreational experience, following the former Otago Central Branch Railway for 150 km from Middlemarch to Clyde."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Golden Progress mine",
+   "quote": "The Golden Progress mine, poppet head and other gold mining relics, a short bike ride off the trail near Oturehua.",
+   "ref": null,
+   "from": "Oturehua"
+  }
+ ],
+ "huts": [],
+ "not_on_route": [],
+ "doubts": "Page gives no ordered list of the places along the trail, so via lists only Hyde and Tiroiti (Hyde is next to Middlemarch; Hyde before Tiroiti is assumed from the Middlemarch-to-Clyde direction). Time not given as a DOC time (text says 3-4 day), so null. The side-trip quote is the whole sentence; ref null since only the mine is meant."
+}

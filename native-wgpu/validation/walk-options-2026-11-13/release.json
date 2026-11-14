@@ -1,0 +1,28 @@
+{
+  "artifact": "Ridgeline-Native-Walk-Options-0.1.52-Base.apk",
+  "bytes": 34034470,
+  "sha256": "1c98d707184ec347f2fe8f92b8a4d0e63aa3d8d727adddadb2041e2a05655c41",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.52-walk-options",
+  "versionCode": 53,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.51 Full Audit (same package and signer)",
+  "changes": [
+    "Walk start and end options: where DOC describes a walk as alternatives (legs that do not follow one another: 'Tiki Trail to Ben Lomond Summit', 'Tiki Trail to Ben Lomond Saddle', 'Skyline Gondola top complex to Ben Lomond Saddle'), each is followed over the map's own tracks whatever they are called (LINZ, gaps up to 200 m joined) and kept only within 25% of DOC's distance for it and mostly along DOC's line. Ends are placed by gondola ends, peaks, map track names, the gazetteer, and ends of DOC's line; the best fit to DOC's distance is used. The track bar shows 'From … ▾' and 'To … ▾' choices.",
+    "Starts named only in DOC's text ('Start on the Kea Point Track either outside the … Visitor Centre or at White Horse Hill car park'): each followed to the far end of DOC's line (on the named track where given; roads by their map names; towns by the nearest end of DOC's line), kept when the route covers 70% of DOC's line and fits DOC's time at 0.75-6 km/h.",
+    "Ben Lomond reaches the summit (6.3 km from the Tiki Trail; DOC 7 km).",
+    "A walk's line well short of DOC's stated length (where the map's track changes name) continues over the map's tracks to their natural ends (next junction, dead end or gap), only when that brings it within 25% of DOC's length."
+  ],
+  "dataChecks": "Options survey over all 1,460 DOC walk pages (options-survey.txt): options for Ben Lomond, Sealy Tarns, Arthur's Pass Walking Track, Lake Clearwater, Stafford Bay, Mahaukura, Buckland Peaks; rejected cases (no DOC distance, ends not found, off DOC's line, partial single routes, circuits) keep the earlier behaviour. Extension survey (extend-survey.txt): 113 walks with a line under 75% of DOC's length; 14 extended, the rest unchanged. Label marking unchanged.",
+  "tests": {
+    "kotlinJvm": "268 tests, 0 failures (new: Ben Lomond options, Sealy Tarns starts from DOC's text, start sentences, chained legs not options, extension to junctions)",
+    "rust": "unchanged (native libraries byte-identical to 0.1.51)"
+  },
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

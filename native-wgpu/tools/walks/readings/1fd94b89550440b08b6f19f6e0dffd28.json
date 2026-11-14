@@ -1,0 +1,118 @@
+{
+ "guid": "1fd94b89-5504-40b0-8b6f-19f6e0dffd28",
+ "kind": "out_and_back",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Mangawhai Cliffs Walkway, car park to rock archway and back",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Mangawhai Heads car park",
+    "quote": "Mangawhai Heads car park",
+    "ref": null
+   },
+   "end": {
+    "name": "natural rock archway",
+    "quote": "a natural rock archway",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Mangawhai Heads Beach",
+     "quote": "follow the beach north",
+     "ref": null
+    },
+    {
+     "name": "walkway sign",
+     "quote": "the sign for Mangawhai Cliffs Walkway",
+     "ref": null
+    },
+    {
+     "name": "viewpoint",
+     "quote": "a viewpoint",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "2-3 hr return",
+   "distance": "8.4 km return via same track",
+   "evidence": [
+    "From Mangawhai Heads car park, follow the beach north.",
+    "From here, it’s a steep descent with lots of steps down to the coast and a natural rock archway.",
+    "Return to the car park via the track, or the beach (low and mid tide only)."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Return via beach loop (low and mid tide only)",
+   "shape": "loop",
+   "start": {
+    "name": "Mangawhai Heads car park",
+    "quote": "Mangawhai Heads car park",
+    "ref": null
+   },
+   "end": {
+    "name": "Mangawhai Heads car park",
+    "quote": "Mangawhai Heads car park",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "walkway sign",
+     "quote": "the sign for Mangawhai Cliffs Walkway",
+     "ref": null
+    },
+    {
+     "name": "viewpoint",
+     "quote": "a viewpoint",
+     "ref": null
+    },
+    {
+     "name": "rock archway",
+     "quote": "rock archway",
+     "ref": null
+    },
+    {
+     "name": "Mangawhai Heads Beach",
+     "quote": "Mangawhai Heads Beach",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "At low and mid tide, you can walk from the rock archway along Mangawhai Heads Beach all the way to the car park.",
+    "Return to the car park via the track, or the beach (low and mid tide only)."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Cove Road link track",
+   "quote": "Cove Road",
+   "ref": null,
+   "onto": "Mangawhai Cliffs Walkway"
+  }
+ ],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Te Whara/Bream Head",
+   "quote": "Te Whara/Bream Head",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Uretiti Beach Campsite",
+   "quote": "Uretiti Beach Campsite",
+   "ref": "L1",
+   "why": "nearby"
+  }
+ ],
+ "doubts": "Car park is at the end of Wintle Street; no road end feature for it, so ref null. W2 time/distance not given for the whole loop (4.8 km / 1 hr is the beach section only)."
+}

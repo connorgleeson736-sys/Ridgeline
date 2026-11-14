@@ -1,0 +1,30 @@
+{
+  "artifact": "Ridgeline-Native-Walk-Legs-0.1.47-Base.apk",
+  "bytes": 34001698,
+  "sha256": "8833a8d650f82c5b65e80394fc6f2b23d1110c1408f34f727cdc7214d1745523",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.47-walk-legs",
+  "versionCode": 48,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.46 Full Audit (same package and signer)",
+  "changes": [
+    "Walks follow DOC's own legs: the legs in each walk's DOC page description ('A to B' or 'A - B - C' headings with DOC's time and distance; side trips and other headings excluded) are chained in DOC's order (where DOC gives alternatives, the leg to a place not yet visited, then the shorter) and followed over DOC's line with leg ends placed by the bundled gazetteer (exact name, then a longer name that starts with it, then without generic words such as 'carpark'); locality ends ('Makarora') take the line end that best fits the leg's distance. Gaps between DOC's line pieces are bridged only where needed. Routes far from DOC's distances (over 25% total, or a third of measured legs over 50%) are not used; DOC's line is used as before.",
+    "Map names: only the walk itself carries a large walk's name (the Gillespie Pass Circuit no longer names the Wilkin Valley Track up to Top Forks Hut, an extension on DOC's line). Large walks are named once their route is known (page and gazetteer, cached).",
+    "Direction and times: walk summaries run in DOC's direction (the order DOC describes the legs); tracks without legs start at their lower end. The header shows DOC's time for the walk; a section of a larger walk shows the track's own DOC facts with 'Part of <walk> · <DOC time>' (tap for the whole walk) and DOC's leg that covers it (title, time, distance and text).",
+    "Sections: chips under the chart for 'Whole', each DOC leg (DOC's time and distance), and each map track name making up the walk (Siberia Track, Gillespie Pass Circuit Track, Blue-Young Link Track...). A section zooms and shades the chart, shows its own distance, ascent, descent and highest point, DOC's text for a leg, and is drawn bright on the map with the rest of the walk dimmed.",
+    "Track sheet: three heights (compact, middle with the map still usable, full at 86% of the screen, was 78%); the map resizes to the space above it like the route sheet, the bottom controls move up with it, and the track is framed on the map.",
+    "DOC page reading: text blocks containing nested boxes (Gillespie Pass warning) are read whole; description sections named 'Track description' too. Name lookups also try DOC's plural collections ('Wilkin Valley Track' -> 'Wilkin Valley tracks')."
+  ],
+  "dataChecks": "Survey of DOC's live data (DocSurveyTest, 166 large walks and 60 others): all 226 pages parse with introductions; 96 large walks have legs; 51 are followed leg by leg and accepted (Gillespie Pass Circuit 51 km vs DOC 54, Kepler 57 vs 60, Abel Tasman 55 vs 60, St James 63 vs 65, Southern Circuit 112 vs 118); 92 of 98 leg spans within 25% of DOC's leg distances. Others (e.g. Tongariro Northern Circuit, Routeburn) fall back to DOC's line.",
+  "tests": {
+    "kotlinJvm": "251 tests, 0 failures (new: WalkRoutesTest x5 on DOC's real Gillespie Pass page and line)",
+    "rust": "unchanged (native libraries byte-identical to 0.1.46)"
+  },
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

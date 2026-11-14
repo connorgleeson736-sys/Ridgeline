@@ -1,0 +1,212 @@
+{
+ "guid": "799eb0a4-871c-4d00-a964-1b78f5edbfce",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Lauder Station Road to Cluden Creek car park",
+   "shape": "one_way",
+   "start": {
+    "name": "Lauder Station Road",
+    "quote": "The Lauder Station Easement Track starts on Lauder Station Road.",
+    "ref": null
+   },
+   "end": {
+    "name": "Cluden Creek car park",
+    "quote": "Lauder Basin Conservation Area boundary to Cluden Creek car park",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Lauder Station Easement Track",
+     "quote": "Lauder Station Easement Track (Lauder Station Road to Lauder Basin Conservation Area boundary)",
+     "ref": null
+    },
+    {
+     "name": "Lauder Station",
+     "quote": "Follow the track through Lauder Station to the boundary of Lauder Basin Conservation Area.",
+     "ref": null
+    },
+    {
+     "name": "Lauder Basin Conservation Area Road",
+     "quote": "Lauder Basin Conservation Area Road (Lauder Station boundary to Cluden Station boundary)",
+     "ref": null
+    },
+    {
+     "name": "Cluden Station",
+     "quote": "follow the formed 4WD farm track through Cluden Station to Cluden Creek Road",
+     "ref": null
+    },
+    {
+     "name": "Cluden Station Easement Track",
+     "quote": "Cluden Station Easement Track (Lauder Basin Conservation Area boundary to Cluden Creek Road)",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": "31 km",
+   "evidence": [
+    "Lauder Station Road to Cluden Creek car park",
+    "Distance: 31 km",
+    "The Lauder Station Easement Track starts on Lauder Station Road.",
+    "Lauder Basin Conservation Area boundary to Cluden Creek car park: 7 km, 2-3 hours walking"
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Cluden Creek Track",
+   "shape": "one_way",
+   "start": {
+    "name": "Cluden Creek car park",
+    "quote": "Cluden Creek Track leads from Cluden Creek Car park",
+    "ref": null
+   },
+   "end": {
+    "name": "Lauder Basin Conservation Area Road",
+    "quote": "where it meets Lauder Basin Conservation Area Road",
+    "ref": null
+   },
+   "via": [],
+   "direction": null,
+   "time": "7-8 hours walking",
+   "distance": "20 km",
+   "evidence": [
+    "Cluden Creek Track",
+    "Distance: 20 km",
+    "Time: 7-8 hours walking",
+    "Cluden Creek Track leads from Cluden Creek Car park to Lauder Basin Conservation Area, where it meets Lauder Basin Conservation Area Road."
+   ]
+  },
+  {
+   "id": "W3",
+   "main": false,
+   "label": "Dunstan Pass Track",
+   "shape": "one_way",
+   "start": {
+    "name": "junction of Cluden Creek Track and Chain Hills Access Track",
+    "quote": "From the junction of Cluden Creek Track and Chain Hills Access Track",
+    "ref": null
+   },
+   "end": {
+    "name": "Dunstan Creek",
+    "quote": "From the pass, Dunstan Pass Track then descends to Dunstan Creek.",
+    "ref": "T6"
+   },
+   "via": [
+    {
+     "name": "Dunstan Pass",
+     "quote": "Dunstan Pass Track climbs to Dunstan Pass",
+     "ref": "T7"
+    }
+   ],
+   "direction": null,
+   "time": "1 hour 30 mins walking",
+   "distance": "4 km",
+   "evidence": [
+    "Dunstan Pass Track",
+    "Distance: 4 km",
+    "Time: 1 hour 30 mins walking",
+    "From the junction of Cluden Creek Track and Chain Hills Access Track, Dunstan Pass Track climbs to Dunstan Pass.",
+    "From the pass, Dunstan Pass Track then descends to Dunstan Creek."
+   ]
+  },
+  {
+   "id": "W4",
+   "main": false,
+   "label": "Chain Hills Access Track",
+   "shape": "one_way",
+   "start": {
+    "name": "junction of Cluden Creek Track and Dunstan Pass Track",
+    "quote": "This track leads from the junction of Cluden Creek Track and Dunstan Pass Track",
+    "ref": null
+   },
+   "end": {
+    "name": "northern section of Lauder Basin Conservation Area",
+    "quote": "up the hill to the northern section of Lauder Basin Conservation Area",
+    "ref": null
+   },
+   "via": [],
+   "direction": null,
+   "time": null,
+   "distance": "3.4 km",
+   "evidence": [
+    "Chain Hills Access Track",
+    "Distance: 3.4 km",
+    "This track leads from the junction of Cluden Creek Track and Dunstan Pass Track up the hill to the northern section of Lauder Basin Conservation Area."
+   ]
+  },
+  {
+   "id": "W5",
+   "main": false,
+   "label": "Sailors Creek Track",
+   "shape": "one_way",
+   "start": {
+    "name": "Sailors Creek car park",
+    "quote": "From the Sailors Creek car park",
+    "ref": null
+   },
+   "end": {
+    "name": "Lauder Basin Conservation Area boundary",
+    "quote": "leads to the Lauder Basin Conservation Area boundary",
+    "ref": null
+   },
+   "via": [],
+   "direction": null,
+   "time": "45 mins walking",
+   "distance": "2 km",
+   "evidence": [
+    "Sailors Creek Track",
+    "Distance: 2 km",
+    "Time: 45 mins walking",
+    "From the Sailors Creek car park, Sailors Creek Track starts from a stile and leads to the Lauder Basin Conservation Area boundary."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Cluden Quarry car park",
+   "quote": "The first car park is the Cluden Quarry car park.",
+   "ref": null,
+   "onto": "Cluden Creek Road"
+  }
+ ],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Lauder Basin Hut",
+   "quote": "The sidle down to Lauder Basin Hut has a section on an incline",
+   "ref": "T8",
+   "why": "nearby"
+  },
+  {
+   "name": "Cluden Creek Conservation Area",
+   "quote": "Cluden Creek Conservation Area",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "Chain Hills Track",
+   "quote": "there is a junction with Chain Hills Track",
+   "ref": "L1",
+   "why": "other walk"
+  },
+  {
+   "name": "Long Acre Track",
+   "quote": "which gives access to Long Acre Track, Shilmar Track",
+   "ref": "T4",
+   "why": "other walk"
+  },
+  {
+   "name": "Shilmar Track",
+   "quote": "which gives access to Long Acre Track, Shilmar Track",
+   "ref": null,
+   "why": "other walk"
+  }
+ ],
+ "doubts": "Kind is one_way: the page's first heading gives one crossing (Lauder Station Road to Cluden Creek car park, 31 km = 6 + 18 + 7 km), with its legs as via; the other tracks have their own headings, distances and start and end, so they are listed as separate ways. Whether those separate tracks are offered as alternatives to the crossing is not stated. Whether the 4WD road passes Lauder Basin Hut is not stated (only that the sidle down to it is on the 4WD track), so it is not_on_route. Chain Hills Track is mentioned by a link to the Lindis Valley tracks page (L1); the ref is taken from that link. The gate from Cluden Creek car park onto Cluden Creek Track is locked and no key is available. No time is given for the whole crossing. The main way's start is not a feature on the map, so start and end carry no ref."
+}

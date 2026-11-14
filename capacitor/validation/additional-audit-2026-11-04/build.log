@@ -1,0 +1,5 @@
+
+> ridgeline-capacitor@0.20.0 build
+> node scripts/build-web.mjs
+
+Packaged website Direct 3D renderer and mobile controls.

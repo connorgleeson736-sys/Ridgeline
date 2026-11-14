@@ -1,0 +1,112 @@
+{
+  "baseline": {
+    "elapsedMs": 5071.39999999851,
+    "fallback": "12/3967/2612",
+    "abortedEsri": 0,
+    "stats": {
+      "untouchedLINZ": 0,
+      "regionalEsri": 0,
+      "boundaryComposites": 0,
+      "overzoomCrops": 0,
+      "esriColourCompensations": 0,
+      "precomputedOverviews": 0,
+      "southOverviews": 0,
+      "southRangeBytes": 0,
+      "southFailures": 0,
+      "southStatic": 0,
+      "overviewGenericContentType": 0,
+      "overviewFallbacks": 0,
+      "workerJobs": 1,
+      "mainThreadJobs": 0,
+      "compositionFailures": 0,
+      "referenceOverviews": 0,
+      "inputBytes": 13318,
+      "inputTiles": 2,
+      "inputHits": 0,
+      "inputShared": 0,
+      "inputPending": 0,
+      "gapInterior": 0,
+      "gapBoundary": 1,
+      "gapOverview": 0,
+      "compositesActive": 0,
+      "compositesQueued": 0,
+      "queuedCompositionBytes": 0,
+      "activeCompositionInputBytes": 0,
+      "compositionQueueByteLimit": 16777216,
+      "compositionQueueLimit": 32,
+      "compositionCancellations": 0,
+      "compositionDeclined": 0,
+      "workerFailures": 0,
+      "pendingWorkerCompositions": 0,
+      "waitingEsriCompositions": 0,
+      "workerRestartAfterMs": 0,
+      "mainThreadFallback": false
+    }
+  },
+  "fixed": {
+    "elapsedMs": 57.600000001490116,
+    "fallback": null,
+    "abortedEsri": 1,
+    "stats": {
+      "untouchedLINZ": 0,
+      "regionalEsri": 0,
+      "boundaryComposites": 0,
+      "overzoomCrops": 0,
+      "esriColourCompensations": 0,
+      "precomputedOverviews": 0,
+      "southOverviews": 0,
+      "southRangeBytes": 0,
+      "southFailures": 0,
+      "southStatic": 0,
+      "overviewGenericContentType": 0,
+      "overviewFallbacks": 0,
+      "workerJobs": 1,
+      "mainThreadJobs": 0,
+      "compositionFailures": 0,
+      "referenceOverviews": 0,
+      "inputBytes": 6819,
+      "inputTiles": 1,
+      "inputHits": 0,
+      "inputShared": 0,
+      "inputPending": 0,
+      "gapInterior": 0,
+      "gapBoundary": 1,
+      "gapOverview": 0,
+      "gapEsriWaitsAvoided": 1,
+      "compositesActive": 0,
+      "compositesQueued": 0,
+      "queuedCompositionBytes": 0,
+      "activeCompositionInputBytes": 0,
+      "compositionQueueByteLimit": 16777216,
+      "compositionQueueLimit": 32,
+      "compositionCancellations": 0,
+      "compositionDeclined": 0,
+      "workerFailures": 0,
+      "pendingWorkerCompositions": 0,
+      "waitingEsriCompositions": 0,
+      "workerRestartAfterMs": 0,
+      "mainThreadFallback": false
+    }
+  },
+  "scheduler": {
+    "linzElapsedMs": 54.69999999925494,
+    "oneSlotAvailableDuringEsriWait": true,
+    "mixedPixelsByteIdentical": true
+  },
+  "cancel": {
+    "preparedInputsReleased": true,
+    "pendingWorkerCompositions": 0
+  },
+  "mainThreadFallback": {
+    "elapsedMs": 34.30000000074506,
+    "encodedPixelsByteIdentical": true
+  },
+  "sourceFailures": {
+    "unusedEsriFailureDoesNotBlock": true,
+    "neededEsriFailureRejects": true,
+    "fineAlphaFailureRejects": true
+  },
+  "workerLoss": {
+    "preparedNetworkWaitRejectedPromptly": true
+  }
+}

@@ -1,0 +1,60 @@
+{
+ "guid": "54ce2667-09f2-4cd3-a3ad-37d0d81bb5c9",
+ "kind": "out_and_back",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Mount Aicken Track to the bushline",
+   "shape": "out_and_back",
+   "start": {
+    "name": "northern end of Arthur's Pass village",
+    "quote": "northern end of Arthur's Pass village",
+    "ref": null
+   },
+   "end": {
+    "name": "bushline",
+    "quote": "bushline",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Devils Punchbowl Walking Track",
+     "quote": "Devils Punchbowl Walking Track",
+     "ref": "T2"
+    },
+    {
+     "name": "old pipeline",
+     "quote": "an old pipeline",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "2-4 hr return to the bushline",
+   "distance": "2.8 km (540 vertical climb) to the bushline return via same track",
+   "evidence": [
+    "Start on the Devils Punchbowl Walking Track at the northern end of Arthur's Pass village, just off SH73.",
+    "This track ends at the bushline as there have been multiple fatalities from inexperienced trampers/walkers falling to their deaths."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Mount Aicken",
+   "quote": "Mount Aicken summit",
+   "ref": "T8",
+   "why": "other"
+  },
+  {
+   "name": "Avalanche Peak",
+   "quote": "Avalanche Peak",
+   "ref": "T7",
+   "why": "other walk"
+  }
+ ],
+ "doubts": "Start is not a named place; no feature clearly matches (Devils Punchbowl road-end features are at the railway tunnel), so ref null. Turnoff from Devils Punchbowl track is said to be 15 min up it."
+}

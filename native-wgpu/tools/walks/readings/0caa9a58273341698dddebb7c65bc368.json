@@ -1,0 +1,92 @@
+{
+ "guid": "0caa9a58-2733-4169-8ddd-ebb7c65bc368",
+ "kind": "unclear",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Upper Copland Valley Track, car park to the alpine basin",
+   "shape": null,
+   "start": {
+    "name": "Car park",
+    "quote": "Car park to Welcome Flat Hut",
+    "ref": null
+   },
+   "end": {
+    "name": "alpine basin",
+    "quote": "The route ends at the alpine basin.",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Copland Track",
+     "quote": "Copland Track",
+     "ref": "T1"
+    },
+    {
+     "name": "Architect Creek Hut",
+     "quote": "Architect Creek Hut",
+     "ref": "T3"
+    },
+    {
+     "name": "Welcome Flat Hut",
+     "quote": "Welcome Flat Hut",
+     "ref": "T13"
+    },
+    {
+     "name": "Scott Creek",
+     "quote": "Scott Creek",
+     "ref": "T8",
+     "how": "ford"
+    },
+    {
+     "name": "Tekano Creek",
+     "quote": "Tekano Creek",
+     "ref": "T9"
+    },
+    {
+     "name": "Douglas Rock Hut",
+     "quote": "Douglas Rock Hut",
+     "ref": "T5"
+    }
+   ],
+   "direction": null,
+   "time": "3 days +",
+   "distance": null,
+   "evidence": [
+    "Follow Copland Track to Welcome Flat Hut via Architect Creek Hut.",
+    "Past Douglas Rock Hut, a marked route continues up the Copland Valley.",
+    "The route ends at the alpine basin."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Architect Creek Hut",
+   "quote": "Architect Creek Hut",
+   "ref": "T3"
+  },
+  {
+   "name": "Welcome Flat Hut",
+   "quote": "Welcome Flat Hut",
+   "ref": "T13"
+  },
+  {
+   "name": "Douglas Rock Hut",
+   "quote": "Douglas Rock Hut",
+   "ref": "T5"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Copland Pass",
+   "quote": "Copland Pass",
+   "ref": null,
+   "why": "other"
+  }
+ ],
+ "doubts": "Car park is not described or located. Return is not stated so shape is null. Whether the main way ends at Douglas Rock Hut or the alpine basin is a judgement; chose the basin where the page says the route ends. Scott Creek is crossed (multiple channels, no bridge mentioned)."
+}

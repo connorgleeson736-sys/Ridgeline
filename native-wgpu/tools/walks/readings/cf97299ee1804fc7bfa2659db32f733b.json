@@ -1,0 +1,134 @@
+{
+ "guid": "cf97299e-e180-4fc7-bfa2-659db32f733b",
+ "kind": "network",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Denniston Brakehead Walk",
+   "shape": "loop",
+   "start": {
+    "name": "Main Denniston car park",
+    "quote": "Denniston Brakehead Walk starts at the main Denniston car park, by the large shelter.",
+    "ref": null
+   },
+   "end": {
+    "name": "Main Denniston car park",
+    "quote": "The loop track takes you back to the car park",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "top of the incline",
+     "quote": "The track descends from the car park down to the top of the incline.",
+     "ref": null
+    },
+    {
+     "name": "The Camp",
+     "quote": "the site of Denniston’s first settlement, ‘The Camp’",
+     "ref": null
+    },
+    {
+     "name": "rope road",
+     "quote": "via the historic ‘rope road’ haulage system",
+     "ref": null
+    },
+    {
+     "name": "coal workshops and powerhouse",
+     "quote": "coal workshops and powerhouse",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "1 hr",
+   "distance": "2 km (loop)",
+   "evidence": [
+    "1 hr / 2 km (loop)",
+    "Denniston Brakehead Walk starts at the main Denniston car park, by the large shelter.",
+    "The loop track takes you back to the car park via the historic ‘rope road’ haulage system, coal workshops and powerhouse."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Lower car park to Denniston Incline viewpoint",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Lower car park shelter",
+    "quote": "The track begins at the lower car park shelter.",
+    "ref": null
+   },
+   "end": {
+    "name": "Denniston Incline viewpoint",
+    "quote": "Accessible access to the Denniston Incline viewpoint starts at the lower car park",
+    "ref": null
+   },
+   "via": [],
+   "direction": null,
+   "time": "5 min",
+   "distance": "150 m (return)",
+   "evidence": [
+    "5 min / 150 m (return)",
+    "The track begins at the lower car park shelter.",
+    "A gravel track with boardwalk sections leads to the viewing platform.",
+    "Return to the shelter the same way you came."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Denniston Incline viewpoint",
+   "quote": "Take a side trip to the incline viewpoint",
+   "ref": null,
+   "from": "top of the incline"
+  },
+  {
+   "name": "Banbury Arches",
+   "quote": "take a side trip to Banbury Arches (15 min return)",
+   "ref": null,
+   "from": null
+  }
+ ],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Banbury Mine",
+   "quote": "tramway access to Banbury Mine",
+   "ref": null,
+   "why": "side trip"
+  },
+  {
+   "name": "Tasman Sea",
+   "quote": "on a good day, the Tasman Sea",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Denniston Bridle Track",
+   "quote": "leads to the bottom of Denniston Bridle Track",
+   "ref": "L1",
+   "why": "other walk"
+  },
+  {
+   "name": "Denniston Plateau mountain biking tracks",
+   "quote": "see Denniston Plateau mountain biking tracks",
+   "ref": null,
+   "why": "other walk"
+  },
+  {
+   "name": "Waimangaroa",
+   "quote": "follow SH67 to Waimangaroa",
+   "ref": "T6",
+   "why": "nearby"
+  },
+  {
+   "name": "Westport",
+   "quote": "Food and petrol can be found in Westport",
+   "ref": null,
+   "why": "nearby"
+  }
+ ],
+ "doubts": "The page describes two separate walks (the 1 hr Denniston Brakehead Walk loop and the 5 min accessible walk from the lower car park to the Denniston Incline viewpoint), so it is a network with the Brakehead Walk as the main way; it could instead be read as one walk with two parts. Neither the main Denniston car park (reached via Boswell Street) nor the lower car park clearly matches any road-end feature (the features name Young Street, Burnetts Face Road and Denniston Road, not Boswell Street), so starts and ends are null. The text does not say where the Banbury Arches side trip leaves the loop (it is described after The Camp), so its from is null. The Denniston Incline viewpoint is in W1 as a side trip from the top of the incline and is also the end of W2."
+}

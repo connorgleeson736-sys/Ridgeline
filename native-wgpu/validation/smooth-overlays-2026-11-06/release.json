@@ -1,0 +1,35 @@
+{
+  "artifact": "Ridgeline-Native-Smooth-Overlays-0.1.18-Base.apk",
+  "bytes": 32706903,
+  "sha256": "f6f2494760c8a0f25396186ee59a589a31f985d9b67227c3288c859360d2f7d9",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.18-smooth-overlays",
+  "versionCode": 19,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.17 Full Audit (same package and signer)",
+  "changes": [
+    "overlay view selection: 50 ms leading-edge throttle (was a 180 ms debounce restarted by every camera frame)",
+    "overlay publication within 100 ms during gestures (was 300 ms + 60 ms delay); per-tile styling cached",
+    "waypoint sprites depth-tested at their point raised by six radii of ground distance (whole dot; ridges still hide it)",
+    "route sheet: square corners, menu and boxed close removed, chart fills expanded sheet with Capacitor tooltip, spaced buttons without press shadows",
+    "chart section A/B markers in chart and on map; cached chart bitmap and O(log n) section/grade",
+    "smaller top-right controls"
+  ],
+  "tests": {
+    "kotlinJvm": "171 tests, 0 failures (incl. ProfileIndexTest against reference section/grade)",
+    "rust": "cargo test --workspace: all pass",
+    "gpuVulkanLavapipe": "waypoint_occlusion (Vulkan and GLES; old shader shows top half only), route_smoke, overlay_parity, progressive_multi pass"
+  },
+  "lineWidthNote": "line widths stay evaluated at quarter-zoom steps: between steps the style's widths change by at most about 0.2 px",
+  "lintErrors": 0,
+  "originalAssetsIdentical": 623,
+  "jniExportsPerAbi": 43,
+  "loadAlignment": "0x4000",
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false,
+  "uiSeenOnDevice": false
+}

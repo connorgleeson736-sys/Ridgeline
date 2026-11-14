@@ -1,0 +1,62 @@
+{
+ "guid": "b3e33c02-1732-4820-8715-4c7b9e337bd4",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Main walk (old dray track) through the settlement",
+   "shape": "one_way",
+   "start": {
+    "name": "main track entrance",
+    "quote": "It begins at the main track entrance",
+    "ref": "F2"
+   },
+   "end": {
+    "name": "western end",
+    "quote": "runs through to the western end",
+    "ref": null
+   },
+   "via": [],
+   "direction": null,
+   "time": "At your leisure",
+   "distance": null,
+   "evidence": [
+    "The main walk (old dray track) that runs through the centre of the settlement is suitable for wheelchairs and buggies.",
+    "It begins at the main track entrance and runs through to the western end.",
+    "The Arrowtown Chinese Settlement is near Bush Creek, at the top end of Buckingham Street, Arrowtown’s main street."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Ah Lum’s restored store",
+   "quote": "Ah Lum’s restored store is on a terrace to the left",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Arrow River",
+   "quote": "the junction of Bush Creek and the Arrow River",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "Bush Creek",
+   "quote": "near Bush Creek",
+   "ref": "T4",
+   "why": "nearby"
+  },
+  {
+   "name": "Arrowtown",
+   "quote": "Arrowtown’s main street",
+   "ref": "T3",
+   "why": "nearby"
+  }
+ ],
+ "doubts": "The page describes a heritage site, not a route. The start is taken as F2 (the unnamed track meeting Buckingham Street), because the settlement is at the top end of Buckingham Street; the text does not name the entrance road end, so this ref is a judgment. Shape is one_way from 'runs through to the western end' with no return stated. Time 'At your leisure' is DOC's summary. The restored buildings are historic huts, not DOC huts with bunks, so huts is empty. The side tracks off the main walk are not named, so no side trips are recorded."
+}

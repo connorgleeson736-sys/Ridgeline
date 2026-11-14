@@ -1,0 +1,19 @@
+{
+  "scope": "Prototype packaging only, not feature/device/visual acceptance",
+  "apk": "Ridgeline-Native-Latency-0.1.7-Base.apk",
+  "bytes": 32092956,
+  "sha256": "9432908850999d937293a6efc85c5b40ef7aedfa10683f67d3cf2ae111330dbb",
+  "nativeLibraries": [
+    "lib/arm64-v8a/libridgeline_renderer.so",
+    "lib/armeabi-v7a/libridgeline_renderer.so",
+    "lib/x86_64/libridgeline_renderer.so"
+  ],
+  "webRuntimeAssets": 0,
+  "webViewOrCapacitorDexReferences": 0,
+  "base": true,
+  "coarseImageryFiles": 67,
+  "originalZipFiles": 0,
+  "overviewPayloadBytes": 0,
+  "imageRanges": 0,
+  "packs": []
+}

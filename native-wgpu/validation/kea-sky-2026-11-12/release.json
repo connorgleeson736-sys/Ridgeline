@@ -1,0 +1,29 @@
+{
+  "artifact": "Ridgeline-Native-Kea-Sky-0.1.41-Base.apk",
+  "bytes": 33887006,
+  "sha256": "7be2e5279da0049fe9355695b38b6b1ff1fcf965795e1714066a446c86873e1b",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.41-kea-sky",
+  "versionCode": 42,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.40 Full Audit (same package and signer)",
+  "changes": [
+    "App logo: the user's flying kea, cut out from its cream background (soft edges; eye ring kept) and set on a sky gradient sampled from the user's reference 3D-viewer screenshot (RGB 120,181,254 at the top to 217,242,255 at the horizon). Adaptive launcher icon (gradient background, kea foreground within the safe zone, monochrome layer for themed icons), the in-app top-bar logo, and brand files (1024 master, 512 Play icon, rounded preview, transparent kea) in branding/.",
+    "3D sky: a 'Clear sky' gradient behind the terrain, deep blue overhead to pale haze at the horizon, by each pixel's angle above the horizon (colour stops from the same screenshot, spread over about 12 degrees). New default; installs on the old default (Mist) move to it once; all flat sky colours remain in Layers > Advanced.",
+    "Examples: sky_smoke renders the gradient (Vulkan and GLES). overlay_drape and overlay_pool counted bright sky pixels as green through u8 overflow (217 + 60 wrapped); their colour tests now widen to u16."
+  ],
+  "tests": {
+    "kotlinJvm": "211 tests, 0 failures (PlaceSearch's 150 ms timing test exceeded once under load; the rerun passed)",
+    "rust": "51 tests pass",
+    "gpu": "sky_smoke, overlay_drape (Vulkan and GLES), overlay_pool (Vulkan)"
+  },
+  "lintErrors": 0,
+  "jniExportsPerAbi": 49,
+  "loadAlignment": "0x4000",
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

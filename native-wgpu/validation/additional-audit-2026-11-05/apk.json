@@ -1,0 +1,19 @@
+{
+  "scope": "Prototype packaging only, not feature/device/visual acceptance",
+  "apk": "Ridgeline-Native-Additional-Audit-0.1.12-Base.apk",
+  "bytes": 33192122,
+  "sha256": "085fff49995826f07da20d451c63a968c3afc15b8a4ce3390f7bf486f57f61ce",
+  "nativeLibraries": [
+    "lib/arm64-v8a/libridgeline_renderer.so",
+    "lib/armeabi-v7a/libridgeline_renderer.so",
+    "lib/x86_64/libridgeline_renderer.so"
+  ],
+  "webRuntimeAssets": 0,
+  "webViewOrCapacitorDexReferences": 0,
+  "base": true,
+  "coarseImageryFiles": 67,
+  "originalZipFiles": 0,
+  "overviewPayloadBytes": 0,
+  "imageRanges": 0,
+  "packs": []
+}

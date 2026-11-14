@@ -1,0 +1,136 @@
+{
+ "guid": "f73f8cf3-e0ee-4526-ba6f-454fc2b4dfad",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Burtton's Track from Scotts Road to Mangahao Road carpark",
+   "shape": "one_way",
+   "start": {
+    "name": "Scotts Road carpark at the entrance to Gordon Kear Forest",
+    "quote": "The track starts at the entrance to Gordon Kear Forest.",
+    "ref": null
+   },
+   "end": {
+    "name": "Mangahao Road carpark",
+    "quote": "The DOC track ends at the carpark just off the Mangahao Road",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "metalled forestry road alongside the Kahuterawa Stream",
+     "quote": "The walk commences following the metalled forestry road alongside the Kahuterawa Stream.",
+     "ref": null,
+     "how": "road"
+    },
+    {
+     "name": "open clearing where the forest roads fork",
+     "quote": "open clearing where the forest roads fork",
+     "ref": null
+    },
+    {
+     "name": "DOC Boundary",
+     "quote": "DOC Boundary 1 hour 30 minutes",
+     "ref": null
+    },
+    {
+     "name": "No 1 Stream",
+     "quote": "The track crosses the No 1 stream",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Tokomaru River",
+     "quote": "follows the eastern side of the Tokomaru River",
+     "ref": "T2"
+    },
+    {
+     "name": "former Burtton’s Whare site",
+     "quote": "Five minutes further on the former Burtton’s Whare site is reached.",
+     "ref": null
+    },
+    {
+     "name": "former Tokomaru Valley Road",
+     "quote": "The final hour of walk, 3.2 km is along the former Tokomaru Valley Road.",
+     "ref": null,
+     "how": "road"
+    }
+   ],
+   "direction": null,
+   "time": "6 hr going south, 7 hr going north",
+   "distance": "17 km one way",
+   "evidence": [
+    "The track can be walked from either direction. Walking south from Scotts Road is easiest for the steepest gradient is then downhill.",
+    "The following track description applies to the walk when undertaken from north to south.",
+    "The track starts at the entrance to Gordon Kear Forest. There is a carpark on Scotts Road.",
+    "The DOC track ends at the carpark just off the Mangahao Road 7.7 km from the Mangahao Power Station."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Mangahao Road carpark",
+   "quote": "The track can be walked from either direction.",
+   "ref": null,
+   "onto": null
+  }
+ ],
+ "exits": [
+  {
+   "name": "Mangahao Road towards Shannon",
+   "quote": "walking down Mangahao Road towards Shannon",
+   "ref": null,
+   "from": "Mangahao Road carpark",
+   "how": "road"
+  },
+  {
+   "name": "Mangahao-Makahika Track",
+   "quote": "continuing up the road towards the dams to the Mangahao-Makahika Track",
+   "ref": null,
+   "from": "Mangahao Road carpark",
+   "how": "track"
+  }
+ ],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Mangahao-Makahika Track",
+   "quote": "the Mangahao-Makahika Track",
+   "ref": null,
+   "why": "other walk"
+  },
+  {
+   "name": "Mangahao Power Station",
+   "quote": "7.7 km from the Mangahao Power Station",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "Shannon",
+   "quote": "walking down Mangahao Road towards Shannon",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "Palmerston North",
+   "quote": "From Palmerston North the track can be accessed from Scotts Road",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "Kaihinau, Tokomaru Gorge and Manawatu Plain",
+   "quote": "views of Kaihinau, the Tokomaru Gorge and the Manawatu Plain",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Te Araroa Trail",
+   "quote": "This track is part of Te Araroa Trail.",
+   "ref": null,
+   "why": "other walk"
+  }
+ ],
+ "doubts": "Start: the text gives the entrance to Gordon Kear Forest and the carpark on Scotts Road; no road-end feature or named place matches, so the start ref is null. End: the Mangahao Road carpark has no feature, so its ref is null. Shape: one_way from the page's north-to-south description and DOC's distance; the page says the track can be walked from either direction, which is the same crossing reversed, so it is not a second way. The main way follows the page's north to south description and DOC's time covers both directions. The Kahuterawa Stream bridge is mentioned in a sentence before the walk description ('A stile crosses the fence and an information sign is located just before the bridge over the Kahuterawa Stream') whose place in the order is not clear, so it is left out of via. The track crosses the No 1 stream; the page says it is 'easily crossed' most of the year and that the track has unbridged crossings, but it does not say the No 1 stream itself is unbridged, so the ford is an inference. The Tokomaru River is followed on its eastern side, so no crossing is recorded. Mountain bike access from Kahuterawa Rd or Scott's Rd to Gordon Kear Forest is for riders and is not recorded as a walking access point."
+}

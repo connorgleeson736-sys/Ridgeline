@@ -1,0 +1,119 @@
+{
+ "guid": "7a9c364e-36aa-4b4b-af32-dcdfeda9ebd1",
+ "kind": "out_and_back",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Tiki Trail to Ben Lomond Summit",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Skyline Gondola base",
+    "quote": "Skyline Gondola base on Brecon street",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Ben Lomond summit",
+    "quote": "Ben Lomond's 1,748 m summit",
+    "ref": "T5"
+   },
+   "via": [
+    {
+     "name": "Tiki Trail",
+     "quote": "Tiki Trail",
+     "ref": "T3"
+    },
+    {
+     "name": "Ben Lomond Saddle",
+     "quote": "1,326 m Ben Lomond Saddle",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "evidence": [
+    "This track starts from the Skyline Gondola base on Brecon street.",
+    "Climb to the 1,326 m Ben Lomond Saddle.",
+    "The hardest part of the climb remains as you approach Ben Lomond's 1,748 m summit."
+   ],
+   "time": "6-8 hr return",
+   "distance": "14 km return"
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Tiki Trail to Ben Lomond Saddle",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Skyline Gondola base",
+    "quote": "Skyline Gondola base on Brecon street",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Ben Lomond Saddle",
+    "quote": "Ben Lomond Saddle",
+    "ref": null
+   },
+   "via": [],
+   "direction": null,
+   "evidence": [
+    "You can follow the Tiki Trail to hike to Ben Lomond Saddle from Queenstown."
+   ],
+   "time": "5 hr return",
+   "distance": "10 km return"
+  },
+  {
+   "id": "W3",
+   "main": false,
+   "label": "Skyline Gondola top complex to Ben Lomond Saddle",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Skyline Gondola top complex",
+    "quote": "Skyline Gondola top complex",
+    "ref": "F3"
+   },
+   "end": {
+    "name": "Ben Lomond Saddle",
+    "quote": "Ben Lomond Saddle",
+    "ref": null
+   },
+   "via": [],
+   "direction": null,
+   "evidence": [
+    "Enjoy a shorter tramp on the Ben Lomond Track by riding the Gondola to the Skyline complex and hiking to the Ben Lomond Saddle and back."
+   ],
+   "time": "3-4 hr return",
+   "distance": "7 km return"
+  }
+ ],
+ "access_points": [
+  {
+   "name": "bottom of the Skyline Access Road",
+   "quote": "the bottom of the Skyline Access Road on Lomond Crescent",
+   "ref": null,
+   "onto": null
+  },
+  {
+   "name": "One Mile Creek Track",
+   "quote": "One Mile Creek Track which starts at the Fernhill roundabout",
+   "ref": null,
+   "onto": null
+  }
+ ],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Arthurs Point",
+   "quote": "Arthurs Point",
+   "ref": "T4",
+   "why": "nearby"
+  },
+  {
+   "name": "Ben Lomond Station",
+   "quote": "Ben Lomond Station",
+   "ref": null,
+   "why": "other"
+  }
+ ],
+ "doubts": "Ben Lomond Station is private land the track crosses beyond the saddle, not a stop. The access points do not say where they join the Ben Lomond Track."
+}

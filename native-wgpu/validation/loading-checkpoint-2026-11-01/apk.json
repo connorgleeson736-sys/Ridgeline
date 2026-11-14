@@ -1,0 +1,19 @@
+{
+  "scope": "Prototype packaging only, not feature/device/visual acceptance",
+  "apk": "Ridgeline-Native-Performance-2026-11-01-Base.apk",
+  "bytes": 32040144,
+  "sha256": "8dcee8432de6d61fb2f6a11303b95edbfea91698104f8e26c26623d9dd56f24c",
+  "nativeLibraries": [
+    "lib/arm64-v8a/libridgeline_renderer.so",
+    "lib/armeabi-v7a/libridgeline_renderer.so",
+    "lib/x86_64/libridgeline_renderer.so"
+  ],
+  "webRuntimeAssets": 0,
+  "webViewOrCapacitorDexReferences": 0,
+  "base": true,
+  "coarseImageryFiles": 67,
+  "originalZipFiles": 0,
+  "overviewPayloadBytes": 0,
+  "imageRanges": 0,
+  "packs": []
+}

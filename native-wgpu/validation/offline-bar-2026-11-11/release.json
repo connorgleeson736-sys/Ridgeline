@@ -1,0 +1,32 @@
+{
+  "artifact": "Ridgeline-Native-Offline-Bar-0.1.36-Base.apk",
+  "bytes": 33789242,
+  "sha256": "7278113c26cb9bc83a608da734b37f59668396c1faacb1faf7fb0804cca38f1e",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.36-offline-bar",
+  "versionCode": 37,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.35 Full Audit (same package and signer)",
+  "changes": [
+    "Names no longer stay on screen when zoomed far out: when no candidates remain (no name layer at this zoom, or names off) the renderer clears them at once instead of keeping them until a placement that never comes (regression from 0.1.35 keeping names across atlas changes).",
+    "Offline regions in one bottom bar: frame on the map with page size (or Custom) and orientation, name, map content and detail, live area, size and file estimate, Save as PDF and Download, progress with Stop; Saved regions and Advanced (coordinates, downloaded-maps-only, overview imagery packs) fold away. Explanatory text removed. The previous Offline maps dialog is gone; GPU textures and Loading diagnostics moved to Layers > Advanced.",
+    "Save as PDF: the framed map (renderer pixels via PixelCopy, at screen resolution) on the chosen paper size and orientation with title, date, scale bar, north arrow and source credit; saved through the Android file picker.",
+    "Route sheet: vertical drags on the route name and stats rows also move the sheet (not only the 28 dp grip).",
+    "Route stats (distance, ascent, descent, highest) are centred in the same columns as the tool buttons below."
+  ],
+  "tests": {
+    "kotlinJvm": "199 tests, 0 failures (new: PdfLayoutTest x2). One run hit PlaceSearch's 150 ms load-time limit while the machine was busy (195 ms); the rerun passed.",
+    "rust": "51 tests pass",
+    "gpu": "overlay_drape (Vulkan and GLES)"
+  },
+  "lintErrors": 0,
+  "assetsIdenticalTo0135": "626 of 628; only the generated dexopt baseline profiles differ",
+  "jniExportsPerAbi": 49,
+  "loadAlignment": "0x4000",
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

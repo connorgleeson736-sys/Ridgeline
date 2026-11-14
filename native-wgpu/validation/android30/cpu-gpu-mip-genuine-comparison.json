@@ -1,0 +1,5 @@
+{
+  "changedRgbBytes": 3,
+  "maximumChannelDifference": 1,
+  "scope": "CPU/GPU mip implementation comparison; full source level0 unchanged; no0.18visual parity claim"
+}

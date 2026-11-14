@@ -1,0 +1,31 @@
+{
+  "artifact": "Ridgeline-Native-Hut-Names-0.1.25-Base.apk",
+  "bytes": 32861799,
+  "sha256": "84fb90c57846b8d7114f144176eb4587ed4645c1424db07edd0a5614a4d0d0d4",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.25-hut-names",
+  "versionCode": 26,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.24 Full Audit (same package and signer)",
+  "changes": [
+    "label candidates' terrain visibility probed on the GPU (512x1 pass after the main pass, this frame's depth, same anchor test as drawing) and read back asynchronously; labels hidden by terrain take no space in collision placement (as MapLibre places symbols)",
+    "collision placement orders by symbol-sort-key first, already-shown labels first only among equal priority",
+    "label depth-valid flag written before the label camera uniform (was one frame late); an extra frame is requested when labels were skipped for missing depth",
+    "collision boxes as plain floats instead of android.graphics.RectF"
+  ],
+  "tests": {
+    "kotlinJvm": "178 tests, 0 failures (new LabelPlacementTest)",
+    "rust": "cargo test --workspace: all pass",
+    "gpu": "label_occlusion with candidate visibility readback, still-map frame stop, lone label at 4 fps (fails on 0.1.24) and moving-resolution return (Vulkan and GLES); topo_filter, overlay_drape, waypoint_occlusion pass"
+  },
+  "lintErrors": 0,
+  "originalAssetsIdentical": 623,
+  "jniExportsPerAbi": 46,
+  "loadAlignment": "0x4000",
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

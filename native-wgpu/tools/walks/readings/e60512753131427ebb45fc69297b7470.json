@@ -1,0 +1,48 @@
+{
+ "guid": "e6051275-3131-427e-bb45-fc69297b7470",
+ "kind": "loop",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Mount Iron loop over the summit",
+   "shape": "loop",
+   "start": {
+    "name": "car park off SH84",
+    "quote": "a car park off SH84",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "car park off SH84",
+    "quote": "a car park off SH84",
+    "ref": "F1"
+   },
+   "via": [
+    {
+     "name": "Mount Iron summit",
+     "quote": "climbs through low kānuka shrubland on Mount Iron's western side to the summit",
+     "ref": "T3"
+    }
+   ],
+   "direction": null,
+   "evidence": [
+    "The track begins over the stile by the car park and taking the left fork, climbs through low kānuka shrubland on Mount Iron's western side to the summit.",
+    "After taking in the view and the information on the panels, follow the track to descend on the eastern side and return round the foot of the hill to the car park."
+   ],
+   "time": "1 hr 30 min",
+   "distance": "4.5 km loop"
+  }
+ ],
+ "access_points": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Albert Town",
+   "quote": "Racecourse Road, Albert Town",
+   "ref": "T2",
+   "why": "nearby"
+  }
+ ],
+ "doubts": "The text says up the western side and down the eastern side but does not name a direction; recorded as the summit between the two ways."
+}

@@ -1,0 +1,260 @@
+{
+ "guid": "0de03093-e3f3-446c-babe-63176cdafcda",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Three Passes, east to west: SH73 to Lake Kaniere Road via the Styx",
+   "shape": "one_way",
+   "start": {
+    "name": "Road bridge over the Waimakariri River beside SH73",
+    "quote": "the road bridge over the Waimakariri River",
+    "ref": null
+   },
+   "end": {
+    "name": "Carpark at Lake Kaniere Road (Styx exit)",
+    "quote": "the carpark at Lake Kaniere Road",
+    "ref": "F1"
+   },
+   "via": [
+    {
+     "name": "Carrington Hut Route",
+     "quote": "Carrington Hut Route",
+     "ref": "L1"
+    },
+    {
+     "name": "Carrington Hut",
+     "quote": "Carrington Hut",
+     "ref": "T5"
+    },
+    {
+     "name": "White River",
+     "quote": "White River",
+     "ref": "T23"
+    },
+    {
+     "name": "Taipoiti River",
+     "quote": "Taipoiti River",
+     "ref": "T21"
+    },
+    {
+     "name": "Harman Pass",
+     "quote": "Harman Pass",
+     "ref": "T11"
+    },
+    {
+     "name": "Ariels Tarns",
+     "quote": "Ariels Tarns",
+     "ref": "T2"
+    },
+    {
+     "name": "Whitehorn Pass",
+     "quote": "Whitehorn Pass",
+     "ref": "T24"
+    },
+    {
+     "name": "Cronin Stream",
+     "quote": "Cronin Stream",
+     "ref": "T6"
+    },
+    {
+     "name": "Park Morpeth Memorial Hut",
+     "quote": "Park Morpeth Memorial Hut",
+     "ref": null
+    },
+    {
+     "name": "Wilberforce River",
+     "quote": "Wilberforce River",
+     "ref": null
+    },
+    {
+     "name": "Hall Creek",
+     "quote": "Hall Creek",
+     "ref": "T8"
+    },
+    {
+     "name": "Browning Pass/Noti Raureka",
+     "quote": "Browning Pass/Noti Raureka",
+     "ref": "T4"
+    },
+    {
+     "name": "Lake Browning/Whakarewa",
+     "quote": "Lake Browning/Whakarewa",
+     "ref": "T14"
+    },
+    {
+     "name": "Arahura River",
+     "quote": "Arahura River",
+     "ref": null
+    },
+    {
+     "name": "Harman Hut",
+     "quote": "Harman Hut",
+     "ref": "T10"
+    },
+    {
+     "name": "Styx Saddle",
+     "quote": "Styx Saddle",
+     "ref": "T20"
+    },
+    {
+     "name": "Styx River",
+     "quote": "Styx River",
+     "ref": "T19"
+    },
+    {
+     "name": "Grassy Flat Hut",
+     "quote": "Grassy Flat Hut",
+     "ref": "T7"
+    },
+    {
+     "name": "Mid Styx Hut",
+     "quote": "Mid Styx Hut",
+     "ref": "T17"
+    },
+    {
+     "name": "Tyndall Creek",
+     "quote": "Tyndall Creek",
+     "ref": "T22"
+    }
+   ],
+   "direction": null,
+   "time": "4 - 5 days",
+   "distance": null,
+   "evidence": [
+    "The Three Passes trip can be started from either end, but the east to west route described here is recommended.",
+    "The eastern starting point is at the road bridge over the Waimakariri River, beside State Highway 73 (SH73), 10 km east of Arthur's Pass village.",
+    "The Styx is crossed again to an old farm track that leads to the carpark at Lake Kaniere Road."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Exit via the Arahura valley",
+   "shape": "one_way",
+   "start": {
+    "name": "Road bridge over the Waimakariri River beside SH73",
+    "quote": "the road bridge over the Waimakariri River",
+    "ref": null
+   },
+   "end": {
+    "name": "End of the Arahura river track, via Lake Kaniere Road",
+    "quote": "the ends of the Arahura or Styx river tracks",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Carrington Hut",
+     "quote": "Carrington Hut",
+     "ref": "T5"
+    },
+    {
+     "name": "Harman Pass",
+     "quote": "Harman Pass",
+     "ref": "T11"
+    },
+    {
+     "name": "Whitehorn Pass",
+     "quote": "Whitehorn Pass",
+     "ref": "T24"
+    },
+    {
+     "name": "Park Morpeth Memorial Hut",
+     "quote": "Park Morpeth Memorial Hut",
+     "ref": null
+    },
+    {
+     "name": "Browning Pass/Noti Raureka",
+     "quote": "Browning Pass/Noti Raureka",
+     "ref": "T4"
+    },
+    {
+     "name": "Harman Hut",
+     "quote": "Harman Hut",
+     "ref": "T10"
+    },
+    {
+     "name": "Arahura valley",
+     "quote": "Arahura valley",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "Parties or individuals that are not confident with river crossing should travel through via the Arahura valley.",
+    "On the western side, access to the ends of the Arahura or Styx river tracks is via Lake Kaniere Road, inland from Hokitika."
+   ]
+  }
+ ],
+ "access_points": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Carrington Hut",
+   "quote": "Carrington Hut",
+   "ref": "T5"
+  },
+  {
+   "name": "Park Morpeth Memorial Hut",
+   "quote": "Park Morpeth Memorial Hut",
+   "ref": null
+  },
+  {
+   "name": "Harman Hut",
+   "quote": "Harman Hut",
+   "ref": "T10"
+  },
+  {
+   "name": "Grassy Flat Hut",
+   "quote": "Grassy Flat Hut",
+   "ref": "T7"
+  },
+  {
+   "name": "Mid Styx Hut",
+   "quote": "Mid Styx Hut",
+   "ref": "T17"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Julia Hut",
+   "quote": "Julia Hut",
+   "ref": "T12",
+   "why": "other"
+  },
+  {
+   "name": "Mary Creek",
+   "quote": "Mary Creek",
+   "ref": "T16",
+   "why": "other"
+  },
+  {
+   "name": "Hamer Falls",
+   "quote": "Hamer Falls",
+   "ref": "T9",
+   "why": "other"
+  },
+  {
+   "name": "Clough Memorial",
+   "quote": "Clough Memorial",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "Arthur's Pass village",
+   "quote": "Arthur's Pass village",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "Hokitika",
+   "quote": "Hokitika",
+   "ref": null,
+   "why": "nearby"
+  }
+ ],
+ "doubts": "Start: the eastern start at the SH73 road bridge over the Waimakariri River has no matching feature or name, so ref is null (the first section is described only by the link to the Carrington Hut Route). End: the text says the carpark at Lake Kaniere Road; the only road ends nearby are on Dorothy Falls Road, and I gave F1 (an unnamed track) as the Styx exit because F2 is the Lake Kaniere Walkway, a different track; the road names do not match, so F1 is not certain. W2 (exit via the Arahura valley) is offered for parties not confident with river crossings, but its route below Harman Hut and its road end are not described, so its end has no ref and no time. The route can also be walked west to east but only east to west is described. Direction is given only as east to west, so null."
+}

@@ -1,0 +1,134 @@
+[
+  {
+    "reference": "R1",
+    "title": "Cesium Native selection/load/render algorithm",
+    "url": "https://cesium.com/learn/cesium-native/ref-doc/selection-algorithm-details.html",
+    "retrievedDate": "2026-11-01"
+  },
+  {
+    "reference": "R2",
+    "title": "SQLite WAL concurrency",
+    "url": "https://www.sqlite.org/wal.html",
+    "retrievedDate": "2026-11-01"
+  },
+  {
+    "reference": "R3",
+    "title": "wgpu submission best practices",
+    "url": "https://wgpu.rs/doc/wgpu/documentation/best_practices/dos_and_donts/index.html",
+    "retrievedDate": "2026-11-01"
+  },
+  {
+    "reference": "R4",
+    "title": "wgpu 30 Queue",
+    "url": "https://docs.rs/wgpu/30.0.1/wgpu/struct.Queue.html",
+    "retrievedDate": "2026-11-01"
+  },
+  {
+    "reference": "R4",
+    "title": "StagingBelt",
+    "url": "https://docs.rs/wgpu/30.0.1/wgpu/util/struct.StagingBelt.html",
+    "retrievedDate": "2026-11-01"
+  },
+  {
+    "reference": "R5",
+    "title": "wgpu 30.0.1 PipelineCache",
+    "url": "https://docs.rs/wgpu/30.0.1/wgpu/struct.PipelineCache.html",
+    "retrievedDate": "2026-11-01"
+  },
+  {
+    "reference": "R5",
+    "title": "Khronos pipeline management",
+    "url": "https://docs.vulkan.org/samples/latest/samples/performance/pipeline_cache/README.html",
+    "retrievedDate": "2026-11-01"
+  },
+  {
+    "reference": "R5",
+    "title": "newer pipeline binary sample",
+    "url": "https://docs.vulkan.org/samples/latest/samples/extensions/pipeline_binary/README.html",
+    "retrievedDate": "2026-11-01"
+  },
+  {
+    "reference": "R6",
+    "title": "Android SurfaceHolder.Callback ownership contract",
+    "url": "https://developer.android.com/reference/android/view/SurfaceHolder.Callback",
+    "retrievedDate": "2026-11-01"
+  },
+  {
+    "reference": "R7",
+    "title": "Android frame pacing",
+    "url": "https://developer.android.com/games/sdk/frame-pacing",
+    "retrievedDate": "2026-11-01"
+  },
+  {
+    "reference": "R8",
+    "title": "ADPF",
+    "url": "https://developer.android.com/games/optimize/adpf",
+    "retrievedDate": "2026-11-01"
+  },
+  {
+    "reference": "R8",
+    "title": "PerformanceHintManager API 31",
+    "url": "https://developer.android.com/reference/android/os/PerformanceHintManager",
+    "retrievedDate": "2026-11-01"
+  },
+  {
+    "reference": "R8",
+    "title": "thermal support",
+    "url": "https://developer.android.com/games/optimize/adpf/thermal",
+    "retrievedDate": "2026-11-01"
+  },
+  {
+    "reference": "R9",
+    "title": "Android Baseline Profiles",
+    "url": "https://developer.android.com/topic/performance/baselineprofiles/overview",
+    "retrievedDate": "2026-11-01"
+  },
+  {
+    "reference": "R10",
+    "title": "Rust PGO",
+    "url": "https://doc.rust-lang.org/rustc/profile-guided-optimization.html",
+    "retrievedDate": "2026-11-01"
+  },
+  {
+    "reference": "R11",
+    "title": "Cronet protocol/priority capabilities",
+    "url": "https://developer.android.com/develop/connectivity/cronet",
+    "retrievedDate": "2026-11-01"
+  },
+  {
+    "reference": "R12",
+    "title": "Khronos sparse resources",
+    "url": "https://docs.vulkan.org/guide/latest/sparse_resources.html",
+    "retrievedDate": "2026-11-01"
+  },
+  {
+    "reference": "R13",
+    "title": "Khronos descriptor indexing",
+    "url": "https://docs.vulkan.org/samples/latest/samples/extensions/descriptor_indexing/README.html",
+    "retrievedDate": "2026-11-01"
+  },
+  {
+    "reference": "R14",
+    "title": "Arm ASTC format overview",
+    "url": "https://github.com/ARM-software/astc-encoder/blob/main/Docs/FormatOverview.md",
+    "retrievedDate": "2026-11-01"
+  },
+  {
+    "reference": "R15",
+    "title": "Khronos mobile tile-based rendering guidance",
+    "url": "https://docs.vulkan.org/guide/latest/tile_based_rendering_best_practices.html",
+    "retrievedDate": "2026-11-01"
+  },
+  {
+    "reference": "R16",
+    "title": "Perfetto FrameTimeline limitations",
+    "url": "https://perfetto.dev/docs/data-sources/frametimeline",
+    "retrievedDate": "2026-11-01"
+  },
+  {
+    "reference": "R16",
+    "title": "Android system tracing",
+    "url": "https://developer.android.com/topic/performance/tracing",
+    "retrievedDate": "2026-11-01"
+  }
+]

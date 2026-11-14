@@ -1,0 +1,223 @@
+{
+ "guid": "ecc7ac27-4ae6-46e1-8764-d05e39489de5",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Te Ara Pātaka/Summit Walkway, Kaituna Valley to The Hilltop",
+   "shape": "one_way",
+   "start": {
+    "name": "Kaituna Valley",
+    "quote": "Kaituna Valley",
+    "ref": "F6"
+   },
+   "end": {
+    "name": "The Hilltop",
+    "quote": "The Hilltop",
+    "ref": "T8"
+   },
+   "via": [
+    {
+     "name": "Kaituna Valley Packhorse Hut Track",
+     "quote": "The Kaituna Valley Packhorse Hut Track",
+     "ref": "L1"
+    },
+    {
+     "name": "valley stream",
+     "quote": "crossing the valley stream several times",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Parkinsons Bush Reserve",
+     "quote": "a farm track through the Parkinsons Bush Reserve",
+     "ref": null
+    },
+    {
+     "name": "Packhorse Hut",
+     "quote": "the historic stone Packhorse Hut",
+     "ref": "T15"
+    },
+    {
+     "name": "Sign of the Packhorse Scenic Reserve",
+     "quote": "crosses the Sign of the Packhorse Scenic Reserve",
+     "ref": "T17"
+    },
+    {
+     "name": "Mount Bradley",
+     "quote": "zig-zags steeply up the side of Mount Bradley",
+     "ref": "T11"
+    },
+    {
+     "name": "Mount Herbert Shelter",
+     "quote": "The Mount Herbert Shelter",
+     "ref": null
+    },
+    {
+     "name": "Mt Herbert/Te Ahu Patiki summit",
+     "quote": "leads through gorse to the Mount Herbert/Te Ahu Patiki summit",
+     "ref": "T14"
+    },
+    {
+     "name": "Little Mount Herbert",
+     "quote": "Little Mount Herbert",
+     "ref": null
+    },
+    {
+     "name": "Port Levy saddle car park on Western Valley Road",
+     "quote": "the Port Levy saddle car park on Western Valley Road",
+     "ref": null
+    },
+    {
+     "name": "Waipuna Saddle",
+     "quote": "follow the marked track to Waipuna Saddle",
+     "ref": "T18"
+    },
+    {
+     "name": "Rod Donald Hut",
+     "quote": "Rod Donald Hut is down a side track",
+     "ref": "T16"
+    },
+    {
+     "name": "Rod Donald Hut to The Hilltop via Montgomery Reserve",
+     "quote": "Rod Donald Hut to The Hilltop via Montgomery Reserve",
+     "ref": "L2"
+    },
+    {
+     "name": "Mount Fitzgerald",
+     "quote": "the narrow rocky track through Mount Fitzgerald",
+     "ref": "T12"
+    },
+    {
+     "name": "Whatarangi Totara Scenic Reserve",
+     "quote": "Soon after the Whatarangi Totara Scenic Reserve",
+     "ref": "T19"
+    },
+    {
+     "name": "Montgomery Park Scenic Reserve",
+     "quote": "head up to Montgomery Park Scenic Reserve",
+     "ref": "T10"
+    },
+    {
+     "name": "Summit Road",
+     "quote": "The track emerges from the reserve onto Summit Road.",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "2-3 days",
+   "distance": "35 km one way",
+   "evidence": [
+    "The following description covers the walkway from Kaituna Valley to The Hilltop, but other access and exit points are possible.",
+    "Te Ara Pātaka/Summit Walkway links Kaituna Valley in the Lyttelton crater to The Hilltop in the Akaroa crater.",
+    "The track can be completed as a one-way walk most of the year.",
+    "Walkers should head up to Montgomery Park Scenic Reserve and walk directly to The Hilltop.",
+    "The track emerges from the reserve onto Summit Road."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Gebbies Pass",
+   "quote": "Gebbies Pass to Packhorse Hut",
+   "ref": "T7",
+   "onto": "Packhorse Hut"
+  },
+  {
+   "name": "Mount Herbert Walkway",
+   "quote": "Mount Herbert Walkway",
+   "ref": "L3",
+   "onto": null
+  },
+  {
+   "name": "Tablelands/Faulkner tracks",
+   "quote": "Tablelands/Faulkner tracks",
+   "ref": null,
+   "onto": null
+  },
+  {
+   "name": "Monument Track (both north and south)",
+   "quote": "Monument Track (both north and south)",
+   "ref": "T3",
+   "onto": null
+  },
+  {
+   "name": "Port Levy saddle via Western Valley Road",
+   "quote": "The track can be picked up at Port Levy saddle, via Western Valley Road.",
+   "ref": null,
+   "onto": null
+  },
+  {
+   "name": "Diamond Harbour jetty",
+   "quote": "starting at Diamond Harbour jetty",
+   "ref": null,
+   "onto": null
+  },
+  {
+   "name": "Pettigrews Road (mountain bikes)",
+   "quote": "Pettigrews Road is an entry/exit for mountain bikes.",
+   "ref": null,
+   "onto": null
+  }
+ ],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Packhorse Hut",
+   "quote": "the historic stone Packhorse Hut",
+   "ref": "T15"
+  },
+  {
+   "name": "Rod Donald Hut",
+   "quote": "Rod Donald Hut",
+   "ref": "T16"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Orton Bradley Park",
+   "quote": "a side track branches off to Orton Bradley Park",
+   "ref": null,
+   "why": "other"
+  },
+  {
+   "name": "Kaitorete Spit",
+   "quote": "Kaitorete Spit",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Lyttelton Harbour",
+   "quote": "Lyttelton Harbour",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Quail island",
+   "quote": "Quail island",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Port Hills",
+   "quote": "the Port Hills",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Little River",
+   "quote": "connects Little River to Port Levy",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "Port Levy",
+   "quote": "connects Little River to Port Levy",
+   "ref": null,
+   "why": "nearby"
+  }
+ ],
+ "doubts": "Start: the text says Kaituna Valley; I gave F6, where the Kaituna Valley Packhorse Hut Track meets Parkinsons Road, which is where the first section begins. End: 'The Hilltop' is the place T8; the walk emerges onto Summit Road, and features F4 and F5 are nearby road ends, but neither is named as the end, so I did not use them. Rod Donald Hut is reached by a side track from Waipuna Saddle, but the main way is described as going to it (section 'Port Levy saddle to Rod Donald Hut' and the return up the access track), so it is kept in via and huts. The 'Rod Donald Hut to The Hilltop via Montgomery Reserve' heading is walked as part of the way and is given the link L2 by name, although L2 is a separate walk page. The valley stream is unnamed, so it is recorded as 'valley stream' with how ford; the text says the track crosses it several times and that stepping stones can be used. Mount Herbert Shelter has a toilet and water but no bunks are mentioned, so it is not a hut. The Diamond Harbour jetty two-day public transport trip is kept as an access point because the packet does not say where its track joins. Pettigrews Road is for mountain bikes only and is recorded as an access point with that caveat. Time and distance are DOC's whole-walk values from the page header."
+}

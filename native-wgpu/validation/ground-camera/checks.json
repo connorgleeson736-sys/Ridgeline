@@ -1,0 +1,13 @@
+{
+  "tests": 28,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "normalHasSessionCa": false,
+  "localTestHasSessionCa": true,
+  "identicalAssetAndNativeLibraryEntries": 625,
+  "normalApk": "Ridgeline-Native-Grounded-Camera-Debug.apk",
+  "sha256": "79a9b370c5d63abdfd3fc88065ebc3c12f27ae26bcb30ed6b64682ab5b85938a",
+  "signatureVerified": true,
+  "zipalign16KiB": true
+}

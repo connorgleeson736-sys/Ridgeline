@@ -1,0 +1,158 @@
+{
+ "guid": "01f85cb8-133e-413d-939b-0d9ba340d1e9",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Tararua Southern Crossing, Otaki Forks to Kaitoke",
+   "shape": "one_way",
+   "start": {
+    "name": "Otaki Forks car park",
+    "quote": "From the car park next to the caretaker’s house",
+    "ref": null
+   },
+   "end": {
+    "name": "Kaitoke carpark",
+    "quote": "Kaitoke carpark",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Waiotauru River swing bridge",
+     "quote": "swing bridge over the Waiotauru River",
+     "ref": null
+    },
+    {
+     "name": "Field Hut",
+     "quote": "Field Hut",
+     "ref": "T17"
+    },
+    {
+     "name": "Kime Hut",
+     "quote": "Kime Hut",
+     "ref": "T22"
+    },
+    {
+     "name": "Field Peak",
+     "quote": "Field Peak",
+     "ref": "T18"
+    },
+    {
+     "name": "Mount Hector",
+     "quote": "Mount Hector",
+     "ref": "T27"
+    },
+    {
+     "name": "Dress Circle",
+     "quote": "Dress Circle",
+     "ref": "T14"
+    },
+    {
+     "name": "Aston",
+     "quote": "Aston",
+     "ref": "T12"
+    },
+    {
+     "name": "Alpha",
+     "quote": "Alpha",
+     "ref": "T10"
+    },
+    {
+     "name": "Alpha Hut",
+     "quote": "Alpha Hut",
+     "ref": "T11"
+    },
+    {
+     "name": "Hells Gate",
+     "quote": "Hells Gate",
+     "ref": "T19"
+    },
+    {
+     "name": "Marchant Ridge",
+     "quote": "Marchant Ridge",
+     "ref": "T24"
+    },
+    {
+     "name": "Smith Creek Shelter",
+     "quote": "Smith Creek Shelter",
+     "ref": null
+    },
+    {
+     "name": "Dobson Loop Track",
+     "quote": "Dobson Loop Track",
+     "ref": "T2"
+    }
+   ],
+   "direction": null,
+   "time": "3 days",
+   "distance": null,
+   "evidence": [
+    "The track down from Alpha Hut to the Kaitoke carpark leads through the saddle of Hell’s Gate, over Omega, and through the stunted silver beech along the Marchant Ridge.",
+    "From the car park next to the caretaker’s house, follow the marked track through the trees to the swing bridge over the Waiotauru River.",
+    "Use Table Top, Kime Hut and Mt Hector as decision-making points for the Ōtaki to Kaitoke direction."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [
+  {
+   "name": "Marchant Road",
+   "quote": "exiting on Marchant Road",
+   "ref": null,
+   "from": "Dobson Loop Track",
+   "how": "road"
+  }
+ ],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Field Hut",
+   "quote": "Field Hut",
+   "ref": "T17"
+  },
+  {
+   "name": "Kime Hut",
+   "quote": "Kime Hut",
+   "ref": "T22"
+  },
+  {
+   "name": "Alpha Hut",
+   "quote": "Alpha Hut",
+   "ref": "T11"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Penn Creek Hut",
+   "quote": "Penn Creek Hut",
+   "ref": "T30",
+   "why": "nearby"
+  },
+  {
+   "name": "Maungahuka Hut",
+   "quote": "Maungahuka Hut",
+   "ref": "T26",
+   "why": "nearby"
+  },
+  {
+   "name": "Elder Hut",
+   "quote": "Elder Hut",
+   "ref": "T16",
+   "why": "nearby"
+  },
+  {
+   "name": "Bull Mound track",
+   "quote": "Bull Mound",
+   "ref": null,
+   "why": "other"
+  },
+  {
+   "name": "Omega track",
+   "quote": "Omega",
+   "ref": null,
+   "why": "other"
+  }
+ ],
+ "doubts": "Start car park has no feature; Otaki Forks given in text only as heading. Kaitoke carpark end not matched to a feature (text also mentions Kiwi Ranch Road car park). Omega is passed 'over Omega' in the intro; not added to via because Omega track turn-offs are alternatives. Marchant Road exit is how the walk ends, recorded as exit; unsure."
+}

@@ -1,0 +1,38 @@
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:generateDebugSessionTrust UP-TO-DATE
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:processDebugNavigationResources UP-TO-DATE
+> Task :app:compileDebugNavigationResources UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+
+> Task :app:compileDebugKotlin
+w: file:///workspace/Ridgeline/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/MainActivity.kt:31:257 'val systemWindowInsetLeft: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/Ridgeline/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/MainActivity.kt:31:286 'val systemWindowInsetTop: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/Ridgeline/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/MainActivity.kt:31:314 'val systemWindowInsetRight: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/Ridgeline/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/MainActivity.kt:31:344 'val systemWindowInsetBottom: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/Ridgeline/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/MainActivity.kt:104:137 'fun onBackPressed(): Unit' is deprecated. Deprecated in Java.
+w: file:///workspace/Ridgeline/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/MainActivity.kt:110:55 'static field TRIM_MEMORY_RUNNING_LOW: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/Ridgeline/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/MainActivity.kt:110:123 'static field TRIM_MEMORY_RUNNING_CRITICAL: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/Ridgeline/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/MainActivity.kt:31:257 'val systemWindowInsetLeft: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/Ridgeline/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/MainActivity.kt:31:286 'val systemWindowInsetTop: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/Ridgeline/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/MainActivity.kt:31:314 'val systemWindowInsetRight: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/Ridgeline/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/MainActivity.kt:31:344 'val systemWindowInsetBottom: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/Ridgeline/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/MainActivity.kt:104:137 'fun onBackPressed(): Unit' is deprecated. Deprecated in Java.
+w: file:///workspace/Ridgeline/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/MainActivity.kt:110:55 'static field TRIM_MEMORY_RUNNING_LOW: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/Ridgeline/native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/MainActivity.kt:110:123 'static field TRIM_MEMORY_RUNNING_CRITICAL: Int' is deprecated. Deprecated in Java.
+
+BUILD SUCCESSFUL in 8s
+17 actionable tasks: 1 executed, 16 up-to-date

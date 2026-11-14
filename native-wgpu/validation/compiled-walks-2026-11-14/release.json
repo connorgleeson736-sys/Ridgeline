@@ -1,0 +1,28 @@
+{
+  "artifact": "Ridgeline-Native-Compiled-Walks-0.1.56-Base.apk",
+  "bytes": 34430507,
+  "sha256": "e36a7e372ef8e86cae6cf1841ff65c193c274ff9e9a4b81a97f6c17cda5887d0",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.56-compiled-walks",
+  "versionCode": 57,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.54 Full Audit (same package and signer)",
+  "changes": [
+    "Compiled walk records (assets/walks/walks.json): each DOC walk page read in full into structured ways, huts and access points with verbatim quotes, checked by tools/walks/validate.py, then followed over the map's tracks and checked by WalkCompiler (places reached in order, no detours, covers 75% of DOC's line, fits DOC's time, distance within 50%, loops close, huts on the way). 145 walks compiled so far: 93 verified are shown as compiled (start/end choices, DOC legs, the page's own hut list); 52 flagged show DOC's own line. Walks without a reading keep the 0.1.54 behaviour.",
+    "Greenstone and Caples Track lists its three huts: Mid Caples, McKellar and Greenstone.",
+    "Description photos use DOC's larger linked image, drawn at most 1.5x their pixels (from the unpublished 0.1.55).",
+    "Fix found before release: the records are shipped as plain walks.json (the build unpacks .gz assets, so the .gz name would not have been found); a unit test now loads the shipped asset."
+  ],
+  "dataChecks": "compile-report.json and review.html: every compiled walk with its status, flags and a map (DOC's line, the compiled ways, huts).",
+  "tests": {
+    "kotlinJvm": "285 tests; PriorityPipelineTest timing case failed once under full-suite load and passed 3 of 3 alone; new: shipped records load, Greenstone huts",
+    "rust": "unchanged"
+  },
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

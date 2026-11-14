@@ -1,0 +1,32 @@
+[
+  {
+    "kind": "aerial",
+    "z": 19,
+    "x": 509931,
+    "y": 332830,
+    "status": 200,
+    "size": [
+      256,
+      256
+    ],
+    "bytes": 13506,
+    "sha256": "fb8b54df9f32e245f88d9d576b1f621fbca6666d635d49b13b630a7ec1e323f6"
+  },
+  {
+    "kind": "elevation",
+    "z": 18,
+    "x": 254965,
+    "y": 166415,
+    "status": 200,
+    "size": [
+      256,
+      256
+    ],
+    "bytes": 64959,
+    "sha256": "09d69980baa28c5a65cc51663a0801151b32c9a421a3b8371a44d4b10e7b3a8b",
+    "alphaExtrema": [
+      255,
+      255
+    ]
+  }
+]

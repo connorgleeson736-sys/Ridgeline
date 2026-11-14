@@ -1,0 +1,115 @@
+{
+ "guid": "276d1bde-9a04-4ff9-9e09-c1207ae39450",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Top Forks Hut to Cameron Flat over Rabbit Pass",
+   "shape": "one_way",
+   "start": {
+    "name": "Top Forks Hut",
+    "quote": "Top Forks Hut to Ruth Flat",
+    "ref": "T14"
+   },
+   "end": {
+    "name": "Cameron Flat",
+    "quote": "Ruth Flat to Cameron Flat",
+    "ref": "T6"
+   },
+   "via": [
+    {
+     "name": "open flats of the south branch",
+     "quote": "to the open flats of the south branch",
+     "ref": null
+    },
+    {
+     "name": "Waterfall Face",
+     "quote": "until you reach the waterfall face",
+     "ref": null
+    },
+    {
+     "name": "Rabbit Pass",
+     "quote": "to reach Rabbit Pass (1430 metres)",
+     "ref": "T12"
+    },
+    {
+     "name": "narrow rock slide",
+     "quote": "a narrow rock slide leading down through the bluffs",
+     "ref": null
+    },
+    {
+     "name": "Ruth Flat",
+     "quote": "to Ruth Flat",
+     "ref": "T13"
+    },
+    {
+     "name": "Bledisloe Gorge",
+     "quote": "The track down Bledisloe Gorge",
+     "ref": "T5"
+    },
+    {
+     "name": "Hester Pinney Creek",
+     "quote": "just before Hester Pinney Creek",
+     "ref": "T8"
+    },
+    {
+     "name": "Junction Flat",
+     "quote": "Here it descends to the river and Junction Flat",
+     "ref": "T9"
+    },
+    {
+     "name": "two 3-wire bridges",
+     "quote": "Cross the two 3-wire bridges",
+     "ref": null
+    },
+    {
+     "name": "track on the true right bank of the East Matukituki River",
+     "quote": "the track on the true right bank of the East Matukituki River",
+     "ref": null
+    },
+    {
+     "name": "Glacier Burn",
+     "quote": "down to the Glacier Burn (2 hours)",
+     "ref": "T7"
+    },
+    {
+     "name": "West Matukituki River",
+     "quote": "follow the flats to the West Matukituki River, ford the river",
+     "ref": null,
+     "how": "ford"
+    }
+   ],
+   "direction": null,
+   "time": "7 - 10 hr",
+   "distance": null,
+   "evidence": [
+    "Follow the track behind the hut and climb, before sidling around above the gorge to the open flats of the south branch.",
+    "Follow the valley through the alpine herb fields for about an hour, to reach Rabbit Pass (1430 metres), to follow the obvious shelf east, and climb towards Mt Lois for about 30 minutes until a narrow rock slide leading down through the bluffs.",
+    "It’s an easy 1 to 2 hours to Ruth Flat.",
+    "The track down Bledisloe Gorge starts on the true left, at the bottom of the bush spur, about 20 minutes from Ruth Flat.",
+    "Here it descends to the river and Junction Flat, 4 - 5 hours from Ruth Flat.",
+    "From here follow the flats to the West Matukituki River, ford the river to Cameron Flat or, if the river is too high to cross safely, use the bridge an hour upstream."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Top Forks Hut",
+   "quote": "Top Forks Hut to Ruth Flat",
+   "ref": "T14"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Mt Lois",
+   "quote": "climb towards Mt Lois",
+   "ref": "T10",
+   "why": "other"
+  }
+ ],
+ "doubts": "A one-way traverse from Top Forks Hut to Cameron Flat. The page does not say how to reach Top Forks Hut, or whether the route is walked in reverse. The end is Cameron Flat (T6, a valley name); the Cameron Flat road ends in the packet (F1, F2) are nearby but the text names no road end, so they are not used. The section times (8 - 10 hr and 7 - 9 hr) do not sum to DOC's overall '7 - 10 hr'; DOC's time is copied. If the West Matukituki is too high to cross, the text says to use the bridge an hour upstream instead, which changes the final approach; it is not a separate way. The track on the true right bank of the East Matukituki River is not named in the text, so its ref is null. The Waterfall Face is a place on the way with no entry, so its ref is null."
+}

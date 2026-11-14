@@ -1,0 +1,115 @@
+{
+ "guid": "ed5c6c86-6448-4030-8f39-04c3e0bbc7c4",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Raspberry Creek car park to French Ridge Hut",
+   "shape": "one_way",
+   "start": {
+    "name": "Raspberry Creek car park",
+    "quote": "The track starts at Raspberry Creek car park.",
+    "ref": null
+   },
+   "end": {
+    "name": "French Ridge Hut",
+    "quote": "French Ridge hut",
+    "ref": "T8"
+   },
+   "via": [
+    {
+     "name": "West Matukituki Track",
+     "quote": "Follow the West Matukituki Track up the valley to Aspiring Hut.",
+     "ref": "L1"
+    },
+    {
+     "name": "Aspiring Hut",
+     "quote": "Aspiring Hut to Pearl Flat",
+     "ref": "T5"
+    },
+    {
+     "name": "Rough Creek",
+     "quote": "Rough Creek (just beyond Aspiring Hut)",
+     "ref": "T14"
+    },
+    {
+     "name": "Cascade Creek bridge",
+     "quote": "a bridge crosses Cascade Creek",
+     "ref": "T6"
+    },
+    {
+     "name": "Shovel Flat",
+     "quote": "an open terrace leading to Shovel Flat",
+     "ref": "T15"
+    },
+    {
+     "name": "Pearl Flat",
+     "quote": "After 400 m, you will reach Pearl Flat.",
+     "ref": "T11"
+    },
+    {
+     "name": "Liverpool Stream swing bridge",
+     "quote": "cross the Liverpool Stream swing bridge",
+     "ref": "T9"
+    },
+    {
+     "name": "Matukituki River swing bridge",
+     "quote": "a second swing bridge to the east bank of the Matukituki River",
+     "ref": null
+    },
+    {
+     "name": "French Ridge Track",
+     "quote": "At Pearl Flat, the West Matukituki Track connects with French Ridge Track and Liverpool Track.",
+     "ref": "T1"
+    }
+   ],
+   "direction": null,
+   "time": "6 hr - 7 hr 30 min one way",
+   "distance": null,
+   "evidence": [
+    "The track starts at Raspberry Creek car park.",
+    "Follow the West Matukituki Track up the valley to Aspiring Hut.",
+    "At Pearl Flat, the West Matukituki Track connects with French Ridge Track and Liverpool Track.",
+    "From Pearl Flat, cross the Liverpool Stream swing bridge then a second swing bridge to the east bank of the Matukituki River.",
+    "The hut is at 1480 m, on flattish ground."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Aspiring Hut",
+   "quote": "Aspiring Hut to Pearl Flat",
+   "ref": "T5"
+  },
+  {
+   "name": "French Ridge Hut",
+   "quote": "French Ridge hut",
+   "ref": "T8"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Liverpool Track",
+   "quote": "Liverpool Track",
+   "ref": "L2",
+   "why": "other walk"
+  },
+  {
+   "name": "Rob Roy Glacier",
+   "quote": "to see the Rob Roy Glacier",
+   "ref": "T13",
+   "why": "side trip"
+  },
+  {
+   "name": "Wanaka",
+   "quote": "54 km west of Wanaka",
+   "ref": null,
+   "why": "nearby"
+  }
+ ],
+ "doubts": "Start: the text says the track starts at Raspberry Creek car park, but no road-end feature or named place marks that car park, and T12 is the creek, so the start ref is null. Shape: one_way is taken from DOC's time '6 hr - 7 hr 30 min one way'; the page does not say how hikers return. Rough Creek is placed right after Aspiring Hut because the text says 'just beyond Aspiring Hut', before the Cascade Creek bridge, which is 10 minutes along the track; this order is inferred. The second swing bridge over the Matukituki River has no entry. The Rob Roy Glacier and the valley side trips are options from Aspiring Hut as an overnight trip, not part of this walk, so they are kept out of the way. The packet has no walk distance for this way; the section distances are not summed."
+}

@@ -1,0 +1,6 @@
+   Compiling ridgeline-renderer v0.1.0 (/workspace/Ridgeline/native-wgpu/renderer)
+    Finished `release` profile [optimized] target(s) in 33.72s
+     Running `native-wgpu/target/release/examples/layer_smoke`
+PASS native route GPU: 1536 affected pixels, visible draped line/waypoints, unchanged geometry uploads on idle/pan. Synthetic height fixture; not phone performance.
+Line batch bytes: expanded 29952, instanced 4992; identical pixels
+PASS native layers: cartographic line, depth-tested native-font atlas, projection, ungraded nearest Topo, relief picking/clearance and sky on actual GPU. Synthetic source fixture, not device/visual acceptance.

@@ -1,0 +1,18 @@
+[
+  {
+    "event": "Runtime.exceptionThrown",
+    "text": "Uncaught",
+    "class": "SyntaxError",
+    "description": "SyntaxError: Unexpected reserved word",
+    "line": 1783,
+    "column": 0
+  },
+  {
+    "event": "Runtime.exceptionThrown",
+    "text": "Uncaught",
+    "class": "SyntaxError",
+    "description": "SyntaxError: Unexpected reserved word",
+    "line": 1783,
+    "column": 0
+  }
+]

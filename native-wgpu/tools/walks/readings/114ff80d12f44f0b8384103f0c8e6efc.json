@@ -1,0 +1,229 @@
+{
+ "guid": "114ff80d-12f4-4f0b-8384-103f0c8e6efc",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Abel Tasman Coast Track, Marahau to Wainui",
+   "shape": "one_way",
+   "start": {
+    "name": "Marahau",
+    "quote": "Marahau",
+    "ref": "T41"
+   },
+   "end": {
+    "name": "Wainui",
+    "quote": "Wainui",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Anchorage Hut",
+     "quote": "Anchorage Hut",
+     "ref": "L9"
+    },
+    {
+     "name": "Torrent Bay estuary",
+     "quote": "Torrent Bay estuary",
+     "ref": null
+    },
+    {
+     "name": "Falls River suspension bridge",
+     "quote": "Falls River",
+     "ref": "T33"
+    },
+    {
+     "name": "Bark Bay Hut",
+     "quote": "Bark Bay Hut",
+     "ref": "L12"
+    },
+    {
+     "name": "Tonga Quarry",
+     "quote": "Tonga Quarry",
+     "ref": "T50"
+    },
+    {
+     "name": "Tonga Saddle",
+     "quote": "Tonga Saddle",
+     "ref": "T51"
+    },
+    {
+     "name": "Awaroa Inlet",
+     "quote": "Awaroa Inlet",
+     "ref": "T26",
+     "how": "ford"
+    },
+    {
+     "name": "Awaroa Hut",
+     "quote": "Awaroa Hut",
+     "ref": "L16"
+    },
+    {
+     "name": "Tōtaranui",
+     "quote": "Tōtaranui",
+     "ref": "T55"
+    },
+    {
+     "name": "Whariwharangi Hut",
+     "quote": "Whariwharangi Hut",
+     "ref": "L22"
+    }
+   ],
+   "direction": null,
+   "time": "3–5 days one way",
+   "distance": "60 km one way",
+   "evidence": [
+    "Walk the whole track in either direction, take a water taxi or kayak between different locations.",
+    "You’ll begin your journey as you cross the estuary over the Marahau causeway, and follow the track",
+    "The track winds down to the shore and follows the estuary edge to the car park.",
+    "Wainui is the northern entrance"
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Whariwharangi Bay to Tōtaranui via Gibbs Hill Track",
+   "shape": "one_way",
+   "start": {
+    "name": "Whariwharangi Hut",
+    "quote": "Whariwharangi Hut",
+    "ref": "L22"
+   },
+   "end": {
+    "name": "Tōtaranui",
+    "quote": "Tōtaranui",
+    "ref": "T55"
+   },
+   "via": [
+    {
+     "name": "Gibbs Hill Track",
+     "quote": "Gibbs Hill Track",
+     "ref": "T7"
+    }
+   ],
+   "direction": null,
+   "time": "3 hr",
+   "distance": "9 km",
+   "evidence": [
+    "From Whariwharangi Hut follow a small stream, then climb out of the bay to a low saddle overlooking Wainui Inlet.",
+    "This track will take you over the steep Gibbs Hill then back down to Tōtaranui."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Tōtaranui",
+   "quote": "Totaranui is 160 km from Nelson",
+   "ref": "T55",
+   "onto": "Coast Track"
+  },
+  {
+   "name": "Kaiteretere",
+   "quote": "Kaiteretere is 61 km from Nelson providing access by kayak or water taxi.",
+   "ref": "T36",
+   "onto": "Coast Track"
+  }
+ ],
+ "exits": [
+  {
+   "name": "Apple Tree Bay water taxi",
+   "quote": "Apple Tree Bay",
+   "ref": "T21",
+   "from": "Apple Tree Bay",
+   "how": "boat"
+  },
+  {
+   "name": "Anchorage water taxi",
+   "quote": "Anchorage",
+   "ref": null,
+   "from": "Anchorage Hut",
+   "how": "boat"
+  },
+  {
+   "name": "Bark Bay water taxi",
+   "quote": "Bark Bay",
+   "ref": "T27",
+   "from": "Bark Bay Hut",
+   "how": "boat"
+  },
+  {
+   "name": "Tonga Quarry water taxi",
+   "quote": "Tonga Quarry",
+   "ref": "T50",
+   "from": "Tonga Quarry",
+   "how": "boat"
+  },
+  {
+   "name": "Awaroa water taxi",
+   "quote": "Awaroa",
+   "ref": null,
+   "from": "Awaroa Hut",
+   "how": "boat"
+  },
+  {
+   "name": "Totaranui water taxi",
+   "quote": "Totaranui",
+   "ref": "T55",
+   "from": "Tōtaranui",
+   "how": "boat"
+  }
+ ],
+ "side_trips": [
+  {
+   "name": "Tinline Bay Nature Walk",
+   "quote": "Tinline Bay Nature Walk",
+   "ref": null,
+   "from": null
+  },
+  {
+   "name": "Cascade Falls",
+   "quote": "Cascade Falls",
+   "ref": "T30",
+   "from": null
+  },
+  {
+   "name": "Cleopatra's Pool",
+   "quote": "Cleopatra's Pool",
+   "ref": null,
+   "from": "Torrent Bay estuary"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Anchorage Hut",
+   "quote": "Anchorage Hut",
+   "ref": "L9"
+  },
+  {
+   "name": "Bark Bay Hut",
+   "quote": "Bark Bay Hut",
+   "ref": "L12"
+  },
+  {
+   "name": "Awaroa Hut",
+   "quote": "Awaroa Hut",
+   "ref": "L16"
+  },
+  {
+   "name": "Whariwharangi Hut",
+   "quote": "Whariwharangi Hut",
+   "ref": "L22"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Mosquito Bay Campsite",
+   "quote": "Mosquito Bay campsite can only be accessed by private boat",
+   "ref": "L13",
+   "why": "other"
+  },
+  {
+   "name": "Inland Track",
+   "quote": "Abel Tasman Inland Track",
+   "ref": null,
+   "why": "other walk"
+  }
+ ],
+ "doubts": "The page says the track can be walked in either direction; Marahau to Wainui is the order described. Start Marahau given as place T41; the Marahau and Wainui road ends were not matched to features with certainty. Awaroa Inlet and Torrent Bay estuary are tidal crossings with no bridge; only Awaroa Inlet recorded as ford. The tidal-crossing alternative tracks are not recorded. Water taxi pick-up places come from the list in Getting there."
+}

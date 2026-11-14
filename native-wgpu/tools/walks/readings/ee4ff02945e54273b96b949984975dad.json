@@ -1,0 +1,151 @@
+{
+ "guid": "ee4ff029-45e5-4273-b96b-949984975dad",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Croesus Track, Smoke-ho car park to Barrytown",
+   "shape": "one_way",
+   "start": {
+    "name": "Smoke-ho car park",
+    "quote": "Smoke-ho car park",
+    "ref": null
+   },
+   "end": {
+    "name": "Barrytown",
+    "quote": "Ces Clark Hut to Barrytown",
+    "ref": "F2"
+   },
+   "via": [
+    {
+     "name": "wire suspension bridge over Smoke-ho Creek",
+     "quote": "cross a wire suspension bridge over the Smoke-ho Creek",
+     "ref": "T12"
+    },
+    {
+     "name": "dividing ridge between Blackball Creek and Roaring Meg catchments",
+     "quote": "the dividing ridge between Blackball Creek and Roaring Meg catchments",
+     "ref": null
+    },
+    {
+     "name": "Battery Track turn-off",
+     "quote": "until you reach the turn-off to the Battery Track",
+     "ref": null
+    },
+    {
+     "name": "Croesus Top Hut",
+     "quote": "You will pass the historic Croesus Top Hut just before reaching Ces Clark Hut.",
+     "ref": null
+    },
+    {
+     "name": "Ces Clark Hut",
+     "quote": "Ces Clark Hut is on the edge of the bushline",
+     "ref": "T6"
+    },
+    {
+     "name": "Paparoa Track across the tops",
+     "quote": "follow Paparoa Track across the tops around the head of the Ten Mile Waianiwaniwa Creek",
+     "ref": "T2"
+    },
+    {
+     "name": "Paparoa Track junction",
+     "quote": "Halfway across the tops, the Paparoa Track branches off to the right",
+     "ref": null
+    },
+    {
+     "name": "flanks of Mount Ryall",
+     "quote": "climbs to the flanks of Mount Ryall (1220 m high)",
+     "ref": "T9"
+    },
+    {
+     "name": "ridge",
+     "quote": "For the last 2 hours, 30 minutes the track is marked down the ridge.",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "1–2 days one way",
+   "distance": "22.1 km one way",
+   "evidence": [
+    "The Croesus Track crosses the Paparoa Range between Blackball in the Grey Valley and Barrytown on the Tasman Sea Coast.",
+    "It's recommended to walk from Smoke-ho carpark in the east to Barrytown in the west.",
+    "Go up this gravel road to Smoke-ho car park and to the start of Croesus Track.",
+    "For the last 2 hours, 30 minutes the track is marked down the ridge."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Garden Gully Track",
+   "quote": "Side trip: Garden Gully Track",
+   "ref": null,
+   "from": "Garden Gully junction"
+  },
+  {
+   "name": "Croesus Knob Route",
+   "quote": "Side trip: Croesus Knob Route",
+   "ref": "T8",
+   "from": "Ces Clark Hut"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Croesus Top Hut",
+   "quote": "You will pass the historic Croesus Top Hut just before reaching Ces Clark Hut.",
+   "ref": null
+  },
+  {
+   "name": "Ces Clark Hut",
+   "quote": "Ces Clark Hut is on the edge of the bushline",
+   "ref": "T6"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Garden Gully Hut",
+   "quote": "historic Garden Gully Hut",
+   "ref": null,
+   "why": "side trip"
+  },
+  {
+   "name": "Garden Gully Battery Site",
+   "quote": "Garden Gully Battery Site",
+   "ref": null,
+   "why": "side trip"
+  },
+  {
+   "name": "Garden Gully Mine",
+   "quote": "the Garden Gully Mine",
+   "ref": null,
+   "why": "side trip"
+  },
+  {
+   "name": "Lake Brunner",
+   "quote": "there are views of Lake Brunner",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Aoraki Mount Cook",
+   "quote": "down to Aoraki Mount Cook",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Southern Alps",
+   "quote": "excellent views of the Southern Alps",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Blackball",
+   "quote": "towards the Blackball township",
+   "ref": "T4",
+   "why": "nearby"
+  }
+ ],
+ "doubts": "Start: the text says Smoke-ho car park, reached by Croesus Track Road from Blackball; no road-end feature clearly matches it (F1 is an unnamed track on Blackball Road, which the text does not mention), so the start ref is null. End: 'Barrytown' is the end; F2, where the Croesus Track meets Coast Road, is at Barrytown, so I used it. Shape: one_way from DOC's 'one way' times and the Smoke-ho to Barrytown description. The text recommends walking east to west but does not say the reverse is a separate way, so no direction is given. The Garden Gully junction is named as where the Garden Gully side trip leaves the Croesus Track, but its position along the way is not stated, so it is not placed in via. The Battery Track turn-off is a junction the way passes before Ces Clark Hut. Croesus Top Hut is passed but cannot be stayed in; it is listed in huts since the way passes it, with no feature or link ref. The ridge entry in via has no name in the text."
+}

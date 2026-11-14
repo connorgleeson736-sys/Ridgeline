@@ -1,0 +1,94 @@
+{
+ "guid": "f0215e07-0d91-42ab-ad56-4a96a0018529",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Bush Stream car park to skifield road car park",
+   "shape": "one_way",
+   "start": {
+    "name": "Bush Stream car park",
+    "quote": "Bush Stream car park to Crooked Spur Hut",
+    "ref": null
+   },
+   "end": {
+    "name": "skifield road car park",
+    "quote": "Camp Stream Hut to skifield road car park",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Crooked Spur Hut",
+     "quote": "Crooked Spur Hut to Stone Hut",
+     "ref": "T8"
+    },
+    {
+     "name": "Stone Hut",
+     "quote": "Stone Hut to Royal Hut",
+     "ref": "T13"
+    },
+    {
+     "name": "Royal Hut",
+     "quote": "Royal Hut to Stag Saddle",
+     "ref": "L1"
+    },
+    {
+     "name": "Stag Saddle",
+     "quote": "Royal Hut to Stag Saddle",
+     "ref": "T12"
+    },
+    {
+     "name": "Camp Stream Hut",
+     "quote": "Stag Saddle to Camp Stream Hut",
+     "ref": "T5"
+    }
+   ],
+   "direction": null,
+   "time": "2-3 days",
+   "distance": null,
+   "evidence": [
+    "Bush Stream car park to Crooked Spur Hut",
+    "Crooked Spur Hut to Stone Hut",
+    "Stone Hut to Royal Hut",
+    "Royal Hut to Stag Saddle",
+    "Stag Saddle to Camp Stream Hut",
+    "Camp Stream Hut to skifield road car park"
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Crooked Spur Hut",
+   "quote": "Crooked Spur Hut to Stone Hut",
+   "ref": "T8"
+  },
+  {
+   "name": "Stone Hut",
+   "quote": "Stone Hut to Royal Hut",
+   "ref": "T13"
+  },
+  {
+   "name": "Royal Hut",
+   "quote": "Royal Hut to Stag Saddle",
+   "ref": "L1"
+  },
+  {
+   "name": "Camp Stream Hut",
+   "quote": "Stag Saddle to Camp Stream Hut",
+   "ref": "T5"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Te Araroa Trail",
+   "quote": "This track is part of Te Araroa Trail.",
+   "ref": null,
+   "why": "other walk"
+  }
+ ],
+ "doubts": "Start: the text gives 'Bush Stream car park' as the first leg's start, but no road-end feature clearly matches it (the Lilybank Road ends F1 and F2 are near Lake Tekapo, far from Bush Stream), so the start ref is null. End: 'skifield road car park' is not matched to a feature; the ski tow lower end F3 might be at the skifield but the text does not say so, so the end ref is null. Shape: one_way because the walk goes from one car park to a different place; the text does not say 'one way' itself, and DOC's time is '2-3 days' without 'return'. Way time is DOC's '2-3 days' from the page header; the leg times (4 hr, 5 hr, 2 hr, 3-4 hr, 4 hr, 3-4 hr) are not summed. Bush Stream, Sawtooth Bluff and Coal River are mentioned in the text, but the page does not give their order along the track, so they are not placed in via. Bush Stream is described as difficult to cross, but the text does not say to cross it on the way, so no ford is recorded. Between Stag Saddle and Camp Stream Hut the text describes two possible routes (a poled valley-floor route and an informal ridgeline route); the valley-floor route is not marked as the main one, so only the way through Camp Stream Hut is given. The Richmond Trail link is not in the page text, so it is not used."
+}

@@ -1,0 +1,20 @@
+{
+  "sourceCommit": "db36617a595ef0058c43622864f2bb603a6223b7",
+  "artifact": "Ridgeline-Native-Current-View-0.1.4-Base.apk",
+  "bytes": 32056520,
+  "sha256": "79f0654dfff7c91944f5c84d879d61018191a37ad846db3cdd1f8b684c8ed2dd",
+  "versionName": "0.1.4-current-view",
+  "versionCode": 5,
+  "applicationId": "nz.ridgeline.nativeapp.performance",
+  "signerSha256": "03ef64214daee8c59cad6571ce5036579237d553c040837ce996f80efa898ae7",
+  "updates013InPlace": true,
+  "assetsAndNativeFilesByteIdenticalTo013": 621,
+  "noSessionCa": true,
+  "signatureV2Verified": true,
+  "zip16KiBAlignmentVerified": true,
+  "targetedTestsPassed": 1,
+  "alternatingBenchmarkTrials": 4,
+  "fullSuiteOrLintRun": false,
+  "physicalDeviceRun": false,
+  "scope": "Isolated real-OkHttp canceled-call queue regression plus package checks; no claim about the particular phone stall."
+}

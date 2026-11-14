@@ -1,0 +1,96 @@
+{
+ "guid": "4a66a7ab-172c-4671-ace9-5cfc2f488f23",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Angelus Hut via Mt Cedric Track/Route",
+   "shape": "one_way",
+   "start": {
+    "name": "Sabine Hut",
+    "quote": "The track begins behind Sabine Hut",
+    "ref": "L1"
+   },
+   "end": {
+    "name": "Angelus Hut",
+    "quote": "Angelus Hut",
+    "ref": "T7"
+   },
+   "via": [
+    {
+     "name": "bush edge",
+     "quote": "the bush edge",
+     "ref": null
+    },
+    {
+     "name": "Mt Cedric",
+     "quote": "Mt Cedric",
+     "ref": "T12"
+    },
+    {
+     "name": "Rotomaninitua/Lake Angelus",
+     "quote": "Rotomaninitua/Lake Angelus",
+     "ref": "T14"
+    }
+   ],
+   "direction": null,
+   "time": "6 hr",
+   "distance": "6.8 km one way",
+   "evidence": [
+    "This is a very steep route to the Angelus basin which is exposed above the bush edge.",
+    "The track begins behind Sabine Hut and climbs very steeply and steadily to the bush edge.",
+    "Poles and cairns mark the route from here, which eventually drops off the eastern side of a high ridge of Mt Cedric (1,532 m) and onto Rotomaninitua/Lake Angelus."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Maniniaro/Angelus Peak",
+   "quote": "Maniniaro/Angelus Peak",
+   "ref": "T11",
+   "from": "Angelus Hut"
+  },
+  {
+   "name": "Sunset Saddle",
+   "quote": "Sunset Saddle",
+   "ref": "T16",
+   "from": "Angelus Hut"
+  },
+  {
+   "name": "Travers Range",
+   "quote": "Travers Range",
+   "ref": "T17",
+   "from": "Sunset Saddle"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Sabine Hut",
+   "quote": "Sabine Hut",
+   "ref": "L1"
+  },
+  {
+   "name": "Angelus Hut",
+   "quote": "Angelus Hut",
+   "ref": "T7"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Robert Ridge Route",
+   "quote": "Robert Ridge Route",
+   "ref": "T5",
+   "why": "other walk"
+  },
+  {
+   "name": "Coldwater Hut",
+   "quote": "Coldwater Hut",
+   "ref": "T9",
+   "why": "other walk"
+  }
+ ],
+ "doubts": "The text never states that the route ends at Angelus Hut in the description; it is taken from the page name, the one-way distance and the side trips 'from Angelus Hut'. The text says the route drops onto Lake Angelus. Sabine Hut is the start (track begins behind it), listed as a hut at the start."
+}
