@@ -27,7 +27,9 @@ export function attach(ctx, { form, results, routes }) {
     input.setAttribute('aria-expanded', String(!!q));
     if (active >= 0) input.setAttribute('aria-activedescendant', `result-${active}`); else input.removeAttribute('aria-activedescendant');
   }
-  const searchNow = async () => {
+  let pending = Promise.resolve([]);
+  const searchNow = () => (pending = searchFor());
+  const searchFor = async () => {
     const q = input.value.trim(), t = ++token;
     lastQuery = q;
     if (!q) { found = []; show(); return []; }
@@ -49,8 +51,10 @@ export function attach(ctx, { form, results, routes }) {
     if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); if (!found.length) return; active = (active + (e.key === 'ArrowDown' ? 1 : -1) + found.length) % found.length; show(); }
     else if (e.key === 'Enter') {
       e.preventDefault();
+      // Typed faster than the results (or the names are still loading): wait for them.
       if (input.value.trim() !== lastQuery) searchNow().then((r) => { if (r?.[0]) choose(r[0]); });
       else if (found[active]) choose(found[active]);
+      else pending.then((r) => { if (r?.[0] && input.value.trim() === lastQuery) choose(r[0]); });
     }
   });
   form.addEventListener('submit', (e) => e.preventDefault());
