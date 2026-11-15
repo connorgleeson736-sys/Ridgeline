@@ -15,7 +15,10 @@ import kotlin.math.*
 internal object WalkOptions {
     /** The map around a walk: tracks (name, line), aerial lifts and named peaks. */
     /** [box]: the area read (longitude, latitude bounds), if not the whole map. */
-    class Area(val tracks:List<Pair<String,List<Coordinate>>>,val lifts:List<List<Coordinate>> = emptyList(),val peaks:List<Pair<String,Coordinate>> = emptyList(),val box:DoubleArray?=null,val roads:List<Pair<String,List<Coordinate>>> = emptyList()){
+    /** [ways]: roads a walker may use (TrackFollow); [water]: rivers and streams
+     * (lines and the edges of wide rivers), where a route may ford. */
+    class Area(val tracks:List<Pair<String,List<Coordinate>>>,val lifts:List<List<Coordinate>> = emptyList(),val peaks:List<Pair<String,Coordinate>> = emptyList(),val box:DoubleArray?=null,val roads:List<Pair<String,List<Coordinate>>> = emptyList(),
+               val ways:List<Pair<String,List<Coordinate>>> = emptyList(),val water:List<List<Coordinate>> = emptyList()){
         /** Within [m] metres of the edge of the area read (where the map's tracks are cut off). */
         fun atEdge(c:Coordinate,m:Double):Boolean{val b=box?:return false;val dy=m/111_320.0;val dx=dy/max(.2,cos(Math.toRadians(c.latitude)))
             return c.longitude<b[0]+dx||c.longitude>b[2]-dx||c.latitude<b[1]+dy||c.latitude>b[3]-dy}
@@ -30,8 +33,15 @@ internal object WalkOptions {
         fun option(s:Int,e:Int)=options.firstOrNull{it.start==s&&it.end==e}
     }
     /** Adds one zoom-14 map tile's tracks (clipped to it), aerial lifts and named peaks to the lists. */
-    fun read(id:GpuUploadQueue.Id,features:List<VectorTile.Feature>,tracks:MutableList<Pair<String,List<Coordinate>>>,lifts:MutableList<List<Coordinate>>,peaks:MutableList<Pair<String,Coordinate>>,roads:MutableList<Pair<String,List<Coordinate>>>?=null){
+    fun read(id:GpuUploadQueue.Id,features:List<VectorTile.Feature>,tracks:MutableList<Pair<String,List<Coordinate>>>,lifts:MutableList<List<Coordinate>>,peaks:MutableList<Pair<String,Coordinate>>,roads:MutableList<Pair<String,List<Coordinate>>>?=null,
+             ways:MutableList<Pair<String,List<Coordinate>>>?=null,water:MutableList<List<Coordinate>>?=null){
         fun c(p:VectorTile.Point)=Coordinate(p.x*360-180,CameraMath.latitude(p.y))
+        for(f in features){
+            if(ways!=null&&f.layer=="streets"&&f.properties["kind"] in WALKABLE_ROADS)
+                for(path in f.paths)for(part in BoundaryIndex.clip(path,id.bounds))if(part.size>=2)ways.add(((f.properties["name"] as? String).orEmpty()) to part.map(::c))
+            if(water!=null&&(f.layer=="water_lines"||f.layer=="water_polygons")&&f.properties["kind"]=="river")
+                for(path in f.paths)for(part in BoundaryIndex.clip(path,id.bounds))if(part.size>=2)water.add(part.map(::c))
+        }
         for(f in features)when{
             roads!=null&&f.layer=="streets"&&f.properties["kind"]!="track"&&f.properties["name"] is String->for(path in f.paths)for(part in BoundaryIndex.clip(path,id.bounds))if(part.size>=2)roads.add((f.properties["name"] as String) to part.map(::c))
             f.layer=="streets"&&f.properties["kind"]=="track"->for(path in f.paths)for(part in BoundaryIndex.clip(path,id.bounds))if(part.size>=2)tracks.add((f.properties["name"] as? String).orEmpty() to part.map(::c))
@@ -41,6 +51,10 @@ internal object WalkOptions {
     }
     /** Map layers [read] uses. */
     val LAYERS=setOf("streets","aerialways","place_labels")
+    /** Map layers for a route along tracks and roads, with its fords. */
+    val FOLLOW_LAYERS=setOf("streets","water_lines","water_polygons")
+    /** Roads a walker may follow (the map's other kinds: motorway, rail, raceway, track). */
+    val WALKABLE_ROADS=setOf("primary","secondary")
     /** A route must be within this share of DOC's distance for the leg. */
     const val MATCH=.25
     /** Track points this close are one point. */

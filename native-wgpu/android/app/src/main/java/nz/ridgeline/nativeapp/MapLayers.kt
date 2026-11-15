@@ -326,8 +326,8 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
     fun followTracks(from:Coordinate,to:Coordinate,reach:Double,callback:(List<Coordinate>?)->Unit){runCatching{worker.execute{
         val margin=(NativeGeo.distance(from,to)*.35).coerceIn(400.0,3000.0)
         // Long legs read coarser tiles (zoom 13, then 12) rather than giving up.
-        area(listOf(from,to),margin,FOLLOW_ZOOMS){area->
-            val out=area?.let{runCatching{TrackFollow.route(from,to,it.tracks,reach)}.getOrNull()}
+        area(listOf(from,to),margin,FOLLOW_ZOOMS,follow=true){area->
+            val out=area?.let{runCatching{TrackFollow.route(from,to,it.tracks,reach,it.ways,it.water)}.getOrNull()}
             main.post{if(!closed)callback(out)}}
     }}.onFailure{callback(null)}}
     /** A loop walk's [line] closed over the map's tracks (WalkOptions.closeLoop), or null. Main thread callback. */
@@ -342,7 +342,8 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
     /** [zooms]: tile zooms to read, finest first: the first whose tiles over the
      * area number at most [AREA_TILES] (the map's tracks are in its tiles from
      * zoom 12, to a metre or two). */
-    private fun area(points:List<Coordinate>,margin:Double,zooms:List<Int> = listOf(VECTOR_MAX_ZOOM),done:(WalkOptions.Area?)->Unit){
+    /** [follow]: also the walkable roads and rivers (TrackFollow), not lifts or peaks. */
+    private fun area(points:List<Coordinate>,margin:Double,zooms:List<Int> = listOf(VECTOR_MAX_ZOOM),follow:Boolean=false,done:(WalkOptions.Area?)->Unit){
         if(points.isEmpty()){runCatching{routeJobs.execute{done(null)}};return}
         val z=areaZoom(points,margin,zooms)?:run{runCatching{routeJobs.execute{done(null)}};return}
         val lat=points.sumOf{it.latitude}/points.size;val dy=margin/111_320.0;val dx=dy/cos(Math.toRadians(lat))
@@ -352,8 +353,9 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         val ids=ArrayList<GpuUploadQueue.Id>();for(x in x0..x1)for(y in y0..y1)ids.add(GpuUploadQueue.Id(z,x,y))
         val box=doubleArrayOf(x0/n*360-180,CameraMath.latitude((y1+1)/n),(x1+1)/n*360-180,CameraMath.latitude(y0/n))
         val tracks=ArrayList<Pair<String,List<Coordinate>>>();val lifts=ArrayList<List<Coordinate>>();val peaks=ArrayList<Pair<String,Coordinate>>();val roads=ArrayList<Pair<String,List<Coordinate>>>()
-        visitTiles(ids,AREA_TILES,{id,features->WalkOptions.read(id,features,tracks,lifts,peaks,roads);emptyList()},WalkOptions.LAYERS){
-            runCatching{routeJobs.execute{done(WalkOptions.Area(tracks,lifts,peaks,box,roads))}}
+        val ways=ArrayList<Pair<String,List<Coordinate>>>();val water=ArrayList<List<Coordinate>>()
+        visitTiles(ids,AREA_TILES,{id,features->if(follow)WalkOptions.read(id,features,tracks,lifts,peaks,null,ways,water)else WalkOptions.read(id,features,tracks,lifts,peaks,roads);emptyList()},if(follow)WalkOptions.FOLLOW_LAYERS else WalkOptions.LAYERS){
+            runCatching{routeJobs.execute{done(WalkOptions.Area(tracks,lifts,peaks,box,roads,ways,water))}}
         }
     }
 

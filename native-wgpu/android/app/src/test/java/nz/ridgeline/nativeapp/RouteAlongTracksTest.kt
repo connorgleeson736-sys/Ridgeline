@@ -40,6 +40,48 @@ class RouteAlongTracksTest{
         assertEquals(DocTracks.length(bends)+40.0,DocTracks.length(line),2.0)
         assertTrue("the bends only, not every 20 m: ${line.size}",line.size<=20)
     }
+    @Test fun walksAlongARoadBetweenTracks(){
+        // Track A ends at a road; 1 km along the road track B starts.
+        val a="A Track" to listOf(at(0.0,500.0),at(0.0,0.0));val b="B Track" to listOf(at(1000.0,0.0),at(1000.0,500.0))
+        val road="Valley Road" to listOf(at(-200.0,0.0),at(1200.0,0.0))
+        val line=TrackFollow.route(at(0.0,500.0),at(1000.0,500.0),listOf(a,b),20.0,listOf(road))!!
+        assertEquals(500.0+1000.0+500.0,DocTracks.length(line),2.0)
+        // Without the road they do not join.
+        assertNull(TrackFollow.route(at(0.0,500.0),at(1000.0,500.0),listOf(a,b),20.0))
+    }
+    @Test fun prefersTheTrackToAParallelRoad(){
+        // A track and a road both from (0,0) to (1000,0), the road 10% shorter.
+        val track="Riverside Walk" to listOf(at(0.0,0.0),at(500.0,100.0),at(1000.0,0.0))
+        val road="Main Road" to listOf(at(0.0,0.0),at(500.0,-20.0),at(1000.0,0.0))
+        val line=TrackFollow.route(at(0.0,0.0),at(1000.0,0.0),listOf(track),20.0,listOf(road))!!
+        assertTrue("along the track: $line",line.any{near(it,at(500.0,100.0))})
+    }
+    /** Two tracks along opposite banks of a river (north and south, 60 m apart),
+     * joined by a bridge [bridgeAt] metres east; to the west each turns away from
+     * the river (their ends far apart: the network joins dead ends within 80 m). */
+    private fun banks(bridgeAt:Double):List<Pair<String,List<Coordinate>>> = listOf(
+        "North Bank Track" to listOf(at(-300.0,330.0),at(-300.0,30.0),at(bridgeAt,30.0)),
+        "South Bank Track" to listOf(at(-300.0,-330.0),at(-300.0,-30.0),at(bridgeAt,-30.0)),
+        "Bridge" to listOf(at(bridgeAt,30.0),at(bridgeAt,-30.0)))
+    private val river=listOf(listOf(at(-500.0,0.0),at(5000.0,0.0)))
+    @Test fun fordsARiverRatherThanAFarDetour(){
+        // The bridge 3 km away: ford straight across (60 m).
+        val line=TrackFollow.route(at(0.0,30.0),at(0.0,-30.0),banks(3000.0),20.0,emptyList(),river)!!
+        assertEquals(60.0,DocTracks.length(line),2.0)
+    }
+    @Test fun usesANearbyBridgeRatherThanFording(){
+        // The bridge 100 m away: 260 m over it beats a 60 m ford (counted 3 x 60 + 150).
+        val line=TrackFollow.route(at(0.0,30.0),at(0.0,-30.0),banks(100.0),20.0,emptyList(),river)!!
+        assertEquals(100.0+60.0+100.0,DocTracks.length(line),2.0)
+    }
+    @Test fun noFordWithoutAMappedRiverOrTooWide(){
+        // No river between: never a straight jump across country.
+        val line=TrackFollow.route(at(0.0,30.0),at(0.0,-30.0),banks(3000.0),20.0)!!
+        assertEquals(3000.0+60.0+3000.0,DocTracks.length(line),2.0)
+        // A 200 m wide river: too wide to ford.
+        val wide=listOf("North" to listOf(at(0.0,100.0),at(3000.0,100.0)),"South" to listOf(at(0.0,-100.0),at(3000.0,-100.0)),"Bridge" to listOf(at(3000.0,100.0),at(3000.0,-100.0)))
+        assertEquals(3000.0+200.0+3000.0,DocTracks.length(TrackFollow.route(at(0.0,100.0),at(0.0,-100.0),wide,20.0,emptyList(),river)!!),2.0)
+    }
     @Test fun longLegsReadCoarserTiles(){
         val a=Coordinate(169.0,-44.5)
         // [km] east and [km] north: a diagonal leg, the largest area for its length.
