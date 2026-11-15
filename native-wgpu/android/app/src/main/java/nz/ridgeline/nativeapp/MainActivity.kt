@@ -54,8 +54,22 @@ class MainActivity:Activity(){
             background=NativeUi.background(this@MainActivity,NativeUi.glass,14)
             setTextColor(NativeUi.ink)
         }
-        mapHost.addView(status,FrameLayout.LayoutParams(-2,-2,Gravity.TOP or Gravity.CENTER_HORIZONTAL).apply{topMargin=dp(62)})
-        terrain.onStatus={if(status.text.toString()!=it)status.text=it;status.visibility=if(it.isEmpty())View.GONE else View.VISIBLE}
+        // Small notes at the top of the map, one under another: loading and
+        // connection messages, and "Drawing route" while a route is drawn.
+        topNotes=LinearLayout(this).apply{orientation=LinearLayout.VERTICAL;gravity=Gravity.CENTER_HORIZONTAL}
+        topNotes.addView(status,LinearLayout.LayoutParams(-2,-2))
+        mapHost.addView(topNotes,FrameLayout.LayoutParams(-2,-2,Gravity.TOP or Gravity.CENTER_HORIZONTAL).apply{topMargin=dp(62)})
+        // A missing source (no connection): shown once, for a few seconds, then
+        // not again until the phone's connection comes back.
+        val hideFailure=Runnable{status.visibility=View.GONE}
+        terrain.onStatus={message->
+            val failure=message.startsWith("Terrain load failed")||message=="Imagery metadata unavailable"
+            if(!(failure&&failureShown)){
+                if(failure){failureShown=true;status.removeCallbacks(hideFailure);status.postDelayed(hideFailure,FAILURE_MILLIS)}
+                if(status.text.toString()!=message)status.text=message;status.visibility=if(message.isEmpty())View.GONE else View.VISIBLE
+            }
+        }
+        runCatching{getSystemService(android.net.ConnectivityManager::class.java)?.registerDefaultNetworkCallback(network)}
         val attribution=TextView(this).apply{
             text=Html.fromHtml(
                 "<a href=\"https://www.linz.govt.nz/data/linz-data/linz-basemaps/data-attribution\">LINZ imagery, elevation &amp; topography · CC BY 4.0 &amp; contributors</a><br>"+
@@ -134,22 +148,14 @@ class MainActivity:Activity(){
         planner.onProfilePoint={terrain.inspect(it)}
         layersUi=LayersUi(this,root,terrain,loader,offlineUi){planner.newRoute()}
         location=LocationUi(this,mapHost,terrain,false)
-        val drawingBanner=LinearLayout(this).apply{gravity=Gravity.CENTER_VERTICAL;background=NativeUi.background(this@MainActivity,NativeUi.paper,8,true);visibility=View.GONE}
-        val drawingTitle=NativeUi.text(this,"Drawing route").apply{setPadding(dp(10),0,dp(10),0)}
-        drawingBanner.addView(drawingTitle)
-        // From here to there along the tracks: on, each tap is reached from the last
-        // point along the map's tracks; off, in a straight line.
-        lateinit var followButton:TextView
-        fun showFollow(){followButton.text=if(planner.followTracks)"✓ Follow tracks" else "Follow tracks"
-            followButton.contentDescription=if(planner.followTracks)"Following tracks: tap to draw straight lines" else "Draw along tracks"}
-        followButton=NativeUi.button(this,"Follow tracks"){planner.followTracks=!planner.followTracks;showFollow()}
-        showFollow()
-        drawingBanner.addView(followButton,LinearLayout.LayoutParams(-2,-2).apply{marginEnd=dp(6)})
-        drawingBanner.addView(NativeUi.button(this,"Done"){planner.controller.drawing(false)})
-        planner.trackWay={from,to,done->mapLayers.followTracks(from,to,done)}
-        planner.onFollowing={busy->drawingTitle.text=if(busy)"Finding the track…" else "Drawing route"}
-        mapHost.addView(drawingBanner,FrameLayout.LayoutParams(-2,dp(44),Gravity.TOP or Gravity.CENTER_HORIZONTAL).apply{topMargin=dp(62)})
-        planner.onDrawing={drawingBanner.visibility=if(it)View.VISIBLE else View.GONE}
+        // While drawing: a small note like the status message; tap it to finish.
+        val drawingNote=TextView(this).apply{
+            text="Drawing route  ·  Done";textSize=11f;setPadding(dp(10),dp(5),dp(10),dp(5))
+            background=NativeUi.background(this@MainActivity,NativeUi.glass,14);setTextColor(NativeUi.ink);visibility=View.GONE
+            contentDescription="Drawing route. Tap to finish.";isClickable=true;setOnClickListener{planner.controller.drawing(false)}}
+        topNotes.addView(drawingNote,LinearLayout.LayoutParams(-2,-2).apply{topMargin=dp(4)})
+        planner.trackWay={from,to,reach,done->mapLayers.followTracks(from,to,reach,done)}
+        planner.onDrawing={drawingNote.visibility=if(it)View.VISIBLE else View.GONE}
         // Capacitor layout: kea launcher and locate (top left), 2D/3D switch,
         // compass and layers (top right). No zoom buttons: pinch and double-tap zoom.
         val launcher=MapControls.logo(this){layersUi.dismiss();planner.showRoutes()}
@@ -205,5 +211,12 @@ class MainActivity:Activity(){
             if(::loader.isInitialized)loader.memoryPressure();if(::terrain.isInitialized)terrain.memoryPressure()
         }
     }
-    override fun onDestroy(){if(::trackSheet.isInitialized)trackSheet.close();if(::mapLayers.isInitialized)mapLayers.close();if(::planner.isInitialized)planner.close();if(::loader.isInitialized)loader.close();if(::terrain.isInitialized)terrain.close();super.onDestroy()}
+    private lateinit var topNotes:LinearLayout
+    /** A connection failure note was shown: not again until the connection returns. */
+    @Volatile private var failureShown=false
+    private val network=object:android.net.ConnectivityManager.NetworkCallback(){
+        override fun onAvailable(n:android.net.Network){failureShown=false}
+    }
+    private companion object{const val FAILURE_MILLIS=4000L}
+    override fun onDestroy(){runCatching{getSystemService(android.net.ConnectivityManager::class.java)?.unregisterNetworkCallback(network)};if(::trackSheet.isInitialized)trackSheet.close();if(::mapLayers.isInitialized)mapLayers.close();if(::planner.isInitialized)planner.close();if(::loader.isInitialized)loader.close();if(::terrain.isInitialized)terrain.close();super.onDestroy()}
 }

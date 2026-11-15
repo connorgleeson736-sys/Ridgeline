@@ -274,12 +274,13 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
                 WalkDirections.route(sections,walk,distance,time,doc,a,places,current)}.getOrNull()}
             main.post{if(!closed)callback(out)}}
     }}.onFailure{callback(null)}}
-    /** A drawn route's next piece from [from] to [to] along the map's tracks
-     * (TrackFollow), or null when no track joins them nearby. Main thread callback. */
-    fun followTracks(from:Coordinate,to:Coordinate,callback:(List<Coordinate>?)->Unit){runCatching{worker.execute{
+    /** A drawn route's next piece from [from] along the map's tracks to the
+     * track beside [to] (TrackFollow), or null when [to] is not within [reach]
+     * metres of a track or no track joins them. Main thread callback. */
+    fun followTracks(from:Coordinate,to:Coordinate,reach:Double,callback:(List<Coordinate>?)->Unit){runCatching{worker.execute{
         val margin=(NativeGeo.distance(from,to)*.35).coerceIn(400.0,3000.0)
         area(listOf(from,to),margin){area->
-            val out=area?.let{runCatching{TrackFollow.route(from,to,it.tracks)}.getOrNull()}
+            val out=area?.let{runCatching{TrackFollow.route(from,to,it.tracks,reach)}.getOrNull()}
             main.post{if(!closed)callback(out)}}
     }}.onFailure{callback(null)}}
     /** A loop walk's [line] closed over the map's tracks (WalkOptions.closeLoop), or null. Main thread callback. */
