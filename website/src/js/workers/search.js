@@ -5,6 +5,7 @@ let index = null;
 let loading = null;
 const load = (url) => loading || (loading = fetch(url).then((r) => { if (!r.ok) throw new Error(r.status); return r.text(); }).then((t) => { index = new PlaceSearch(t); }));
 self.onmessage = async ({ data: m }) => {
+  if (m.id == null || !m.url) return;
   try {
     await load(m.url);
     if (m.type === 'warm') { postMessage({ id: m.id, result: index.size }); return; }

@@ -1,7 +1,7 @@
 // Calls into the map's two worker threads, as promises.
 import config from './config.js';
 
-function client(url) {
+function client(url, { key = false } = {}) {
   let worker = null, next = 1;
   const waiting = new Map();
   const start = () => {
@@ -14,7 +14,7 @@ function client(url) {
       if (data.superseded) w.resolve(undefined); else if (data.error) w.reject(new Error(data.error)); else w.resolve(data.result);
     };
     worker.onerror = () => { for (const w of waiting.values()) w.reject(new Error('Worker failed')); waiting.clear(); worker = null; };
-    if (config.linzKey) worker.postMessage({ type: 'key', key: config.linzKey });
+    if (key && config.linzKey) worker.postMessage({ type: 'key', key: config.linzKey });
     return worker;
   };
   return {
@@ -22,5 +22,5 @@ function client(url) {
     post(message) { start().postMessage(message); },
   };
 }
-export const data = client('../workers/data.js');
+export const data = client('../workers/data.js', { key: true });
 export const search = client('../workers/search.js');
