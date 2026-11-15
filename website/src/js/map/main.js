@@ -10,7 +10,8 @@
 //   routing, elevation and search on worker threads.
 // - Camera saved in an idle callback, not on every move.
 import { Map as MapLibre, setWorkerUrl, addProtocol, getVersion, ScaleControl, AttributionControl } from '/vendor/maplibre-gl-6.16.0/maplibre-gl.mjs';
-import { build, GROUPS, sky, hatch, shown, NZ_BOUNDS } from './style.js';
+import { build, GROUPS, sky, hatch, shown, grade, NZ_BOUNDS } from './style.js';
+import { START as A_COLOUR, END as B_COLOUR } from './chart.js';
 import { install as installOverview, loadOverview } from './overview.js';
 import { attach as attachOverlays } from './overlays.js';
 import { attach as attachPlanner } from './planner.js';
@@ -27,7 +28,7 @@ loadOverview();
 const $ = (id) => document.getElementById(id);
 const dark = matchMedia('(prefers-color-scheme: dark)');
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const DEFAULTS = { base: 'aerial', threeD: true, relief: 1, names: true, peaks: true, roads: true, tracks: true, huts: true, contours: false, hunting: false };
+const DEFAULTS = { base: 'aerial', natural: true, threeD: true, relief: 1, names: true, peaks: true, roads: true, tracks: true, huts: true, contours: false, hunting: false };
 const settings = { ...DEFAULTS, ...store.get('settings', {}) };
 const saveSettings = () => store.set('settings', settings);
 
@@ -64,7 +65,9 @@ async function main() {
     pitch: settings.threeD ? (view.pitch ?? 0) : 0,
     minZoom: 4.5, maxZoom: 19, maxPitch: 85, maxBounds: NZ_BOUNDS,
     pixelRatio: pixelRatio(view.zoom),
-    maxTileCacheSize: saveData ? 80 : memory <= 2 ? 96 : memory <= 4 ? 128 : 192,
+    // Tiles kept after they leave the view, per source, by the device's memory
+    // (the app's RAM budget): panning back shows them at once.
+    maxTileCacheSize: saveData ? 120 : memory <= 2 ? 160 : memory <= 4 ? 360 : 640,
     maxTileCacheZoomLevels: 8,
     cancelPendingTileRequestsWhileZooming: false,
     centerClampedToGround: true,
@@ -90,18 +93,35 @@ async function main() {
     return pad;
   };
   const geo = (type, data) => map.getSource(type)?.setData(data);
-  function select(lines) { geo('selection', { type: 'FeatureCollection', features: (lines || []).map((l) => ({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: l } })) }); }
+  let selected = null, part = null;
+  function drawSelection() {
+    const features = (selected || []).map((l) => ({ type: 'Feature', properties: { dim: !!part }, geometry: { type: 'LineString', coordinates: l } }));
+    if (part) features.push({ type: 'Feature', properties: { dim: false }, geometry: { type: 'LineString', coordinates: part } });
+    geo('selection', { type: 'FeatureCollection', features });
+  }
+  function select(lines) { selected = lines; part = null; drawSelection(); range(null); }
+  /** A section measured on the profile: A and B on the map, the rest of the line dimmed. */
+  function range(r) {
+    part = r?.part?.length > 1 ? r.part : null;
+    drawSelection();
+    geo('range', { type: 'FeatureCollection', features: r ? [['A', A_COLOUR, r.a], ['B', B_COLOUR, r.b]].map(([label, color, p]) => ({ type: 'Feature', properties: { label, color }, geometry: { type: 'Point', coordinates: p } })) : [] });
+  }
   function marker(p) { geo('marker', { type: 'FeatureCollection', features: p ? [{ type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: p } }] : [] }); }
-  function section(points) { map.setPaintProperty('selection-line', 'line-color', '#2f7fd8'); geo('marker', { type: 'FeatureCollection', features: points ? [{ type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: points[0] } }, { type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: points[points.length - 1] } }] : [] }); }
+  /** Frames a box beside the panel: worked out flat, then tilted (a pitched fit
+   * around a half-screen sheet would zoom far out). */
   function fitBox(b) {
-    map.fitBounds([[b[0], b[1]], [b[2], b[3]]], { padding: sheetPadding(), maxZoom: 15, duration: reducedMotion ? 0 : 900, pitch: settings.threeD ? Math.min(map.getPitch() || 50, 55) : 0 });
+    const padding = sheetPadding(), pitch = settings.threeD ? Math.min(map.getPitch() || 50, 55) : 0;
+    const cam = map.cameraForBounds([[b[0], b[1]], [b[2], b[3]]], { padding, maxZoom: 15, bearing: map.getBearing(), pitch: 0 });
+    if (!cam) return;
+    // No padding on the move itself: MapLibre keeps it, and the next fit would count it twice.
+    map.easeTo({ center: cam.center, zoom: Math.max(5, cam.zoom - (pitch ? 0.35 : 0)), bearing: map.getBearing(), pitch, duration: reducedMotion ? 0 : 900 });
   }
   function fit(line) { let w = 180, s = 0, e = 0, n = -90; for (const [x, y] of line) { w = Math.min(w, x); e = Math.max(e, x); s = Math.min(s, y); n = Math.max(n, y); } fitBox([w, s, e, n]); }
   const ctx = {
     map, sheet, select, fit, fitBox,
     marker: (p, fly) => marker(p),
-    section,
-    flyTo: (p, zoom) => map.flyTo({ center: p, zoom, pitch: settings.threeD ? Math.max(map.getPitch(), 45) : 0, padding: sheetPadding(), duration: reducedMotion ? 0 : 1600, essential: true }),
+    range,
+    flyTo: (p, zoom) => { const pad = sheetPadding(); map.flyTo({ center: p, zoom, pitch: settings.threeD ? Math.max(map.getPitch(), 45) : 0, offset: [(pad.left - pad.right) / 2, (pad.top - pad.bottom) / 2], duration: reducedMotion ? 0 : 1600, essential: true }); },
     openWalk: (guid) => openWalk(ctx, guid),
     openHut: (name, p) => openHut(ctx, name, p),
     closeDetails: () => { if (!planner.active) sheet.close(); },
@@ -179,7 +199,8 @@ async function main() {
     if (planner.drawing) {
       const p = e.point, near = map.queryRenderedFeatures([[p.x - 8, p.y - 8], [p.x + 8, p.y + 8]], { layers: ['waypoints', 'route-line'] });
       if (near.some((f) => f.layer.id === 'waypoints')) return;
-      if (near.some((f) => f.layer.id === 'route-line') && planner.lineTap(e.lngLat)) return;
+      const onHut = map.queryRenderedFeatures([[p.x - 24, p.y - 24], [p.x + 24, p.y + 24]], { layers: ['nz-huts-dot', 'nz-huts-label'].filter((l) => map.getLayer(l)) }).length > 0;
+      if (!onHut && near.some((f) => f.layer.id === 'route-line') && planner.lineTap(e.lngLat)) return;
       planner.tap(e.lngLat);
       return;
     }
@@ -268,7 +289,7 @@ async function main() {
   dark.addEventListener('change', () => { map.setSky(sky(dark.matches)); map.setPaintProperty('background', 'background-color', dark.matches ? '#16211d' : '#dfe7e1'); });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !cover.hidden) { closeDrawer(); return; }
-    const typing = e.target.matches('input, textarea, select');
+    const typing = e.target.matches('input:not([type=checkbox]):not([type=range]), textarea, select');
     if (typing) return;
     if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); planner.undo(); }
     else if ((e.key === 'Delete' || e.key === 'Backspace') && planner.drawing) { e.preventDefault(); planner.deleteSelected(); }
@@ -284,9 +305,18 @@ function layers(map, panel, button, { setThreeD, overlays, resize, closeDrawer }
   const reliefValue = el('output', {}, `${(+settings.relief).toFixed(1)}×`);
   const relief = el('input', { type: 'range', min: 1, max: 2, step: 0.1, value: settings.relief, 'aria-label': 'Terrain relief', oninput: (e) => { settings.relief = +e.target.value; reliefValue.textContent = `${settings.relief.toFixed(1)}×`; if (settings.threeD) map.setTerrain({ source: 'terrain', exaggeration: settings.relief }); saveSettings(); } });
   const topoNote = el('p', { class: 'note', hidden: true }, 'NZ Topo shows its own tracks, huts and names.');
+  // The app's "Natural imagery colour": its overview imagery and colour grade, on by default.
+  const naturalInput = el('input', { type: 'checkbox', checked: settings.natural, onchange: (e) => setNatural(e.target.checked) });
+  const naturalBox = el('label', { class: 'check' }, el('span', {}, 'Natural imagery colour'), naturalInput);
+  function setNatural(on) {
+    settings.natural = on; saveSettings();
+    for (const id of ['aerial', 'satellite']) for (const [k, v] of Object.entries(grade(id, on))) map.setPaintProperty(id, k, v);
+    map.getSource('aerial')?.setTiles([`bushline://aerial/{z}/{x}/{y}${on ? '' : '?raw'}`]);
+  }
   panel.append(
     el('div', { class: 'heading' }, el('h2', {}, 'Map layers'), el('button', { class: 'icon-button', type: 'button', 'aria-label': 'Close layers', onclick: () => close() }, '✕')),
-    el('div', { class: 'bases' }, base('aerial', 'LINZ aerial'), base('topo', 'NZ Topo · 2D')),
+    el('div', { class: 'bases' }, base('aerial', 'LINZ aerial'), base('satellite', 'Satellite'), base('topo', 'NZ Topo · 2D')),
+    naturalBox,
     el('h3', {}, 'Topographic overlays'),
     topoNote,
     ...toggles.map(([key, label, keyClass]) => el('label', { class: 'check' }, el('span', {}, keyClass ? el('i', { class: `key ${keyClass}`, 'aria-hidden': 'true' }) : null, label), el('input', { type: 'checkbox', 'data-toggle': key, checked: settings[key], onchange: (e) => setGroup(key, e.target.checked) }))),
@@ -295,8 +325,7 @@ function layers(map, panel, button, { setThreeD, overlays, resize, closeDrawer }
   const applyAll = () => { for (const ids of Object.values(GROUPS)) for (const id of ids) if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', shown(id, settings) ? 'visible' : 'none'); };
   function setBase(id, { keep3d = false } = {}) {
     settings.base = id; saveSettings();
-    map.setLayoutProperty('aerial', 'visibility', id === 'aerial' ? 'visible' : 'none');
-    map.setLayoutProperty('topo', 'visibility', id === 'topo' ? 'visible' : 'none');
+    for (const layer of ['aerial', 'satellite', 'topo']) map.setLayoutProperty(layer, 'visibility', id === layer ? 'visible' : 'none');
     applyAll(); overlays.refresh(); sync(); resize();
     if (id === 'topo' && settings.threeD && !keep3d) setThreeD(false);
   }
@@ -310,6 +339,7 @@ function layers(map, panel, button, { setThreeD, overlays, resize, closeDrawer }
     for (const b of panel.querySelectorAll('[data-base]')) b.setAttribute('aria-pressed', String(b.dataset.base === settings.base));
     relief.disabled = !settings.threeD;
     const topo = settings.base === 'topo';
+    naturalInput.disabled = topo; naturalBox.classList.toggle('disabled', topo);
     for (const input of panel.querySelectorAll('[data-toggle]')) { const off = topo && input.dataset.toggle !== 'hunting'; input.disabled = off; input.closest('label').classList.toggle('disabled', off); }
     topoNote.hidden = !topo;
   }

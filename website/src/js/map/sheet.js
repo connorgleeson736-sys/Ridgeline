@@ -11,7 +11,9 @@ export class Sheet {
     this.grip = el('div', { class: 'grip', role: 'button', tabindex: 0, 'aria-label': 'Resize panel' }, this.back, this.closeButton);
     this.title = el('h2', { class: 'sheet-title', id: 'sheet-title' });
     this.subtitle = el('p', { class: 'sheet-subtitle' });
-    this.head = el('header', { class: 'sheet-head' }, this.title, this.subtitle);
+    // A small photo in the corner (the app's 56 dp thumbnail).
+    this.photo = el('img', { class: 'thumb', alt: '', hidden: true, decoding: 'async', referrerpolicy: 'no-referrer', onerror: () => { this.photo.hidden = true; } });
+    this.head = el('header', { class: 'sheet-head' }, this.photo, el('div', { class: 'sheet-heading' }, this.title, this.subtitle));
     this.body = el('div', { class: 'sheet-body' });
     root.append(this.grip, this.head, this.body);
     root.setAttribute('role', 'dialog');
@@ -40,6 +42,7 @@ export class Sheet {
     this.subtitle.textContent = panel.subtitle || '';
     this.subtitle.hidden = !panel.subtitle;
     this.head.hidden = !panel.title;
+    this.photo.hidden = true; this.photo.removeAttribute('src');
     this.back.hidden = !this.stack.length;
     this.body.replaceChildren();
     this.body.scrollTop = 0;
@@ -54,6 +57,10 @@ export class Sheet {
   setTitle(title, subtitle) {
     if (title != null) { this.title.textContent = title; this.head.hidden = !title; }
     if (subtitle != null) { this.subtitle.textContent = subtitle; this.subtitle.hidden = !subtitle; }
+  }
+  setPhoto(src, alt = '') {
+    if (!src || !/^https:\/\//.test(src)) { this.photo.hidden = true; return; }
+    this.photo.alt = alt; this.photo.src = src; this.photo.hidden = false;
   }
   pop() { const prev = this.stack.pop(); if (prev) this.show(prev); else this.close(); }
   close() {

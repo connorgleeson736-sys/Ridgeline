@@ -5,6 +5,7 @@
 // browser and shared as links.
 import { el, icon, distance, height, store, toast, metresPerPixel } from './ui.js';
 import { Chart, stats } from './chart.js';
+import { chartEvents } from './details.js';
 import { meters, length, nearestOn, bounds } from '../core/geo.js';
 import { encodeRoute, decodeRoute } from '../core/share.js';
 import { data as worker } from './workers.js';
@@ -77,11 +78,16 @@ export function attach(ctx) {
     if (save) persist();
   }
 
+  /** The hut under a tap: its dot within a finger's reach, or its name (the app's hutAt). */
   async function hutAt(point) {
     const p = map.project(point);
-    const hits = map.queryRenderedFeatures([[p.x - HUT_PX, p.y - HUT_PX], [p.x + HUT_PX, p.y + HUT_PX]], { layers: ['nz-huts-dot'] });
+    const layers = ['nz-huts-dot', 'nz-huts-label'].filter((l) => map.getLayer(l) && map.getLayoutProperty(l, 'visibility') !== 'none');
+    if (!layers.length) return null;
+    const named = map.queryRenderedFeatures(p, { layers: ['nz-huts-label'].filter((l) => layers.includes(l)) })[0];
+    if (named) return { point: named.geometry.coordinates, name: named.properties.name || 'hut' };
+    const hits = map.queryRenderedFeatures([[p.x - HUT_PX, p.y - HUT_PX], [p.x + HUT_PX, p.y + HUT_PX]], { layers });
     let best = null, bestD = Infinity;
-    for (const f of hits) { const c = f.geometry.coordinates, q = map.project(c), d = Math.hypot(q.x - p.x, q.y - p.y); if (d < bestD) { bestD = d; best = c; } }
+    for (const f of hits) { const c = f.geometry.coordinates, q = map.project(c), d = Math.hypot(q.x - p.x, q.y - p.y); if (d < bestD) { bestD = d; best = { point: c, name: f.properties.name || 'hut' }; } }
     return best;
   }
 
@@ -91,8 +97,9 @@ export function attach(ctx) {
     if (!route) start();
     pending++;
     queue = queue.then(async () => {
-      const hut = await hutAt(p);
-      if (hut) p = hut;
+      const found = await hutAt(p);
+      const hut = found?.point || null;
+      if (found) { p = hut; toast(`Locked onto ${found.name}`, 1600); }
       snapshot();
       const legs = route.legs;
       if (!legs.length) { legs.push({ p, path: [] }); changed(); return; }
@@ -234,25 +241,18 @@ export function attach(ctx) {
         const name = el('input', { class: 'route-name', value: route.name, 'aria-label': 'Route name', placeholder: 'Route name', maxlength: 80, oninput: (e) => { route.name = e.target.value.trim() || 'Untitled route'; persist(); } });
         statsBox = el('div', { class: 'stats' }, stat('Distance', 'distance'), stat('Ascent', 'ascent'), stat('Descent', 'descent'), stat('Highest', 'high'));
         const canvas = el('canvas', { class: 'chart', role: 'img', 'aria-label': 'Elevation profile' });
-        const section = el('div', { class: 'section-stats', hidden: true });
-        chart = new Chart(canvas, {
-          onPoint: (s) => ctx.marker(s?.p || null),
-          onSection: (st, pts) => {
-            ctx.section(pts && pts.length > 1 ? pts : null);
-            section.hidden = !st;
-            if (st) section.replaceChildren(el('span', { class: 'ab' }, 'A → B'), stat('Distance', null, distance(st.distance)), stat('Ascent', null, height(st.ascent)), stat('Descent', null, height(st.descent)), el('button', { class: 'link-button', type: 'button', onclick: () => chart.clearSection() }, 'Clear'));
-          },
-        });
+        const view = new Chart(canvas, chartEvents(ctx, () => view));
+        chart = view;
         const tools = el('div', { class: 'route-tools' },
           el('button', { class: 'btn', type: 'button', onclick: () => setDrawing(!drawing) }, drawing ? 'Done' : 'Edit'),
           el('button', { class: 'btn', type: 'button', onclick: undo, disabled: !drawing || !history.length }, 'Undo'),
           el('button', { class: 'btn', type: 'button', onclick: share, disabled: route.legs.length < 2 }, 'Share'),
           el('button', { class: 'btn danger', type: 'button', onclick: () => deletePoint(selected), disabled: !drawing || selected < 0 }, 'Delete point'));
-        body.append(name, statsBox, el('div', { class: 'chart-wrap grow' }, canvas), section, tools);
-        if (!drawing) body.append(el('div', { class: 'app-cta route-extra' }, el('p', {}, 'Open the share link on your Android phone to take this route offline in the Bushline Maps app.'), el('a', { class: 'btn', href: '/#app' }, 'Get the app')));
+        body.append(name, statsBox, el('div', { class: 'chart-wrap grow' }, canvas), tools);
+        if (!drawing) body.append(el('div', { class: 'app-cta route-extra' }, el('p', {}, 'Take your routes offline on the hill with the Bushline Maps Android app.'), el('a', { class: 'btn', href: '/about/#app' }, 'Get the app')));
         updateStats();
         updateProfile();
-        return () => { chart = null; statsBox = null; ctx.marker(null); ctx.section(null); };
+        return () => { chart = null; statsBox = null; ctx.marker(null); ctx.range(null); };
       },
     });
   }
@@ -273,7 +273,7 @@ export function attach(ctx) {
   function share() {
     if (!route || route.legs.length < 2) return;
     const { points, waypoints } = flatten(route.legs);
-    const link = `${location.origin}/map/#${encodeRoute({ name: route.name, points, waypoints })}`;
+    const link = `${location.origin}/#${encodeRoute({ name: route.name, points, waypoints })}`;
     const done = () => toast('Link copied. Open it on your phone to take the route with you.');
     if (navigator.share && matchMedia('(pointer: coarse)').matches) navigator.share({ title: route.name, text: `${route.name} – Bushline Maps`, url: link }).catch(() => {});
     else navigator.clipboard?.writeText(link).then(done, () => prompt('Copy this link:', link));
@@ -319,20 +319,47 @@ export function attach(ctx) {
     g.stroke();
     return c;
   }
+  /** The app's "Saved routes" drawer: Import GPX, Create new, then a card per route. */
   function list(container) {
     const routes = saved();
     const day = (t) => new Date(t).toLocaleDateString('en-NZ', { day: 'numeric', month: 'short', year: 'numeric' });
-    container.replaceChildren(
+    const file = el('input', { type: 'file', accept: '.gpx,application/gpx+xml', hidden: true, onchange: (e) => { const f = e.target.files[0]; if (f) importGpx(f).then(() => list(container)); e.target.value = ''; } });
+    const rename = (r) => { const name = prompt('Route name', r.name); if (!name || !name.trim()) return; r.name = name.trim().slice(0, 80); store.set('routes', saved().map((x) => (x.id === r.id ? { ...x, name: r.name } : x))); if (route?.id === r.id) route.name = r.name; list(container); };
+    const remove = (r) => { if (!confirm(`Delete “${r.name}”?`)) return; store.set('routes', saved().filter((x) => x.id !== r.id)); if (route?.id === r.id) { clear(); sheet.close(); } list(container); };
+    const open = (r) => { ctx.closeDrawer(); load(r); };
+    container.replaceChildren(...[
       el('h2', {}, 'Saved routes'),
-      el('button', { class: 'btn', type: 'button', onclick: () => { ctx.closeDrawer(); newRoute(); } }, '＋  Create new'),
+      el('button', { class: 'btn block', type: 'button', onclick: () => file.click() }, 'Import GPX'), file,
+      el('button', { class: 'btn block', type: 'button', onclick: () => { ctx.closeDrawer(); newRoute(); } }, '＋  Create new'),
       routes.length ? null : el('p', { class: 'empty' }, 'No saved routes yet. Create one, then tap the map where you want to go. Near a track, the route follows it.'),
       ...routes.map((r) => el('div', { class: 'route-card' },
-        el('div', { class: 'head', onclick: () => { ctx.closeDrawer(); load(r); } }, thumbnail(r.points), el('div', {}, el('b', {}, r.name), el('small', {}, `${distance(length(r.points))} · ${day(r.updated)}`))),
+        el('div', { class: 'head' }, thumbnail(r.points), el('div', {}, el('b', {}, r.name), el('small', {}, `${distance(length(r.points))} · ${r.points.length > 1 ? `${r.waypoints?.length || 2} points` : ''} · ${day(r.updated)}`.replace(' ·  · ', ' · ')))),
         el('div', { class: 'actions' },
-          el('button', { class: 'link', type: 'button', onclick: () => { ctx.closeDrawer(); load(r); } }, 'Open'),
-          el('button', { class: 'link', type: 'button', onclick: () => { const name = prompt('Route name', r.name); if (name && name.trim()) { r.name = name.trim().slice(0, 80); store.set('routes', saved().map((x) => (x.id === r.id ? { ...x, name: r.name } : x))); if (route?.id === r.id) route.name = r.name; list(container); } } }, 'Rename'),
-          el('button', { class: 'link', type: 'button', onclick: () => { if (confirm(`Delete “${r.name}”?`)) { store.set('routes', saved().filter((x) => x.id !== r.id)); if (route?.id === r.id) { clear(); sheet.close(); } list(container); } } }, 'Delete')))),
-      el('p', { class: 'fine' }, 'Routes are kept in this browser. Share a route to open it on your phone.'));
+          el('button', { class: 'link', type: 'button', onclick: () => open(r) }, route?.id === r.id ? 'Opened' : 'Open'),
+          el('button', { class: 'link', type: 'button', onclick: () => rename(r) }, 'Rename'),
+          el('button', { class: 'link', type: 'button', onclick: () => shareRoute(r) }, 'Share'),
+          el('button', { class: 'link', type: 'button', onclick: () => remove(r) }, 'Delete')))),
+    ].filter(Boolean));
+  }
+  /** A GPX file's track (or route) as a saved route: its name, points and route points. */
+  async function importGpx(fileObj) {
+    try {
+      const doc = new DOMParser().parseFromString(await fileObj.text(), 'application/xml');
+      const pick = (sel) => [...doc.getElementsByTagName(sel)].map((n) => [+n.getAttribute('lon'), +n.getAttribute('lat')]).filter(([x, y]) => isFinite(x) && isFinite(y));
+      let points = pick('trkpt'), waypoints = null;
+      if (points.length < 2) { points = pick('rtept'); waypoints = points.map((_, i) => i); }
+      if (points.length < 2) { toast('That GPX file has no track or route.'); return; }
+      if (points.length > 20000) points = points.filter((_, i) => i % Math.ceil(points.length / 20000) === 0);
+      const name = (doc.querySelector('trk > name, rte > name, metadata > name')?.textContent || fileObj.name.replace(/\.gpx$/i, '')).trim().slice(0, 80) || 'Imported route';
+      const r = { id: uid(), name, points, waypoints: waypoints || [0, points.length - 1], updated: Date.now() };
+      store.set('routes', [r, ...saved()].slice(0, MAX_ROUTES));
+      toast(`Imported “${name}”.`);
+    } catch { toast('That file could not be read as GPX.'); }
+  }
+  function shareRoute(r) {
+    const link = `${location.origin}/#${encodeRoute({ name: r.name, points: r.points, waypoints: r.waypoints })}`;
+    if (navigator.share && matchMedia('(pointer: coarse)').matches) navigator.share({ title: r.name, url: link }).catch(() => {});
+    else navigator.clipboard?.writeText(link).then(() => toast('Link copied.'), () => prompt('Copy this link:', link));
   }
   function newRoute() {
     ctx.closeDetails?.();

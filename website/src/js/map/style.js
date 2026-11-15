@@ -42,6 +42,20 @@ export function shown(id, settings) {
   return true;
 }
 
+/** The app's colour grade (renderer appearance.rs) as MapLibre raster paint:
+ * natural colour on LINZ photography and, more lightly, on Esri's. */
+export function grade(layer, natural) {
+  const on = natural && layer !== 'topo';
+  const linz = layer === 'aerial';
+  return {
+    'raster-saturation': on ? (linz ? -0.25 : -0.12) : 0,
+    'raster-contrast': on ? (linz ? 0.26 : 0.015) : 0,
+    'raster-brightness-min': on && linz ? 0.058 : 0,
+    'raster-brightness-max': on && !linz ? 0.99 : 1,
+  };
+}
+export const ESRI_ATTRIBUTION = '<a href="https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9" target="_blank" rel="noopener">Esri World Imagery &amp; contributors</a>';
+
 /** The whole style. `topography`: the app's layers (data/topography-style.json). */
 export function build({ topography, settings, dark }) {
   const visible = (on) => (on ? 'visible' : 'none');
@@ -57,7 +71,8 @@ export function build({ topography, settings, dark }) {
     sky: sky(dark),
     sources: {
       // Overview imagery for zooms 5–12 (the app's, averaged from LINZ's zoom-13 photography), LINZ beyond.
-      aerial: { type: 'raster', tiles: ['bushline://aerial/{z}/{x}/{y}'], tileSize: 256, maxzoom: 19, bounds: [160, -53, 185, -28], attribution: LINZ_ATTRIBUTION },
+      aerial: { type: 'raster', tiles: [`bushline://aerial/{z}/{x}/{y}${settings.natural ? '' : '?raw'}`], tileSize: 256, maxzoom: 19, bounds: [160, -53, 185, -28], attribution: `${LINZ_ATTRIBUTION} · gaps: ${ESRI_ATTRIBUTION}` },
+      satellite: { type: 'raster', tiles: ['bushline://satellite/{z}/{x}/{y}'], tileSize: 256, maxzoom: 19, bounds: [160, -53, 185, -28], attribution: ESRI_ATTRIBUTION },
       topo: { type: 'raster', tiles: [urls.topo], tileSize: 256, maxzoom: 16, bounds: [165, -49, 180, -33], attribution: '<a href="https://www.linz.govt.nz/products-services/maps/new-zealand-topographic-maps" target="_blank" rel="noopener">Topo50 © Toitū Te Whenua LINZ</a> CC BY 4.0' },
       terrain: { type: 'raster-dem', tiles: [urls.elevation], tileSize: 256, maxzoom: 18, encoding: 'mapbox', bounds: [165, -48, 179, -34] },
       'ridgeline-topography': { type: 'vector', tiles: [urls.vector], minzoom: 0, maxzoom: 14, bounds: [165, -48, 179, -34] },
@@ -68,11 +83,13 @@ export function build({ topography, settings, dark }) {
       selection: { type: 'geojson', data: { type: 'FeatureCollection', features: [] }, tolerance: 0.3, buffer: 32, maxzoom: 18 },
       marker: { type: 'geojson', data: { type: 'FeatureCollection', features: [] } },
       you: { type: 'geojson', data: { type: 'FeatureCollection', features: [] } },
+      range: { type: 'geojson', data: { type: 'FeatureCollection', features: [] } },
     },
     terrain: settings.threeD ? { source: 'terrain', exaggeration: settings.relief } : undefined,
     layers: [
       { id: 'background', type: 'background', paint: { 'background-color': dark ? '#16211d' : '#dfe7e1' } },
-      { id: 'aerial', type: 'raster', source: 'aerial', layout: { visibility: visible(settings.base === 'aerial') }, paint: { 'raster-fade-duration': 150, 'raster-resampling': 'linear' } },
+      { id: 'aerial', type: 'raster', source: 'aerial', layout: { visibility: visible(settings.base === 'aerial') }, paint: { 'raster-fade-duration': 150, 'raster-resampling': 'linear', ...grade('aerial', settings.natural) } },
+      { id: 'satellite', type: 'raster', source: 'satellite', layout: { visibility: visible(settings.base === 'satellite') }, paint: { 'raster-fade-duration': 150, 'raster-resampling': 'linear', ...grade('satellite', settings.natural) } },
       { id: 'topo', type: 'raster', source: 'topo', layout: { visibility: visible(settings.base === 'topo') }, paint: { 'raster-fade-duration': 150 } },
       ...lines,
       // Hunting permit areas: faint blaze-orange hatching inside a dashed outline.
@@ -82,17 +99,22 @@ export function build({ topography, settings, dark }) {
       { id: 'doc-walks-halo', type: 'line', source: 'doc-walks', minzoom: 9, maxzoom: 12, layout: { visibility: visible(shown('doc-walks', settings)), 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': 'rgba(15,30,31,.8)', 'line-width': 2.6 } },
       { id: 'doc-walks', type: 'line', source: 'doc-walks', minzoom: 9, maxzoom: 12, layout: { visibility: visible(shown('doc-walks', settings)), 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': '#f6db94', 'line-width': 1.2, 'line-dasharray': [3, 2] } },
       // The selected walk or track, and the route being planned.
-      { id: 'selection-halo', type: 'line', source: 'selection', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': '#ffffff', 'line-width': 8, 'line-opacity': 0.85 } },
-      { id: 'selection-line', type: 'line', source: 'selection', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': '#2f7fd8', 'line-width': 4 } },
-      { id: 'route-halo', type: 'line', source: 'route', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': '#ffffff', 'line-width': 7, 'line-opacity': 0.9 } },
-      { id: 'route-line', type: 'line', source: 'route', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': '#e87944', 'line-width': 3.6 } },
+      // The app's track highlight: golden; with a section chosen, the rest dimmed.
+      { id: 'selection-halo', type: 'line', source: 'selection', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': '#ffffff', 'line-width': 6, 'line-opacity': ['case', ['boolean', ['get', 'dim'], false], 0.45, 0.85] } },
+      { id: 'selection-line', type: 'line', source: 'selection', layout: { 'line-join': 'round', 'line-cap': 'round', 'line-sort-key': ['case', ['boolean', ['get', 'dim'], false], 0, 1] }, paint: { 'line-color': ['case', ['boolean', ['get', 'dim'], false], 'rgba(255,214,120,0.59)', 'rgb(255,201,74)'], 'line-width': 3 } },
+      { id: 'route-halo', type: 'line', source: 'route', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': '#ffffff', 'line-width': 6, 'line-opacity': 0.85 } },
+      { id: 'route-line', type: 'line', source: 'route', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': 'rgb(232,121,68)', 'line-width': 3 } },
       ...symbols,
       { id: 'doc-walk-names', type: 'symbol', source: 'doc-walks', minzoom: 11, maxzoom: 15, filter: ['==', ['get', 'large'], true], layout: { visibility: visible(shown('doc-walks', settings)), 'symbol-placement': 'line', 'symbol-spacing': 650, 'text-field': ['get', 'name'], 'text-font': ['Open Sans Regular'], 'text-size': 12, 'text-max-angle': 30, 'text-padding': 8, 'symbol-sort-key': 5 }, paint: { 'text-color': '#f6db94', 'text-halo-color': 'rgba(15,30,31,.9)', 'text-halo-width': 1.6 } },
       { id: 'hunting-names', type: 'symbol', source: 'hunting', minzoom: 11, filter: ['==', ['geometry-type'], 'Point'], layout: { visibility: visible(settings.hunting), 'text-field': ['get', 'name'], 'text-font': ['Open Sans Regular'], 'text-size': 11, 'text-max-width': 10, 'text-padding': 6 }, paint: { 'text-color': '#ffa25f', 'text-halo-color': 'rgba(20,20,20,.85)', 'text-halo-width': 1.4 } },
-      { id: 'waypoints', type: 'circle', source: 'waypoints', paint: { 'circle-radius': ['case', ['boolean', ['get', 'selected'], false], 8, ['boolean', ['get', 'end'], false], 6.5, 5], 'circle-color': ['case', ['boolean', ['get', 'selected'], false], '#e87944', ['boolean', ['get', 'end'], false], '#e87944', '#fafaf5'], 'circle-stroke-width': 2, 'circle-stroke-color': ['case', ['boolean', ['get', 'end'], false], '#ffffff', '#e87944'], 'circle-pitch-alignment': 'viewport' } },
+      // The app's route points: paper with an orange ring; selected, all orange and larger.
+      { id: 'waypoints', type: 'circle', source: 'waypoints', paint: { 'circle-radius': ['case', ['boolean', ['get', 'selected'], false], 7.5, 4.5], 'circle-color': ['case', ['boolean', ['get', 'selected'], false], 'rgb(216,117,73)', 'rgb(250,250,245)'], 'circle-stroke-width': ['case', ['boolean', ['get', 'selected'], false], 1, 1.5], 'circle-stroke-color': 'rgb(216,117,73)', 'circle-pitch-alignment': 'viewport' } },
+      // A and B: the ends of a section measured on the elevation profile.
+      { id: 'range', type: 'circle', source: 'range', paint: { 'circle-radius': 11, 'circle-color': ['get', 'color'], 'circle-stroke-width': 2, 'circle-stroke-color': '#ffffff', 'circle-pitch-alignment': 'viewport' } },
+      { id: 'range-label', type: 'symbol', source: 'range', layout: { 'text-field': ['get', 'label'], 'text-font': ['Open Sans Bold'], 'text-size': 12, 'text-allow-overlap': true, 'text-ignore-placement': true, 'text-pitch-alignment': 'viewport' }, paint: { 'text-color': '#ffffff' } },
       { id: 'you-accuracy', type: 'circle', source: 'you', paint: { 'circle-radius': ['interpolate', ['exponential', 2], ['zoom'], 8, ['/', ['get', 'accuracy'], 600], 18, ['/', ['get', 'accuracy'], 0.6]], 'circle-color': 'rgba(47,127,216,.14)', 'circle-stroke-color': 'rgba(47,127,216,.35)', 'circle-stroke-width': 1, 'circle-pitch-alignment': 'map' } },
       { id: 'you', type: 'circle', source: 'you', paint: { 'circle-radius': 7, 'circle-color': '#2f7fd8', 'circle-stroke-width': 2.5, 'circle-stroke-color': '#ffffff', 'circle-pitch-alignment': 'viewport' } },
-      { id: 'marker', type: 'circle', source: 'marker', paint: { 'circle-radius': 7, 'circle-color': '#2f7fd8', 'circle-stroke-width': 2.5, 'circle-stroke-color': '#ffffff', 'circle-pitch-alignment': 'viewport' } },
+      { id: 'marker', type: 'circle', source: 'marker', paint: { 'circle-radius': 6, 'circle-color': 'rgb(186,99,53)', 'circle-stroke-width': 2.5, 'circle-stroke-color': '#ffffff', 'circle-pitch-alignment': 'viewport' } },
     ],
   };
 }

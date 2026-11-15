@@ -127,8 +127,12 @@ const fileIndex = new Map();
 const fileOf = (sha) => { if (!fileIndex.has(sha)) { fileIndex.set(sha, overview.files.length); overview.files.push(sha); } return fileIndex.get(sha); };
 const catalog = JSON.parse(readFileSync(join(repo, 'capacitor/overview-catalog.json'), 'utf8'));
 const north = JSON.parse(readFileSync(join(repo, 'native-wgpu/assets/overviews/north-island.json'), 'utf8'));
-const natural = (e) => e.natural || e;
-for (const [k, e] of Object.entries({ ...catalog.tiles, ...north.tiles })) { const r = natural(e); overview.tiles[k] = [fileOf(r.file), r.offset, r.bytes]; }
+// Both colourings, as the app: "natural" (the default) and LINZ's own ("raw").
+const variant = (e, v) => e[v] || e;
+for (const [k, e] of Object.entries({ ...catalog.tiles, ...north.tiles })) {
+  const n = variant(e, 'natural'), r = variant(e, 'raw');
+  overview.tiles[k] = [fileOf(n.file), n.offset, fileOf(r.file), r.offset];
+}
 const southText = readFileSync(join(repo, 'public/south-overviews.js'), 'utf8');
 const ctx = {}; vm.runInNewContext(southText, ctx);
 const south = ctx.RidgeSouthOverviews;
@@ -136,25 +140,39 @@ mkdirSync(join(out, 'imagery'), { recursive: true });
 const coarseFile = (from, name) => { const to = join(out, 'imagery', name); if (!existsSync(to)) cpSync(from, to); return `/imagery/${name}`; };
 for (const [k, e] of Object.entries(south.tiles)) {
   if (+k.split('/')[0] > 8 || north.coarse[k]) continue;
-  const url = natural(e).url?.replace(/^\//, '');
-  if (url) overview.coarse[k] = coarseFile(join(repo, 'public', url), url.split('/').pop());
+  const urls = ['natural', 'raw'].map((v) => variant(e, v).url?.replace(/^\//, ''));
+  if (urls.every(Boolean)) overview.coarse[k] = urls.map((url) => coarseFile(join(repo, 'public', url), url.split('/').pop()));
 }
 for (const [k, e] of Object.entries(north.coarse)) {
-  const name = e.natural.replace(/^assets\/nz-overviews-v1\//, '');
-  overview.coarse[k] = coarseFile(join(repo, 'native-wgpu/assets/overviews/nz-overviews-v1', name), name);
+  overview.coarse[k] = ['natural', 'raw'].map((v) => { const name = e[v].replace(/^assets\/nz-overviews-v1\//, ''); return coarseFile(join(repo, 'native-wgpu/assets/overviews/nz-overviews-v1', name), name); });
 }
-// Compact index: per zoom, rows of [x step, y, file, offset], sorted by x then y.
+// Compact index: per zoom, rows of [x step, y, natural file, offset, raw file, offset], sorted by x then y.
 const zooms = {};
-for (const [k, [f, offset]] of Object.entries(overview.tiles).map(([k, v]) => [k.split('/').map(Number), v]).sort((a, b) => a[0][0] - b[0][0] || a[0][1] - b[0][1] || a[0][2] - b[0][2])) {
+for (const [k, v] of Object.entries(overview.tiles).map(([k, v]) => [k.split('/').map(Number), v]).sort((a, b) => a[0][0] - b[0][0] || a[0][1] - b[0][1] || a[0][2] - b[0][2])) {
   const [z, x, y] = k;
   const rows = (zooms[z] ||= { x: 0, rows: [] });
-  rows.rows.push(x - rows.x, y, f, offset);
+  rows.rows.push(x - rows.x, y, ...v);
   rows.x = x;
 }
 writeFileSync(join(data, 'overview.json'), JSON.stringify({ files: overview.files, zooms: Object.fromEntries(Object.entries(zooms).map(([z, v]) => [z, v.rows])), coarse: overview.coarse }));
 
+// Where LINZ's photography has gaps (the app's gap atlas, from LINZ's capture
+// areas): Esri World Imagery is drawn inside these outlines, LINZ outside.
+const gapContext = {}; vm.runInNewContext(readFileSync(join(repo, 'public/gap-imagery-atlas.js'), 'utf8'), gapContext);
+const atlas = gapContext.RidgeGapAtlas;
+const round = (rings) => (rings || []).map((ring) => ring.map(([x, y]) => [Math.round(x * 10) / 10, Math.round(y * 10) / 10]));
+const gaps = { z: atlas.z, entries: {}, coarse: {} };
+for (const [k, e] of Object.entries(atlas.entries)) gaps.entries[k] = [round(e.outer), round(e.seamRings), e.vector ? 1 : 0, round(e.inner)];
+mkdirSync(join(out, 'imagery/gap'), { recursive: true });
+for (const [k, e] of Object.entries(atlas.coarse || {})) {
+  const from = join(repo, 'public', e.url.replace(/^\//, '')), name = e.url.split('/').pop();
+  cpSync(from, join(out, 'imagery/gap', name));
+  gaps.coarse[k] = [`/imagery/gap/${name}`, e.full ? 1 : 0];
+}
+writeFileSync(join(data, 'gaps.json'), JSON.stringify(gaps));
+
 // ---- Hosting: headers, sitemap, robots ----
-const connect = ["'self'", 'https://basemaps.linz.govt.nz', 'https://services1.arcgis.com'];
+const connect = ["'self'", 'https://basemaps.linz.govt.nz', 'https://services1.arcgis.com', 'https://services.arcgisonline.com'];
 if (overviewUrl) connect.push(new URL(overviewUrl).origin);
 const csp = [
   "default-src 'self'",
@@ -189,7 +207,7 @@ writeFileSync(join(out, '_headers'), `/*
 /data/*
   Cache-Control: public, max-age=86400
 `);
-writeFileSync(join(out, '_redirects'), '/app /map/ 301\n/planner /map/ 301\n');
+writeFileSync(join(out, '_redirects'), '/map / 301\n/map/ / 301\n/planner / 301\n/app /about/#app 301\n');
 const urls = pages.filter((p) => !p.startsWith('404')).map((p) => SITE.domain + '/' + p.replace(/index\.html$/, ''));
 writeFileSync(join(out, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `  <url><loc>${u}</loc></url>`).join('\n')}\n</urlset>\n`);
 // NOINDEX=1: a test copy (pages.dev) that search engines leave alone.

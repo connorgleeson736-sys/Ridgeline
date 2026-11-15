@@ -1,8 +1,8 @@
 # Bushline Maps website
 
-The site for bushlinemaps.co.nz: the home page, support, privacy and credits
-pages, and the web map (`/map/`), a browser version of the Android app's map
-without the offline features. It is a static site, built for Cloudflare Pages.
+The site for bushlinemaps.co.nz: the web map at `/` (a browser version of the
+Android app's map without the offline features), and the about, support,
+privacy and credits pages. Old `/map/` links redirect to `/`. It is a static site, built for Cloudflare Pages.
 
 ## Build and test
 
@@ -37,6 +37,9 @@ overview index and compiled walks from `native-wgpu/`, `capacitor/` and
   rules for every walk, from the walks' DOC pages (browsers cannot read those
   pages). Refresh now and then with `node tools/walk-facts.mjs` (it only fetches
   walks it does not have; delete the file to refetch all of them).
+- `data/gaps.json` (built from the app's gap atlas) marks where LINZ has no
+  photography; Esri World Imagery is drawn there, as in the app. Esri's terms
+  for commercial use need checking before launch.
 - Overview imagery (zooms 5 to 12) comes from the same public bucket as the
   app, which allows cross-origin GET requests. For heavy traffic, serve it from
   a custom domain on that bucket rather than `r2.dev`, and set `OVERVIEW_URL`.

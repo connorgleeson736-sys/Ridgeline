@@ -1,133 +1,61 @@
 <!doctype html>
 <html lang="en-NZ">
 <head>
-{{> head}}
-<title>Bushline Maps – 3D topo maps for New Zealand trampers and hunters</title>
-<meta name="description" content="Plan tramping and hunting trips across Aotearoa New Zealand in real 3D: LINZ aerial imagery and topo maps, every DOC walk and hut, routes that follow the tracks, and hunting permit areas.">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+<meta name="theme-color" content="#233d34">
+<title>Map – Bushline Maps</title>
+<meta name="description" content="The Bushline Maps 3D topo map of New Zealand: LINZ aerial imagery and NZ Topo over real terrain, every DOC walk and hut, hunting areas, and a route planner that follows the tracks.">
 <link rel="canonical" href="{{site.domain}}/">
-<meta property="og:title" content="Bushline Maps – 3D topo maps for New Zealand">
-<meta property="og:description" content="Real 3D terrain, every DOC walk and hut, and routes that follow the tracks. Plan on the web, take it offline in the app.">
+<link rel="icon" href="/img/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/img/favicon-48.png" sizes="48x48" type="image/png">
+<link rel="apple-touch-icon" href="/img/kea-180.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:site_name" content="Bushline Maps">
+<meta property="og:title" content="Bushline Maps – the 3D topo map of New Zealand">
+<meta property="og:description" content="Real 3D terrain, every DOC walk and hut, and routes that follow the tracks.">
+<meta property="og:image" content="{{site.domain}}/img/og.jpg">
 <meta property="og:url" content="{{site.domain}}/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Bushline Maps","url":"{{site.domain}}/","applicationCategory":"TravelApplication","operatingSystem":"Web, Android","description":"3D topo maps and route planning for New Zealand trampers and hunters.","offers":{"@type":"Offer","price":"0","priceCurrency":"NZD"}}</script>
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://basemaps.linz.govt.nz" crossorigin>
+<link rel="preconnect" href="https://services1.arcgis.com" crossorigin>
+<link rel="preconnect" href="{{overviewOrigin}}" crossorigin>
+<link rel="modulepreload" href="{{maplibre}}/maplibre-gl.mjs">
+<link rel="modulepreload" href="/js/map/main.js">
+<link rel="preload" href="/data/topography-style.json" as="fetch" crossorigin>
+<link rel="preload" href="/data/overview.json" as="fetch" crossorigin>
+<link rel="stylesheet" href="{{maplibre}}/maplibre-gl.css">
+<link rel="stylesheet" href="/css/map.css">
 </head>
-<body>
-<a class="skip" href="#main">Skip to content</a>
-{{> header}}
-<main id="main">
-  <section class="hero">
-    <picture><source srcset="/img/hero.webp" type="image/webp"><img src="/img/hero.jpg" alt="Aoraki/Mount Cook, the Hooker and Tasman valleys in 3D, with tracks and huts" width="1920" height="1080" fetchpriority="high" decoding="async"></picture>
-    <div class="wrap">
-      <span class="eyebrow">Aotearoa New Zealand in 3D</span>
-      <h1>See the ridge before you climb it.</h1>
-      <p class="lead">3D topo maps for trampers and hunters: LINZ aerial imagery and topo maps over real terrain, every DOC walk and hut, and routes that follow the tracks.</p>
-      <div class="actions">
-        <a class="button" href="/map/">Open the map – it's free</a>
-        <a class="button light" href="#app">Get the Android app</a>
-      </div>
-    </div>
-  </section>
+<body class="map-page">
+<h1 class="visually-hidden">Bushline Maps – 3D topo map of New Zealand</h1>
+<div id="map" aria-label="Map of New Zealand"></div>
+<p id="map-status" class="map-status" role="status"><span class="spinner"></span>Bringing the mountains into view…</p>
+<div class="progress" aria-hidden="true"></div>
 
-  <section id="features">
-    <div class="wrap">
-      <div class="section-head">
-        <h2>Everything you need to plan the trip</h2>
-        <p>Built for New Zealand's backcountry, on official LINZ and DOC data.</p>
-      </div>
-      <div class="grid">
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><path d="m2 20 7-13 4 7 3-5 6 11Z"/><path d="m7 11 2 1 2-2"/></svg></div><h3>Real 3D terrain</h3><p>Tilt and turn the land itself. LINZ's elevation model under aerial photography or the NZ Topo50 map, sharp from the whole country down to a single spur.</p></div>
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><path d="M3 20h18"/><path d="M5 20V11l7-6 7 6v9"/><path d="M10 20v-5h4v5"/></svg></div><h3>Every DOC walk and hut</h3><p>Tap a track or a hut for DOC's description, distance, climb, an elevation profile and the huts along the way, with a link to DOC's own page.</p></div>
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="18" r="2"/><path d="M7 6h8a4 4 0 0 1 0 8H9a4 4 0 0 0 0 8h8"/></svg></div><h3>Routes that follow the tracks</h3><p>Tap a start and an end: the route follows tracks and roads between them, fords a river where that is the sensible way, and locks onto huts.</p></div>
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M4 12 12 4M4 20 20 4M12 20l8-8"/></svg></div><h3>Hunting permit areas</h3><p>DOC's recreational hunting permit areas shaded on the map, named, with the permit details one tap away.</p></div>
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><path d="M3 17 8 9l4 5 3-4 6 7"/><path d="M3 21h18"/></svg></div><h3>Elevation profiles</h3><p>Distance, ascent, descent and the high point for any route or walk. Drag across the profile to measure a section.</p></div>
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg></div><h3>Offline in the app</h3><p>The Android app keeps whole regions on your phone – imagery, terrain, topo and tracks – for where there's no reception.</p></div>
-      </div>
-    </div>
-  </section>
+<!-- The app's map chrome: kea (routes and search) and locate on the left;
+     2D | 3D, compass and layers on the right; scale and credits at the bottom. -->
+<button id="launcher" class="launcher" type="button" aria-label="Search and saved routes" aria-controls="drawer" aria-expanded="false" title="Bushline Maps – search and routes"><img src="/img/kea-96.png" alt="" width="44" height="44"></button>
+<button id="locate" class="tile locate" type="button" aria-label="Show my location"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><circle cx="12" cy="12" r="7"/><path d="M12 5V1M12 23v-4M5 12H1M23 12h-4"/><circle cx="12" cy="12" r="3" class="fill"/></svg></button>
+<div id="perspective" class="perspective" role="group" aria-label="Map perspective"><button type="button" data-view="2d" aria-label="Show the map in 2D">2D</button><button type="button" data-view="3d" aria-label="Show the map in 3D">3D</button></div>
+<button id="compass" class="tile compass" type="button" aria-label="Reset bearing to north"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M12 2.5 8.6 12h6.8Z" class="n"/><path d="M12 21.5 15.4 12H8.6Z" class="s"/></svg></button>
+<button id="layers-button" class="tile layers" type="button" aria-label="Map layers" aria-expanded="false" aria-controls="layers-panel"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 12.5 9 5 9-5M3 17l9 5 9-5"/></svg></button>
+<div id="notes" class="notes" aria-live="polite"><div id="drawing-note" class="toast" hidden></div><div id="toast" class="toast" role="status" hidden></div></div>
 
-  <section class="alt">
-    <div class="wrap">
-      <div class="split">
-        <div class="shot"><picture><source srcset="/img/shot-walk.webp" type="image/webp"><img src="/img/shot-walk.jpg" alt="The Routeburn Track summary: DOC’s details, distance, climb and elevation profile, with the track in 3D" width="1280" height="800" loading="lazy" decoding="async"></picture></div>
-        <div>
-          <h2>Know the walk before you go</h2>
-          <p class="muted">Every DOC walk in one place, drawn the way DOC describes it – from the car park, round the loop, with side trips left out.</p>
-          <ul class="ticks">
-            <li>Distance, time, ascent and descent</li>
-            <li>An elevation profile you can measure sections on</li>
-            <li>Every hut along the way, with bunks and booking</li>
-            <li>DOC's introduction and a link to current alerts</li>
-          </ul>
-        </div>
-      </div>
-      <div class="split flip">
-        <div class="shot"><picture><source srcset="/img/shot-route.webp" type="image/webp"><img src="/img/shot-route.jpg" alt="A route along the Routeburn Track in 3D with its elevation profile" width="1280" height="800" loading="lazy" decoding="async"></picture></div>
-        <div>
-          <h2>Plan your own line</h2>
-          <p class="muted">Tap where you want to go. Near a track, the route follows it; anywhere else, it draws straight – off-track routes and tops travel included.</p>
-          <ul class="ticks">
-            <li>Follows tracks and roads, fords rivers within reason</li>
-            <li>Drag a point and it slides along the track</li>
-            <li>Locks onto huts with a tap</li>
-            <li>Share a link to your route</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
+<div id="drawer-cover" class="drawer-cover" hidden>
+  <aside id="drawer" class="drawer" aria-label="Search and saved routes">
+    <form id="search" class="search" role="search" autocomplete="off">
+      <div class="field"><input type="search" placeholder="Search places, huts, tracks" aria-label="Search places, huts and tracks" role="combobox" aria-autocomplete="list" aria-expanded="false" enterkeyhint="search" spellcheck="false"><button class="search-clear" type="button" aria-label="Clear search" hidden>✕</button></div>
+      <button id="drawer-close" class="close" type="button" aria-label="Close saved routes">✕</button>
+    </form>
+    <div id="drawer-body" class="drawer-body"></div>
+    <a class="btn primary block drawer-offline" href="/about/#app">Offline regions · get the app</a>
+  </aside>
+</div>
 
-  <section>
-    <div class="wrap">
-      <div class="section-head">
-        <h2>Plan at home. Take it with you.</h2>
-        <p>The map is free on the web. The app is for the hill.</p>
-      </div>
-      <div class="steps">
-        <div class="card"><h3>Plan on the web</h3><p>Explore in 3D on a big screen, read up on the walks and huts, and plan your route along the tracks.</p></div>
-        <div class="card"><h3>Send it to your phone</h3><p>Open your route's share link on your phone and it's in the app, ready to save.</p></div>
-        <div class="card"><h3>Take it offline</h3><p>Download the area – aerial, terrain, topo and tracks – and follow your position with no reception.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <section id="app" class="app-section">
-    <div class="wrap">
-      <div class="app-band">
-        <div>
-          <span class="eyebrow">Android app</span>
-          <h2>Bushline Maps for Android</h2>
-          <p>The same 3D map in your pocket, with offline regions, your position on the hill, printable PDF maps and GPX. Now in testing – join the beta and help shape it.</p>
-          <div class="actions" data-app-actions>
-            <a class="button" href="{{site.betaUrl}}" data-beta>Join the Android beta</a>
-            <a class="button light" href="{{site.playUrl}}" data-play>Get it on Google Play</a>
-          </div>
-          <p class="fine" style="color:rgb(255 255 255 / 60%)">iPhone: use the map on the web for now – an iPhone app is planned.</p>
-        </div>
-        <div class="pro">
-          <h3>In the app</h3>
-          <ul>
-            <li>Offline regions: imagery, terrain, topo and tracks</li>
-            <li>Your GPS position and compass, no reception needed</li>
-            <li>Your routes on your phone, GPX import and export</li>
-            <li>Printable PDF maps with grid</li>
-            <li>Hunting areas offline</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="alt" id="faq">
-    <div class="narrow">
-      <h2>Questions</h2>
-      <details><summary>Is the map really free?</summary><p>Yes. The map, walks, huts, hunting areas and route planning are free on the web, with no account. The Android app adds offline maps and navigation for use on the hill.</p></details>
-      <details><summary>Where does the data come from?</summary><p>Aerial imagery, topographic maps and elevation from Toitū Te Whenua Land Information New Zealand (LINZ). Walks, tracks, huts and hunting permit areas from the Department of Conservation (DOC). Both under Creative Commons Attribution 4.0. See <a href="/credits/">data credits</a>.</p></details>
-      <details><summary>Is it an official DOC app?</summary><p>No. Bushline Maps is independent. It uses DOC's open data and links to DOC's own pages – always check DOC's alerts and track conditions before you go.</p></details>
-      <details><summary>Can I rely on it for navigation?</summary><p>Use it alongside, not instead of, a paper map, compass and personal locator beacon. Maps can be out of date, phones run flat, and conditions change. Tell someone your plans.</p></details>
-      <details><summary>Do you track me?</summary><p>No. The website has no accounts, no cookies and no analytics; your routes stay in your browser. See the <a href="/privacy/">privacy policy</a>.</p></details>
-    </div>
-  </section>
-</main>
-{{> footer}}
-<script type="module" src="/js/site.js"></script>
+<section id="layers-panel" class="layers-panel" hidden aria-label="Map layers"></section>
+<aside id="sheet" class="sheet" hidden></aside>
+<noscript><p class="map-status">The map needs JavaScript. Everything else on this site works without it.</p></noscript>
+<script type="module" src="/js/map/main.js"></script>
 </body>
 </html>

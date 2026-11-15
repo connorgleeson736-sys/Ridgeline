@@ -17,27 +17,36 @@ const DOC_NOTE = 'Track information from the Department of Conservation. Check D
 const bunks = (b) => { const n = /^\d+/.exec(b || '')?.[0]; return n ? `${n} bunks` : ''; };
 const statBox = (label, value) => el('div', { class: 'stat' }, el('span', {}, label), el('b', {}, value));
 
-/** Stats, elevation chart and section measuring for a line, filled in as heights arrive. */
+/** Stats and the app's elevation chart for a line, filled in as heights arrive.
+ * Inspecting marks the point on the map; a section shows A and B there and
+ * dims the rest of the line. node.chart.setMarkers([[distance, name]]) adds huts. */
 export function profileBlock(ctx, line, alive, { onReady } = {}) {
   const grid = el('div', { class: 'stats' }, statBox('Distance', distance(length(line))), statBox('Ascent', '…'), statBox('Descent', '…'), statBox('Highest', '…'));
-  const canvas = el('canvas', { class: 'chart', role: 'img', 'aria-label': 'Elevation profile' });
-  const section = el('div', { class: 'section-stats', hidden: true });
-  const chart = new Chart(canvas, {
-    onPoint: (s) => ctx.marker(s?.p || null),
-    onSection: (st, pts) => {
-      ctx.section(pts && pts.length > 1 ? pts : null);
-      section.hidden = !st;
-      if (st) section.replaceChildren(el('span', { class: 'ab' }, 'A → B'), statBox('Distance', distance(st.distance)), statBox('Ascent', height(st.ascent)), statBox('Descent', height(st.descent)), el('button', { class: 'link-button', type: 'button', onclick: () => chart.clearSection() }, 'Clear'));
-    },
-  });
+  const canvas = el('canvas', { class: 'chart' });
+  const chart = new Chart(canvas, chartEvents(ctx, () => chart));
   worker.call({ type: 'profile', points: line, max: 700 }).then((samples) => {
     if (!alive() || !samples) return;
-    chart.set(samples);
+    chart.set(samples, chart.markers);
     const s = stats(samples);
     grid.replaceChildren(statBox('Distance', distance(length(line))), statBox('Ascent', height(s.ascent)), statBox('Descent', height(s.descent)), statBox('Highest', height(s.high)));
     onReady?.(samples, s);
-  }).catch(() => { if (alive()) chart.set([{ d: 0, h: null }]); });
-  return el('div', { class: 'profile' }, grid, el('div', { class: 'chart-wrap' }, canvas), section, el('p', { class: 'hint' }, 'Drag across the profile to measure a section.'));
+  }).catch(() => { if (alive()) chart.set([{ d: 0, h: null, p: line[0] }]); });
+  const node = el('div', { class: 'profile' }, grid, el('div', { class: 'chart-wrap' }, canvas));
+  node.chart = chart;
+  return node;
+}
+/** The chart's map side (the app's PlannerUi range badges and track highlight). */
+export function chartEvents(ctx, chart) {
+  return {
+    onInspect: (s) => ctx.marker(s?.p || null),
+    onRange: (sec, a, b, r) => {
+      if (!sec || !a || !b) { ctx.range(null); return; }
+      ctx.marker(null);
+      const [lo, hi] = [Math.min(...r), Math.max(...r)];
+      const part = [a, ...chart().samples.filter((s) => s.d > lo && s.d < hi), b].sort((x, y) => x.d - y.d).map((s) => s.p);
+      ctx.range({ a: a.p, b: b.p, part });
+    },
+  };
 }
 
 function photo(src, alt) {
@@ -66,18 +75,19 @@ export function openWalk(ctx, guid, { push = false, near = null } = {}) {
         const name = info?.name || ctx.overlays.infos()[guid]?.name || 'Track';
         ctx.sheet.setTitle(name, [info?.difficulty, fact[1] || info?.time].filter(Boolean).join(' · ') || 'DOC walk');
         if (line.length >= 2) { ctx.select([line]); ctx.fit(line); }
-        const img = photo(info?.thumbnail, name);
-        if (img) body.append(img);
+        ctx.sheet.setPhoto(info?.thumbnail, name);
         body.append(chips(fact[0] && `DOC: ${fact[0]}`, (fact[1] || info?.time) && `Time: ${fact[1] || info.time}`, fact[2] === 'loop' ? 'Loop' : fact[2] === 'one_way' ? 'One way' : null, fact[3] && fact[3].split('.')[0]));
         if (info?.alerts && /yes|true|1/i.test(info.alerts)) body.append(el('p', { class: 'alert' }, 'DOC has alerts for this track. ', docLink(info.page, 'Read them on DOC ↗')));
         if (line.length >= 2) {
-          body.append(profileBlock(ctx, line, alive));
+          const profile = profileBlock(ctx, line, alive);
+          body.append(profile);
           const hutsBox = el('div', { class: 'huts' });
           body.append(hutsBox);
           doc.hutsIn(bounds(line, 500), controller.signal).then((huts) => {
             if (!alive()) return;
             const along = stops(line, huts);
             if (!along.length) return;
+            profile.chart.setMarkers(along.map((s) => [s.along, s.hut.name]));
             hutsBox.append(el('h3', {}, 'Huts along the way'), el('ul', { class: 'hut-list' }, along.map((s) => el('li', {}, el('button', { type: 'button', onclick: () => openHut(ctx, s.hut.name, s.hut.point, { push: true }) }, el('span', { class: 'hut-dot' }), el('span', { class: 'hut-name' }, s.hut.name, el('small', {}, [s.hut.category, bunks(s.hut.bunks)].filter(Boolean).join(' · '))), el('span', { class: 'hut-km' }, distance(s.along)))))));
           }).catch(() => {});
         } else body.append(failed('DOC has no line for this walk.'));
@@ -88,7 +98,7 @@ export function openWalk(ctx, guid, { push = false, near = null } = {}) {
         if (link) actions.append(link);
         body.append(actions, el('p', { class: 'fine' }, DOC_NOTE));
       })().catch((e) => { if (alive() && e.name !== 'AbortError') body.replaceChildren(failed('DOC’s track information could not be loaded. Check your connection and try again.')); });
-      return () => { controller.abort(); ctx.select(null); ctx.marker(null); ctx.section(null); };
+      return () => { controller.abort(); ctx.select(null); ctx.marker(null); ctx.range(null); };
     },
   }, { push });
 }
@@ -112,7 +122,7 @@ export function openTrack(ctx, name, tapped, pieces, { push = false } = {}) {
         extra.append(el('p', { class: 'fine' }, DOC_NOTE));
       }).catch(() => {});
       body.append(el('div', { class: 'sheet-actions' }, line.length >= 2 ? el('button', { class: 'btn', type: 'button', onclick: () => ctx.planner.fromLine(name || 'Track', line) }, 'Save as route') : null));
-      return () => { controller.abort(); ctx.select(null); ctx.marker(null); ctx.section(null); };
+      return () => { controller.abort(); ctx.select(null); ctx.marker(null); ctx.range(null); };
     },
   }, { push });
 }
@@ -131,8 +141,7 @@ export function openHut(ctx, name, point, { push = false } = {}) {
         body.replaceChildren();
         const title = page?.name || asset?.name || name || 'Hut';
         ctx.sheet.setTitle(title, [asset?.category && `${asset.category} hut`, page?.place].filter(Boolean).join(' · ') || 'Hut');
-        const img = photo(page?.thumbnail, title);
-        if (img) body.append(img);
+        ctx.sheet.setPhoto(page?.thumbnail, title);
         if (asset?.status && !/^open$/i.test(asset.status)) body.append(el('p', { class: 'alert' }, `DOC lists this hut as ${asset.status.toLowerCase()}.`));
         body.append(el('div', { class: 'stats' }, statBox('Bunks', /^\d+/.exec(asset?.bunks || '')?.[0] || '–'), statBox('Bookings', page ? (page.bookable ? 'Required' : 'Not needed') : '–'), statBox('Category', asset?.category || '–')));
         if (asset?.roadEnd) body.append(el('p', {}, el('b', {}, 'From the road end: '), asset.roadEnd));
