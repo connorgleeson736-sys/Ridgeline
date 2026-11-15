@@ -2,9 +2,10 @@ package nz.ridgeline.nativeapp
 
 import kotlin.math.*
 
-/** A drawn route's "from here to there" along the map's tracks: a tap close
- * to a track is reached from the route's last point by the shortest way over
- * the tracks (WalkOptions.Network), ending on the track. Pure Kotlin, unit tested. */
+/** A drawn route's "from here to there" along the map's tracks and walkable
+ * roads: a tap close to one is reached from the route's last point by the
+ * shortest way (WalkOptions.Network), ending on it, fording a river or stream
+ * where that is within reason. Pure Kotlin, unit tested. */
 internal object TrackFollow {
     /** The route's last point (a hut, say) joins a track this close. */
     const val START_REACH_METERS=200.0
@@ -14,36 +15,95 @@ internal object TrackFollow {
     /** Points kept where the line bends by more than this (metres off the line). */
     const val TOLERANCE_METERS=2.0
 
-    /** From [from] (the route's last point) along [tracks] (name, line) to the
-     * point on a track nearest [to]: point to point along the track, ending on
-     * it (not branching off to [to] itself). [from] joins the track straight
-     * where it is off it. Null when [to] is not within [reach] metres of a
-     * track, [from] not within [START_REACH_METERS], or the tracks do not join. */
-    fun route(from:Coordinate,to:Coordinate,tracks:List<Pair<String,List<Coordinate>>>,reach:Double):List<Coordinate>?{
+    /** A metre of road counts this much against a metre of track: tracks are
+     * preferred, roads used where they are the way (or much shorter). */
+    const val ROAD_COST=1.25
+    /** A ford: a straight crossing of a mapped river or stream, at most this wide… */
+    const val FORD_MAX_METERS=120.0
+    /** …counted this many times its width plus [FORD_EXTRA_METERS], so a bridge or
+     * track round is taken unless the ford saves a real detour. */
+    const val FORD_FACTOR=3.0
+    const val FORD_EXTRA_METERS=150.0
+
+    /** From [from] (the route's last point) along [tracks] and walkable [roads]
+     * (name, line) to the point on a track or road nearest [to]: point to point,
+     * ending on it (not branching off to [to] itself). [from] joins straight
+     * where it is off them. Where [water] (rivers and streams) separates the way,
+     * one ford within reason ([FORD_MAX_METERS]) may cross it. Null when [to] is
+     * not within [reach] metres of a track or road, [from] not within
+     * [START_REACH_METERS], or nothing joins them. */
+    fun route(from:Coordinate,to:Coordinate,tracks:List<Pair<String,List<Coordinate>>>,reach:Double,
+              roads:List<Pair<String,List<Coordinate>>> = emptyList(),water:List<List<Coordinate>> = emptyList()):List<Coordinate>?{
         // Split only near the two taps (where a tap joins the track): a long leg's
         // area holds hundreds of kilometres of track.
         val near={c:Coordinate->DocTracks.meters(c,from)<=SPLIT_NEAR_METERS||DocTracks.meters(c,to)<=SPLIT_NEAR_METERS}
-        val usable=tracks.filter{it.second.size>=2}.map{(n,l)->n to split(l,near)}
-        if(usable.isEmpty())return null
-        val net=WalkOptions.Network(usable)
+        val lines=ArrayList<Pair<String,List<Coordinate>>>();val road=ArrayList<Boolean>()
+        for(t in tracks)if(t.second.size>=2){lines.add(t.first to split(t.second,near));road.add(false)}
+        for(t in roads)if(t.second.size>=2){lines.add(t.first to split(t.second,near));road.add(true)}
+        if(lines.isEmpty())return null
+        val net=WalkOptions.Network(lines,cost={i->if(road[i])ROAD_COST else 1.0})
         val b=net.nearest(to,reach+SPLIT_METERS)?:return null
         val end=onTrack(net,b,to);if(DocTracks.meters(end.first,to)>reach)return null
         val a=net.nearest(from,START_REACH_METERS+SPLIT_METERS)?:return null
         val start=onTrack(net,a,from);if(DocTracks.meters(start.first,from)>START_REACH_METERS)return null
         val (dist,prev)=net.from(a)
-        if(dist[b]==Double.MAX_VALUE)return null
-        val nodes=net.path(prev,b)
-        val line=ArrayList<Coordinate>(nodes.size+3);line.add(from)
+        var nodes:List<Int>?=if(dist[b]<Double.MAX_VALUE)net.path(prev,b)else null
+        if(water.isNotEmpty()){
+            val (back,prevB)=net.from(b)
+            ford(net,dist,back,water,if(nodes!=null)dist[b]else Double.MAX_VALUE)?.let{(u,v)->
+                nodes=net.path(prev,u)+net.path(prevB,v).reversed()}
+        }
+        val path=nodes?:return null
+        val line=ArrayList<Coordinate>(path.size+3);line.add(from)
+        // Both on the same piece of track: straight along it.
+        if(path.size==1&&start.second>=0&&start.second==end.second){line.add(start.first);line.add(end.first)
+            return simplify(line.filterIndexed{i,p->i==0||DocTracks.meters(p,line[i-1])>.05})}
         // The exact points beside [from] and [to] on the pieces next to the end
         // nodes: replacing the node where the path runs over that piece anyway.
-        // Both on the same piece of track: straight along it.
-        if(nodes.size==1&&start.second>=0&&start.second==end.second){line.add(start.first);line.add(end.first)
-            return simplify(line.filterIndexed{i,p->i==0||DocTracks.meters(p,line[i-1])>.05})}
-        if(nodes.size>=2&&nodes[1]==start.second)line.add(start.first)else{line.add(start.first);line.add(net.points[a])}
-        for(i in 1 until nodes.size-1)line.add(net.points[nodes[i]])
-        if(nodes.size>=2){if(nodes[nodes.size-2]==end.second)line.add(end.first)else{line.add(net.points[b]);line.add(end.first)}}
+        if(path.size>=2&&path[1]==start.second)line.add(start.first)else{line.add(start.first);line.add(net.points[a])}
+        for(i in 1 until path.size-1)line.add(net.points[path[i]])
+        if(path.size>=2){if(path[path.size-2]==end.second)line.add(end.first)else{line.add(net.points[b]);line.add(end.first)}}
         else line.add(end.first)
         return simplify(line.filterIndexed{i,p->i==0||DocTracks.meters(p,line[i-1])>.05})
+    }
+    /** The best ford (u, v): a straight step of at most [FORD_MAX_METERS] that
+     * crosses [water], from a point reached from the start ([fromA]) to one that
+     * reaches the end ([toB]), cheaper (at [FORD_FACTOR] its width plus
+     * [FORD_EXTRA_METERS]) than [limit], the way without one. Null if none. */
+    private fun ford(net:WalkOptions.Network,fromA:DoubleArray,toB:DoubleArray,water:List<List<Coordinate>>,limit:Double):Pair<Int,Int>?{
+        if(net.points.isEmpty())return null
+        val lat0=net.points[0].latitude;val kx=111_320.0*cos(Math.toRadians(lat0));val ky=111_320.0
+        fun x(c:Coordinate)=c.longitude*kx
+        fun y(c:Coordinate)=c.latitude*ky
+        val cell=FORD_MAX_METERS
+        fun key(cx:Long,cy:Long)=(cx shl 32) or (cy and 0xffffffffL)
+        val ends=HashMap<Long,MutableList<Int>>()
+        for(v in net.points.indices)if(toB[v]<Double.MAX_VALUE)ends.getOrPut(key(floor(x(net.points[v])/cell).toLong(),floor(y(net.points[v])/cell).toLong())){ArrayList()}.add(v)
+        // Water segments by cell, for the crossing test.
+        val wcell=60.0;val waterCells=HashMap<Long,MutableList<DoubleArray>>()
+        for(w in water)for(i in 1 until w.size){val ax=x(w[i-1]);val ay=y(w[i-1]);val bx=x(w[i]);val by=y(w[i])
+            for(cx in floor(min(ax,bx)/wcell).toLong()..floor(max(ax,bx)/wcell).toLong())for(cy in floor(min(ay,by)/wcell).toLong()..floor(max(ay,by)/wcell).toLong())
+                waterCells.getOrPut(key(cx,cy)){ArrayList()}.add(doubleArrayOf(ax,ay,bx,by))}
+        if(waterCells.isEmpty())return null
+        fun crosses(px:Double,py:Double,qx:Double,qy:Double):Boolean{
+            for(cx in floor(min(px,qx)/wcell).toLong()..floor(max(px,qx)/wcell).toLong())for(cy in floor(min(py,qy)/wcell).toLong()..floor(max(py,qy)/wcell).toLong())
+                for(s in waterCells[key(cx,cy)]?:continue)if(intersects(px,py,qx,qy,s[0],s[1],s[2],s[3]))return true
+            return false
+        }
+        var best=limit;var pick:Pair<Int,Int>?=null
+        for(u in net.points.indices){val du=fromA[u];if(du==Double.MAX_VALUE||du+FORD_EXTRA_METERS>=best)continue
+            val ux=x(net.points[u]);val uy=y(net.points[u]);val cx=floor(ux/cell).toLong();val cy=floor(uy/cell).toLong()
+            for(dx in -1L..1L)for(dy in -1L..1L)for(v in ends[key(cx+dx,cy+dy)]?:continue){
+                val vx=x(net.points[v]);val vy=y(net.points[v]);val d=hypot(vx-ux,vy-uy);if(d>FORD_MAX_METERS||d<1)continue
+                val c=du+FORD_FACTOR*d+FORD_EXTRA_METERS+toB[v]
+                if(c<best&&crosses(ux,uy,vx,vy)){best=c;pick=u to v}}}
+        return pick
+    }
+    /** Whether segments p-q and a-b cross. */
+    private fun intersects(px:Double,py:Double,qx:Double,qy:Double,ax:Double,ay:Double,bx:Double,by:Double):Boolean{
+        fun side(x1:Double,y1:Double,x2:Double,y2:Double,x3:Double,y3:Double)=(x2-x1)*(y3-y1)-(y2-y1)*(x3-x1)
+        val d1=side(ax,ay,bx,by,px,py);val d2=side(ax,ay,bx,by,qx,qy);val d3=side(px,py,qx,qy,ax,ay);val d4=side(px,py,qx,qy,bx,by)
+        return (d1>0)!=(d2>0)&&(d3>0)!=(d4>0)
     }
     /** The point on the track nearest [p] beside node [v] (on one of its track
      * pieces), and that piece's other node (-1: the node itself). */

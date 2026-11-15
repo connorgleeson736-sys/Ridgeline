@@ -1,0 +1,25 @@
+{
+  "artifact": "Ridgeline-Native-Roads-Fords-0.1.69-Base.apk",
+  "bytes": 36315113,
+  "sha256": "cfa5689f1a144f566b0bbc475266cb36d48be9e18334eceb9e5376607cb783f2",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.69-roads-fords",
+  "versionCode": 70,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.68 Full Audit (same package and signer)",
+  "changes": [
+    "Routes along tracks also walk along roads: the map's primary and secondary roads (not motorways, rail or raceways) join the track network, each metre counted 1.25 times a metre of track, so tracks are preferred where both go. A tap close to a road is followed too.",
+    "Fords within reason: one straight crossing of a mapped river or stream (map river lines and wide-river areas; not lakes), at most 120 m wide, counted 3 times its width plus 150 m, so a bridge or a track round is taken unless the ford saves a real detour. Never a straight jump without a river in between."
+  ],
+  "tests": {
+    "kotlinJvm": "all pass, full suite (new: road between tracks, track preferred to a parallel road, ford vs far bridge, nearby bridge vs ford, no ford without a river or when too wide)",
+    "rust": "unchanged since 0.1.67"
+  },
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}
