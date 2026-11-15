@@ -146,7 +146,6 @@ body.loading .progress { opacity: 1; }
   .sheet .chart-wrap { height: 190px; }
   body.sheet-open .maplibregl-ctrl-bottom-left { left: 460px; }
 }
-}
 .grip { position: relative; height: 28px; flex: none; cursor: grab; touch-action: none; }
 .grip::before { content: ""; position: absolute; left: 50%; top: 12px; width: 32px; height: 4px; margin-left: -16px; border-radius: 3px; background: var(--grip); }
 .grip .close { position: absolute; right: 0; top: 0; width: 46px; height: 28px; border: 0; background: transparent; font-size: 19px; color: var(--ink); cursor: pointer; line-height: 1; }
