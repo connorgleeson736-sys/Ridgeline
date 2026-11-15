@@ -460,8 +460,10 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
                     else mapLine(name.text.toString(),at){paths->if(id==request)lineFound(id,DocTracks.chain(paths,at))}
                 }
             };return@walkRoute}
-            val line=DocTracks.chain(docPaths,at,3000.0)
-            if(line.size>=2)lineFound(id,line)
+            // DOC's pieces as one route (DocRoute): split where they meet, a loop closed
+            // at its car park, side trips left out, from where DOC's line starts.
+            val line=DocRoute.route(docPaths,WalkRoutes.stated(overview?.distance.orEmpty()))
+            if(line.size>=2)lineFound(id,line,pieces=docPaths)
             else mapLine(name.text.toString(),at){paths->if(id==request)lineFound(id,DocTracks.chain(paths,at))}
         }
     }
@@ -599,7 +601,8 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     /** [line] in view: map, profile, stats and huts. [found]: its parts;
      * [oriented]: in DOC's direction already (otherwise it is turned to start
      * at its lower end, where tracks are usually walked from). */
-    private fun lineFound(id:Long,line:List<Coordinate>,found:List<Part> = emptyList(),oriented:Boolean=false){
+    /** [pieces]: all of DOC's line, side trips included, for the huts on them. */
+    private fun lineFound(id:Long,line:List<Coordinate>,found:List<Part> = emptyList(),oriented:Boolean=false,pieces:List<List<Coordinate>> = emptyList()){
         if(line.size<2){chart.visibility=View.GONE;return}
         lineNow=line;onLine(line,null)
         if(keepView){keepView=false;fitNext=false}else if(fitNext){fitNext=false;onFit(line)}else onFit(line)
@@ -612,7 +615,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
                 val first=values.firstOrNull{it.height!=null}?.height;val last=values.lastOrNull{it.height!=null}?.height
                 if(first!=null&&last!=null&&first>last+30){
                     val total=DocTracks.length(line)
-                    lineFound(id,line.reversed(),found.map{p->Part(p.title,p.detail,p.spans.map{(a,b)->total-b to total-a}.reversed(),p.blocks)},true);return@trackProfile}
+                    lineFound(id,line.reversed(),found.map{p->Part(p.title,p.detail,p.spans.map{(a,b)->total-b to total-a}.reversed(),p.blocks)},true,pieces);return@trackProfile}
             }
             chart.data(values);val totals=NativeGeo.totals(values.map{it.height});val measured=values.count{it.height!=null}>=2
             wholeStats=arrayOf(values.lastOrNull()?.let{distance(it.distance)}?:wholeStats[0],if(measured&&totals.complete)metres(totals.ascent)else null,
@@ -620,8 +623,8 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
             if(selected<0)for(i in 0..3)stats[i].value(wholeStats[i])else select(selected,false)
             chart.refreshInspection()
         }
-        val b=DocTracks.bounds(line)?:return
-        fetch(DocTracks.hutsUrl(b),{DocTracks.stops(DocTracks.parseHuts(text(it)),line)}){stops->
+        val b=DocTracks.bounds(line+pieces.flatten())?:return
+        fetch(DocTracks.hutsUrl(b),{DocTracks.stops(DocTracks.parseHuts(text(it)),line,pieces=pieces)}){stops->
             if(id!=request||stops.isNullOrEmpty()||lineNow!==line)return@fetch
             showHuts(stops)
             fetch(DocTracks.hutPagesUrl(b),{pages->DocTracks.joinHutPages(stops.map{it.hut},text(pages));true}){joined->if(id==request&&joined==true&&lineNow===line)showHuts(stops)}

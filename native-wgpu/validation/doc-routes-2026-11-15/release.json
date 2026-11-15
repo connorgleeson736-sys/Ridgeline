@@ -1,0 +1,26 @@
+{
+  "artifact": "Ridgeline-Native-Doc-Routes-0.1.71-Base.apk",
+  "bytes": 36315105,
+  "sha256": "77a8d6998f2c54e1f5040c5d6ec8d9fd4e4d453c8d47c05de322dd140fdefdb9",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.71-doc-routes",
+  "versionCode": 72,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.70 Full Audit (same package and signer)",
+  "changes": [
+    "Walk routes from DOC's line (DocRoute), for every walk: DOC's pieces were joined greedily end to end from where the walk was tapped, so where a piece ends part way along another (Kepler Track: the Luxmore piece ends at Iris Burn Hut, half way along the valley piece, which starts 1 km on at Iris Burn Falls) the route jumped between piece ends and started at a side trip's end. Now the pieces form a network: split where one ends on another, touching ends merged, separate parts joined across their shortest gaps, a loop left open at its car park closed (ends within 1.5 km, far apart along the line). Dead-end branches are side trips. The route is, simplest first, the loop, the loop with an access track in and out, or the longest end-to-end path: the first within 10% of DOC's stated distance (else the nearest); with no stated distance, the loop when it is most of the line. Starts where DOC's line starts, the way DOC's line goes round. A network with several loops keeps DOC's pieces end to end from DOC's start.",
+    "Huts on side trips are listed too (near any of DOC's pieces), at the point their side trip leaves the route.",
+    "Checked on 46 multi-piece DOC walks (validation/doc-routes-2026-11-15/doc-routes-46-walks.txt): closer to DOC's distance on 7 walks, further on 5 (old routes took side trips by jumps), largest straight step never longer; Tongariro Alpine Crossing 0.3 km -> 18.8 km (DOC 20.2), Holdsworth to Kaitoke 14.3 -> 32.2 km (DOC 36), Hump Ridge 44.1 -> 53.8 km (DOC 61.5), Kepler 57.0 km loop from the control gates with Luxmore, Iris Burn and Moturau in order."
+  ],
+  "tests": {
+    "kotlinJvm": "all pass, full suite (new: DocRouteTest on DOC's Kepler data and synthetic shapes)",
+    "rust": "unchanged since 0.1.67"
+  },
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}
