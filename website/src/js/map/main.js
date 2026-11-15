@@ -9,10 +9,10 @@
 // - Data overlays fetched nearest-centre first and drawn once per batch;
 //   routing, elevation and search on worker threads.
 // - Camera saved in an idle callback, not on every move.
-import { Map as MapLibre, setWorkerUrl, addProtocol, getVersion, ScaleControl, AttributionControl } from '/vendor/maplibre-gl-6.16.0/maplibre-gl.mjs';
+import { Map as MapLibre, setWorkerUrl, addProtocol, getVersion, setMaxParallelImageRequests, ScaleControl, AttributionControl } from '/vendor/maplibre-gl-6.16.0/maplibre-gl.mjs';
 import { build, GROUPS, sky, hatch, shown, grade, NZ_BOUNDS } from './style.js';
 import { START as A_COLOUR, END as B_COLOUR } from './chart.js';
-import { install as installOverview, loadOverview } from './overview.js';
+import { install as installOverview, loadOverview, loadGapIndex } from './overview.js';
 import { attach as attachOverlays } from './overlays.js';
 import { attach as attachPlanner } from './planner.js';
 import { attach as attachSearch } from './search.js';
@@ -24,9 +24,15 @@ import { el, icon, store, toast } from './ui.js';
 setWorkerUrl('/vendor/maplibre-gl-6.16.0/maplibre-gl-worker.mjs');
 installOverview({ addProtocol });
 loadOverview();
+loadGapIndex();
+// Imagery, terrain and the app's overview tiles all come over HTTP/2: more requests
+// in flight than MapLibre's default 16 shortens the first full view.
+try { setMaxParallelImageRequests(24); } catch { /* older engines */ }
 
 const $ = (id) => document.getElementById(id);
 const dark = matchMedia('(prefers-color-scheme: dark)');
+/** A finger (touch) or a mouse: tap targets are sized for it. */
+const coarse = matchMedia('(pointer: coarse)').matches;
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const DEFAULTS = { base: 'aerial', natural: true, threeD: true, relief: 1, names: true, peaks: true, roads: true, tracks: true, huts: true, contours: false, hunting: false };
 const settings = { ...DEFAULTS, ...store.get('settings', {}) };
@@ -121,6 +127,8 @@ async function main() {
     map, sheet, select, fit, fitBox,
     marker: (p, fly) => marker(p),
     range,
+    /** A leg of a walk: brighter, the rest dimmed (no A and B). */
+    part: (pts) => { part = pts?.length > 1 ? pts : null; drawSelection(); geo('range', { type: 'FeatureCollection', features: [] }); },
     flyTo: (p, zoom) => { const pad = sheetPadding(); map.flyTo({ center: p, zoom, pitch: settings.threeD ? Math.max(map.getPitch(), 45) : 0, offset: [(pad.left - pad.right) / 2, (pad.top - pad.bottom) / 2], duration: reducedMotion ? 0 : 1600, essential: true }); },
     openWalk: (guid) => openWalk(ctx, guid),
     openHut: (name, p) => openHut(ctx, name, p),
@@ -151,7 +159,7 @@ async function main() {
   function closeDrawer() { cover.hidden = true; launcher.setAttribute('aria-expanded', 'false'); }
   launcher.addEventListener('click', () => (cover.hidden ? openDrawer() : closeDrawer()));
   $('drawer-close').addEventListener('click', closeDrawer);
-  cover.addEventListener('pointerdown', (e) => { if (e.target === cover) closeDrawer(); });
+  // The map stays usable with the drawer open (pan, zoom); a tap on the map closes it.
 
   map.on('styleimagemissing', (e) => { if (e.id === 'hatch' && !map.hasImage('hatch')) { const h = hatch(2); map.addImage('hatch', h.image, { pixelRatio: h.pixelRatio }); } });
 
@@ -196,10 +204,11 @@ async function main() {
 
   // ---- Taps: route points while drawing; else huts, tracks, hunting areas ----
   map.on('click', (e) => {
+    if (!cover.hidden) { closeDrawer(); return; }
     if (planner.drawing) {
       const p = e.point, near = map.queryRenderedFeatures([[p.x - 8, p.y - 8], [p.x + 8, p.y + 8]], { layers: ['waypoints', 'route-line'] });
       if (near.some((f) => f.layer.id === 'waypoints')) return;
-      const onHut = map.queryRenderedFeatures([[p.x - 24, p.y - 24], [p.x + 24, p.y + 24]], { layers: ['nz-huts-dot', 'nz-huts-label'].filter((l) => map.getLayer(l)) }).length > 0;
+      const r = coarse ? 24 : 12, onHut = map.queryRenderedFeatures([[p.x - r, p.y - r], [p.x + r, p.y + r]], { layers: ['nz-huts-dot', 'nz-huts-label'].filter((l) => map.getLayer(l)) }).length > 0;
       if (!onHut && near.some((f) => f.layer.id === 'route-line') && planner.lineTap(e.lngLat)) return;
       planner.tap(e.lngLat);
       return;

@@ -46,6 +46,8 @@ export function distanceKm(lat1, lon1, lat2, lon2) {
 /** DOC page links are stored as their 32-character id. */
 const expandLink = (l) => (/^[0-9a-f]{32}$/.test(l) ? `https://www.doc.govt.nz/link/${l}.aspx` : l);
 
+const GENERIC = new Set(['carpark', 'car', 'park', 'road', 'end', 'roadend', 'shelter', 'picnic', 'area', 'village', 'settlement', 'township', 'track', 'entrance', 'start', 'the']);
+
 export class PlaceSearch {
   constructor(text) {
     this.entries = [];
@@ -63,6 +65,19 @@ export class PlaceSearch {
     }
   }
   get size() { return this.entries.length; }
+  /** The place called `name` nearest `near` ([lon, lat]) within maxKm: exact, else a
+   * longer name starting with it, else without generic words (the app's locate). */
+  locate(name, near, maxKm = 40) {
+    const key = normalize(name);
+    if (!key) return null;
+    const nearest = (match) => {
+      let best = null, bestKm = maxKm;
+      for (const e of this.entries) if (e.full.some(match)) { const km = distanceKm(near[1], near[0], e.place.lat, e.place.lon); if (km <= bestKm) { bestKm = km; best = e.place; } }
+      return best;
+    };
+    const bare = key.split(' ').filter((w) => !GENERIC.has(w)).join(' ');
+    return nearest((n) => n === key) || nearest((n) => n.startsWith(key + ' ')) || (bare && bare !== key ? nearest((n) => n === bare) || nearest((n) => n.startsWith(bare + ' ')) : null);
+  }
   search(query, near = null, limit = 30) {
     const q = words(query);
     if (!q.length) return [];

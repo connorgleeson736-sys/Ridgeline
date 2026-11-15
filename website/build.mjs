@@ -9,6 +9,7 @@ import { createHash } from 'node:crypto';
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import vm from 'node:vm';
+import { gunzipSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -120,6 +121,14 @@ for (const [guid, w] of Object.entries(walks)) {
   m[2] = w.kind || way?.shape || '';
 }
 writeFileSync(join(data, 'walks.json'), JSON.stringify(meta));
+// Each walk's DOC page (tools/walk-pages.mjs): summary and sections, one file per
+// walk, loaded only when its summary is opened.
+const pagesFile = join(here, 'data/walk-pages.json.gz');
+if (existsSync(pagesFile)) {
+  const pages = JSON.parse(gunzipSync(readFileSync(pagesFile)));
+  mkdirSync(join(data, 'walks'), { recursive: true });
+  for (const [guid, page] of Object.entries(pages)) if (/^[0-9a-f-]{36}$/.test(guid)) writeFileSync(join(data, 'walks', `${guid}.json`), JSON.stringify(page));
+}
 // Overview imagery (zooms 0-12, averaged from LINZ's zoom-13 aerial photography):
 // the same tiles as the app, served from the overview host, coarse ones with the site.
 const overview = { files: [], tiles: {}, coarse: {} };
@@ -169,7 +178,9 @@ for (const [k, e] of Object.entries(atlas.coarse || {})) {
   cpSync(from, join(out, 'imagery/gap', name));
   gaps.coarse[k] = [`/imagery/gap/${name}`, e.full ? 1 : 0];
 }
-writeFileSync(join(data, 'gaps.json'), JSON.stringify(gaps));
+writeFileSync(join(data, 'gaps.json'), JSON.stringify(gaps.entries));
+// The small part the first tiles need: which zoom-13 tiles have gaps, and the coarse images.
+writeFileSync(join(data, 'gaps-index.json'), JSON.stringify({ z: gaps.z, keys: Object.keys(gaps.entries), coarse: gaps.coarse }));
 
 // ---- Hosting: headers, sitemap, robots ----
 const connect = ["'self'", 'https://basemaps.linz.govt.nz', 'https://services1.arcgis.com', 'https://services.arcgisonline.com'];

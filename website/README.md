@@ -33,16 +33,18 @@ overview index and compiled walks from `native-wgpu/`, `capacitor/` and
 
 ## Data
 
-- `data/walk-facts.json`: DOC's stated distance, time, difficulty and dog
-  rules for every walk, from the walks' DOC pages (browsers cannot read those
-  pages). Refresh now and then with `node tools/walk-facts.mjs` (it only fetches
-  walks it does not have; delete the file to refetch all of them).
+- `data/walk-pages.json.gz` and `data/walk-facts.json`: every DOC walk's page
+  (summary, introduction, sections and photos) and its stated distance, time,
+  difficulty and dog rules. Browsers cannot read DOC's pages, so they are
+  compiled here; refresh now and then with `node tools/walk-pages.mjs`
+  (`FRESH=1` refetches all). DOC content is CC BY 4.0, credited on the site.
 - `data/gaps.json` (built from the app's gap atlas) marks where LINZ has no
   photography; Esri World Imagery is drawn there, as in the app. Esri's terms
   for commercial use need checking before launch.
-- Overview imagery (zooms 5 to 12) comes from the same public bucket as the
-  app, which allows cross-origin GET requests. For heavy traffic, serve it from
-  a custom domain on that bucket rather than `r2.dev`, and set `OVERVIEW_URL`.
+- Overview imagery (zooms 5 to 12) is the app's, from its bucket. `r2.dev` is
+  slow (uncached, rate-limited): serve it from a custom domain on the bucket
+  (cached by Cloudflare) and set `OVERVIEW_URL`; the test copy's Worker serves
+  it edge-cached at `/tiles/`. The bucket allows cross-origin GET requests.
 
 ## Speed
 

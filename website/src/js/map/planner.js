@@ -10,7 +10,10 @@ import { meters, length, nearestOn, bounds } from '../core/geo.js';
 import { encodeRoute, decodeRoute } from '../core/share.js';
 import { data as worker } from './workers.js';
 
-const TAP_PX = 22, HUT_PX = 24;
+// Taps reach this far: a finger's width on touch screens (the app's 22 and 24 dp),
+// less with a mouse, which points precisely.
+const coarse = matchMedia('(pointer: coarse)').matches;
+const TAP_PX = coarse ? 22 : 14, HUT_PX = coarse ? 24 : 12;
 const MAX_ROUTES = 200;
 const reachAt = (map, p) => Math.min(150, Math.max(10, TAP_PX * metresPerPixel(p[1], map.getZoom())));
 const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
@@ -85,9 +88,10 @@ export function attach(ctx) {
     if (!layers.length) return null;
     const named = map.queryRenderedFeatures(p, { layers: ['nz-huts-label'].filter((l) => layers.includes(l)) })[0];
     if (named) return { point: named.geometry.coordinates, name: named.properties.name || 'hut' };
-    const hits = map.queryRenderedFeatures([[p.x - HUT_PX, p.y - HUT_PX], [p.x + HUT_PX, p.y + HUT_PX]], { layers });
-    let best = null, bestD = Infinity;
-    for (const f of hits) { const c = f.geometry.coordinates, q = map.project(c), d = Math.hypot(q.x - p.x, q.y - p.y); if (d < bestD) { bestD = d; best = { point: c, name: f.properties.name || 'hut' }; } }
+    const hits = map.queryRenderedFeatures([[p.x - HUT_PX, p.y - HUT_PX], [p.x + HUT_PX, p.y + HUT_PX]], { layers: ['nz-huts-dot'].filter((l) => layers.includes(l)) });
+    // Within HUT_PX of the dot itself (a circle, not the box's corners).
+    let best = null, bestD = HUT_PX;
+    for (const f of hits) { const c = f.geometry.coordinates, q = map.project(c), d = Math.hypot(q.x - p.x, q.y - p.y); if (d <= bestD) { bestD = d; best = { point: c, name: f.properties.name || 'hut' }; } }
     return best;
   }
 

@@ -24,6 +24,17 @@ export default {
     const url = new URL(request.url);
     if (request.method !== 'GET' && request.method !== 'HEAD') return new Response('Method not allowed', { status: 405 });
     let path = decodeURIComponent(url.pathname);
+    // The app's overview imagery, from its bucket, cached at Cloudflare's edge
+    // (r2.dev is uncached and rate-limited): /tiles/<pack>/<offset>.webp.
+    if (env.OVERVIEWS && /^\/tiles\/[0-9a-f]{64}\/\d+\.webp$/.test(path)) {
+      const cache = caches.default, get = request.method === 'GET', hit = get ? await cache.match(request) : null;
+      if (hit) return hit;
+      const object = await env.OVERVIEWS.get(path.slice(1));
+      if (!object) return new Response('Not found', { status: 404 });
+      const response = new Response(object.body, { headers: { 'Content-Type': 'image/webp', 'Cache-Control': 'public, max-age=31536000, immutable', 'Access-Control-Allow-Origin': '*', ETag: object.httpEtag } });
+      if (get) await cache.put(request, response.clone());
+      return request.method === 'HEAD' ? new Response(null, { headers: response.headers }) : response;
+    }
     for (const [from, to, status] of redirects) if (path === from) return Response.redirect(new URL(to, url).href, +(status || 301));
     let key = path.replace(/^\//, '');
     if (key === '' || key.endsWith('/')) key += 'index.html';

@@ -130,3 +130,29 @@ test('DOC distances', () => {
   assert.equal(docroute.stated('1.5 km one way return via same track'), 1500);
   assert.equal(docroute.stated('Various'), null);
 });
+
+// ---- DOC pages (DocPages), on the app's real page fixtures ----
+import * as docpages from '../src/js/core/docpages.js';
+const page = (name) => readFileSync(fixtures + `docpages/${name}.html`, 'utf8');
+
+test('DOC page summary, as the app reads it', () => {
+  const o = docpages.overview(page('milford-track'));
+  assert.equal(o.title, 'Milford Track');
+  assert.equal(o.time, '4 days');
+  assert.equal(o.level, 'Intermediate tramping track');
+  assert.equal(o.distance, '53.5 km one way');
+  assert.ok(o.intro.startsWith('Take a journey through the heart of Fiordland'));
+  assert.equal(o.dogs, 'No dogs.');
+});
+
+test('DOC page sections and legs', () => {
+  const sections = docpages.parse(page('gillespie-pass-circuit'));
+  assert.ok(sections.some(([t]) => /description/i.test(t)), 'has a description');
+  assert.ok(sections.every(([, blocks]) => blocks.length > 0));
+  const legs = docpages.legs(sections);
+  assert.ok(legs.length >= 3, `legs: ${legs.map((l) => l.title).join(' | ')}`);
+  assert.ok(legs.some((l) => /Siberia Hut/i.test(l.to) || /Siberia Hut/i.test(l.from)));
+  assert.ok(legs.every((l) => l.time || l.km != null));
+  const milford = docpages.legs(docpages.parse(page('milford-track')));
+  assert.ok(milford.length >= 3 && /Clinton Hut/.test(milford[0].title), milford.map((l) => l.title).join(' | '));
+});

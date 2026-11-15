@@ -5,9 +5,10 @@ import { el, icon, distance, height, escape } from './ui.js';
 import { Chart, stats } from './chart.js';
 import { route as docRoute, stated } from '../core/docroute.js';
 import { stops, matchHut, guidOf } from '../core/walks.js';
-import { length, bounds, chain } from '../core/geo.js';
+import { length, bounds, chain, nearestOn } from '../core/geo.js';
+import { legs } from '../core/docpages.js';
 import * as doc from './doc.js';
-import { data as worker } from './workers.js';
+import { data as worker, search } from './workers.js';
 
 let facts = null;
 const walkFacts = () => facts || (facts = fetch('/data/walks.json').then((r) => (r.ok ? r.json() : {})).catch(() => ({})));
@@ -28,11 +29,18 @@ export function profileBlock(ctx, line, alive, { onReady } = {}) {
     if (!alive() || !samples) return;
     chart.set(samples, chart.markers);
     const s = stats(samples);
-    grid.replaceChildren(statBox('Distance', distance(length(line))), statBox('Ascent', height(s.ascent)), statBox('Descent', height(s.descent)), statBox('Highest', height(s.high)));
+    whole = [length(line), s.ascent, s.descent, s.high];
+    node.setStats();
     onReady?.(samples, s);
   }).catch(() => { if (alive()) chart.set([{ d: 0, h: null, p: line[0] }]); });
   const node = el('div', { class: 'profile' }, grid, el('div', { class: 'chart-wrap' }, canvas));
   node.chart = chart;
+  let whole = null;
+  /** Stats for a part (or, with no arguments, the whole line). */
+  node.setStats = (...v) => {
+    const [d, up, down, high] = v.length ? v : whole || [length(line), null, null, null];
+    grid.replaceChildren(statBox('Distance', distance(d)), statBox('Ascent', height(up)), statBox('Descent', height(down)), statBox('Highest', height(high)));
+  };
   return node;
 }
 /** The chart's map side (the app's PlannerUi range badges and track highlight). */
@@ -58,45 +66,123 @@ const docLink = (href, text = 'DOC page ↗') => (href && /^https:\/\//.test(hre
 const busy = (text = 'Loading…') => el('p', { class: 'loading' }, el('span', { class: 'spinner' }), text);
 const failed = (text) => el('p', { class: 'notice' }, text);
 
-/** A DOC walk by its line id. */
-export function openWalk(ctx, guid, { push = false, near = null } = {}) {
+/** DOC's text blocks (the app's fill): headings, paragraphs, bullets, photos with captions. */
+function fill(box, blocks) {
+  let list = null;
+  for (const [type, value, url] of blocks) {
+    if (type === 'b') { if (!list) box.append(list = el('ul', { class: 'doc-list' })); list.append(el('li', {}, value)); continue; }
+    list = null;
+    if (type === 'h') box.append(el('h4', { class: 'doc-heading' }, value));
+    else if (type === 'p') box.append(el('p', { class: 'doc-text' }, value));
+    else if (type === 'i' && /^https:\/\//.test(url)) box.append(el('figure', { class: 'doc-photo' }, el('img', { src: url, alt: value.split('\n')[0] || '', loading: 'lazy', decoding: 'async', referrerpolicy: 'no-referrer', onerror: (e) => e.target.closest('figure')?.remove() }), value ? el('figcaption', {}, value) : null));
+  }
+}
+let pages = new Map();
+const walkPage = (guid) => pages.get(guid) || pages.set(guid, fetch(`/data/walks/${guid}.json`).then((r) => (r.ok ? r.json() : null)).catch(() => null)).get(guid);
+/** The part of `line` between distances a and b along it. */
+function slice(line, a, b) {
+  const out = [];
+  let walked = 0;
+  for (let i = 1; i < line.length; i++) {
+    const p = line[i - 1], q = line[i], len = length([p, q]);
+    const t0 = (a - walked) / len, t1 = (b - walked) / len;
+    if (walked + len >= a && walked <= b) {
+      if (!out.length) out.push(t0 > 0 ? [p[0] + (q[0] - p[0]) * t0, p[1] + (q[1] - p[1]) * t0] : p);
+      out.push(t1 < 1 ? [p[0] + (q[0] - p[0]) * t1, p[1] + (q[1] - p[1]) * t1] : q);
+    }
+    walked += len;
+    if (walked > b) break;
+  }
+  return out;
+}
+
+/** A DOC walk by its line id: as the app's track summary – DOC's summary,
+ * its legs (pick one to see it on the profile and map), the profile, huts
+ * along the way, and DOC's page sections. */
+export function openWalk(ctx, guid, { push = false } = {}) {
   ctx.sheet.open({
     kind: 'walk', title: ctx.overlays.infos()[guid]?.name || 'Track', subtitle: 'DOC walk',
     render(body, alive) {
       const controller = new AbortController();
       body.append(busy());
       (async () => {
-        const [info, paths, f] = await Promise.all([doc.walkByGuid(guid, controller.signal), doc.walkLine(guid, controller.signal), walkFacts()]);
+        const [info, paths, f, page] = await Promise.all([doc.walkByGuid(guid, controller.signal), doc.walkLine(guid, controller.signal), walkFacts(), walkPage(guid)]);
         if (!alive()) return;
-        const fact = f[guid] || [];
-        const target = stated(fact[0] || '');
+        const fact = f[guid] || [], o = page?.o || {};
+        const target = stated(o.distance || fact[0] || '');
         const line = paths.length ? docRoute(paths, target) : [];
         body.replaceChildren();
-        const name = info?.name || ctx.overlays.infos()[guid]?.name || 'Track';
-        ctx.sheet.setTitle(name, [info?.difficulty, fact[1] || info?.time].filter(Boolean).join(' · ') || 'DOC walk');
+        const name = info?.name || o.title || ctx.overlays.infos()[guid]?.name || 'Track';
+        const subtitle = [o.level || info?.difficulty, o.time || fact[1] || info?.time].filter(Boolean).join(' · ') || 'DOC walk';
+        ctx.sheet.setTitle(name, subtitle);
+        ctx.sheet.setPhoto(info?.thumbnail || o.image, name);
         if (line.length >= 2) { ctx.select([line]); ctx.fit(line); }
-        ctx.sheet.setPhoto(info?.thumbnail, name);
-        body.append(chips(fact[0] && `DOC: ${fact[0]}`, (fact[1] || info?.time) && `Time: ${fact[1] || info.time}`, fact[2] === 'loop' ? 'Loop' : fact[2] === 'one_way' ? 'One way' : null, fact[3] && fact[3].split('.')[0]));
+        body.append(chips((o.distance || fact[0]) && `DOC: ${o.distance || fact[0]}`, (o.time || fact[1]) && `Time: ${o.time || fact[1]}`, fact[2] === 'loop' ? 'Loop' : fact[2] === 'one_way' ? 'One way' : null, (o.dogs || fact[3]) && (o.dogs || fact[3]).split('.')[0]));
         if (info?.alerts && /yes|true|1/i.test(info.alerts)) body.append(el('p', { class: 'alert' }, 'DOC has alerts for this track. ', docLink(info.page, 'Read them on DOC ↗')));
+        const partRow = el('div', { class: 'parts', hidden: true });
+        const partText = el('div', { class: 'part-text', hidden: true });
+        const intro = (o.intro || info?.introduction) ? el('p', { class: 'intro' }, o.intro || info.introduction) : null;
+        let profile = null;
         if (line.length >= 2) {
-          const profile = profileBlock(ctx, line, alive);
-          body.append(profile);
-          const hutsBox = el('div', { class: 'huts' });
-          body.append(hutsBox);
-          doc.hutsIn(bounds(line, 500), controller.signal).then((huts) => {
-            if (!alive()) return;
-            const along = stops(line, huts);
-            if (!along.length) return;
-            profile.chart.setMarkers(along.map((s) => [s.along, s.hut.name]));
-            hutsBox.append(el('h3', {}, 'Huts along the way'), el('ul', { class: 'hut-list' }, along.map((s) => el('li', {}, el('button', { type: 'button', onclick: () => openHut(ctx, s.hut.name, s.hut.point, { push: true }) }, el('span', { class: 'hut-dot' }), el('span', { class: 'hut-name' }, s.hut.name, el('small', {}, [s.hut.category, bunks(s.hut.bunks)].filter(Boolean).join(' · '))), el('span', { class: 'hut-km' }, distance(s.along)))))));
-          }).catch(() => {});
+          profile = profileBlock(ctx, line, alive);
+          body.append(partRow, profile, partText);
         } else body.append(failed('DOC has no line for this walk.'));
-        if (info?.introduction) body.append(el('p', { class: 'intro' }, info.introduction));
+        if (intro) body.append(intro);
+        const hutsBox = el('div', { class: 'huts' });
+        const sectionsBox = el('div', { class: 'doc-sections' });
+        body.append(hutsBox, sectionsBox);
+        // DOC's page sections, as the app's accordion.
+        for (const [title, blocks] of page?.s || []) {
+          const content = el('div', { class: 'doc-section-body' });
+          const item = el('details', { class: 'doc-section', ontoggle: () => { if (item.open && !content.childElementCount) fill(content, blocks); } }, el('summary', {}, title), content);
+          sectionsBox.append(item);
+        }
         const actions = el('div', { class: 'sheet-actions' });
         if (line.length >= 2) actions.append(el('button', { class: 'btn', type: 'button', onclick: () => ctx.planner.fromLine(name, line) }, 'Save as route'));
-        const link = docLink(info?.page || ctx.overlays.infos()[guid]?.page);
+        const link = docLink(info?.page || ctx.overlays.infos()[guid]?.page, 'DOC page ↗');
         if (link) actions.append(link);
-        body.append(actions, el('p', { class: 'fine' }, DOC_NOTE));
+        body.append(actions, el('p', { class: 'fine' }, page ? 'From DOC’s page for this walk (CC BY 4.0). Check DOC for alerts and conditions before you go.' : DOC_NOTE));
+        if (!profile) return;
+        // Huts along the way, on the profile and listed.
+        doc.hutsIn(bounds(line, 500), controller.signal).then((huts) => {
+          if (!alive()) return;
+          const along = stops(line, huts);
+          if (!along.length) return;
+          profile.chart.setMarkers(along.map((h) => [h.along, h.hut.name]));
+          hutsBox.append(el('h3', {}, 'Huts along the way'), el('ul', { class: 'hut-list' }, along.map((h) => el('li', {}, el('button', { type: 'button', onclick: () => openHut(ctx, h.hut.name, h.hut.point, { push: true }) }, el('span', { class: 'hut-dot' }), el('span', { class: 'hut-name' }, h.hut.name, el('small', {}, [h.hut.category, bunks(h.hut.bunks)].filter(Boolean).join(' · '))), el('span', { class: 'hut-km' }, distance(h.along)))))));
+        }).catch(() => {});
+        // DOC's legs ("A to B"), placed on the line by their ends' names.
+        const docLegs = legs(page?.s || []);
+        if (!docLegs.length) return;
+        const total = length(line), mid = line[Math.floor(line.length / 2)];
+        const names = docLegs.flatMap((l) => [l.from, l.to]);
+        const located = await search.call({ type: 'locate', url: '/data/places.tsv', names, near: mid, maxKm: 40 }).catch(() => null);
+        if (!alive() || !located) return;
+        const at = (p) => { if (!p) return null; const n = nearestOn(line, p); return n.d <= 1500 ? n.along : null; };
+        const parts = docLegs.map((l, i) => { const a = at(located[i * 2]), b = at(located[i * 2 + 1]); return a == null || b == null || Math.abs(b - a) < 100 ? null : { ...l, span: [Math.min(a, b), Math.max(a, b)] }; }).filter(Boolean);
+        if (!parts.length || parts.every((p) => p.span[1] - p.span[0] > total * 0.97)) return;
+        let selected = -1;
+        const show = () => {
+          [...partRow.children].forEach((c, i) => c.setAttribute('aria-pressed', String(i - 1 === selected)));
+          if (selected < 0) {
+            profile.chart.showAll(); profile.setStats(); ctx.part(null); ctx.sheet.setTitle(null, subtitle);
+            partText.hidden = true; if (intro) intro.hidden = false;
+            ctx.fit(line);
+            return;
+          }
+          const p = parts[selected], [a, b] = p.span, st = profile.chart.spanStats(a, b);
+          profile.chart.focus([p.span]);
+          profile.setStats(b - a, st?.complete ? st.ascent : null, st?.complete ? st.descent : null, st?.high);
+          ctx.sheet.setTitle(null, [p.time, p.km != null && `${p.km} km`].filter(Boolean).join(' · ') || subtitle);
+          const piece = slice(line, a, b);
+          ctx.part(piece); ctx.fit(piece);
+          partText.replaceChildren(el('h3', {}, p.title), el('p', { class: 'muted' }, [p.time, p.km != null && `${p.km} km`].filter(Boolean).join(' · ')));
+          fill(partText, p.blocks);
+          partText.hidden = false; if (intro) intro.hidden = true;
+        };
+        partRow.append(...['Whole', ...parts.map((p) => p.title)].map((t, i) => el('button', { type: 'button', class: 'part', onclick: () => { selected = i - 1; show(); } }, t)));
+        partRow.hidden = false;
+        show();
       })().catch((e) => { if (alive() && e.name !== 'AbortError') body.replaceChildren(failed('DOC’s track information could not be loaded. Check your connection and try again.')); });
       return () => { controller.abort(); ctx.select(null); ctx.marker(null); ctx.range(null); };
     },

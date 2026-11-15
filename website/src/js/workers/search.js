@@ -9,6 +9,7 @@ self.onmessage = async ({ data: m }) => {
   try {
     await load(m.url);
     if (m.type === 'warm') { postMessage({ id: m.id, result: index.size }); return; }
+    if (m.type === 'locate') { postMessage({ id: m.id, result: m.names.map((n) => { const p = index.locate(n, m.near, m.maxKm || 40); return p && [p.lon, p.lat]; }) }); return; }
     postMessage({ id: m.id, result: index.search(m.query, m.near, m.limit || 12).map((r) => ({ ...r.place, km: r.km })) });
   } catch (e) {
     loading = null;

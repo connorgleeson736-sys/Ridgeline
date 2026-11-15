@@ -145,8 +145,19 @@ export class Chart {
   box() { const w = this.canvas.clientWidth, h = this.canvas.clientHeight; return { left: 46, right: Math.max(47, w - 12), top: 22, bottom: Math.max(23, h - 30), w, h }; }
   dAt(px) { const b = this.box(); return this.lo + Math.min(1, Math.max(0, (px - b.left) / (b.right - b.left))) * (this.hi - this.lo); }
   x(d) { const b = this.box(); return b.left + ((d - this.lo) / Math.max(1e-6, this.hi - this.lo)) * (b.right - b.left); }
-  set(samples, markers = []) { this.samples = samples || []; this.markers = markers; this.cursor = null; this.range = null; this.sec = null; this.v0 = this.v1 = 0; this.picked = -1; this.draw(); }
+  set(samples, markers = []) { this.samples = samples || []; this.markers = markers; this.bands = []; this.cursor = null; this.range = null; this.sec = null; this.v0 = this.v1 = 0; this.picked = -1; this.draw(); }
   setMarkers(markers) { this.markers = markers || []; this.draw(); }
+  /** Shaded spans (a leg of a walk), zoomed to (the app's focus). */
+  focus(spans) {
+    this.bands = spans || [];
+    const a = Math.min(...this.bands.map((s) => s[0])), b = Math.max(...this.bands.map((s) => s[1])), pad = (b - a) * 0.06;
+    this.v0 = Math.max(0, a - pad); this.v1 = Math.min(this.total, b + pad);
+    if (!isFinite(a) || this.v1 - this.v0 >= this.total * 0.999 || this.v1 <= this.v0) { this.v0 = this.v1 = 0; }
+    this.cursor = null; this.range = null; this.sec = null; this.picked = -1; this.draw();
+  }
+  showAll() { this.bands = []; this.v0 = this.v1 = 0; this.draw(); }
+  /** Ascent and descent over a span, and its highest point. */
+  spanStats(a, b) { const s = section(this.samples, a, b); const hs = this.samples.filter((x) => x.d >= a && x.d <= b && x.h != null).map((x) => x.h); return s && { ...s, high: hs.length ? Math.max(...hs) : null }; }
   clear() { this.cursor = null; this.range = null; this.sec = null; this.onRange(null); this.onInspect(null); this.draw(); }
   inspect(d) { this.cursor = at(this.samples, d); this.onInspect(this.cursor); this.draw(); }
   select(from, to) {
@@ -209,6 +220,7 @@ export class Chart {
     });
     if (pen) { fill.lineTo(lastX, b.bottom); fill.closePath(); }
     g.save(); g.beginPath(); g.rect(b.left, 0, b.right - b.left, b.bottom); g.clip();
+    g.fillStyle = 'rgba(88,125,98,0.12)'; for (const [a, bb] of this.bands || []) g.fillRect(this.x(a), b.top, this.x(bb) - this.x(a), b.bottom - b.top);
     g.fillStyle = 'rgba(232,121,68,0.133)'; g.fill(fill);
     g.strokeStyle = END; g.lineWidth = 2; g.lineJoin = 'round'; g.stroke(path);
     g.restore();

@@ -73,7 +73,8 @@ body.loading .progress { opacity: 1; }
 .icon-button { width: 40px; height: 40px; border: 0; border-radius: 8px; background: transparent; cursor: pointer; display: grid; place-items: center; color: var(--muted); font-size: 18px; flex: none; }
 
 /* ---- The routes drawer (PlannerUi.showRoutes) ---- */
-.drawer-cover { position: fixed; inset: 0; z-index: 25; background: rgb(16 40 35 / 16%); }
+.drawer-cover { position: fixed; inset: 0; z-index: 25; pointer-events: none; }
+.drawer-cover .drawer { pointer-events: auto; }
 .drawer { position: absolute; left: 10px; top: var(--top); bottom: 10px; width: min(300px, calc(100vw - 64px)); display: flex; flex-direction: column; padding: 4px 14px 10px; background: var(--paper); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow-12); overflow: hidden; }
 .search { display: flex; align-items: center; gap: 4px; padding: 8px 0 2px; position: relative; }
 .search .field { position: relative; flex: 1; height: 40px; }
@@ -131,23 +132,20 @@ body.loading .progress { opacity: 1; }
 .sheet { position: fixed; z-index: 15; left: 0; right: 0; bottom: 0; height: 55vh; height: 55dvh; display: flex; flex-direction: column; background: var(--paper); border-radius: 20px 20px 0 0; box-shadow: var(--shadow-8); overflow: hidden; transition: height .2s ease; padding-bottom: env(safe-area-inset-bottom); }
 .sheet.dragging { transition: none; }
 .sheet[data-size="compact"] { height: calc(var(--compact, 116px) + env(safe-area-inset-bottom)); }
-/* On computers: a large side panel the full height of the window (phones keep the app's sheet). */
+/* On computers: a floating card at the lower left, as tall as its content (up to most
+   of the window), so the map stays in view around it. Phones keep the app's sheet. */
 @media (min-width: 800px) {
-  .sheet, .sheet[data-size="compact"] { left: 0; top: 0; bottom: 0; right: auto; width: min(500px, 42vw); height: auto; border-radius: 0; box-shadow: 2px 0 16px rgb(0 0 0 / 16%); padding-bottom: 0; transition: none; }
-  .sheet .grip { height: 44px; cursor: default; }
+  .sheet, .sheet[data-size="compact"] { left: 12px; right: auto; bottom: 12px; top: auto; width: 440px; height: auto; max-height: calc(100vh - 120px); border-radius: 16px; box-shadow: 0 8px 30px rgb(0 0 0 / 22%), 0 2px 6px rgb(0 0 0 / 12%); padding-bottom: 0; transition: none; }
+  .sheet .grip { height: 34px; cursor: default; flex: none; }
   .sheet .grip::before { display: none; }
-  .sheet .grip .close { width: 52px; height: 44px; font-size: 24px; }
-  .sheet .grip .back { height: 44px; font-size: 14px; }
-  .sheet-head { padding: 0 24px; }
-  .sheet-body { padding: 0 24px 20px; }
-  .sheet-title { font-size: 22px; }
-  .sheet-subtitle { font-size: 14px; }
-  .sheet .chart-wrap { height: 240px; }
-  .sheet .intro { font-size: 15px; }
-  .sheet .stat b { font-size: 19px; }
-  .sheet .stat span { font-size: 11.5px; }
-  body.sheet-open .launcher, body.sheet-open .locate { left: calc(min(500px, 42vw) + 10px); }
-  body.sheet-open .maplibregl-ctrl-bottom-left { left: min(500px, 42vw); }
+  .sheet .grip .close { width: 46px; height: 34px; font-size: 22px; }
+  .sheet .grip .back { height: 34px; font-size: 13px; }
+  .sheet-head { padding: 0 20px; }
+  .sheet-body { padding: 0 20px 16px; }
+  .sheet-title { font-size: 19px; }
+  .sheet .chart-wrap { height: 190px; }
+  body.sheet-open .maplibregl-ctrl-bottom-left { left: 460px; }
+}
 }
 .grip { position: relative; height: 28px; flex: none; cursor: grab; touch-action: none; }
 .grip::before { content: ""; position: absolute; left: 50%; top: 12px; width: 32px; height: 4px; margin-left: -16px; border-radius: 3px; background: var(--grip); }
@@ -158,7 +156,7 @@ body.loading .progress { opacity: 1; }
 /* The app's 56 dp photo, top left beside the name. */
 .thumb { width: 56px; height: 56px; border-radius: 12px; object-fit: cover; background: var(--line); flex: none; margin-bottom: 8px; }
 @media (min-width: 800px) { .thumb { width: 72px; height: 72px; } }
-.sheet-body { flex: 1; overflow: auto; padding: 0 16px 8px; overscroll-behavior: contain; display: flex; flex-direction: column; }
+.sheet-body { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 0 16px 8px; overscroll-behavior: contain; display: flex; flex-direction: column; }
 .sheet-body > * { flex: none; }
 .sheet-title { font-size: 17px; font-weight: 700; line-height: 1.25; margin: 0; overflow-wrap: anywhere; }
 .sheet-subtitle { font-size: 12.5px; color: var(--muted); margin: 2px 0 8px; }
@@ -226,5 +224,27 @@ body.sheet-open .maplibregl-ctrl-bottom-left, body.sheet-open .maplibregl-ctrl-b
 @media (min-width: 800px) {
   .sheet[data-size="compact"] .chart-wrap, .sheet[data-size="compact"] .route-name { display: block; }
   .sheet[data-size="compact"] .route-extra.app-cta { display: flex; }
-  .sheet .chart-wrap.grow { flex: 1 1 260px; max-height: 420px; }
+  .sheet .chart-wrap.grow { flex: none; height: 200px; }
 }
+
+/* The app's track summary: leg chips, leg text, DOC's page sections. */
+.parts { display: flex; gap: 6px; overflow-x: auto; padding: 2px 0 8px; scrollbar-width: none; flex: none; }
+.parts::-webkit-scrollbar { display: none; }
+.part { flex: none; padding: 6px 12px; border-radius: 14px; border: 0; background: var(--chip); color: var(--ink); font-size: 12.5px; cursor: pointer; white-space: nowrap; }
+.part[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); }
+.part-text h3 { margin: 8px 0 2px; }
+.part-text .muted { color: var(--muted); font-size: 12.5px; margin: 0 0 6px; }
+.doc-sections { margin-top: 10px; border-top: 1px solid var(--line); }
+.doc-section { border-bottom: 1px solid var(--line); }
+.doc-section summary { list-style: none; display: flex; align-items: center; justify-content: space-between; padding: 10px 0; font-size: 14.5px; font-weight: 700; cursor: pointer; }
+.doc-section summary::-webkit-details-marker { display: none; }
+.doc-section summary::after { content: "›"; font-size: 20px; color: var(--muted); transform: rotate(90deg); transition: transform .15s; font-weight: 400; }
+.doc-section[open] summary::after { transform: rotate(270deg); }
+.doc-section-body { padding-bottom: 10px; }
+.doc-heading { font-size: 13.5px; font-weight: 700; margin: 12px 0 0; }
+.doc-text { font-size: 13.5px; line-height: 1.5; margin: 6px 0 0; white-space: pre-line; }
+.doc-list { margin: 4px 0 0; padding-left: 18px; font-size: 13.5px; line-height: 1.45; }
+.doc-list li { margin-top: 4px; }
+.doc-photo { margin: 10px 0 0; }
+.doc-photo img { width: 100%; height: auto; border-radius: 10px; background: var(--line); display: block; }
+.doc-photo figcaption { font-size: 11.5px; color: var(--muted); margin-top: 4px; white-space: pre-line; line-height: 1.35; }

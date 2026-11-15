@@ -27,9 +27,14 @@ export function loadOverview() {
     return overview;
   }).catch(() => null));
 }
-let gaps = null, gapsLoading = null;
-function loadGaps() {
-  return gapsLoading || (gapsLoading = fetch('/data/gaps.json').then((r) => (r.ok ? r.json() : null)).then((g) => { gaps = g; return g; }).catch(() => null));
+// The gap index (small, preloaded) says which tiles touch a gap; only those wait
+// for the outlines themselves.
+let gapIndex = null, indexLoading = null, gapShapes = null, shapesLoading = null;
+export function loadGapIndex() {
+  return indexLoading || (indexLoading = fetch('/data/gaps-index.json').then((r) => (r.ok ? r.json() : null)).then((g) => { if (g) gapIndex = { ...g, keys: new Set(g.keys) }; return gapIndex; }).catch(() => null));
+}
+function loadGapShapes() {
+  return shapesLoading || (shapesLoading = fetch('/data/gaps.json').then((r) => (r.ok ? r.json() : null)).then((g) => { gapShapes = g; return g; }).catch(() => null));
 }
 
 const linz = (z, x, y) => urls.aerial.replace('{z}', z).replace('{x}', x).replace('{y}', y);
@@ -59,15 +64,18 @@ function relation(rings, box) {
   }
   return hit ? 1 : -1;
 }
-function plan(z, x, y) {
-  if (!gaps) return { mode: 'linz' };
-  const az = gaps.z;
+async function plan(z, x, y) {
+  if (z >= 9 && !gapIndex) await loadGapIndex();
+  if (!gapIndex) return { mode: 'linz' };
+  const az = gapIndex.z;
   if (z < az) {
-    const c = gaps.coarse[`${z}/${x}/${y}`];
+    const c = gapIndex.coarse[`${z}/${x}/${y}`];
     return c ? { mode: c[1] ? 'esri' : 'boundary', coarse: c[0] } : { mode: 'linz' };
   }
-  const f = 2 ** (z - az), mx = Math.floor(x / f), my = Math.floor(y / f);
-  const e = gaps.entries[`${mx}/${my}`];
+  const f = 2 ** (z - az), mx = Math.floor(x / f), my = Math.floor(y / f), key = `${mx}/${my}`;
+  if (!gapIndex.keys.has(key)) return { mode: 'linz' };
+  if (!gapShapes) await loadGapShapes();
+  const e = gapShapes?.[key];
   if (!e) return { mode: 'linz' };
   const [outer, seams, vector, inner] = e;
   const size = 256 / f, px = x * size - mx * 256, py = y * size - my * 256;
@@ -101,8 +109,7 @@ export function install(maplibregl) {
       return { data: await worker.call({ type: 'compose', layers: [{ url: t.url, crop: t.crop }] }) };
     }
     if (z <= 12 && !overview) await loadOverview();
-    if (z >= 9 && !gaps) await loadGaps();
-    const p = plan(z, x, y);
+    const p = await plan(z, x, y);
     const own = baseUrl(z, x, y, !/[?&]raw/.test(params.url));
     if (p.mode === 'linz') {
       let r = await fetch(own, { signal: abort.signal });
