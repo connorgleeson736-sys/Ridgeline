@@ -311,6 +311,8 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     /** The track or walk a hut was opened from: its X goes back there. */
     private var returnTo:(()->Unit)?=null
     private var restoring=false
+    /** Back to a track from a hut: the map stays where it is (no re-framing). */
+    private var keepView=false
     private fun remember(again:()->Unit,hut:Boolean){
         if(restoring)restoring=false
         else if(hut){if(visible&&!currentIsHut&&current!=null)returnTo=current else if(!visible)returnTo=null}
@@ -320,7 +322,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     /** The X (and back at the lowest stop): to the track a hut was opened from, else closed. */
     fun closeOrReturn(){
         val again=returnTo
-        if(again!=null&&visible){returnTo=null;restoring=true;again()}else hide()
+        if(again!=null&&visible){returnTo=null;restoring=true;keepView=true;again()}else hide()
     }
     fun hide(){
         returnTo=null
@@ -599,7 +601,8 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
      * at its lower end, where tracks are usually walked from). */
     private fun lineFound(id:Long,line:List<Coordinate>,found:List<Part> = emptyList(),oriented:Boolean=false){
         if(line.size<2){chart.visibility=View.GONE;return}
-        lineNow=line;onLine(line,null);if(fitNext){fitNext=false;onFit(line)}else onFit(line)
+        lineNow=line;onLine(line,null)
+        if(keepView){keepView=false;fitNext=false}else if(fitNext){fitNext=false;onFit(line)}else onFit(line)
         stats[0].value(distance(DocTracks.length(line)));wholeStats[0]=distance(DocTracks.length(line))
         showParts(found)
         var checked=oriented

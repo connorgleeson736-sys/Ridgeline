@@ -7,10 +7,11 @@
       they are, for "Download all") and OUT_DIR/tiles/<payload>/<offset>.webp, every
       packed image byte for byte (OverviewStream.tileUrl). Upload OUT_DIR as it is.
 
-  CLOUDFLARE_API_TOKEN=... python3 -I publish.py upload OUT_DIR ACCOUNT_ID BUCKET
+  CLOUDFLARE_API_TOKEN=... python3 -I publish.py upload OUT_DIR ACCOUNT_ID BUCKET [ONLY ...]
       Uploads every file in OUT_DIR to a Cloudflare R2 bucket through the Cloudflare
       API, marked to be cached for a year: the files never change (a new pack gets
-      new payload names).
+      new payload names). ONLY: upload just the files whose path contains one of
+      these (a pack's payload sha or ZIP name), e.g. a new island's packs.
 
   python3 -I publish.py check BASE_URL ASSETS_DIR ZIP_DIR [all]
       Fetches tiles (a sample, or all) and the packs' first bytes from BASE_URL and
@@ -100,11 +101,13 @@ def check(base, assets, zip_dir, which="sample"):
     return 1 if bad else 0
 
 
-def upload(out, account, bucket):
+def upload(out, account, bucket, *only):
     import concurrent.futures, time, urllib.error
     token = os.environ.get("CLOUDFLARE_API_TOKEN", "proxy-injected")
     api = f"https://api.cloudflare.com/client/v4/accounts/{account}/r2/buckets/{bucket}/objects/"
     files = [os.path.join(d, f) for d, _, fs in os.walk(out) for f in fs]
+    if only:
+        files = [f for f in files if any(o in f for o in only)]
 
     def put(path):
         key = os.path.relpath(path, out).replace(os.sep, "/")

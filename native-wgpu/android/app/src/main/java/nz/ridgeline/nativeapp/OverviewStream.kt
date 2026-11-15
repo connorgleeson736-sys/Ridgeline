@@ -14,7 +14,7 @@ internal object OverviewStream {
     }
     /** Where an original overview ZIP ([name] from overview-archives.json) is served, or null. */
     fun packUrl(base:String,name:String):String?{
-        if(base.isBlank()||!name.matches(Regex("Ridgeline-Overviews-[0-9.]+-[0-9]-of-[0-9]\\.zip")))return null
+        if(base.isBlank()||!name.matches(Regex("Ridgeline-Overviews-(NI-)?[0-9.]+-[0-9]+-of-[0-9]+\\.zip")))return null
         return "${base.trimEnd('/')}/packs/$name"
     }
     /** A served tile is used only when it is exactly the packed image's length. */

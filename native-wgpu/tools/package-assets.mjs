@@ -5,12 +5,21 @@ const load=name=>{const c={};vm.runInNewContext(fs.readFileSync(path.join(root,'
 const gap=load('gap-imagery-atlas.js').RidgeGapAtlas,south=load('south-overviews.js').RidgeSouthOverviews;
 if(Object.values(gap.entries).some(e=>!e.vector))throw Error('Non-vector gap atlas requires legacy mask support');
 const catalog=JSON.parse(fs.readFileSync(path.join(root,'capacitor/overview-catalog.json'),'utf8'));
-const overview={...catalog,coarse:{}};const copied=new Set();
+const overview={...catalog,tiles:{...catalog.tiles},coarse:{}};const copied=new Set();
+// The North Island (tools/overviews/north_island.py): its tiles, and the shared
+// coordinates over Cook Strait and the whole country, replace the South Island's.
+const north=JSON.parse(fs.readFileSync(path.join(root,'native-wgpu/assets/overviews/north-island.json'),'utf8'));
+fs.rmSync(path.join(out,'assets/south-overviews-v1'),{recursive:true,force:true});fs.rmSync(path.join(out,'assets/nz-overviews-v1'),{recursive:true,force:true});
 for(const [key,entry]of Object.entries(south.tiles)){
- if(+key.split('/')[0]>8)continue;
+ if(+key.split('/')[0]>8||north.coarse[key])continue;
  const select=row=>{if(!row?.url)return null;const name=row.url.replace(/^\//,'');if(!/^assets\/south-overviews-v1\/[a-f0-9]+\.webp$/.test(name))throw Error('Invalid overview path');const dest=path.join(out,name);fs.mkdirSync(path.dirname(dest),{recursive:true});fs.copyFileSync(path.join(root,'public',name),dest);copied.add(name);return name;};
  const raw=select(entry.raw||entry),natural=select(entry.natural||entry);if(raw&&natural)overview.coarse[key]={raw,natural};
 }
+for(const [key,entry]of Object.entries(north.coarse)){const row={};
+ for(const mode of ['raw','natural']){const name=entry[mode];if(!/^assets\/nz-overviews-v1\/[a-f0-9]{24}\.webp$/.test(name))throw Error('Invalid overview path');
+  const dest=path.join(out,name);fs.mkdirSync(path.dirname(dest),{recursive:true});fs.copyFileSync(path.join(root,'native-wgpu/assets/overviews',name.replace(/^assets\//,'')),dest);copied.add(name);row[mode]=name;}
+ overview.coarse[key]=row;}
+Object.assign(overview.tiles,north.tiles);overview.files=[...catalog.files,...north.files];
 // Capacitor0.18 explicitly excludes website-only Cook substitutions.
 fs.rmSync(path.join(out,'assets/cook-reference-v1'),{recursive:true,force:true});
 fs.writeFileSync(path.join(out,'gap-atlas.json'),JSON.stringify(gap));
@@ -22,8 +31,10 @@ if(full){const source=process.env.RIDGELINE_OVERVIEW_ZIPS||path.join(root,'overv
  overview.archives=JSON.parse(execFileSync('python3',[path.join(root,'native-wgpu/tools/package-archives.py'),source,packOutput],{encoding:'utf8',maxBuffer:1024*1024}));
 }
 fs.writeFileSync(path.join(out,'overview-index.json'),JSON.stringify(overview));
-fs.copyFileSync(path.join(root,'native-wgpu/overview-archives.json'),path.join(out,'overview-archives.json'));
-console.log(JSON.stringify({full,packCount:full?catalog.files.length:0,coarseImages:copied.size,gapEntries:Object.keys(gap.entries).length,overviewCoordinates:Object.keys(catalog.tiles).length}));
+// Every pack the app can stream or keep offline: the South Island's six and the North Island's.
+const archiveList=JSON.parse(fs.readFileSync(path.join(root,'native-wgpu/overview-archives.json'),'utf8'));
+archiveList.files=[...archiveList.files,...north.archives];fs.writeFileSync(path.join(out,'overview-archives.json'),JSON.stringify(archiveList,null,2)+'\n');
+console.log(JSON.stringify({full,packCount:full?catalog.files.length:0,coarseImages:copied.size,gapEntries:Object.keys(gap.entries).length,overviewCoordinates:Object.keys(overview.tiles).length,northIsland:north.coordinates}));
 
 // Retain the notice for algorithms adapted from the reference MapLibre engine.
 fs.mkdirSync(path.join(out,'licenses'),{recursive:true});

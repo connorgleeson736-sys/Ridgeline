@@ -24,13 +24,13 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
         pdfResult(request,result,data)
         if(request!=attachRequest||result!=Activity.RESULT_OK||data==null)return
         val uris=if(data.clipData!=null)(0 until data.clipData!!.itemCount).map{data.clipData!!.getItemAt(it).uri}else listOfNotNull(data.data)
-        val selected=uris.distinct().take(6);if(selected.isEmpty())return
+        val selected=uris.distinct().take(loader.overviews.total);if(selected.isEmpty())return
         attaching=true
         val progress=TextView(activity).apply{setPadding(dp(16),dp(12),dp(16),dp(12))}
         val dialog=AlertDialog.Builder(activity).setTitle("Add imagery").setView(progress).create().apply{setCancelable(false);show()}
         var complete=0;val errors=ArrayList<String>()
         fun next(){
-            if(complete==selected.size){attaching=false;dialog.dismiss();Toast.makeText(activity,if(errors.isEmpty())"Imagery attached · ${loader.overviews.list().size}/6 packs"else errors.distinct().joinToString("\n"),Toast.LENGTH_LONG).show();startRegion();return}
+            if(complete==selected.size){attaching=false;dialog.dismiss();Toast.makeText(activity,if(errors.isEmpty())"Imagery attached · ${loader.overviews.list().size}/${loader.overviews.total} packs"else errors.distinct().joinToString("\n"),Toast.LENGTH_LONG).show();startRegion();return}
             progress.text="Checking ZIP ${complete+1}/${selected.size}…\nOriginal files stay at their selected location."
             val uri=selected[complete]
             try{activity.contentResolver.takePersistableUriPermission(uri,android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)}catch(_:SecurityException){errors.add("Choose ZIPs stored in Files or Downloads so Ridgeline can retain access.");complete++;next();return}
@@ -226,16 +226,16 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
     fun imageryPacks(){
         val packs=loader.overviews.list()
         val names=packs.map{"Detach ${it.name}"}.toTypedArray()
-        AlertDialog.Builder(activity).setTitle("Overview imagery · ${packs.size}/6 packs")
+        AlertDialog.Builder(activity).setTitle("Overview imagery · ${packs.size}/${loader.overviews.total} packs")
             .setItems(names){_,i->loader.detachOverview(packs[i].payload){Toast.makeText(activity,"Detached ${packs[i].name}",Toast.LENGTH_SHORT).show()}}
             .setPositiveButton("Add ZIPs"){_,_->closeBar();addImagery()}.setNegativeButton("Close",null)
-            .apply{if(loader.overviewsOnline&&packs.size<6)setNeutralButton("Download all"){_,_->downloadImagery()}}.show()
+            .apply{if(loader.overviewsOnline&&packs.size<loader.overviews.total)setNeutralButton("Download all"){_,_->downloadImagery()}}.show()
     }
     /** All six overview ZIPs from where the imagery is served, kept for offline use. */
     private fun downloadImagery(){
         hint("Downloading overview imagery…")
         loader.downloadOverviews({got,total->hint("Overview imagery ${got*100/maxOf(1L,total)}% · ${got/1_000_000}/${total/1_000_000} MB")}){error->
-            Toast.makeText(activity,error?:"Overview imagery saved for offline use · ${loader.overviews.list().size}/6 packs",Toast.LENGTH_LONG).show()}
+            Toast.makeText(activity,error?:"Overview imagery saved for offline use · ${loader.overviews.list().size}/${loader.overviews.total} packs",Toast.LENGTH_LONG).show()}
     }
     /** A short note at the top of the map, styled like the map status ("Terrain load failed…"). */
     private var hintView:TextView?=null
