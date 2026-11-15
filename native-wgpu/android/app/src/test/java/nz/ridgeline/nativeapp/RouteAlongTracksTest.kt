@@ -82,6 +82,22 @@ class RouteAlongTracksTest{
         val wide=listOf("North" to listOf(at(0.0,100.0),at(3000.0,100.0)),"South" to listOf(at(0.0,-100.0),at(3000.0,-100.0)),"Bridge" to listOf(at(3000.0,100.0),at(3000.0,-100.0)))
         assertEquals(3000.0+200.0+3000.0,DocTracks.length(TrackFollow.route(at(0.0,100.0),at(0.0,-100.0),wide,20.0,emptyList(),river)!!),2.0)
     }
+    @Test fun aDraggedPointSlidesAlongTheTrackThenComesOff(){
+        val graph=TrackFollow.Graph(tracks)
+        // The route's points either side: the track's start and the spur's end.
+        val prev=at(0.0,0.0);val next=at(500.0,-300.0)
+        // Dragged 25 m north of the track at 700 m east: on the track beside the finger.
+        val d=TrackFollow.drag(graph,prev,at(700.0,25.0),next,40.0)
+        assertTrue(near(d.point,at(700.0,0.0)))
+        assertEquals(700.0,DocTracks.length(listOf(prev)+d.before),1.0)
+        // Back along the track to the junction and down the spur to the next point.
+        assertEquals(200.0+300.0,DocTracks.length(listOf(d.point)+d.after+next),1.0)
+        // Pulled 60 m off (beyond the 40 m reach): off the track, straight either side.
+        val off=TrackFollow.drag(graph,prev,at(700.0,60.0),next,40.0)
+        assertTrue(near(off.point,at(700.0,60.0)));assertEquals(listOf(off.point),off.before);assertTrue(off.after.isEmpty())
+        // The last point of a route: nothing after it.
+        assertTrue(TrackFollow.drag(graph,prev,at(900.0,10.0),null,40.0).after.isEmpty())
+    }
     @Test fun longLegsReadCoarserTiles(){
         val a=Coordinate(169.0,-44.5)
         // [km] east and [km] north: a diagonal leg, the largest area for its length.

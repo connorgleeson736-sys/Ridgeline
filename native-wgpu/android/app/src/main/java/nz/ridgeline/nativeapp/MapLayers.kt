@@ -76,6 +76,8 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         }
         /** A tap this close (dp) to a hut's dot locks onto the hut. */
         const val HUT_TAP_DP=24.0
+        /** A dragged point slides along track this close to where the drag began (finely split). */
+        const val DRAG_SPLIT_METERS=2000.0
         /** Leases older than [limit] at [now], given their start times. */
         /** One tile's pieces of the foot track [name], clipped to the tile, and
          * the neighbouring tiles the track continues into (a piece ending on an
@@ -329,6 +331,15 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         area(listOf(from,to),margin,FOLLOW_ZOOMS,follow=true){area->
             val out=area?.let{runCatching{TrackFollow.route(from,to,it.tracks,reach,it.ways,it.water)}.getOrNull()}
             main.post{if(!closed)callback(out)}}
+    }}.onFailure{callback(null)}}
+    /** The tracks, walkable roads and rivers around [points] as one network
+     * (TrackFollow.Graph), for dragging a route point along them: split finely
+     * within [DRAG_SPLIT_METERS] of [around]. Null when not to hand. Main thread callback. */
+    fun trackGraph(points:List<Coordinate>,around:Coordinate,callback:(TrackFollow.Graph?)->Unit){runCatching{worker.execute{
+        val span=points.maxOf{a->points.maxOf{b->NativeGeo.distance(a,b)}}
+        area(points,(span*.35).coerceIn(500.0,3000.0),FOLLOW_ZOOMS,follow=true){area->
+            val graph=area?.let{a->runCatching{TrackFollow.Graph(a.tracks,a.ways,a.water){c->DocTracks.meters(c,around)<=DRAG_SPLIT_METERS}}.getOrNull()}
+            main.post{if(!closed)callback(graph)}}
     }}.onFailure{callback(null)}}
     /** A loop walk's [line] closed over the map's tracks (WalkOptions.closeLoop), or null. Main thread callback. */
     fun closeWalk(line:List<Coordinate>,target:Double,clockwise:Boolean?,callback:(List<Coordinate>?)->Unit){runCatching{worker.execute{

@@ -64,6 +64,9 @@ class RouteController(
     fun undo(){if(editable()&&editor.undo())edited()}
     fun beginDrag(index:Int):Boolean {if(!editable()||!drawing)return false;val started=editor.beginDrag(index);if(started)emit(Change.SELECTION);return started}
     fun previewDrag(point:Coordinate){if(editable()&&editor.previewDrag(point))emit(Change.PREVIEW)}
+    /** See RouteEditor.previewReroute. */
+    fun previewReroute(before:List<Coordinate>,after:List<Coordinate>){if(editable()&&editor.previewReroute(before,after))emit(Change.PREVIEW)}
+    fun dragNeighbours()=editor.dragNeighbours()
     fun finishDrag(){if(!editable())return;val was=editor.isDragging;if(editor.commitDrag())edited()else if(was)emit(Change.VIEW)}
     fun cancelDrag(){val was=editor.isDragging;if(editor.cancelDrag())emit(Change.PREVIEW)else if(was)emit(Change.VIEW)}
     fun drawing(value:Boolean){if(!editable())return;finishDrag();drawing=value;if(!value)editor.clearSelection();emit(Change.VIEW)}

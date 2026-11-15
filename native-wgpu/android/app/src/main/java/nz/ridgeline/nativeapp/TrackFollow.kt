@@ -37,11 +37,46 @@ internal object TrackFollow {
         // Split only near the two taps (where a tap joins the track): a long leg's
         // area holds hundreds of kilometres of track.
         val near={c:Coordinate->DocTracks.meters(c,from)<=SPLIT_NEAR_METERS||DocTracks.meters(c,to)<=SPLIT_NEAR_METERS}
-        val lines=ArrayList<Pair<String,List<Coordinate>>>();val road=ArrayList<Boolean>()
-        for(t in tracks)if(t.second.size>=2){lines.add(t.first to split(t.second,near));road.add(false)}
-        for(t in roads)if(t.second.size>=2){lines.add(t.first to split(t.second,near));road.add(true)}
-        if(lines.isEmpty())return null
-        val net=WalkOptions.Network(lines,cost={i->if(road[i])ROAD_COST else 1.0})
+        val graph=Graph(tracks,roads,water,near)
+        return if(graph.net.points.isEmpty())null else route(from,to,graph,reach)
+    }
+    /** The tracks and walkable roads of an area as one network, built once
+     * (dragging a point re-routes along it at every move). [near]: where long
+     * pieces are split so a point joins the track beside it (everywhere by default). */
+    class Graph(tracks:List<Pair<String,List<Coordinate>>>,roads:List<Pair<String,List<Coordinate>>> = emptyList(),
+                val water:List<List<Coordinate>> = emptyList(),near:(Coordinate)->Boolean={true}){
+        val net:WalkOptions.Network
+        init{
+            val lines=ArrayList<Pair<String,List<Coordinate>>>();val road=ArrayList<Boolean>()
+            for(t in tracks)if(t.second.size>=2){lines.add(t.first to split(t.second,near));road.add(false)}
+            for(t in roads)if(t.second.size>=2){lines.add(t.first to split(t.second,near));road.add(true)}
+            net=WalkOptions.Network(lines,cost={i->if(road[i])ROAD_COST else 1.0})
+        }
+        /** The point on a track or road nearest [p], if within [reach] metres. */
+        fun snap(p:Coordinate,reach:Double):Coordinate?{
+            val v=net.nearest(p,reach+SPLIT_METERS)?:return null
+            val q=onTrack(net,v,p).first;return q.takeIf{DocTracks.meters(it,p)<=reach}
+        }
+    }
+    /** A dragged point and the route beside it: [before] runs from just after the
+     * previous point to the dragged point (its last), [after] from just after it
+     * to just before the next point. */
+    class Dragged(val point:Coordinate,val before:List<Coordinate>,val after:List<Coordinate>)
+    /** Dragging a point between [prev] and [next] (null at the route's ends) to [p]:
+     * within [reach] of a track or road it slides along it, and both pieces beside
+     * it follow the tracks (each straight where they do not join); further away it
+     * comes off the track and both pieces are straight. */
+    fun drag(graph:Graph,prev:Coordinate?,p:Coordinate,next:Coordinate?,reach:Double):Dragged{
+        val on=graph.snap(p,reach)?:return Dragged(p,listOf(p),emptyList())
+        val before=prev?.let{route(it,on,graph,reach)}?.drop(1)?.takeIf{it.isNotEmpty()}?:listOf(on)
+        val point=before.last()
+        val after=next?.let{n->route(n,point,graph,reach)?.reversed()}?.let{l->l.subList(1,l.size-1)}.orEmpty()
+        return Dragged(point,before,after)
+    }
+    /** As [route] over a [graph] already built. */
+    fun route(from:Coordinate,to:Coordinate,graph:Graph,reach:Double):List<Coordinate>?{
+        val net=graph.net;val water=graph.water
+        if(net.points.isEmpty())return null
         val b=net.nearest(to,reach+SPLIT_METERS)?:return null
         val end=onTrack(net,b,to);if(DocTracks.meters(end.first,to)>reach)return null
         val a=net.nearest(from,START_REACH_METERS+SPLIT_METERS)?:return null

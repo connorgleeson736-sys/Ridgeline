@@ -209,9 +209,9 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
             }
             else onIdleTap(x,y)
         }
-        terrain.onWaypointDragStart={controller.beginDrag(it)}
-        terrain.onWaypointDrag={controller.previewDrag(it)}
-        terrain.onWaypointDragEnd={if(it)controller.finishDrag()else controller.cancelDrag()}
+        terrain.onWaypointDragStart={index->controller.beginDrag(index).also{if(it)startDrag()}}
+        terrain.onWaypointDrag={p->dragTo(p)}
+        terrain.onWaypointDragEnd={done->endDrag(done)}
         controller.observe{state,change->
             if(combiningPending&&change==RouteController.Change.OPENED){combineSelection.clear();combiningPending=false}else if(state.error!=null&&!state.busy)combiningPending=false
             if(!restoring&&state.loaded){restoring=true;val old=preferences.getString("active",null);if(old!=null&&state.records.any{it.id==old}){restoreId=old;main.post{controller.open(old)}}}
@@ -275,6 +275,42 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
     }
     private fun report(result:RouteEditor.Result){
         when(result){RouteEditor.Result.TOO_CLOSE->toast("Place the next point at least 5 m away.");RouteEditor.Result.OUTSIDE_NZ->toast("Choose a point in New Zealand.");RouteEditor.Result.LIMIT->toast("This route has reached 2,000 points.");else->{}}
+    }
+    /** The tracks around points as a network for dragging (MapLayers.trackGraph): set by the activity. */
+    internal var trackGraph:(List<Coordinate>,Coordinate,(TrackFollow.Graph?)->Unit)->Unit={_,_,done->done(null)}
+    // Dragging a waypoint along the tracks: the network around it and its
+    // neighbours is read once when the drag starts; each move then slides the
+    // point along the track within a finger's width and re-routes the pieces
+    // either side (off the track beyond that: straight), on a background thread,
+    // the latest move only.
+    private val dragWork=Executors.newSingleThreadExecutor()
+    private var dragGraph:TrackFollow.Graph?=null;private var dragToken=0;private var dragMoves=0
+    @Volatile private var dragLatest=0
+    private var dragAt:Coordinate?=null
+    private fun startDrag(){
+        val token=++dragToken;dragGraph=null;dragAt=null
+        val (prev,next)=controller.dragNeighbours()?:return
+        val state=controller.state;val here=state.points.getOrNull(state.selected)?:return
+        trackGraph(listOfNotNull(prev,here,next),here){g->if(token==dragToken&&controller.state.dragging){dragGraph=g;dragAt?.let{dragTo(it)}}}
+    }
+    private fun dragTo(p:Coordinate){
+        dragAt=p
+        val graph=dragGraph?:run{controller.previewDrag(p);return}
+        val (prev,next)=controller.dragNeighbours()?:return
+        val reach=reach(p);val token=dragToken;val move=++dragMoves;dragLatest=move
+        dragWork.execute{
+            if(dragLatest!=move)return@execute
+            val d=runCatching{TrackFollow.drag(graph,prev,p,next,reach)}.getOrNull()?:return@execute
+            main.post{if(token==dragToken&&dragLatest==move&&controller.state.dragging)controller.previewReroute(d.before,d.after)}
+        }
+    }
+    private fun endDrag(done:Boolean){
+        val graph=dragGraph;val p=dragAt;dragToken++;dragLatest=++dragMoves;dragGraph=null;dragAt=null
+        if(!done){controller.cancelDrag();return}
+        // The final place, worked out now (a move still on its way would be dropped).
+        if(graph!=null&&p!=null)controller.dragNeighbours()?.let{(prev,next)->
+            runCatching{TrackFollow.drag(graph,prev,p,next,reach(p))}.getOrNull()?.let{controller.previewReroute(it.before,it.after)}}
+        controller.finishDrag()
     }
     /** The way along the tracks (MapLayers.followTracks): set by the activity. */
     var trackWay:(Coordinate,Coordinate,Double,(List<Coordinate>?)->Unit)->Unit={_,_,_,done->done(null)}
@@ -478,7 +514,7 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
     fun back():Boolean{if(dismissDrawer())return true;if(controller.state.drawing){controller.drawing(false);return true};if(controller.state.id!=null||controller.state.points.isNotEmpty()){controller.unload();return true};return false}
     fun pause(){controller.cancelDrag();controller.flush();loader.cancelProfile();profileDirty=true}
     fun resume(){if(profileDirty)controller.drawing(controller.state.drawing)}
-    override fun close(){closed=true;main.removeCallbacks(settle);loader.cancelProfile();controller.close();files.shutdown()}
+    override fun close(){closed=true;dragWork.shutdownNow();main.removeCallbacks(settle);loader.cancelProfile();controller.close();files.shutdown()}
     private fun formatDistance(m:Double)=if(m>=1000)String.format(java.util.Locale.ROOT,"%.2f km",m/1000)else"${m.roundToInt()} m"
     private companion object{
         /** A tap within this distance (dp on screen) of a track follows it. */
