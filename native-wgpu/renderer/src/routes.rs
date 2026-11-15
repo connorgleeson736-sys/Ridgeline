@@ -185,6 +185,9 @@ pub struct RoutePath {
     pub points: Vec<[f64; 2]>,
     pub color: [f32; 4],
     pub selected: Option<usize>,
+    /// Per point: true for a point along a followed track, drawn as line only
+    /// (no waypoint dot). Empty: every point of the first path has a dot.
+    pub shape: Vec<bool>,
 }
 #[repr(C)]
 #[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]
@@ -770,6 +773,11 @@ fn build_routes(job: RouteJob, valid: &dyn Fn() -> bool) -> Option<RouteOutput> 
                 }
                 let point = sample(p).map(|h| [p[0], p[1], h]);
                 waypoints.push(point);
+                // Points along a followed track: projected (for inserting on the
+                // line) but not drawn as waypoints.
+                if path.shape.get(i).copied().unwrap_or(false) {
+                    continue;
+                }
                 if let Some(p) = point {
                     for row in &job.patches {
                         let b = row.clip;

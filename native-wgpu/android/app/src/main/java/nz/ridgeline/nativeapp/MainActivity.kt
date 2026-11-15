@@ -135,8 +135,19 @@ class MainActivity:Activity(){
         layersUi=LayersUi(this,root,terrain,loader,offlineUi){planner.newRoute()}
         location=LocationUi(this,mapHost,terrain,false)
         val drawingBanner=LinearLayout(this).apply{gravity=Gravity.CENTER_VERTICAL;background=NativeUi.background(this@MainActivity,NativeUi.paper,8,true);visibility=View.GONE}
-        drawingBanner.addView(NativeUi.text(this,"Drawing route").apply{setPadding(dp(10),0,dp(10),0)})
+        val drawingTitle=NativeUi.text(this,"Drawing route").apply{setPadding(dp(10),0,dp(10),0)}
+        drawingBanner.addView(drawingTitle)
+        // From here to there along the tracks: on, each tap is reached from the last
+        // point along the map's tracks; off, in a straight line.
+        lateinit var followButton:TextView
+        fun showFollow(){followButton.text=if(planner.followTracks)"✓ Follow tracks" else "Follow tracks"
+            followButton.contentDescription=if(planner.followTracks)"Following tracks: tap to draw straight lines" else "Draw along tracks"}
+        followButton=NativeUi.button(this,"Follow tracks"){planner.followTracks=!planner.followTracks;showFollow()}
+        showFollow()
+        drawingBanner.addView(followButton,LinearLayout.LayoutParams(-2,-2).apply{marginEnd=dp(6)})
         drawingBanner.addView(NativeUi.button(this,"Done"){planner.controller.drawing(false)})
+        planner.trackWay={from,to,done->mapLayers.followTracks(from,to,done)}
+        planner.onFollowing={busy->drawingTitle.text=if(busy)"Finding the track…" else "Drawing route"}
         mapHost.addView(drawingBanner,FrameLayout.LayoutParams(-2,dp(44),Gravity.TOP or Gravity.CENTER_HORIZONTAL).apply{topMargin=dp(62)})
         planner.onDrawing={drawingBanner.visibility=if(it)View.VISIBLE else View.GONE}
         // Capacitor layout: kea launcher and locate (top left), 2D/3D switch,

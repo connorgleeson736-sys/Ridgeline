@@ -1083,7 +1083,7 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_routes(
         .with_env(|env| -> Result<u8, jni::errors::Error> {
             let input = unsafe { jni::objects::JByteBuffer::from_raw(env, input) };
             let size = env.get_direct_buffer_capacity(&input)?;
-            if !(4..=1_601_000).contains(&size) {
+            if !(4..=1_603_100).contains(&size) {
                 return Ok(0);
             }
             let bytes =
@@ -1136,7 +1136,26 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_routes(
                     } else {
                         None
                     },
+                    shape: vec![],
                 });
+            }
+            // Optional: the first path's followed-track flags (u32 count, then one
+            // byte a point, 0 or 1), points drawn without a waypoint dot.
+            if offset + 4 <= size && !paths.is_empty() {
+                let n = u32::from_le_bytes(bytes[offset..offset + 4].try_into().unwrap()) as usize;
+                offset += 4;
+                if n != paths[0].points.len() || offset + n > size {
+                    return Ok(0);
+                }
+                let mut shape = Vec::with_capacity(n);
+                for &b in &bytes[offset..offset + n] {
+                    if b > 1 {
+                        return Ok(0);
+                    }
+                    shape.push(b == 1);
+                }
+                offset += n;
+                paths[0].shape = shape;
             }
             if offset != size {
                 return Ok(0);

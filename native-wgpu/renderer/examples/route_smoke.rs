@@ -95,6 +95,7 @@ async fn run() {
         ],
         color: [232. / 255., 121. / 255., 68. / 255., 1.],
         selected: Some(0),
+        shape: vec![],
     }]);
     r.render(&target, center, 11., 0., 0., 500.);
     let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);

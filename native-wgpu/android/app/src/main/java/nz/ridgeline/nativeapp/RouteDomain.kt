@@ -91,34 +91,52 @@ object NativeGeo {
 /** Rendering-independent route mutations. Preview never creates history or saves;
  * one completed drag creates one undo snapshot, cancellation restores the point. */
 class RouteEditor {
-    data class Snapshot(val points:List<Coordinate>,val selected:Int)
+    data class Snapshot(val points:List<Coordinate>,val selected:Int,val shape:List<Boolean> = emptyList())
     enum class Result {CHANGED,TOO_CLOSE,OUTSIDE_NZ,LIMIT,NO_CHANGE}
     var points:List<Coordinate> = emptyList();private set
+    /** Per point: true for a point along a followed track (drawn as line, no
+     * waypoint dot); empty while the route has none. */
+    var shape:List<Boolean> = emptyList();private set
     var selected=-1;private set
     private val history=java.util.ArrayDeque<Snapshot>()
     private var drag:Snapshot?=null
     val canUndo get()=history.isNotEmpty()
     val isDragging get()=drag!=null
-    private fun snapshot()=Snapshot(points.toList(),selected)
+    private fun snapshot()=Snapshot(points.toList(),selected,shape.toList())
     private fun remember(value:Snapshot=snapshot()){history.addLast(value);while(history.size>50)history.removeFirst()}
-    fun reset(value:List<Coordinate>,selection:Int=-1){require(value.size<=2000&&value.all{it.inNewZealand()});points=value.toList();selected=selection.takeIf{it in value.indices}?:-1;history.clear();drag=null}
+    private fun flags()=if(shape.isEmpty())MutableList(points.size){false}else shape.toMutableList()
+    private fun setFlags(value:List<Boolean>){shape=if(value.any{it})value.toList()else emptyList()}
+    fun reset(value:List<Coordinate>,selection:Int=-1,shape:List<Boolean> = emptyList()){require(value.size<=2000&&value.all{it.inNewZealand()}&&(shape.isEmpty()||shape.size==value.size));points=value.toList();setFlags(shape);selected=selection.takeIf{it in value.indices}?:-1;history.clear();drag=null}
     fun clearSelection(){if(drag==null)selected=-1}
-    fun select(index:Int):Boolean {if(drag!=null||index !in points.indices)return false;selected=index;return true}
+    fun select(index:Int):Boolean {if(drag!=null||index !in points.indices||shape.getOrElse(index){false})return false;selected=index;return true}
     fun append(value:Coordinate):Result {
         cancelDrag();val p=value.rounded();if(!p.inNewZealand())return Result.OUTSIDE_NZ
         if(points.size>=2000)return Result.LIMIT
         if(points.lastOrNull()?.let{NativeGeo.distance(it,p)<5}==true)return Result.TOO_CLOSE
-        remember();points=points+p;selected=points.lastIndex;return Result.CHANGED
+        remember();val f=flags();points=points+p;f.add(false);setFlags(f);selected=points.lastIndex;return Result.CHANGED
+    }
+    /** A followed track from the last point: [path]'s points (along the track)
+     * then its last (a waypoint), as one undo step. */
+    fun appendPath(path:List<Coordinate>):Result {
+        cancelDrag();val rounded=path.map{it.rounded()};if(rounded.isEmpty())return Result.NO_CHANGE
+        if(!rounded.all{it.inNewZealand()})return Result.OUTSIDE_NZ
+        val added=ArrayList<Coordinate>();var last=points.lastOrNull()
+        for((i,p) in rounded.withIndex()){val end=i==rounded.lastIndex
+            if(last!=null&&NativeGeo.distance(last,p)<(if(end)5.0 else 1.0)){if(end&&added.isNotEmpty())added[added.lastIndex]=p;continue}
+            added.add(p);last=p}
+        if(added.isEmpty())return Result.TOO_CLOSE
+        if(points.size+added.size>2000)return Result.LIMIT
+        remember();val f=flags();points=points+added;for(i in added.indices)f.add(i<added.lastIndex);setFlags(f);selected=points.lastIndex;return Result.CHANGED
     }
     fun insertAfter(index:Int,p:Coordinate):Result {
         cancelDrag();if(index !in 0 until points.lastIndex)return Result.NO_CHANGE
         if(!p.inNewZealand())return Result.OUTSIDE_NZ;if(points.size>=2000)return Result.LIMIT
-        remember();points=points.toMutableList().apply{add(index+1,p)};selected=index+1;return Result.CHANGED
+        remember();val f=flags();points=points.toMutableList().apply{add(index+1,p)};f.add(index+1,false);setFlags(f);selected=index+1;return Result.CHANGED
     }
-    fun deleteSelected():Boolean {cancelDrag();if(selected !in points.indices)return false;remember();points=points.toMutableList().apply{removeAt(selected)};selected=-1;return true}
+    fun deleteSelected():Boolean {cancelDrag();if(selected !in points.indices)return false;remember();val f=flags();points=points.toMutableList().apply{removeAt(selected)};f.removeAt(selected);setFlags(f);selected=-1;return true}
     fun beginDrag(index:Int):Boolean {cancelDrag();if(!select(index))return false;drag=snapshot();return true}
     fun previewDrag(value:Coordinate):Boolean {if(drag==null)return false;val p=value.rounded();if(!p.inNewZealand()||points[selected]==p)return false;points=points.toMutableList().apply{set(selected,p)};return true}
     fun commitDrag():Boolean {val old=drag?:return false;drag=null;if(old.points==points)return false;remember(old);return true}
-    fun cancelDrag():Boolean {val old=drag?:return false;drag=null;val changed=points!=old.points;points=old.points;selected=old.selected;return changed}
-    fun undo():Boolean {cancelDrag();val old=history.pollLast()?:return false;points=old.points;selected=old.selected;return true}
+    fun cancelDrag():Boolean {val old=drag?:return false;drag=null;val changed=points!=old.points;points=old.points;selected=old.selected;shape=old.shape;return changed}
+    fun undo():Boolean {cancelDrag();val old=history.pollLast()?:return false;points=old.points;selected=old.selected;shape=old.shape;return true}
 }

@@ -10,7 +10,8 @@ import java.util.concurrent.TimeUnit
 interface RouteStorage {
     fun summaries():List<RouteSummary>
     fun load(id:String):SavedRoute?
-    fun save(id:String?,name:String,points:List<Coordinate>,now:Long=System.currentTimeMillis()):RouteSummary
+    /** [shape]: per point, true along a followed track (RouteEditor.shape); empty for none. */
+    fun save(id:String?,name:String,points:List<Coordinate>,now:Long=System.currentTimeMillis(),shape:List<Boolean> = emptyList()):RouteSummary
     fun rename(id:String,name:String,now:Long=System.currentTimeMillis()):Boolean
     fun delete(id:String):Boolean
 }
@@ -26,7 +27,9 @@ class RouteController(
     enum class Change {VIEW,GEOMETRY,PREVIEW,SELECTION,SAVE,OPENED,LIST}
     data class State(val loaded:Boolean,val busy:Boolean,val name:String,val id:String?,val points:List<Coordinate>,val selected:Int,
                      val drawing:Boolean,val canUndo:Boolean,val dragging:Boolean,val saveState:SaveState,val error:String?,
-                     val records:List<RouteSummary>,val opened:Set<String>,val revision:Long)
+                     val records:List<RouteSummary>,val opened:Set<String>,val revision:Long,
+                     /** Per point: true along a followed track (no waypoint dot). */
+                     val shape:List<Boolean> = emptyList())
     private val editor=RouteEditor()
     private var loaded=false;private var busy=false;private var name="Untitled route";private var id:String?=null
     private var drawing=false;private var status=SaveState.IDLE;private var error:String?=null
@@ -35,7 +38,7 @@ class RouteController(
     private var timer:ScheduledFuture<*>?=null
     @Volatile private var closed=false
     private val listeners=linkedSetOf<(State,Change)->Unit>()
-    val state get()=State(loaded,busy,name,id,editor.points,editor.selected,drawing,editor.canUndo,editor.isDragging,status,error,records,opened.toSet(),revision)
+    val state get()=State(loaded,busy,name,id,editor.points,editor.selected,drawing,editor.canUndo,editor.isDragging,status,error,records,opened.toSet(),revision,editor.shape)
     init {reload()}
     fun observe(listener:(State,Change)->Unit):()->Unit {listeners.add(listener);listener(state,Change.VIEW);return {listeners.remove(listener)}}
     private fun emit(change:Change){val snapshot=state;listeners.toList().forEach{it(snapshot,change)}}
@@ -46,6 +49,11 @@ class RouteController(
     fun append(point:Coordinate):RouteEditor.Result {
         if(!editable()||!drawing||editor.isDragging)return RouteEditor.Result.NO_CHANGE
         val result=editor.append(point);if(result==RouteEditor.Result.CHANGED)edited();return result
+    }
+    /** A followed track's points to [path]'s last point, as one step (one undo). */
+    fun appendPath(path:List<Coordinate>):RouteEditor.Result {
+        if(!editable()||!drawing||editor.isDragging)return RouteEditor.Result.NO_CHANGE
+        val result=editor.appendPath(path);if(result==RouteEditor.Result.CHANGED)edited();return result
     }
     fun insert(index:Int,point:Coordinate):RouteEditor.Result {
         if(!editable()||!drawing)return RouteEditor.Result.NO_CHANGE
@@ -65,11 +73,11 @@ class RouteController(
         if(editor.points.isEmpty()&&id==null){dirty=false;status=SaveState.IDLE;busy=false;after?.invoke();return}
         if(!dirty){busy=false;after?.invoke();return}
         if(id==null)id=UUID.randomUUID().toString()
-        val key=id!!;val points=editor.points;val title=name;val version=saveRevision;val generation=epoch
+        val key=id!!;val points=editor.points;val shape=editor.shape;val title=name;val version=saveRevision;val generation=epoch
         status=SaveState.SAVING;error=null;emit(Change.SAVE)
         timer=io.schedule({
             try {
-                storage.save(key,title,points);val rows=storage.summaries()
+                storage.save(key,title,points,shape=shape);val rows=storage.summaries()
                 post {
                     if(generation!=epoch)return@post
                     records=rows;opened.add(key)
@@ -87,15 +95,15 @@ class RouteController(
     }
     fun retrySave(){if(editable())save(0)}
     private fun navigate(action:()->Unit){if(!editable())return;finishDrag();busy=true;emit(Change.VIEW);save(0,action)}
-    private fun reset(points:List<Coordinate>,title:String,key:String?,draw:Boolean) {
-        epoch++;saveRevision++;revision++;editor.reset(points);name=title;id=key;drawing=draw;dirty=false
+    private fun reset(points:List<Coordinate>,title:String,key:String?,draw:Boolean,shape:List<Boolean> = emptyList()) {
+        epoch++;saveRevision++;revision++;editor.reset(points,shape=shape);name=title;id=key;drawing=draw;dirty=false
         status=if(key==null)SaveState.IDLE else SaveState.SAVED;busy=false;error=null
     }
     fun newRoute(){navigate{reset(emptyList(),"Untitled route",null,true);emit(Change.OPENED)}}
     fun unload(){navigate{val previous=id;reset(emptyList(),name,null,false);if(previous!=null)opened.remove(previous);emit(Change.GEOMETRY)}}
     fun open(key:String){navigate{
         busy=true;emit(Change.VIEW)
-        io.execute{try{val route=storage.load(key)?:error("Missing route");post{reset(route.points,route.summary.name,key,false);opened.add(key);emit(Change.OPENED)}}catch(_:Exception){post{busy=false;error="This saved route could not be opened.";emit(Change.VIEW)}}}
+        io.execute{try{val route=storage.load(key)?:error("Missing route");post{reset(route.points,route.summary.name,key,false,route.shape);opened.add(key);emit(Change.OPENED)}}catch(_:Exception){post{busy=false;error="This saved route could not be opened.";emit(Change.VIEW)}}}
     }}
     fun showOther(key:String){if(editable()){opened.add(key);emit(Change.LIST)}}
     fun closeOther(key:String){if(key==id)unload()else if(editable()){opened.remove(key);emit(Change.LIST)}}
@@ -133,9 +141,9 @@ class RouteController(
     override fun close(){
         if(closed)return
         closed=true;listeners.clear();timer?.cancel(false)
-        val points=editor.points;val title=name;val key=id
+        val points=editor.points;val shape=editor.shape;val title=name;val key=id
         val pending=dirty&&(points.isNotEmpty()||key!=null)
-        io.execute{try{if(pending)storage.save(key,title,points)}finally{(storage as? AutoCloseable)?.close()}}
+        io.execute{try{if(pending)storage.save(key,title,points,shape=shape)}finally{(storage as? AutoCloseable)?.close()}}
         io.shutdown()
     }
 }

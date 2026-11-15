@@ -12,22 +12,33 @@ import java.util.UUID
  * repeated JSON serialization of every saved route during a drag/commit. */
 object RouteBlob {
     private const val MAGIC=0x31524752 // RGR1 in little-endian byte order
-    fun encode(points:List<Coordinate>):ByteArray {
-        require(points.size<=2000&&points.all{it.inNewZealand()})
-        return ByteBuffer.allocate(8+points.size*16).order(ByteOrder.LITTLE_ENDIAN).apply {
-            putInt(MAGIC);putInt(points.size);for(p in points){putDouble(p.longitude);putDouble(p.latitude)}
+    /** RGR2: RGR1's points, then one byte a point (1: a point along a followed
+     * track, drawn without a waypoint dot). Written only when there are such points. */
+    private const val MAGIC2=0x32524752
+    fun encode(points:List<Coordinate>,shape:List<Boolean> = emptyList()):ByteArray {
+        require(points.size<=2000&&points.all{it.inNewZealand()}&&(shape.isEmpty()||shape.size==points.size))
+        val flags=shape.any{it}
+        return ByteBuffer.allocate(8+points.size*(if(flags)17 else 16)).order(ByteOrder.LITTLE_ENDIAN).apply {
+            putInt(if(flags)MAGIC2 else MAGIC);putInt(points.size);for(p in points){putDouble(p.longitude);putDouble(p.latitude)}
+            if(flags)for(f in shape)put(if(f)1 else 0)
         }.array()
     }
-    fun decode(bytes:ByteArray):List<Coordinate> {
+    fun decode(bytes:ByteArray):List<Coordinate> = decodeAll(bytes).first
+    /** Points and their followed-track flags (empty when the route has none). */
+    fun decodeAll(bytes:ByteArray):Pair<List<Coordinate>,List<Boolean>> {
         require(bytes.size>=8){"Saved route is incomplete"}
         val input=ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN)
-        require(input.int==MAGIC){"Unknown saved route format"};val count=input.int
-        require(count in 0..2000&&bytes.size==8+count*16){"Invalid saved route length"}
-        return List(count){Coordinate(input.double,input.double).also{require(it.inNewZealand())}}
+        val magic=input.int;require(magic==MAGIC||magic==MAGIC2){"Unknown saved route format"};val count=input.int
+        val flags=magic==MAGIC2
+        require(count in 0..2000&&bytes.size==8+count*(if(flags)17 else 16)){"Invalid saved route length"}
+        val points=List(count){Coordinate(input.double,input.double).also{require(it.inNewZealand())}}
+        val shape=if(flags)List(count){input.get().toInt().also{v->require(v==0||v==1){"Invalid saved route flag"}}==1}else emptyList()
+        return points to shape
     }
 }
 data class RouteSummary(val id:String,val name:String,val pointCount:Int,val lengthMeters:Double,val updatedMillis:Long)
-data class SavedRoute(val summary:RouteSummary,val points:List<Coordinate>)
+/** [shape]: per point, true for a point along a followed track (no waypoint dot); empty for none. */
+data class SavedRoute(val summary:RouteSummary,val points:List<Coordinate>,val shape:List<Boolean> = emptyList())
 class RouteLimitException:IllegalStateException("50 route limit. Delete a route or export GPX to keep this route.")
 
 /** Call from the controller's I/O executor. Separate application-private database.
@@ -51,10 +62,10 @@ class RouteDatabase(context:Context,name:String="routes-v1.sqlite"):SQLiteOpenHe
     private fun summary(cursor:android.database.Cursor)=RouteSummary(cursor.getString(0),cursor.getString(1),cursor.getInt(2),cursor.getDouble(3),cursor.getLong(4))
     override fun summaries():List<RouteSummary> = readableDatabase.query("routes",summaryColumns,null,null,null,null,"seq DESC").use { c ->buildList{while(c.moveToNext())add(summary(c))} }
     override fun load(id:String):SavedRoute? = readableDatabase.query("routes",summaryColumns+"coords","id=?",arrayOf(id),null,null,null).use { c ->
-        if(!c.moveToFirst())null else {val metadata=summary(c);val points=RouteBlob.decode(c.getBlob(5));check(metadata.pointCount==points.size);SavedRoute(metadata,points)}
+        if(!c.moveToFirst())null else {val metadata=summary(c);val (points,shape)=RouteBlob.decodeAll(c.getBlob(5));check(metadata.pointCount==points.size);SavedRoute(metadata,points,shape)}
     }
-    @Synchronized override fun save(id:String?,name:String,points:List<Coordinate>,now:Long):RouteSummary {
-        val data=RouteBlob.encode(points)
+    @Synchronized override fun save(id:String?,name:String,points:List<Coordinate>,now:Long,shape:List<Boolean>):RouteSummary {
+        val data=RouteBlob.encode(points,shape)
         val title=name.trim().ifEmpty{"Untitled route"}.take(80)
         val db=writableDatabase;db.beginTransaction()
         try {

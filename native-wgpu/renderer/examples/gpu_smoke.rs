@@ -177,6 +177,7 @@ async fn run() {
         ],
         color: [1., 0.2, 0.1, 1.],
         selected: Some(0),
+        shape: vec![],
     }]);
     r.render(
         &output.create_view(&Default::default()),
