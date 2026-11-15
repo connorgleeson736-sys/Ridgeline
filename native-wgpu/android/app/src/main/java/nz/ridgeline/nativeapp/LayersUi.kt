@@ -148,7 +148,8 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
         parent.addView(NativeUi.button(activity,"Reset download jobs"){loader.resetDownloadJobs();render()})
         parent.addView(NativeUi.text(activity,"More jobs share bandwidth. Routes, names and map backgrounds use the same bounded transport and cache.",11f))
         NativeUi.divider(parent)
-        slider(parent,"Combined RAM tile cache",1000,loader.ramCacheMiB,{"$it MiB"}){loader.ramCacheMiB(it)}
+        // Up to what this phone can hold (it went to 1000 MiB, beyond the app's memory).
+        slider(parent,"Combined RAM tile cache",loader.maxRamCacheMiB,loader.ramCacheMiB,{"$it MiB"}){loader.ramCacheMiB(it)}
         slider(parent,"Automatic disk cache",1000,loader.automaticCacheMiB,{"$it MiB · applies after restart"}){loader.automaticCacheMiB(it)}
         check(parent,"Progressive terrain",settings.progressiveTerrain){loader.progressiveTerrain(it)}
         check(parent,"Prepare nearby terrain while idle",loader.prepareAhead){loader.prepareAhead(it)}

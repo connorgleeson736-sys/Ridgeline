@@ -1,0 +1,26 @@
+{
+  "artifact": "Ridgeline-Native-Memory-Limits-0.1.68-Base.apk",
+  "bytes": 36298729,
+  "sha256": "d76d76c9cf60227eacfc85e3924c7d650e3b40f6e8a133bd8ffeaf7d85177f49",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.68-memory-limits",
+  "versionCode": 69,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.67 Full Audit (same package and signer)",
+  "changes": [
+    "Crashes and roads not loading in cities (Dunedin) with a large RAM tile cache: the slider went to 1000 MiB and half of the cache (downloaded tiles and decoded elevation) is Java arrays, against an app heap limit of typically 256 MB. In busy areas it filled the heap: garbage collection stalled loading, then the app ran out of memory. The Java caches now keep to 30% of the heap limit and the prepared (native) cache to 1/16 of the phone's RAM and 512 MiB, whatever the setting; the slider ends at what the phone can hold.",
+    "A heap watchdog (every 2 s): above 80% of the heap limit the RAM caches are dropped (Android sends no warning for the Java heap).",
+    "Correction: 0.1.67's release noted all tests passing; one new test (long followed leg) was failing on its own geometry (the tap's nearest track point was not the track's end). Fixed; the code was correct."
+  ],
+  "tests": {
+    "kotlinJvm": "all pass (new: cache within heap and RAM limits; slider maximum)",
+    "rust": "unchanged since 0.1.67"
+  },
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}
