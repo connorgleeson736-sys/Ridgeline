@@ -95,7 +95,13 @@ async function main() {
   const sheetPadding = () => {
     const wide = matchMedia('(min-width: 800px)').matches, s = $('sheet');
     const pad = { top: 70, bottom: 50, left: 70, right: 60 };
-    if (!s.hidden) { if (wide) pad.left += s.offsetWidth + 10; else pad.bottom += Math.min(s.offsetHeight, innerHeight * 0.6); }
+    if (!s.hidden) {
+      if (wide) {
+        // Beside the card, wherever it has been moved to.
+        const r = s.getBoundingClientRect();
+        if (r.left + r.width / 2 < innerWidth / 2) pad.left = Math.max(pad.left, r.right + 20); else pad.right = Math.max(pad.right, innerWidth - r.left + 20);
+      } else pad.bottom += Math.min(s.offsetHeight, innerHeight * 0.6);
+    }
     return pad;
   };
   const geo = (type, data) => map.getSource(type)?.setData(data);
@@ -319,8 +325,8 @@ function layers(map, panel, button, { setThreeD, overlays, resize, closeDrawer }
   const naturalBox = el('label', { class: 'check' }, el('span', {}, 'Natural imagery colour'), naturalInput);
   function setNatural(on) {
     settings.natural = on; saveSettings();
-    for (const id of ['aerial', 'satellite']) for (const [k, v] of Object.entries(grade(id, on))) map.setPaintProperty(id, k, v);
-    map.getSource('aerial')?.setTiles([`bushline://aerial/{z}/{x}/{y}${on ? '' : '?raw'}`]);
+    for (const id of ['aerial', 'satellite']) for (const l of [id, `${id}-cover`]) for (const [k, v] of Object.entries(grade(id, on))) map.setPaintProperty(l, k, v);
+    for (const src of ['aerial', 'aerial-cover']) map.getSource(src)?.setTiles([`bushline://aerial/{z}/{x}/{y}${on ? '' : '?raw'}`]);
   }
   panel.append(
     el('div', { class: 'heading' }, el('h2', {}, 'Map layers'), el('button', { class: 'icon-button', type: 'button', 'aria-label': 'Close layers', onclick: () => close() }, '✕')),
@@ -334,7 +340,7 @@ function layers(map, panel, button, { setThreeD, overlays, resize, closeDrawer }
   const applyAll = () => { for (const ids of Object.values(GROUPS)) for (const id of ids) if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', shown(id, settings) ? 'visible' : 'none'); };
   function setBase(id, { keep3d = false } = {}) {
     settings.base = id; saveSettings();
-    for (const layer of ['aerial', 'satellite', 'topo']) map.setLayoutProperty(layer, 'visibility', id === layer ? 'visible' : 'none');
+    for (const layer of ['aerial', 'satellite', 'topo']) for (const l of [layer, `${layer}-cover`]) map.setLayoutProperty(l, 'visibility', id === layer ? 'visible' : 'none');
     applyAll(); overlays.refresh(); sync(); resize();
     if (id === 'topo' && settings.threeD && !keep3d) setThreeD(false);
   }

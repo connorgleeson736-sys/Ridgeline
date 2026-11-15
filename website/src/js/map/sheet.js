@@ -1,6 +1,6 @@
 // The bottom sheet, as the app's NativeSheet: a grip with × at the top right,
 // two stops (compact and expanded); tap the grip to switch, or drag it.
-import { el } from './ui.js';
+import { el, store } from './ui.js';
 
 export class Sheet {
   constructor(root, { onClose = () => {} } = {}) {
@@ -26,6 +26,7 @@ export class Sheet {
     this.stack = [];
     this.token = 0;
     this.dragging();
+    this.card();
   }
   get isOpen() { return !this.root.hidden; }
   /** Shows a panel: {kind, title, subtitle, size, render(body, alive) → cleanup}. `push`: Back returns here. */
@@ -76,11 +77,66 @@ export class Sheet {
   }
   size(s) { this.root.dataset.size = s; this.onSize?.(s); }
   toggle() { this.size(this.root.dataset.size === 'compact' ? 'expanded' : 'compact'); }
+  /** On computers: a floating card moved by its top bar and resized from its
+   * edges and corners, kept where it was left (position and size remembered). */
+  card() {
+    const wide = matchMedia('(min-width: 800px)');
+    const root = this.root;
+    const handles = ['e', 'w', 's', 'n', 'se', 'sw', 'ne', 'nw'].map((d) => el('div', { class: `resize resize-${d}`, 'data-dir': d, 'aria-hidden': 'true' }));
+    root.append(...handles);
+    let box = store.get('card', null);
+    const clamp = (b) => {
+      const w = Math.min(Math.max(320, b.w), innerWidth - 24), h = b.h == null ? null : Math.min(Math.max(220, b.h), innerHeight - 24);
+      return { x: Math.min(Math.max(12, b.x), innerWidth - w - 12), y: Math.min(Math.max(12, b.y), innerHeight - (h ?? 220) - 12), w, h };
+    };
+    const apply = () => {
+      if (!wide.matches || !box) { for (const k of ['left', 'top', 'width', 'height', 'bottom', 'maxHeight']) root.style[k] = ''; return; }
+      box = clamp(box);
+      Object.assign(root.style, { left: `${box.x}px`, top: `${box.y}px`, bottom: 'auto', width: `${box.w}px`, height: box.h == null ? '' : `${box.h}px`, maxHeight: box.h == null ? `${innerHeight - box.y - 12}px` : '' });
+    };
+    this.applyCard = apply;
+    addEventListener('resize', apply);
+    wide.addEventListener('change', apply);
+    let start = null;
+    const down = (e, mode) => {
+      if (!wide.matches || e.button !== 0) return;
+      const r = root.getBoundingClientRect();
+      start = { mode, x: e.clientX, y: e.clientY, r: { x: r.left, y: r.top, w: r.width, h: r.height } };
+      e.target.setPointerCapture(e.pointerId);
+      e.preventDefault();
+      document.body.classList.add(mode === 'move' ? 'card-moving' : 'card-resizing');
+    };
+    const move = (e) => {
+      if (!start) return;
+      const dx = e.clientX - start.x, dy = e.clientY - start.y, r = start.r;
+      if (start.mode === 'move') box = { x: r.x + dx, y: r.y + dy, w: r.w, h: box?.h ?? null };
+      else {
+        const d = start.mode;
+        let { x, y, w, h } = r;
+        if (d.includes('e')) w = r.w + dx;
+        if (d.includes('w')) { w = r.w - dx; x = r.x + dx; }
+        if (d.includes('s')) h = r.h + dy;
+        if (d.includes('n')) { h = r.h - dy; y = r.y + dy; }
+        // Only a vertical resize fixes the height; widening alone keeps it fitting its content.
+        box = { x, y, w, h: /[ns]/.test(d) ? h : box?.h ?? null };
+      }
+      apply();
+    };
+    const up = () => { if (!start) return; start = null; document.body.classList.remove('card-moving', 'card-resizing'); store.set('card', box); };
+    for (const t of [this.grip, this.head]) t.addEventListener('pointerdown', (e) => { if (!e.target.closest('button')) down(e, 'move'); });
+    for (const h of handles) h.addEventListener('pointerdown', (e) => down(e, h.dataset.dir));
+    root.addEventListener('pointermove', move);
+    root.addEventListener('pointerup', up);
+    root.addEventListener('pointercancel', up);
+    // Double-click the top bar: back to the default place and size.
+    this.grip.addEventListener('dblclick', () => { if (!wide.matches) return; box = null; store.set('card', null); apply(); });
+    apply();
+  }
   /** Drag the grip between the two stops; a tap switches. */
   dragging() {
     let start = null;
     const down = (e) => {
-      if (e.target.closest('button')) return;
+      if (e.target.closest('button') || matchMedia('(min-width: 800px)').matches) return;
       start = { y: e.clientY, h: this.root.getBoundingClientRect().height };
       this.grip.setPointerCapture(e.pointerId);
       this.root.classList.add('dragging');

@@ -290,7 +290,6 @@ export function attach(ctx) {
   }
   function remove() {
     if (!route) return;
-    if (!confirm(`Delete “${route.name}”?`)) return;
     store.set('routes', saved().filter((r) => r.id !== route.id));
     clear();
     sheet.close();
@@ -329,7 +328,7 @@ export function attach(ctx) {
     const day = (t) => new Date(t).toLocaleDateString('en-NZ', { day: 'numeric', month: 'short', year: 'numeric' });
     const file = el('input', { type: 'file', accept: '.gpx,application/gpx+xml', hidden: true, onchange: (e) => { const f = e.target.files[0]; if (f) importGpx(f).then(() => list(container)); e.target.value = ''; } });
     const rename = (r) => { const name = prompt('Route name', r.name); if (!name || !name.trim()) return; r.name = name.trim().slice(0, 80); store.set('routes', saved().map((x) => (x.id === r.id ? { ...x, name: r.name } : x))); if (route?.id === r.id) route.name = r.name; list(container); };
-    const remove = (r) => { if (!confirm(`Delete “${r.name}”?`)) return; store.set('routes', saved().filter((x) => x.id !== r.id)); if (route?.id === r.id) { clear(); sheet.close(); } list(container); };
+    const remove = (r) => { store.set('routes', saved().filter((x) => x.id !== r.id)); if (route?.id === r.id) { clear(); sheet.close(); } list(container); };
     const open = (r) => { ctx.closeDrawer(); load(r); };
     container.replaceChildren(...[
       el('h2', {}, 'Saved routes'),

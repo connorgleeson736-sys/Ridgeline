@@ -72,6 +72,12 @@ export function build({ topography, settings, dark }) {
     sources: {
       // Overview imagery for zooms 5–12 (the app's, averaged from LINZ's zoom-13 photography), LINZ beyond.
       aerial: { type: 'raster', tiles: [`bushline://aerial/{z}/{x}/{y}${settings.natural ? '' : '?raw'}`], tileSize: 256, maxzoom: 19, bounds: [160, -53, 185, -28], attribution: `${LINZ_ATTRIBUTION} · gaps: ${ESRI_ATTRIBUTION}` },
+      // Coarse covers, always resident under each base (the app's and the old website's
+      // coarse cover): where finer tiles have not arrived, slightly blurred imagery shows
+      // instead of a gap. A few tiles per view, from the same cached URLs.
+      'aerial-cover': { type: 'raster', tiles: [`bushline://aerial/{z}/{x}/{y}${settings.natural ? '' : '?raw'}`], tileSize: 256, maxzoom: 11, bounds: [160, -53, 185, -28] },
+      'satellite-cover': { type: 'raster', tiles: ['bushline://satellite/{z}/{x}/{y}'], tileSize: 256, maxzoom: 11, bounds: [160, -53, 185, -28] },
+      'topo-cover': { type: 'raster', tiles: [urls.topo], tileSize: 256, maxzoom: 11, bounds: [165, -49, 180, -33] },
       satellite: { type: 'raster', tiles: ['bushline://satellite/{z}/{x}/{y}'], tileSize: 256, maxzoom: 19, bounds: [160, -53, 185, -28], attribution: ESRI_ATTRIBUTION },
       topo: { type: 'raster', tiles: [urls.topo], tileSize: 256, maxzoom: 16, bounds: [165, -49, 180, -33], attribution: '<a href="https://www.linz.govt.nz/products-services/maps/new-zealand-topographic-maps" target="_blank" rel="noopener">Topo50 © Toitū Te Whenua LINZ</a> CC BY 4.0' },
       terrain: { type: 'raster-dem', tiles: [urls.elevation], tileSize: 256, maxzoom: 18, encoding: 'mapbox', bounds: [165, -48, 179, -34] },
@@ -88,6 +94,9 @@ export function build({ topography, settings, dark }) {
     terrain: settings.threeD ? { source: 'terrain', exaggeration: settings.relief } : undefined,
     layers: [
       { id: 'background', type: 'background', paint: { 'background-color': dark ? '#16211d' : '#dfe7e1' } },
+      { id: 'aerial-cover', type: 'raster', source: 'aerial-cover', layout: { visibility: visible(settings.base === 'aerial') }, paint: { 'raster-fade-duration': 0, 'raster-resampling': 'linear', ...grade('aerial', settings.natural) } },
+      { id: 'satellite-cover', type: 'raster', source: 'satellite-cover', layout: { visibility: visible(settings.base === 'satellite') }, paint: { 'raster-fade-duration': 0, 'raster-resampling': 'linear', ...grade('satellite', settings.natural) } },
+      { id: 'topo-cover', type: 'raster', source: 'topo-cover', layout: { visibility: visible(settings.base === 'topo') }, paint: { 'raster-fade-duration': 0 } },
       { id: 'aerial', type: 'raster', source: 'aerial', layout: { visibility: visible(settings.base === 'aerial') }, paint: { 'raster-fade-duration': 150, 'raster-resampling': 'linear', ...grade('aerial', settings.natural) } },
       { id: 'satellite', type: 'raster', source: 'satellite', layout: { visibility: visible(settings.base === 'satellite') }, paint: { 'raster-fade-duration': 150, 'raster-resampling': 'linear', ...grade('satellite', settings.natural) } },
       { id: 'topo', type: 'raster', source: 'topo', layout: { visibility: visible(settings.base === 'topo') }, paint: { 'raster-fade-duration': 150 } },
@@ -105,7 +114,7 @@ export function build({ topography, settings, dark }) {
       { id: 'route-halo', type: 'line', source: 'route', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': '#ffffff', 'line-width': 6, 'line-opacity': 0.85 } },
       { id: 'route-line', type: 'line', source: 'route', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': 'rgb(232,121,68)', 'line-width': 3 } },
       ...symbols,
-      { id: 'doc-walk-names', type: 'symbol', source: 'doc-walks', minzoom: 11, maxzoom: 15, filter: ['==', ['get', 'large'], true], layout: { visibility: visible(shown('doc-walks', settings)), 'symbol-placement': 'line', 'symbol-spacing': 650, 'text-field': ['get', 'name'], 'text-font': ['Open Sans Regular'], 'text-size': 12, 'text-max-angle': 30, 'text-padding': 8, 'symbol-sort-key': 5 }, paint: { 'text-color': '#f6db94', 'text-halo-color': 'rgba(15,30,31,.9)', 'text-halo-width': 1.6 } },
+      { id: 'doc-walk-names', type: 'symbol', source: 'doc-walks', minzoom: 11, maxzoom: 12, filter: ['==', ['get', 'large'], true], layout: { visibility: visible(shown('doc-walks', settings)), 'symbol-placement': 'line-center', 'text-rotation-alignment': 'viewport', 'text-field': ['get', 'name'], 'text-font': ['Open Sans Regular'], 'text-size': 12, 'text-max-angle': 180, 'text-padding': 8, 'symbol-sort-key': 5 }, paint: { 'text-color': '#f6db94', 'text-halo-color': 'rgba(15,30,31,.9)', 'text-halo-width': 1.6 } },
       { id: 'hunting-names', type: 'symbol', source: 'hunting', minzoom: 11, filter: ['==', ['geometry-type'], 'Point'], layout: { visibility: visible(settings.hunting), 'text-field': ['get', 'name'], 'text-font': ['Open Sans Regular'], 'text-size': 11, 'text-max-width': 10, 'text-padding': 6 }, paint: { 'text-color': '#ffa25f', 'text-halo-color': 'rgba(20,20,20,.85)', 'text-halo-width': 1.4 } },
       // The app's route points: paper with an orange ring; selected, all orange and larger.
       { id: 'waypoints', type: 'circle', source: 'waypoints', paint: { 'circle-radius': ['case', ['boolean', ['get', 'selected'], false], 7.5, 4.5], 'circle-color': ['case', ['boolean', ['get', 'selected'], false], 'rgb(216,117,73)', 'rgb(250,250,245)'], 'circle-stroke-width': ['case', ['boolean', ['get', 'selected'], false], 1, 1.5], 'circle-stroke-color': 'rgb(216,117,73)', 'circle-pitch-alignment': 'viewport' } },

@@ -102,6 +102,16 @@ for (const layer of style) {
     fix(layer.filter);
   }
 }
+// Names along lines (tracks, roads, rivers, contours) as the app draws them: one flat
+// label at the middle of each line, not text bent along it. MapLibre's bent labels
+// give up on curvy tracks and are re-placed at every zoom, so names came and went.
+for (const layer of style) {
+  if (layer.type !== 'symbol' || layer.layout?.['symbol-placement'] !== 'line') continue;
+  layer.layout['symbol-placement'] = 'line-center';
+  layer.layout['text-rotation-alignment'] = 'viewport';
+  layer.layout['text-max-angle'] = 180;
+  delete layer.layout['symbol-spacing'];
+}
 writeFileSync(join(data, 'topography-style.json'), JSON.stringify(style));
 // Place search (LINZ Gazetteer, DOC huts, campsites and walks), as the app searches.
 // DOC page links shortened to their id (the search adds DOC's address back).
