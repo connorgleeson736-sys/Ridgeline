@@ -1,0 +1,28 @@
+{
+  "artifact": "Ridgeline-Native-Hut-Lock-0.1.66-Base.apk",
+  "bytes": 36273945,
+  "sha256": "4d22006de08cb532494dd6389d6ad29bd041068c81f7d0d266f6b918929e9864",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.66-hut-lock",
+  "versionCode": 67,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.65 Full Audit (same package and signer)",
+  "changes": [
+    "Drawing a route: a tap on or near a hut (its dot within 24 dp, or its name) adds the hut's exact place, reached along the tracks to the track nearest the hut (within 200 m) and then to the hut; the hut's point is selected (enlarged dot).",
+    "Not drawing: a tap on a hut's dot (not only its name) opens the hut, marked on the map.",
+    "Track sections not loading after many names: each DOC walk page that arrived (one per large walk named in view, plus page details) restyled every tile in view and re-sent all its lines to the renderer as new groups, which repainted every overlay texture, all on the map's single worker thread; with many walk names this queued new tiles behind dozens of full rebuilds. Lines are now cached apart from names (DOC's data changes names only), so walk pages rebuild names only and lines are referenced, not re-sent.",
+    "DOC pages read only for map names: fetched behind every map tile (rank 150) and two walks at a time.",
+    "A refused line packet no longer forgets what the renderer holds (it was refused before any change), so the next packet stays incremental rather than a full re-send."
+  ],
+  "tests": {
+    "kotlinJvm": "all pass (new: DOC marks change names not lines; names-only build)",
+    "rust": "unchanged since 0.1.64"
+  },
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

@@ -189,12 +189,15 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         chart.onInspect={p,_->if(chart.rangeEnds()==null)onProfilePoint(p.point)}
         chart.onRange={_->val ends=chart.rangeEnds();if(ends!=null){onProfilePoint(null);terrain.rangeMarkers(listOf(ends.first,ends.second))}else terrain.rangeMarkers(emptyList())}
         chart.onLeave={onProfilePoint(null);terrain.rangeMarkers(emptyList())}
-        terrain.onMapTap={x,y,index->
+        terrain.onMapTap=mapTap@{x,y,index->
             val state=controller.state
             if(index>=0&&state.drawing)controller.select(index)
             else if(state.drawing){
                 val epoch=state.revision
                 val insertion=nearestSegment(x,y)
+                // On or near a hut (its dot or its name): the point locks onto the hut.
+                val hut=hutAt(x,y)
+                if(hut!=null){if(insertion>=0)report(controller.insert(insertion,hut.second))else follow(hut.second,true);return@mapTap}
                 terrain.pick(x,y){hit->
                     if(hit==null)toast("Terrain is still loading here.")
                     else if(controller.state.drawing&&controller.state.revision==epoch){
@@ -278,7 +281,10 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
     /** Taps waiting to be added, in order: each tap close to a track is reached
      * from the route's last point along the tracks (point to point, ending on
      * the track); any other tap is a straight line, as before. */
-    private val taps=ArrayDeque<Pair<Coordinate,Double>>()
+    private class Tap(val at:Coordinate,val reach:Double,val hut:Boolean)
+    private val taps=ArrayDeque<Tap>()
+    /** The hut (name, place) whose dot or name is under a tap: set by the activity. */
+    var hutAt:(Double,Double)->Pair<String,Coordinate>? = {_,_->null}
     private var following=false;private var followToken=0
     /** How close (metres) a tap must be to a track to follow it: a finger's
      * width on screen at the current zoom, 10 to 150 m. */
@@ -286,10 +292,12 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         val metresPerDp=40_075_016.686*cos(Math.toRadians(at.latitude))/(512.0*2.0.pow(terrain.cameraPose.zoom))
         return (FOLLOW_DP*metresPerDp).coerceIn(10.0,150.0)
     }
-    private fun follow(to:Coordinate){taps.addLast(to to reach(to));nextTap()}
+    /** [hut]: [to] is a hut's place: reached along the tracks to the track
+     * nearest it (within [HUT_REACH_METERS]), then to the hut itself. */
+    private fun follow(to:Coordinate,hut:Boolean=false){taps.addLast(Tap(to,if(hut)HUT_REACH_METERS else reach(to),hut));nextTap()}
     private fun nextTap(){
         if(following||closed)return
-        val (to,reach)=taps.removeFirstOrNull()?:return
+        val tap=taps.removeFirstOrNull()?:return;val to=tap.at;val reach=tap.reach
         val state=controller.state
         if(!state.drawing){taps.clear();return}
         if(state.points.isEmpty()){report(controller.append(to));nextTap();return}
@@ -300,7 +308,8 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
             following=false
             val now=controller.state
             if(closed||!now.drawing||now.revision!=epoch){taps.clear();return}
-            report(if(way!=null&&way.size>=2)controller.appendPath(way)else controller.append(to))
+            val path=if(way!=null&&way.size>=2)(if(tap.hut)way+to else way)else null
+            report(if(path!=null)controller.appendPath(path)else controller.append(to))
             nextTap()
         }
         trackWay(from,to,reach){finish(it)}
@@ -473,5 +482,7 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         const val FOLLOW_DP=22.0
         /** Longest wait for the map's tracks before a tap is drawn straight. */
         const val FOLLOW_WAIT_MILLIS=3000L
+        /** A hut this close to a track is reached along it. */
+        const val HUT_REACH_METERS=200.0
     }
 }
