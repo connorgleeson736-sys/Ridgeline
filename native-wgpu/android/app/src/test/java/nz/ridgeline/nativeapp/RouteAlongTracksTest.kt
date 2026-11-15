@@ -31,6 +31,24 @@ class RouteAlongTracksTest{
         assertEquals(listOf(at(3.0,5.0),at(3.0,0.0),at(9.0,0.0)).size,line.size)
         assertTrue(near(line.last(),at(9.0,0.0)))
     }
+    @Test fun aLongLegFollowsTheTrack(){
+        // A 32 km valley track with 2 km bends; taps 40 m beside each end.
+        val bends=(0..16).map{i->at(i*2000.0,if(i%2==0)0.0 else 600.0)}
+        val line=TrackFollow.route(at(0.0,40.0),at(32_000.0,40.0),listOf("Long Valley Track" to bends),60.0)!!
+        assertTrue(near(line.last(),at(32_000.0,0.0)))
+        assertEquals(DocTracks.length(bends)+40.0,DocTracks.length(line),2.0)
+        assertTrue("the bends only, not every 20 m: ${line.size}",line.size<=20)
+    }
+    @Test fun longLegsReadCoarserTiles(){
+        val a=Coordinate(169.0,-44.5)
+        // [km] east and [km] north: a diagonal leg, the largest area for its length.
+        fun b(km:Double)=Coordinate(169.0+km*1000/(111_320.0*kotlin.math.cos(Math.toRadians(-44.5))),-44.5+km*1000/111_320.0)
+        assertEquals(14,MapLayers.areaZoom(listOf(a,b(3.0)),1000.0,MapLayers.FOLLOW_ZOOMS))
+        // 25 km each way (3 km margin): about 360 zoom-14 tiles, so zoom 13 (about 100).
+        assertEquals(13,MapLayers.areaZoom(listOf(a,b(25.0)),3000.0,MapLayers.FOLLOW_ZOOMS))
+        assertEquals(12,MapLayers.areaZoom(listOf(a,b(50.0)),3000.0,MapLayers.FOLLOW_ZOOMS))
+        assertNull(MapLayers.areaZoom(listOf(a,b(300.0)),3000.0,MapLayers.FOLLOW_ZOOMS))
+    }
     @Test fun aTapNotCloseToATrackIsNotFollowed(){
         // 60 m off the track with a 50 m reach: drawn straight instead.
         assertNull(TrackFollow.route(at(0.0,0.0),at(600.0,60.0),tracks,50.0))

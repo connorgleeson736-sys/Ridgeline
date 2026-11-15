@@ -382,6 +382,7 @@ impl Overlay {
         queue: &wgpu::Queue,
         tiles: impl Iterator<Item = TileId>,
         logical_zoom: f64,
+        center: [f64; 2],
     ) -> HashMap<TileId, f32> {
         let mut result = HashMap::new();
         self.pending = false;
@@ -395,12 +396,21 @@ impl Overlay {
         let band = (logical_zoom * 4.).floor();
         let zoom = (band + 0.5) / 4.;
         let mut order: Vec<TileId> = tiles.collect();
-        order.sort_by(|a, b| b.z.cmp(&a.z).then(a.x.cmp(&b.x)).then(a.y.cmp(&b.y)));
+        // Finest first, then nearest the view's centre: when the pool cannot
+        // hold every tile with lines, those left out are the coarsest and the
+        // furthest from the centre (they were the south-east ones in a flat view).
+        let distance = |t: &TileId| {
+            let b = t.bounds();
+            ((b[0] + b[2]) / 2. - center[0]).hypot((b[1] + b[3]) / 2. - center[1])
+        };
+        order.sort_by(|a, b| b.z.cmp(&a.z).then(distance(a).total_cmp(&distance(b))).then(a.x.cmp(&b.x)).then(a.y.cmp(&b.y)));
         order.dedup();
         let mut batch: Vec<Segment> = Vec::new();
         let mut paints: Vec<(usize, std::ops::Range<u32>)> = Vec::new();
         // (tile, groups, fingerprint, current slot, rank among tiles with lines)
         let mut work: Vec<(TileId, Vec<Arc<Group>>, u64, Option<usize>, usize)> = Vec::new();
+        // Each visible tile with lines by its place in that order (finest first).
+        let mut ranks: HashMap<TileId, usize> = HashMap::new();
         let mut rank = 0;
         for tile in order {
             let b = tile.bounds();
@@ -419,6 +429,7 @@ impl Overlay {
                 continue;
             }
             rank += 1;
+            ranks.insert(tile, rank - 1);
             let mut hasher = std::collections::hash_map::DefaultHasher::new();
             (band as i64, tile.z, tile.x, tile.y).hash(&mut hasher);
             for g in &near {
@@ -439,6 +450,7 @@ impl Overlay {
         // refreshed, so lines never go missing while others are repainted.
         work.sort_by_key(|w| (w.3.is_some(), w.4));
         self.missing = 0;
+        let capacity = (self.big + self.small) as usize;
         for (tile, near, fingerprint, existing, rank) in work {
             if paints.len() >= RENDERS_PER_FRAME || batch.len() >= SEGMENTS_PER_FRAME {
                 // Show the previous texture of this tile until it is repainted.
@@ -448,13 +460,20 @@ impl Overlay {
                 }
                 continue;
             }
+            // A slot taken this frame by a tile that comes first is no longer this tile's.
+            let existing = existing.filter(|s| self.slots[*s].tile == Some(tile));
             // The finest (nearest) tiles get 512 px textures, the rest 256 px.
             let want_big = rank < self.big as usize;
             let slot = existing
                 .filter(|s| self.is_big(*s) == want_big)
                 .or_else(|| self.free_slot(want_big))
                 .or(existing)
-                .or_else(|| self.free_slot(!want_big));
+                .or_else(|| self.free_slot(!want_big))
+                // Pool full: a tile within the pool's size takes the texture of the
+                // visible tile that comes last. Holders used to keep their textures
+                // whatever came into view, so new ground (in a busy area such as a
+                // town, where every tile has lines) stayed without tracks.
+                .or_else(|| if rank < capacity { self.steal(&ranks, rank) } else { None });
             let Some(slot) = slot else {
                 // Every texture already serves a nearer, finer tile this frame.
                 self.missing += 1;
@@ -468,6 +487,9 @@ impl Overlay {
             if let Some(old) = self.slots[slot].tile {
                 if old != tile {
                     self.by_tile.remove(&old);
+                    if result.remove(&old).is_some() {
+                        self.missing += 1;
+                    }
                 }
             }
             let start = batch.len() as u32;
@@ -485,6 +507,18 @@ impl Overlay {
             self.paint(device, queue, &batch, &paints);
         }
         result
+    }
+    /// The slot of the visible tile that comes last, if it comes after [rank].
+    fn steal(&self, ranks: &HashMap<TileId, usize>, rank: usize) -> Option<usize> {
+        self.slots
+            .iter()
+            .enumerate()
+            .filter_map(|(i, s)| s.tile.and_then(|t| ranks.get(&t)).filter(|&&r| r > rank).map(|&r| (i, r)))
+            .max_by_key(|&(_, r)| r)
+            .map(|(i, _)| i)
+    }
+    pub fn held_tiles(&self) -> Vec<TileId> {
+        self.by_tile.keys().copied().collect()
     }
     fn free_slot(&mut self, big: bool) -> Option<usize> {
         let range = if big { 0..self.big as usize } else { self.big as usize..(self.big + self.small) as usize };

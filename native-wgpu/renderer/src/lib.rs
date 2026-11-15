@@ -1964,6 +1964,7 @@ impl Renderer {
             &self.queue,
             rows.iter().map(|row| row.image),
             self.logical_zoom.unwrap_or(zoom),
+            center,
         );
         if self.overlay.pending {
             self.next_adaptive_frame = Some(self.next_adaptive_frame.map_or(1, |d| d.min(1)));

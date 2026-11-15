@@ -286,6 +286,8 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
     /** The hut (name, place) whose dot or name is under a tap: set by the activity. */
     var hutAt:(Double,Double)->Pair<String,Coordinate>? = {_,_->null}
     private var following=false;private var followToken=0
+    /** True while the way to a tap is being found (shown on the drawing note). */
+    var onFollowing:(Boolean)->Unit={}
     /** How close (metres) a tap must be to a track to follow it: a finger's
      * width on screen at the current zoom, 10 to 150 m. */
     private fun reach(at:Coordinate):Double{
@@ -302,10 +304,10 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         if(!state.drawing){taps.clear();return}
         if(state.points.isEmpty()){report(controller.append(to));nextTap();return}
         val from=state.points.last();val epoch=state.revision;val token=++followToken
-        following=true
+        following=true;onFollowing(true)
         fun finish(way:List<Coordinate>?){
             if(token!=followToken||!following)return
-            following=false
+            following=false;onFollowing(false)
             val now=controller.state
             if(closed||!now.drawing||now.revision!=epoch){taps.clear();return}
             val path=if(way!=null&&way.size>=2)(if(tap.hut)way+to else way)else null
@@ -313,7 +315,8 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
             nextTap()
         }
         trackWay(from,to,reach){finish(it)}
-        // The map's tracks not to hand (no connection): a straight line.
+        // The map's tracks not to hand at all (no connection): a straight line.
+        // Long legs read many tiles; they used to be cut off after 3 s.
         main.postDelayed({finish(null)},FOLLOW_WAIT_MILLIS)
     }
     private fun nearestSegment(x:Double,y:Double):Int {
@@ -481,7 +484,7 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         /** A tap within this distance (dp on screen) of a track follows it. */
         const val FOLLOW_DP=22.0
         /** Longest wait for the map's tracks before a tap is drawn straight. */
-        const val FOLLOW_WAIT_MILLIS=3000L
+        const val FOLLOW_WAIT_MILLIS=20_000L
         /** A hut this close to a track is reached along it. */
         const val HUT_REACH_METERS=200.0
     }

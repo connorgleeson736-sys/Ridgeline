@@ -1,0 +1,25 @@
+{
+  "artifact": "Ridgeline-Native-Overlay-Priority-0.1.67-Base.apk",
+  "bytes": 36298729,
+  "sha256": "792205fc32b5f7218b6a225dbb9698b5eb33ac3dd6817dc01eca196ae62c57b9",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.67-overlay-priority",
+  "versionCode": 68,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.66 Full Audit (same package and signer)",
+  "changes": [
+    "Track sections not loading in busy areas (Wanaka): the map's lines are painted into a fixed pool of textures, one per visible ground tile with lines (32-122 by phone memory). In a busy area every tile has lines, so the view can need more; tiles holding a texture kept it whatever came into view, and newly visible ground (often the nearest) stayed without tracks. Now tiles are ranked finest first, then nearest the view's centre, and a tile within the pool's size takes the texture of the visible tile that comes last; tiles left out are the coarsest and furthest. Reproduced and checked on the GPU (renderer/examples/overlay_priority.rs: fails before, passes after).",
+    "Long followed legs no longer drawn straight: the 3 s wait for the map's tracks is 20 s (\"Finding the track\u2026\" on the drawing note), long legs read zoom-13 or zoom-12 tiles (at most 120) instead of giving up beyond about 15-20 km, and track is split only near the taps."
+  ],
+  "tests": {
+    "kotlinJvm": "all pass (new: long leg along a 32 km track; tile zoom chosen by leg length)",
+    "rust": "all pass; GPU examples on Vulkan (lavapipe): overlay_priority (new), overlay_pool, overlay_drape, waypoint_occlusion"
+  },
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

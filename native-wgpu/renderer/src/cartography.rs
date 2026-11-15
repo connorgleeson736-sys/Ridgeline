@@ -42,6 +42,10 @@ impl Renderer {
     pub fn overlay_coverage(&self) -> (usize, usize) {
         (self.overlay.shown, self.overlay.missing)
     }
+    /// The image tiles that hold an overlay texture (diagnostics and checks).
+    pub fn overlay_tiles(&self) -> Vec<crate::TileId> {
+        self.overlay.held_tiles()
+    }
     pub fn set_overlay_group_inputs(&mut self, groups: Vec<crate::overlay::GroupInput>) -> bool {
         let changed = self.overlay.set_group_inputs(groups);
         if changed {
