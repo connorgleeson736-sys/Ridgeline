@@ -54,7 +54,7 @@ fn settle(r: &mut Renderer, target: &wgpu::TextureView, center: [f64; 2]) {
     }
     r.render(target, center, 13., 0., 60., 500.);
 }
-async fn scene(instance: &wgpu::Instance, heights: &[f32]) -> (Vec<u8>, [f32; 3]) {
+async fn scene(instance: &wgpu::Instance, heights: &[f32], shape: Vec<bool>) -> (Vec<u8>, [f32; 3]) {
     let mut r = Renderer::new(instance, None, Some(wgpu::TextureFormat::Rgba8Unorm), 256, 256)
         .await
         .unwrap();
@@ -80,6 +80,7 @@ async fn scene(instance: &wgpu::Instance, heights: &[f32]) -> (Vec<u8>, [f32; 3]
         points: vec![center, [center[0], center[1] - span * 0.2]],
         color: [232. / 255., 121. / 255., 68. / 255., 1.],
         selected: None,
+        shape,
     }]);
     settle(&mut r, &target, center);
     let dot = r.project_waypoints()[0];
@@ -96,7 +97,7 @@ async fn run() {
     };
     // Flat ground at 60 degrees pitch: the ground just below the dot on screen
     // is nearer the camera than the dot's anchor.
-    let (flat, dot) = scene(&instance, &vec![500.; 129 * 129]).await;
+    let (flat, dot) = scene(&instance, &vec![500.; 129 * 129], vec![]).await;
     assert_eq!(dot[2], 1., "waypoint projected: {dot:?}");
     // White fill rows in the dot's column: radius 4 px gives about 8 rows,
     // centred on the projected point. A half dot gives about 4.
@@ -117,12 +118,19 @@ async fn run() {
             ridge[row * 129 + column] = 3000.;
         }
     }
-    let (blocked, dot) = scene(&instance, &ridge).await;
+    let (blocked, dot) = scene(&instance, &ridge, vec![]).await;
     let hidden = dot[2] == 0. || (-3..=3).all(|dy| !fill(&blocked, dot[0], dot[1] + dy as f32));
     assert!(hidden, "a ridge in front still hides the waypoint");
     // The route runs north, behind the ridge: the raised depth test must not
     // let it show through real terrain.
     let leaked: usize = (0..256).map(|y| orange(&blocked, y)).sum();
     assert_eq!(leaked, 0, "a ridge in front still hides the route line");
+    // A point along a followed track: projected (taps insert on the line there)
+    // but drawn as line only, no dot.
+    let (along, dot) = scene(&instance, &vec![500.; 129 * 129], vec![true, false]).await;
+    assert_eq!(dot[2], 1., "point along a track still projected: {dot:?}");
+    assert!((-3..=3).all(|dy| !fill(&along, dot[0], dot[1] + dy as f32)), "no dot on a point along a followed track");
+    assert!(orange(&along, row) >= 2, "its line is still drawn");
+    println!("PASS points along followed tracks drawn without dots");
     println!("PASS waypoint dots drawn whole on the ground and hidden behind ridges; route line {width} px wide ({})", if gles { "GLES" } else { "Vulkan" });
 }

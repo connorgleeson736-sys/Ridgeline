@@ -24,6 +24,7 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
     private val passive=linkedMapOf<String,List<Coordinate>>()
     private val loading=hashSetOf<String>()
     private var lastPaths=emptyList<Triple<List<Coordinate>,Int,Int>>()
+    private var lastShape=emptyList<Boolean>()
     private var summaryPoints=emptyList<Coordinate>()
     private var routeLength=0.0
     private var profilePoints=emptyList<Coordinate>()
@@ -197,8 +198,9 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
                 terrain.pick(x,y){hit->
                     if(hit==null)toast("Terrain is still loading here.")
                     else if(controller.state.drawing&&controller.state.revision==epoch){
-                        val point=Coordinate(hit[0],hit[1]);val result=if(insertion>=0)controller.insert(insertion,point)else controller.append(point)
-                        when(result){RouteEditor.Result.TOO_CLOSE->toast("Place the next point at least 5 m away.");RouteEditor.Result.OUTSIDE_NZ->toast("Choose a point in New Zealand.");RouteEditor.Result.LIMIT->toast("This route has reached 2,000 points.");else->{}}
+                        val point=Coordinate(hit[0],hit[1])
+                        if(insertion<0&&followTracks&&controller.state.points.isNotEmpty())follow(point)
+                        else report(if(insertion>=0)controller.insert(insertion,point)else controller.append(point))
                     }
                 }
             }
@@ -268,6 +270,32 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         for(id in state.opened)if(id!=state.id)passive[id]?.let(all::addAll)
         terrain.focus(all);fitOpenedPending=state.opened.any{it!=state.id&&passive[it]==null}
     }
+    private fun report(result:RouteEditor.Result){
+        when(result){RouteEditor.Result.TOO_CLOSE->toast("Place the next point at least 5 m away.");RouteEditor.Result.OUTSIDE_NZ->toast("Choose a point in New Zealand.");RouteEditor.Result.LIMIT->toast("This route has reached 2,000 points.");else->{}}
+    }
+    /** Drawing follows the map's tracks: each tap is reached from the route's
+     * last point along the tracks (from here to there), not in a straight line.
+     * Kept between sessions. */
+    var followTracks:Boolean
+        get()=preferences.getBoolean("followTracks",false)
+        set(value){preferences.edit().putBoolean("followTracks",value).apply()}
+    /** The way along the tracks (MapLayers.followTracks): set by the activity. */
+    var trackWay:(Coordinate,Coordinate,(List<Coordinate>?)->Unit)->Unit={_,_,done->done(null)}
+    /** True while the way to a tap is being found. */
+    var onFollowing:(Boolean)->Unit={}
+    private var following=false
+    private fun follow(to:Coordinate){
+        if(following){toast("Still finding the way along the track…");return}
+        val from=controller.state.points.last();val epoch=controller.state.revision
+        following=true;onFollowing(true)
+        trackWay(from,to){way->
+            following=false;onFollowing(false)
+            val state=controller.state
+            if(closed||!state.drawing||state.revision!=epoch)return@trackWay
+            if(way==null||way.size<2){toast("No track joins these points here: drawn straight.");report(controller.append(to))}
+            else report(controller.appendPath(way))
+        }
+    }
     private fun nearestSegment(x:Double,y:Double):Int {
         val values=terrain.projectedWaypoints();var best=(12*terrain.pixelScale).pow(2);var found=-1
         for(i in 0 until values.size/3-1){
@@ -292,7 +320,7 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         // with it every line): long walks are simplified for drawing only.
         trackLine?.let{paths.add(Triple(DocTracks.simplify(it),if(trackPart!=null)trackDim else trackColor,-1))}
         trackPart?.let{paths.add(Triple(DocTracks.simplify(it),trackColor,-1))}
-        if(paths!=lastPaths){lastPaths=paths;terrain.routes(paths)}
+        if(paths!=lastPaths||state.shape!=lastShape){lastPaths=paths;lastShape=state.shape;terrain.routes(paths,state.shape)}
     }
     /** A tapped DOC track drawn over the map while its summary is open. */
     private var trackLine:List<Coordinate>?=null

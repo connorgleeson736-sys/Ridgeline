@@ -13,11 +13,11 @@ class RouteControllerTest {
   @Volatile var release:CountDownLatch?=null
   @Synchronized override fun summaries()=values.values.toList().asReversed().map{it.summary}
   @Synchronized override fun load(id:String)=values[id]
-  override fun save(id:String?,name:String,points:List<Coordinate>,now:Long):RouteSummary {
+  override fun save(id:String?,name:String,points:List<Coordinate>,now:Long,shape:List<Boolean>):RouteSummary {
    calls.incrementAndGet();entered?.countDown();release?.await(3,TimeUnit.SECONDS)
    if(fail.getAndSet(false))throw java.io.IOException("Simulated unavailable storage")
    synchronized(this){val key=id?:java.util.UUID.randomUUID().toString();if(key !in values&&values.size>=50)throw RouteLimitException()
-    val row=RouteSummary(key,name.trim().ifEmpty{"Untitled route"},points.size,NativeGeo.length(points),now);values[key]=SavedRoute(row,points.toList());return row}
+    val row=RouteSummary(key,name.trim().ifEmpty{"Untitled route"},points.size,NativeGeo.length(points),now);values[key]=SavedRoute(row,points.toList(),shape.toList());return row}
   }
   @Synchronized override fun rename(id:String,name:String,now:Long):Boolean {val old=values[id]?:return false;values[id]=old.copy(summary=old.summary.copy(name=name,updatedMillis=now));return true}
   @Synchronized override fun delete(id:String)=values.remove(id)!=null

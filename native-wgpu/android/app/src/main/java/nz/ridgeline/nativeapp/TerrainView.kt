@@ -161,15 +161,21 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     private val projectedBytes=ByteBuffer.allocateDirect(2000*12).order(ByteOrder.LITTLE_ENDIAN)
     @Volatile private var projected=FloatArray(0)
     fun projectedWaypoints()=projected
-    fun routes(paths:List<Triple<List<Coordinate>,Int,Int>>){
-        val buffer=ByteBuffer.allocateDirect(4+paths.sumOf{12+it.first.size*16}).order(ByteOrder.LITTLE_ENDIAN)
+    /** [shape]: the first path's points along a followed track (drawn as line,
+     * no waypoint dot, not selectable); empty for none. */
+    fun routes(paths:List<Triple<List<Coordinate>,Int,Int>>,shape:List<Boolean> = emptyList()){
+        val flags=shape.takeIf{f->f.any{it}&&paths.isNotEmpty()&&f.size==paths[0].first.size}
+        val buffer=ByteBuffer.allocateDirect(4+paths.sumOf{12+it.first.size*16}+(flags?.let{4+it.size}?:0)).order(ByteOrder.LITTLE_ENDIAN)
         buffer.putInt(paths.size)
         for((points,color,selected)in paths){buffer.putInt(points.size);buffer.putInt(color);buffer.putInt(selected);for(p in points){buffer.putDouble(p.longitude);buffer.putDouble(p.latitude)}}
+        if(flags!=null){buffer.putInt(flags.size);for(f in flags)buffer.put(if(f)1 else 0)}
+        waypointShape=flags.orEmpty()
         buffer.rewind();routePacket=buffer;requestFrame()
     }
+    @Volatile private var waypointShape:List<Boolean> = emptyList()
     private fun nearestWaypoint(x:Double,y:Double):Int {
-        val points=projected;val radius=20*pixelScale;var best=radius*radius;var found=-1
-        for(i in 0 until points.size/3)if(points[i*3+2]>0){val dx=x-points[i*3];val dy=y-points[i*3+1];val d=dx*dx+dy*dy;if(d<best){best=d;found=i}}
+        val points=projected;val radius=20*pixelScale;var best=radius*radius;var found=-1;val shape=waypointShape
+        for(i in 0 until points.size/3)if(points[i*3+2]>0&&!shape.getOrElse(i){false}){val dx=x-points[i*3];val dy=y-points[i*3+1];val d=dx*dx+dy*dy;if(d<best){best=d;found=i}}
         return found
     }
     fun focus(points:List<Coordinate>,maximumZoom:Double=14.0){

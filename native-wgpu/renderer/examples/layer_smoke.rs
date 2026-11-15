@@ -117,6 +117,7 @@ async fn run() {
         ],
         color: [1., 0.1, 0.1, 1.],
         selected: Some(0),
+        shape: vec![],
     }]);
     render(&mut r, &target, center, 11., 0., 0., 500.);
     let after = read(&r, &output);
@@ -171,6 +172,7 @@ async fn run() {
         points: vec![center],
         color: [1., 0., 0., 1.],
         selected: Some(0),
+        shape: vec![],
     }]);
     render(&mut r, &target, center, 11., 0., 0., 500.);
     assert_eq!(
