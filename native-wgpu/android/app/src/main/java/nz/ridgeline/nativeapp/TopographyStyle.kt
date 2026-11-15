@@ -20,6 +20,19 @@ internal class TopographyStyle(json:String){
         // Performance: river names start later than in Capacitor (1.5 zooms for
         // rivers, 1.5 for lake-river polygons). Track names follow Capacitor.
         LATER_NAMES[spec.optString("id")]?.let{spec.put("minzoom",it)}
+        // Track names one zoom earlier than Capacitor: other tracks from zoom 13
+        // (was 14). Great Walks and large DOC walks start at the layer's zoom 12
+        // here, and at zoom 11 from DOC's own walk lines (MapLayers).
+        if(spec.optString("id")==TRACK_LABELS)earlierTrackNames(spec.opt("filter"))
+    }
+    /** The track name filter's [">=",["zoom"],["case",…,12,14]]: its last value to [TRACK_NAME_ZOOM]. */
+    private fun earlierTrackNames(filter:Any?){
+        if(filter !is JSONArray)return
+        if(filter.optString(0)==">="&&filter.optJSONArray(1)?.optString(0)=="zoom"){
+            val case=filter.optJSONArray(2)
+            if(case!=null&&case.optString(0)=="case"&&case.length()>=4){case.put(case.length()-1,TRACK_NAME_ZOOM);return}
+        }
+        for(i in 0 until filter.length())earlierTrackNames(filter.opt(i))
     }
     companion object{
         /** Label identity grid in world units (2^22 cells, ~10 m at the equator). */
@@ -29,6 +42,8 @@ internal class TopographyStyle(json:String){
         val ONE_PER_NAME=setOf("nz-rivers","nz-river-polygons")
         /** Track names repeat along the track (MapLibre's symbol-spacing). */
         const val TRACK_LABELS="nz-tracks-label"
+        /** Tile zoom from which tracks other than Great Walks are named. */
+        const val TRACK_NAME_ZOOM=13
         const val HUT_LABELS="nz-huts-label"
         /** Large DOC walks rank with the style's Great Walks. */
         const val WALK_PRIORITY=15.0

@@ -315,7 +315,7 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         val top=LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL;setPadding(0,dp(8),0,dp(2))}
         val field=EditText(activity).apply{
             hint="Search places, huts, tracks";textSize=14f;setSingleLine();imeOptions=android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH
-            setTextColor(NativeUi.ink);setHintTextColor(NativeUi.hint);setPadding(dp(12),0,dp(12),0)
+            setTextColor(NativeUi.ink);setHintTextColor(NativeUi.hint);setPadding(dp(12),0,dp(34),0)
             background=NativeUi.background(activity,NativeUi.chip,10,true);contentDescription="Search places, huts and tracks"
             setText(searchQuery);setOnEditorActionListener{_,_,_->hideKeyboard();true}
             addTextChangedListener(object:android.text.TextWatcher{
@@ -324,7 +324,17 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
                 override fun afterTextChanged(t:android.text.Editable?){searchQuery=t?.toString().orEmpty();main.removeCallbacks(searchRun);main.postDelayed(searchRun,120)}
             })
         }
-        top.addView(field,LinearLayout.LayoutParams(0,dp(40),1f))
+        // A small ✕ inside the field clears the search (shown only while it has text).
+        val clear=TextView(activity).apply{text="✕";textSize=13f;gravity=Gravity.CENTER;setTextColor(NativeUi.muted);contentDescription="Clear search"
+            background=NativeUi.pressable(activity,null);isClickable=true;visibility=if(searchQuery.isEmpty())View.GONE else View.VISIBLE
+            setOnClickListener{field.setText("");field.requestFocus()}}
+        field.addTextChangedListener(object:android.text.TextWatcher{
+            override fun beforeTextChanged(t:CharSequence?,a:Int,b:Int,c:Int){}
+            override fun onTextChanged(t:CharSequence?,a:Int,b:Int,c:Int){}
+            override fun afterTextChanged(t:android.text.Editable?){clear.visibility=if(t.isNullOrEmpty())View.GONE else View.VISIBLE}
+        })
+        val fieldBox=FrameLayout(activity).apply{addView(field,FrameLayout.LayoutParams(-1,-1));addView(clear,FrameLayout.LayoutParams(dp(32),dp(32),Gravity.END or Gravity.CENTER_VERTICAL).apply{marginEnd=dp(4)})}
+        top.addView(fieldBox,LinearLayout.LayoutParams(0,dp(40),1f))
         top.addView(TextView(activity).apply{text="✕";textSize=18f;gravity=Gravity.CENTER;setTextColor(NativeUi.muted);contentDescription="Close saved routes";background=NativeUi.pressable(activity,null);isClickable=true;setOnClickListener{hideKeyboard();dismissDrawer()}},LinearLayout.LayoutParams(dp(40),dp(40)).apply{marginStart=dp(4)});sidebar.addView(top)
         val heading=NativeUi.text(activity,"Saved routes",17f).apply{setTypeface(null,android.graphics.Typeface.BOLD);setPadding(0,dp(10),0,dp(6))};sidebar.addView(heading)
         val importButton=button("Import GPX"){dismissDrawer();importGpx()}.apply{textSize=13f};sidebar.addView(importButton,LinearLayout.LayoutParams(-1,dp(38)))
