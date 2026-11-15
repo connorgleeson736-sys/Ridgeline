@@ -26,6 +26,11 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
          * vector tiles carry tracks from zoom 12 only): lines only, no names. */
         const val FAR_TRACKS_ZOOM=9.0
         const val NEAR_TRACKS_ZOOM=12.0
+        /** Large DOC walks (Great Walks, circuits, multi-day walks) named from here, one
+         * zoom before the map's own track names start (zoom 12, as Capacitor). */
+        const val FAR_NAMES_ZOOM=11.0
+        /** How far from a track line (in dp on screen) a tap still opens it. */
+        const val TAP_DP=18.0
         /** The map's track style at its first zoom (topography-style.json nz-tracks, -halo). */
         val TRACK_HALO=0xCC0F1E1F.toInt();val TRACK_LINE=0xFFF6DB94.toInt()
         /** Styled zoom bands kept per tile. */
@@ -528,6 +533,46 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         }
     }
     /** Areas containing a place (from the tiles loaded), for the tap details. */
+    /** A drawn track line under a tap: the walk to open ([walk]: [ref] is its DOC
+     * id) or the track by its map name (a [section] of walk [ref] when marked). */
+    class TrackHit(val name:String,val ref:String,val walk:Boolean,val section:Boolean)
+    /** The track line nearest a tap at [longitude], [latitude] (within a finger's
+     * [TAP_DP] at camera [zoom]), opened as its name would be: the map's own
+     * tracks from zoom 12, otherwise DOC's walk lines (as drawn from zoom 9). */
+    fun trackAt(longitude:Double,latitude:Double,zoom:Double,callback:(TrackHit?)->Unit){runCatching{worker.execute{
+        val state=loader.mapSettings.state
+        var found:TrackHit?=null
+        if(state.tracks&&state.overlays()&&zoom>=FAR_TRACKS_ZOOM){
+            val x=(longitude+180)/360;val y=CameraMath.mercatorY(latitude)
+            val reach=TAP_DP/(512.0*2.0.pow(zoom))
+            if(zoom>=NEAR_TRACKS_ZOOM){
+                var best=reach;var hit:VectorTile.Feature?=null
+                for((id,tile) in tiles){val b=id.bounds
+                    if(x<b[0]-reach||x>b[2]+reach||y<b[1]-reach||y>b[3]+reach)continue
+                    for(f in marked(id,tile))if(f.layer=="streets"&&footTrack(f.properties))for(path in f.paths){val d=TrackHits.distance(path,x,y);if(d<best){best=d;hit=f}}
+                }
+                hit?.let{f->
+                    val own=(f.properties["name"] as? String)?.trim().orEmpty()
+                    val walk=f.properties[DocWalks.WALK] as? String;val ref=(f.properties[DocWalks.WALK_ID] as? String).orEmpty()
+                    found=when{
+                        walk!=null&&ref.isNotEmpty()&&(zoom<DocWalks.CHILD_NAMES||own==walk||own.isEmpty())->TrackHit(walk,ref,true,false)
+                        own.isNotEmpty()->TrackHit(own,ref,false,walk!=null&&ref.isNotEmpty())
+                        else->null
+                    }
+                }
+            }
+            if(found==null){
+                val all=infos();var best=reach;var guid:String?=null
+                for(index in docTiles.values)for(line in index.lines){if(all[line.guid]?.name.isNullOrBlank())continue
+                    for(path in line.paths){val d=TrackHits.distance(path,x,y);if(d<best){best=d;guid=line.guid}}}
+                guid?.let{g->found=TrackHit(all[g]!!.name,g,true,false)}
+            }
+        }
+        val result=found
+        main.post{if(!closed)callback(result)}
+    }}.onFailure{callback(null)}}
+    /** Foot tracks as the style draws them (nz-tracks): not vehicle tracks or roads. */
+    private fun footTrack(p:Map<String,Any?>)=p["kind"]=="track"&&(p["track_use"]=="foot"||p["subclass"]=="foot_closed"||p["subclass"]=="foot_route_closed")
     fun huntingAt(longitude:Double,latitude:Double,callback:(List<HuntingAreas.Area>)->Unit){runCatching{worker.execute{
         val x=(longitude+180)/360;val y=CameraMath.mercatorY(latitude)
         val found=huntingTiles.values.asSequence().flatten().filter{it.contains(x,y)}.distinctBy{it.id}.sortedBy{it.hectares}.toList()
@@ -606,9 +651,11 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
                 if(zoom>=11)for(clipped in fragments)if(clipped.size>1){val p=clipped[clipped.size/2];labels.add(TopographyStyle.Label(p,"LINZ imagery | Esri World Imagery",10f,0xffdddddd.toInt(),85.0,key="boundary:${p.x}:${p.y}"))}
             }
         }else borderGroups.clear()
-        // DOC's walks where the map's tracks are not drawn yet: the track style, no names.
+        // DOC's walks where the map's tracks are not drawn yet: the track style, and
+        // from FAR_NAMES_ZOOM the names of large walks (as the map names them from 12).
         if(farTracks(state,zoom)){
             farGroups.keys.retainAll(docWanted.toSet())
+            val all=if(zoom>=FAR_NAMES_ZOOM)infos()else emptyMap()
             for(id in docWanted){val index=docTiles[id]?:continue
                 groups.add(farGroups.getOrPut(id){
                     val b=id.bounds;val lines=ArrayList<TopographyStyle.Line>()
@@ -617,6 +664,19 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
                         lines.add(TopographyStyle.Line(part,TRACK_LINE,1.2f,3.6f,2.4f,8))}
                     group(id.z+192,id.x,id.y,b,lines)
                 })
+                if(all.isEmpty())continue
+                val b=id.bounds
+                fun inside(p:VectorTile.Point)=p.x>=b[0]&&p.x<b[2]&&p.y>=b[1]&&p.y<b[3]
+                for(line in index.lines){val info=all[line.guid]?:continue
+                    if(!info.large||info.name.isBlank())continue
+                    val name=info.name.take(256)
+                    // Keyed as track names (taps open the walk), by place: the same
+                    // label whichever data tile the line came from.
+                    fun add(p:VectorTile.Point,where:String)=labels.add(TopographyStyle.Label(p,name,12f,TRACK_LINE,TopographyStyle.WALK_PRIORITY,
+                        key="${TopographyStyle.TRACK_LABELS}:$name:$where",spacing=650f,ref=line.guid))
+                    for(path in line.paths)for((p,where) in TopographyStyle.crossings(path,floor(zoom).toInt()))if(inside(p))add(p,where)
+                    line.paths.maxByOrNull{it.size}?.let{path->path[path.size/2].takeIf(::inside)?.let{add(it,"walk:${line.guid}")}}
+                }
             }
         }else farGroups.clear()
         // Hunting permit areas: hatched blaze orange inside a bolder dashed outline, names when closer.

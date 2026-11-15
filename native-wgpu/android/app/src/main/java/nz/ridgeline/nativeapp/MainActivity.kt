@@ -120,7 +120,15 @@ class MainActivity:Activity(){
                 label!=null&&at!=null&&label.ref.isNotEmpty()&&!label.section->trackSheet.showWalk(label.ref,label.text,at)
                 // A section under its own name: in the walk the map gives it.
                 label!=null&&at!=null->trackSheet.show(label.text.removeSuffix(" (mapped closed)"),at,label.ref.takeIf{label.section})
-                loader.mapSettings.state.hunting->terrain.pick(x,y){hit->if(hit!=null)mapLayers.huntingAt(hit[0],hit[1]){areas->HuntingDetails.show(this,areas)}}
+                // The line itself, not only its name: the track or walk nearest the tap,
+                // else the hunting areas there.
+                else->terrain.pick(x,y){hit->if(hit==null)return@pick
+                    val tapped=Coordinate(hit[0],hit[1])
+                    mapLayers.trackAt(hit[0],hit[1],terrain.cameraPose.zoom){track->when{
+                        track!=null&&track.walk->trackSheet.showWalk(track.ref,track.name,tapped)
+                        track!=null->trackSheet.show(track.name.removeSuffix(" (mapped closed)"),tapped,track.ref.takeIf{track.section})
+                        loader.mapSettings.state.hunting->mapLayers.huntingAt(hit[0],hit[1]){areas->HuntingDetails.show(this,areas)}
+                    }}}
             }
         }
         planner.onProfilePoint={terrain.inspect(it)}

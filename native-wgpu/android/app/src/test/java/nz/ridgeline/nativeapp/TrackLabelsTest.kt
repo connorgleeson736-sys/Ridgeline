@@ -20,10 +20,11 @@ class TrackLabelsTest {
     private fun names(features:List<VectorTile.Feature>,zoom:Double,tileZoom:Double=z.toDouble())=
         style.build(features,state,zoom,tileZoom).labels.filter{it.key.startsWith(TopographyStyle.TRACK_LABELS+":")}
 
-    @Test fun ordinaryTrackNamesFromTileZoom14(){
+    @Test fun ordinaryTrackNamesFromTileZoom13(){
         val f=listOf(track("Diamond Lake Track"))
         assertTrue("named at camera 14 on a zoom-14 tile",names(f,14.0).isNotEmpty())
-        assertTrue("not on a coarser zoom-13 tile (style filter)",names(f,14.0,13.0).isEmpty())
+        assertTrue("named on a zoom-13 tile (one zoom before Capacitor)",names(f,13.0,13.0).isNotEmpty())
+        assertTrue("not on a coarser zoom-12 tile (style filter)",names(f,13.0,12.0).isEmpty())
         assertTrue("not below the layer's minzoom",names(f,11.75).isEmpty())
     }
     @Test fun greatWalkNamesFromZoom12(){
