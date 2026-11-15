@@ -1,0 +1,13 @@
+{
+  "name": "Bushline Maps",
+  "short_name": "Bushline",
+  "description": "3D topo maps of New Zealand for trampers and hunters.",
+  "start_url": "/map/",
+  "display": "standalone",
+  "background_color": "#fafaf5",
+  "theme_color": "#233d34",
+  "icons": [
+    { "src": "/img/kea-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/img/kea-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
