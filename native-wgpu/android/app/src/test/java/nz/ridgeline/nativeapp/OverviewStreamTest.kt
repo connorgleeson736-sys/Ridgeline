@@ -20,6 +20,7 @@ class OverviewStreamTest{
         assertNull(OverviewStream.tileUrl("",payload,0));assertNull(OverviewStream.tileUrl("https://p",payload.take(10),0));assertNull(OverviewStream.tileUrl("https://p",payload,-1))
         assertEquals("https://p/packs/Ridgeline-Overviews-0.3.0-1-of-6.zip",OverviewStream.packUrl("https://p","Ridgeline-Overviews-0.3.0-1-of-6.zip"))
         assertNull(OverviewStream.packUrl("https://p","../secret.zip"))
+        assertEquals("https://p/packs/Ridgeline-Overviews-NI-1.0-2-of-5.zip",OverviewStream.packUrl("https://p","Ridgeline-Overviews-NI-1.0-2-of-5.zip"))
         assertTrue(OverviewStream.complete(ByteArray(4270),4270));assertFalse(OverviewStream.complete(ByteArray(4000),4270))
     }
     /** Streaming is off unless map-defaults.json names where the imagery is served. */
@@ -37,7 +38,11 @@ class OverviewStreamTest{
             for(v in listOf("natural","raw")){val r=e.optJSONObject(v)?:e
                 val u=OverviewStream.tileUrl("https://p",r.getString("file"),r.getLong("offset"))!!
                 val prior=urls.put(u,r.getInt("bytes"));assertTrue(prior==null||prior==r.getInt("bytes"))}}
-        assertEquals(5255,tiles.length());assertTrue(urls.size in 5255..10510)
+        // South Island 5,255 tiles at zooms 9-12, plus the North Island's.
+        assertTrue(tiles.length()>=5255);assertTrue(urls.size in tiles.length()..2*tiles.length())
+        // Every tile names a pack the app knows (and can download whole).
+        val packs=JSONObject(File("src/main/assets/overview-archives.json").readText()).getJSONArray("files").let{a->(0 until a.length()).map{a.getJSONObject(it).getString("payload")}}.toSet()
+        for(key in tiles.keys())for(v in listOf("natural","raw"))assertTrue(key,(tiles.getJSONObject(key).optJSONObject(v)?:tiles.getJSONObject(key)).getString("file") in packs)
     }
     private fun server(body:ByteArray,honourRange:Boolean,seen:MutableList<String?>):MockWebServer{
         val s=MockWebServer()

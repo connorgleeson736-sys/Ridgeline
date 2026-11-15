@@ -21,7 +21,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         /** Hunting permit area outline and name colours (blaze orange). */
         val HUNTING_LINE=0xF0FF6A13.toInt();val HUNTING_TEXT=0xFFFFA25F.toInt()
         /** Hunting areas shaded by translucent blaze-orange hatching under their outline. */
-        val HUNTING_HATCH=0x73FF6A13
+        val HUNTING_HATCH=0x4DFF6A13
         /** DOC's walks drawn from this zoom, until the map's own tracks start (its
          * vector tiles carry tracks from zoom 12 only): lines only, no names. */
         const val FAR_TRACKS_ZOOM=9.0

@@ -155,7 +155,12 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         // Tools line up by their tops (not their text baselines) and all take the height of the
         // tallest, so a label on two lines ("Export GPX" on a narrow phone) is never cut off.
         tools.isBaselineAligned=false
-        for((i,view) in listOf(edit,undo,export,delete).withIndex())tools.addView(view.apply{minimumHeight=dp(34);minHeight=dp(34);maxLines=2;gravity=Gravity.CENTER;setPadding(dp(6),dp(4),dp(6),dp(4))},LinearLayout.LayoutParams(0,-1,1f).apply{if(i>0)marginStart=dp(8)})
+        val toolViews=listOf(edit,undo,export,delete)
+        for((i,view) in toolViews.withIndex())tools.addView(view.apply{textSize=11f;minimumHeight=dp(30);minHeight=dp(30);maxLines=2;gravity=Gravity.CENTER;setPadding(dp(4),dp(2),dp(4),dp(2))},LinearLayout.LayoutParams(0,-1,1f).apply{if(i>0)marginStart=dp(6)})
+        // A label that still wraps (a narrow phone, a large font) gets a smaller font.
+        tools.addOnLayoutChangeListener{_,_,_,_,_,_,_,_,_->for(v in toolViews)if(v.lineCount>1&&v.textSize>NativeUi.dp(activity,10).toFloat())v.textSize=9.5f}
+        // The tools sit at the bottom of the sheet: a spacer takes any room the chart does not.
+        val spacer=View(activity);panel.addView(spacer,LinearLayout.LayoutParams(-1,0,1f))
         panel.addView(tools,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(6)});panel.addView(summary)
         // The compact stop shows the stats and tools whole, however tall the phone's font makes them.
         sheet.compactContent={if(statRow.height>0&&tools.height>0)statRow.height+dp(6)+tools.height+dp(10)else 0}
@@ -163,7 +168,7 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         statRow.addOnLayoutChangeListener(resize);tools.addOnLayoutChangeListener(resize)
         sheet.onClose={controller.unload()}
         sheet.onCover={onMapCover(it)}
-        sheet.onSnap={expanded->chart.visibility=if(expanded)View.VISIBLE else View.GONE;heading.visibility=if(expanded)View.VISIBLE else View.GONE;summary.visibility=if(expanded&&controller.state.drawing)View.VISIBLE else View.GONE;if(!expanded)chart.clearInspection()}
+        sheet.onSnap={expanded->chart.visibility=if(expanded)View.VISIBLE else View.GONE;spacer.visibility=if(expanded)View.GONE else View.VISIBLE;heading.visibility=if(expanded)View.VISIBLE else View.GONE;summary.visibility=if(expanded&&controller.state.drawing)View.VISIBLE else View.GONE;if(!expanded)chart.clearInspection()}
         for(badge in rangeBadges)mapHost.addView(badge,1,android.widget.FrameLayout.LayoutParams(dp(22),dp(22)))
         terrain.onRangeMarkers={points,positions->
             for((i,badge) in rangeBadges.withIndex()){

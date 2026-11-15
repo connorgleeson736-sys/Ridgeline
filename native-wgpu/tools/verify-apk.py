@@ -29,7 +29,9 @@ with zipfile.ZipFile(args.apk) as apk:
             assert b'Landroid/webkit/WebView;' not in data and b'Lcom/getcapacitor/' not in data, 'Web runtime dependency'
     index=json.loads(apk.read('assets/overview-index.json'))
     coarse={name for row in index['coarse'].values() for name in row.values()}
-    assert len(coarse)==67,'Expected all original coarse overview images'
+    north=json.loads((root/'native-wgpu/assets/overviews/north-island.json').read_text())
+    # The South Island's 67 original coarse images, less those the North Island's shared tiles replace, plus its own.
+    assert len(coarse)==len({n for row in index['coarse'].values() for n in row.values()})>=67 and all(index['coarse'][k]==v for k,v in north['coarse'].items()),'Expected all coarse overview images'
     for name in coarse:
         data=apk.read('assets/'+name)
         assert data[:4]==b'RIFF' and data[8:12]==b'WEBP'
