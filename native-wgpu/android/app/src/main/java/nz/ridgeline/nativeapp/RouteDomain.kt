@@ -136,6 +136,31 @@ class RouteEditor {
     fun deleteSelected():Boolean {cancelDrag();if(selected !in points.indices)return false;remember();val f=flags();points=points.toMutableList().apply{removeAt(selected)};f.removeAt(selected);setFlags(f);selected=-1;return true}
     fun beginDrag(index:Int):Boolean {cancelDrag();if(!select(index))return false;drag=snapshot();return true}
     fun previewDrag(value:Coordinate):Boolean {if(drag==null)return false;val p=value.rounded();if(!p.inNewZealand()||points[selected]==p)return false;points=points.toMutableList().apply{set(selected,p)};return true}
+    /** While dragging: the route from the previous waypoint to the next (from the
+     * drag's start) replaced by [before] (ending at the dragged point) and [after]
+     * (up to the next waypoint): the pieces beside a point dragged along a track,
+     * or straight ([before] the point alone, [after] empty) when it leaves it. */
+    fun previewReroute(before:List<Coordinate>,after:List<Coordinate>):Boolean {
+        val old=drag?:return false
+        val b=before.map{it.rounded()};val a=after.map{it.rounded()}
+        if(b.isEmpty()||!(b+a).all{it.inNewZealand()})return false
+        val flags=if(old.shape.isEmpty())List(old.points.size){false}else old.shape
+        val prevA=(old.selected-1 downTo 0).firstOrNull{!flags[it]}?:-1
+        val nextA=(old.selected+1 until old.points.size).firstOrNull{!flags[it]}?:-1
+        val head=if(prevA>=0)old.points.subList(0,prevA+1)else emptyList()
+        val tail=if(nextA>=0)old.points.subList(nextA,old.points.size)else emptyList()
+        val next=head+b+a+tail;if(next.size>2000)return false
+        val f=(if(prevA>=0)flags.subList(0,prevA+1)else emptyList())+List(b.size){it<b.size-1}+List(a.size){true}+(if(nextA>=0)flags.subList(nextA,flags.size)else emptyList())
+        if(next==points&&f==(if(shape.isEmpty())List(points.size){false}else shape))return false
+        points=next;setFlags(f);selected=head.size+b.size-1;return true
+    }
+    /** The waypoints either side of the one being dragged (from the drag's start), or null at an end. */
+    fun dragNeighbours():Pair<Coordinate?,Coordinate?>?{
+        val old=drag?:return null
+        val flags=if(old.shape.isEmpty())List(old.points.size){false}else old.shape
+        val prevA=(old.selected-1 downTo 0).firstOrNull{!flags[it]};val nextA=(old.selected+1 until old.points.size).firstOrNull{!flags[it]}
+        return prevA?.let{old.points[it]} to nextA?.let{old.points[it]}
+    }
     fun commitDrag():Boolean {val old=drag?:return false;drag=null;if(old.points==points)return false;remember(old);return true}
     fun cancelDrag():Boolean {val old=drag?:return false;drag=null;val changed=points!=old.points;points=old.points;selected=old.selected;shape=old.shape;return changed}
     fun undo():Boolean {cancelDrag();val old=history.pollLast()?:return false;points=old.points;selected=old.selected;shape=old.shape;return true}
