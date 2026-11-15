@@ -105,7 +105,7 @@ class MainActivity:Activity(){
         trackSheet.onPoint={terrain.inspect(it)}
         trackSheet.onRange={terrain.rangeMarkers(it)}
         trackSheet.mapLine={name,at,callback->mapLayers.trackLine(name,at,callback)}
-        trackSheet.walkRoute={guid,page,callback->mapLayers.walkRoute(guid,page,null,callback)}
+        trackSheet.walkRoute={guid,page,callback->mapLayers.walkRoute(guid,page,null,callback=callback)}
         trackSheet.alongLine={corridor,callback->mapLayers.alongLine(corridor,callback)}
         trackSheet.walkOptions={guid,legs,starts,walk,time,doc,callback->mapLayers.walkOptions(guid,legs,starts,walk,time,doc,callback)}
         trackSheet.extendWalk={line,target,callback->mapLayers.extendWalk(line,target,callback)}
@@ -126,10 +126,14 @@ class MainActivity:Activity(){
             }
         }
         trackSheet.walkInfo={mapLayers.walkInfo(it)}
+        planner.hutAt={x,y->mapLayers.hutAt(x,y)}
         planner.onIdleTap={x,y->
             val label=mapLayers.labelAt(x,y)
             val at=label?.let{Coordinate(it.point.x*360-180,CameraMath.latitude(it.point.y))}
+            // A hut's dot (not only its name) opens the hut, marked on the map.
+            val hut=if(label==null)mapLayers.hutAt(x,y)else null
             when{
+                hut!=null->trackSheet.showHut(hut.first,hut.second)
                 label!=null&&at!=null&&label.key.startsWith(TopographyStyle.HUT_LABELS+":")->trackSheet.showHut(label.text,at)
                 label!=null&&at!=null&&label.ref.isNotEmpty()&&!label.section->trackSheet.showWalk(label.ref,label.text,at)
                 // A section under its own name: in the walk the map gives it.

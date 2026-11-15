@@ -45,6 +45,8 @@ internal class TopographyStyle(json:String){
         /** Tile zoom from which tracks other than Great Walks are named. */
         const val TRACK_NAME_ZOOM=13
         const val HUT_LABELS="nz-huts-label"
+        /** Hut dots (circles at the hut's place, under its name). */
+        const val HUT_DOTS="nz-huts-dot"
         /** Large DOC walks rank with the style's Great Walks. */
         const val WALK_PRIORITY=15.0
         /** At most this many candidates per track name per tile. */
@@ -111,7 +113,8 @@ internal class TopographyStyle(json:String){
      * from the next tile zoom was a new label: it lost its placement and
      * visibly reloaded while zooming. */
     internal fun labelKey(layer:String,text:String,point:VectorTile.Point)="$layer:$text:${floor(point.x*LABEL_GRID).toLong()}:${floor(point.y*LABEL_GRID).toLong()}"
-    fun build(features:List<VectorTile.Feature>,state:MapSettings.State,zoom:Double,tileZoom:Double=floor(zoom)):Output{
+    /** [withLines] false: names only (the lines are cached apart; see MapLayers). */
+    fun build(features:List<VectorTile.Feature>,state:MapSettings.State,zoom:Double,tileZoom:Double=floor(zoom),withLines:Boolean=true):Output{
         val lines=ArrayList<Line>();val labels=ArrayList<Label>();val grouped=features.groupBy{it.layer};val named=HashSet<String>()
         // Track names: one at the middle of each named track per tile (kept at
         // every camera zoom), plus candidates where it crosses the grid.
@@ -119,6 +122,7 @@ internal class TopographyStyle(json:String){
         for((order,spec) in specs.withIndex()){val id=spec.getString("id");val group=group(id)
             if(!state.enabled(group)||zoom<spec.optDouble("minzoom",0.0)||zoom>=spec.optDouble("maxzoom",30.0))continue
             val kind=spec.getString("type");val paint=spec.getJSONObject("paint");val layout=spec.optJSONObject("layout")?:JSONObject()
+            if(kind=="line"&&!withLines)continue
             for(f in grouped[spec.getString("source-layer")].orEmpty()){
                 // A piece of a large DOC walk is named like a Great Walk (from tile zoom 12).
                 val walk=if(id==TRACK_LABELS)f.properties[DocWalks.WALK] as? String else null

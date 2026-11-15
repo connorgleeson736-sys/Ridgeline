@@ -51,4 +51,17 @@ class OverlayRulesTest {
         assertEquals(1,names.size)
         assertEquals(850f,names[0].spacing)
     }
+    /** MapLayers caches a tile's lines apart from its names: DOC's walk data
+     * (marked tracks) changes names only, so lines are never rebuilt or re-sent for it. */
+    @Test fun walkMarksChangeNamesNotLines(){
+        val s=MapSettings.State()
+        val plain=listOf(track("Siberia Track",1),track("Local Spur Track",2))
+        val marked=plain.map{f->if(f.properties["name"]=="Siberia Track")f.copy(properties=f.properties+mapOf(DocWalks.WALK to "Gillespie Pass Circuit",DocWalks.WALK_ID to "abc"))else f}
+        val a=style.build(plain,s,13.0,13.0);val b=style.build(marked,s,13.0,13.0)
+        assertEquals(a.lines,b.lines)
+        assertNotEquals(names(a),names(b))
+        // Names only: no lines, the same names as a full build.
+        val only=style.build(marked,s,13.0,13.0,withLines=false)
+        assertTrue(only.lines.isEmpty());assertEquals(b.labels,only.labels)
+    }
 }

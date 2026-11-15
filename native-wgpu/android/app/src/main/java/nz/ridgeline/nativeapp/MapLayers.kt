@@ -58,6 +58,13 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
          * slots while its tile stays in view (overlays then stopped until the
          * map was moved away or overlays were toggled). */
         const val STALE_LEASE_MILLIS=20_000L
+        /** Download rank of DOC pages read only for map names: after every map
+         * tile (those rank 0 to 24 in view order). */
+        const val BACKGROUND_RANK=150
+        /** DOC walk pages read at once for map names. */
+        const val NAMING_ROUTES=2
+        /** A tap this close (dp) to a hut's dot locks onto the hut. */
+        const val HUT_TAP_DP=24.0
         /** Leases older than [limit] at [now], given their start times. */
         /** One tile's pieces of the foot track [name], clipped to the tile, and
          * the neighbouring tiles the track continues into (a piece ending on an
@@ -83,6 +90,9 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
      * tile was decoded again whenever the enabled set changed: 260 decodes for
      * 39 tiles). Styling filters layers by camera zoom itself. */
     private data class Tile(val body:TileBody,var mask:Set<String>,var features:List<VectorTile.Feature>){
+        /** Names with tracks marked by their DOC walk, per (settings, zoom, DOC
+         * revision): kept apart from [styles], whose lines DOC's data never changes. */
+        val walkLabels=object:LinkedHashMap<Any,List<TopographyStyle.Label>>(4,.75f,true){override fun removeEldestEntry(eldest:MutableMap.MutableEntry<Any,List<TopographyStyle.Label>>)=size>STYLES_PER_TILE}
         /** [features] with tracks marked by their DOC walk, for [markedRevision]. */
         var marked:List<VectorTile.Feature>?=null;var markedRevision=-1L
         /** Styled output and packed groups (per display clip) for the most recent
@@ -157,7 +167,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
             try{
                 val next=projection.getAndSet(null)
                 if(next!=null&&!closed&&active){val start=System.nanoTime();val selection=NativeLabels.place(next.atlas,next.positions,next.width,next.height,next.scale)
-                    placedTracks=trackRects(next,selection)
+                    placedTracks=trackRects(next,selection);placedHuts=hutRects(next,selection)
                     main.post{if(!closed&&active&&projectionRevision.get()==next.revision)view.placeMapLabels(next.atlas,selection)}
                     diagnostics=diagnostics.substringBefore("\nLabel placement:")+"\nLabel placement: ${selection.getInt(0)}/${next.atlas.labels.size} · ${(System.nanoTime()-start)/1_000_000} ms · background"
                 }
@@ -177,6 +187,31 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
             val x=p.positions[i*3]+ox*p.scale;val y=p.positions[i*3+1]+oy*p.scale
             out.add(Placed(floatArrayOf(x,y,x+row.width*p.scale,y+row.height*p.scale),row.label))}
         return out
+    }
+    /** Huts on screen (dots and names), for taps that lock onto a hut. */
+    private class PlacedHut(val x:Float,val y:Float,val box:FloatArray,val name:String,val point:VectorTile.Point)
+    @Volatile private var placedHuts=emptyList<PlacedHut>()
+    private fun hutRects(p:Projection,selection:ByteBuffer):List<PlacedHut>{
+        val names=HashMap<Long,String>()
+        fun at(q:VectorTile.Point)=(floor(q.x*TopographyStyle.LABEL_GRID).toLong() shl 24) xor floor(q.y*TopographyStyle.LABEL_GRID).toLong()
+        for(row in p.atlas.labels)if(row.label.key.startsWith(TopographyStyle.HUT_LABELS+":"))names[at(row.label.point)]=row.label.text
+        val out=ArrayList<PlacedHut>();val b=selection.duplicate().order(ByteOrder.LITTLE_ENDIAN);val n=b.getInt(0)
+        for(k in 0 until n){val i=b.getInt(4+k*12);val ox=b.getFloat(8+k*12);val oy=b.getFloat(12+k*12)
+            val row=p.atlas.labels.getOrNull(i)?:continue
+            val dot=row.label.key.startsWith(TopographyStyle.HUT_DOTS+":")
+            if(!(dot||row.label.key.startsWith(TopographyStyle.HUT_LABELS+":"))||i*3+1>=p.positions.size)continue
+            val name=if(dot)names[at(row.label.point)]?:continue else row.label.text
+            val px=p.positions[i*3];val py=p.positions[i*3+1];val x=px+ox*p.scale;val y=py+oy*p.scale
+            out.add(PlacedHut(px,py,floatArrayOf(x,y,x+row.width*p.scale,y+row.height*p.scale),name,row.label.point))}
+        return out
+    }
+    /** The hut whose dot or name is under a tap (within a finger's [HUT_TAP_DP]),
+     * nearest dot first: its name and exact place. */
+    fun hutAt(x:Double,y:Double):Pair<String,Coordinate>?{
+        val margin=HUT_TAP_DP*view.pixelScale
+        val hit=placedHuts.filter{val r=it.box;hypot(it.x-x,it.y-y)<=margin||x>=r[0]-margin/2&&x<=r[2]+margin/2&&y>=r[1]-margin/2&&y<=r[3]+margin/2}
+            .minByOrNull{hypot(it.x-x,it.y-y)}?:return null
+        return hit.name to Coordinate(hit.point.x*360-180,CameraMath.latitude(hit.point.y))
     }
     /** The track name under a tap (with a finger's margin), nearest first. */
     /** The track or hut name under a tap (with a finger's margin), nearest first. */
@@ -318,7 +353,9 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
     /** DOC's walk [guid] as DOC describes it: its route (null when DOC's page
      * has no legs to follow) and its page sections. [page]: DOC's page link;
      * [doc]: DOC's line when the map has not loaded it. Main thread callback. */
-    fun walkRoute(guid:String,page:String,doc:List<List<Coordinate>>?=null,callback:(WalkRoutes.Route?,List<DocPages.Section>,List<List<Coordinate>>,DocPages.Overview?)->Unit={_,_,_,_->}){runCatching{worker.execute{
+    /** [background]: for map names only (not a summary someone opened): fetched
+     * behind every map tile. */
+    fun walkRoute(guid:String,page:String,doc:List<List<Coordinate>>?=null,background:Boolean=false,callback:(WalkRoutes.Route?,List<DocPages.Section>,List<List<Coordinate>>,DocPages.Overview?)->Unit={_,_,_,_->}){runCatching{worker.execute{
         val state=routes.getOrPut(guid){RouteState()}
         if(state.done){val r=state.route;val sec=state.sections;val ps=state.paths;val o=state.overview;main.post{if(!closed)callback(r,sec,ps,o)};return@execute}
         val first=state.waiting.isEmpty();state.waiting.add(callback)
@@ -330,7 +367,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
             val waiting=state.waiting.toList();state.waiting.clear();val ps=lineUsed;val o=state.overview;main.post{if(!closed)for(w in waiting)w(route,sections,ps,o)}
         }
         fun get(url:String,done:(ByteArray?)->Unit){
-            val owned=loader.layerConsumer(9)
+            val owned=loader.layerConsumer(if(background)BACKGROUND_RANK else 9)
             val body=startLeased(owned){loader.layerBody(owned,url)}
             if(body==null){done(null);return}
             body.whenComplete{r,e->runCatching{worker.execute{owned.close();done(if(e==null&&r!=null&&r.status in 200..299)r.bytes else null)}}.onFailure{owned.close()}}
@@ -366,7 +403,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         for(l in index.lines){
             if(pageInfoLoading.size>=3)return
             if(l.guid in docInfos||l.guid in pageInfos||l.guid in pageInfoLoading||l.guid in pageInfoFailed)continue
-            val owned=loader.layerConsumer(10);val guid=l.guid
+            val owned=loader.layerConsumer(BACKGROUND_RANK);val guid=l.guid
             val body=startLeased(owned){loader.layerBody(owned,pageOf(guid))}?:return
             pageInfoLoading.add(guid)
             body.whenComplete{r,e->runCatching{worker.execute{
@@ -384,6 +421,8 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
      * the whole line, whichever DOC's stated length fits), so side trips and extensions on DOC's line keep their own names;
      * a large walk is left out until that is known. Others as DOC drew them. */
     private val markIndexes=HashMap<GpuUploadQueue.Id,Triple<Long,DocWalks.Index,DocWalks.Index>>()
+    /** Walks whose pages are being read for map names (at most [NAMING_ROUTES]). */
+    private val namingRoutes=java.util.Collections.synchronizedSet(HashSet<String>())
     private fun markIndex(id:GpuUploadQueue.Id):DocWalks.Index?{
         val base=docTiles[id]?:return null
         val all=infos()
@@ -392,7 +431,8 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
             val info=all[l.guid]
             if(info==null||!info.large)return@flatMap listOf(l)
             val state=routes[l.guid]
-            if(state==null){walkRoute(l.guid,info.page.ifBlank{pageOf(l.guid)});return@flatMap emptyList()}
+            // Two walks' pages at a time for names; the rest when those are in.
+            if(state==null){if(namingRoutes.size<NAMING_ROUTES&&namingRoutes.add(l.guid))walkRoute(l.guid,info.page.ifBlank{pageOf(l.guid)},background=true){_,_,_,_->namingRoutes.remove(l.guid)};return@flatMap emptyList()}
             if(!state.done)return@flatMap emptyList()
             val (walk,_)=WalkRoutes.extent(state.route,state.paths.ifEmpty{lonLat(l.paths)},state.overview?.distance.orEmpty())
             // The walk itself names tracks; DOC's whole line matches its own-named tracks.
@@ -635,19 +675,24 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         trimTiles(current.toSet()+patches.map{it.source})
         if(state.overlays())for(patch in patches){val id=patch.source;val tile=tiles[id]?:continue
             val missing=enabled-tile.mask
-            if(missing.isNotEmpty()){tile.features=tile.features+VectorTile.decode(tile.body.bytes,id.z,id.x,id.y,missing);tile.mask=tile.mask+missing;tile.styles.clear();tile.marked=null;tile.markedRevision=-1;decoded++}
+            if(missing.isNotEmpty()){tile.features=tile.features+VectorTile.decode(tile.body.bytes,id.z,id.x,id.y,missing);tile.mask=tile.mask+missing;tile.styles.clear();tile.walkLabels.clear();tile.marked=null;tile.markedRevision=-1;decoded++}
             // MapLibre evaluates ["zoom"] in filters at the tile's own zoom, layer
             // ranges and paint at the camera zoom.
             // Track sections named by their DOC walk (circuits) when the walk data is in.
+            // Lines never depend on DOC's walks (only names do): every DOC page that
+            // arrived used to restyle every tile and send all its lines again as new
+            // groups, which the renderer then repainted, all on this one thread, so
+            // with many walk names in view new tiles' tracks waited behind it.
             val walks=state.tracks&&zoom>=DocWalks.MIN_ZOOM&&docInfos.isNotEmpty()
-            val styled=tile.styles.getOrPut(listOf(state,zoom,if(walks)docRevision else -1L)){Styled(style.build(if(walks)marked(id,tile)else tile.features,state,zoom,id.z.toDouble()))}
+            val styled=tile.styles.getOrPut(listOf(state,zoom)){Styled(style.build(tile.features,state,zoom,id.z.toDouble()))}
+            val names=if(walks)tile.walkLabels.getOrPut(listOf(state,zoom,docRevision)){style.build(marked(id,tile),state,zoom,id.z.toDouble(),withLines=false).labels}else styled.output.labels
             val output=styled.output;val b=patch.clip.bounds
             groups.add(styled.groups.getOrPut(b.toList()){
                 val clipped=ArrayList<TopographyStyle.Line>()
                 for(line in output.lines)for(path in clip(line.points,b))if(path.size>=2)clipped.add(line.copy(points=path))
                 group(id.z,id.x,id.y,b,clipped)
             })
-            labels.addAll(output.labels.filter{it.point.x>=b[0]&&it.point.x<b[2]&&it.point.y>=b[1]&&it.point.y<b[3]})
+            labels.addAll(names.filter{it.point.x>=b[0]&&it.point.x<b[2]&&it.point.y>=b[1]&&it.point.y<b[3]})
         }
         if(state.borders&&state.base==MapSettings.Base.LINZ&&zoom>=8){
             val parts=boundary?:BoundaryIndex(readBoundary()).also{boundary=it}

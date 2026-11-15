@@ -117,7 +117,10 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
                 var result=NativeBridge.cartography(scene,linePacket(packet,held))
                 if(result==2){lineCounts.incrementAndGet(3);result=NativeBridge.cartography(scene,linePacket(packet,emptySet()))}
                 if(result!=1){
-                    lineCounts.incrementAndGet(2);heldLines=null
+                    // Refused before the renderer changed anything: it still holds
+                    // what it held, so the next packet stays incremental (forgetting
+                    // that made every later packet a full one).
+                    lineCounts.incrementAndGet(2)
                     val wait=minOf(30_000L,250L shl minOf(lineRefusals,7));lineRefusals++
                     refusedLines=Triple(scene,packet,now+wait);gpu.postDelayed({requestFrame()},wait);break
                 }
