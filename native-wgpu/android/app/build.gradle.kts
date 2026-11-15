@@ -11,7 +11,7 @@ android {
  compileSdk=36
  defaultConfig { applicationId = explicitId ?: if (sideBySide) "nz.ridgeline.nativeapp.performance" else "nz.ridgeline.nativeapp"
   manifestPlaceholders["ridgelineAppLabel"] = explicitLabel ?: if (sideBySide) "Ridgeline Native Performance" else "Ridgeline Native Prototype"
-  minSdk=26; targetSdk=36; versionCode = 67; versionName="0.1.66-hut-lock"; ndk {abiFilters+=providers.gradleProperty("ridgelineAbis").getOrElse("arm64-v8a").split(",")} }
+  minSdk=26; targetSdk=36; versionCode = 68; versionName="0.1.67-overlay-priority"; ndk {abiFilters+=providers.gradleProperty("ridgelineAbis").getOrElse("arm64-v8a").split(",")} }
  // An optional external key makes signing reproducible without committing keys.
  signingConfigs.getByName("debug") {
   providers.environmentVariable("RIDGELINE_SIGNING_KEYSTORE").orNull?.let {storeFile=file(it)}

@@ -63,6 +63,17 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         const val BACKGROUND_RANK=150
         /** DOC walk pages read at once for map names. */
         const val NAMING_ROUTES=2
+        /** Tile zooms read to follow tracks between two taps, finest first. */
+        val FOLLOW_ZOOMS=listOf(14,13,12)
+        /** The first of [zooms] whose tiles over [points] widened by [margin]
+         * metres number at most [AREA_TILES], or null. */
+        fun areaZoom(points:List<Coordinate>,margin:Double,zooms:List<Int>):Int?{
+            val lat=points.sumOf{it.latitude}/points.size;val dy=margin/111_320.0;val dx=dy/cos(Math.toRadians(lat))
+            return zooms.firstOrNull{z->val n=(1 shl z).toDouble()
+                val x0=floor((points.minOf{it.longitude}-dx+180)/360*n).toInt();val x1=floor((points.maxOf{it.longitude}+dx+180)/360*n).toInt()
+                val y0=floor(CameraMath.mercatorY(points.maxOf{it.latitude}+dy)*n).toInt();val y1=floor(CameraMath.mercatorY(points.minOf{it.latitude}-dy)*n).toInt()
+                (x1-x0+1)*(y1-y0+1)<=AREA_TILES}
+        }
         /** A tap this close (dp) to a hut's dot locks onto the hut. */
         const val HUT_TAP_DP=24.0
         /** Leases older than [limit] at [now], given their start times. */
@@ -314,7 +325,8 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
      * metres of a track or no track joins them. Main thread callback. */
     fun followTracks(from:Coordinate,to:Coordinate,reach:Double,callback:(List<Coordinate>?)->Unit){runCatching{worker.execute{
         val margin=(NativeGeo.distance(from,to)*.35).coerceIn(400.0,3000.0)
-        area(listOf(from,to),margin){area->
+        // Long legs read coarser tiles (zoom 13, then 12) rather than giving up.
+        area(listOf(from,to),margin,FOLLOW_ZOOMS){area->
             val out=area?.let{runCatching{TrackFollow.route(from,to,it.tracks,reach)}.getOrNull()}
             main.post{if(!closed)callback(out)}}
     }}.onFailure{callback(null)}}
@@ -327,13 +339,16 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
     /** The map's tracks, aerial lifts and named peaks within [margin] metres
      * of [points] (at most [AREA_TILES] zoom-14 tiles, else null), read on
      * the walk-route thread: [done] runs there. */
-    private fun area(points:List<Coordinate>,margin:Double,done:(WalkOptions.Area?)->Unit){
+    /** [zooms]: tile zooms to read, finest first: the first whose tiles over the
+     * area number at most [AREA_TILES] (the map's tracks are in its tiles from
+     * zoom 12, to a metre or two). */
+    private fun area(points:List<Coordinate>,margin:Double,zooms:List<Int> = listOf(VECTOR_MAX_ZOOM),done:(WalkOptions.Area?)->Unit){
         if(points.isEmpty()){runCatching{routeJobs.execute{done(null)}};return}
+        val z=areaZoom(points,margin,zooms)?:run{runCatching{routeJobs.execute{done(null)}};return}
         val lat=points.sumOf{it.latitude}/points.size;val dy=margin/111_320.0;val dx=dy/cos(Math.toRadians(lat))
-        val z=VECTOR_MAX_ZOOM;val n=(1 shl z).toDouble()
+        val n=(1 shl z).toDouble()
         val x0=floor((points.minOf{it.longitude}-dx+180)/360*n).toInt();val x1=floor((points.maxOf{it.longitude}+dx+180)/360*n).toInt()
         val y0=floor(CameraMath.mercatorY(points.maxOf{it.latitude}+dy)*n).toInt();val y1=floor(CameraMath.mercatorY(points.minOf{it.latitude}-dy)*n).toInt()
-        if((x1-x0+1)*(y1-y0+1)>AREA_TILES){runCatching{routeJobs.execute{done(null)}};return}
         val ids=ArrayList<GpuUploadQueue.Id>();for(x in x0..x1)for(y in y0..y1)ids.add(GpuUploadQueue.Id(z,x,y))
         val box=doubleArrayOf(x0/n*360-180,CameraMath.latitude((y1+1)/n),(x1+1)/n*360-180,CameraMath.latitude(y0/n))
         val tracks=ArrayList<Pair<String,List<Coordinate>>>();val lifts=ArrayList<List<Coordinate>>();val peaks=ArrayList<Pair<String,Coordinate>>();val roads=ArrayList<Pair<String,List<Coordinate>>>()

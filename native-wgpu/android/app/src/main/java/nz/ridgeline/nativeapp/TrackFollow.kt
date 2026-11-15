@@ -20,7 +20,10 @@ internal object TrackFollow {
      * where it is off it. Null when [to] is not within [reach] metres of a
      * track, [from] not within [START_REACH_METERS], or the tracks do not join. */
     fun route(from:Coordinate,to:Coordinate,tracks:List<Pair<String,List<Coordinate>>>,reach:Double):List<Coordinate>?{
-        val usable=tracks.filter{it.second.size>=2}.map{(n,l)->n to split(l)}
+        // Split only near the two taps (where a tap joins the track): a long leg's
+        // area holds hundreds of kilometres of track.
+        val near={c:Coordinate->DocTracks.meters(c,from)<=SPLIT_NEAR_METERS||DocTracks.meters(c,to)<=SPLIT_NEAR_METERS}
+        val usable=tracks.filter{it.second.size>=2}.map{(n,l)->n to split(l,near)}
         if(usable.isEmpty())return null
         val net=WalkOptions.Network(usable)
         val b=net.nearest(to,reach+SPLIT_METERS)?:return null
@@ -55,10 +58,14 @@ internal object TrackFollow {
             val d=DocTracks.meters(q,p);if(d<bestD-1e-9){bestD=d;best=q;other=if(f>0.0)n else -1}}
         return best to other
     }
-    /** [line] with points added so no piece is longer than [SPLIT_METERS]. */
-    fun split(line:List<Coordinate>):List<Coordinate>{
+    /** Track is split this close to either tap (see [split]). */
+    const val SPLIT_NEAR_METERS=600.0
+    /** [line] with points added so no piece is longer than [SPLIT_METERS]
+     * (only pieces with an end where [near] holds). */
+    fun split(line:List<Coordinate>,near:(Coordinate)->Boolean={true}):List<Coordinate>{
         val out=ArrayList<Coordinate>(line.size);out.add(line[0])
-        for(i in 1 until line.size){val a=line[i-1];val b=line[i];val n=ceil(DocTracks.meters(a,b)/SPLIT_METERS).toInt().coerceIn(1,500)
+        for(i in 1 until line.size){val a=line[i-1];val b=line[i];val len=DocTracks.meters(a,b)
+            val n=if(near(a)||near(b)||len>SPLIT_NEAR_METERS)ceil(len/SPLIT_METERS).toInt().coerceIn(1,500)else 1
             for(k in 1 until n){val t=k.toDouble()/n;out.add(Coordinate(a.longitude+(b.longitude-a.longitude)*t,a.latitude+(b.latitude-a.latitude)*t))}
             out.add(b)}
         return out

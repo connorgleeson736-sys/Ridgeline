@@ -159,6 +159,7 @@ class MainActivity:Activity(){
             contentDescription="Drawing route. Tap to finish.";isClickable=true;setOnClickListener{planner.controller.drawing(false)}}
         topNotes.addView(drawingNote,LinearLayout.LayoutParams(-2,-2).apply{topMargin=dp(4)})
         planner.trackWay={from,to,reach,done->mapLayers.followTracks(from,to,reach,done)}
+        planner.onFollowing={busy->drawingNote.text=if(busy)"Finding the track…" else "Drawing route  ·  Done"}
         planner.onDrawing={drawingNote.visibility=if(it)View.VISIBLE else View.GONE}
         // Capacitor layout: kea launcher and locate (top left), 2D/3D switch,
         // compass and layers (top right). No zoom buttons: pinch and double-tap zoom.
