@@ -187,14 +187,17 @@ internal object DocTracks {
         return line
     }
     /** Huts within [limit] metres of [line], in order along it. */
-    fun stops(huts:List<Hut>,line:List<Coordinate>,limit:Double=HUT_METERS):List<Stop>{
+    /** [pieces]: the walk's other lines (side trips): a hut near one of them is
+     * listed too, where its side trip leaves [line]. */
+    fun stops(huts:List<Hut>,line:List<Coordinate>,limit:Double=HUT_METERS,pieces:List<List<Coordinate>> = emptyList()):List<Stop>{
         if(line.size<2)return emptyList()
         val out=ArrayList<Stop>();val seen=HashSet<String>()
         for(h in huts){
             var best=Double.MAX_VALUE;var along=0.0;var walked=0.0
             for(i in 1 until line.size){val a=line[i-1];val b=line[i];val (d,t)=segment(h.point,a,b);val len=meters(a,b)
                 if(d<best){best=d;along=walked+len*t};walked+=len}
-            if(best<=limit&&seen.add(h.name.lowercase()))out.add(Stop(h,along))
+            val near=best<=limit||pieces.any{p->p.size>=2&&distanceTo(p,h.point)<=limit}
+            if(near&&seen.add(h.name.lowercase()))out.add(Stop(h,along))
         }
         return out.sortedBy{it.along}
     }

@@ -1,0 +1,47 @@
+walks 46, closer to DOC's distance: new 7, old 5
+Abel Tasman Coast Track, Marahau to Wain one_way pieces 10 DOC  60.0 km | old  55.2 km jump 1018 m | new  54.8 km jump 1018 m
+Flora car park to Rolling Junction road  one_way pieces  6 DOC  91.0 km | old  87.2 km jump 1214 m | new  84.6 km jump  614 m
+Angelus Hut via Pinchgut Track and Rober one_way pieces  3 DOC  12.2 km | old  12.1 km jump  561 m | new  11.4 km jump  561 m
+Round the Mountain Track from Whakapapa  loop pieces  6 DOC  66.2 km | old  60.6 km jump 2877 m | new  60.3 km jump 2895 m
+Milford Track, Glade Wharf to Sandfly Po one_way pieces  4 DOC  53.5 km | old  52.3 km jump  459 m | new  51.5 km jump  459 m
+Takahue Saddle Road to Makene Road       one_way pieces  3 DOC  19.0 km | old  15.5 km jump  281 m | new  15.4 km jump  281 m
+Holdsworth to Kaitoke                    one_way pieces  3 DOC  36.0 km | old  14.3 km jump  964 m | new  32.2 km jump  964 m
+Webb Creek Track to Pinnacles Hut        out_and_back pieces  9 DOC   6.0 km | old   6.3 km jump  259 m | new   6.3 km jump  259 m
+Rakiura Track circuit from Lee Bay       loop pieces  4 DOC  32.0 km | old  29.0 km jump 1469 m | new  25.6 km jump  310 m
+Te Pua-a-Tāne Circuit from River Road ca loop pieces  8 DOC  78.7 km | old  79.3 km jump  415 m | new  79.3 km jump  415 m
+Triangle Flat to Wharariki Beach (full t one_way pieces  6 DOC   8.0 km | old  10.0 km jump 1573 m | new   7.2 km jump  279 m
+Lake Waikaremoana Track from Onepoto to  one_way pieces  5 DOC  46.0 km | old  45.4 km jump  444 m | new  44.8 km jump  444 m
+Gillespie Pass Circuit from Makarora     loop pieces  2 DOC  56.0 km | old  50.2 km jump  677 m | new  50.2 km jump  677 m
+Kapowairua (Spirits Bay) to Te Paki Stre one_way pieces  3 DOC  48.0 km | old  37.4 km jump  655 m | new  37.4 km jump  655 m
+Tongariro Alpine Crossing from Mangatepō one_way pieces  2 DOC  20.2 km | old   0.3 km jump   87 m | new  18.8 km jump  668 m
+North West Circuit from Halfmoon Bay     loop pieces 10 DOC 125.0 km | old 119.5 km jump 1334 m | new 117.4 km jump 1334 m
+Routeburn Shelter to The Divide          one_way pieces  3 DOC  33.0 km | old  33.3 km jump  636 m | new  31.0 km jump  392 m
+Mautohe Cathedral Cove Track             out_and_back pieces  5 DOC   5.0 km | old   2.2 km jump  290 m | new   1.6 km jump  225 m
+Mueller Hut Route                        one_way pieces  3 DOC   5.2 km | old   5.4 km jump  411 m | new   5.2 km jump  411 m
+Inland Pack Track from Waikori Road car  one_way pieces  3 DOC  25.0 km | old  21.9 km jump  332 m | new  21.9 km jump  324 m
+Travers-Sabine Circuit                   loop pieces  8 DOC  80.0 km | old  86.4 km jump  837 m | new  86.4 km jump  837 m
+Toaroha roadend to Whitcombe Valley road one_way pieces  2 DOC  48.0 km | old  43.9 km jump  691 m | new  43.2 km jump  691 m
+Brown Hut to Kohaihai carpark            one_way pieces  9 DOC  78.4 km | old  73.3 km jump 1045 m | new  73.3 km jump 1045 m
+Lake Hauroko to Lake Manapouri           one_way pieces  2 DOC  84.0 km | old  50.1 km jump 1383 m | new  50.1 km jump 1383 m
+Mangatepopo Carpark to Whakapapa Village one_way pieces  3 DOC  35.5 km | old  33.0 km jump  853 m | new  33.1 km jump  878 m
+Copland Track from the carpark beside Ro out_and_back pieces  4 DOC  18.0 km | old  15.7 km jump  503 m | new  15.5 km jump  503 m
+Hollyford Track from the end of Lower Ho one_way pieces  7 DOC  56.0 km | old  58.8 km jump 1000 m | new  52.7 km jump  622 m
+Awaroa/Godley Head Loop from Taylors Mis loop pieces  4 DOC   9.3 km | old   7.9 km jump  239 m | new   8.5 km jump  235 m
+Pouākai Crossing, North Taranaki Visitor one_way pieces  3 DOC  19.0 km | old  15.5 km jump  913 m | new  15.7 km jump  566 m
+Southern Circuit from Freshwater Hut via loop pieces  3 DOC  71.5 km | old  91.9 km jump  993 m | new  70.8 km jump  993 m
+Smoke-ho car park to Pororari River car  one_way pieces  2 DOC  55.0 km | old  51.2 km jump  281 m | new  51.2 km jump  281 m
+Taranaki Maunga Summit Climb from North  out_and_back pieces  2 DOC   6.3 km | old   5.6 km jump  291 m | new   5.6 km jump  291 m
+Nydia Track from Duncan Bay to Kaiuma Ba one_way pieces  2 DOC  27.0 km | old  24.6 km jump  293 m | new  24.6 km jump  293 m
+Hump Ridge Track loop from Rarakau car p loop pieces  2 DOC  61.5 km | old  44.1 km jump 1255 m | new  53.8 km jump 1255 m
+Inland Track, Marahau to Wainui car park one_way pieces  8 DOC  41.1 km | old  28.1 km jump  502 m | new  54.3 km jump  502 m
+Meretoto/Ship Cove to Anakiwa along the  one_way pieces  3 DOC  73.5 km | old  67.1 km jump  383 m | new  67.1 km jump  383 m
+Leatham Molesworth Route loop from Botto loop pieces  2 DOC  56.0 km | old  23.6 km jump 2216 m | new  19.1 km jump  535 m
+Hope Kiwi Track from Hurunui swing bridg one_way pieces  2 DOC  33.0 km | old  33.0 km jump  504 m | new  33.0 km jump  504 m
+Te Whara Track from Ocean Beach car park one_way pieces  2 DOC   7.5 km | old   6.9 km jump  542 m | new   6.9 km jump  492 m
+Full Whanganui Journey by canoe, Taumaru one_way pieces  2 DOC 145.0 km | old 150.4 km jump  514 m | new 150.4 km jump  514 m
+Matemateāonga Track from Kohi Saddle to  one_way pieces  3 DOC  42.0 km | old  34.8 km jump  502 m | new  34.9 km jump  502 m
+Ohakune Railway Station to Horopito      one_way pieces  3 DOC  15.0 km | old  11.2 km jump  337 m | new  17.3 km jump  315 m
+Cape Foulwind Walkway, Tauranga Bay car  one_way pieces  3 DOC   3.4 km | old   3.2 km jump  218 m | new   3.2 km jump  218 m
+Kepler Track full track                  loop pieces  5 DOC  60.0 km | old  60.2 km jump  404 m | new  57.0 km jump  376 m
+Lewis Pass picnic area to Boyle shelter  one_way pieces  2 DOC  66.0 km | old  63.3 km jump  653 m | new  62.6 km jump  653 m
+Okahu Road end to River Road car park    one_way pieces  2 DOC  35.0 km | old  30.6 km jump  319 m | new  30.0 km jump  319 m
