@@ -199,7 +199,7 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
                     if(hit==null)toast("Terrain is still loading here.")
                     else if(controller.state.drawing&&controller.state.revision==epoch){
                         val point=Coordinate(hit[0],hit[1])
-                        if(insertion<0&&followTracks&&controller.state.points.isNotEmpty())follow(point)
+                        if(insertion<0)follow(point)
                         else report(if(insertion>=0)controller.insert(insertion,point)else controller.append(point))
                     }
                 }
@@ -273,28 +273,39 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
     private fun report(result:RouteEditor.Result){
         when(result){RouteEditor.Result.TOO_CLOSE->toast("Place the next point at least 5 m away.");RouteEditor.Result.OUTSIDE_NZ->toast("Choose a point in New Zealand.");RouteEditor.Result.LIMIT->toast("This route has reached 2,000 points.");else->{}}
     }
-    /** Drawing follows the map's tracks: each tap is reached from the route's
-     * last point along the tracks (from here to there), not in a straight line.
-     * Kept between sessions. */
-    var followTracks:Boolean
-        get()=preferences.getBoolean("followTracks",false)
-        set(value){preferences.edit().putBoolean("followTracks",value).apply()}
     /** The way along the tracks (MapLayers.followTracks): set by the activity. */
-    var trackWay:(Coordinate,Coordinate,(List<Coordinate>?)->Unit)->Unit={_,_,done->done(null)}
-    /** True while the way to a tap is being found. */
-    var onFollowing:(Boolean)->Unit={}
-    private var following=false
-    private fun follow(to:Coordinate){
-        if(following){toast("Still finding the way along the track…");return}
-        val from=controller.state.points.last();val epoch=controller.state.revision
-        following=true;onFollowing(true)
-        trackWay(from,to){way->
-            following=false;onFollowing(false)
-            val state=controller.state
-            if(closed||!state.drawing||state.revision!=epoch)return@trackWay
-            if(way==null||way.size<2){toast("No track joins these points here: drawn straight.");report(controller.append(to))}
-            else report(controller.appendPath(way))
+    var trackWay:(Coordinate,Coordinate,Double,(List<Coordinate>?)->Unit)->Unit={_,_,_,done->done(null)}
+    /** Taps waiting to be added, in order: each tap close to a track is reached
+     * from the route's last point along the tracks (point to point, ending on
+     * the track); any other tap is a straight line, as before. */
+    private val taps=ArrayDeque<Pair<Coordinate,Double>>()
+    private var following=false;private var followToken=0
+    /** How close (metres) a tap must be to a track to follow it: a finger's
+     * width on screen at the current zoom, 10 to 150 m. */
+    private fun reach(at:Coordinate):Double{
+        val metresPerDp=40_075_016.686*cos(Math.toRadians(at.latitude))/(512.0*2.0.pow(terrain.cameraPose.zoom))
+        return (FOLLOW_DP*metresPerDp).coerceIn(10.0,150.0)
+    }
+    private fun follow(to:Coordinate){taps.addLast(to to reach(to));nextTap()}
+    private fun nextTap(){
+        if(following||closed)return
+        val (to,reach)=taps.removeFirstOrNull()?:return
+        val state=controller.state
+        if(!state.drawing){taps.clear();return}
+        if(state.points.isEmpty()){report(controller.append(to));nextTap();return}
+        val from=state.points.last();val epoch=state.revision;val token=++followToken
+        following=true
+        fun finish(way:List<Coordinate>?){
+            if(token!=followToken||!following)return
+            following=false
+            val now=controller.state
+            if(closed||!now.drawing||now.revision!=epoch){taps.clear();return}
+            report(if(way!=null&&way.size>=2)controller.appendPath(way)else controller.append(to))
+            nextTap()
         }
+        trackWay(from,to,reach){finish(it)}
+        // The map's tracks not to hand (no connection): a straight line.
+        main.postDelayed({finish(null)},FOLLOW_WAIT_MILLIS)
     }
     private fun nearestSegment(x:Double,y:Double):Int {
         val values=terrain.projectedWaypoints();var best=(12*terrain.pixelScale).pow(2);var found=-1
@@ -457,4 +468,10 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
     fun resume(){if(profileDirty)controller.drawing(controller.state.drawing)}
     override fun close(){closed=true;main.removeCallbacks(settle);loader.cancelProfile();controller.close();files.shutdown()}
     private fun formatDistance(m:Double)=if(m>=1000)String.format(java.util.Locale.ROOT,"%.2f km",m/1000)else"${m.roundToInt()} m"
+    private companion object{
+        /** A tap within this distance (dp on screen) of a track follows it. */
+        const val FOLLOW_DP=22.0
+        /** Longest wait for the map's tracks before a tap is drawn straight. */
+        const val FOLLOW_WAIT_MILLIS=3000L
+    }
 }
