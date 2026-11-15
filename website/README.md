@@ -48,3 +48,15 @@ budget for the drawing buffer, no antialiasing), cancels tiles that leave the
 view, loads DOC data nearest the centre first, and does routing, elevation
 and search on worker threads. Scripts, styles and imagery are cached for a
 year under content-hashed paths. Pages carry no web fonts or third-party scripts.
+
+## Test copy (no domain)
+
+`tools/deploy-test.mjs` uploads `dist/` to an R2 bucket (`bushline-site`) and
+serves it with `worker/site.js` on the account's workers.dev address, applying
+the same `_headers` and `_redirects` rules as Pages. Build it with `NOINDEX=1`
+so search engines skip it:
+
+```bash
+NOINDEX=1 SITE_URL=https://bushline-maps.<subdomain>.workers.dev node build.mjs
+CLOUDFLARE_ACCOUNT_ID=... CLOUDFLARE_API_TOKEN=... node tools/deploy-test.mjs
+```

@@ -170,7 +170,7 @@ const csp = [
 ].join('; ');
 writeFileSync(join(out, '_headers'), `/*
   Content-Security-Policy: ${csp}
-  X-Content-Type-Options: nosniff
+  X-Content-Type-Options: nosniff${process.env.NOINDEX ? '\n  X-Robots-Tag: noindex, nofollow' : ''}
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: geolocation=(self), camera=(), microphone=(), payment=()
   Strict-Transport-Security: max-age=31536000; includeSubDomains
@@ -192,5 +192,6 @@ writeFileSync(join(out, '_headers'), `/*
 writeFileSync(join(out, '_redirects'), '/app /map/ 301\n/planner /map/ 301\n');
 const urls = pages.filter((p) => !p.startsWith('404')).map((p) => SITE.domain + '/' + p.replace(/index\.html$/, ''));
 writeFileSync(join(out, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `  <url><loc>${u}</loc></url>`).join('\n')}\n</urlset>\n`);
-writeFileSync(join(out, 'robots.txt'), `User-agent: *\nAllow: /\nSitemap: ${SITE.domain}/sitemap.xml\n`);
+// NOINDEX=1: a test copy (pages.dev) that search engines leave alone.
+writeFileSync(join(out, 'robots.txt'), process.env.NOINDEX ? 'User-agent: *\nDisallow: /\n' : `User-agent: *\nAllow: /\nSitemap: ${SITE.domain}/sitemap.xml\n`);
 console.log(JSON.stringify({ pages: pages.length, js: jsVersion, css: cssVersion, walks: Object.keys(meta).length, overviewTiles: Object.keys(overview.tiles).length, coarse: Object.keys(overview.coarse).length }));
