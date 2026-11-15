@@ -153,13 +153,17 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         view.post{if(!dead)done(error)}
     }}
     private val am = context.getSystemService(ActivityManager::class.java)
-    val recommendedRamCacheMiB=RamCacheBudget.recommended(am.memoryClass,am.isLowRamDevice)
-    val ramCacheMiB get()=preferences.getInt("ramCacheMiB",recommendedRamCacheMiB).coerceIn(0,1000)
-    @Volatile private var ramBudget=RamCacheBudget.split(ramCacheMiB)
+    private val heapMax=Runtime.getRuntime().maxMemory()
+    private val deviceRam=android.app.ActivityManager.MemoryInfo().also{am.getMemoryInfo(it)}.totalMem
+    /** The largest RAM cache this phone can hold (the slider's end). */
+    val maxRamCacheMiB=RamCacheBudget.maximumMiB(heapMax,deviceRam)
+    val recommendedRamCacheMiB=RamCacheBudget.recommended(am.memoryClass,am.isLowRamDevice).coerceAtMost(maxRamCacheMiB)
+    val ramCacheMiB get()=preferences.getInt("ramCacheMiB",recommendedRamCacheMiB).coerceIn(0,maxRamCacheMiB)
+    @Volatile private var ramBudget=RamCacheBudget.split(ramCacheMiB,heapMax,deviceRam)
     fun ramCacheMiB(value:Int){
-        val mib=value.coerceIn(0,1000)
+        val mib=value.coerceIn(0,maxRamCacheMiB)
         preferences.edit().putInt("ramCacheMiB",mib).apply()
-        ramBudget=RamCacheBudget.split(mib)
+        ramBudget=RamCacheBudget.split(mib,heapMax,deviceRam)
         transport.setRamLimit(ramBudget.encoded)
         synchronized(ready){trimReady()}
         synchronized(decoded){trimDecoded()}
@@ -274,6 +278,8 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     // Provisional terrain interiors currently staged, one owner task per tile.
     private val interiorOwners=ConcurrentHashMap<Source,Task>()
     companion object{
+        /** Share of the Java heap limit in use at which the RAM caches are dropped. */
+        const val HEAP_HIGH=.8
         /** Image tiles in one painted download (about 1 GB of aerial imagery). */
         const val MAX_PAINTED_TILES=30_000
         /** Image tiles in one region (was 2,000). */
@@ -564,7 +570,20 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private val storedWork=Executors.newSingleThreadScheduledExecutor{r->Thread({android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);r.run()},"RidgelineStoredIndex").apply{isDaemon=true}}.also{w->
         w.execute{storedTiles.load();storedReady.countDown()}
         w.scheduleWithFixedDelay({storedTiles.save()},60,60,TimeUnit.SECONDS)
+        // The Java heap nearly full (Android sends no warning for that): drop the
+        // RAM caches before garbage collection stalls loading or memory runs out.
+        w.scheduleWithFixedDelay({runCatching{
+            val r=Runtime.getRuntime();if(r.totalMemory()-r.freeMemory()>r.maxMemory()*HEAP_HIGH)heapPressure()
+        }},2,2,TimeUnit.SECONDS)
     }
+    /** Lighter than [memoryPressure]: caches only, the pipeline keeps running. */
+    private fun heapPressure(){
+        heapTrims++
+        transport.memoryPressure()
+        synchronized(decoded){while(decoded.size>minOf(16,demLimit/2))decoded.remove(decoded.keys.first())}
+        synchronized(ready){val it=ready.entries.iterator();while(it.hasNext()){val row=it.next();if(row.key !in wanted){readyBytes-=row.value.capacity();it.remove()}}}
+    }
+    @Volatile private var heapTrims=0
     private val storedChecked=java.util.concurrent.atomic.AtomicBoolean()
     /** Once per session, check the index against the cache itself, in the
      * background (evictions, writes that were dropped), then refresh the tint. */

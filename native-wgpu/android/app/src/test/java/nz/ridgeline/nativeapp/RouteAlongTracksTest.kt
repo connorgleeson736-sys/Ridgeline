@@ -32,10 +32,11 @@ class RouteAlongTracksTest{
         assertTrue(near(line.last(),at(9.0,0.0)))
     }
     @Test fun aLongLegFollowsTheTrack(){
-        // A 32 km valley track with 2 km bends; taps 40 m beside each end.
+        // A 32 km valley track with 2 km bends; taps 40 m south of each end (the
+        // track bends north from both, so each end is the nearest track point).
         val bends=(0..16).map{i->at(i*2000.0,if(i%2==0)0.0 else 600.0)}
-        val line=TrackFollow.route(at(0.0,40.0),at(32_000.0,40.0),listOf("Long Valley Track" to bends),60.0)!!
-        assertTrue(near(line.last(),at(32_000.0,0.0)))
+        val line=TrackFollow.route(at(0.0,-40.0),at(32_000.0,-40.0),listOf("Long Valley Track" to bends),60.0)!!
+        assertTrue(near(line[1],at(0.0,0.0)));assertTrue(near(line.last(),at(32_000.0,0.0)))
         assertEquals(DocTracks.length(bends)+40.0,DocTracks.length(line),2.0)
         assertTrue("the bends only, not every 20 m: ${line.size}",line.size<=20)
     }
