@@ -15,6 +15,7 @@ import { START as A_COLOUR, END as B_COLOUR } from './chart.js';
 import { install as installOverview, loadOverview, loadGapIndex } from './overview.js';
 import { attach as attachOverlays } from './overlays.js';
 import { install as installVector, attach as attachVector } from './vector.js';
+import { attach as attachLabels } from './labels.js';
 import { attach as attachPlanner } from './planner.js';
 import { attach as attachSearch } from './search.js';
 import { Sheet } from './sheet.js';
@@ -66,9 +67,10 @@ const view = parseView(location.hash) || store.get('view', null) || START;
 async function main() {
   if (!webglSupported()) { $('map-status').hidden = false; $('map-status').textContent = 'Your browser can’t show the 3D map (WebGL is turned off or unsupported). Try an up-to-date Chrome, Edge, Firefox or Safari.'; return; }
   const topography = await fetch('/data/topography-style.json').then((r) => r.json());
+  const style = build({ topography, settings, dark: dark.matches });
   const map = new MapLibre({
     container: 'map',
-    style: build({ topography, settings, dark: dark.matches }),
+    style,
     center: view.center, zoom: view.zoom, bearing: view.bearing,
     pitch: settings.threeD ? (view.pitch ?? 0) : 0,
     minZoom: 4.5, maxZoom: 19, maxPitch: 85, maxBounds: NZ_BOUNDS,
@@ -147,6 +149,7 @@ async function main() {
   };
   const overlays = attachOverlays(map, () => settings);
   attachVector(map, () => shown('nz-tracks', settings));
+  const labels = attachLabels(map, style.metadata.labels);
   ctx.overlays = overlays;
   const planner = attachPlanner(ctx);
   ctx.planner = planner;
@@ -242,9 +245,14 @@ async function main() {
     if (shown('nz-tracks', settings)) {
       const track = nearestFeature(point, ['nz-tracks', 'nz-tracks-label', 'doc-walks', 'doc-walk-names'], 18);
       if (track) {
-        if (track.source === 'doc-walks') { openWalk(ctx, track.properties.guid); return; }
+        if (track.source === 'doc-walks' || track.layer.id === 'doc-walk-names') { openWalk(ctx, track.properties.guid); return; }
         const name = (track.properties.name || '').trim();
-        const geom = longest(track.geometry);
+        let geom = longest(track.geometry);
+        // A name is a point (labels.js): the track is the named piece through it.
+        if (track.geometry.type === 'Point' && name) {
+          const at = track.geometry.coordinates, d = (l) => Math.min(...l.map((p) => (p[0] - at[0]) ** 2 + (p[1] - at[1]) ** 2));
+          geom = map.querySourceFeatures('ridgeline-tracks', { sourceLayer: 'streets', filter: ['==', ['get', 'name'], name] }).flatMap((f) => lines(f.geometry)).sort((a, b) => d(a) - d(b))[0] || [at];
+        }
         const found = walkFor(geom, name, overlays.walkLines(), overlays.infos());
         // A track on a DOC walk opens the walk; close in (zoom 15), a named section
         // of a large walk opens as itself (the app's DocWalks.CHILD_NAMES).
@@ -302,7 +310,7 @@ async function main() {
       if (first) { first = false; if (p[0] > 165 && p[0] < 179.5 && p[1] < -33 && p[1] > -48) map.flyTo({ center: p, zoom: Math.max(map.getZoom(), 13), duration: reducedMotion ? 0 : 1500 }); else toast('You’re outside New Zealand.'); }
     }, () => { toast('Couldn’t get your location. Check that location is allowed for this site.'); locate.click(); }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 10000 });
   });
-  const layersPanel = layers(map, $('layers-panel'), $('layers-button'), { setThreeD, overlays, resize, closeDrawer });
+  const layersPanel = layers(map, $('layers-panel'), $('layers-button'), { setThreeD, overlays, labels, resize, closeDrawer });
 
   dark.addEventListener('change', () => { map.setSky(sky(dark.matches)); map.setPaintProperty('background', 'background-color', dark.matches ? '#16211d' : '#dfe7e1'); });
   document.addEventListener('keydown', (e) => {
@@ -317,7 +325,7 @@ async function main() {
 }
 
 /** The layers card, with the app's wording; only the settings that matter. */
-function layers(map, panel, button, { setThreeD, overlays, resize, closeDrawer }) {
+function layers(map, panel, button, { setThreeD, overlays, labels, resize, closeDrawer }) {
   const toggles = [['roads', 'Roads & road names'], ['names', 'Place & water names'], ['tracks', 'Mapped walking tracks', 'tracks'], ['huts', 'Huts & bivouacs', 'huts'], ['contours', 'Contour lines & heights'], ['hunting', 'Hunting permit areas', 'hunting'], ['peaks', 'Peak labels']];
   const base = (id, label) => el('button', { class: 'base', type: 'button', 'data-base': id, onclick: () => setBase(id) }, el('span', { class: `swatch swatch-${id}` }), label);
   const reliefValue = el('output', {}, `${(+settings.relief).toFixed(1)}×`);
@@ -340,7 +348,7 @@ function layers(map, panel, button, { setThreeD, overlays, resize, closeDrawer }
     ...toggles.map(([key, label, keyClass]) => el('label', { class: 'check' }, el('span', {}, keyClass ? el('i', { class: `key ${keyClass}`, 'aria-hidden': 'true' }) : null, label), el('input', { type: 'checkbox', 'data-toggle': key, checked: settings[key], onchange: (e) => setGroup(key, e.target.checked) }))),
     el('label', { class: 'relief' }, el('span', {}, 'Terrain relief'), reliefValue, relief),
     el('a', { class: 'doc-link', href: 'https://www.doc.govt.nz/parks-and-recreation/know-before-you-go/alerts/', target: '_blank', rel: 'noopener' }, 'Check DOC alerts ↗'));
-  const applyAll = () => { for (const ids of Object.values(GROUPS)) for (const id of ids) if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', shown(id, settings) ? 'visible' : 'none'); };
+  const applyAll = () => { for (const ids of Object.values(GROUPS)) for (const id of ids) if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', shown(id, settings) ? 'visible' : 'none'); labels.refresh(); };
   function setBase(id, { keep3d = false } = {}) {
     settings.base = id; saveSettings();
     for (const layer of ['aerial', 'satellite', 'topo']) for (const l of [layer, `${layer}-cover`]) map.setLayoutProperty(l, 'visibility', id === layer ? 'visible' : 'none');

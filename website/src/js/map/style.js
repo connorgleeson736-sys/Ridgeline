@@ -58,8 +58,31 @@ export const ESRI_ATTRIBUTION = '<a href="https://www.arcgis.com/home/item.html?
 
 const TRACK_LAYERS = new Set(['nz-tracks-halo', 'nz-tracks', 'nz-tracks-label', 'nz-huts-dot', 'nz-huts-label']);
 
-/** The whole style. `topography`: the app's layers (data/topography-style.json). */
-export function build({ topography, settings, dark }) {
+/** Names placed by labels.js, one per road, track, river or lake in view, and what
+ * their geometry is. MapLibre names a line or area once per map tile it crosses, so a
+ * long track or a big lake would carry its name several times over. */
+export const LABELS = {
+  'nz-roads-highway-label': 'line', 'nz-roads-local-label': 'line', 'nz-tracks-label': 'line', 'nz-rivers': 'line',
+  'nz-lakes': 'polygon', 'nz-river-polygons': 'polygon', 'doc-walk-names': 'line',
+};
+
+/** The whole style. `topography`: the app's layers (data/topography-style.json).
+ * `metadata.labels`: where labels.js finds the features each name layer labels. */
+export function build(options) {
+  const style = buildStyle(options), labels = [];
+  style.layers = style.layers.map((l) => {
+    if (!LABELS[l.id]) return l;
+    labels.push({ id: l.id, kind: LABELS[l.id], source: l.source, sourceLayer: l['source-layer'], filter: l.filter });
+    const { 'symbol-placement': _p, 'text-max-angle': _a, 'symbol-spacing': _s, ...layout } = l.layout || {};
+    const { 'source-layer': _l, ...rest } = l;
+    return { ...rest, source: 'labels', filter: ['==', ['get', '_layer'], l.id], layout };
+  });
+  style.sources.labels = { type: 'geojson', data: { type: 'FeatureCollection', features: [] }, maxzoom: 16 };
+  style.metadata = { labels };
+  return style;
+}
+
+function buildStyle({ topography, settings, dark }) {
   const visible = (on) => (on ? 'visible' : 'none');
   const topoLayers = topography.map((l) => {
     const layer = { ...l, layout: { ...(l.layout || {}), visibility: visible(shown(l.id, settings)) } };
