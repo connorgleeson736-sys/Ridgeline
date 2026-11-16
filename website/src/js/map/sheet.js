@@ -1,5 +1,6 @@
 // The bottom sheet, as the app's NativeSheet: a grip with × at the top right,
-// two stops (compact and expanded); tap the grip to switch, or drag it.
+// three stops (compact, expanded and full); tap the grip to go up a stop (from full,
+// back to compact), or drag it to the nearest.
 import { el, store } from './ui.js';
 
 export class Sheet {
@@ -57,7 +58,8 @@ export class Sheet {
     this.body.scrollTop = 0;
     this.root.hidden = false;
     this.root.dataset.kind = panel.kind || '';
-    this.size(panel.size || 'expanded');
+    // Left at full, the next panel stays full.
+    this.size(panel.size || (this.root.dataset.size === 'full' && this.isOpen ? 'full' : 'expanded'));
     document.body.classList.add('sheet-open');
     const r = panel.render?.(this.body, () => token === this.token, { restored });
     if (typeof r === 'function') this.cleanup = r;
@@ -84,7 +86,7 @@ export class Sheet {
     this.onClose();
   }
   size(s) { this.root.dataset.size = s; this.onSize?.(s); }
-  toggle() { this.size(this.root.dataset.size === 'compact' ? 'expanded' : 'compact'); }
+  toggle() { this.size({ compact: 'expanded', expanded: 'full' }[this.root.dataset.size] || 'compact'); }
   /** On computers: a floating card moved by its top bar and resized from its
    * edges and corners, kept where it was left (position and size remembered). */
   card() {
@@ -140,7 +142,7 @@ export class Sheet {
     this.grip.addEventListener('dblclick', () => { if (!wide.matches) return; box = null; store.set('card', null); apply(); });
     apply();
   }
-  /** Drag the grip between the two stops; a tap switches. */
+  /** Drag the grip between the stops; a tap goes up one. */
   dragging() {
     let start = null;
     const down = (e) => {
@@ -159,7 +161,7 @@ export class Sheet {
       this.root.classList.remove('dragging');
       this.root.style.height = '';
       if (Math.abs(moved) < 6) this.toggle();
-      else this.size(h < innerHeight * 0.32 ? 'compact' : 'expanded');
+      else this.size(h < innerHeight * 0.32 ? 'compact' : h < innerHeight * 0.72 ? 'expanded' : 'full');
       start = null;
     };
     this.grip.addEventListener('pointerdown', down);

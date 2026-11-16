@@ -342,6 +342,7 @@ function sectionPanel(ctx, d, s, { at = null, walk = null, fromList = false } = 
         if (lines.length) { ctx.select(lines); if (first) ctx.fit(lines.flat()); }
         first = false;
         if (!fromList) body.append(directionSwitch(draw));
+        body.append(sectionSteps(ctx, d, s, host, { fromList }));
         body.append(el('p', { class: 'ta-facts' }, [s.length && `${km(s.length)} km`, shortTime(s.time)].filter(Boolean).join(' · ')));
         if (s.alternative) body.append(el('p', { class: 'ta-why' }, teAraroa.optionKind(s).why));
         body.append(taAlertsBox(s.slug));
@@ -404,6 +405,33 @@ function sectionPanel(ctx, d, s, { at = null, walk = null, fromList = false } = 
       draw();
     },
   };
+}
+
+/** The sections before and after this one along the trail, in walking order. */
+function neighbours(d, s) {
+  if (s.alternative || s.from == null) return [null, null];
+  const order = teAraroa.walking(d.mains.filter((m) => m.from != null).sort((a, b) => a.from - b.from));
+  const i = order.indexOf(s);
+  return i < 0 ? [null, null] : [order[i - 1] || null, order[i + 1] || null];
+}
+
+/** ‹ Previous and Next › along the trail: the panel is replaced where it is (Back still
+ * leads where it did), and the map moves to the new section. */
+function sectionSteps(ctx, d, s, host, opts) {
+  const [prev, next] = neighbours(d, s);
+  if (!prev && !next) return document.createTextNode('');
+  const go = (t) => {
+    const p = sectionPanel(ctx, d, t, { fromList: opts.fromList });
+    if (host === ctx.side) ctx.side.show({ ...p, render: (body, alive, o) => p.render(body, alive, ctx.side, o) });
+    else ctx.sheet.show({ kind: p.kind, title: p.title, subtitle: p.subtitle, backLabel: p.backLabel, size: ctx.sheet.root.dataset.size, render: (body, alive, o) => { p.render(body, alive, ctx.sheet, o); return opts.fromList ? undefined : () => ctx.select(null); } });
+  };
+  const step = (t, back) => (t
+    ? el('button', { type: 'button', class: `ta-step ${back ? 'prev' : 'next'}`, title: t.name, 'aria-label': `${back ? 'Previous' : 'Next'} section: ${t.name}`, onclick: () => go(t) },
+      back ? el('span', { class: 'arrow', 'aria-hidden': 'true' }, '‹') : null,
+      el('span', { class: 'ta-step-text' }, el('small', {}, back ? 'Previous' : 'Next'), el('span', { class: 'ta-step-name' }, t.name)),
+      back ? null : el('span', { class: 'arrow', 'aria-hidden': 'true' }, '›'))
+    : el('span', { class: 'ta-step empty' }));
+  return el('nav', { class: 'ta-steps', 'aria-label': 'Sections along the trail' }, step(prev, true), step(next, false));
 }
 
 /** The whole trail, as a panel (Back from a section returns here). */
