@@ -19,6 +19,7 @@ import { attach as attachLabels } from './labels.js';
 import { attach as attachPlanner } from './planner.js';
 import { attach as attachSearch } from './search.js';
 import { Sheet } from './sheet.js';
+import { SidePanel } from './side.js';
 import { openWalk, openTrack, openHut, openHunting, openTeAraroa, openTeAraroaPlace, openTeAraroaStop } from './details.js';
 import * as teAraroa from './te-araroa.js';
 import { walkFor } from '../core/walks.js';
@@ -96,7 +97,9 @@ async function main() {
   map.addControl(new AttributionControl({ compact: true, customAttribution: '<a href="/credits/">Data credits</a>' }), 'bottom-right');
 
   // ---- Shared context for panels ----
-  const sheet = new Sheet($('sheet'), { onClose: () => { if (planner.active) planner.close(); select(null); marker(null); } });
+  const sheet = new Sheet($('sheet'), { onClose: () => { side.close(); if (planner.active) planner.close(); select(null); marker(null); } });
+  // Beside the side panel on computers: what is picked in a list opens there.
+  const side = new SidePanel(sheet);
   const sheetPadding = () => {
     const wide = matchMedia('(min-width: 800px)').matches, s = $('sheet');
     const pad = { top: 70, bottom: 50, left: 70, right: 60 };
@@ -106,6 +109,12 @@ async function main() {
         const r = s.getBoundingClientRect();
         if (r.left + r.width / 2 < innerWidth / 2) pad.left = Math.max(pad.left, r.right + 20); else pad.right = Math.max(pad.right, innerWidth - r.left + 20);
       } else pad.bottom += Math.min(s.offsetHeight, innerHeight * 0.6);
+    }
+    // And beside the panel next to it (a picked Te Araroa section).
+    const sp = document.querySelector('.side-panel');
+    if (wide && sp && !sp.hidden) {
+      const r = sp.getBoundingClientRect();
+      if (r.left + r.width / 2 < innerWidth / 2) pad.left = Math.max(pad.left, r.right + 20); else pad.right = Math.max(pad.right, innerWidth - r.left + 20);
     }
     return pad;
   };
@@ -135,6 +144,7 @@ async function main() {
   }
   function fit(line) { let w = 180, s = 0, e = 0, n = -90; for (const [x, y] of line) { w = Math.min(w, x); e = Math.max(e, x); s = Math.min(s, y); n = Math.max(n, y); } fitBox([w, s, e, n]); }
   const ctx = {
+    side,
     map, sheet, select, fit, fitBox,
     marker: (p, fly) => marker(p),
     range,
@@ -309,45 +319,6 @@ async function main() {
     map.on('mouseleave', l, () => { if (!planner.drawing) map.getCanvas().style.cursor = ''; });
   }
 
-  // ---- Close in, hovering a track: "Start route" there. A temporary route, drawn
-  // exactly as the planner draws, which the walker can then save to their routes ----
-  const START_ZOOM = 13, START_PX = 10, START_LAYERS = ['nz-tracks', 'doc-walks', 'te-araroa', 'te-araroa-option'];
-  const startPill = el('div', { class: 'track-start', hidden: true }, el('span', { class: 'track-start-dot', 'aria-hidden': 'true' }),
-    el('button', { type: 'button', class: 'track-start-button' }, 'Start route here'));
-  map.getContainer().append(startPill);
-  let startPoint = null, startHide = 0, startFrame = 0, lastMove = null;
-  const hideStart = () => { clearTimeout(startHide); startHide = setTimeout(() => { startPill.hidden = true; startPoint = null; }, 500); };
-  startPill.addEventListener('mouseenter', () => clearTimeout(startHide));
-  startPill.addEventListener('mouseleave', hideStart);
-  startPill.querySelector('button').addEventListener('click', (ev) => {
-    ev.stopPropagation();
-    if (!startPoint) return;
-    const p = startPoint;
-    startPill.hidden = true; startPoint = null;
-    planner.startTemp(p);
-  });
-  if (!coarse) {
-    map.on('mousemove', (e) => {
-      lastMove = e;
-      if (startFrame) return;
-      startFrame = requestAnimationFrame(() => {
-        startFrame = 0;
-        const ev = lastMove;
-        if (planner.drawing || map.getZoom() < START_ZOOM || map.isMoving()) { hideStart(); return; }
-        const p = ev.point;
-        const layers = START_LAYERS.filter((l) => map.getLayer(l) && map.getLayoutProperty(l, 'visibility') !== 'none');
-        const hits = layers.length ? map.queryRenderedFeatures([[p.x - START_PX, p.y - START_PX], [p.x + START_PX, p.y + START_PX]], { layers }) : [];
-        const snap = nearestOnScreen(map, hits, p);
-        if (!snap || snap.d > START_PX) { hideStart(); return; }
-        clearTimeout(startHide);
-        startPoint = map.unproject([snap.x, snap.y]).toArray();
-        startPill.style.transform = `translate(${Math.round(snap.x)}px, ${Math.round(snap.y)}px)`;
-        startPill.hidden = false;
-      });
-    });
-    map.on('movestart', () => { startPill.hidden = true; startPoint = null; });
-  }
-
   // ---- Map chrome, as the app's ----
   const compass = $('compass'), needle = compass.querySelector('svg');
   const turn = () => { needle.style.transform = `rotate(${-map.getBearing()}deg)`; };
@@ -450,20 +421,6 @@ function layers(map, panel, button, { setThreeD, overlays, labels, resize, close
 
 function lines(g) { return g.type === 'LineString' ? [g.coordinates] : g.type === 'MultiLineString' ? g.coordinates : []; }
 function longest(g) { return lines(g).sort((a, b) => b.length - a.length)[0] || []; }
-/** The point of any of these features' lines nearest p on screen, and its distance. */
-function nearestOnScreen(map, features, p) {
-  let best = null;
-  for (const f of features) for (const line of lines(f.geometry)) {
-    const q = line.map((c) => map.project(c));
-    for (let i = 1; i < q.length; i++) {
-      const a = q[i - 1], b = q[i], dx = b.x - a.x, dy = b.y - a.y, l = dx * dx + dy * dy;
-      const t = l ? Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy) / l)) : 0;
-      const x = a.x + t * dx, y = a.y + t * dy, d = Math.hypot(x - p.x, y - p.y);
-      if (!best || d < best.d) best = { x, y, d };
-    }
-  }
-  return best;
-}
 function pixelDistance(map, g, p) {
   const pts = g.type === 'Point' ? [[g.coordinates]] : lines(g);
   let best = Infinity;

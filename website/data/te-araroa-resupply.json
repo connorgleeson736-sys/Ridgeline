@@ -104,7 +104,9 @@
     {
       "name": "Picton",
       "level": "full",
-      "note": "Supermarkets at the ferry terminal town."
+      "note": "Supermarkets at the ferry terminal town.",
+      "via": "The ferry lands here and the water taxi to Ship Cove leaves from here.",
+      "km": 1739
     },
     {
       "name": "Havelock",

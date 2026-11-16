@@ -165,10 +165,16 @@ const kml = Object.values(unzip(kmz, (n) => /\.kml$/i.test(n)))[0].toString('utf
 const cells = (pm) => Object.fromEntries([...pm.matchAll(/<td>([^<]{1,40})<\/td>\s*<td>([\s\S]*?)<\/td>/g)].map(([, k, v]) => [k.trim(), unescape(v)]));
 const value = (v) => (v && v !== '<Null>' ? v : '');
 const href = (v) => /href="([^"]+)"/.exec(v || '')?.[1] || (/^https?:\/\//.test(value(v)) ? value(v) : '');
-const legal = new Map(), places = [];
+const legal = new Map(), places = [], bypassLines = [];
 for (const m of kml.matchAll(/<Placemark\b[\s\S]*?<\/Placemark>/g)) {
   const pm = m[0], f = cells(pm);
   if (pm.includes('<LineString>') && f.SEQUENCE && f.LEGALSTAT) legal.set(+f.SEQUENCE, value(f.LEGALSTAT));
+  // The official bypass lines: each one clean and whole (the section pages' lines for
+  // options come in loose parts, a boat leg among them).
+  if (pm.includes('<LineString>') && /bypass/i.test(f.Type || '')) {
+    const lines = [...pm.matchAll(/<coordinates>([\s\S]*?)<\/coordinates>/g)].map((c) => c[1].trim().split(/\s+/).map((t) => t.split(',').map(Number)).map(([x, y]) => [r5(x), r5(y)])).filter((l) => l.length >= 2);
+    if (lines.length) bypassLines.push({ name: value(f.Name) || tag(pm, 'name'), lines });
+  }
   if (!pm.includes('<Point>')) continue;
   const at = /<coordinates>\s*([-\d.]+),([-\d.]+)/.exec(pm);
   if (!at) continue;
@@ -178,6 +184,23 @@ for (const m of kml.matchAll(/<Placemark\b[\s\S]*?<\/Placemark>/g)) {
   } else if (f.categories && f.name) {
     places.push({ name: value(f.name), type: 'Holiday park', facilities: value(f.tags), phone: value(f.phone), address: value(f.physical_address), website: href(f.website), point });
   }
+}
+
+/** An option's line: the official bypass line of the same name where there is one;
+ * otherwise its parts, less any boat leg on a walking or road option. */
+const STOP = new Set(['bypass', 'to', 'the', 'by', 'via', 'and', 'walking', 'north', 'south']);
+const words = (n) => n.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/ngungruru/g, 'ngunguru').split(/[^a-z0-9]+/).filter((w) => w && !STOP.has(w));
+function optionLines(name, parts) {
+  const own = words(name);
+  // Shared words, less a little for each of the bypass's own words not in the name
+  // (so "Whanganui River Road Bypass" takes the walking bypass, not the kayak one).
+  const scored = bypassLines.map((b) => { const w = words(b.name), hit = w.filter((x) => own.includes(x)).length; return { b, hit, n: hit - 0.1 * (w.length - hit) }; }).filter((x) => x.hit >= 2);
+  const top = Math.max(-Infinity, ...scored.map((x) => x.n));
+  if (scored.length) return scored.filter((x) => Math.abs(x.n - top) < 1e-9).flatMap((x) => x.b.lines);
+  const water = /kayak|water|ferry|interislander|canoe|boat/i.test(name);
+  const boat = (l) => l.length < 40 && lengthOf(l) / (l.length - 1) > 800;
+  const kept = water ? parts : parts.filter((l) => !boat(l));
+  return (kept.length ? kept : parts).map((l) => l.map(([x, y]) => [x, y]));
 }
 
 // ---- 3. Sections: the site's section list, then each section's page data ----
@@ -204,7 +227,7 @@ for (const [n, t] of overview.tracks.entries()) {
     length: t.len ? Math.round(t.len * 10) / 10 : null, time: unescape(t.time || ''), kind: t.tc || '', grade: t.diff || null,
     from: a == null ? null : Math.round(a * 10) / 10, to: b == null ? null : Math.round(b * 10) / 10, alternative, on: on.map((k) => k.km),
     // An option's own line is drawn beside the trail (to about 5 m).
-    line: alternative ? lines.map((l) => simplify(l, 5)) : null,
+    line: alternative ? optionLines(t.name || '', lines).map((l) => simplify(l, 5)) : null,
   });
   // Text only: pictures in the notes (embedded or linked) belong to their photographers.
   const words = (html) => (html || '').replace(/<img\b[^>]*>/gi, '').replace(/<(figure|picture|svg)\b[\s\S]*?<\/\1>/gi, '');
@@ -272,7 +295,7 @@ for (const c of curated) {
   const list = (towns.get(fold(c.place || c.name)) || []).slice().sort((a, b) => (RANK[a.type] ?? 9) - (RANK[b.type] ?? 9));
   const best = list.map((g) => ({ g, k: kmAt(g.point) })).sort((a, b) => (RANK[a.g.type] ?? 9) - (RANK[b.g.type] ?? 9) || a.k.d - b.k.d).find((x) => x.k.d < 60_000);
   if (!best) { console.log(`  not placed: ${c.name}`); continue; }
-  stops.push({ name: c.name, point: best.g.point, km: Math.round(best.k.km * 10) / 10, off: Math.round(best.k.d), level: c.level, note: c.note || '', bounce: !!c.bounce, shops: [], from: 'guides' });
+  stops.push({ name: c.name, point: best.g.point, km: c.km ?? Math.round(best.k.km * 10) / 10, off: Math.round(best.k.d), level: c.level, note: [c.note, c.via].filter(Boolean).join(' '), bounce: !!c.bounce, via: !!c.via, shops: [], from: 'guides' });
 }
 for (const s of sections) {
   const text = plain(notes[s.slug]?.food);

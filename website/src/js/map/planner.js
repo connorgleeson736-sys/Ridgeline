@@ -36,7 +36,7 @@ function unflatten(points, waypoints) {
 
 export function attach(ctx) {
   const { map, sheet } = ctx;
-  let route = null;            // {id, name, legs, saved, temp}: temp until the walker saves it
+  let route = null;            // {id, name, legs, saved}
   let drawing = false, selected = -1;
   let history = [];
   let queue = Promise.resolve(), pending = 0, pendingLine = null;
@@ -44,7 +44,7 @@ export function attach(ctx) {
 
   const saved = () => store.get('routes', []);
   const persist = () => {
-    if (!route || route.temp || route.legs.length < 2) return;
+    if (!route || route.legs.length < 2) return;
     const { points, waypoints } = flatten(route.legs);
     const list = saved().filter((r) => r.id !== route.id);
     list.unshift({ id: route.id, name: route.name, points, waypoints, updated: Date.now() });
@@ -71,8 +71,6 @@ export function attach(ctx) {
     tools[1].disabled = !drawing || !history.length;
     tools[2].disabled = !route || route.legs.length < 2;
     tools[3].disabled = !drawing || selected < 0;
-    const save = sheet.body.querySelector('.route-save .btn');
-    if (save) save.disabled = !route || route.legs.length < 2;
   }
   function changed({ save = true } = {}) {
     render();
@@ -254,9 +252,7 @@ export function attach(ctx) {
           el('button', { class: 'btn', type: 'button', onclick: undo, disabled: !drawing || !history.length }, 'Undo'),
           el('button', { class: 'btn', type: 'button', onclick: share, disabled: route.legs.length < 2 }, 'Share'),
           el('button', { class: 'btn danger', type: 'button', onclick: () => deletePoint(selected), disabled: !drawing || selected < 0 }, 'Delete point'));
-        // A route started from a track is temporary until it is saved.
-        const keep = route.temp ? el('div', { class: 'route-save' }, el('button', { class: 'btn primary', type: 'button', disabled: route.legs.length < 2, onclick: saveTemp }, 'Save to my routes'), el('small', {}, 'Not saved yet: closing this discards it.')) : null;
-        body.append(...[name, keep, statsBox, el('div', { class: 'chart-wrap grow' }, canvas), tools].filter(Boolean));
+        body.append(name, statsBox, el('div', { class: 'chart-wrap grow' }, canvas), tools);
         if (!drawing) body.append(el('div', { class: 'app-cta route-extra' }, el('p', {}, 'Take your routes offline on the hill with the Bushline Maps Android app.'), el('a', { class: 'btn', href: '/about/#app' }, 'Get the app')));
         updateStats();
         updateProfile();
@@ -279,7 +275,7 @@ export function attach(ctx) {
     ctx.note(on ? 'Tap to add points · near a track, the route follows it' : null);
   }
   function share() {
-    if (!route || route.temp || route.legs.length < 2) return;
+    if (!route || route.legs.length < 2) return;
     const { points, waypoints } = flatten(route.legs);
     const link = `${location.origin}/#${encodeRoute({ name: route.name, points, waypoints })}`;
     const done = () => toast('Link copied. Open it on your phone to take the route with you.');
@@ -384,23 +380,6 @@ export function attach(ctx) {
     renderPanel();
     toast('Saved to your routes. Edit it to change it.');
   }
-  /** A temporary route from a point on a track (the hover "Start route"): drawn as any
-   * route is, saved to the walker's routes only when they choose to. */
-  function startTemp(point, name = 'New route') {
-    ctx.closeDetails?.();
-    start(name);
-    route.temp = true;
-    route.legs.push({ p: point, path: [] });
-    setDrawing(true);
-    ctx.note('Tap along the way to draw the route · near a track, it follows it');
-  }
-  function saveTemp() {
-    if (!route || route.legs.length < 2) return;
-    route.temp = false;
-    persist();
-    toast('Saved to your routes.');
-    renderPanel();
-  }
   function startAt(point, name) {
     start(`From ${name}`);
     route.legs.push({ p: point, path: [] });
@@ -422,7 +401,7 @@ export function attach(ctx) {
     get active() { return !!route; },
     tap,
     lineTap: (lngLat) => (drawing && route && route.legs.length > 1 ? insertAt(lngLat) : false),
-    newRoute, list, fromLine, startAt, startTemp, openLink, setDrawing, clear,
+    newRoute, list, fromLine, startAt, openLink, setDrawing, clear,
     undo: () => drawing && undo(),
     deleteSelected: () => drawing && selected >= 0 && deletePoint(selected),
     close() { if (drawing) setDrawing(false); clear(); },

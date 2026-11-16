@@ -37,13 +37,31 @@ function decode(j) {
   return (ready = { name: j.name, season: j.season, total: j.total, pieces, sections, mains, bySlug, places: j.places || [], resupply: j.resupply || [] });
 }
 
-/** The trail's pieces in a section, in order, as one line (southbound). */
+/** A section as one line, southbound: the trail's pieces in order, or an option's
+ * longest part (an option's parts are never joined: they can be separate ways). */
 export function sectionLine(d, s) {
-  if (s.alternative) return (s.line || []).flat();
+  if (s.alternative) return (s.line || []).reduce((a, l) => (l.length > a.length ? l : a), []);
   const out = [];
   for (const p of d.pieces) if (p.section === s.slug) for (const q of p.line) { const l = out[out.length - 1]; if (!l || l[0] !== q[0] || l[1] !== q[1]) out.push(q); }
   return out;
 }
+
+/** Everything to draw for a section: its line, or all of an option's parts. */
+export function sectionLines(d, s) {
+  return s.alternative ? (s.line || []).filter((l) => l.length >= 2) : [sectionLine(d, s)].filter((l) => l.length >= 2);
+}
+
+// ---- Direction: southbound (Cape Reinga to Bluff) or northbound, the walker's choice ----
+const DIR_KEY = 'bushline:ta-direction';
+let direction = (() => { try { return localStorage.getItem(DIR_KEY) === 'nobo' ? 'nobo' : 'sobo'; } catch { return 'sobo'; } })();
+export const dir = () => direction;
+export function setDir(v) { direction = v === 'nobo' ? 'nobo' : 'sobo'; try { localStorage.setItem(DIR_KEY, direction); } catch { /* private mode */ } }
+/** A southbound km as the walker counts it. */
+export const kmIn = (d, v) => (v == null ? null : direction === 'nobo' ? Math.max(0, d.total - v) : v);
+/** In walking order. */
+export const walking = (list) => (direction === 'nobo' ? [...list].reverse() : list);
+/** A line in walking order. */
+export const facing = (line) => (direction === 'nobo' ? [...line].reverse() : line);
 
 /** How much of a section is on roads, by the Trust's land status of each piece. */
 export function roadShare(d, s) {
@@ -105,8 +123,8 @@ export function alerts(slug) {
 
 // ---- Food: resupply stops and the carries between them ----
 export const LEVELS = { full: 'Supermarket', limited: 'Small store', box: 'Send a box' };
-/** A stop the trail reaches (within 3 km); further off it is a hitch. */
-export const onTrail = (r) => r.off <= 3000;
+/** A stop the trail reaches (within 3 km, or on its way, as Picton by ferry); further off it is a hitch. */
+export const onTrail = (r) => r.off <= 3000 || !!r.via;
 
 /** The Trust's time for a section as [least, most] days, or null ("2–3 days", "6 hours"). */
 export function daysOf(time) {
@@ -140,18 +158,21 @@ export function daysText([lo, hi]) {
  * stops a hitch away in between. */
 export function carries(d) {
   const on = d.resupply.filter(onTrail);
+  const nobo = direction === 'nobo';
   const out = [];
   for (let i = 1; i < on.length; i++) {
     const a = on[i - 1], b = on[i];
     if (b.km - a.km < 0.5) continue;
-    out.push({ from: a, to: b, km: b.km - a.km, days: days(d, a.km, b.km), hitch: d.resupply.filter((r) => !onTrail(r) && r.km >= a.km && r.km < b.km) });
+    const hitch = d.resupply.filter((r) => !onTrail(r) && r.km >= a.km && r.km < b.km);
+    out.push(nobo ? { from: b, to: a, km: b.km - a.km, days: days(d, a.km, b.km), hitch: hitch.reverse() } : { from: a, to: b, km: b.km - a.km, days: days(d, a.km, b.km), hitch });
   }
-  return out;
+  return nobo ? out.reverse() : out;
 }
-/** The nearest stops with food behind and ahead of km (on the trail, or a hitch). */
+/** The nearest stops on the trail with food behind and ahead of km, in walking order. */
 export function foodAround(d, km) {
   const on = d.resupply.filter(onTrail);
-  return { behind: [...on].reverse().find((r) => r.km <= km - 0.05) || null, ahead: on.find((r) => r.km >= km + 0.05) || null };
+  const south = on.find((r) => r.km >= km + 0.05) || null, north = [...on].reverse().find((r) => r.km <= km - 0.05) || null;
+  return direction === 'nobo' ? { behind: south, ahead: north } : { behind: north, ahead: south };
 }
 
 /** Te Araroa sections a line (a walk or a track) runs along: those holding at least a

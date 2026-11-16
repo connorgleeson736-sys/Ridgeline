@@ -344,11 +344,27 @@ body.sheet-open .maplibregl-ctrl-bottom-left, body.sheet-open .maplibregl-ctrl-b
 .ta-link small { color: var(--muted); font-size: 12px; }
 .ta-link-buttons { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; }
 .ta-link-buttons .btn { min-height: 30px; font-size: 12px; }
-/* Hovering a track close in: "Start route here". */
-.track-start { position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none; }
-.track-start-dot { position: absolute; left: -6px; top: -6px; width: 12px; height: 12px; border-radius: 50%; background: #fff; border: 3px solid var(--orange); box-shadow: 0 1px 4px rgb(0 0 0 / 35%); }
-.track-start-button { position: absolute; left: 10px; top: -36px; pointer-events: auto; white-space: nowrap; border: 0; border-radius: 999px; padding: 6px 12px; background: var(--orange); color: #fff; font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; box-shadow: 0 2px 8px rgb(0 0 0 / 30%); }
-.track-start-button:hover { filter: brightness(1.06); }
-.route-save { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 0 0 8px; }
-.route-save small { color: var(--muted); font-size: 12px; }
 .stat b { overflow: hidden; text-overflow: ellipsis; max-width: 100%; display: block; }
+
+/* The panel beside the side panel (computers): a picked section or food stop. */
+.side-panel { position: fixed; z-index: 6; display: flex; flex-direction: column; background: var(--paper); color: var(--ink); border-radius: 16px; box-shadow: 0 8px 30px rgb(0 0 0 / 22%), 0 2px 6px rgb(0 0 0 / 12%); overflow: hidden; }
+.side-panel .side-top { display: flex; justify-content: flex-end; padding: 6px 8px 0; }
+.side-panel .close { border: 0; background: none; font-size: 22px; line-height: 1; color: var(--muted); cursor: pointer; padding: 4px 8px; }
+.side-panel .sheet-head { padding: 0 16px 6px; }
+.side-panel .sheet-body { overflow: auto; padding: 0 16px 16px; }
+@media (max-width: 799px) { .side-panel { display: none; } }
+/* Te Araroa, simpler. */
+.ta-dir { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 2px; margin: 4px 0 6px; background: var(--surface); }
+.ta-dir button { border: 0; background: none; color: var(--muted); font: inherit; font-size: 12.5px; font-weight: 600; padding: 5px 12px; border-radius: 999px; cursor: pointer; }
+.ta-dir button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); }
+.ta-facts { margin: 2px 0 8px; font-size: 13.5px; font-weight: 600; }
+.ta-food-line { display: flex; gap: 8px; align-items: flex-start; margin: 10px 0; font-size: 13.5px; }
+.ta-food-line .food-dot { margin-top: 4px; }
+.ta-food-line small { display: block; color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+.ta-food-line .link, .ta-options .link { padding: 0; font-size: inherit; }
+.ta-options { display: block; margin: 8px 0; font-size: 13px; }
+.ta-options .link { margin-right: 10px; }
+.ta-row.food .ta-name { grid-column: 1 / -1; }
+.ta-row.food.long { box-shadow: inset 3px 0 0 #ef3b5d; }
+.ta-n.option { color: #c42a4a; }
+.ta-food-line .link, .ta-options .link, .ta-row .link { min-height: 0; display: inline; padding: 0; }
