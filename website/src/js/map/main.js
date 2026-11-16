@@ -14,6 +14,7 @@ import { build, GROUPS, sky, hatch, shown, grade, NZ_BOUNDS } from './style.js';
 import { START as A_COLOUR, END as B_COLOUR } from './chart.js';
 import { install as installOverview, loadOverview, loadGapIndex } from './overview.js';
 import { attach as attachOverlays } from './overlays.js';
+import { install as installVector, attach as attachVector } from './vector.js';
 import { attach as attachPlanner } from './planner.js';
 import { attach as attachSearch } from './search.js';
 import { Sheet } from './sheet.js';
@@ -23,6 +24,7 @@ import { el, icon, store, toast } from './ui.js';
 
 setWorkerUrl('/vendor/maplibre-gl-6.16.0/maplibre-gl-worker.mjs');
 installOverview({ addProtocol });
+installVector({ addProtocol });
 loadOverview();
 loadGapIndex();
 // Imagery, terrain and the app's overview tiles all come over HTTP/2: more requests
@@ -144,6 +146,7 @@ async function main() {
     closeDrawer: () => closeDrawer(),
   };
   const overlays = attachOverlays(map, () => settings);
+  attachVector(map, () => shown('nz-tracks', settings));
   ctx.overlays = overlays;
   const planner = attachPlanner(ctx);
   ctx.planner = planner;

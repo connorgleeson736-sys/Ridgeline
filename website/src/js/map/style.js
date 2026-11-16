@@ -64,13 +64,13 @@ export function build({ topography, settings, dark }) {
   const topoLayers = topography.map((l) => {
     const layer = { ...l, layout: { ...(l.layout || {}), visibility: visible(shown(l.id, settings)) } };
     // Tracks and huts read their own copy of the tiles, never coarser than zoom 12
-    // (LINZ's tiles carry tracks only from 12): a tilted view's distant, coarser
-    // tiles would otherwise drop the tracks far away while near ones show.
+    // (LINZ's tiles carry tracks only from 12).
     if (TRACK_LAYERS.has(l.id)) {
       layer.source = 'ridgeline-tracks';
-      // Loaded from zoom 11.5 but drawn from 12, so the map's tracks are in hand
-      // when DOC's lines hand over to them.
-      if (l.type === 'line') { layer.minzoom = 11.5; layer.paint = { ...l.paint, 'line-opacity': ['step', ['zoom'], 0, 12, l.paint?.['line-opacity'] ?? 1] }; }
+      // The lines are drawn wherever a zoom-12-or-finer tile is: a tilted view's near
+      // tiles are a level or two finer than the map's zoom. A map-zoom switch here
+      // would leave the near ground with no lines for a zoom level.
+      if (l.type === 'line') layer.minzoom = 9;
     }
     return layer;
   });
@@ -95,9 +95,11 @@ export function build({ topography, settings, dark }) {
       satellite: { type: 'raster', tiles: ['bushline://satellite/{z}/{x}/{y}'], tileSize: 256, maxzoom: 19, bounds: [160, -53, 185, -28], attribution: ESRI_ATTRIBUTION },
       topo: { type: 'raster', tiles: [urls.topo], tileSize: 256, maxzoom: 16, bounds: [165, -49, 180, -33], attribution: '<a href="https://www.linz.govt.nz/products-services/maps/new-zealand-topographic-maps" target="_blank" rel="noopener">Topo50 © Toitū Te Whenua LINZ</a> CC BY 4.0' },
       terrain: { type: 'raster-dem', tiles: [urls.elevation], tileSize: 256, maxzoom: 18, encoding: 'mapbox', bounds: [165, -48, 179, -34] },
-      'ridgeline-topography': { type: 'vector', tiles: [urls.vector], minzoom: 0, maxzoom: 14, bounds: [165, -48, 179, -34] },
-      'ridgeline-tracks': { type: 'vector', tiles: [urls.vector], minzoom: 12, maxzoom: 14, bounds: [165, -48, 179, -34] },
-      'doc-walks': { type: 'geojson', data: { type: 'FeatureCollection', features: [] }, tolerance: 0.6, buffer: 32, attribution: DOC_ATTRIBUTION },
+      // Both read LINZ's vector tiles through one memory cache (vector.js).
+      'ridgeline-topography': { type: 'vector', tiles: ['bushline-vt://{z}/{x}/{y}'], minzoom: 0, maxzoom: 14, bounds: [165, -48, 179, -34] },
+      'ridgeline-tracks': { type: 'vector', tiles: ['bushline-vt://{z}/{x}/{y}'], minzoom: 12, maxzoom: 14, bounds: [165, -48, 179, -34] },
+      // Cut no finer than 12: finer tiles draw nothing from it (see doc-walks).
+      'doc-walks': { type: 'geojson', data: { type: 'FeatureCollection', features: [] }, tolerance: 0.6, buffer: 32, maxzoom: 12, attribution: DOC_ATTRIBUTION },
       hunting: { type: 'geojson', data: { type: 'FeatureCollection', features: [] }, tolerance: 0.6, buffer: 16 },
       route: { type: 'geojson', data: { type: 'FeatureCollection', features: [] }, tolerance: 0, buffer: 32, maxzoom: 18 },
       waypoints: { type: 'geojson', data: { type: 'FeatureCollection', features: [] }, tolerance: 0, maxzoom: 18 },
@@ -119,9 +121,14 @@ export function build({ topography, settings, dark }) {
       // Hunting permit areas: faint blaze-orange hatching inside a dashed outline.
       { id: 'hunting-fill', type: 'fill', source: 'hunting', minzoom: 7, layout: { visibility: visible(settings.hunting) }, paint: { 'fill-pattern': 'hatch', 'fill-opacity': 0.85 } },
       { id: 'hunting-line', type: 'line', source: 'hunting', minzoom: 7, layout: { visibility: visible(settings.hunting), 'line-join': 'round' }, paint: { 'line-color': 'rgba(255,106,19,.94)', 'line-width': ['interpolate', ['linear'], ['zoom'], 7, 1.2, 13, 2.6], 'line-dasharray': [3, 1.5] } },
-      // DOC's walks where the map's own tracks are not drawn yet (zooms 9–12).
-      { id: 'doc-walks-halo', type: 'line', source: 'doc-walks', minzoom: 9, maxzoom: 12, layout: { visibility: visible(shown('doc-walks', settings)), 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': 'rgba(15,30,31,.8)', 'line-width': 2.6 } },
-      { id: 'doc-walks', type: 'line', source: 'doc-walks', minzoom: 9, maxzoom: 12, layout: { visibility: visible(shown('doc-walks', settings)), 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': '#f6db94', 'line-width': 1.2, 'line-dasharray': [3, 2] } },
+      // DOC's walks before the map's own tracks (zooms 9–12), handed over per tile by
+      // the tile's zoom, not the map's: a tilted view's near tiles are finer (the map's
+      // tracks), its distant ones coarser (DOC's lines), so every part of the view has
+      // one or the other at every zoom. Zoom-12 tiles carry both, DOC's over the map's
+      // own line for the same track, so nothing goes blank while the map's zoom-12
+      // tiles arrive; from 13 the map shows its zoom-12 tiles until finer ones load.
+      { id: 'doc-walks-halo', type: 'line', source: 'doc-walks', minzoom: 9, filter: ['<', ['zoom'], 13], layout: { visibility: visible(shown('doc-walks', settings)), 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': 'rgba(15,30,31,.8)', 'line-width': 2.6 } },
+      { id: 'doc-walks', type: 'line', source: 'doc-walks', minzoom: 9, filter: ['<', ['zoom'], 13], layout: { visibility: visible(shown('doc-walks', settings)), 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': '#f6db94', 'line-width': 1.2, 'line-dasharray': [3, 2] } },
       // The selected walk or track, and the route being planned.
       // The app's track highlight: golden; with a section chosen, the rest dimmed.
       { id: 'selection-halo', type: 'line', source: 'selection', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': '#ffffff', 'line-width': 6, 'line-opacity': ['case', ['boolean', ['get', 'dim'], false], 0.45, 0.85] } },
@@ -129,7 +136,7 @@ export function build({ topography, settings, dark }) {
       { id: 'route-halo', type: 'line', source: 'route', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': '#ffffff', 'line-width': 6, 'line-opacity': 0.85 } },
       { id: 'route-line', type: 'line', source: 'route', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': 'rgb(232,121,68)', 'line-width': 3 } },
       ...symbols,
-      { id: 'doc-walk-names', type: 'symbol', source: 'doc-walks', minzoom: 11, maxzoom: 12, filter: ['==', ['get', 'large'], true], layout: { visibility: visible(shown('doc-walks', settings)), 'symbol-placement': 'line-center', 'text-rotation-alignment': 'viewport', 'text-field': ['get', 'name'], 'text-font': ['Open Sans Regular'], 'text-size': 12, 'text-max-angle': 180, 'text-padding': 8, 'symbol-sort-key': 5 }, paint: { 'text-color': '#f6db94', 'text-halo-color': 'rgba(15,30,31,.9)', 'text-halo-width': 1.6 } },
+      { id: 'doc-walk-names', type: 'symbol', source: 'doc-walks', minzoom: 11, filter: ['all', ['==', ['get', 'large'], true], ['<', ['zoom'], 12]], layout: { visibility: visible(shown('doc-walks', settings)), 'symbol-placement': 'line-center', 'text-rotation-alignment': 'viewport', 'text-field': ['get', 'name'], 'text-font': ['Open Sans Regular'], 'text-size': 12, 'text-max-angle': 180, 'text-padding': 8, 'symbol-sort-key': 5 }, paint: { 'text-color': '#f6db94', 'text-halo-color': 'rgba(15,30,31,.9)', 'text-halo-width': 1.6 } },
       { id: 'hunting-names', type: 'symbol', source: 'hunting', minzoom: 11, filter: ['==', ['geometry-type'], 'Point'], layout: { visibility: visible(settings.hunting), 'text-field': ['get', 'name'], 'text-font': ['Open Sans Regular'], 'text-size': 11, 'text-max-width': 10, 'text-padding': 6 }, paint: { 'text-color': '#ffa25f', 'text-halo-color': 'rgba(20,20,20,.85)', 'text-halo-width': 1.4 } },
       // The app's route points: paper with an orange ring; selected, all orange and larger.
       { id: 'waypoints', type: 'circle', source: 'waypoints', paint: { 'circle-radius': ['case', ['boolean', ['get', 'selected'], false], 7.5, 4.5], 'circle-color': ['case', ['boolean', ['get', 'selected'], false], 'rgb(216,117,73)', 'rgb(250,250,245)'], 'circle-stroke-width': ['case', ['boolean', ['get', 'selected'], false], 1, 1.5], 'circle-stroke-color': 'rgb(216,117,73)', 'circle-pitch-alignment': 'viewport' } },
