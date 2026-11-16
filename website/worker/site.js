@@ -3,6 +3,7 @@
 // redirects and the headers that Pages would apply from _headers/_redirects.
 // HEADERS and REDIRECTS are filled in by tools/deploy-test.mjs.
 import { docAlerts } from './doc-alerts.js';
+import { teAraroa } from './te-araroa.js';
 
 const HEADERS = __HEADERS__;
 const REDIRECTS = __REDIRECTS__;
@@ -29,6 +30,9 @@ export default {
     // DOC's current alerts (as functions/api/doc-alerts on Pages).
     const alerts = /^\/api\/doc-alerts\/([^/]+)$/.exec(path);
     if (alerts && request.method === 'GET') return docAlerts(alerts[1]);
+    // Te Araroa's section status and alerts (as functions/api/te-araroa on Pages).
+    const ta = /^\/api\/te-araroa\/(.+)$/.exec(path);
+    if (ta && request.method === 'GET') return teAraroa(ta[1]);
     // The app's overview imagery, from its bucket, cached at Cloudflare's edge
     // (r2.dev is uncached and rate-limited): /tiles/<pack>/<offset>.webp.
     if (env.OVERVIEWS && /^\/tiles\/[0-9a-f]{64}\/\d+\.webp$/.test(path)) {

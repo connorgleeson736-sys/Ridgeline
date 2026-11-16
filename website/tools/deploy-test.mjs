@@ -54,6 +54,7 @@ const form = new FormData();
 form.append('metadata', new Blob([JSON.stringify({ main_module: 'site.js', compatibility_date: '2026-10-01', bindings: [{ type: 'r2_bucket', name: 'SITE', bucket_name: bucket }, { type: 'r2_bucket', name: 'OVERVIEWS', bucket_name: process.env.OVERVIEW_BUCKET || 'ridgeline-overviews' }] })], { type: 'application/json' }));
 form.append('site.js', new Blob([source], { type: 'application/javascript+module' }), 'site.js');
 form.append('doc-alerts.js', new Blob([readFileSync(join(here, 'worker/doc-alerts.js'), 'utf8')], { type: 'application/javascript+module' }), 'doc-alerts.js');
+form.append('te-araroa.js', new Blob([readFileSync(join(here, 'worker/te-araroa.js'), 'utf8')], { type: 'application/javascript+module' }), 'te-araroa.js');
 await call('PUT', `${api}/workers/scripts/${script}`, form);
 await call('POST', `${api}/workers/scripts/${script}/subdomain`, JSON.stringify({ enabled: true, previews_enabled: false }), { 'Content-Type': 'application/json' });
 const sub = (await (await call('GET', `${api}/workers/subdomain`)).json()).result.subdomain;

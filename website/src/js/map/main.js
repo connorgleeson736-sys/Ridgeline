@@ -19,7 +19,7 @@ import { attach as attachLabels } from './labels.js';
 import { attach as attachPlanner } from './planner.js';
 import { attach as attachSearch } from './search.js';
 import { Sheet } from './sheet.js';
-import { openWalk, openTrack, openHut, openHunting, openTeAraroa } from './details.js';
+import { openWalk, openTrack, openHut, openHunting, openTeAraroa, openTeAraroaPlace } from './details.js';
 import * as teAraroa from './te-araroa.js';
 import { walkFor } from '../core/walks.js';
 import { el, icon, store, toast } from './ui.js';
@@ -143,7 +143,7 @@ async function main() {
     flyTo: (p, zoom) => { const pad = sheetPadding(); map.flyTo({ center: p, zoom, pitch: settings.threeD ? Math.max(map.getPitch(), 45) : 0, offset: [(pad.left - pad.right) / 2, (pad.top - pad.bottom) / 2], duration: reducedMotion ? 0 : 1600, essential: true }); },
     openWalk: (guid) => openWalk(ctx, guid),
     openHut: (name, p) => openHut(ctx, name, p),
-    openTeAraroa: (i = null, options) => openTeAraroa(ctx, i, options),
+    openTeAraroa: (slug = null, options) => openTeAraroa(ctx, slug, options),
     closeDetails: () => { if (!planner.active) sheet.close(); },
     note: (text) => { const n = $('drawing-note'); n.textContent = text || ''; n.hidden = !text; },
     openDrawer: () => openDrawer(),
@@ -157,7 +157,7 @@ async function main() {
     teAraroaLoaded = true;
     teAraroa.load().then((d) => {
       const f = teAraroa.features(d);
-      const put = () => { map.getSource('te-araroa')?.setData(f.lines); map.getSource('te-araroa-km')?.setData(f.km); };
+      const put = () => { map.getSource('te-araroa')?.setData(f.lines); map.getSource('te-araroa-places')?.setData(f.places); };
       if (map.getSource('te-araroa')) put(); else map.once('load', put);
     }).catch(() => { teAraroaLoaded = false; });
   };
@@ -257,13 +257,18 @@ async function main() {
       const hut = nearestFeature(point, ['nz-huts-dot', 'nz-huts-label'], 24);
       if (hut) { openHut(ctx, hut.properties.name || '', hut.geometry.type === 'Point' ? hut.geometry.coordinates : lngLat); return; }
     }
-    if (shown('te-araroa', settings)) {
-      const ta = nearestFeature(point, ['te-araroa'], 16);
+    if (shown('te-araroa', settings) && teAraroa.loaded()) {
+      const d = teAraroa.loaded();
+      const place = nearestFeature(point, ['te-araroa-places'], 16);
+      if (place) { openTeAraroaPlace(ctx, place.properties.i); return; }
+      const ta = nearestFeature(point, ['te-araroa', 'te-araroa-option'], 16);
       const other = ta && shown('nz-tracks', settings) ? nearestFeature(point, ['nz-tracks', 'doc-walks'], 18) : null;
+      // Te Araroa when its line is nearest (it is drawn over the tracks it follows).
       if (ta && (!other || pixelDistance(map, ta.geometry, point) <= pixelDistance(map, other.geometry, point) + 4)) {
-        const name = ta.properties.name || '';
-        const found = walkFor(longest(ta.geometry), name, overlays.walkLines(), overlays.infos());
-        openTeAraroa(ctx, ta.properties.i, { walk: found?.line.guid || null });
+        const piece = ta.properties.kind === 'main' ? d.pieces[ta.properties.i] : null;
+        const slug = piece ? piece.section : ta.properties.section;
+        const found = piece ? walkFor(longest(ta.geometry), piece.name, overlays.walkLines(), overlays.infos()) : null;
+        openTeAraroa(ctx, slug, { at: piece ? teAraroa.kmOn(piece, lngLat) : null, walk: found?.line.guid || null });
         return;
       }
     }
@@ -296,7 +301,7 @@ async function main() {
   }
   const sameAsWalk = (a, b) => !!b && a.toLowerCase() === b.toLowerCase();
   // Pointer cursor over what can be tapped.
-  const tappable = ['nz-huts-dot', 'nz-huts-label', 'te-araroa', 'nz-tracks', 'nz-tracks-label', 'doc-walks', 'doc-walk-names'];
+  const tappable = ['nz-huts-dot', 'nz-huts-label', 'te-araroa', 'te-araroa-option', 'te-araroa-places', 'nz-tracks', 'nz-tracks-label', 'doc-walks', 'doc-walk-names'];
   for (const l of tappable) {
     map.on('mouseenter', l, () => { if (!planner.drawing) map.getCanvas().style.cursor = 'pointer'; });
     map.on('mouseleave', l, () => { if (!planner.drawing) map.getCanvas().style.cursor = ''; });

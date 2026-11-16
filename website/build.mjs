@@ -131,8 +131,14 @@ for (const [guid, w] of Object.entries(walks)) {
   m[2] = w.kind || way?.shape || '';
 }
 writeFileSync(join(data, 'walks.json'), JSON.stringify(meta));
-// Te Araroa (tools/te-araroa.mjs), loaded by the map when its layer is on.
+// Te Araroa (tools/te-araroa.mjs): the index, loaded by the map when its layer is on,
+// and each section's notes and line, one file per section, loaded when it is opened.
 if (existsSync(join(here, 'data/te-araroa.json'))) writeFileSync(join(data, 'te-araroa.json'), readFileSync(join(here, 'data/te-araroa.json')));
+const taSections = join(here, 'data/te-araroa-sections.json.gz');
+if (existsSync(taSections)) {
+  mkdirSync(join(data, 'te-araroa'), { recursive: true });
+  for (const [slug, notes] of Object.entries(JSON.parse(gunzipSync(readFileSync(taSections))))) if (/^[a-z0-9-]+$/.test(slug)) writeFileSync(join(data, 'te-araroa', `${slug}.json`), JSON.stringify(notes));
+}
 // Each walk's DOC page (tools/walk-pages.mjs): summary and sections, one file per
 // walk, loaded only when its summary is opened.
 const pagesFile = join(here, 'data/walk-pages.json.gz');
