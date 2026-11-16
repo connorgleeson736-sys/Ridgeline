@@ -30,6 +30,10 @@ overview index and compiled walks from `native-wgpu/`, `capacitor/` and
   - `BETA_URL` and `PLAY_URL`: the Play closed-test opt-in link and the
     store listing, once they exist. Until then the buttons read "coming soon".
 - Custom domain: add `bushlinemaps.co.nz` and `www.bushlinemaps.co.nz`.
+- `functions/api/doc-alerts/[guid].js` (a Pages Function) relays DOC's current
+  alerts for a walk or hut (`worker/doc-alerts.js`): browsers cannot read DOC's
+  alert service from another site. Cached at the edge for 10 minutes. The test
+  copy's Worker serves the same at `/api/doc-alerts/`.
 
 ## Data
 

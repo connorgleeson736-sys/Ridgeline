@@ -263,3 +263,20 @@ body.sheet-open .maplibregl-ctrl-bottom-left, body.sheet-open .maplibregl-ctrl-b
 .doc-photo figcaption { font-size: 11.5px; color: var(--muted); margin-top: 4px; white-space: pre-line; line-height: 1.35; }
 
 @media (max-width: 799.98px) { .resize { display: none; } }
+
+/* DOC's current alerts: amber, as DOC marks them, above the walk's or hut's details. */
+.doc-alerts { margin: 10px 0 12px; border-radius: 10px; background: rgb(253 236 217); color: rgb(92 45 12); font-size: 13px; overflow: hidden; }
+.doc-alerts-head { margin: 0; padding: 9px 12px 7px; font-weight: 700; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.doc-alerts-head::before { content: ''; width: 16px; height: 16px; flex: none; background: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2 1 21h22L12 2zm1 15h-2v2h2v-2zm0-7h-2v5h2v-5z'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2 1 21h22L12 2zm1 15h-2v2h2v-2zm0-7h-2v5h2v-5z'/%3E%3C/svg%3E") center / contain no-repeat; }
+.doc-alerts-head a { font-weight: 600; color: inherit; }
+.doc-alert { border-top: 1px solid rgb(122 60 18 / .18); }
+.doc-alert > summary { cursor: pointer; padding: 8px 12px; font-weight: 600; line-height: 1.35; list-style-position: inside; }
+.doc-alert-body { padding: 0 12px 10px; line-height: 1.45; }
+.doc-alert-body p, .doc-alert-body ul, .doc-alert-body ol { margin: 0 0 6px; }
+.doc-alert-body ul, .doc-alert-body ol { padding-left: 18px; }
+.doc-alert-body a { color: inherit; text-decoration: underline; overflow-wrap: anywhere; }
+.doc-alert-body .muted { opacity: .75; font-size: 12px; margin: 4px 0 0; }
+@media (prefers-color-scheme: dark) {
+  .doc-alerts { background: rgb(71 48 30); color: rgb(250 214 180); }
+  .doc-alert { border-top-color: rgb(250 214 180 / .18); }
+}

@@ -2,6 +2,8 @@
 // testing before the site moves to Cloudflare Pages: index pages, the 404 page,
 // redirects and the headers that Pages would apply from _headers/_redirects.
 // HEADERS and REDIRECTS are filled in by tools/deploy-test.mjs.
+import { docAlerts } from './doc-alerts.js';
+
 const HEADERS = __HEADERS__;
 const REDIRECTS = __REDIRECTS__;
 
@@ -24,6 +26,9 @@ export default {
     const url = new URL(request.url);
     if (request.method !== 'GET' && request.method !== 'HEAD') return new Response('Method not allowed', { status: 405 });
     let path = decodeURIComponent(url.pathname);
+    // DOC's current alerts (as functions/api/doc-alerts on Pages).
+    const alerts = /^\/api\/doc-alerts\/([^/]+)$/.exec(path);
+    if (alerts && request.method === 'GET') return docAlerts(alerts[1]);
     // The app's overview imagery, from its bucket, cached at Cloudflare's edge
     // (r2.dev is uncached and rate-limited): /tiles/<pack>/<offset>.webp.
     if (env.OVERVIEWS && /^\/tiles\/[0-9a-f]{64}\/\d+\.webp$/.test(path)) {

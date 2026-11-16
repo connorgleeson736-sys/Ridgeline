@@ -13,10 +13,59 @@ import { data as worker, search } from './workers.js';
 let facts = null;
 const walkFacts = () => facts || (facts = fetch('/data/walks.json').then((r) => (r.ok ? r.json() : {})).catch(() => ({})));
 
-const DOC_NOTE = 'Track information from the Department of Conservation. Check DOC for alerts and conditions before you go.';
+const DOC_NOTE = 'Track information from the Department of Conservation. Check conditions with DOC before you go.';
 /** DOC writes bunks as "8 each", "20", "4 (bunks)"… */
 const bunks = (b) => { const n = /^\d+/.exec(b || '')?.[0]; return n ? `${n} bunks` : ''; };
 const statBox = (label, value) => el('div', { class: 'stat' }, el('span', {}, label), el('b', {}, value));
+
+// ---- DOC's current alerts ----
+const KEEP = new Set(['P', 'UL', 'OL', 'LI', 'STRONG', 'B', 'EM', 'I', 'BR', 'A']);
+const DROP = new Set(['SCRIPT', 'STYLE', 'IFRAME', 'OBJECT', 'EMBED', 'IMG', 'SVG', 'VIDEO', 'AUDIO', 'FORM', 'INPUT', 'BUTTON', 'TEMPLATE', 'NOSCRIPT']);
+/** DOC's alert text (HTML) as plain paragraphs, lists and links only: nothing else
+ * of the markup is carried over (no attributes but a checked link). */
+function safeHtml(html) {
+  const doc = new DOMParser().parseFromString(`<body>${html || ''}</body>`, 'text/html');
+  const out = document.createDocumentFragment();
+  const copy = (from, to) => {
+    for (const node of from.childNodes) {
+      if (node.nodeType === Node.TEXT_NODE) { to.append(node.textContent.replace(/\u00a0/g, ' ')); continue; }
+      if (node.nodeType !== Node.ELEMENT_NODE || DROP.has(node.tagName)) continue;
+      const tag = /^H[1-6]$/.test(node.tagName) ? 'P' : node.tagName;
+      if (!KEEP.has(tag)) { copy(node, to); continue; }
+      let made;
+      if (tag === 'A') {
+        let href = node.getAttribute('href') || '';
+        if (href.startsWith('/')) href = `https://www.doc.govt.nz${href}`;
+        if (!/^(https:|mailto:|tel:)/i.test(href)) { copy(node, to); continue; }
+        made = el('a', { href, target: '_blank', rel: 'noopener' });
+      } else made = document.createElement(tag.toLowerCase());
+      copy(node, made);
+      to.append(made);
+    }
+  };
+  copy(doc.body, out);
+  return out;
+}
+
+/** DOC's current alerts for a page id, filled in when they arrive; nothing shows
+ * when there are none. If they cannot be read, a pointer to DOC's alerts. */
+function alertsBox(guid, page) {
+  const box = el('section', { class: 'doc-alerts', hidden: true, 'aria-label': 'DOC alerts' });
+  if (!guid) return box;
+  doc.alerts(guid).then((list) => {
+    if (list && !list.length) return;
+    box.hidden = false;
+    if (!list) { box.append(el('p', { class: 'doc-alerts-head' }, 'Couldn’t load DOC’s current alerts. ', docLink(page || 'https://www.doc.govt.nz/parks-and-recreation/know-before-you-go/alerts/', 'Check them on DOC ↗'))); return; }
+    box.append(el('p', { class: 'doc-alerts-head' }, list.length === 1 ? 'DOC alert' : `${list.length} DOC alerts`));
+    list.forEach((a, i) => {
+      const item = el('details', { class: 'doc-alert' }, el('summary', {}, a.summary || 'Alert'),
+        el('div', { class: 'doc-alert-body' }, safeHtml(a.description), (a.note || a.date) ? el('p', { class: 'muted' }, a.note || `Published ${a.date}.`) : null));
+      if (i === 0 && list.length === 1) item.open = true;
+      box.append(item);
+    });
+  });
+  return box;
+}
 
 /** Stats and the app's elevation chart for a line, filled in as heights arrive.
  * Inspecting marks the point on the map; a section shows A and B there and
@@ -118,7 +167,7 @@ export function openWalk(ctx, guid, { push = false } = {}) {
         ctx.sheet.setPhoto(info?.thumbnail || o.image, name);
         if (line.length >= 2) { ctx.select([line]); ctx.fit(line); }
         body.append(chips((o.distance || fact[0]) && `DOC: ${o.distance || fact[0]}`, (o.time || fact[1]) && `Time: ${o.time || fact[1]}`, fact[2] === 'loop' ? 'Loop' : fact[2] === 'one_way' ? 'One way' : null, (o.dogs || fact[3]) && (o.dogs || fact[3]).split('.')[0]));
-        if (info?.alerts && /yes|true|1/i.test(info.alerts)) body.append(el('p', { class: 'alert' }, 'DOC has alerts for this track. ', docLink(info.page, 'Read them on DOC ↗')));
+        body.append(alertsBox(guid, info?.page || ctx.overlays.infos()[guid]?.page));
         const partRow = el('div', { class: 'parts', hidden: true });
         const partText = el('div', { class: 'part-text', hidden: true });
         const intro = (o.intro || info?.introduction) ? el('p', { class: 'intro' }, o.intro || info.introduction) : null;
@@ -229,6 +278,7 @@ export function openHut(ctx, name, point, { push = false } = {}) {
         ctx.sheet.setTitle(title, [asset?.category && `${asset.category} hut`, page?.place].filter(Boolean).join(' · ') || 'Hut');
         ctx.sheet.setPhoto(page?.thumbnail, title);
         if (asset?.status && !/^open$/i.test(asset.status)) body.append(el('p', { class: 'alert' }, `DOC lists this hut as ${asset.status.toLowerCase()}.`));
+        body.append(alertsBox(guidOf(page?.page), page?.page));
         body.append(el('div', { class: 'stats' }, statBox('Bunks', /^\d+/.exec(asset?.bunks || '')?.[0] || '–'), statBox('Bookings', page ? (page.bookable ? 'Required' : 'Not needed') : '–'), statBox('Category', asset?.category || '–')));
         if (asset?.roadEnd) body.append(el('p', {}, el('b', {}, 'From the road end: '), asset.roadEnd));
         const facilities = page?.facilities?.length ? page.facilities : (asset?.facilities ? asset.facilities.split(/,\s*/) : []);

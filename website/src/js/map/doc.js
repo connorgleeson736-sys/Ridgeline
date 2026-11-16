@@ -108,3 +108,19 @@ export async function huntingIn(b, tolerance, signal) {
   const j = await r.json();
   return (j.features || []).filter((f) => f.geometry);
 }
+
+// ---- Current alerts (DOC's own alert service, relayed by the site) ----
+const alertCache = new Map();
+/** DOC's current alerts for a walk, track or hut page id: [{summary, description (HTML),
+ * date, note}], [] for none, null when they could not be read. Kept for 5 minutes. */
+export function alerts(guid) {
+  const hit = alertCache.get(guid);
+  if (hit && hit.until > Date.now()) return hit.promise;
+  const promise = fetch(`/api/doc-alerts/${encodeURIComponent(guid)}`)
+    .then((r) => (r.ok ? r.json() : null))
+    .then((j) => (Array.isArray(j?.alerts) ? j.alerts : null))
+    .catch(() => null);
+  alertCache.set(guid, { promise, until: Date.now() + 5 * 60_000 });
+  promise.then((v) => { if (v == null) alertCache.delete(guid); });
+  return promise;
+}
