@@ -20,7 +20,7 @@ import { attach as attachPlanner } from './planner.js';
 import { attach as attachSearch } from './search.js';
 import { Sheet } from './sheet.js';
 import { SidePanel } from './side.js';
-import { openWalk, openTrack, openHut, openHunting, openTeAraroa, openTeAraroaPlace, openTeAraroaStop } from './details.js';
+import { openWalk, openTrack, openHut, openHunting, openTeAraroa, openTeAraroaPlace, openTeAraroaStop, pickOnTeAraroa } from './details.js';
 import * as teAraroa from './te-araroa.js';
 import { walkFor } from '../core/walks.js';
 import { el, icon, store, toast } from './ui.js';
@@ -167,10 +167,38 @@ async function main() {
     teAraroaLoaded = true;
     teAraroa.load().then((d) => {
       const f = teAraroa.features(d);
-      const put = () => { map.getSource('te-araroa')?.setData(f.lines); map.getSource('te-araroa-places')?.setData(f.places); map.getSource('te-araroa-food')?.setData(f.stops); map.getSource('te-araroa-names')?.setData(f.names); };
+      const put = () => { map.getSource('te-araroa')?.setData(f.lines); map.getSource('te-araroa-places')?.setData(f.places); map.getSource('te-araroa-food')?.setData(f.stops); placeTeAraroaName(); };
       if (map.getSource('te-araroa')) put(); else map.once('load', put);
     }).catch(() => { teAraroaLoaded = false; });
   };
+  // "Te Araroa" once on screen per island: on the part of the trail in view nearest
+  // the middle of the screen, placed again when the map stops.
+  const placeTeAraroaName = () => {
+    const d = teAraroa.loaded(), src = map.getSource('te-araroa-names');
+    if (!d || !src) return;
+    const z = map.getZoom(), features = [];
+    if (z >= 5 && z < 11.5) {
+      const b = map.getBounds(), c = map.getCenter(), k = Math.cos((c.lat * Math.PI) / 180);
+      const inView = (p) => p[0] > b.getWest() && p[0] < b.getEast() && p[1] > b.getSouth() && p[1] < b.getNorth();
+      for (const south of [false, true]) {
+        let best = null, bd = Infinity;
+        for (const piece of d.pieces) {
+          if ((piece.from >= 1739) !== south) continue;
+          const pb = piece.box;
+          if (pb[2] < b.getWest() || pb[0] > b.getEast() || pb[3] < b.getSouth() || pb[1] > b.getNorth()) continue;
+          for (let i = 0; i < piece.line.length; i += 3) {
+            const p = piece.line[i];
+            if (!inView(p)) continue;
+            const dd = ((p[0] - c.lng) * k) ** 2 + (p[1] - c.lat) ** 2;
+            if (dd < bd) { bd = dd; best = p; }
+          }
+        }
+        if (best) features.push({ type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: best } });
+      }
+    }
+    src.setData({ type: 'FeatureCollection', features });
+  };
+  map.on('moveend', placeTeAraroaName);
   const refreshOverlays = overlays.refresh;
   overlays.refresh = () => { refreshOverlays(); syncTeAraroa(); };
   attachVector(map, () => shown('nz-tracks', settings));
@@ -271,10 +299,12 @@ async function main() {
     }
     if (shown('te-araroa', settings) && teAraroa.loaded()) {
       const d = teAraroa.loaded();
+      // The "Te Araroa" label: its page.
+      if (nearestFeature(point, ['te-araroa-name'], 6)) { if (!sheet.current?.overview) openTeAraroa(ctx, null, { push }); return; }
       const food = nearestFeature(point, ['te-araroa-food', 'te-araroa-food-label'], 14);
-      if (food) { openTeAraroaStop(ctx, food.properties.i, { push }); return; }
+      if (food) { const i = food.properties.i; pickOnTeAraroa(ctx, 'stop', i).then((done) => { if (!done) openTeAraroaStop(ctx, i, { push }); }); return; }
       const place = nearestFeature(point, ['te-araroa-places'], 12);
-      if (place) { openTeAraroaPlace(ctx, place.properties.i, { push }); return; }
+      if (place) { const i = place.properties.i; pickOnTeAraroa(ctx, 'place', i).then((done) => { if (!done) openTeAraroaPlace(ctx, i, { push }); }); return; }
       const ta = nearestFeature(point, ['te-araroa', 'te-araroa-option'], 16);
       const other = ta && shown('nz-tracks', settings) ? nearestFeature(point, ['nz-tracks', 'doc-walks'], 18) : null;
       // Te Araroa when its line is nearest (it is drawn over the tracks it follows).
@@ -282,7 +312,10 @@ async function main() {
         const piece = ta.properties.kind === 'main' ? d.pieces[ta.properties.i] : null;
         const slug = piece ? piece.section : ta.properties.section;
         const found = piece ? walkFor(longest(ta.geometry), piece.name, overlays.walkLines(), overlays.infos()) : null;
-        openTeAraroa(ctx, slug, { push, at: piece ? teAraroa.kmOn(piece, lngLat) : null, walk: found?.line.guid || null });
+        const at = piece ? teAraroa.kmOn(piece, lngLat) : null, walk = found?.line.guid || null;
+        // On the Te Araroa page: beside the list. On a section opened from the map: in its place.
+        const onSection = sheet.current?.kind === 'te-araroa' && !sheet.current.overview;
+        pickOnTeAraroa(ctx, 'section', slug, { at, walk }).then((done) => { if (!done) openTeAraroa(ctx, slug, { push: push && !onSection, at, walk }); });
         return;
       }
     }
@@ -315,7 +348,7 @@ async function main() {
   }
   const sameAsWalk = (a, b) => !!b && a.toLowerCase() === b.toLowerCase();
   // Pointer cursor over what can be tapped.
-  const tappable = ['nz-huts-dot', 'nz-huts-label', 'te-araroa', 'te-araroa-option', 'te-araroa-places', 'te-araroa-food', 'nz-tracks', 'nz-tracks-label', 'doc-walks', 'doc-walk-names'];
+  const tappable = ['nz-huts-dot', 'nz-huts-label', 'te-araroa', 'te-araroa-name', 'te-araroa-option', 'te-araroa-places', 'te-araroa-food', 'nz-tracks', 'nz-tracks-label', 'doc-walks', 'doc-walk-names'];
   for (const l of tappable) {
     map.on('mouseenter', l, () => { if (!planner.drawing) map.getCanvas().style.cursor = 'pointer'; });
     map.on('mouseleave', l, () => { if (!planner.drawing) map.getCanvas().style.cursor = ''; });

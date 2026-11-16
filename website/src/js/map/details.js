@@ -332,6 +332,7 @@ function sectionPanel(ctx, d, s, { at = null, walk = null, fromList = false } = 
         if (s.alternative) body.append(el('p', { class: 'ta-why' }, teAraroa.optionKind(s).why));
         body.append(taAlertsBox(s.slug));
         const profile = line.length >= 2 ? profileBlock(ctx, line, alive) : null;
+        const intro = el('div', { class: 'intro ta-intro' });
         if (profile) {
           body.append(profile);
           if (!s.alternative && s.to > s.from) {
@@ -340,6 +341,7 @@ function sectionPanel(ctx, d, s, { at = null, walk = null, fromList = false } = 
             if (marks.length) profile.chart.setMarkers(marks);
           }
         }
+        body.append(intro);
         // Food: what is in the section, and the next place after it.
         if (s.from != null) {
           const here = teAraroa.walking(d.resupply.filter((r) => teAraroa.onTrail(r) && r.km >= s.from - 0.05 && r.km <= s.to + 0.05));
@@ -368,7 +370,8 @@ function sectionPanel(ctx, d, s, { at = null, walk = null, fromList = false } = 
         }
         teAraroa.notes(s.slug).then((n) => {
           if (!alive() || !n) return;
-          for (const [title, html] of [['About', n.intro], ['The walk', n.walk], ['Getting there', n.access], ['Transport', n.transport], ['Accommodation', n.accommodation], ['Food and supplies', n.food], ['Track conditions and hazards', n.conditions]]) {
+          if (n.intro) intro.append(safeHtml(n.intro));
+          for (const [title, html] of [['The walk', n.walk], ['Getting there', n.access], ['Transport', n.transport], ['Accommodation', n.accommodation], ['Food and supplies', n.food], ['Track conditions and hazards', n.conditions]]) {
             if (!html || !html.replace(/<[^>]+>|&nbsp;|\s/g, '')) continue;
             const content = el('div', { class: 'doc-section-body' });
             const item = el('details', { class: 'doc-section', ontoggle: () => { if (item.open && !content.childElementCount) content.append(safeHtml(html)); } }, el('summary', {}, title), content);
@@ -392,13 +395,27 @@ function sectionPanel(ctx, d, s, { at = null, walk = null, fromList = false } = 
 /** The whole trail, as a panel (Back from a section returns here). */
 function overviewPanel(ctx, tab = null) {
   return {
-    kind: 'te-araroa', title: 'Te Araroa', subtitle: 'Cape Reinga to Bluff', backLabel: 'Te Araroa',
+    kind: 'te-araroa', overview: true, title: 'Te Araroa', subtitle: 'Cape Reinga to Bluff', backLabel: 'Te Araroa',
     render(body, alive, { restored = false } = {}) {
       body.append(busy());
       teAraroa.load().then((d) => { if (alive()) overview(ctx, d, body, alive, tab, restored); }).catch(() => { if (alive()) body.replaceChildren(failed('Te Araroa could not be loaded. Check your connection.')); });
       return () => { ctx.side?.close(); if (ctx.side) ctx.side.onChange = null; ctx.select(null); ctx.marker(null); };
     },
   };
+}
+
+/** Whether the Te Araroa page is open with room beside it (a computer). */
+const onTeAraroaPage = (ctx) => !!ctx.sheet.current?.overview && !!ctx.side?.available;
+
+/** Something on Te Araroa tapped on the map: on the Te Araroa page it opens beside the
+ * list (the page stays); elsewhere in the sheet. */
+export function pickOnTeAraroa(ctx, what, i, { push = false, at = null, walk = null } = {}) {
+  return teAraroa.load().then((d) => {
+    if (!onTeAraroaPage(ctx)) return false;
+    const panel = what === 'section' ? sectionPanel(ctx, d, d.bySlug[i], { at, walk, fromList: true }) : what === 'stop' ? stopPanel(ctx, d, i, { fromList: true }) : placePanel(ctx, d, i);
+    openPicked(ctx, panel, { fromList: true });
+    return true;
+  });
 }
 
 /** One section of Te Araroa (from the map: Back leads to the whole trail), or with no
