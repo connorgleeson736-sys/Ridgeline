@@ -39,7 +39,7 @@ async function get(url, as = 'buffer') {
 async function fetchRetry(url, as) {
   for (let attempt = 0; ; attempt++) {
     try {
-      const r = await fetch(url, { headers: { 'User-Agent': 'Bushline Maps data refresh' } });
+      const r = await fetch(url, { headers: { 'User-Agent': 'trail-data-refresh/1.0' } });
       if (!r.ok) throw new Error(`${r.status} ${url}`);
       return as === 'json' ? await r.json() : Buffer.from(await r.arrayBuffer());
     } catch (e) {
@@ -406,6 +406,41 @@ for (const s of sections) {
 }
 placed.sort((a, b) => a.km - b.km);
 console.log(`  ${added} more places to stay from the notes (${placed.filter((p) => p.approx).length} placed by town only)`);
+// ---- 6. The shops and cafés at each food stop, from OpenStreetMap (© OpenStreetMap
+// contributors, ODbL; via its Nominatim search, a request a second as its policy asks) ----
+console.log('Shops and cafés (OpenStreetMap)…');
+const SHOP_KINDS = [['supermarket', 'supermarket'], ['convenience store', 'store'], ['general store', 'store'], ['cafe', 'cafe'], ['bakery', 'cafe']];
+const shops = [], seenShop = new Set();
+for (const [si, r] of resupply.entries()) {
+  const [x, y] = r.point, dx = 0.035, dy = 0.025;
+  for (const [phrase, kind] of SHOP_KINDS) {
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(phrase)}&format=jsonv2&limit=40&bounded=1&addressdetails=1&extratags=1&viewbox=${x - dx},${y + dy},${x + dx},${y - dy}`;
+    let list = [];
+    const cached = process.env.TA_CACHE && existsSync(join(process.env.TA_CACHE, url.replace(/[^a-z0-9]+/gi, '_').slice(-180)));
+    try { list = await get(url, 'json'); } catch { list = []; }
+    if (!cached) await sleep(1100);
+    for (const e of Array.isArray(list) ? list : []) {
+      const id = `${e.osm_type}/${e.osm_id}`;
+      if (seenShop.has(id) || !e.name) continue;
+      const t = e.type || '';
+      const k = t === 'supermarket' ? 'supermarket' : /^(convenience|general|greengrocer|deli|kiosk|variety_store)$/.test(t) ? 'store' : /^(cafe|bakery|coffee)$/.test(t) ? 'cafe' : null;
+      if (!k) continue;
+      seenShop.add(id);
+      const a = e.address || {}, x2 = e.extratags || {};
+      shops.push({ name: e.name, kind: k, point: [r5(+e.lon), r5(+e.lat)], stop: si, address: [a.house_number && a.road ? `${a.house_number} ${a.road}` : a.road, a.suburb || a.village || a.town || a.city].filter(Boolean).join(', '), hours: x2.opening_hours || '', phone: x2.phone || x2['contact:phone'] || '', website: x2.website || x2['contact:website'] || '', osm: id });
+    }
+  }
+  process.stdout.write(`\r  ${si + 1}/${resupply.length} ${r.name.padEnd(24)} ${shops.length} shops`);
+}
+console.log();
+
+// Per stop: every supermarket, and the stores and cafés nearest its middle (a city's
+// hundred cafés are no help to a walker).
+const trimmed = [];
+for (const [si, r] of resupply.entries()) {
+  const near = (k, n) => shops.filter((x) => x.stop === si && x.kind === k).sort((a, b) => metres(a.point, r.point) - metres(b.point, r.point)).slice(0, n);
+  trimmed.push(...near('supermarket', 99), ...near('store', 10), ...near('cafe', 12));
+}
 const index = {
   name: trailName, season: (/(\d{4}-\d{2})/.exec(trailName) || [])[1] || '', total,
   pieces: pieces.map((p) => {
@@ -417,6 +452,7 @@ const index = {
   sections: sections.map(({ line, ...s }) => ({ ...s, line: line && line.map((l) => pack(l)) })),
   places: placed,
   resupply,
+  shops: trimmed,
 };
 writeFileSync(join(here, 'data/te-araroa.json'), JSON.stringify(index));
 writeFileSync(join(here, 'data/te-araroa-sections.json.gz'), gzipSync(JSON.stringify(notes)));

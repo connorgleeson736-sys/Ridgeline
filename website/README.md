@@ -53,6 +53,9 @@ overview index and compiled walks from `native-wgpu/`, `capacitor/` and
   store, or send-a-box), hand-kept from walkers' published resupply guides; the
   tool places them on the trail and adds the shops the Trust's notes name. Check
   it each season. `TA_CACHE=<folder>` keeps the tool's downloads between runs.
+- The shops and cafés at each food stop come from OpenStreetMap (ODbL, credited
+  on the site) through its Nominatim search, one request a second; the tool takes a
+  few minutes for them.
 - `data/gaps.json` (built from the app's gap atlas) marks where LINZ has no
   photography; Esri World Imagery is drawn there, as in the app. Esri's terms
   for commercial use need checking before launch.

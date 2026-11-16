@@ -384,3 +384,6 @@ body.sheet-open .maplibregl-ctrl-bottom-left, body.sheet-open .maplibregl-ctrl-b
 .food-dot.cafe { background: #c98a4b; border-color: #6b4421; }
 .food-dot.box { background: #fff; border-color: #ef3b5d; }
 .food-dot { width: 8px; height: 8px; border-width: 1.5px; }
+.ta-sub { margin: 12px 0 4px; font-size: 13px; }
+.on-map { font-size: 12px; white-space: nowrap; }
+.on-map { min-height: 0; display: inline; padding: 0; }

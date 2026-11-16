@@ -34,7 +34,7 @@ function decode(j) {
   const bySlug = Object.fromEntries(sections.map((s) => [s.slug, s]));
   const mains = sections.filter((s) => !s.alternative);
   for (const p of pieces) { let w = 180, so = 0, e = 0, n = -90; for (const [x, y] of p.line) { w = Math.min(w, x); e = Math.max(e, x); so = Math.min(so, y); n = Math.max(n, y); } p.box = [w, so, e, n]; }
-  return (ready = { name: j.name, season: j.season, total: j.total, pieces, sections, mains, bySlug, places: j.places || [], resupply: j.resupply || [] });
+  return (ready = { name: j.name, season: j.season, total: j.total, pieces, sections, mains, bySlug, places: j.places || [], resupply: j.resupply || [], shops: j.shops || [] });
 }
 
 /** A section as one line, southbound: the trail's pieces in order, or an option's
@@ -93,14 +93,15 @@ export function features(d) {
   // Places known only by their town are listed with their section, not drawn.
   const places = d.places.map((p, i) => ({ p, i })).filter(({ p }) => !p.approx).map(({ p, i }) => ({ type: 'Feature', properties: { i, name: p.name, type: p.type, hut: /^hut$/i.test(p.type) }, geometry: { type: 'Point', coordinates: p.point } }));
   const stops = d.resupply.map((r, i) => ({ type: 'Feature', properties: { i, name: r.name, level: r.level, kind: r.kind || (r.level === 'full' ? 'supermarket' : r.level === 'box' ? 'box' : 'store') }, geometry: { type: 'Point', coordinates: r.point } }));
-  // "Te Araroa" every 100 km along the trail (the map hides those that would overlap).
+  // "Te Araroa" once on each island, fixed, at the middle of the island's trail.
   const names = [];
-  for (let k = 50; k < d.total; k += 100) {
-    const piece = d.pieces.find((x) => k >= x.from && k <= x.to);
-    if (!piece || piece.line.length < 2) continue;
-    names.push({ type: 'Feature', properties: { km: k }, geometry: { type: 'Point', coordinates: piece.line[Math.floor(((k - piece.from) / Math.max(1e-9, piece.to - piece.from)) * (piece.line.length - 1))] } });
+  for (const [a, b] of [[0, 1739], [1739, d.total]]) {
+    const k = (a + b) / 2, piece = d.pieces.find((x) => k >= x.from && k <= x.to);
+    if (piece?.line.length) names.push({ type: 'Feature', properties: { km: k }, geometry: { type: 'Point', coordinates: piece.line[Math.floor(((k - piece.from) / Math.max(1e-9, piece.to - piece.from)) * (piece.line.length - 1))] } });
   }
-  return { lines: { type: 'FeatureCollection', features: lines }, places: { type: 'FeatureCollection', features: places }, stops: { type: 'FeatureCollection', features: stops }, names: { type: 'FeatureCollection', features: names } };
+  // The shops and cafés at each food stop (OpenStreetMap), shown closer in.
+  const shops = (d.shops || []).map((x, i) => ({ type: 'Feature', properties: { i, name: x.name, kind: x.kind }, geometry: { type: 'Point', coordinates: x.point } }));
+  return { lines: { type: 'FeatureCollection', features: lines }, places: { type: 'FeatureCollection', features: places }, stops: { type: 'FeatureCollection', features: stops }, names: { type: 'FeatureCollection', features: names }, shops: { type: 'FeatureCollection', features: shops } };
 }
 
 const notesCache = new Map();
