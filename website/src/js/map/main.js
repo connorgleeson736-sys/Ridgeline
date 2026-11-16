@@ -167,7 +167,7 @@ async function main() {
     teAraroaLoaded = true;
     teAraroa.load().then((d) => {
       const f = teAraroa.features(d);
-      const put = () => { map.getSource('te-araroa')?.setData(f.lines); map.getSource('te-araroa-places')?.setData(f.places); map.getSource('te-araroa-food')?.setData(f.stops); };
+      const put = () => { map.getSource('te-araroa')?.setData(f.lines); map.getSource('te-araroa-places')?.setData(f.places); map.getSource('te-araroa-food')?.setData(f.stops); map.getSource('te-araroa-names')?.setData(f.names); };
       if (map.getSource('te-araroa')) put(); else map.once('load', put);
     }).catch(() => { teAraroaLoaded = false; });
   };
@@ -263,16 +263,18 @@ async function main() {
   }
   function identify(e) {
     const point = e.point, lngLat = [e.lngLat.lng, e.lngLat.lat];
+    // Tapped while on Te Araroa: Back returns to it (and leaves the map where it is).
+    const push = /^te-araroa/.test(sheet.current?.kind || '');
     if (shown('nz-huts-dot', settings)) {
       const hut = nearestFeature(point, ['nz-huts-dot', 'nz-huts-label'], 24);
-      if (hut) { openHut(ctx, hut.properties.name || '', hut.geometry.type === 'Point' ? hut.geometry.coordinates : lngLat); return; }
+      if (hut) { openHut(ctx, hut.properties.name || '', hut.geometry.type === 'Point' ? hut.geometry.coordinates : lngLat, { push }); return; }
     }
     if (shown('te-araroa', settings) && teAraroa.loaded()) {
       const d = teAraroa.loaded();
       const food = nearestFeature(point, ['te-araroa-food', 'te-araroa-food-label'], 14);
-      if (food) { openTeAraroaStop(ctx, food.properties.i); return; }
+      if (food) { openTeAraroaStop(ctx, food.properties.i, { push }); return; }
       const place = nearestFeature(point, ['te-araroa-places'], 12);
-      if (place) { openTeAraroaPlace(ctx, place.properties.i); return; }
+      if (place) { openTeAraroaPlace(ctx, place.properties.i, { push }); return; }
       const ta = nearestFeature(point, ['te-araroa', 'te-araroa-option'], 16);
       const other = ta && shown('nz-tracks', settings) ? nearestFeature(point, ['nz-tracks', 'doc-walks'], 18) : null;
       // Te Araroa when its line is nearest (it is drawn over the tracks it follows).
@@ -280,14 +282,14 @@ async function main() {
         const piece = ta.properties.kind === 'main' ? d.pieces[ta.properties.i] : null;
         const slug = piece ? piece.section : ta.properties.section;
         const found = piece ? walkFor(longest(ta.geometry), piece.name, overlays.walkLines(), overlays.infos()) : null;
-        openTeAraroa(ctx, slug, { at: piece ? teAraroa.kmOn(piece, lngLat) : null, walk: found?.line.guid || null });
+        openTeAraroa(ctx, slug, { push, at: piece ? teAraroa.kmOn(piece, lngLat) : null, walk: found?.line.guid || null });
         return;
       }
     }
     if (shown('nz-tracks', settings)) {
       const track = nearestFeature(point, ['nz-tracks', 'nz-tracks-label', 'doc-walks', 'doc-walk-names'], 18);
       if (track) {
-        if (track.source === 'doc-walks' || track.layer.id === 'doc-walk-names') { openWalk(ctx, track.properties.guid); return; }
+        if (track.source === 'doc-walks' || track.layer.id === 'doc-walk-names') { openWalk(ctx, track.properties.guid, { push }); return; }
         const name = (track.properties.name || '').trim();
         let geom = longest(track.geometry);
         // A name is a point (labels.js): the track is the named piece through it.
@@ -299,9 +301,9 @@ async function main() {
         // A track on a DOC walk opens the walk; close in (zoom 15), a named section
         // of a large walk opens as itself (the app's DocWalks.CHILD_NAMES).
         const section = found?.named && name && map.getZoom() >= 15 && !sameAsWalk(name, overlays.infos()[found.line.guid]?.name);
-        if (found && !section) { openWalk(ctx, found.line.guid); return; }
+        if (found && !section) { openWalk(ctx, found.line.guid, { push }); return; }
         const pieces = name ? map.querySourceFeatures('ridgeline-tracks', { sourceLayer: 'streets', filter: ['==', ['get', 'name'], name] }).flatMap((f) => lines(f.geometry)) : [geom];
-        openTrack(ctx, name || 'Track', lngLat, pieces.length ? pieces : [geom]);
+        openTrack(ctx, name || 'Track', lngLat, pieces.length ? pieces : [geom], { push });
         return;
       }
     }

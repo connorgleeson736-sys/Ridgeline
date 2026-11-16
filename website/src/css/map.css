@@ -368,3 +368,19 @@ body.sheet-open .maplibregl-ctrl-bottom-left, body.sheet-open .maplibregl-ctrl-b
 .ta-row.food.long { box-shadow: inset 3px 0 0 #ef3b5d; }
 .ta-n.option { color: #c42a4a; }
 .ta-food-line .link, .ta-options .link, .ta-row .link { min-height: 0; display: inline; padding: 0; }
+
+/* Te Araroa: the list narrows and the picked section joins it, wider. */
+@media (min-width: 800px) {
+  .sheet.joined { width: 300px !important; height: calc(100vh - 120px) !important; border-top-right-radius: 0; border-bottom-right-radius: 0; }
+  .sheet.joined .ta-row .ta-name small, .sheet.joined .ta-status-line { display: none; }
+  .sheet.joined .resize-e { display: none; }
+  .side-panel { border-radius: 0 16px 16px 0; border-left: 1px solid var(--line); }
+  .side-panel.left { border-radius: 16px 0 0 16px; border-left: 0; border-right: 1px solid var(--line); }
+}
+.side-panel .side-top { justify-content: space-between; align-items: center; padding: 8px 10px 0; }
+.side-panel .back { border: 0; background: none; color: var(--link); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; padding: 4px 6px; }
+.food-dot.supermarket { background: #2f8f5b; border-color: #1f6b42; }
+.food-dot.store { background: #a8dcbc; border-color: #1f6b42; }
+.food-dot.cafe { background: #c98a4b; border-color: #6b4421; }
+.food-dot.box { background: #fff; border-color: #ef3b5d; }
+.food-dot { width: 8px; height: 8px; border-width: 1.5px; }

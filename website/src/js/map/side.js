@@ -1,5 +1,6 @@
-// A second panel beside the side panel, on computers: what is picked in a list (a
-// Te Araroa section, a food stop) opens here, one at a time, so the list stays put.
+// A second panel joined to the side panel, on computers: what is picked in a list (a
+// Te Araroa section, a food stop, a place to stay) opens here, and the list beside it
+// narrows. Back (top left) steps back through what was opened, then to the list.
 // On phones there is no room beside it: the caller opens it in the sheet instead.
 import { el } from './ui.js';
 
@@ -11,12 +12,15 @@ export class SidePanel {
     this.title = el('h2', { class: 'sheet-title' });
     this.subtitle = el('p', { class: 'sheet-subtitle' });
     this.body = el('div', { class: 'sheet-body' });
+    this.backButton = el('button', { class: 'back', type: 'button', onclick: () => this.back() }, '‹ Te Araroa');
     this.root = el('aside', { class: 'side-panel', hidden: true, 'aria-label': 'Details' },
-      el('div', { class: 'side-top' }, el('button', { class: 'close', type: 'button', 'aria-label': 'Close', onclick: () => this.close() }, '×')),
+      el('div', { class: 'side-top' }, this.backButton, el('button', { class: 'close', type: 'button', 'aria-label': 'Close', onclick: () => this.close() }, '×')),
       el('header', { class: 'sheet-head' }, el('div', { class: 'sheet-heading' }, this.title, this.subtitle)),
       this.body);
+    this.root.addEventListener('keydown', (e) => { if (e.key === 'Escape') this.back(); });
     document.body.append(this.root);
     this.token = 0;
+    this.stack = [];
     const place = () => this.place();
     new ResizeObserver(place).observe(sheet.root);
     new MutationObserver(place).observe(sheet.root, { attributes: true, attributeFilter: ['style', 'hidden'] });
@@ -26,23 +30,32 @@ export class SidePanel {
   /** Whether there is room for it (a computer). */
   get available() { return WIDE.matches; }
   get isOpen() { return !this.root.hidden; }
-  /** {key, title, subtitle, render(body, alive) → cleanup}; replaces what was open. */
-  open(panel) {
+  get key() { return this.current?.key ?? null; }
+  /** {key, title, subtitle, backLabel, render(body, alive, {restored}) → cleanup}.
+   * `push`: Back returns to what is open now; otherwise it replaces it. */
+  open(panel, { push = false } = {}) {
+    if (push && this.current) this.stack.push(this.current); else this.stack = [];
+    this.show(panel);
+  }
+  show(panel, { restored = false } = {}) {
     this.cleanup?.();
     this.cleanup = null;
+    this.current = panel;
     const token = ++this.token;
-    this.key = panel.key;
     this.title.textContent = panel.title || '';
     this.subtitle.textContent = panel.subtitle || '';
     this.subtitle.hidden = !panel.subtitle;
+    this.backButton.textContent = `‹ ${this.stack.length ? this.stack[this.stack.length - 1].backLabel || 'Back' : this.home || 'Back'}`;
     this.body.replaceChildren();
     this.body.scrollTop = 0;
     this.root.hidden = false;
+    this.sheet.root.classList.add('joined');
     this.place();
-    const r = panel.render?.(this.body, () => token === this.token && !this.root.hidden);
+    const r = panel.render?.(this.body, () => token === this.token && !this.root.hidden, { restored });
     if (typeof r === 'function') this.cleanup = r;
     this.onChange?.(this.key);
   }
+  back() { const prev = this.stack.pop(); if (prev) this.show(prev, { restored: true }); else this.close(); }
   setTitle(title, subtitle) {
     if (title != null) this.title.textContent = title;
     if (subtitle != null) { this.subtitle.textContent = subtitle; this.subtitle.hidden = !subtitle; }
@@ -52,17 +65,19 @@ export class SidePanel {
     this.token++;
     this.cleanup?.();
     this.cleanup = null;
-    this.key = null;
+    this.current = null;
+    this.stack = [];
     this.root.hidden = true;
+    this.sheet.root.classList.remove('joined');
     this.onChange?.(null);
   }
-  /** Beside the side panel: to its right, or its left if there is no room. */
+  /** Joined to the side panel's right edge, the same height; to its left if there is no room. */
   place() {
     if (this.root.hidden) return;
     if (this.sheet.root.hidden) { this.close(); return; }
-    const r = this.sheet.root.getBoundingClientRect(), w = Math.min(400, innerWidth - 24);
-    const right = r.right + 10 + w <= innerWidth - 10;
-    const left = right ? r.right + 10 : Math.max(10, r.left - 10 - w);
-    Object.assign(this.root.style, { left: `${left}px`, top: `${Math.max(10, r.top)}px`, width: `${w}px`, maxHeight: `${innerHeight - Math.max(10, r.top) - 12}px` });
+    const r = this.sheet.root.getBoundingClientRect(), w = Math.min(520, innerWidth - r.width - 24);
+    const right = r.right + w <= innerWidth - 10;
+    this.root.classList.toggle('left', !right);
+    Object.assign(this.root.style, { left: `${right ? r.right : Math.max(10, r.left - w)}px`, top: `${r.top}px`, width: `${w}px`, height: `${r.height}px` });
   }
 }

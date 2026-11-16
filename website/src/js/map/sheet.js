@@ -34,7 +34,14 @@ export class Sheet {
     if (push && this.current) this.stack.push(this.current); else this.stack = [];
     this.show(panel);
   }
-  show(panel) {
+  /** Shows a panel with Back leading to `back` (not shown first): a Te Araroa section
+   * opened from the map, Back to the trail. */
+  openWithBack(panel, back) {
+    this.stack = [back];
+    this.show(panel);
+  }
+  /** `restored`: shown again by Back; panels then leave the map's view as it is. */
+  show(panel, { restored = false } = {}) {
     this.cleanup?.();
     this.cleanup = null;
     this.current = panel;
@@ -45,13 +52,14 @@ export class Sheet {
     this.head.hidden = !panel.title;
     this.photo.hidden = true; this.photo.removeAttribute('src');
     this.back.hidden = !this.stack.length;
+    this.back.textContent = `‹ ${this.stack[this.stack.length - 1]?.backLabel || 'Back'}`;
     this.body.replaceChildren();
     this.body.scrollTop = 0;
     this.root.hidden = false;
     this.root.dataset.kind = panel.kind || '';
     this.size(panel.size || 'expanded');
     document.body.classList.add('sheet-open');
-    const r = panel.render?.(this.body, () => token === this.token);
+    const r = panel.render?.(this.body, () => token === this.token, { restored });
     if (typeof r === 'function') this.cleanup = r;
     requestAnimationFrame(() => this.root.focus({ preventScroll: true }));
   }
@@ -63,7 +71,7 @@ export class Sheet {
     if (!src || !/^https:\/\//.test(src)) { this.photo.hidden = true; return; }
     this.photo.alt = alt; this.photo.src = src; this.photo.hidden = false;
   }
-  pop() { const prev = this.stack.pop(); if (prev) this.show(prev); else this.close(); }
+  pop() { const prev = this.stack.pop(); if (prev) this.show(prev, { restored: true }); else this.close(); }
   close() {
     if (this.root.hidden) return;
     this.token++;

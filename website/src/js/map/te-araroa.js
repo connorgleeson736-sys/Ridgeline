@@ -90,9 +90,17 @@ export function kmOn(piece, p) {
 export function features(d) {
   const lines = d.pieces.map((p) => ({ type: 'Feature', properties: { kind: 'main', i: p.i, section: p.section }, geometry: { type: 'LineString', coordinates: p.line } }));
   for (const s of d.sections) if (s.alternative && s.line) lines.push({ type: 'Feature', properties: { kind: 'option', section: s.slug }, geometry: { type: 'MultiLineString', coordinates: s.line } });
-  const places = d.places.map((p, i) => ({ type: 'Feature', properties: { i, name: p.name, type: p.type, hut: /hut/i.test(p.type) }, geometry: { type: 'Point', coordinates: p.point } }));
-  const stops = d.resupply.map((r, i) => ({ type: 'Feature', properties: { i, name: r.name, level: r.level }, geometry: { type: 'Point', coordinates: r.point } }));
-  return { lines: { type: 'FeatureCollection', features: lines }, places: { type: 'FeatureCollection', features: places }, stops: { type: 'FeatureCollection', features: stops } };
+  // Places known only by their town are listed with their section, not drawn.
+  const places = d.places.map((p, i) => ({ p, i })).filter(({ p }) => !p.approx).map(({ p, i }) => ({ type: 'Feature', properties: { i, name: p.name, type: p.type, hut: /^hut$/i.test(p.type) }, geometry: { type: 'Point', coordinates: p.point } }));
+  const stops = d.resupply.map((r, i) => ({ type: 'Feature', properties: { i, name: r.name, level: r.level, kind: r.kind || (r.level === 'full' ? 'supermarket' : r.level === 'box' ? 'box' : 'store') }, geometry: { type: 'Point', coordinates: r.point } }));
+  // "Te Araroa" every 100 km along the trail (the map hides those that would overlap).
+  const names = [];
+  for (let k = 50; k < d.total; k += 100) {
+    const piece = d.pieces.find((x) => k >= x.from && k <= x.to);
+    if (!piece || piece.line.length < 2) continue;
+    names.push({ type: 'Feature', properties: { km: k }, geometry: { type: 'Point', coordinates: piece.line[Math.floor(((k - piece.from) / Math.max(1e-9, piece.to - piece.from)) * (piece.line.length - 1))] } });
+  }
+  return { lines: { type: 'FeatureCollection', features: lines }, places: { type: 'FeatureCollection', features: places }, stops: { type: 'FeatureCollection', features: stops }, names: { type: 'FeatureCollection', features: names } };
 }
 
 const notesCache = new Map();
@@ -123,6 +131,7 @@ export function alerts(slug) {
 
 // ---- Food: resupply stops and the carries between them ----
 export const LEVELS = { full: 'Supermarket', limited: 'Small store', box: 'Send a box' };
+export const KINDS = { supermarket: 'Supermarket', store: 'Store', cafe: 'Café only', box: 'No shop: send a box' };
 /** A stop the trail reaches (within 3 km, or on its way, as Picton by ferry); further off it is a hitch. */
 export const onTrail = (r) => r.off <= 3000 || !!r.via;
 

@@ -325,6 +325,87 @@ for (const s of sections) {
   }
 }
 const resupply = stops.sort((a, b) => a.km - b.km);
+// What kind of food stop: a supermarket, a store, only a café, or nothing (send a box).
+for (const r of resupply) {
+  const text = `${r.note} ${r.shops.join(' ')}`;
+  r.kind = r.level === 'full' ? 'supermarket' : r.level === 'box' ? 'box'
+    : /caf[eé]|tearoom|bakery|coffee|restaurant/i.test(text) && !/\bstore|shop\b|dairy|square|superette|grocer|general/i.test(text) ? 'cafe' : 'store';
+}
+
+// ---- 5. More places to stay, from each section's Accommodation notes: campsites,
+// holiday parks, hostels, bunkhouses and walkers' lodges (not hotels or motels) ----
+console.log('Accommodation notes…');
+const names = readFileSync(join(here, '..', 'native-wgpu/android/app/src/main/assets/search/places.tsv'), 'utf8')
+  .split('\n').map((l) => l.split('\t')).filter((c) => /^(place|camp|hut|area|coast)$/.test(c[0]) && (c[1] || '').length >= 5)
+  .map((c) => ({ key: fold(c[1]), point: [+c[4], +c[3]] }));
+const byKey = new Map();
+for (const n of names) { if (!byKey.has(n.key)) byKey.set(n.key, []); byKey.get(n.key).push(n.point); }
+function pointAtKm(km) {
+  const p = pieces.find((x) => km >= x.from && km <= x.to);
+  if (!p) return null;
+  const total = lengthOf(p.line), want = ((km - p.from) / Math.max(1e-9, p.to - p.from)) * total;
+  let walked = 0;
+  for (let i = 1; i < p.line.length; i++) {
+    const seg = metres(p.line[i - 1], p.line[i]);
+    if (walked + seg >= want) { const t = seg ? (want - walked) / seg : 0; return [r5(p.line[i - 1][0] + (p.line[i][0] - p.line[i - 1][0]) * t), r5(p.line[i - 1][1] + (p.line[i][1] - p.line[i - 1][1]) * t)]; }
+    walked += seg;
+  }
+  return p.line[p.line.length - 1];
+}
+/** The place a name names (the longest gazetteer name in it), nearest the trail. */
+function locate(text) {
+  const f = fold(text);
+  let best = null;
+  for (const [key, pts] of byKey) {
+    if (key.length <= (best?.key.length || 0) || !f.includes(key) || !new RegExp(`(^|[^a-z])${key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}([^a-z]|$)`).test(f)) continue;
+    const near = pts.map((p) => ({ p, k: kmAt(p) })).sort((a, b) => a.k.d - b.k.d)[0];
+    if (near.k.d <= 15_000) best = { key, point: near.p, k: near.k };
+  }
+  return best;
+}
+const STAY = /camp(ground|site|ing)?\b|holiday park|motor camp|top ?10|backpacker|hostel|\byha\b|bunk ?house|lodge|\bhut\b|cabins?\b/i;
+const NOT = /\bmotel|\bhotel|motor lodge|econo|microtel|b ?& ?b\b|bed and breakfast|apartment|resort|chalets?\b|villas?\b/i;
+const typeOf = (t) => (/holiday park|motor camp|top ?10/i.test(t) ? 'Holiday park' : /camp/i.test(t) ? 'Campsite' : /backpacker|hostel|\byha\b/i.test(t) ? 'Hostel' : /\bhut\b/i.test(t) ? 'Hut' : 'Lodge');
+const famous = (a, b) => { const strip = (x) => fold(x).replace(/\b(campsite|campground|camp|holiday park|motor camp|top 10|hut|lodge|backpackers?|the)\b/g, '').replace(/[^a-z]/g, ''); const x = strip(a), y = strip(b); return x.length >= 4 && y.length >= 4 && (x.includes(y) || y.includes(x)); };
+let added = 0;
+for (const s of sections) {
+  const html = notes[s.slug]?.accommodation || '';
+  if (!html) continue;
+  let town = '';
+  for (const m of html.matchAll(/<h\d[^>]*>([\s\S]*?)<\/h\d>|<(li|p)\b[^>]*>([\s\S]*?)<\/\2>/gi)) {
+    if (m[1] != null) { town = unescape(m[1].replace(/<[^>]+>/g, '')).trim(); continue; }
+    const raw = m[3];
+    if (/text-decoration:\s*line-through/i.test(raw) && !/<\/span>\s*\S/.test(raw.replace(/<span[^>]*line-through[^>]*>[\s\S]*?<\/span>/gi, ''))) continue;
+    const text = unescape(raw.replace(/<span[^>]*line-through[^>]*>[\s\S]*?<\/span>/gi, '').replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ').trim();
+    if (!text) continue;
+    const link = /<a\b[^>]*href="(https?:[^"]+)"[^>]*>([\s\S]*?)<\/a>/i.exec(raw);
+    let name = link ? unescape(link[2].replace(/<[^>]+>/g, '')).replace(/\s+/g, ' ').trim() : text.split(/\s[-–—]\s|,\s/)[0].trim();
+    name = name.replace(/[\s()\-–—:.,]+$/, '').replace(/^\W+/, '').replace(/\s*\($/, '').trim();
+    if (!name || name.length > 60 || name.length < 5 || /^(there|the|a|an|this|book|turn|take|check|hot|please|note|see|call|ask|via|from|at|on|in)\b/i.test(name) || /airbnb|shower|book online|website|phone|email/i.test(name)) continue;
+    const desc = text.slice(text.indexOf(name) + name.length).replace(/^[\s,\-–—]+/, '');
+    if (NOT.test(name) && !/camp/i.test(name)) continue;
+    // The name says what it is (a campsite, holiday park, hut, lodge, hostel…).
+    if (!STAY.test(name) || name.split(/\s+/).length > 8 || /\b(has|have|offers?|range of|is|are)\b/i.test(name)) continue;
+    if ((name.match(/\(/g) || []).length > (name.match(/\)/g) || []).length) name = name.replace(/\s*\([^)]*$/, '').trim();
+    if (placed.some((p) => famous(p.name, name))) continue;
+    // Where: a km on the trail if the notes give one, else its own name, else its town.
+    let point = null, approx = false, kmv = null;
+    const kmText = /\bkm\s*([\d,]+(?:\.\d+)?)/i.exec(text);
+    if (kmText) { kmv = +kmText[1].replace(/,/g, ''); if (kmv > total || kmv < 0) kmv = null; else point = pointAtKm(kmv); }
+    if (!point) { const own = locate(name); if (own) point = own.point; }
+    if (!point) { const where = locate(`${town} ${desc}`); if (where) { point = where.point; approx = true; } }
+    if (!point) continue;
+    const k = kmAt(point);
+    if (k.d > 15_000) continue;
+    if (placed.some((p) => metres(p.point, point) < 250 && typeOf(name) === p.type)) continue;
+    const phone = /\bP:\s*([0-9 +()]{7,20})/.exec(text)?.[1]?.trim() || '';
+    placed.push({ name, type: typeOf(`${name} ${STAY.test(name) ? '' : desc}`), facilities: desc.replace(/\bP:\s*[0-9 +()]{7,20}/g, '').replace(/\bE:\s*\S+@\S+/g, '').replace(/\s*[-–—]\s*$/,'').replace(/\s+[-–—]\s+[-–—]\s+/g, ' – ').trim().slice(0, 160),
+      phone, website: link ? link[1] : '', point, km: Math.round((kmv ?? k.km) * 10) / 10, off: Math.round(k.d), section: s.slug, from: 'notes', approx, town: approx ? town : '' });
+    added++;
+  }
+}
+placed.sort((a, b) => a.km - b.km);
+console.log(`  ${added} more places to stay from the notes (${placed.filter((p) => p.approx).length} placed by town only)`);
 const index = {
   name: trailName, season: (/(\d{4}-\d{2})/.exec(trailName) || [])[1] || '', total,
   pieces: pieces.map((p) => {
