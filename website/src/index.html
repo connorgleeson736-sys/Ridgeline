@@ -22,9 +22,9 @@
 <link rel="preconnect" href="{{overviewOrigin}}" crossorigin>
 <link rel="modulepreload" href="{{maplibre}}/maplibre-gl.mjs">
 <link rel="modulepreload" href="/js/map/main.js">
-<link rel="preload" href="/data/topography-style.json" as="fetch" crossorigin>
-<link rel="preload" href="/data/overview.json" as="fetch" crossorigin>
-<link rel="preload" href="/data/gaps-index.json" as="fetch" crossorigin>
+<link rel="preload" href="/data/topography-style.json?v={{dataVersion}}" as="fetch" crossorigin>
+<link rel="preload" href="/data/overview.json?v={{dataVersion}}" as="fetch" crossorigin>
+<link rel="preload" href="/data/gaps-index.json?v={{dataVersion}}" as="fetch" crossorigin>
 <link rel="stylesheet" href="{{maplibre}}/maplibre-gl.css">
 <link rel="stylesheet" href="/css/map.css">
 </head>

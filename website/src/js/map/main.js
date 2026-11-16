@@ -24,6 +24,7 @@ import { openWalk, openTrack, openHut, openHunting, openTeAraroa, openTeAraroaPl
 import * as teAraroa from './te-araroa.js';
 import { walkFor } from '../core/walks.js';
 import { el, icon, store, toast } from './ui.js';
+import { dataUrl } from './data-url.js';
 
 setWorkerUrl('/vendor/maplibre-gl-6.16.0/maplibre-gl-worker.mjs');
 installOverview({ addProtocol });
@@ -68,7 +69,7 @@ const view = parseView(location.hash) || store.get('view', null) || START;
 
 async function main() {
   if (!webglSupported()) { $('map-status').hidden = false; $('map-status').textContent = 'Your browser can’t show the 3D map (WebGL is turned off or unsupported). Try an up-to-date Chrome, Edge, Firefox or Safari.'; return; }
-  const topography = await fetch('/data/topography-style.json').then((r) => r.json());
+  const topography = await fetch(dataUrl('/data/topography-style.json')).then((r) => r.json());
   const style = build({ topography, settings, dark: dark.matches });
   const map = new MapLibre({
     container: 'map',

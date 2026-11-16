@@ -4,6 +4,7 @@
 // and the options beside them (bypasses, water and ferry legs), and the huts,
 // campsites and holiday parks on it. A section's notes and line load when it is
 // opened; its status and alerts are read live through the site (worker/te-araroa.js).
+import { dataUrl } from './data-url.js';
 let data = null, ready = null;
 /** The trail if it has already loaded (no fetch). */
 export const loaded = () => ready;
@@ -22,7 +23,7 @@ const unpack = (c, z = false) => {
 };
 
 export function load() {
-  return data || (data = fetch('/data/te-araroa.json')
+  return data || (data = fetch(dataUrl('/data/te-araroa.json'))
     .then((r) => { if (!r.ok) throw new Error(`Te Araroa ${r.status}`); return r.json(); })
     .then(decode)
     .catch((e) => { data = null; throw e; }));
@@ -107,7 +108,7 @@ export function features(d) {
 const notesCache = new Map();
 /** A section's notes (HTML from the Trust). */
 export function notes(slug) {
-  if (!notesCache.has(slug)) notesCache.set(slug, fetch(`/data/te-araroa/${slug}.json`).then((r) => (r.ok ? r.json() : null)).catch(() => null));
+  if (!notesCache.has(slug)) notesCache.set(slug, fetch(dataUrl(`/data/te-araroa/${slug}.json`)).then((r) => (r.ok ? r.json() : null)).catch(() => null));
   return notesCache.get(slug);
 }
 

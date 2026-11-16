@@ -44,7 +44,14 @@ const hashOf = (dir) => {
   walk(dir);
   return h.digest('hex').slice(0, 10);
 };
-const config = `export default ${JSON.stringify({ linzKey, overviewUrl, playUrl: SITE.playUrl, betaUrl: SITE.betaUrl, version: SITE.updated })};\n`;
+// The data files' version, from everything they are made from: their URLs carry it
+// (?v=), so a changed file is fetched afresh while unchanged ones stay cached.
+const dataVersion = (() => {
+  const h = createHash('sha256').update(readFileSync(fileURLToPath(import.meta.url))).update(hashOf(join(here, 'data')));
+  for (const f of [join(appAssets, 'topography-style.json'), join(appAssets, 'search/places.tsv'), join(appAssets, 'walks/walks.json'), join(repo, 'capacitor/overview-catalog.json'), join(repo, 'native-wgpu/assets/overviews/north-island.json'), join(repo, 'public/south-overviews.js'), join(repo, 'public/gap-imagery-atlas.js')]) if (existsSync(f)) h.update(readFileSync(f));
+  return h.digest('hex').slice(0, 10);
+})();
+const config = `export default ${JSON.stringify({ linzKey, overviewUrl, playUrl: SITE.playUrl, betaUrl: SITE.betaUrl, version: SITE.updated, dataVersion })};\n`;
 const jsVersion = createHash('sha256').update(hashOf(join(src, 'js'))).update(config).digest('hex').slice(0, 10);
 const cssVersion = hashOf(join(src, 'css'));
 const jsOut = join(out, 'js', jsVersion), cssOut = join(out, 'css', cssVersion);
@@ -68,6 +75,7 @@ const render = (html) => html
   .replace(/\{\{>\s*(\w+)\s*\}\}/g, (_, name) => partials[name] ?? '')
   .replace(/\{\{site\.(\w+)\}\}/g, (_, key) => SITE[key] ?? '')
   .replace(/\{\{year\}\}/g, '2026')
+  .replace(/\{\{dataVersion\}\}/g, dataVersion)
   .replace(/\{\{maplibre\}\}/g, `/vendor/${maplibre}`)
   .replace(/<link rel="preconnect" href="\{\{overviewOrigin\}\}"[^>]*>\n?/g, overviewUrl ? `<link rel="preconnect" href="${new URL(overviewUrl).origin}" crossorigin>\n` : '')
   .replace(/(["'(])\/js\//g, `$1/js/${jsVersion}/`)

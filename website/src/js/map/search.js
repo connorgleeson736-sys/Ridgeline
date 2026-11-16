@@ -6,6 +6,7 @@ import { search as worker } from './workers.js';
 import { LABELS, zoomFor } from '../core/search.js';
 import { guidOf } from '../core/walks.js';
 import * as teAraroa from './te-araroa.js';
+import { dataUrl } from './data-url.js';
 
 export function attach(ctx, { form, results, routes }) {
   const input = form.querySelector('input');
@@ -14,7 +15,7 @@ export function attach(ctx, { form, results, routes }) {
   results.setAttribute('role', 'listbox');
   input.setAttribute('aria-controls', 'search-results');
   let found = [], active = -1, token = 0, lastQuery = '';
-  const url = '/data/places.tsv';
+  const url = dataUrl('/data/places.tsv');
   const warm = () => worker.call({ type: 'warm', url }).catch(() => {});
 
   function show() {

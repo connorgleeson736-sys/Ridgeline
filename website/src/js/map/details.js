@@ -10,9 +10,10 @@ import { legs } from '../core/docpages.js';
 import * as doc from './doc.js';
 import * as teAraroa from './te-araroa.js';
 import { data as worker, search } from './workers.js';
+import { dataUrl } from './data-url.js';
 
 let facts = null;
-const walkFacts = () => facts || (facts = fetch('/data/walks.json').then((r) => (r.ok ? r.json() : {})).catch(() => ({})));
+const walkFacts = () => facts || (facts = fetch(dataUrl('/data/walks.json')).then((r) => (r.ok ? r.json() : {})).catch(() => ({})));
 
 const DOC_NOTE = 'Track information from the Department of Conservation. Check conditions with DOC before you go.';
 /** DOC writes bunks as "8 each", "20", "4 (bunks)"… */
@@ -128,7 +129,7 @@ function fill(box, blocks) {
   }
 }
 let pages = new Map();
-const walkPage = (guid) => pages.get(guid) || pages.set(guid, fetch(`/data/walks/${guid}.json`).then((r) => (r.ok ? r.json() : null)).catch(() => null)).get(guid);
+const walkPage = (guid) => pages.get(guid) || pages.set(guid, fetch(dataUrl(`/data/walks/${guid}.json`)).then((r) => (r.ok ? r.json() : null)).catch(() => null)).get(guid);
 /** The part of `line` between distances a and b along it. */
 function slice(line, a, b) {
   const out = [];
@@ -209,7 +210,7 @@ export function openWalk(ctx, guid, { push = false } = {}) {
         if (!docLegs.length) return;
         const total = length(line), mid = line[Math.floor(line.length / 2)];
         const names = docLegs.flatMap((l) => [l.from, l.to]);
-        const located = await search.call({ type: 'locate', url: '/data/places.tsv', names, near: mid, maxKm: 40 }).catch(() => null);
+        const located = await search.call({ type: 'locate', url: dataUrl('/data/places.tsv'), names, near: mid, maxKm: 40 }).catch(() => null);
         if (!alive() || !located) return;
         const at = (p) => { if (!p) return null; const n = nearestOn(line, p); return n.d <= 1500 ? n.along : null; };
         const parts = docLegs.map((l, i) => { const a = at(located[i * 2]), b = at(located[i * 2 + 1]); return a == null || b == null || Math.abs(b - a) < 100 ? null : { ...l, span: [Math.min(a, b), Math.max(a, b)] }; }).filter(Boolean);

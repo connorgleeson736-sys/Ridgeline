@@ -9,6 +9,7 @@
 import config from './config.js';
 import { urls } from './style.js';
 import { data as worker } from './workers.js';
+import { dataUrl } from './data-url.js';
 
 const base = (config.overviewUrl || '').replace(/\/$/, '');
 const ESRI = 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile';
@@ -16,7 +17,7 @@ const ESRI = 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Image
 let overview = null, overviewLoading = null;
 export function loadOverview() {
   if (!base) return Promise.resolve(null);
-  return overviewLoading || (overviewLoading = fetch('/data/overview.json').then((r) => (r.ok ? r.json() : null)).then((o) => {
+  return overviewLoading || (overviewLoading = fetch(dataUrl('/data/overview.json')).then((r) => (r.ok ? r.json() : null)).then((o) => {
     if (!o) return null;
     const tiles = new Map();
     for (const [z, rows] of Object.entries(o.zooms)) {
@@ -31,10 +32,10 @@ export function loadOverview() {
 // for the outlines themselves.
 let gapIndex = null, indexLoading = null, gapShapes = null, shapesLoading = null;
 export function loadGapIndex() {
-  return indexLoading || (indexLoading = fetch('/data/gaps-index.json').then((r) => (r.ok ? r.json() : null)).then((g) => { if (g) gapIndex = { ...g, keys: new Set(g.keys) }; return gapIndex; }).catch(() => null));
+  return indexLoading || (indexLoading = fetch(dataUrl('/data/gaps-index.json')).then((r) => (r.ok ? r.json() : null)).then((g) => { if (g) gapIndex = { ...g, keys: new Set(g.keys) }; return gapIndex; }).catch(() => null));
 }
 function loadGapShapes() {
-  return shapesLoading || (shapesLoading = fetch('/data/gaps.json').then((r) => (r.ok ? r.json() : null)).then((g) => { gapShapes = g; return g; }).catch(() => null));
+  return shapesLoading || (shapesLoading = fetch(dataUrl('/data/gaps.json')).then((r) => (r.ok ? r.json() : null)).then((g) => { gapShapes = g; return g; }).catch(() => null));
 }
 
 const linz = (z, x, y) => urls.aerial.replace('{z}', z).replace('{x}', x).replace('{y}', y);
