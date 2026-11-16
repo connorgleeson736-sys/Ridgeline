@@ -167,7 +167,6 @@ export function openWalk(ctx, guid, { push = false } = {}) {
         ctx.sheet.setPhoto(info?.thumbnail || o.image, name);
         if (line.length >= 2) { ctx.select([line]); ctx.fit(line); }
         body.append(chips((o.distance || fact[0]) && `DOC: ${o.distance || fact[0]}`, (o.time || fact[1]) && `Time: ${o.time || fact[1]}`, fact[2] === 'loop' ? 'Loop' : fact[2] === 'one_way' ? 'One way' : null, (o.dogs || fact[3]) && (o.dogs || fact[3]).split('.')[0]));
-        body.append(alertsBox(guid, info?.page || ctx.overlays.infos()[guid]?.page));
         const partRow = el('div', { class: 'parts', hidden: true });
         const partText = el('div', { class: 'part-text', hidden: true });
         const intro = (o.intro || info?.introduction) ? el('p', { class: 'intro' }, o.intro || info.introduction) : null;
@@ -177,6 +176,8 @@ export function openWalk(ctx, guid, { push = false } = {}) {
           body.append(partRow, profile, partText);
         } else body.append(failed('DOC has no line for this walk.'));
         if (intro) body.append(intro);
+        // DOC's current alerts: after the profile and summary, before the huts and DOC's sections.
+        body.append(alertsBox(guid, info?.page || ctx.overlays.infos()[guid]?.page));
         const hutsBox = el('div', { class: 'huts' });
         const sectionsBox = el('div', { class: 'doc-sections' });
         body.append(hutsBox, sectionsBox);
