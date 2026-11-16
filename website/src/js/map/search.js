@@ -22,7 +22,7 @@ export function attach(ctx, { form, results, routes }) {
     results.hidden = !q;
     results.replaceChildren(...found.map((r, i) => el('li', { role: 'option', id: `result-${i}`, 'aria-selected': i === active ? 'true' : 'false' },
       el('button', { type: 'button', tabindex: -1, onmousedown: (e) => e.preventDefault(), onclick: () => choose(r) },
-        el('b', {}, r.name), el('small', {}, [LABELS[r.kind] || 'Place', r.detail].filter(Boolean).join(' · '))))));
+        el('b', {}, r.name), el('small', {}, [r.label || LABELS[r.kind] || 'Place', r.detail].filter(Boolean).join(' · '))))));
     if (!found.length && q) results.replaceChildren(el('li', { class: 'none' }, 'No places found'));
     input.setAttribute('aria-expanded', String(!!q));
     if (active >= 0) input.setAttribute('aria-activedescendant', `result-${active}`); else input.removeAttribute('aria-activedescendant');
@@ -35,8 +35,11 @@ export function attach(ctx, { form, results, routes }) {
     if (!q) { found = []; show(); return []; }
     const c = ctx.map.getCenter();
     try {
-      const r = await worker.call({ type: 'search', url, query: q, near: [c.lng, c.lat], limit: 30 });
+      let r = await worker.call({ type: 'search', url, query: q, near: [c.lng, c.lat], limit: 30 });
       if (t !== token) return r || [];
+      // Te Araroa, the whole trail, first when its name is typed.
+      const typed = q.toLowerCase().replace(/[\s-]+/g, ' ');
+      if (typed.length >= 4 && ('te araroa'.startsWith(typed) || typed.includes('araroa') || 'the long pathway'.startsWith(typed))) r = [{ kind: 'te-araroa', name: 'Te Araroa', label: 'Trail', detail: 'Cape Reinga to Bluff' }, ...(r || [])];
       found = r || []; active = found.length ? 0 : -1;
       show();
       return found;
@@ -64,6 +67,7 @@ export function attach(ctx, { form, results, routes }) {
     token++;
     input.blur();
     ctx.closeDrawer();
+    if (r.kind === 'te-araroa') { ctx.openTeAraroa(null); return; }
     const p = [r.lon, r.lat];
     const guid = r.kind === 'walk' ? guidOf(r.link) : null;
     // The sheet first, so the flight leaves room for it.

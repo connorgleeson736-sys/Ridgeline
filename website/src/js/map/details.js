@@ -8,6 +8,7 @@ import { stops, matchHut, guidOf } from '../core/walks.js';
 import { length, bounds, chain, nearestOn } from '../core/geo.js';
 import { legs } from '../core/docpages.js';
 import * as doc from './doc.js';
+import * as teAraroa from './te-araroa.js';
 import { data as worker, search } from './workers.js';
 
 let facts = null;
@@ -259,6 +260,52 @@ export function openTrack(ctx, name, tapped, pieces, { push = false } = {}) {
       }).catch(() => {});
       body.append(el('div', { class: 'sheet-actions' }, line.length >= 2 ? el('button', { class: 'btn', type: 'button', onclick: () => ctx.planner.fromLine(name || 'Track', line) }, 'Save as route') : null));
       return () => { controller.abort(); ctx.select(null); ctx.marker(null); ctx.range(null); };
+    },
+  }, { push });
+}
+
+const km = (v) => (v == null ? '' : v.toLocaleString('en-NZ', { maximumFractionDigits: 1 }));
+
+/** Te Araroa: one piece of it (its kilometres, profile and the pieces either side)
+ * or, with no piece, the whole trail. `walk`: the DOC walk the piece follows, if any. */
+export function openTeAraroa(ctx, index = null, { push = false, walk = null } = {}) {
+  ctx.sheet.open({
+    kind: 'te-araroa', title: 'Te Araroa', subtitle: 'Trail',
+    render(body, alive) {
+      body.append(busy());
+      teAraroa.load().then((d) => {
+        if (!alive()) return;
+        body.replaceChildren();
+        const piece = index == null ? null : d.pieces[index];
+        const links = el('div', { class: 'sheet-actions' });
+        if (!piece) {
+          ctx.sheet.setTitle('Te Araroa', `The Long Pathway · ${km(d.total)} km`);
+          const all = d.pieces.map((p) => p.line);
+          ctx.select(all);
+          ctx.fit(all.flat());
+          body.append(el('div', { class: 'stats' }, statBox('Distance', `${km(d.total)} km`), statBox('From', 'Cape Reinga'), statBox('To', 'Bluff'), statBox('Season', d.season || '–')));
+          body.append(el('p', { class: 'intro' }, 'Te Araroa runs the length of Aotearoa New Zealand, from Cape Reinga to Bluff, along tracks, beaches, rivers, forest roads and towns. Tap any part of the red line for that stretch’s kilometres and elevation profile.'));
+          links.append(...[docLink(teAraroa.PAGE, 'Te Araroa ↗'), docLink(teAraroa.NOTES, 'Trail notes & maps ↗'), docLink(teAraroa.ALERTS, 'Trail alerts ↗')].filter(Boolean));
+        } else {
+          const from = piece.from, to = piece.to;
+          ctx.sheet.setTitle(piece.name || 'Te Araroa', from != null ? `Te Araroa · km ${km(from)} to ${km(to)}` : 'Te Araroa');
+          ctx.select([piece.line]);
+          ctx.fit(piece.line);
+          body.append(chips('Kilometres southbound', d.season && `${d.season} season`));
+          body.append(profileBlock(ctx, piece.line, alive));
+          const prev = d.pieces[index - 1], next = d.pieces[index + 1];
+          body.append(el('div', { class: 'ta-steps' },
+            el('button', { class: 'btn', type: 'button', disabled: !prev, title: prev?.name || '', onclick: () => openTeAraroa(ctx, index - 1) }, '← Previous'),
+            el('button', { class: 'btn', type: 'button', onclick: () => openTeAraroa(ctx, null) }, 'Whole trail'),
+            el('button', { class: 'btn', type: 'button', disabled: !next, title: next?.name || '', onclick: () => openTeAraroa(ctx, index + 1) }, 'Next →')));
+          const walkName = walk && ctx.overlays.infos()[walk]?.name;
+          links.append(...[el('button', { class: 'btn', type: 'button', onclick: () => ctx.planner.fromLine(`Te Araroa: ${piece.name}`, piece.line) }, 'Save as route'),
+            walkName ? el('button', { class: 'btn', type: 'button', onclick: () => ctx.openWalk(walk) }, `DOC: ${walkName}`) : null,
+            docLink(teAraroa.ALERTS, 'Trail alerts ↗')].filter(Boolean));
+        }
+        body.append(links, el('p', { class: 'fine' }, `Trail from Te Araroa Trust’s ${d.season || 'current'} GPS files (teararoa.org.nz, CC BY 4.0). Routes change between seasons: check the trail notes and alerts before you go.`));
+      }).catch(() => { if (alive()) body.replaceChildren(failed('Te Araroa could not be loaded. Check your connection.')); });
+      return () => { ctx.select(null); ctx.marker(null); ctx.range(null); };
     },
   }, { push });
 }

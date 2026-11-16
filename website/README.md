@@ -42,6 +42,10 @@ overview index and compiled walks from `native-wgpu/`, `capacitor/` and
   difficulty and dog rules. Browsers cannot read DOC's pages, so they are
   compiled here; refresh now and then with `node tools/walk-pages.mjs`
   (`FRESH=1` refetches all). DOC content is CC BY 4.0, credited on the site.
+- `data/te-araroa.json`: Te Araroa from the Te Araroa Trust's official Tracks
+  GPX (CC BY 4.0, credited on the site). The Trust refreshes it in November,
+  February, May and August: `node tools/te-araroa.mjs [ZIP URL]` (the URL from
+  https://www.teararoa.org.nz/notes-and-maps/, "Tracks GPX").
 - `data/gaps.json` (built from the app's gap atlas) marks where LINZ has no
   photography; Esri World Imagery is drawn there, as in the app. Esri's terms
   for commercial use need checking before launch.

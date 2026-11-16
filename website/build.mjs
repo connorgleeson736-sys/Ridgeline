@@ -131,6 +131,8 @@ for (const [guid, w] of Object.entries(walks)) {
   m[2] = w.kind || way?.shape || '';
 }
 writeFileSync(join(data, 'walks.json'), JSON.stringify(meta));
+// Te Araroa (tools/te-araroa.mjs), loaded by the map when its layer is on.
+if (existsSync(join(here, 'data/te-araroa.json'))) writeFileSync(join(data, 'te-araroa.json'), readFileSync(join(here, 'data/te-araroa.json')));
 // Each walk's DOC page (tools/walk-pages.mjs): summary and sections, one file per
 // walk, loaded only when its summary is opened.
 const pagesFile = join(here, 'data/walk-pages.json.gz');

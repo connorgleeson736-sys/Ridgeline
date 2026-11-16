@@ -7,6 +7,8 @@ const LINZ = 'https://basemaps.linz.govt.nz/v1';
 const key = encodeURIComponent(config.linzKey);
 export const NZ_BOUNDS = [[150, -58], [195, -24]];
 export const LINZ_ATTRIBUTION = '<a href="https://www.linz.govt.nz/" target="_blank" rel="noopener">© Toitū Te Whenua LINZ</a> CC BY 4.0';
+const TA_ATTRIBUTION = '<a href="https://www.teararoa.org.nz/" target="_blank" rel="noopener">Te Araroa Trust</a> CC BY 4.0';
+export const TE_ARAROA_COLOUR = '#ef3b5d';
 const DOC_ATTRIBUTION = '<a href="https://www.doc.govt.nz/" target="_blank" rel="noopener">Department of Conservation</a> CC BY 4.0';
 
 export const urls = {
@@ -33,12 +35,13 @@ export const GROUPS = {
   huts: ['nz-huts-dot', 'nz-huts-label'],
   contours: ['nz-contours-minor', 'nz-contours-index', 'nz-contours-label'],
   hunting: ['hunting-fill', 'hunting-line', 'hunting-names'],
+  teAraroa: ['te-araroa-halo', 'te-araroa', 'te-araroa-km'],
 };
 
 /** Whether a layer shows: its switch is on, and on Topo50 (which has its own tracks,
  * huts and names) only hunting areas are drawn over it, as in the app. */
 export function shown(id, settings) {
-  for (const [group, ids] of Object.entries(GROUPS)) if (ids.includes(id)) return !!settings[group] && (group === 'hunting' || settings.base !== 'topo');
+  for (const [group, ids] of Object.entries(GROUPS)) if (ids.includes(id)) return !!settings[group] && (group === 'hunting' || group === 'teAraroa' || settings.base !== 'topo');
   return true;
 }
 
@@ -123,6 +126,8 @@ function buildStyle({ topography, settings, dark }) {
       'ridgeline-tracks': { type: 'vector', tiles: ['bushline-vt://{z}/{x}/{y}'], minzoom: 12, maxzoom: 14, bounds: [165, -48, 179, -34] },
       // Cut no finer than 12: finer tiles draw nothing from it (see doc-walks).
       'doc-walks': { type: 'geojson', data: { type: 'FeatureCollection', features: [] }, tolerance: 0.6, buffer: 32, maxzoom: 12, attribution: DOC_ATTRIBUTION },
+      'te-araroa': { type: 'geojson', data: { type: 'FeatureCollection', features: [] }, tolerance: 0.4, buffer: 32, maxzoom: 14, attribution: TA_ATTRIBUTION },
+      'te-araroa-km': { type: 'geojson', data: { type: 'FeatureCollection', features: [] }, maxzoom: 14 },
       hunting: { type: 'geojson', data: { type: 'FeatureCollection', features: [] }, tolerance: 0.6, buffer: 16 },
       route: { type: 'geojson', data: { type: 'FeatureCollection', features: [] }, tolerance: 0, buffer: 32, maxzoom: 18 },
       waypoints: { type: 'geojson', data: { type: 'FeatureCollection', features: [] }, tolerance: 0, maxzoom: 18 },
@@ -152,6 +157,9 @@ function buildStyle({ topography, settings, dark }) {
       // tiles arrive; from 13 the map shows its zoom-12 tiles until finer ones load.
       { id: 'doc-walks-halo', type: 'line', source: 'doc-walks', minzoom: 9, filter: ['<', ['zoom'], 13], layout: { visibility: visible(shown('doc-walks', settings)), 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': 'rgba(15,30,31,.8)', 'line-width': 2.6 } },
       { id: 'doc-walks', type: 'line', source: 'doc-walks', minzoom: 9, filter: ['<', ['zoom'], 13], layout: { visibility: visible(shown('doc-walks', settings)), 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': '#f6db94', 'line-width': 1.2, 'line-dasharray': [3, 2] } },
+      // Te Araroa, the length of the country: red over the tracks it follows.
+      { id: 'te-araroa-halo', type: 'line', source: 'te-araroa', layout: { visibility: visible(shown('te-araroa', settings)), 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': 'rgba(40,10,16,.75)', 'line-width': ['interpolate', ['linear'], ['zoom'], 5, 2.6, 12, 4.4, 16, 6] } },
+      { id: 'te-araroa', type: 'line', source: 'te-araroa', layout: { visibility: visible(shown('te-araroa', settings)), 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': TE_ARAROA_COLOUR, 'line-width': ['interpolate', ['linear'], ['zoom'], 5, 1.3, 12, 2.4, 16, 3.4] } },
       // The selected walk or track, and the route being planned.
       // The app's track highlight: golden; with a section chosen, the rest dimmed.
       { id: 'selection-halo', type: 'line', source: 'selection', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': '#ffffff', 'line-width': 6, 'line-opacity': ['case', ['boolean', ['get', 'dim'], false], 0.45, 0.85] } },
@@ -160,6 +168,8 @@ function buildStyle({ topography, settings, dark }) {
       { id: 'route-line', type: 'line', source: 'route', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': 'rgb(232,121,68)', 'line-width': 3 } },
       ...symbols,
       { id: 'doc-walk-names', type: 'symbol', source: 'doc-walks', minzoom: 11, filter: ['all', ['==', ['get', 'large'], true], ['<', ['zoom'], 12]], layout: { visibility: visible(shown('doc-walks', settings)), 'symbol-placement': 'line-center', 'text-rotation-alignment': 'viewport', 'text-field': ['get', 'name'], 'text-font': ['Open Sans Regular'], 'text-size': 12, 'text-max-angle': 180, 'text-padding': 8, 'symbol-sort-key': 5 }, paint: { 'text-color': '#f6db94', 'text-halo-color': 'rgba(15,30,31,.9)', 'text-halo-width': 1.6 } },
+      // Te Araroa's kilometres: every 10th from zoom 11, each one from 13 (tile zoom).
+      { id: 'te-araroa-km', type: 'symbol', source: 'te-araroa-km', minzoom: 11, filter: ['any', ['>=', ['zoom'], 13], ['==', ['%', ['get', 'km'], 10], 0]], layout: { visibility: visible(shown('te-araroa-km', settings)), 'text-field': ['get', 'label'], 'text-font': ['Open Sans Bold'], 'text-size': 10.5, 'text-padding': 6, 'text-offset': [0, -0.9], 'symbol-sort-key': 20 }, paint: { 'text-color': '#ffd1da', 'text-halo-color': 'rgba(60,10,22,.95)', 'text-halo-width': 1.5 } },
       { id: 'hunting-names', type: 'symbol', source: 'hunting', minzoom: 11, filter: ['==', ['geometry-type'], 'Point'], layout: { visibility: visible(settings.hunting), 'text-field': ['get', 'name'], 'text-font': ['Open Sans Regular'], 'text-size': 11, 'text-max-width': 10, 'text-padding': 6 }, paint: { 'text-color': '#ffa25f', 'text-halo-color': 'rgba(20,20,20,.85)', 'text-halo-width': 1.4 } },
       // The app's route points: paper with an orange ring; selected, all orange and larger.
       { id: 'waypoints', type: 'circle', source: 'waypoints', paint: { 'circle-radius': ['case', ['boolean', ['get', 'selected'], false], 7.5, 4.5], 'circle-color': ['case', ['boolean', ['get', 'selected'], false], 'rgb(216,117,73)', 'rgb(250,250,245)'], 'circle-stroke-width': ['case', ['boolean', ['get', 'selected'], false], 1, 1.5], 'circle-stroke-color': 'rgb(216,117,73)', 'circle-pitch-alignment': 'viewport' } },

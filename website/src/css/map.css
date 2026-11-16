@@ -121,6 +121,7 @@ body.loading .progress { opacity: 1; }
 .check.disabled { opacity: .45; cursor: default; }
 .check .key { display: inline-block; width: 18px; height: 0; border-top: 2.5px dashed #c79a3b; vertical-align: middle; margin-right: 8px; }
 .check .key.huts { width: 10px; height: 10px; border: 1.5px solid #233d34; border-radius: 50%; background: #f6db94; }
+.check .key.te-araroa { border-top: 3px solid #ef3b5d; border-radius: 2px; box-shadow: 0 0 0 1px rgb(40 10 16 / .5); }
 .check .key.hunting { width: 14px; height: 10px; border: 1.5px dashed rgb(255 106 19); background: repeating-linear-gradient(-45deg, rgb(255 106 19 / 35%) 0 1.5px, transparent 1.5px 4px); }
 .relief { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 4px 10px; padding: 8px 0; font-size: 14px; }
 .relief input { grid-column: 1 / -1; width: 100%; accent-color: var(--ink); }
@@ -280,3 +281,6 @@ body.sheet-open .maplibregl-ctrl-bottom-left, body.sheet-open .maplibregl-ctrl-b
   .doc-alerts { background: rgb(71 48 30); color: rgb(250 214 180); }
   .doc-alert { border-top-color: rgb(250 214 180 / .18); }
 }
+
+/* Te Araroa: step along the trail. */
+.ta-steps { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; margin: 10px 0 4px; }

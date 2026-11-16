@@ -19,7 +19,8 @@ import { attach as attachLabels } from './labels.js';
 import { attach as attachPlanner } from './planner.js';
 import { attach as attachSearch } from './search.js';
 import { Sheet } from './sheet.js';
-import { openWalk, openTrack, openHut, openHunting } from './details.js';
+import { openWalk, openTrack, openHut, openHunting, openTeAraroa } from './details.js';
+import * as teAraroa from './te-araroa.js';
 import { walkFor } from '../core/walks.js';
 import { el, icon, store, toast } from './ui.js';
 
@@ -37,7 +38,7 @@ const dark = matchMedia('(prefers-color-scheme: dark)');
 /** A finger (touch) or a mouse: tap targets are sized for it. */
 const coarse = matchMedia('(pointer: coarse)').matches;
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const DEFAULTS = { base: 'aerial', natural: true, threeD: true, relief: 1, names: true, peaks: true, roads: true, tracks: true, huts: true, contours: false, hunting: false };
+const DEFAULTS = { base: 'aerial', natural: true, threeD: true, relief: 1, names: true, peaks: true, roads: true, tracks: true, huts: true, contours: false, hunting: false, teAraroa: true };
 const settings = { ...DEFAULTS, ...store.get('settings', {}) };
 const saveSettings = () => store.set('settings', settings);
 
@@ -142,12 +143,26 @@ async function main() {
     flyTo: (p, zoom) => { const pad = sheetPadding(); map.flyTo({ center: p, zoom, pitch: settings.threeD ? Math.max(map.getPitch(), 45) : 0, offset: [(pad.left - pad.right) / 2, (pad.top - pad.bottom) / 2], duration: reducedMotion ? 0 : 1600, essential: true }); },
     openWalk: (guid) => openWalk(ctx, guid),
     openHut: (name, p) => openHut(ctx, name, p),
+    openTeAraroa: (i = null, options) => openTeAraroa(ctx, i, options),
     closeDetails: () => { if (!planner.active) sheet.close(); },
     note: (text) => { const n = $('drawing-note'); n.textContent = text || ''; n.hidden = !text; },
     openDrawer: () => openDrawer(),
     closeDrawer: () => closeDrawer(),
   };
   const overlays = attachOverlays(map, () => settings);
+  // Te Araroa: its line and kilometres, loaded the first time its layer is on.
+  let teAraroaLoaded = false;
+  const syncTeAraroa = () => {
+    if (teAraroaLoaded || !shown('te-araroa', settings)) return;
+    teAraroaLoaded = true;
+    teAraroa.load().then((d) => {
+      const f = teAraroa.features(d);
+      const put = () => { map.getSource('te-araroa')?.setData(f.lines); map.getSource('te-araroa-km')?.setData(f.km); };
+      if (map.getSource('te-araroa')) put(); else map.once('load', put);
+    }).catch(() => { teAraroaLoaded = false; });
+  };
+  const refreshOverlays = overlays.refresh;
+  overlays.refresh = () => { refreshOverlays(); syncTeAraroa(); };
   attachVector(map, () => shown('nz-tracks', settings));
   const labels = attachLabels(map, style.metadata.labels);
   ctx.overlays = overlays;
@@ -242,6 +257,16 @@ async function main() {
       const hut = nearestFeature(point, ['nz-huts-dot', 'nz-huts-label'], 24);
       if (hut) { openHut(ctx, hut.properties.name || '', hut.geometry.type === 'Point' ? hut.geometry.coordinates : lngLat); return; }
     }
+    if (shown('te-araroa', settings)) {
+      const ta = nearestFeature(point, ['te-araroa'], 16);
+      const other = ta && shown('nz-tracks', settings) ? nearestFeature(point, ['nz-tracks', 'doc-walks'], 18) : null;
+      if (ta && (!other || pixelDistance(map, ta.geometry, point) <= pixelDistance(map, other.geometry, point) + 4)) {
+        const name = ta.properties.name || '';
+        const found = walkFor(longest(ta.geometry), name, overlays.walkLines(), overlays.infos());
+        openTeAraroa(ctx, ta.properties.i, { walk: found?.line.guid || null });
+        return;
+      }
+    }
     if (shown('nz-tracks', settings)) {
       const track = nearestFeature(point, ['nz-tracks', 'nz-tracks-label', 'doc-walks', 'doc-walk-names'], 18);
       if (track) {
@@ -271,7 +296,7 @@ async function main() {
   }
   const sameAsWalk = (a, b) => !!b && a.toLowerCase() === b.toLowerCase();
   // Pointer cursor over what can be tapped.
-  const tappable = ['nz-huts-dot', 'nz-huts-label', 'nz-tracks', 'nz-tracks-label', 'doc-walks', 'doc-walk-names'];
+  const tappable = ['nz-huts-dot', 'nz-huts-label', 'te-araroa', 'nz-tracks', 'nz-tracks-label', 'doc-walks', 'doc-walk-names'];
   for (const l of tappable) {
     map.on('mouseenter', l, () => { if (!planner.drawing) map.getCanvas().style.cursor = 'pointer'; });
     map.on('mouseleave', l, () => { if (!planner.drawing) map.getCanvas().style.cursor = ''; });
@@ -326,7 +351,7 @@ async function main() {
 
 /** The layers card, with the app's wording; only the settings that matter. */
 function layers(map, panel, button, { setThreeD, overlays, labels, resize, closeDrawer }) {
-  const toggles = [['roads', 'Roads & road names'], ['names', 'Place & water names'], ['tracks', 'Mapped walking tracks', 'tracks'], ['huts', 'Huts & bivouacs', 'huts'], ['contours', 'Contour lines & heights'], ['hunting', 'Hunting permit areas', 'hunting'], ['peaks', 'Peak labels']];
+  const toggles = [['roads', 'Roads & road names'], ['names', 'Place & water names'], ['tracks', 'Mapped walking tracks', 'tracks'], ['huts', 'Huts & bivouacs', 'huts'], ['contours', 'Contour lines & heights'], ['hunting', 'Hunting permit areas', 'hunting'], ['teAraroa', 'Te Araroa trail', 'te-araroa'], ['peaks', 'Peak labels']];
   const base = (id, label) => el('button', { class: 'base', type: 'button', 'data-base': id, onclick: () => setBase(id) }, el('span', { class: `swatch swatch-${id}` }), label);
   const reliefValue = el('output', {}, `${(+settings.relief).toFixed(1)}×`);
   const relief = el('input', { type: 'range', min: 1, max: 2, step: 0.1, value: settings.relief, 'aria-label': 'Terrain relief', oninput: (e) => { settings.relief = +e.target.value; reliefValue.textContent = `${settings.relief.toFixed(1)}×`; if (settings.threeD) map.setTerrain({ source: 'terrain', exaggeration: settings.relief }); saveSettings(); } });
