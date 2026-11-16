@@ -18,11 +18,12 @@ function tileBox(z, x, y) {
 
 class TileSet {
   constructor({ max, load, changed }) { this.max = max; this.load = load; this.changed = changed; this.tiles = new Map(); this.loading = new Map(); this.failed = new Map(); this.wanted = []; }
-  want(ids, center) {
+  /** The tiles to load: the `limit` nearest the centre of those in view, nearest first
+   * (the app's overlay priority). Tiles already loaded stay drawn (see current). */
+  want(ids, center, limit = Infinity) {
     const key = (t) => t.join('/');
     const cx = lonToX(center[0]), cy = latToY(center[1]);
-    // Nearest the centre first (the app's overlay priority).
-    this.wanted = ids.map((t) => ({ t, k: key(t), d: Math.hypot((t[1] + 0.5) / 2 ** t[0] - cx, (t[2] + 0.5) / 2 ** t[0] - cy) })).sort((a, b) => a.d - b.d);
+    this.wanted = ids.map((t) => ({ t, k: key(t), d: Math.hypot((t[1] + 0.5) / 2 ** t[0] - cx, (t[2] + 0.5) / 2 ** t[0] - cy) })).sort((a, b) => a.d - b.d).slice(0, limit);
     const keep = new Set(this.wanted.map((w) => w.k));
     for (const [k, c] of this.loading) if (!keep.has(k)) { c.abort(); this.loading.delete(k); }
     this.pump();
@@ -44,7 +45,9 @@ class TileSet {
       });
     }
   }
-  current() { return this.wanted.map((w) => this.tiles.get(w.k)).filter(Boolean); }
+  /** Everything loaded at data zoom z (all of it, up to the cache's size): tiles that
+   * leave the wanted set while the map moves are not dropped from the map. */
+  current(z) { const out = []; for (const [k, v] of this.tiles) if (z == null || k.startsWith(`${z}/`)) out.push(v); return out; }
   clear() { for (const c of this.loading.values()) c.abort(); this.loading.clear(); this.wanted = []; }
 }
 
@@ -65,7 +68,7 @@ function anchor(geometry) {
 
 export function attach(map, settings) {
   let infos = {};
-  let walkDirty = false, huntDirty = false, frame = 0;
+  let walkDirty = false, huntDirty = false, frame = 0, huntZ = 8, lastHuntZ = null, shownHuntZ = 8;
   const flush = () => {
     frame = 0;
     if (walkDirty) {
@@ -82,7 +85,10 @@ export function attach(map, settings) {
     if (huntDirty) {
       huntDirty = false;
       const seen = new Set(), features = [];
-      for (const list of huntSet.current()) for (const f of list) {
+      // The areas at the current data zoom; until its first tile arrives, those already drawn.
+      let lists = huntSet.current(huntZ);
+      if (lists.length) shownHuntZ = huntZ; else lists = huntSet.current(shownHuntZ);
+      for (const list of lists) for (const f of list) {
         const id = f.properties.OBJECTID;
         if (seen.has(id)) continue;
         seen.add(id);
@@ -109,8 +115,8 @@ export function attach(map, settings) {
   }
   function update() {
     const s = settings(), v = view();
-    if (s.tracks && s.base !== 'topo' && v.zoom >= WALK_MIN - 0.5) walkSet.want(tilesFor(clampTo(v.box, v.center, 1.6), WALK_ZOOM).slice(0, 40), v.center); else walkSet.want([], v.center);
-    if (s.hunting && v.zoom >= HUNT_MIN) { const z = huntZoom(v.zoom); huntSet.want(tilesFor(clampTo(v.box, v.center, 4 / 2 ** (z - 8)), z).slice(0, 48), v.center); } else huntSet.want([], v.center);
+    if (s.tracks && s.base !== 'topo' && v.zoom >= WALK_MIN - 0.5) walkSet.want(tilesFor(clampTo(v.box, v.center, 4), WALK_ZOOM), v.center, 80); else walkSet.want([], v.center);
+    if (s.hunting && v.zoom >= HUNT_MIN) { huntZ = huntZoom(v.zoom); huntSet.want(tilesFor(clampTo(v.box, v.center, 8 / 2 ** (huntZ - 8)), huntZ), v.center, 64); if (huntZ !== lastHuntZ) { lastHuntZ = huntZ; huntDirty = true; schedule(); } } else huntSet.want([], v.center);
   }
   const clampTo = (box, c, deg) => [Math.max(box[0], c[0] - deg), Math.max(box[1], c[1] - deg), Math.min(box[2], c[0] + deg), Math.min(box[3], c[1] + deg)];
   let timer = 0;

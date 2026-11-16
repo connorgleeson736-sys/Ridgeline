@@ -56,10 +56,24 @@ export function grade(layer, natural) {
 }
 export const ESRI_ATTRIBUTION = '<a href="https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9" target="_blank" rel="noopener">Esri World Imagery &amp; contributors</a>';
 
+const TRACK_LAYERS = new Set(['nz-tracks-halo', 'nz-tracks', 'nz-tracks-label', 'nz-huts-dot', 'nz-huts-label']);
+
 /** The whole style. `topography`: the app's layers (data/topography-style.json). */
 export function build({ topography, settings, dark }) {
   const visible = (on) => (on ? 'visible' : 'none');
-  const topoLayers = topography.map((l) => ({ ...l, layout: { ...(l.layout || {}), visibility: visible(shown(l.id, settings)) } }));
+  const topoLayers = topography.map((l) => {
+    const layer = { ...l, layout: { ...(l.layout || {}), visibility: visible(shown(l.id, settings)) } };
+    // Tracks and huts read their own copy of the tiles, never coarser than zoom 12
+    // (LINZ's tiles carry tracks only from 12): a tilted view's distant, coarser
+    // tiles would otherwise drop the tracks far away while near ones show.
+    if (TRACK_LAYERS.has(l.id)) {
+      layer.source = 'ridgeline-tracks';
+      // Loaded from zoom 11.5 but drawn from 12, so the map's tracks are in hand
+      // when DOC's lines hand over to them.
+      if (l.type === 'line') { layer.minzoom = 11.5; layer.paint = { ...l.paint, 'line-opacity': ['step', ['zoom'], 0, 12, l.paint?.['line-opacity'] ?? 1] }; }
+    }
+    return layer;
+  });
   // Names and lines go above routes' lines but labels stay on top: split the app's
   // layers into lines and symbols so DOC walks and routes sit between them.
   const lines = topoLayers.filter((l) => l.type !== 'symbol' && l.type !== 'circle');
@@ -82,6 +96,7 @@ export function build({ topography, settings, dark }) {
       topo: { type: 'raster', tiles: [urls.topo], tileSize: 256, maxzoom: 16, bounds: [165, -49, 180, -33], attribution: '<a href="https://www.linz.govt.nz/products-services/maps/new-zealand-topographic-maps" target="_blank" rel="noopener">Topo50 © Toitū Te Whenua LINZ</a> CC BY 4.0' },
       terrain: { type: 'raster-dem', tiles: [urls.elevation], tileSize: 256, maxzoom: 18, encoding: 'mapbox', bounds: [165, -48, 179, -34] },
       'ridgeline-topography': { type: 'vector', tiles: [urls.vector], minzoom: 0, maxzoom: 14, bounds: [165, -48, 179, -34] },
+      'ridgeline-tracks': { type: 'vector', tiles: [urls.vector], minzoom: 12, maxzoom: 14, bounds: [165, -48, 179, -34] },
       'doc-walks': { type: 'geojson', data: { type: 'FeatureCollection', features: [] }, tolerance: 0.6, buffer: 32, attribution: DOC_ATTRIBUTION },
       hunting: { type: 'geojson', data: { type: 'FeatureCollection', features: [] }, tolerance: 0.6, buffer: 16 },
       route: { type: 'geojson', data: { type: 'FeatureCollection', features: [] }, tolerance: 0, buffer: 32, maxzoom: 18 },

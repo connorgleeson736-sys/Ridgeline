@@ -247,7 +247,7 @@ async function main() {
         // of a large walk opens as itself (the app's DocWalks.CHILD_NAMES).
         const section = found?.named && name && map.getZoom() >= 15 && !sameAsWalk(name, overlays.infos()[found.line.guid]?.name);
         if (found && !section) { openWalk(ctx, found.line.guid); return; }
-        const pieces = name ? map.querySourceFeatures('ridgeline-topography', { sourceLayer: 'streets', filter: ['==', ['get', 'name'], name] }).flatMap((f) => lines(f.geometry)) : [geom];
+        const pieces = name ? map.querySourceFeatures('ridgeline-tracks', { sourceLayer: 'streets', filter: ['==', ['get', 'name'], name] }).flatMap((f) => lines(f.geometry)) : [geom];
         openTrack(ctx, name || 'Track', lngLat, pieces.length ? pieces : [geom]);
         return;
       }
