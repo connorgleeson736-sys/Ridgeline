@@ -49,6 +49,10 @@ overview index and compiled walks from `native-wgpu/`, `capacitor/` and
   files in November, February, May and August: `node tools/te-araroa.mjs`
   (set `TA_SEASON`, e.g. `2027_28`, for a new season). Section status and alerts
   are live, relayed by `functions/api/te-araroa/` (`worker/te-araroa.js`).
+- `data/te-araroa-resupply.json`: Te Araroa's usual food stops (supermarket, small
+  store, or send-a-box), hand-kept from walkers' published resupply guides; the
+  tool places them on the trail and adds the shops the Trust's notes name. Check
+  it each season. `TA_CACHE=<folder>` keeps the tool's downloads between runs.
 - `data/gaps.json` (built from the app's gap atlas) marks where LINZ has no
   photography; Esri World Imagery is drawn there, as in the app. Esri's terms
   for commercial use need checking before launch.

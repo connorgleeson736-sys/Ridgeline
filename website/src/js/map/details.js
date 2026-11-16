@@ -167,6 +167,8 @@ export function openWalk(ctx, guid, { push = false } = {}) {
         ctx.sheet.setTitle(name, subtitle);
         ctx.sheet.setPhoto(info?.thumbnail || o.image, name);
         if (line.length >= 2) { ctx.select([line]); ctx.fit(line); }
+        const taWalk = teAraroaLinks(ctx, line);
+        if (taWalk) body.append(taWalk);
         body.append(chips((o.distance || fact[0]) && `DOC: ${o.distance || fact[0]}`, (o.time || fact[1]) && `Time: ${o.time || fact[1]}`, fact[2] === 'loop' ? 'Loop' : fact[2] === 'one_way' ? 'One way' : null, (o.dogs || fact[3]) && (o.dogs || fact[3]).split('.')[0]));
         const partRow = el('div', { class: 'parts', hidden: true });
         const partText = el('div', { class: 'part-text', hidden: true });
@@ -248,6 +250,8 @@ export function openTrack(ctx, name, tapped, pieces, { push = false } = {}) {
       const controller = new AbortController();
       const line = chain(pieces, tapped);
       if (line.length >= 2) ctx.select([line]);
+      const taTrack = teAraroaLinks(ctx, line);
+      if (taTrack) body.append(taTrack);
       body.append(line.length >= 2 ? profileBlock(ctx, line, alive) : busy());
       const extra = el('div');
       body.append(extra);
@@ -258,7 +262,10 @@ export function openTrack(ctx, name, tapped, pieces, { push = false } = {}) {
         extra.append(chips(t.type, t.status && !/^open$/i.test(t.status) ? `Status: ${t.status}` : null, t.dogs && `Dogs: ${t.dogs}`));
         extra.append(el('p', { class: 'fine' }, DOC_NOTE));
       }).catch(() => {});
-      body.append(el('div', { class: 'sheet-actions' }, line.length >= 2 ? el('button', { class: 'btn', type: 'button', onclick: () => ctx.planner.fromLine(name || 'Track', line) }, 'Save as route') : null));
+      body.append(el('div', { class: 'sheet-actions' }, ...[
+        line.length >= 2 ? el('button', { class: 'btn', type: 'button', onclick: () => ctx.planner.startTemp(nearestOn(line, tapped).at || tapped, name ? `From ${name}` : 'New route') }, 'Start a route here') : null,
+        line.length >= 2 ? el('button', { class: 'btn', type: 'button', onclick: () => ctx.planner.fromLine(name || 'Track', line) }, 'Save as route') : null,
+      ].filter(Boolean)));
       return () => { controller.abort(); ctx.select(null); ctx.marker(null); ctx.range(null); };
     },
   }, { push });
@@ -291,6 +298,29 @@ function taAlertsBox(slug) {
   return box;
 }
 
+/** The Trust's time, its first part ("5 days walking, 2–3 days biking" → "5 days walking"). */
+const shortTime = (t) => (t || '').split(/[,;(]/)[0].trim();
+const stopLine = (r) => [teAraroa.LEVELS[r.level], !teAraroa.onTrail(r) && `${km(r.off / 1000)} km off the trail`, r.bounce && 'boxes'].filter(Boolean).join(' · ');
+
+/** Food for a section: stops in it, and the nearest ones behind and ahead. */
+function taFood(ctx, d, s, at) {
+  if (s.from == null) return null;
+  const here = d.resupply.filter((r) => r.km >= s.from - 0.05 && r.km <= s.to + 0.05);
+  const from = at ?? s.from, to = at ?? s.to;
+  const behind = teAraroa.foodAround(d, from).behind, ahead = teAraroa.foodAround(d, to).ahead;
+  const row = (label, r, dist) => el('li', {}, el('button', { type: 'button', onclick: () => openTeAraroaStop(ctx, d.resupply.indexOf(r), { push: true }) },
+    el('span', { class: `food-dot ${r.level}` }),
+    el('span', { class: 'hut-name' }, `${label}${r.name}`, el('small', {}, stopLine(r))),
+    el('span', { class: 'hut-km' }, dist)));
+  const rows = [];
+  if (behind && !here.includes(behind)) rows.push(row('Behind: ', behind, `${km(from - behind.km)} km back`));
+  for (const r of here) rows.push(row('', r, at != null ? `${r.km >= at ? '+' : '−'}${km(Math.abs(r.km - at))} km` : `km ${km(r.km)}`));
+  if (ahead && !here.includes(ahead)) rows.push(row('Next: ', ahead, `${km(ahead.km - to)} km · ${teAraroa.daysText(teAraroa.days(d, to, ahead.km))}`));
+  const hitch = d.resupply.filter((r) => !teAraroa.onTrail(r) && r.km >= s.from - 0.05 && r.km <= s.to + 0.05 && !here.includes(r));
+  for (const r of hitch) rows.push(row('Hitch: ', r, `km ${km(r.km)}`));
+  return rows.length ? el('div', { class: 'huts ta-food' }, el('h3', {}, 'Food'), el('ul', { class: 'hut-list' }, rows)) : null;
+}
+
 /** Huts, campsites and holiday parks along a section, with their kilometres. */
 function taPlaces(ctx, d, s, at) {
   const list = d.places.filter((p) => p.section === s.slug);
@@ -303,9 +333,79 @@ function taPlaces(ctx, d, s, at) {
       el('span', { class: 'hut-km' }, at != null && Math.abs(p.km - at) >= 0.1 ? `${p.km > at ? '+' : '−'}${km(Math.abs(p.km - at))} km` : `km ${km(p.km)}`))))));
 }
 
-/** One section of Te Araroa (or, with no section, the whole trail and its sections).
- * `at`: the kilometre tapped, if any. */
-export function openTeAraroa(ctx, slug = null, { push = false, at = null, walk = null } = {}) {
+/** An option (bypass, water or ferry leg) as a card: what it is, why, where, how long. */
+function optionCard(ctx, d, o, onOpen) {
+  const kind = teAraroa.optionKind(o);
+  const main = d.mains.filter((m) => o.from != null && Math.min(m.to, o.to) - Math.max(m.from, o.from) > 0.3);
+  const instead = o.to > o.from ? o.to - o.from : null;
+  const badge = el('span', { class: 'ta-badge', hidden: true });
+  teAraroa.status().then((st) => { const v = st?.[o.slug]; if (v && (v.alerts || !/^open$/i.test(v.status))) { badge.hidden = false; badge.textContent = v.alerts ? `${v.alerts} alert${v.alerts > 1 ? 's' : ''}` : v.status; } });
+  return el('button', { type: 'button', class: 'ta-option', onclick: () => onOpen(o) },
+    el('span', { class: 'ta-option-kind' }, kind.label, badge),
+    el('b', {}, o.name),
+    el('small', {}, [o.length && `${km(o.length)} km`, shortTime(o.time), instead && `instead of km ${km(o.from)}–${km(o.to)} (${km(instead)} km)`].filter(Boolean).join(' · ')),
+    el('small', {}, kind.why, main.length ? ` Replaces part of ${main.map((m) => m.name).join(', ')}.` : ''));
+}
+
+/** A section's contents (in its own panel, or inline under its row in the list). */
+function renderSection(ctx, d, s, body, alive, { at = null, walk = null, inline = false } = {}) {
+  const line = teAraroa.sectionLine(d, s);
+  if (line.length >= 2) { ctx.select([line]); ctx.fit(line); }
+  const range = s.from != null ? (s.alternative ? `Leaves the trail at km ${km(s.from)}, rejoins at km ${km(s.to)}` : `km ${km(s.from)}–${km(s.to)} southbound · ${km(nobo(d, s.to))}–${km(nobo(d, s.from))} northbound`) : '';
+  body.append(chips(range, s.length && `Te Araroa: ${km(s.length)} km`, at != null && `Tapped: km ${km(at)} (NOBO ${km(nobo(d, at))})`));
+  if (s.alternative) { const k = teAraroa.optionKind(s); body.append(el('p', { class: 'ta-why' }, el('b', {}, `${k.label}. `), k.why)); }
+  const road = teAraroa.roadShare(d, s);
+  body.append(el('div', { class: 'stats' },
+    statBox('Time', shortTime(s.time) || '–'), statBox('Grade', teAraroa.GRADES[s.grade] || '–'),
+    statBox('Type', s.kind === 'multi' ? 'Multi-day' : s.kind === 'day' ? 'Day walk' : '–'), statBox('On roads', road == null ? '–' : `${Math.round(road * 100)}%`)));
+  const profile = line.length >= 2 ? profileBlock(ctx, line, alive) : null;
+  if (profile) body.append(profile);
+  const intro = el('div', { class: 'intro' });
+  body.append(intro);
+  body.append(taAlertsBox(s.slug));
+  const food = taFood(ctx, d, s, at);
+  if (food) body.append(food);
+  // Options on this section (or, for an option, the sections it replaces), as cards.
+  const options = d.sections.filter((o) => o.alternative && o.from != null && s.from != null && o !== s && (s.alternative ? Math.abs(o.from - s.from) < 1 : o.from < s.to && o.to > s.from - 0.1));
+  const replaces = s.alternative ? d.mains.filter((m) => Math.min(m.to, s.to) - Math.max(m.from, s.from) > 0.3) : [];
+  if (replaces.length) body.append(el('div', { class: 'ta-options' }, el('h3', {}, 'The trail it replaces'), ...replaces.map((m) => el('button', { class: 'btn', type: 'button', onclick: () => openTeAraroa(ctx, m.slug) }, `${m.n}. ${m.name}`))));
+  if (options.length) body.append(el('div', { class: 'ta-options' }, el('h3', {}, s.alternative ? 'Other options here' : 'Bypasses and options'), ...options.map((o) => optionCard(ctx, d, o, (x) => openTeAraroa(ctx, x.slug, { push: true })))));
+  const places = taPlaces(ctx, d, s, at);
+  if (places) body.append(places);
+  if (profile && !s.alternative && s.to > s.from) {
+    const total = s.to - s.from;
+    const marks = d.places.filter((p) => p.section === s.slug && /hut/i.test(p.type)).map((p) => [((p.km - s.from) / total) * length(line), p.name]);
+    if (marks.length) profile.chart.setMarkers(marks);
+  }
+  const parts = el('div', { class: 'doc-sections' });
+  body.append(parts);
+  teAraroa.notes(s.slug).then((n) => {
+    if (!alive() || !n) return;
+    if (n.intro) intro.append(safeHtml(n.intro));
+    for (const [title, html] of [['The walk', n.walk], ['Getting there', n.access], ['Transport', n.transport], ['Accommodation', n.accommodation], ['Food and supplies', n.food], ['Track conditions and hazards', n.conditions]]) {
+      if (!html || !html.replace(/<[^>]+>|&nbsp;|\s/g, '')) continue;
+      const content = el('div', { class: 'doc-section-body' });
+      const item = el('details', { class: 'doc-section', ontoggle: () => { if (item.open && !content.childElementCount) content.append(safeHtml(html)); } }, el('summary', {}, title), content);
+      parts.append(item);
+    }
+  });
+  const index = d.mains.indexOf(s), prev = d.mains[index - 1], next = d.mains[index + 1];
+  if (!s.alternative && !inline) body.append(el('div', { class: 'ta-steps' },
+    el('button', { class: 'btn', type: 'button', disabled: !prev, title: prev?.name || '', onclick: () => openTeAraroa(ctx, prev.slug) }, '← Previous'),
+    el('button', { class: 'btn', type: 'button', onclick: () => openTeAraroa(ctx, null) }, 'All sections'),
+    el('button', { class: 'btn', type: 'button', disabled: !next, title: next?.name || '', onclick: () => openTeAraroa(ctx, next.slug) }, 'Next →')));
+  const walkName = walk && ctx.overlays.infos()[walk]?.name;
+  body.append(el('div', { class: 'sheet-actions' }, ...[
+    inline ? el('button', { class: 'btn', type: 'button', onclick: () => openTeAraroa(ctx, s.slug, { push: true }) }, 'Open on its own') : null,
+    line.length >= 2 ? el('button', { class: 'btn', type: 'button', onclick: () => ctx.planner.fromLine(`Te Araroa: ${s.name}`, line) }, 'Save as route') : null,
+    walkName ? el('button', { class: 'btn', type: 'button', onclick: () => ctx.openWalk(walk) }, `DOC: ${walkName}`) : null,
+    docLink(teAraroa.sectionPage(s.slug), 'Section on Te Araroa ↗'),
+  ].filter(Boolean)));
+  if (!inline) body.append(el('p', { class: 'fine' }, `From Te Araroa Trust’s ${d.season} trail data and section notes (teararoa.org.nz, CC BY 4.0); food stops from walkers’ resupply guides. Alerts are live from Te Araroa; check them, and the Trail App, before you go.`));
+}
+
+/** One section of Te Araroa (or, with no section, the whole trail). `at`: the km tapped. */
+export function openTeAraroa(ctx, slug = null, { push = false, at = null, walk = null, tab = null } = {}) {
   ctx.sheet.open({
     kind: 'te-araroa', title: 'Te Araroa', subtitle: 'Trail',
     render(body, alive) {
@@ -314,99 +414,91 @@ export function openTeAraroa(ctx, slug = null, { push = false, at = null, walk =
         if (!alive()) return;
         body.replaceChildren();
         const s = slug && d.bySlug[slug];
-        if (!s) return overview(ctx, d, body, alive);
-        const index = d.mains.indexOf(s);
-        ctx.sheet.setTitle(s.name, s.alternative ? `Te Araroa option · ${s.region || (s.island === 'SI' ? 'South Island' : 'North Island')}` : `Te Araroa · Section ${s.n} of ${d.sections.length} · ${s.region}`);
-        const line = teAraroa.sectionLine(d, s);
-        if (line.length >= 2) { ctx.select([line]); ctx.fit(line); }
-        // Where it is on the trail.
-        const range = s.from != null ? (s.alternative ? `Leaves the trail at km ${km(s.from)}, rejoins at km ${km(s.to)}` : `km ${km(s.from)}–${km(s.to)} southbound · ${km(nobo(d, s.to))}–${km(nobo(d, s.from))} northbound`) : '';
-        body.append(chips(range, s.length && `Te Araroa: ${km(s.length)} km`, at != null && `Tapped: km ${km(at)} (NOBO ${km(nobo(d, at))})`));
-        const road = teAraroa.roadShare(d, s);
-        body.append(el('div', { class: 'stats' },
-          statBox('Time', s.time || '–'), statBox('Grade', teAraroa.GRADES[s.grade] || '–'),
-          statBox('Type', s.kind === 'multi' ? 'Multi-day' : s.kind === 'day' ? 'Day walk' : '–'), statBox('On roads', road == null ? '–' : `${Math.round(road * 100)}%`)));
-        const profile = line.length >= 2 ? profileBlock(ctx, line, alive) : null;
-        if (profile) body.append(profile);
-        const intro = el('div', { class: 'intro' });
-        body.append(intro);
-        // The Trust's current alerts, after the profile and summary (as DOC's on walks).
-        body.append(taAlertsBox(s.slug));
-        // The options beside this section, and the section an option replaces.
-        const options = d.sections.filter((o) => o.alternative && o.from != null && s.from != null && o !== s && (s.alternative ? Math.abs(o.from - s.from) < 1 : o.from < s.to && o.to > s.from - 0.1));
-        const replaces = s.alternative ? d.mains.filter((m) => m.from < s.to + 0.1 && m.to > s.from - 0.1) : [];
-        if (options.length || replaces.length) body.append(el('div', { class: 'ta-options' }, el('h3', {}, s.alternative ? 'Instead of' : 'Options on this section'),
-          ...[...replaces, ...options].map((o) => el('button', { class: 'btn', type: 'button', onclick: () => openTeAraroa(ctx, o.slug) }, o.name))));
-        const places = taPlaces(ctx, d, s, at);
-        if (places) body.append(places);
-        if (profile) {
-          const total = s.to - s.from;
-          const marks = d.places.filter((p) => p.section === s.slug && /hut/i.test(p.type) && !s.alternative && total > 0).map((p) => [((p.km - s.from) / total) * length(line), p.name]);
-          if (marks.length) profile.chart.setMarkers(marks);
-        }
-        // The Trust's notes for the section, as collapsible parts.
-        const parts = el('div', { class: 'doc-sections' });
-        body.append(parts);
-        teAraroa.notes(s.slug).then((n) => {
-          if (!alive() || !n) return;
-          if (n.intro) intro.append(safeHtml(n.intro));
-          for (const [title, html] of [['The walk', n.walk], ['Getting there', n.access], ['Transport', n.transport], ['Accommodation', n.accommodation], ['Food and supplies', n.food], ['Track conditions and hazards', n.conditions]]) {
-            if (!html || !html.replace(/<[^>]+>|&nbsp;|\s/g, '')) continue;
-            const content = el('div', { class: 'doc-section-body' });
-            const item = el('details', { class: 'doc-section', ontoggle: () => { if (item.open && !content.childElementCount) content.append(safeHtml(html)); } }, el('summary', {}, title), content);
-            parts.append(item);
-          }
-        });
-        // Along the trail.
-        const prev = d.mains[index - 1], next = d.mains[index + 1];
-        if (!s.alternative) body.append(el('div', { class: 'ta-steps' },
-          el('button', { class: 'btn', type: 'button', disabled: !prev, title: prev?.name || '', onclick: () => openTeAraroa(ctx, prev.slug) }, '← Previous'),
-          el('button', { class: 'btn', type: 'button', onclick: () => openTeAraroa(ctx, null) }, 'All sections'),
-          el('button', { class: 'btn', type: 'button', disabled: !next, title: next?.name || '', onclick: () => openTeAraroa(ctx, next.slug) }, 'Next →')));
-        const walkName = walk && ctx.overlays.infos()[walk]?.name;
-        body.append(el('div', { class: 'sheet-actions' }, ...[
-          line.length >= 2 ? el('button', { class: 'btn', type: 'button', onclick: () => ctx.planner.fromLine(`Te Araroa: ${s.name}`, line) }, 'Save as route') : null,
-          walkName ? el('button', { class: 'btn', type: 'button', onclick: () => ctx.openWalk(walk) }, `DOC: ${walkName}`) : null,
-          docLink(teAraroa.sectionPage(s.slug), 'Section on Te Araroa ↗'),
-        ].filter(Boolean)));
-        body.append(el('p', { class: 'fine' }, `From Te Araroa Trust’s ${d.season} trail data and section notes (teararoa.org.nz, CC BY 4.0). Alerts are live from Te Araroa; check them, and the Trail App, before you go.`));
+        if (!s) return overview(ctx, d, body, alive, tab);
+        ctx.sheet.setTitle(s.name, s.alternative ? `Te Araroa · ${teAraroa.optionKind(s).label} · ${s.region || (s.island === 'SI' ? 'South Island' : 'North Island')}` : `Te Araroa · Section ${s.n} of ${d.sections.length} · ${s.region}`);
+        renderSection(ctx, d, s, body, alive, { at, walk });
       }).catch(() => { if (alive()) body.replaceChildren(failed('Te Araroa could not be loaded. Check your connection.')); });
       return () => { ctx.select(null); ctx.marker(null); ctx.range(null); };
     },
   }, { push });
 }
 
-/** The whole trail: its sections by region, with live status. */
-function overview(ctx, d, body, alive) {
-  ctx.sheet.setTitle('Te Araroa', `Cape Reinga to Bluff · ${km(d.total)} km · ${d.sections.length} sections`);
-  const all = d.pieces.map((p) => p.line);
-  ctx.select(all);
-  ctx.fit(all.flat());
+/** The whole trail: tabs for its sections (opening inline), its bypasses and options,
+ * and its food carries. */
+function overview(ctx, d, body, alive, tab) {
+  ctx.sheet.setTitle('Te Araroa', `Cape Reinga to Bluff · ${km(d.total)} km · ${d.mains.length} sections`);
+  const wholeView = () => { const all = d.pieces.map((p) => p.line); ctx.select(all); ctx.fit(all.flat()); };
+  wholeView();
   const north = d.mains.filter((s) => s.island === 'NI'), south = d.mains.filter((s) => s.island === 'SI');
   const sum = (list) => list.reduce((t, s) => t + (s.to - s.from), 0);
   body.append(el('div', { class: 'stats' }, statBox('Distance', `${km(d.total)} km`), statBox('North Island', `${Math.round(sum(north))} km`), statBox('South Island', `${Math.round(sum(south))} km`), statBox('Season', d.season || '–')));
-  body.append(el('p', { class: 'intro' }, 'Te Araroa, the Long Pathway, runs the length of Aotearoa New Zealand. Pick a section for its notes, profile, places to stay and current alerts, or tap the red line on the map. Dashed red lines are bypasses and water or ferry options.'));
   const counts = el('p', { class: 'muted ta-status-line' });
   body.append(counts);
-  const rows = new Map();
-  const list = el('div', { class: 'ta-sections' });
-  let region = null;
-  for (const s of d.sections) {
-    if (!s.alternative && s.region !== region) { region = s.region; list.append(el('h3', {}, region)); }
+  const panes = { sections: el('div', { class: 'ta-pane' }), options: el('div', { class: 'ta-pane' }), food: el('div', { class: 'ta-pane' }) };
+  const tabs = el('div', { class: 'ta-tabs', role: 'tablist' });
+  const show = (name) => {
+    for (const [k, pane] of Object.entries(panes)) pane.hidden = k !== name;
+    for (const b of tabs.children) b.setAttribute('aria-selected', String(b.dataset.tab === name));
+  };
+  for (const [k, label] of [['sections', 'Sections'], ['options', 'Bypasses & options'], ['food', 'Food carries']]) tabs.append(el('button', { type: 'button', role: 'tab', 'data-tab': k, onclick: () => show(k) }, label));
+  body.append(tabs, ...Object.values(panes));
+
+  // Sections: a row each, opening inline under itself (one at a time).
+  const badges = new Map();
+  let open = null;
+  const toggle = (s, row, slot) => {
+    if (open) { open.slot.replaceChildren(); open.slot.hidden = true; open.row.classList.remove('open'); open.alive.v = false; }
+    if (open?.s === s) { open = null; wholeView(); return; }
+    const flag = { v: true };
+    slot.hidden = false;
+    row.classList.add('open');
+    renderSection(ctx, d, s, slot, () => alive() && flag.v, { inline: true });
+    open = { s, row, slot, alive: flag };
+    requestAnimationFrame(() => row.scrollIntoView({ block: 'nearest', behavior: 'smooth' }));
+  };
+  const rowFor = (s, pane) => {
     const badge = el('span', { class: 'ta-badge', hidden: true });
-    const row = el('button', { type: 'button', class: `ta-row${s.alternative ? ' option' : ''}`, onclick: () => openTeAraroa(ctx, s.slug, { push: true }) },
+    const slot = el('div', { class: 'ta-inline', hidden: true });
+    const row = el('button', { type: 'button', class: 'ta-row', 'aria-expanded': 'false', onclick: () => { toggle(s, row, slot); row.setAttribute('aria-expanded', String(open?.s === s)); } },
       el('span', { class: 'ta-n' }, s.alternative ? '↳' : String(s.n)),
-      el('span', { class: 'ta-name' }, s.name, el('small', {}, [s.length && `${km(s.length)} km`, s.time, teAraroa.GRADES[s.grade]].filter(Boolean).join(' · '))),
+      el('span', { class: 'ta-name' }, s.name, el('small', {}, [s.length && `${km(s.length)} km`, shortTime(s.time), teAraroa.GRADES[s.grade]].filter(Boolean).join(' · '))),
       el('span', { class: 'ta-km' }, s.from != null ? `km ${Math.round(s.from)}` : ''), badge);
-    rows.set(s.slug, badge);
-    list.append(row);
+    badges.set(s.slug, badge);
+    pane.append(row, slot);
+  };
+  let region = null;
+  for (const s of d.mains) {
+    if (s.region !== region) { region = s.region; panes.sections.append(el('h3', {}, region)); }
+    rowFor(s, panes.sections);
   }
-  body.append(list);
+  // Bypasses and options: cards by island, each opening inline.
+  panes.options.append(el('p', { class: 'muted' }, 'Ways around parts of the trail: flood bypasses for rivers too high to cross, road bypasses, and the water and ferry legs. Dashed red on the map.'));
+  for (const island of ['NI', 'SI']) {
+    const list = d.sections.filter((o) => o.alternative && o.island === island);
+    if (!list.length) continue;
+    panes.options.append(el('h3', {}, island === 'NI' ? 'North Island' : 'South Island'));
+    for (const o of list) {
+      const slot = el('div', { class: 'ta-inline', hidden: true });
+      const card = optionCard(ctx, d, o, () => toggle(o, card, slot));
+      panes.options.append(card, slot);
+    }
+  }
+  // Food carries: from each stop on the trail to the next.
+  const carries = teAraroa.carries(d);
+  panes.food.append(el('p', { class: 'muted' }, 'How far you carry food between places to buy it, southbound. Days are rough, from the Trust’s section times. Stops a hitch away are listed under the carry they fall in.'),
+    el('p', { class: 'food-key' }, el('span', { class: 'food-dot full' }), 'Supermarket ', el('span', { class: 'food-dot limited' }), 'Small store ', el('span', { class: 'food-dot box' }), 'Send a box'));
+  const stopBtn = (r) => el('button', { type: 'button', class: 'food-stop', onclick: () => openTeAraroaStop(ctx, d.resupply.indexOf(r), { push: true }) }, el('span', { class: `food-dot ${r.level}` }), r.name, r.bounce ? el('small', {}, ' · boxes') : null);
+  panes.food.append(el('ol', { class: 'food-carries' }, carries.map((c) => el('li', { class: c.km >= 100 ? 'long' : '' },
+    el('div', { class: 'food-leg' }, stopBtn(c.from), el('span', { class: 'food-arrow' }, '→'), stopBtn(c.to)),
+    el('small', {}, `km ${Math.round(c.from.km)}–${Math.round(c.to.km)} · ${km(c.km)} km · ${teAraroa.daysText(c.days)}`),
+    c.hitch.length ? el('small', { class: 'food-hitch' }, 'Hitch: ', ...c.hitch.flatMap((r, i) => [i ? ', ' : '', el('button', { type: 'button', class: 'link', onclick: () => openTeAraroaStop(ctx, d.resupply.indexOf(r), { push: true }) }, `${r.name} (${km(r.off / 1000)} km)`)])) : null))));
+  show(tab || 'sections');
+
   teAraroa.status().then((st) => {
     if (!alive() || !st) return;
     let closed = 0, alerted = 0;
     for (const [slug, v] of Object.entries(st)) {
-      const badge = rows.get(slug);
+      const badge = badges.get(slug);
       if (!badge) continue;
       const shut = /clos/i.test(v.status), warn = !/^open$/i.test(v.status || 'open');
       if (shut) closed++;
@@ -416,7 +508,65 @@ function overview(ctx, d, body, alive) {
     counts.textContent = alerted || closed ? `Live from Te Araroa: ${alerted} section${alerted === 1 ? '' : 's'} with alerts${closed ? `, ${closed} closed` : ''}.` : 'Live from Te Araroa: no section alerts right now.';
   });
   body.append(el('div', { class: 'sheet-actions' }, ...[docLink(teAraroa.SITE, 'Te Araroa ↗'), docLink(teAraroa.NOTES, 'Trail notes & maps ↗'), docLink(teAraroa.ALERTS, 'Trail alerts ↗')].filter(Boolean)));
-  body.append(el('p', { class: 'fine' }, `From Te Araroa Trust’s ${d.season} trail data (teararoa.org.nz, CC BY 4.0).`));
+  body.append(el('p', { class: 'fine' }, `From Te Araroa Trust’s ${d.season} trail data (teararoa.org.nz, CC BY 4.0). Food stops from walkers’ resupply guides and the Trust’s notes: shops and hours change, so check before relying on one.`));
+}
+
+/** A place to buy food on Te Araroa: what is there, and the carries either side. */
+export function openTeAraroaStop(ctx, i, { push = false } = {}) {
+  ctx.sheet.open({
+    kind: 'te-araroa-stop', title: 'Te Araroa', subtitle: 'Food',
+    render(body, alive) {
+      teAraroa.load().then((d) => {
+        if (!alive()) return;
+        const r = d.resupply[i];
+        if (!r) return;
+        ctx.sheet.setTitle(r.name, `Te Araroa food · ${teAraroa.LEVELS[r.level] || ''}`);
+        ctx.marker(r.point);
+        ctx.flyTo?.(r.point, 12);
+        body.append(chips(`km ${km(r.km)} (NOBO ${km(nobo(d, r.km))})`, teAraroa.onTrail(r) ? 'On the trail' : `${km(r.off / 1000)} km off the trail: a hitch or detour`, r.bounce && 'Walkers send boxes here'));
+        if (r.note) body.append(el('p', { class: 'intro' }, r.note));
+        if (r.shops?.length) body.append(el('div', { class: 'huts' }, el('h3', {}, 'From the Trust’s notes'), el('ul', { class: 'plain-list' }, r.shops.map((t) => el('li', {}, t)))));
+        const on = d.resupply.filter(teAraroa.onTrail);
+        const prev = [...on].reverse().find((x) => x.km < r.km - 0.05), next = on.find((x) => x.km > r.km + 0.05);
+        const leg = (label, x, dist) => el('li', {}, el('button', { type: 'button', onclick: () => openTeAraroaStop(ctx, d.resupply.indexOf(x)) }, el('span', { class: `food-dot ${x.level}` }), el('span', { class: 'hut-name' }, `${label}${x.name}`, el('small', {}, stopLine(x))), el('span', { class: 'hut-km' }, dist)));
+        body.append(el('div', { class: 'huts' }, el('h3', {}, 'Carries from here'), el('ul', { class: 'hut-list' }, [
+          next && leg('Next south: ', next, `${km(next.km - r.km)} km · ${teAraroa.daysText(teAraroa.days(d, r.km, next.km))}`),
+          prev && leg('Next north: ', prev, `${km(r.km - prev.km)} km · ${teAraroa.daysText(teAraroa.days(d, prev.km, r.km))}`),
+        ].filter(Boolean))));
+        const s = d.mains.find((m) => r.km >= m.from - 0.05 && r.km <= m.to + 0.05);
+        body.append(el('div', { class: 'sheet-actions' }, ...[
+          s ? el('button', { class: 'btn', type: 'button', onclick: () => openTeAraroa(ctx, s.slug, { at: r.km, push: true }) }, `Section: ${s.name}`) : null,
+          el('button', { class: 'btn', type: 'button', onclick: () => openTeAraroa(ctx, null, { tab: 'food', push: true }) }, 'All food carries'),
+        ].filter(Boolean)));
+        body.append(el('p', { class: 'fine' }, 'From walkers’ resupply guides and Te Araroa Trust’s section notes (teararoa.org.nz, CC BY 4.0). Shops, hours and box arrangements change: check before relying on them.'));
+      });
+      return () => { ctx.marker(null); };
+    },
+  }, { push });
+}
+
+/** "Part of Te Araroa": the sections a walk or track runs along, linked. */
+export function teAraroaLinks(ctx, line) {
+  const d = teAraroa.loaded();
+  if (!d || !line || line.length < 2) return null;
+  const secs = teAraroa.sectionsAlong(d, line);
+  if (!secs.length) return null;
+  return el('div', { class: 'ta-link' }, el('span', { class: 'ta-link-mark', 'aria-hidden': 'true' }),
+    el('span', {}, el('b', {}, 'Part of Te Araroa'), el('small', {}, secs.length === 1 ? `Section ${secs[0].n} · km ${km(secs[0].from)}–${km(secs[0].to)}` : `${secs.length} sections`)),
+    el('span', { class: 'ta-link-buttons' }, ...secs.slice(0, 3).map((s) => el('button', { class: 'btn', type: 'button', onclick: () => openTeAraroa(ctx, s.slug, { push: true }) }, s.alternative ? s.name : `${s.n}. ${s.name}`))));
+}
+
+/** "On Te Araroa" for a hut the trail passes (within 400 m of one of its places). */
+function teAraroaHutLink(ctx, point) {
+  const d = teAraroa.loaded();
+  if (!d || !point) return null;
+  const k = Math.cos((point[1] * Math.PI) / 180);
+  const near = d.places.map((p) => ({ p, m: Math.hypot((p.point[0] - point[0]) * k, p.point[1] - point[1]) * 111320 })).sort((a, b) => a.m - b.m)[0];
+  if (!near || near.m > 400) return null;
+  const s = d.bySlug[near.p.section];
+  return el('div', { class: 'ta-link' }, el('span', { class: 'ta-link-mark', 'aria-hidden': 'true' }),
+    el('span', {}, el('b', {}, 'On Te Araroa'), el('small', {}, [`km ${km(near.p.km)}`, s && `Section ${s.n}`, near.p.pass && 'Te Araroa Pass'].filter(Boolean).join(' · '))),
+    el('span', { class: 'ta-link-buttons' }, s ? el('button', { class: 'btn', type: 'button', onclick: () => openTeAraroa(ctx, s.slug, { at: near.p.km, push: true }) }, s.name) : null));
 }
 
 /** A hut, campsite or holiday park on Te Araroa. */
@@ -437,6 +587,8 @@ export function openTeAraroaPlace(ctx, i, { push = false } = {}) {
         if (p.phone) body.append(el('p', {}, el('b', {}, 'Phone: '), el('a', { href: `tel:${p.phone.replace(/[^\d+]/g, '')}` }, p.phone)));
         const guid = guidOf(p.page);
         if (guid) body.append(alertsBox(guid, p.page));
+        const { behind, ahead } = teAraroa.foodAround(d, p.km);
+        if (ahead || behind) body.append(el('p', { class: 'muted' }, [ahead && `Next food south: ${ahead.name} (${km(ahead.km - p.km)} km)`, behind && `north: ${behind.name} (${km(p.km - behind.km)} km)`].filter(Boolean).join(' · ')));
         body.append(el('div', { class: 'sheet-actions' }, ...[
           s ? el('button', { class: 'btn', type: 'button', onclick: () => openTeAraroa(ctx, s.slug, { at: p.km }) }, `Section: ${s.name}`) : null,
           docLink(p.page, 'DOC page ↗'), docLink(p.website, 'Website ↗'),
@@ -465,6 +617,8 @@ export function openHut(ctx, name, point, { push = false } = {}) {
         ctx.sheet.setPhoto(page?.thumbnail, title);
         if (asset?.status && !/^open$/i.test(asset.status)) body.append(el('p', { class: 'alert' }, `DOC lists this hut as ${asset.status.toLowerCase()}.`));
         body.append(alertsBox(guidOf(page?.page), page?.page));
+        const taHut = teAraroaHutLink(ctx, point);
+        if (taHut) body.append(taHut);
         body.append(el('div', { class: 'stats' }, statBox('Bunks', /^\d+/.exec(asset?.bunks || '')?.[0] || '–'), statBox('Bookings', page ? (page.bookable ? 'Required' : 'Not needed') : '–'), statBox('Category', asset?.category || '–')));
         if (asset?.roadEnd) body.append(el('p', {}, el('b', {}, 'From the road end: '), asset.roadEnd));
         const facilities = page?.facilities?.length ? page.facilities : (asset?.facilities ? asset.facilities.split(/,\s*/) : []);

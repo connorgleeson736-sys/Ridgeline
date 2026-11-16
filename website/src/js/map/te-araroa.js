@@ -33,7 +33,8 @@ function decode(j) {
   const sections = j.sections.map((s) => ({ ...s, line: s.line ? s.line.map((c) => unpack(c)) : null }));
   const bySlug = Object.fromEntries(sections.map((s) => [s.slug, s]));
   const mains = sections.filter((s) => !s.alternative);
-  return (ready = { name: j.name, season: j.season, total: j.total, pieces, sections, mains, bySlug, places: j.places || [] });
+  for (const p of pieces) { let w = 180, so = 0, e = 0, n = -90; for (const [x, y] of p.line) { w = Math.min(w, x); e = Math.max(e, x); so = Math.min(so, y); n = Math.max(n, y); } p.box = [w, so, e, n]; }
+  return (ready = { name: j.name, season: j.season, total: j.total, pieces, sections, mains, bySlug, places: j.places || [], resupply: j.resupply || [] });
 }
 
 /** The trail's pieces in a section, in order, as one line (southbound). */
@@ -72,7 +73,8 @@ export function features(d) {
   const lines = d.pieces.map((p) => ({ type: 'Feature', properties: { kind: 'main', i: p.i, section: p.section }, geometry: { type: 'LineString', coordinates: p.line } }));
   for (const s of d.sections) if (s.alternative && s.line) lines.push({ type: 'Feature', properties: { kind: 'option', section: s.slug }, geometry: { type: 'MultiLineString', coordinates: s.line } });
   const places = d.places.map((p, i) => ({ type: 'Feature', properties: { i, name: p.name, type: p.type, hut: /hut/i.test(p.type) }, geometry: { type: 'Point', coordinates: p.point } }));
-  return { lines: { type: 'FeatureCollection', features: lines }, places: { type: 'FeatureCollection', features: places } };
+  const stops = d.resupply.map((r, i) => ({ type: 'Feature', properties: { i, name: r.name, level: r.level }, geometry: { type: 'Point', coordinates: r.point } }));
+  return { lines: { type: 'FeatureCollection', features: lines }, places: { type: 'FeatureCollection', features: places }, stops: { type: 'FeatureCollection', features: stops } };
 }
 
 const notesCache = new Map();
@@ -99,4 +101,93 @@ export function alerts(slug) {
   const promise = fetch(`/api/te-araroa/alerts/${encodeURIComponent(slug)}`).then((r) => (r.ok ? r.json() : null)).then((j) => (Array.isArray(j?.alerts) ? j.alerts : null)).catch(() => null);
   alertCache.set(slug, { promise, until: Date.now() + 5 * 60_000 });
   return promise;
+}
+
+// ---- Food: resupply stops and the carries between them ----
+export const LEVELS = { full: 'Supermarket', limited: 'Small store', box: 'Send a box' };
+/** A stop the trail reaches (within 3 km); further off it is a hitch. */
+export const onTrail = (r) => r.off <= 3000;
+
+/** The Trust's time for a section as [least, most] days, or null ("2–3 days", "6 hours"). */
+export function daysOf(time) {
+  const m = /(\d+(?:\.\d+)?)(?:\s*(?:-|–|to)\s*(\d+(?:\.\d+)?))?\s*(days?|hours?|hrs?|h\b|mins?)/i.exec(time || '');
+  if (!m) return null;
+  const lo = +m[1], hi = m[2] ? +m[2] : lo, unit = m[3].toLowerCase();
+  if (unit.startsWith('d')) return [lo, hi];
+  if (unit.startsWith('m')) return [lo / 480, hi / 480];
+  return [Math.min(lo, 10) / 8, Math.min(hi, 10) / 8];
+}
+
+/** Rough days to walk the trail from km a to km b: the Trust's section times for the
+ * part of each section in between (25 km a day where a section has none). */
+export function days(d, a, b) {
+  let lo = 0, hi = 0;
+  for (const s of d.mains) {
+    const part = Math.max(0, Math.min(b, s.to) - Math.max(a, s.from));
+    if (!part || s.to <= s.from) continue;
+    const t = daysOf(s.time), f = part / (s.to - s.from);
+    if (t) { lo += t[0] * f; hi += t[1] * f; } else { lo += part / 28; hi += part / 20; }
+  }
+  return [lo, hi];
+}
+export function daysText([lo, hi]) {
+  const r = (v) => Math.max(0.5, Math.round(v * 2) / 2);
+  if (hi < 0.75) return 'under a day';
+  return r(lo) === r(hi) ? `≈ ${r(lo)} day${r(lo) === 1 ? '' : 's'}` : `≈ ${r(lo)}–${r(hi)} days`;
+}
+
+/** The food carries southbound: from each stop on the trail to the next, with any
+ * stops a hitch away in between. */
+export function carries(d) {
+  const on = d.resupply.filter(onTrail);
+  const out = [];
+  for (let i = 1; i < on.length; i++) {
+    const a = on[i - 1], b = on[i];
+    if (b.km - a.km < 0.5) continue;
+    out.push({ from: a, to: b, km: b.km - a.km, days: days(d, a.km, b.km), hitch: d.resupply.filter((r) => !onTrail(r) && r.km >= a.km && r.km < b.km) });
+  }
+  return out;
+}
+/** The nearest stops with food behind and ahead of km (on the trail, or a hitch). */
+export function foodAround(d, km) {
+  const on = d.resupply.filter(onTrail);
+  return { behind: [...on].reverse().find((r) => r.km <= km - 0.05) || null, ahead: on.find((r) => r.km >= km + 0.05) || null };
+}
+
+/** Te Araroa sections a line (a walk or a track) runs along: those holding at least a
+ * few of its points within 60 m of the trail, in trail order. */
+export function sectionsAlong(d, line) {
+  if (!line || line.length < 2) return [];
+  const step = Math.max(1, Math.floor(line.length / 40)), pts = line.filter((_, i) => i % step === 0);
+  const tol = 60 / 111320, count = new Map();
+  for (const p of pts) {
+    const k = Math.cos((p[1] * Math.PI) / 180);
+    let best = null, bd = tol;
+    for (const piece of d.pieces) {
+      const b = piece.box;
+      if (p[0] < b[0] - tol / k || p[0] > b[2] + tol / k || p[1] < b[1] - tol || p[1] > b[3] + tol) continue;
+      const l = piece.line;
+      for (let i = 1; i < l.length; i++) {
+        const a = l[i - 1], c = l[i], dx = (c[0] - a[0]) * k, dy = c[1] - a[1], len = dx * dx + dy * dy;
+        const t = len ? Math.max(0, Math.min(1, (((p[0] - a[0]) * k) * dx + (p[1] - a[1]) * dy) / len)) : 0;
+        const dd = Math.hypot((a[0] - p[0]) * k + dx * t, a[1] - p[1] + dy * t);
+        if (dd < bd) { bd = dd; best = piece; }
+      }
+    }
+    if (best?.section) count.set(best.section, (count.get(best.section) || 0) + 1);
+  }
+  const need = Math.max(2, Math.ceil(pts.length * 0.15));
+  return [...count].filter(([, n]) => n >= need).map(([slug]) => d.bySlug[slug]).filter(Boolean).sort((a, b) => a.from - b.from);
+}
+
+/** What kind of option a bypass, water or ferry leg is. */
+export function optionKind(s) {
+  const n = s.name.toLowerCase();
+  if (/hazard zone/.test(n)) return { label: 'Flood bypass', why: 'For when the river is high: the Trust advises against crossing it then.' };
+  if (/interislander|ferry/.test(n)) return { label: 'Ferry', why: 'The crossing of Cook Strait.' };
+  if (/water taxi/.test(n)) return { label: 'Water taxi', why: 'By boat to the start of the Queen Charlotte Track.' };
+  if (/kayak|by water|canoe/.test(n)) return { label: 'By water', why: 'Paddled rather than walked.' };
+  if (/road bypass/.test(n)) return { label: 'Road bypass', why: 'A road route around this part of the trail.' };
+  if (/lake wakatipu/.test(n)) return { label: 'Bypass', why: 'Around Lake Wakatipu by road, instead of the boat across it.' };
+  return { label: 'Bypass', why: 'An alternative way around this part of the trail.' };
 }

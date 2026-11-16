@@ -35,7 +35,7 @@ export const GROUPS = {
   huts: ['nz-huts-dot', 'nz-huts-label'],
   contours: ['nz-contours-minor', 'nz-contours-index', 'nz-contours-label'],
   hunting: ['hunting-fill', 'hunting-line', 'hunting-names'],
-  teAraroa: ['te-araroa-halo', 'te-araroa-option', 'te-araroa', 'te-araroa-places', 'te-araroa-places-label'],
+  teAraroa: ['te-araroa-halo', 'te-araroa-option', 'te-araroa', 'te-araroa-places', 'te-araroa-places-label', 'te-araroa-food', 'te-araroa-food-label'],
 };
 
 /** Whether a layer shows: its switch is on, and on Topo50 (which has its own tracks,
@@ -128,6 +128,7 @@ function buildStyle({ topography, settings, dark }) {
       'doc-walks': { type: 'geojson', data: { type: 'FeatureCollection', features: [] }, tolerance: 0.6, buffer: 32, maxzoom: 12, attribution: DOC_ATTRIBUTION },
       'te-araroa': { type: 'geojson', data: { type: 'FeatureCollection', features: [] }, tolerance: 0.4, buffer: 32, maxzoom: 14, attribution: TA_ATTRIBUTION },
       'te-araroa-places': { type: 'geojson', data: { type: 'FeatureCollection', features: [] }, maxzoom: 14 },
+      'te-araroa-food': { type: 'geojson', data: { type: 'FeatureCollection', features: [] }, maxzoom: 14 },
       hunting: { type: 'geojson', data: { type: 'FeatureCollection', features: [] }, tolerance: 0.6, buffer: 16 },
       route: { type: 'geojson', data: { type: 'FeatureCollection', features: [] }, tolerance: 0, buffer: 32, maxzoom: 18 },
       waypoints: { type: 'geojson', data: { type: 'FeatureCollection', features: [] }, tolerance: 0, maxzoom: 18 },
@@ -171,8 +172,11 @@ function buildStyle({ topography, settings, dark }) {
       ...symbols,
       { id: 'doc-walk-names', type: 'symbol', source: 'doc-walks', minzoom: 11, filter: ['all', ['==', ['get', 'large'], true], ['<', ['zoom'], 12]], layout: { visibility: visible(shown('doc-walks', settings)), 'symbol-placement': 'line-center', 'text-rotation-alignment': 'viewport', 'text-field': ['get', 'name'], 'text-font': ['Open Sans Regular'], 'text-size': 12, 'text-max-angle': 180, 'text-padding': 8, 'symbol-sort-key': 5 }, paint: { 'text-color': '#f6db94', 'text-halo-color': 'rgba(15,30,31,.9)', 'text-halo-width': 1.6 } },
       // Te Araroa's campsites and holiday parks (huts are the map's own).
-      { id: 'te-araroa-places', type: 'circle', source: 'te-araroa-places', minzoom: 10, filter: ['!', ['get', 'hut']], layout: { visibility: visible(shown('te-araroa-places', settings)) }, paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 3, 14, 5], 'circle-color': '#fff4f6', 'circle-stroke-color': TE_ARAROA_COLOUR, 'circle-stroke-width': 2, 'circle-pitch-alignment': 'viewport' } },
+      { id: 'te-araroa-places', type: 'circle', source: 'te-araroa-places', minzoom: 10, filter: ['!', ['get', 'hut']], layout: { visibility: visible(shown('te-araroa-places', settings)) }, paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 1.8, 14, 3.2], 'circle-color': '#fff4f6', 'circle-stroke-color': TE_ARAROA_COLOUR, 'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 10, 1, 14, 1.5], 'circle-pitch-alignment': 'viewport' } },
       { id: 'te-araroa-places-label', type: 'symbol', source: 'te-araroa-places', minzoom: 12, filter: ['!', ['get', 'hut']], layout: { visibility: visible(shown('te-araroa-places', settings)), 'text-field': ['get', 'name'], 'text-font': ['Open Sans Regular'], 'text-size': 11, 'text-offset': [0, 1.1], 'text-anchor': 'top', 'text-max-width': 9, 'text-padding': 4, 'symbol-sort-key': 30 }, paint: { 'text-color': '#ffe3e8', 'text-halo-color': 'rgba(50,10,20,.9)', 'text-halo-width': 1.4 } },
+      // Where to buy food on Te Araroa: supermarkets filled, small stores and box-only stops ringed.
+      { id: 'te-araroa-food', type: 'circle', source: 'te-araroa-food', minzoom: 6, layout: { visibility: visible(shown('te-araroa-food', settings)) }, paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 6, 2.5, 10, 4.5, 14, 6], 'circle-color': ['match', ['get', 'level'], 'full', '#2f8f5b', 'limited', '#e9f6ee', '#ffffff'], 'circle-stroke-color': ['match', ['get', 'level'], 'box', TE_ARAROA_COLOUR, '#1f6b42'], 'circle-stroke-width': 1.8, 'circle-pitch-alignment': 'viewport' } },
+      { id: 'te-araroa-food-label', type: 'symbol', source: 'te-araroa-food', minzoom: 8, layout: { visibility: visible(shown('te-araroa-food', settings)), 'text-field': ['get', 'name'], 'text-font': ['Open Sans Bold'], 'text-size': 11, 'text-offset': [0, 1], 'text-anchor': 'top', 'text-padding': 4, 'symbol-sort-key': 12 }, paint: { 'text-color': '#e7f7ec', 'text-halo-color': 'rgba(12,40,24,.9)', 'text-halo-width': 1.4 } },
       { id: 'hunting-names', type: 'symbol', source: 'hunting', minzoom: 11, filter: ['==', ['geometry-type'], 'Point'], layout: { visibility: visible(settings.hunting), 'text-field': ['get', 'name'], 'text-font': ['Open Sans Regular'], 'text-size': 11, 'text-max-width': 10, 'text-padding': 6 }, paint: { 'text-color': '#ffa25f', 'text-halo-color': 'rgba(20,20,20,.85)', 'text-halo-width': 1.4 } },
       // The app's route points: paper with an orange ring; selected, all orange and larger.
       { id: 'waypoints', type: 'circle', source: 'waypoints', paint: { 'circle-radius': ['case', ['boolean', ['get', 'selected'], false], 7.5, 4.5], 'circle-color': ['case', ['boolean', ['get', 'selected'], false], 'rgb(216,117,73)', 'rgb(250,250,245)'], 'circle-stroke-width': ['case', ['boolean', ['get', 'selected'], false], 1, 1.5], 'circle-stroke-color': 'rgb(216,117,73)', 'circle-pitch-alignment': 'viewport' } },

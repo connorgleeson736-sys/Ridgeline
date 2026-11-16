@@ -1,0 +1,222 @@
+{
+  "_about": "Te Araroa's usual resupply stops, southbound, as walkers' published resupply guides describe them (BikeHikeSafari, Let's Trek It, Freewheeling Kiwi, Treks Travels Thoughts, sjcamacho, Sean Maskill and others, checked November 2026), with the bounce-box points the Te Araroa Trust confirms (St Arnaud, Boyle, Arthur's Pass). Facts only, in our own words. tools/te-araroa.mjs places each stop on the trail (its km, and how far off the trail) from the gazetteer and adds the shops named in the Trust's section notes. level: full (a supermarket: a full resupply), limited (a small store: top-ups, or a careful resupply), box (no shop worth relying on: send a box). Shops and hours change: check before relying on any of it.",
+  "stops": [
+    {
+      "name": "Ahipara",
+      "level": "limited",
+      "note": "Small store at the end of Ninety Mile Beach."
+    },
+    {
+      "name": "Kaitaia",
+      "level": "full",
+      "note": "Pak'nSave and other supermarkets, a short hitch from Ahipara."
+    },
+    {
+      "name": "Kerikeri",
+      "level": "full",
+      "note": "Countdown and New World."
+    },
+    {
+      "name": "Paihia",
+      "level": "full",
+      "note": "Supermarket and shops."
+    },
+    {
+      "name": "Whangārei",
+      "level": "full",
+      "note": "City, by a side trip from the trail."
+    },
+    {
+      "name": "Waipu",
+      "level": "limited",
+      "note": "Four Square."
+    },
+    {
+      "name": "Mangawhai Heads",
+      "level": "full",
+      "note": "Big New World; outdoor gas at the hardware store."
+    },
+    {
+      "name": "Auckland",
+      "level": "full",
+      "note": "Supermarkets along the way through the city's suburbs; outdoor stores."
+    },
+    {
+      "name": "Huntly",
+      "level": "limited",
+      "note": "Shops for snacks and lunch; most walkers do the full shop in Hamilton."
+    },
+    {
+      "name": "Hamilton",
+      "level": "full",
+      "note": "Full resupply; outdoor stores."
+    },
+    {
+      "name": "Te Kūiti",
+      "level": "full",
+      "note": "New World."
+    },
+    {
+      "name": "Taumarunui",
+      "level": "full",
+      "note": "New World."
+    },
+    {
+      "name": "National Park",
+      "level": "limited",
+      "note": "Small store; plan the Whanganui River food here or before."
+    },
+    {
+      "name": "Whanganui",
+      "level": "full",
+      "note": "City: full resupply after the river."
+    },
+    {
+      "name": "Bulls",
+      "level": "limited",
+      "note": "Small-town shops on the trail."
+    },
+    {
+      "name": "Feilding",
+      "level": "full",
+      "note": "Supermarkets on the trail before Palmerston North."
+    },
+    {
+      "name": "Palmerston North",
+      "level": "full",
+      "note": "City: several supermarkets; last big shop before the Tararua Range."
+    },
+    {
+      "name": "Levin",
+      "level": "full",
+      "note": "Supermarkets, a hitch off the trail."
+    },
+    {
+      "name": "Waikanae",
+      "level": "full",
+      "note": "Full resupply after the Tararua Range."
+    },
+    {
+      "name": "Wellington",
+      "level": "full",
+      "note": "City: full resupply and outdoor stores; many walkers send South Island boxes from here."
+    },
+    {
+      "name": "Picton",
+      "level": "full",
+      "note": "Supermarkets at the ferry terminal town."
+    },
+    {
+      "name": "Havelock",
+      "level": "full",
+      "note": "Four Square; walkers often send a box here for the Richmond Range.",
+      "bounce": true
+    },
+    {
+      "name": "Pelorus Bridge",
+      "level": "limited",
+      "note": "Café with snacks and meals only."
+    },
+    {
+      "name": "St Arnaud",
+      "level": "limited",
+      "note": "Small alpine store, basic food; send a box (the Trust lists the Alpine Lodge).",
+      "bounce": true,
+      "place": "St. Arnaud"
+    },
+    {
+      "name": "Boyle Village",
+      "level": "box",
+      "note": "No shop: send a box to the Boyle Outdoor Education Centre, or hitch to Hanmer Springs.",
+      "bounce": true
+    },
+    {
+      "name": "Hanmer Springs",
+      "level": "full",
+      "note": "Four Square and more, a hitch from Boyle Village or the Lewis Pass road."
+    },
+    {
+      "name": "Arthur's Pass",
+      "level": "limited",
+      "note": "Small store and café, very basic food; send a box.",
+      "bounce": true
+    },
+    {
+      "name": "Methven",
+      "level": "full",
+      "note": "SuperValue and Four Square, a hitch from the Rakaia River; boxes can be held in town.",
+      "bounce": true
+    },
+    {
+      "name": "Geraldine",
+      "level": "full",
+      "note": "FreshChoice, a hitch from the Rangitata River."
+    },
+    {
+      "name": "Lake Tekapo",
+      "level": "full",
+      "note": "Four Square; the post office can forward boxes.",
+      "bounce": true
+    },
+    {
+      "name": "Twizel",
+      "level": "full",
+      "note": "Four Square."
+    },
+    {
+      "name": "Lake Hāwea",
+      "level": "limited",
+      "note": "Small store and café; better to carry through to Wānaka."
+    },
+    {
+      "name": "Albert Town",
+      "level": "full",
+      "note": "Full resupply on the way into Wānaka."
+    },
+    {
+      "name": "Wānaka",
+      "level": "full",
+      "note": "New World; outdoor stores."
+    },
+    {
+      "name": "Arrowtown",
+      "level": "limited",
+      "note": "Convenience store for a basic resupply."
+    },
+    {
+      "name": "Frankton",
+      "level": "full",
+      "note": "Pak'nSave by the trail near Queenstown."
+    },
+    {
+      "name": "Queenstown",
+      "level": "full",
+      "note": "FreshChoice, Four Square and outdoor stores."
+    },
+    {
+      "name": "Te Anau",
+      "level": "full",
+      "note": "FreshChoice, a hitch of about 28 km from the trail; boxes can be held in town."
+    },
+    {
+      "name": "Tuatapere",
+      "level": "limited",
+      "note": "Small-town shops before Longwood Forest."
+    },
+    {
+      "name": "Riverton",
+      "level": "full",
+      "note": "SuperValue right by the trail."
+    },
+    {
+      "name": "Invercargill",
+      "level": "full",
+      "note": "City: Pak'nSave, Countdown and New World."
+    },
+    {
+      "name": "Bluff",
+      "level": "limited",
+      "note": "The end of the trail."
+    }
+  ]
+}

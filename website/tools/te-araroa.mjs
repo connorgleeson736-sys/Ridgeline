@@ -16,7 +16,7 @@
 // data/te-araroa-sections.json.gz (each section's notes, split per
 // section by build.mjs). The Trust refreshes its files in November, February, May
 // and August: the season's download links are on https://www.teararoa.org.nz/notes-and-maps/.
-import { writeFileSync } from 'node:fs';
+import { writeFileSync, readFileSync, existsSync, mkdirSync } from 'node:fs';
 import { inflateRawSync, gzipSync } from 'node:zlib';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -29,6 +29,14 @@ const EARTH_ZIP = process.env.TA_EARTH || `${SITE}/te_araroa_${SEASON.replace('_
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function get(url, as = 'buffer') {
+  // TA_CACHE=<folder>: keep downloads between runs (for working on this tool).
+  const cacheFile = process.env.TA_CACHE && join(process.env.TA_CACHE, url.replace(/[^a-z0-9]+/gi, '_').slice(-180));
+  if (cacheFile && existsSync(cacheFile)) { const b = readFileSync(cacheFile); return as === 'json' ? JSON.parse(b) : b; }
+  const value = await fetchRetry(url, as);
+  if (cacheFile) { mkdirSync(process.env.TA_CACHE, { recursive: true }); writeFileSync(cacheFile, as === 'json' ? JSON.stringify(value) : value); }
+  return value;
+}
+async function fetchRetry(url, as) {
   for (let attempt = 0; ; attempt++) {
     try {
       const r = await fetch(url, { headers: { 'User-Agent': 'Bushline Maps data refresh' } });
@@ -244,6 +252,56 @@ for (const p of places) {
 }
 placed.sort((a, b) => a.km - b.km);
 
+// ---- 4. Resupply: the usual stops (data/te-araroa-resupply.json, from walkers'
+// published resupply guides), placed on the trail, with the shops the Trust's section
+// notes name; and small stops near the trail that only the notes mention ----
+console.log('Resupply…');
+const gazetteer = readFileSync(join(here, '..', 'native-wgpu/android/app/src/main/assets/search/places.tsv'), 'utf8')
+  .split('\n').map((l) => l.split('\t')).filter((c) => c[0] === 'place' && /^(Town|City|Village|Locality|Suburb|Place)$/.test(c[6] || ''))
+  .map((c) => ({ name: c[1], point: [+c[4], +c[3]], type: c[6] }));
+const fold = (t) => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[’']/g, '');
+const RANK = { City: 0, Town: 1, Village: 2, Locality: 3, Suburb: 4, Place: 5 };
+const towns = new Map();
+for (const g of gazetteer) if (g.name.length >= 4) { const k = fold(g.name); if (!towns.has(k)) towns.set(k, []); towns.get(k).push(g); }
+const plain = (html) => unescape((html || '').replace(/<\/(h\d|li|p|div|ul)>/gi, '\n').replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, ' ')).replace(/[ \t]+/g, ' ').replace(/\n\s*/g, '\n').trim();
+const SHOP = /supermarket|new world|countdown|woolworths|pak.?n.?save|four square|4 square|freshchoice|fresh choice|supervalue|super value|foodway|superette/i;
+const SMALL = /dairy|general store|\bstore\b|shop|service (station|centre)|petrol|groceries|grocery|tearooms|caf[eé]|bakery/i;
+const curated = JSON.parse(readFileSync(join(here, 'data/te-araroa-resupply.json'), 'utf8')).stops;
+const stops = [];
+for (const c of curated) {
+  const list = (towns.get(fold(c.place || c.name)) || []).slice().sort((a, b) => (RANK[a.type] ?? 9) - (RANK[b.type] ?? 9));
+  const best = list.map((g) => ({ g, k: kmAt(g.point) })).sort((a, b) => (RANK[a.g.type] ?? 9) - (RANK[b.g.type] ?? 9) || a.k.d - b.k.d).find((x) => x.k.d < 60_000);
+  if (!best) { console.log(`  not placed: ${c.name}`); continue; }
+  stops.push({ name: c.name, point: best.g.point, km: Math.round(best.k.km * 10) / 10, off: Math.round(best.k.d), level: c.level, note: c.note || '', bounce: !!c.bounce, shops: [], from: 'guides' });
+}
+for (const s of sections) {
+  const text = plain(notes[s.slug]?.food);
+  if (!text) continue;
+  let heading = '';
+  const lines = text.split('\n').map((t) => t.trim()).filter(Boolean).map((t) => { if (t.length < 60 && !/[-–:]\s|\d{3}/.test(t)) heading = t; return { t, heading }; });
+  for (const { t, heading: h } of lines) {
+    // "There is no shop…", "no supplies": not a stop.
+    const none = /\b(no|not any|nor)\s+(retail\s+)?(shops?|stores?|supermarkets?|supplies|food|groceries|resupply)\b|there (is|are) no\b|closed (down|permanently)/i.test(t);
+    const level = none ? '' : SHOP.test(t) ? 'full' : SMALL.test(t) ? 'limited' : '';
+    const hay = fold(`${h} ${t}`);
+    for (const [k, list] of towns) {
+      if (!hay.includes(k) || !new RegExp(`(^|[^a-z])${k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}([^a-z]|$)`).test(hay)) continue;
+      const near = list.map((g) => ({ g, k: kmAt(g.point) })).sort((a, b) => a.k.d - b.k.d)[0];
+      if (!near) continue;
+      // The same stop as one already listed (by name, or within 5 km).
+      let e = stops.find((x) => fold(x.name) === fold(near.g.name) || metres(x.point, near.g.point) < 5000);
+      if (!e) {
+        // A stop only the notes name: a shop within 3 km of the trail.
+        if (!level || near.k.d > 3000) continue;
+        e = { name: near.g.name, point: near.g.point, km: Math.round(near.k.km * 10) / 10, off: Math.round(near.k.d), level, note: '', bounce: false, shops: [], from: 'notes' };
+        stops.push(e);
+      } else if (e.from === 'notes' && level === 'full') e.level = 'full';
+      const line = t.replace(/\s*-\s*P:.*$/, '').replace(/\s+/g, ' ').slice(0, 140);
+      if ((level || /bounce/i.test(line)) && fold(line) !== k && !e.shops.includes(line) && e.shops.length < 5) e.shops.push(line);
+    }
+  }
+}
+const resupply = stops.sort((a, b) => a.km - b.km);
 const index = {
   name: trailName, season: (/(\d{4}-\d{2})/.exec(trailName) || [])[1] || '', total,
   pieces: pieces.map((p) => {
@@ -254,7 +312,9 @@ const index = {
   }),
   sections: sections.map(({ line, ...s }) => ({ ...s, line: line && line.map((l) => pack(l)) })),
   places: placed,
+  resupply,
 };
 writeFileSync(join(here, 'data/te-araroa.json'), JSON.stringify(index));
 writeFileSync(join(here, 'data/te-araroa-sections.json.gz'), gzipSync(JSON.stringify(notes)));
-console.log(JSON.stringify({ trail: trailName, km: total, pieces: pieces.length, sections: sections.length, options: sections.filter((s) => s.alternative).map((s) => s.slug), unplaced: sections.filter((s) => s.from == null).map((s) => s.slug), places: placed.length }));
+console.log(JSON.stringify({ trail: trailName, km: total, pieces: pieces.length, sections: sections.length, options: sections.filter((s) => s.alternative).map((s) => s.slug), unplaced: sections.filter((s) => s.from == null).map((s) => s.slug), places: placed.length, resupply: resupply.length }));
+for (const r of resupply) console.log(`  km ${String(r.km).padStart(6)}  ${r.off > 2000 ? `${Math.round(r.off / 1000)} km off`.padEnd(9) : 'on trail '}  ${r.level.padEnd(8)} ${r.bounce ? 'box ' : '    '}${r.name}  [${r.from}${r.shops.length ? `, ${r.shops.length} shops` : ''}]`);
