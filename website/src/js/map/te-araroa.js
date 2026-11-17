@@ -110,7 +110,7 @@ export function features(d) {
   const names = [];
   // [band, step km, (unused), shortest line km (the text's length at the band's
   // widest zoom, and some), longest stretch of trail km].
-  const BANDS = [[0, 3, 0, 250, 1300], [1, 1, 0, 80, 420], [2, 0.25, 0, 24, 130]];
+  const BANDS = [[0, 3, 0, 480, 1700], [1, 1, 0, 135, 640], [2, 0.25, 0, 36, 200]];
   // A gentle curve through the stretch: x and y as cubics of the distance along it
   // (least squares), so the lettering bends with the trail's general line, never its turns.
   const smoothLine = (c, span, step) => {

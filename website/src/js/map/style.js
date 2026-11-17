@@ -113,6 +113,8 @@ function buildStyle({ topography, settings, dark, fine = false }) {
     version: 8,
     name: 'Bushline Maps',
     glyphs: urls.glyphs,
+    // Fonts drawn on the device: the fantasy lettering of the Te Araroa name (OFL).
+    'font-faces': { 'Uncial Antiqua': new URL('/fonts/uncial-antiqua/UncialAntiqua-Regular.ttf', location.href).href },
     sky: sky(dark),
     sources: {
       // Overview imagery for zooms 5–12 (the app's, averaged from LINZ's zoom-13 photography), LINZ beyond.
@@ -190,10 +192,11 @@ function buildStyle({ topography, settings, dark, fine = false }) {
       { id: 'te-araroa-food', type: 'circle', source: 'te-araroa-food', minzoom: 6, maxzoom: 12.5, layout: { visibility: visible(shown('te-araroa-food', settings)) }, paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 6, 2.6, 10, 3.6, 14, 4.6], 'circle-color': ['match', ['get', 'kind'], 'supermarket', '#22a35a', 'store', '#8fd6aa', 'cafe', '#d08a3f', '#ffffff'], 'circle-stroke-color': ['match', ['get', 'kind'], 'box', TE_ARAROA_COLOUR, '#ffffff'], 'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 6, 1.2, 12, 1.6], 'circle-pitch-alignment': 'viewport' } },
       { id: 'te-araroa-food-label', type: 'symbol', source: 'te-araroa-food', minzoom: 8, maxzoom: 12.5, layout: { visibility: visible(shown('te-araroa-food', settings)), 'text-field': ['get', 'name'], 'text-font': ['Open Sans Bold'], 'text-size': 11, 'text-offset': [0, 1], 'text-anchor': 'top', 'text-padding': 4, 'symbol-sort-key': 12 }, paint: { 'text-color': '#e7f7ec', 'text-halo-color': 'rgba(12,40,24,.9)', 'text-halo-width': 1.4 } },
       // Above the food and place labels: placed before them, so the trail's name wins.
-      // The trail's name as an old atlas letters a route: spaced italic capitals in red,
-      // written along the trail's curve just beside it, on a soft parchment halo. One
-      // smoothed line per island and zoom band (te-araroa.js), the band chosen by zoom.
-      { id: 'te-araroa-name', type: 'symbol', source: 'te-araroa-names', minzoom: 5, maxzoom: 11.5, filter: ['==', ['get', 'band'], ['step', ['zoom'], 0, 7, 1, 9, 2]], layout: { visibility: visible(shown('te-araroa-name', settings)), 'symbol-placement': 'line-center', 'text-field': 'TE ARAROA', 'text-font': ['Open Sans Bold Italic'], 'text-size': ['interpolate', ['linear'], ['zoom'], 5, 12.5, 8, 14.5, 11, 16.5], 'text-letter-spacing': ['interpolate', ['linear'], ['zoom'], 5, 0.3, 11, 0.4], 'text-offset': [0, -1.35], 'text-max-angle': 40, 'text-keep-upright': true, 'text-padding': 2, 'symbol-sort-key': 3 }, paint: { 'text-color': '#b8152f', 'text-halo-color': 'rgba(250,243,228,.88)', 'text-halo-width': 1.5, 'text-halo-blur': 0.6 } },
+      // The trail's name as an old fantasy map letters a road: wide-spaced uncial letters
+      // (Uncial Antiqua, drawn on the device from the style's font-faces), a faint red
+      // over a soft halo, written along the trail's curve just beside it. One smoothed
+      // line per island and zoom band (te-araroa.js), the band chosen by zoom.
+      { id: 'te-araroa-name', type: 'symbol', source: 'te-araroa-names', minzoom: 5, maxzoom: 11.5, filter: ['==', ['get', 'band'], ['step', ['zoom'], 0, 7, 1, 9, 2]], layout: { visibility: visible(shown('te-araroa-name', settings)), 'symbol-placement': 'line-center', 'text-field': 'Te Araroa', 'text-font': ['Uncial Antiqua'], 'text-size': ['interpolate', ['linear'], ['zoom'], 5, 20, 8, 23, 11, 26], 'text-letter-spacing': 0.36, 'text-offset': [0, -1.2], 'text-max-angle': 40, 'text-keep-upright': true, 'text-padding': 2, 'symbol-sort-key': 3 }, paint: { 'text-color': '#c21f38', 'text-opacity': 0.74, 'text-halo-color': 'rgba(252,242,222,.42)', 'text-halo-width': 1.4, 'text-halo-blur': 1.2 } },
       { id: 'hunting-names', type: 'symbol', source: 'hunting', minzoom: 11, filter: ['==', ['geometry-type'], 'Point'], layout: { visibility: visible(settings.hunting), 'text-field': ['get', 'name'], 'text-font': ['Open Sans Regular'], 'text-size': 11, 'text-max-width': 10, 'text-padding': 6 }, paint: { 'text-color': '#ffa25f', 'text-halo-color': 'rgba(20,20,20,.85)', 'text-halo-width': 1.4 } },
       // The app's route points: paper with an orange ring; selected, all orange and larger.
       { id: 'waypoints', type: 'circle', source: 'waypoints', paint: { 'circle-radius': ['case', ['boolean', ['get', 'selected'], false], 7.5, 4.5], 'circle-color': ['case', ['boolean', ['get', 'selected'], false], 'rgb(216,117,73)', 'rgb(250,250,245)'], 'circle-stroke-width': ['case', ['boolean', ['get', 'selected'], false], 1, 1.5], 'circle-stroke-color': 'rgb(216,117,73)', 'circle-pitch-alignment': 'viewport' } },

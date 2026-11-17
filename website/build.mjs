@@ -59,6 +59,7 @@ cpSync(join(src, 'js'), jsOut, { recursive: true });
 writeFileSync(join(jsOut, 'map/config.js'), config);
 cpSync(join(src, 'css'), cssOut, { recursive: true });
 cpSync(join(src, 'img'), join(out, 'img'), { recursive: true });
+cpSync(join(src, 'fonts'), join(out, 'fonts'), { recursive: true });
 cpSync(join(src, 'site.webmanifest'), join(out, 'site.webmanifest'));
 // MapLibre, by version (its own path never changes content).
 const maplibre = 'maplibre-gl-6.16.0';
@@ -84,7 +85,7 @@ const pages = [];
 const walkPages = (d) => {
   for (const f of readdirSync(d)) {
     const p = join(d, f);
-    if (f.startsWith('_') || ['js', 'css', 'img'].includes(f) && d === src) continue;
+    if (f.startsWith('_') || ['js', 'css', 'img', 'fonts'].includes(f) && d === src) continue;
     if (statSync(p).isDirectory()) walkPages(p);
     else if (f.endsWith('.html')) {
       const rel = relative(src, p);
@@ -239,6 +240,8 @@ writeFileSync(join(out, '_headers'), `/*
   Cache-Control: public, max-age=31536000, immutable
 /img/*
   Cache-Control: public, max-age=604800
+/fonts/*
+  Cache-Control: public, max-age=2592000
 /site.webmanifest
   Content-Type: application/manifest+json
 /data/*

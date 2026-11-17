@@ -14,7 +14,7 @@ const account = process.env.CLOUDFLARE_ACCOUNT_ID, token = process.env.CLOUDFLAR
 const bucket = process.env.SITE_BUCKET || 'bushline-site', script = process.env.SITE_WORKER || 'bushline-maps';
 const api = `https://api.cloudflare.com/client/v4/accounts/${account}`;
 const auth = { Authorization: `Bearer ${token}` };
-const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.json': 'application/json', '.tsv': 'text/tab-separated-values; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.xml': 'application/xml', '.txt': 'text/plain; charset=utf-8', '.webmanifest': 'application/manifest+json' };
+const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.json': 'application/json', '.tsv': 'text/tab-separated-values; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.xml': 'application/xml', '.txt': 'text/plain; charset=utf-8', '.webmanifest': 'application/manifest+json', '.ttf': 'font/ttf' };
 async function call(method, url, body, headers = {}) {
   for (let attempt = 0; ; attempt++) {
     const r = await fetch(url, { method, body, headers: { ...auth, ...headers } });
