@@ -394,6 +394,10 @@ body.sheet-open .maplibregl-ctrl-bottom-left, body.sheet-open .maplibregl-ctrl-b
   .sheet.joined { width: 300px !important; height: calc(100vh - 120px) !important; border-top-right-radius: 0; border-bottom-right-radius: 0; }
   .sheet.joined .ta-row .ta-name small, .sheet.joined .ta-status-line { display: none; }
   .sheet.joined .resize-e { display: none; }
+  /* The side panel on its left (the list moved to the right of the screen). */
+  .sheet.joined.joined-left { border-radius: 0 16px 16px 0; }
+  .sheet.joined.joined-left .resize-e { display: block; }
+  .sheet.joined.joined-left .resize-w { display: none; }
   .side-panel { border-radius: 0 16px 16px 0; border-left: 1px solid var(--line); }
   .side-panel.left { border-radius: 16px 0 0 16px; border-left: 0; border-right: 1px solid var(--line); }
 }

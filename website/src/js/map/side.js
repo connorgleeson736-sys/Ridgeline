@@ -62,24 +62,38 @@ export class SidePanel {
     if (title != null) this.title.textContent = title;
     if (subtitle != null) { this.subtitle.textContent = subtitle; this.subtitle.hidden = !subtitle; }
   }
+  /** Moves the joined list sideways (only when it changes: its style is watched). */
+  shift(px) {
+    const t = px ? `translateX(${Math.round(px)}px)` : '';
+    if (this.sheet.root.style.transform !== t) this.sheet.root.style.transform = t;
+  }
   close() {
     if (this.root.hidden) return;
+    this.shift(0);
     this.token++;
     this.cleanup?.();
     this.cleanup = null;
     this.current = null;
     this.stack = [];
     this.root.hidden = true;
-    this.sheet.root.classList.remove('joined');
+    this.sheet.root.classList.remove('joined', 'joined-left');
     this.onChange?.(null);
   }
   /** Joined to the side panel's right edge, the same height; to its left if there is no room. */
   place() {
     if (this.root.hidden) return;
     if (this.sheet.root.hidden) { this.close(); return; }
+    // A list moved to the right half keeps its right edge as it narrows, and this panel
+    // opens on its left; elsewhere the list keeps its left edge and this opens on its right.
+    const st = this.sheet.root.style, cardX = parseFloat(st.left), cardW = parseFloat(st.width);
+    const onRight = Number.isFinite(cardX + cardW) && cardX + cardW / 2 > innerWidth / 2;
+    const narrow = this.sheet.root.offsetWidth;
+    this.shift(onRight ? Math.max(0, cardW - narrow) : 0);
     const r = this.sheet.root.getBoundingClientRect(), w = Math.min(520, innerWidth - r.width - 24);
-    const right = r.right + w <= innerWidth - 10;
+    const right = !onRight && r.right + w <= innerWidth - 10;
+    // The corners where the two meet are square, on whichever side that is.
     this.root.classList.toggle('left', !right);
+    this.sheet.root.classList.toggle('joined-left', !right);
     Object.assign(this.root.style, { left: `${right ? r.right : Math.max(10, r.left - w)}px`, top: `${r.top}px`, width: `${w}px`, height: `${r.height}px` });
   }
 }
