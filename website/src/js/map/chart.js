@@ -142,7 +142,8 @@ export class Chart {
   get lo() { return this.zoomed ? this.v0 : 0; }
   get hi() { return this.zoomed ? this.v1 : Math.max(1, this.total); }
   get measured() { return this.samples.filter((s) => s.h != null).length >= 2; }
-  box() { const w = this.canvas.clientWidth, h = this.canvas.clientHeight; return { left: 46, right: Math.max(47, w - 12), top: 22, bottom: Math.max(23, h - 30), w, h }; }
+  // The plot centred in the canvas: as much room on the right as the heights take on the left.
+  box() { const w = this.canvas.clientWidth, h = this.canvas.clientHeight; return { left: 42, right: Math.max(43, w - 42), top: 22, bottom: Math.max(23, h - 30), w, h }; }
   dAt(px) { const b = this.box(); return this.lo + Math.min(1, Math.max(0, (px - b.left) / (b.right - b.left))) * (this.hi - this.lo); }
   x(d) { const b = this.box(); return b.left + ((d - this.lo) / Math.max(1e-6, this.hi - this.lo)) * (b.right - b.left); }
   set(samples, markers = []) { this.samples = samples || []; this.markers = markers; this.bands = []; this.cursor = null; this.range = null; this.sec = null; this.v0 = this.v1 = 0; this.picked = -1; this.draw(); }

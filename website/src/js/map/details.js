@@ -168,8 +168,6 @@ export function openWalk(ctx, guid, { push = false } = {}) {
         ctx.sheet.setTitle(name, subtitle);
         ctx.sheet.setPhoto(info?.thumbnail || o.image, name);
         if (line.length >= 2) { ctx.select([line]); if (!restored) ctx.fit(line); }
-        const taWalk = teAraroaLinks(ctx, line);
-        if (taWalk) body.append(taWalk);
         body.append(chips((o.distance || fact[0]) && `DOC: ${o.distance || fact[0]}`, (o.time || fact[1]) && `Time: ${o.time || fact[1]}`, fact[2] === 'loop' ? 'Loop' : fact[2] === 'one_way' ? 'One way' : null, (o.dogs || fact[3]) && (o.dogs || fact[3]).split('.')[0]));
         const partRow = el('div', { class: 'parts', hidden: true });
         const partText = el('div', { class: 'part-text', hidden: true });
@@ -195,7 +193,8 @@ export function openWalk(ctx, guid, { push = false } = {}) {
         if (line.length >= 2) actions.append(el('button', { class: 'btn', type: 'button', onclick: () => ctx.planner.fromLine(name, line) }, 'Save as route'));
         const link = docLink(info?.page || ctx.overlays.infos()[guid]?.page, 'DOC page ↗');
         if (link) actions.append(link);
-        body.append(actions, el('p', { class: 'fine' }, page ? 'From DOC’s page for this walk (CC BY 4.0). Check DOC for alerts and conditions before you go.' : DOC_NOTE));
+        // Last: the Te Araroa sections it is part of, below DOC's sections and the buttons.
+        body.append(actions, ...[teAraroaLinks(ctx, line)].filter(Boolean), el('p', { class: 'fine' }, page ? 'From DOC’s page for this walk (CC BY 4.0). Check DOC for alerts and conditions before you go.' : DOC_NOTE));
         if (!profile) return;
         // Huts along the way, on the profile and listed.
         doc.hutsIn(bounds(line, 500), controller.signal).then((huts) => {
@@ -251,8 +250,6 @@ export function openTrack(ctx, name, tapped, pieces, { push = false } = {}) {
       const controller = new AbortController();
       const line = chain(pieces, tapped);
       if (line.length >= 2) ctx.select([line]);
-      const taTrack = teAraroaLinks(ctx, line);
-      if (taTrack) body.append(taTrack);
       body.append(line.length >= 2 ? profileBlock(ctx, line, alive) : busy());
       const extra = el('div');
       body.append(extra);
@@ -265,7 +262,7 @@ export function openTrack(ctx, name, tapped, pieces, { push = false } = {}) {
       }).catch(() => {});
       body.append(el('div', { class: 'sheet-actions' }, ...[
         line.length >= 2 ? el('button', { class: 'btn', type: 'button', onclick: () => ctx.planner.fromLine(name || 'Track', line) }, 'Save as route') : null,
-      ].filter(Boolean)));
+      ].filter(Boolean)), ...[teAraroaLinks(ctx, line)].filter(Boolean));
       return () => { controller.abort(); ctx.select(null); ctx.marker(null); ctx.range(null); };
     },
   }, { push });
@@ -622,15 +619,20 @@ export function openTeAraroaStop(ctx, i, { push = false, fromList = false } = {}
   });
 }
 
-/** "Part of Te Araroa": the sections a walk or track runs along, linked. */
+/** "Part of Te Araroa": the sections a walk or track runs along, linked. Returned at
+ * once (empty) and filled when the trail's data has loaded; stays empty if none. */
 export function teAraroaLinks(ctx, line) {
-  const d = teAraroa.loaded();
-  if (!d || !line || line.length < 2) return null;
-  const secs = teAraroa.sectionsAlong(d, line);
-  if (!secs.length) return null;
-  return el('div', { class: 'ta-link' }, el('span', { class: 'ta-link-mark', 'aria-hidden': 'true' }),
-    el('span', {}, el('b', {}, 'Part of Te Araroa'), el('small', {}, secs.length === 1 ? `Section ${secs[0].n} · ${kmRange(d, secs[0].from, secs[0].to)}` : `${secs.length} sections`)),
-    el('span', { class: 'ta-link-buttons' }, ...secs.slice(0, 3).map((s) => el('button', { class: 'btn', type: 'button', onclick: () => openTeAraroa(ctx, s.slug, { push: true }) }, s.alternative ? s.name : `${s.n}. ${s.name}`))));
+  if (!line || line.length < 2) return null;
+  const box = el('div', { class: 'ta-link', hidden: true });
+  teAraroa.load().then((d) => {
+    const secs = teAraroa.sectionsAlong(d, line);
+    if (!secs.length) return;
+    box.append(el('span', { class: 'ta-link-mark', 'aria-hidden': 'true' }),
+      el('span', {}, el('b', {}, 'Part of Te Araroa'), el('small', {}, secs.length === 1 ? `Section ${secs[0].n} · ${kmRange(d, secs[0].from, secs[0].to)}` : `${secs.length} sections`)),
+      el('span', { class: 'ta-link-buttons' }, ...secs.slice(0, 3).map((s) => el('button', { class: 'btn', type: 'button', onclick: () => openTeAraroa(ctx, s.slug, { push: true }) }, s.alternative ? s.name : `${s.n}. ${s.name}`))));
+    box.hidden = false;
+  }).catch(() => {});
+  return box;
 }
 
 /** "On Te Araroa" for a hut the trail passes (within 400 m of one of its places). */
