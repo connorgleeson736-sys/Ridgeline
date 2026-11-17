@@ -121,6 +121,33 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         text="DOC page";textSize=14f;gravity=Gravity.CENTER;setTextColor(NativeUi.orange);setTypeface(null,Typeface.BOLD)
         background=NativeUi.pressable(activity,GradientDrawable().apply{setColor(Color.TRANSPARENT);cornerRadius=dpf(12f);setStroke(dp(1),NativeUi.orange)});isClickable=true;visibility=View.GONE
     }
+    // ---- Te Araroa (TeAraroa, bundled) and live alerts ----
+    /** The trail, once loaded. */
+    @Volatile var teAraroa:TeAraroa?=null
+    /** Saves a line as a route in the route planner. */
+    var saveRoute:(String,List<Coordinate>)->Unit={_,_->}
+    private val prefs=activity.getSharedPreferences("te-araroa",0)
+    /** The walker's direction: northbound (Bluff to Cape Reinga) or southbound. */
+    private var nobo=prefs.getBoolean("nobo",false)
+    private var taNotes:Map<String,TeAraroa.Notes>?=null
+    /** Back (top left): to the page this one was opened from. */
+    private val backButton=TextView(activity).apply{textSize=13.5f;setTextColor(NativeUi.orange);setTypeface(null,Typeface.BOLD);gravity=Gravity.CENTER_VERTICAL;setPadding(dp(14),0,dp(10),0)
+        isClickable=true;background=NativeUi.pressable(activity,null);visibility=View.GONE;maxLines=1;ellipsize=TextUtils.TruncateAt.END;maxWidth=dp(230)}
+    /** Beside the title: Te Araroa's direction switch. */
+    private val aside=FrameLayout(activity)
+    private lateinit var statsRow:LinearLayout
+    /** Above the chart (Te Araroa: tabs and lists, or previous/next and alerts). */
+    private val taTop=NativeUi.column(activity).apply{visibility=View.GONE}
+    /** Below the introduction (Te Araroa: food, bypasses, a stop's or shop's details). */
+    private val taBelow=NativeUi.column(activity).apply{visibility=View.GONE}
+    /** DOC's live alerts, below the chart and introduction. */
+    private val docAlerts=NativeUi.column(activity).apply{visibility=View.GONE}
+    /** At the bottom: "Part of Te Araroa" (walks and tracks), "On Te Araroa" (huts). */
+    private val taLink=NativeUi.column(activity).apply{visibility=View.GONE}
+    private val saveButton=TextView(activity).apply{
+        text="Save as route";textSize=14f;gravity=Gravity.CENTER;setTextColor(NativeUi.ink);setTypeface(null,Typeface.BOLD)
+        background=NativeUi.pressable(activity,GradientDrawable().apply{setColor(Color.TRANSPARENT);cornerRadius=dpf(12f);setStroke(dp(1),NativeUi.line)});isClickable=true;visibility=View.GONE}
+    private val fine=TextView(activity).apply{textSize=11.5f;setTextColor(NativeUi.muted);setLineSpacing(0f,1.1f);visibility=View.GONE}
     /** One stat: small muted label, larger value (as the route sheet). */
     private inner class Stat(var label:String):TextView(activity){
         init{textSize=13f;setTextColor(NativeUi.ink);gravity=Gravity.CENTER;value(null)}
@@ -133,6 +160,8 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     init{
         grip.addView(View(activity).apply{background=NativeUi.background(activity,0xff8a9691.toInt(),3)},FrameLayout.LayoutParams(dp(32),dp(4),Gravity.CENTER))
         grip.addView(NativeUi.button(activity,"×"){closeOrReturn()}.apply{contentDescription="Close track summary";background=null;textSize=19f;setPadding(0,0,0,0)},FrameLayout.LayoutParams(dp(46),dp(28),Gravity.END))
+        grip.addView(backButton,FrameLayout.LayoutParams(-2,dp(28),Gravity.START))
+        backButton.setOnClickListener{goBack()}
         grip.setOnClickListener{settle(if(level<2)level+1 else 1)}
         header.isClickable=true;header.setOnClickListener{settle(if(level<2)level+1 else 1)}
         val top=LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL}
@@ -144,9 +173,12 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         line.addView(subtitle,LinearLayout.LayoutParams(0,-2,1f))
         titles.addView(line,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(2)})
         top.addView(titles,LinearLayout.LayoutParams(0,-2,1f))
+        top.addView(aside,LinearLayout.LayoutParams(-2,-2).apply{marginStart=dp(8)})
         header.addView(top,LinearLayout.LayoutParams(-1,-2))
         // Stats size to their text (two lines, larger phone fonts too) and line up by their tops.
-        header.addView(LinearLayout(activity).apply{isBaselineAligned=false;for((i,v) in stats.withIndex())addView(v.apply{minHeight=dp(40);maxLines=2},LinearLayout.LayoutParams(0,-2,1f).apply{if(i>0)marginStart=dp(8)})},LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(10)})
+        statsRow=LinearLayout(activity).apply{isBaselineAligned=false;for((i,v) in stats.withIndex())addView(v.apply{minHeight=dp(40);maxLines=2},LinearLayout.LayoutParams(0,-2,1f).apply{if(i>0)marginStart=dp(8)})}
+        header.addView(statsRow,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(10)})
+        body.addView(taTop,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(8)})
         body.addView(optionScroll,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(8)})
         fromChip.setOnClickListener{pickOption(it,true)};toChip.setOnClickListener{pickOption(it,false)}
         body.addView(chart,LinearLayout.LayoutParams(-1,dp(230)))
@@ -155,10 +187,15 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         body.addView(walkTitle,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(12)})
         walkTitle.setOnClickListener{walkRef?.let{(guid,name)->showWalk(guid,name,lineNow.firstOrNull()?:Coordinate(0.0,0.0))}}
         body.addView(intro,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(12)})
+        body.addView(docAlerts,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(12)})
+        body.addView(taBelow,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(12)})
         body.addView(factsScroll,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(12)})
         body.addView(huts,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(10)})
         body.addView(sections,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(8)})
         body.addView(page,LinearLayout.LayoutParams(-1,dp(44)).apply{topMargin=dp(16)})
+        body.addView(saveButton,LinearLayout.LayoutParams(-1,dp(44)).apply{topMargin=dp(10)})
+        body.addView(taLink,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(16)})
+        body.addView(fine,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(14)})
         panel.addView(grip,LinearLayout.LayoutParams(-1,dp(28)))
         panel.addView(header,LinearLayout.LayoutParams(-1,-2))
         panel.addView(ScrollView(activity).apply{isVerticalScrollBarEnabled=false;addView(body)},LinearLayout.LayoutParams(-1,0,1f))
@@ -211,13 +248,15 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     private fun begin(title:String,hut:Boolean):Long{
         val id=++request
         visible=true;level=0;link="";sectionOf=false;parts.clear();partRow.removeAllViews();partScroll.visibility=View.GONE;choice=null;optionScroll.visibility=View.GONE;pageWords="";nearHuts=emptyList();recordHuts=null;pageLegs=emptyList();partText.removeAllViews();partText.visibility=View.GONE;walkRef=null
-        name.text=title;subtitle.text="";subtitle.visibility=View.GONE;wholeSubtitle="";closedBadge.visibility=View.GONE
+        name.text=title;subtitle.text="";subtitle.visibility=View.GONE;wholeSubtitle="";closedBadge.visibility=View.GONE;subtitle.maxLines=2
         photo.setImageDrawable(null);photo.visibility=View.GONE
         val labels=if(hut)listOf("Bunks","Elevation","Bookings","From road")else listOf("Distance","Ascent","Descent","Highest")
         for((i,s) in stats.withIndex()){s.label=labels[i];s.value(null)}
         chart.data(emptyList());chart.markers=emptyList();chart.message="";chart.visibility=if(hut)View.GONE else View.VISIBLE
         trackTitle=title;walkTitle.visibility=View.GONE;sections.removeAllViews();sections.visibility=View.GONE
-        intro.visibility=View.GONE;factsScroll.visibility=View.GONE;facts.removeAllViews();huts.removeAllViews();huts.visibility=View.GONE;page.visibility=View.GONE
+        intro.visibility=View.GONE;intro.text="";factsScroll.visibility=View.GONE;facts.removeAllViews();huts.removeAllViews();huts.visibility=View.GONE;page.visibility=View.GONE;page.text="DOC page"
+        aside.removeAllViews();taTop.removeAllViews();taTop.visibility=View.GONE;taBelow.removeAllViews();taBelow.visibility=View.GONE;docAlerts.removeAllViews();docAlerts.visibility=View.GONE
+        taLink.removeAllViews();taLink.visibility=View.GONE;saveButton.visibility=View.GONE;fine.visibility=View.GONE;statsRow.visibility=View.VISIBLE;chart.markers=emptyList()
         onLine(null,null);onPoint(null);onRange(emptyList());loader.cancelTrackProfile();chart.showAll();lineNow=emptyList()
         if(panel.visibility!=View.VISIBLE){panel.visibility=View.VISIBLE;panel.translationY=full().toFloat()}
         panel.post{if(id==request)place(true)}
@@ -313,26 +352,37 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     private var restoring=false
     /** Back to a track from a hut: the map stays where it is (no re-framing). */
     private var keepView=false
-    private fun remember(again:()->Unit,hut:Boolean){
+    /** Pages to go back to (Back, top left): from a Te Araroa page to what it opened. */
+    private val stack=ArrayList<Pair<String,()->Unit>>()
+    private var currentLabel="";private var currentTa=false
+    /** A Te Araroa page is open (taps on the trail stay in it). */
+    val inTeAraroa get()=visible&&currentTa
+    /** [push]: Back returns to the page open now (always so from a Te Araroa page). */
+    private fun remember(again:()->Unit,hut:Boolean,label:String="",ta:Boolean=false,push:Boolean=false){
         if(restoring)restoring=false
-        else if(hut){if(visible&&!currentIsHut&&current!=null)returnTo=current else if(!visible)returnTo=null}
-        else returnTo=null
-        current=again;currentIsHut=hut
+        else if((push||currentTa)&&visible&&current!=null){stack.add((currentLabel.ifBlank{"Back"}) to current!!);returnTo=null}
+        else{stack.clear()
+            if(hut){if(visible&&!currentIsHut&&current!=null)returnTo=current else if(!visible)returnTo=null}
+            else returnTo=null}
+        current=again;currentIsHut=hut;currentLabel=label;currentTa=ta
+        backButton.text="‹ ${stack.lastOrNull()?.first.orEmpty()}";backButton.visibility=if(stack.isEmpty())View.GONE else View.VISIBLE
     }
+    /** Back to the page this one was opened from, the map left where it is. */
+    private fun goBack(){val (_,again)=stack.removeLastOrNull()?:return;restoring=true;keepView=true;again()}
     /** The X (and back at the lowest stop): to the track a hut was opened from, else closed. */
     fun closeOrReturn(){
         val again=returnTo
         if(again!=null&&visible){returnTo=null;restoring=true;keepView=true;again()}else hide()
     }
     fun hide(){
-        returnTo=null
+        returnTo=null;stack.clear();backButton.visibility=View.GONE;currentTa=false
         if(!visible)return
         visible=false;request++;loader.cancelTrackProfile();onLine(null,null);onPoint(null);onRange(emptyList());chart.clearInspection()
         if(map.layoutParams.height!=-1)map.layoutParams=map.layoutParams.apply{height=-1}
         onCover(0);onClosed()
         panel.animate().translationY(full().toFloat()).setDuration(160).withEndAction{if(!visible)panel.visibility=View.GONE}.start()
     }
-    fun back():Boolean{if(!visible)return false;if(level>0)settle(level-1)else closeOrReturn();return true}
+    fun back():Boolean{if(!visible)return false;if(level>0)settle(level-1)else if(stack.isNotEmpty())goBack()else closeOrReturn();return true}
 
     /** A track section named by its large DOC walk (a circuit): the walk's own
      * details and line, followed on the map's tracks. */
@@ -344,6 +394,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         if(info!=null)setSubtitle(listOf(info.difficulty,info.time).filter{it.isNotBlank()}.joinToString(" · "))
         var listed=false
         fetch(DocTracks.walkByGuidUrl(guid),{DocTracks.parseWalks(text(it)).firstOrNull()}){w->if(id==request&&w!=null){listed=true;applyWalk(id,w,false)}}
+        docAlertsFor(id,guid,info?.page?:"https://www.doc.govt.nz/link/${guid.replace("-","")}.aspx")
         val page=info?.page?:"https://www.doc.govt.nz/link/${guid.replace("-","")}.aspx"
         // DOC's line is the walk; DOC's legs give its route and direction when
         // they cover most of it. The map's own tracks along it are drawn.
@@ -357,7 +408,6 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
                     if(o.intro.isNotBlank()&&intro.text.isEmpty()){intro.text=o.intro;intro.visibility=View.VISIBLE}
                     if(photo.visibility!=View.VISIBLE)thumbnail(id,o.image)
                 }
-                if(o.dogs.isNotBlank()&&facts.childCount==0){facts.addView(chip(DocTracks.tidy(o.dogs.removeSuffix("."))),LinearLayout.LayoutParams(-2,-2).apply{marginEnd=dp(6)});factsScroll.visibility=View.VISIBLE}
             }
             if(page.startsWith("https://")){link=page;this.page.visibility=View.VISIBLE;this.page.setOnClickListener{open(link)}}
             if(pageSections.isNotEmpty())showSections(pageSections)
@@ -524,7 +574,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     fun showHut(hutName:String,at:Coordinate){
         remember({showHut(hutName,at)},true)
         val id=begin(hutName,true);fitNext=false
-        onPoint(at)
+        onPoint(at);onTeAraroa(id,at)
         loader.trackProfile(listOf(at,Coordinate(at.longitude+.00002,at.latitude))){values,_->
             if(id==request)values.firstOrNull()?.height?.let{stats[1].value(metres(it))}}
         var asset:DocTracks.HutAsset?=null;var hutPage:DocTracks.HutPage?=null
@@ -593,10 +643,8 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         val summary=line.filter{it.isNotBlank()}.joinToString(" · ")
         setSubtitle(summary)
         closedBadge.visibility=if(t?.closed==true)View.VISIBLE else View.GONE
-        facts.removeAllViews()
-        if(t!=null)for(v in listOf(t.type,t.dogs,if(w!=null)t.category else"").filter{it.isNotBlank()}.map(DocTracks::tidy).distinct())
-            facts.addView(chip(v),LinearLayout.LayoutParams(-2,-2).apply{marginEnd=dp(6)})
-        factsScroll.visibility=if(facts.childCount>0)View.VISIBLE else View.GONE
+        // No tags under walks and tracks (type, dogs, category): the header says what matters.
+        facts.removeAllViews();factsScroll.visibility=View.GONE
     }
     /** [line] in view: map, profile, stats and huts. [found]: its parts;
      * [oriented]: in DOC's direction already (otherwise it is turned to start
@@ -604,6 +652,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     /** [pieces]: all of DOC's line, side trips included, for the huts on them. */
     private fun lineFound(id:Long,line:List<Coordinate>,found:List<Part> = emptyList(),oriented:Boolean=false,pieces:List<List<Coordinate>> = emptyList()){
         if(line.size<2){chart.visibility=View.GONE;return}
+        if(!currentTa&&!currentIsHut)partOfTeAraroa(id,line)
         lineNow=line;onLine(line,null)
         if(keepView){keepView=false;fitNext=false}else if(fitNext){fitNext=false;onFit(line)}else onFit(line)
         stats[0].value(distance(DocTracks.length(line)));wholeStats[0]=distance(DocTracks.length(line))
@@ -782,6 +831,311 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
             paint.color=NativeUi.ink;c.drawPath(shape,paint)
         }
     }
+    // ---- Te Araroa pages ----
+    private fun km(v:Double)=TeAraroa.km(v)
+    private fun kmIn(d:TeAraroa,v:Double)=d.kmIn(v,nobo)
+    private fun kmRange(d:TeAraroa,a:Double,b:Double):String{val x=kmIn(d,a);val y=kmIn(d,b);return "km ${km(min(x,y))}–${km(max(x,y))}"}
+    private fun shortName(n:String)=if(n.length<=24)n else "Back"
+    /** Frames the map round a point (about [half] degrees each way), unless going back. */
+    private fun fitPoint(p:Coordinate,half:Double){if(keepView){keepView=false;return};onFit(listOf(Coordinate(p.longitude-half,p.latitude-half*.7),Coordinate(p.longitude+half,p.latitude+half*.7)))}
+    private fun label(text:CharSequence,size:Float=13.5f,color:Int=NativeUi.ink,bold:Boolean=false)=TextView(activity).apply{this.text=text;textSize=size;setTextColor(color);setLineSpacing(0f,1.15f);if(bold)setTypeface(null,Typeface.BOLD)}
+    private fun dot(colour:Int,edge:Int=Color.WHITE)=View(activity).apply{background=GradientDrawable().apply{shape=GradientDrawable.OVAL;setColor(colour);setStroke(dp(2),edge)}}
+    /** A list row: optional dot, title and detail, a value on the right. */
+    private fun row(title:String,detail:String="",right:String="",colour:Int?=null,edge:Int=Color.WHITE,number:String="",action:()->Unit):View{
+        val r=LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL;setPadding(0,dp(9),0,dp(9));isClickable=true;background=NativeUi.pressable(activity,null);contentDescription=title;setOnClickListener{action()}}
+        if(number.isNotEmpty())r.addView(label(number,12.5f,NativeUi.muted).apply{gravity=Gravity.END},LinearLayout.LayoutParams(dp(26),-2).apply{marginEnd=dp(10)})
+        colour?.let{r.addView(dot(it,edge),LinearLayout.LayoutParams(dp(12),dp(12)).apply{marginEnd=dp(12)})}
+        val text=NativeUi.column(activity)
+        text.addView(label(title,14f,NativeUi.ink,true).apply{maxLines=2;ellipsize=TextUtils.TruncateAt.END})
+        if(detail.isNotEmpty())text.addView(label(detail,12f,NativeUi.muted).apply{maxLines=2;ellipsize=TextUtils.TruncateAt.END})
+        r.addView(text,LinearLayout.LayoutParams(0,-2,1f))
+        if(right.isNotEmpty())r.addView(label(right,12.5f,NativeUi.muted),LinearLayout.LayoutParams(-2,-2).apply{marginStart=dp(8)})
+        return r
+    }
+    private fun divider()=View(activity).apply{setBackgroundColor(NativeUi.line)}
+    /** Text with tappable names in orange (each runs its action). */
+    private fun links(vararg parts:Any):TextView{
+        val b=android.text.SpannableStringBuilder()
+        for(part in parts)when(part){
+            is Pair<*,*>->{val start=b.length;b.append(part.first as String);@Suppress("UNCHECKED_CAST")val go=part.second as ()->Unit
+                b.setSpan(object:android.text.style.ClickableSpan(){override fun onClick(v:View){go()};override fun updateDrawState(ds:android.text.TextPaint){ds.color=NativeUi.orange;ds.isUnderlineText=false}},start,b.length,0)}
+            else->b.append(part.toString())}
+        return label(b).apply{movementMethod=android.text.method.LinkMovementMethod.getInstance();highlightColor=Color.TRANSPARENT}
+    }
+    /** Southbound | Northbound, beside the title; changing it redraws the page in place. */
+    private fun directionSwitch(){
+        aside.removeAllViews()
+        val pill=LinearLayout(activity).apply{background=GradientDrawable().apply{setColor(NativeUi.chip);cornerRadius=dpf(14f);setStroke(dp(1),NativeUi.line)};setPadding(dp(1),dp(1),dp(1),dp(1))}
+        for((value,text) in listOf(false to "Southbound",true to "Northbound")){
+            val on=value==nobo
+            pill.addView(TextView(activity).apply{this.text=text;textSize=11.5f;setTypeface(null,Typeface.BOLD);setPadding(dp(8),dp(3),dp(8),dp(4))
+                setTextColor(if(on)NativeUi.onInk else NativeUi.muted);background=if(on)NativeUi.background(activity,NativeUi.ink,13)else null;isClickable=true
+                setOnClickListener{if(nobo!=value){nobo=value;prefs.edit().putBoolean("nobo",value).apply();restoring=true;keepView=true;current?.invoke()}}})
+        }
+        aside.addView(pill)
+    }
+    /** Reads the Trust's notes (bundled) once. */
+    private fun notes(callback:(Map<String,TeAraroa.Notes>)->Unit){
+        taNotes?.let{callback(it);return}
+        runCatching{liveIo.execute{
+            // The build stores a .gz asset decompressed, without its .gz (notes.json in the APK).
+            val n=runCatching{activity.assets.open("te-araroa/notes.json").bufferedReader().use{TeAraroa.Notes.parseAll(it.readText())}}
+                .recoverCatching{java.util.zip.GZIPInputStream(activity.assets.open("te-araroa/notes.json.gz")).bufferedReader().use{TeAraroa.Notes.parseAll(it.readText())}}.getOrDefault(emptyMap())
+            main.post{taNotes=n;callback(n)}}}
+    }
+    /** Te Araroa's whole trail: direction, then Sections, Food (carries) and Bypasses. */
+    fun showTeAraroa(push:Boolean=false,tab:Int=0){
+        val d=teAraroa?:return
+        var shown=tab
+        remember({showTeAraroa(false,shown)},false,"Te Araroa",true,push)
+        val restored=keepView
+        val id=begin("Te Araroa",false);fitNext=false
+        setSubtitle("Cape Reinga to Bluff");statsRow.visibility=View.GONE;chart.visibility=View.GONE
+        directionSwitch()
+        if(keepView)keepView=false else onFit(listOf(Coordinate(172.6,-34.4),Coordinate(168.3,-46.6)))
+        val tabs=LinearLayout(activity).apply{orientation=LinearLayout.HORIZONTAL}
+        val list=NativeUi.column(activity)
+        fun show(i:Int){shown=i
+            for(k in 0 until tabs.childCount){val c=tabs.getChildAt(k) as TextView;val on=k==i
+                c.setTextColor(if(on)NativeUi.onInk else NativeUi.ink);c.background=NativeUi.background(activity,if(on)NativeUi.ink else NativeUi.chip,14)}
+            list.removeAllViews()
+            when(i){
+                0->{var region=""
+                    for(s in d.walking(d.mains.sortedBy{it.from},nobo)){
+                        if(s.region!=region){region=s.region;list.addView(label(region,13f,NativeUi.muted,true),LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(14);bottomMargin=dp(2)})}
+                        list.addView(row(s.name,number="${s.n}"){showTaSection(s.slug,push=true,fromList=true)},LinearLayout.LayoutParams(-1,-2))
+                        list.addView(divider(),LinearLayout.LayoutParams(-1,dp(1)))}}
+                1->{list.addView(label("Carries between places to buy food, ${if(nobo)"northbound" else "southbound"}. Days are rough.",13f,NativeUi.muted),LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(8);bottomMargin=dp(6)})
+                    for(c in d.carries(nobo)){
+                        val to=d.stops.indexOf(c.to)
+                        val detail=listOf("${km(c.km)} km",TeAraroa.daysText(c.days),c.hitch.takeIf{it.isNotEmpty()}?.joinToString(", "){it.name}?.let{"hitch: $it"}.orEmpty()).filter{it.isNotEmpty()}.joinToString(" · ")
+                        list.addView(row("${c.from.name}  →  ${c.to.name}",detail,colour=MapLayers.foodColour(c.to.kind),edge=if(c.to.kind=="box")MapLayers.TA_LINE else NativeUi.line){showTaStop(to,push=true)}.apply{if(c.km>=100)setBackgroundColor(Color.argb(28,239,59,93))},LinearLayout.LayoutParams(-1,-2))
+                        list.addView(divider(),LinearLayout.LayoutParams(-1,dp(1)))}}
+                else->{list.addView(label("Ways around parts of the trail: for rivers in flood, by road, or by water. Dashed red on the map.",13f,NativeUi.muted),LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(8);bottomMargin=dp(6)})
+                    for(o in d.walking(d.options.sortedBy{it.from},nobo)){
+                        list.addView(row(o.name,TeAraroa.optionKind(o).first,number="↳"){showTaSection(o.slug,push=true,fromList=true)},LinearLayout.LayoutParams(-1,-2))
+                        list.addView(divider(),LinearLayout.LayoutParams(-1,dp(1)))}}
+            }
+        }
+        for((i,t) in listOf("Sections","Food","Bypasses").withIndex())tabs.addView(TextView(activity).apply{text=t;textSize=13f;setTypeface(null,Typeface.BOLD);setPadding(dp(14),dp(6),dp(14),dp(6));isClickable=true;setOnClickListener{show(i)}},LinearLayout.LayoutParams(-2,-2).apply{marginEnd=dp(6)})
+        taTop.addView(tabs,LinearLayout.LayoutParams(-1,-2));taTop.addView(list,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(6)});taTop.visibility=View.VISIBLE
+        show(tab)
+        fine.text="From Te Araroa Trust (teararoa.org.nz, CC BY 4.0); food stops from walkers' resupply guides.";fine.visibility=View.VISIBLE
+        middle(id)
+    }
+    /** One section (or bypass): previous and next, live alerts, profile, introduction,
+     * the next food, bypasses, the Trust's notes; [fromList]: opened from the trail page. */
+    fun showTaSection(slug:String,push:Boolean=false,fromList:Boolean=false){
+        val d=teAraroa?:return;val s=d.bySlug[slug]?:return
+        remember({showTaSection(slug,false,fromList)},false,shortName(s.name),true,push)
+        val id=begin(s.name,false);fitNext=false
+        fun sub()=if(s.alternative)"${TeAraroa.optionKind(s).first} · leaves the trail at km ${km(kmIn(d,if(nobo)s.to else s.from))}, rejoins at km ${km(kmIn(d,if(nobo)s.from else s.to))}"
+            else "Section ${s.n} · ${kmRange(d,s.from,s.to)}"
+        setSubtitle(sub());subtitle.maxLines=if(s.alternative)2 else 1
+        if(!fromList)directionSwitch()
+        // Previous and next along the trail (walking order), on one line.
+        val (prev,next)=d.neighbours(s,nobo)
+        if(prev!=null||next!=null){
+            val steps=LinearLayout(activity).apply{orientation=LinearLayout.HORIZONTAL}
+            for((t,back) in listOf(prev to true,next to false)){
+                val cell=LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL;setPadding(dp(8),dp(7),dp(8),dp(7))}
+                if(t!=null){
+                    cell.background=NativeUi.pressable(activity,GradientDrawable().apply{setColor(Color.TRANSPARENT);cornerRadius=dpf(10f);setStroke(dp(1),NativeUi.line)});cell.isClickable=true
+                    cell.contentDescription="${if(back)"Previous" else "Next"} section: ${t.name}"
+                    cell.setOnClickListener{restoring=true;showTaSection(t.slug,false,fromList)}
+                    val name=label(t.name,13f,NativeUi.ink,true).apply{maxLines=1;ellipsize=TextUtils.TruncateAt.END;gravity=Gravity.CENTER;if(back)setPadding(0,0,dp(10),0)else setPadding(dp(10),0,0,0)}
+                    val arrow=label(if(back)"‹" else "›",18f,NativeUi.ink)
+                    if(back){cell.addView(arrow);cell.addView(name,LinearLayout.LayoutParams(0,-2,1f))}else{cell.addView(name,LinearLayout.LayoutParams(0,-2,1f));cell.addView(arrow)}
+                }
+                steps.addView(cell,LinearLayout.LayoutParams(0,-2,1f).apply{if(back)marginEnd=dp(4)else marginStart=dp(4)})
+            }
+            taTop.addView(steps,LinearLayout.LayoutParams(-1,-2))
+        }
+        if(s.alternative)taTop.addView(label(TeAraroa.optionKind(s).second),LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(8)})
+        val alertBox=NativeUi.column(activity).apply{visibility=View.GONE}
+        taTop.addView(alertBox,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(10)});taTop.visibility=View.VISIBLE
+        live(TeAraroa.trackApi(slug)){body->if(id==request)alerts(alertBox,body?.let{runCatching{TeAraroa.Alert.parseTrust(it)}.getOrNull()},"Trail alert","Couldn’t load Te Araroa’s current alerts.",TeAraroa.ALERTS_PAGE,d)}
+        // The line in walking order: map, profile and stats (DOC's huts along it marked).
+        val line=d.line(s).let{if(nobo)it.reversed()else it}
+        lineFound(id,line,oriented=true)
+        // Food: the next place to buy it, and towns a hitch away before it.
+        val (stop,gap,hitch)=d.nextFood(s,nobo)
+        val food=LinearLayout(activity).apply{gravity=Gravity.TOP}
+        food.addView(dot(MapLayers.foodColour("supermarket")),LinearLayout.LayoutParams(dp(10),dp(10)).apply{topMargin=dp(5);marginEnd=dp(10)})
+        val foodText=NativeUi.column(activity)
+        if(stop!=null){val i=d.stops.indexOf(stop)
+            foodText.addView(links("Next food: ",stop.name to {showTaStop(i,push=true)},if(gap<.5)" (at the start)" else " in ${km(gap)} km"))
+            if(hitch.isNotEmpty())foodText.addView(links("Or hitch to: ",*hitch.flatMapIndexed{k,h->listOf(if(k>0)", " else "",h.name to {showTaStop(d.stops.indexOf(h),push=true)}," (${km(h.off/1000)} km off)")}.toTypedArray()).apply{textSize=12.5f;setTextColor(NativeUi.muted)})
+        }else foodText.addView(label("No more food stops this way."))
+        food.addView(foodText,LinearLayout.LayoutParams(0,-2,1f))
+        taBelow.addView(food,LinearLayout.LayoutParams(-1,-2))
+        // Bypasses here (or, for one, the section it replaces).
+        val others=if(s.alternative)d.mains.filter{min(it.to,s.to)-max(it.from,s.from)>2}else d.options.filter{min(it.to,s.to)-max(it.from,s.from)>.3}
+        if(others.isNotEmpty())taBelow.addView(links(if(s.alternative)"Instead of: " else "Bypasses here: ",*others.flatMapIndexed{k,o->listOf(if(k>0)", " else "",(if(o.alternative)"${o.name} (${km(o.length)} km)" else o.name) to {showTaSection(o.slug,push=true,fromList=fromList)})}.toTypedArray()),LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(10)})
+        taBelow.visibility=View.VISIBLE
+        // The Trust's notes: introduction, then folded sections.
+        notes{all->if(id!=request)return@notes
+            val n=all[slug]?:return@notes
+            TeAraroa.Html.text(n.intro).takeIf{it.isNotBlank()}?.let{intro.text=it;intro.visibility=View.VISIBLE}
+            val near=d.places.filter{!it.approx&&it.point!=null&&(it.section==slug||it.km>=s.from-2&&it.km<=s.to+2)}.map{it.name to it.point!!}
+            val shopsNear=d.shops.filter{x->d.stops.getOrNull(x.stop)?.let{it.km>=s.from-15&&it.km<=s.to+15}==true}.map{it.name to it.point}
+            taFolds(listOf("The walk" to n.walk,"Getting there" to n.access,"Transport" to n.transport,"Accommodation" to n.accommodation,"Food and supplies" to n.food,"Track conditions and hazards" to n.conditions),
+                mapOf("Accommodation" to near,"Food and supplies" to shopsNear))
+        }
+        link=TeAraroa.sectionPage(slug);page.text="Te Araroa page";page.visibility=View.VISIBLE;page.setOnClickListener{open(link)}
+        if(line.size>=2){saveButton.visibility=View.VISIBLE;saveButton.setOnClickListener{saveRoute("Te Araroa: ${s.name}",DocTracks.simplify(line,2000))}}
+        fine.text="From Te Araroa Trust (teararoa.org.nz, CC BY 4.0). Alerts are live.";fine.visibility=View.VISIBLE
+        middle(id)
+    }
+    /** Te Araroa pages open at the middle stop: their lists and details show. */
+    private fun middle(id:Long){panel.post{if(id==request&&level==0)settle(1)}}
+    /** The Trust's notes as folded rows; in some, "On map" after an entry naming a place. */
+    private fun taFolds(list:List<Pair<String,String>>,known:Map<String,List<Pair<String,Coordinate>>>){
+        sections.removeAllViews()
+        fun fold(t:String)=java.text.Normalizer.normalize(t,java.text.Normalizer.Form.NFD).replace(Regex("\\p{M}"),"").lowercase().replace(Regex("[’']"),"").replace(Regex("\\s+")," ").trim()
+        for((title,html) in list){
+            val blocks=TeAraroa.Html.blocks(html);if(blocks.isEmpty())continue
+            val names=known[title].orEmpty().map{(n,p)->fold(n) to p}.filter{it.first.length>=4}.sortedByDescending{it.first.length}
+            val content=NativeUi.column(activity).apply{visibility=View.GONE;setPadding(0,0,0,dp(10))}
+            val chevron=TextView(activity).apply{text="›";textSize=20f;setTextColor(NativeUi.muted);gravity=Gravity.CENTER;rotation=90f}
+            val r=LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL;setPadding(0,dp(10),0,dp(10));isClickable=true;background=NativeUi.pressable(activity,null);contentDescription=title}
+            r.addView(label(title,14.5f,NativeUi.ink,true),LinearLayout.LayoutParams(0,-2,1f));r.addView(chevron,LinearLayout.LayoutParams(dp(24),dp(24)))
+            r.setOnClickListener{
+                if(content.childCount==0)for((kind,text) in blocks){
+                    val hit=names.firstOrNull{fold(text).contains(it.first)}
+                    val shown=if(kind=="li")"•  $text" else text
+                    val v=if(hit!=null)links(shown,"  ",("On map" to {onPoint(hit.second);onFit(listOf(Coordinate(hit.second.longitude-.004,hit.second.latitude-.003),Coordinate(hit.second.longitude+.004,hit.second.latitude+.003)))}))else label(shown)
+                    if(kind=="h")v.setTypeface(null,Typeface.BOLD)
+                    content.addView(v,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(if(kind=="h")12 else if(kind=="li")4 else 6)})}
+                val open=content.visibility!=View.VISIBLE
+                content.visibility=if(open)View.VISIBLE else View.GONE
+                chevron.animate().rotation(if(open)270f else 90f).setDuration(150).start()
+            }
+            sections.addView(divider(),LinearLayout.LayoutParams(-1,dp(1)));sections.addView(r,LinearLayout.LayoutParams(-1,-2));sections.addView(content,LinearLayout.LayoutParams(-1,-2))
+        }
+        if(sections.childCount>0){sections.addView(divider(),LinearLayout.LayoutParams(-1,dp(1)));sections.visibility=View.VISIBLE}
+    }
+    /** A food stop: what it has, the stops either side, and its shops and cafés. */
+    fun showTaStop(i:Int,push:Boolean=false){
+        val d=teAraroa?:return;val r=d.stops.getOrNull(i)?:return
+        remember({showTaStop(i,false)},false,shortName(r.name),true,push)
+        val id=begin(r.name,false);fitNext=false
+        setSubtitle("${TeAraroa.KINDS[r.kind]?:TeAraroa.LEVELS[r.level]?:"Food"} · km ${km(kmIn(d,r.km))}${if(r.onTrail)"" else " · ${km(r.off/1000)} km off the trail"}")
+        statsRow.visibility=View.GONE;chart.visibility=View.GONE
+        onPoint(r.point);fitPoint(r.point,.06)
+        if(r.note.isNotBlank()){intro.text=r.note;intro.visibility=View.VISIBLE}
+        if(r.bounce)taBelow.addView(label("Walkers send food boxes here.",13.5f,NativeUi.ink,true),LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(6)})
+        val (behind,ahead)=d.foodAround(r.km,nobo)
+        for((title,x) in listOf("Next: " to ahead,"Previous: " to behind))if(x!=null){val k=d.stops.indexOf(x)
+            taBelow.addView(row(title+x.name,TeAraroa.KINDS[x.kind]?:TeAraroa.LEVELS[x.level].orEmpty(),"${km(abs(x.km-r.km))} km · ${TeAraroa.daysText(d.days(min(r.km,x.km),max(r.km,x.km)))}",MapLayers.foodColour(x.kind),if(x.kind=="box")MapLayers.TA_LINE else NativeUi.line){showTaStop(k,push=true)},LinearLayout.LayoutParams(-1,-2))}
+        val order=mapOf("supermarket" to 0,"store" to 1,"cafe" to 2)
+        val here=d.shops.withIndex().filter{it.value.stop==i}.sortedWith(compareBy<IndexedValue<TeAraroa.Shop>>{order[it.value.kind]?:3}.thenBy{it.value.name})
+        if(here.isNotEmpty()){
+            taBelow.addView(label("Shops and cafés",14.5f,NativeUi.ink,true),LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(14)})
+            for((k,x) in here)taBelow.addView(row(x.name,listOf(TeAraroa.KINDS[x.kind].orEmpty(),x.address).filter{it.isNotBlank()}.joinToString(" · "),colour=MapLayers.foodColour(x.kind),edge=NativeUi.line){showTaShop(k,push=true)},LinearLayout.LayoutParams(-1,-2))
+        }
+        if(r.shops.isNotEmpty())taFolds(listOf("Shops in Te Araroa’s notes" to r.shops.joinToString(""){"<li>${it.replace("<","&lt;")}</li>"}),emptyMap())
+        taBelow.visibility=View.VISIBLE
+        fine.text="From walkers’ resupply guides and Te Araroa’s notes. Shops and hours change.";fine.visibility=View.VISIBLE
+        middle(id)
+    }
+    /** A shop or café at a food stop (OpenStreetMap). */
+    fun showTaShop(k:Int,push:Boolean=false){
+        val d=teAraroa?:return;val x=d.shops.getOrNull(k)?:return
+        remember({showTaShop(k,false)},false,shortName(x.name),true,push)
+        val id=begin(x.name,false);fitNext=false;middle(id)
+        setSubtitle(listOfNotNull(TeAraroa.KINDS[x.kind],d.stops.getOrNull(x.stop)?.name).joinToString(" · "))
+        statsRow.visibility=View.GONE;chart.visibility=View.GONE
+        onPoint(x.point);fitPoint(x.point,.003)
+        if(x.address.isNotBlank())taBelow.addView(label(x.address),LinearLayout.LayoutParams(-1,-2))
+        if(x.hours.isNotBlank())taBelow.addView(label(android.text.SpannableString("Hours: "+x.hours.replace(Regex(";\\s*"),"; ")).apply{setSpan(android.text.style.StyleSpan(Typeface.BOLD),0,6,0)}),LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(6)})
+        if(x.phone.isNotBlank())taBelow.addView(links(x.phone to {runCatching{activity.startActivity(Intent(Intent.ACTION_DIAL,Uri.parse("tel:"+x.phone.replace(Regex("[^\\d+]"),""))))}}),LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(6)})
+        val ways=ArrayList<Pair<String,()->Unit>>()
+        if(x.website.startsWith("https://"))ways.add("Website ↗" to {open(x.website)})
+        ways.add("Google Maps ↗" to {open("https://www.google.com/maps/search/?api=1&query="+Uri.encode("${x.name} ${x.point.latitude},${x.point.longitude}"))})
+        taBelow.addView(links(*ways.flatMapIndexed{i,w->listOf(if(i>0)"     " else "",w)}.toTypedArray()).apply{textSize=14f},LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(12)})
+        taBelow.visibility=View.VISIBLE
+        fine.text="© OpenStreetMap contributors (ODbL). Hours change: check before you rely on them.";fine.visibility=View.VISIBLE
+    }
+    /** A place to stay on the trail (a campsite, holiday park or lodge). */
+    fun showTaPlace(k:Int,push:Boolean=false){
+        val d=teAraroa?:return;val pl=d.places.getOrNull(k)?:return
+        remember({showTaPlace(k,false)},false,shortName(pl.name),true,push)
+        val id=begin(pl.name,false);fitNext=false;middle(id)
+        setSubtitle(listOf(pl.type,if(pl.approx&&pl.town.isNotBlank())"in ${pl.town}" else if(!pl.km.isNaN())"km ${km(kmIn(d,pl.km))}" else "",if(!pl.approx&&pl.off>150)"${km(pl.off/1000)} km off the trail" else "").filter{it.isNotBlank()}.joinToString(" · "))
+        statsRow.visibility=View.GONE;chart.visibility=View.GONE
+        pl.point?.takeIf{!pl.approx}?.let{onPoint(it);fitPoint(it,.006)}
+        val facts=listOf(if(pl.booking)"Booking required" else if(pl.fromNotes)"" else "No booking",if(pl.pass)"Te Araroa Pass" else "").filter{it.isNotEmpty()}.joinToString(" · ")
+        if(facts.isNotEmpty())taBelow.addView(label(facts,13.5f,NativeUi.ink,true),LinearLayout.LayoutParams(-1,-2))
+        for(t in listOf(pl.facilities,pl.address))if(t.isNotBlank())taBelow.addView(label(t),LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(6)})
+        if(pl.phone.isNotBlank())taBelow.addView(links(pl.phone to {runCatching{activity.startActivity(Intent(Intent.ACTION_DIAL,Uri.parse("tel:"+pl.phone.replace(Regex("[^\\d+]"),""))))}}),LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(6)})
+        taBelow.visibility=View.VISIBLE
+        DocTracks.guidOf(pl.page)?.let{docAlertsFor(id,it,pl.page)}
+        if(pl.page.startsWith("https://")){link=pl.page;page.visibility=View.VISIBLE;page.setOnClickListener{open(link)}}
+        else if(pl.website.startsWith("https://")){link=pl.website;page.text="Website";page.visibility=View.VISIBLE;page.setOnClickListener{open(link)}}
+        if(pl.fromNotes){fine.text="From the accommodation notes for ${d.bySlug[pl.section]?.name?:"this section"} (teararoa.org.nz).";fine.visibility=View.VISIBLE}
+    }
+    /** "Part of Te Araroa": the sections a walk or track runs along, linked (at the bottom). */
+    private fun partOfTeAraroa(id:Long,line:List<Coordinate>){
+        val d=teAraroa?:return
+        runCatching{liveIo.execute{val secs=runCatching{d.sectionsAlong(line)}.getOrDefault(emptyList())
+            main.post{if(id!=request||secs.isEmpty()||currentTa)return@post
+                taLink.removeAllViews()
+                val box=NativeUi.column(activity).apply{background=NativeUi.background(activity,Color.argb(28,239,59,93),12);setPadding(dp(12),dp(10),dp(12),dp(10))}
+                box.addView(label("Part of Te Araroa",14f,NativeUi.ink,true))
+                box.addView(label(if(secs.size==1)"Section ${secs[0].n} · ${kmRange(d,secs[0].from,secs[0].to)}" else "${secs.size} sections",12.5f,NativeUi.muted))
+                for(s in secs.take(3))box.addView(links((if(s.alternative)s.name else "${s.n}. ${s.name}")+"  ›" to {showTaSection(s.slug,push=true)}).apply{textSize=14f},LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(6)})
+                taLink.addView(box,LinearLayout.LayoutParams(-1,-2));taLink.visibility=View.VISIBLE}}}
+    }
+    /** "On Te Araroa" for a hut the trail passes (within 400 m). */
+    private fun onTeAraroa(id:Long,at:Coordinate){
+        val d=teAraroa?:return
+        runCatching{liveIo.execute{val hit=runCatching{d.nearest(at,400.0)}.getOrNull()
+            main.post{val s=hit?.first?.section?.let{d.bySlug[it]}?:return@post;if(id!=request)return@post
+                taLink.removeAllViews()
+                val box=NativeUi.column(activity).apply{background=NativeUi.background(activity,Color.argb(28,239,59,93),12);setPadding(dp(12),dp(10),dp(12),dp(10))}
+                box.addView(label("On Te Araroa",14f,NativeUi.ink,true))
+                box.addView(label("km ${km(kmIn(d,hit.second))}",12.5f,NativeUi.muted))
+                box.addView(links("${s.n}. ${s.name}  ›" to {showTaSection(s.slug,push=true)}).apply{textSize=14f},LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(6)})
+                taLink.addView(box,LinearLayout.LayoutParams(-1,-2));taLink.visibility=View.VISIBLE}}}
+    }
+    // ---- Live alerts (the Trust's, DOC's) ----
+    private val liveIo=Executors.newFixedThreadPool(2){Thread(it,"ridgeline-live").apply{isDaemon=true}}
+    private val liveCache=HashMap<String,Pair<Long,String?>>()
+    /** A live JSON request (no shared cache: alerts change), kept 10 minutes; null when unreadable. */
+    private fun live(url:String,callback:(String?)->Unit){
+        synchronized(liveCache){liveCache[url]}?.takeIf{it.first>System.currentTimeMillis()}?.let{callback(it.second);return}
+        runCatching{liveIo.execute{
+            val body=runCatching{(java.net.URL(url).openConnection() as java.net.HttpURLConnection).run{
+                connectTimeout=8000;readTimeout=15000;setRequestProperty("Accept","application/json")
+                try{when(responseCode){200->inputStream.use{String(it.readBytes(),Charsets.UTF_8)};204->"[]";else->null}}finally{disconnect()}}}.getOrNull()
+            synchronized(liveCache){liveCache[url]=System.currentTimeMillis()+(if(body!=null)600_000L else 60_000L) to body}
+            main.post{callback(body)}}}.onFailure{callback(null)}
+    }
+    /** DOC's current alerts for a walk, track or hut, below the chart and introduction. */
+    private fun docAlertsFor(id:Long,guid:String,page:String){
+        live("https://www.doc.govt.nz/api/alerts/guid/${guid.lowercase()}"){body->
+            if(id!=request)return@live
+            alerts(docAlerts,body?.let{runCatching{TeAraroa.Alert.parseDoc(it)}.getOrNull()},"DOC alert","Couldn’t load DOC’s current alerts.",page.takeIf{it.startsWith("https://")}?:"https://www.doc.govt.nz/parks-and-recreation/know-before-you-go/alerts/",null)}
+    }
+    /** An alerts box: closures first, each folded (one alone opened); nothing when none. */
+    private fun alerts(box:LinearLayout,list:List<TeAraroa.Alert>?,noun:String,failed:String,page:String,d:TeAraroa?){
+        box.removeAllViews()
+        if(list!=null&&list.isEmpty()){box.visibility=View.GONE;return}
+        box.background=NativeUi.background(activity,if(NativeUi.dark)Color.rgb(70,44,30)else Color.rgb(253,236,224),12);box.setPadding(dp(12),dp(10),dp(12),dp(10))
+        val ink=if(NativeUi.dark)Color.rgb(255,214,190)else Color.rgb(110,48,16)
+        if(list==null){box.addView(links("⚠  $failed  ","Check them ↗" to {open(page)}).apply{setTextColor(ink)});box.visibility=View.VISIBLE;return}
+        box.addView(label("⚠  "+if(list.size==1)noun else "${list.size} ${noun}s",14f,ink,true))
+        for(a in list){
+            val where=if(a.from!=null&&d!=null)"km ${km(a.from)}${if(a.to!=null&&a.to!=a.from)"–${km(a.to)}" else ""} SOBO" else ""
+            val text=label(a.text,13f,ink).apply{visibility=if(list.size==1)View.VISIBLE else View.GONE}
+            val head=NativeUi.column(activity).apply{isClickable=true;setPadding(0,dp(8),0,dp(4));setOnClickListener{text.visibility=if(text.visibility==View.VISIBLE)View.GONE else View.VISIBLE}}
+            head.addView(label(a.title,13.5f,ink,true))
+            listOf(a.status,a.date,where).filter{it.isNotBlank()}.joinToString(" · ").takeIf{it.isNotEmpty()}?.let{head.addView(label(it,12f,ink).apply{alpha=.8f})}
+            box.addView(head);box.addView(text,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(4)})
+        }
+        box.visibility=View.VISIBLE
+    }
     private fun open(url:String){runCatching{activity.startActivity(Intent(Intent.ACTION_VIEW,Uri.parse(url)))}}
     private fun metres(v:Double)=String.format(java.util.Locale.ROOT,"%,d m",v.roundToInt())
     private fun distance(m:Double)=if(m>=1000)String.format(java.util.Locale.ROOT,if(m>=10_000)"%.1f km" else "%.2f km",m/1000)else"${m.roundToInt()} m"
@@ -799,5 +1153,5 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         }
     }
     private fun text(b:ByteArray)=String(b,Charsets.UTF_8)
-    fun close(){request++;parse.shutdownNow()}
+    fun close(){request++;parse.shutdownNow();liveIo.shutdownNow()}
 }

@@ -112,7 +112,7 @@ internal class PlaceSearch(lines:Sequence<String>){
             val p1=Math.toRadians(a.latitude);val p2=Math.toRadians(lat);val dp=p2-p1;val dl=Math.toRadians(lon-a.longitude)
             val h=sin(dp/2).pow(2)+cos(p1)*cos(p2)*sin(dl/2).pow(2);return 6371*2*asin(min(1.0,sqrt(h)))
         }
-        fun label(kind:String)=when(kind){"walk"->"Track";"hut"->"Hut";"camp"->"Campsite";"peak"->"Peak";"pass"->"Pass";"lake"->"Lake";"glacier"->"Glacier";"river"->"River";"place"->"Place";"valley"->"Valley";"ridge"->"Ridge";"waterfall"->"Waterfall";"coast"->"Coast";"area"->"Area";else->"Place"}
+        fun label(kind:String)=when(kind){"walk"->"Track";"hut"->"Hut";"camp"->"Campsite";"peak"->"Peak";"pass"->"Pass";"lake"->"Lake";"glacier"->"Glacier";"river"->"River";"place"->"Place";"valley"->"Valley";"ridge"->"Ridge";"waterfall"->"Waterfall";"coast"->"Coast";"area"->"Area";"te-araroa"->"Te Araroa";"te-araroa-section"->"Te Araroa section";else->"Place"}
         /** Zoom to fly to for a result: wide for tracks and places, close for huts. */
         fun zoom(kind:String)=when(kind){"walk"->12.0;"place","area","lake","river","valley","coast"->12.5;"glacier","ridge"->13.0;"peak","pass","waterfall"->13.5;else->14.5}
     }

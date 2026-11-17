@@ -102,6 +102,7 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
         check(parent,"Huts & bivouacs",state.huts,hutKey()){v->settings.change{it.copy(huts=v)}}
         check(parent,"Contour lines & heights",state.contours){v->settings.change{it.copy(contours=v)}}
         check(parent,"Hunting permit areas",state.hunting,huntingKey()){v->settings.change{it.copy(hunting=v)}}
+        check(parent,"Te Araroa",state.teAraroa,teAraroaKey()){v->settings.change{it.copy(teAraroa=v)}}
         parent.addView(NativeUi.text(activity,"Highways and major names appear first. Zoom in for smaller roads, road names, lesser peaks, local tracks and bivouacs.",14f).apply{setTextColor(NativeUi.muted);setPadding(0,dp(10),0,dp(8))})
         parent.addView(NativeUi.text(activity,"Check DOC alerts ↗",14f).apply{
             paintFlags=paintFlags or android.graphics.Paint.UNDERLINE_TEXT_FLAG;setTextColor(if(NativeUi.dark)Color.rgb(126,196,146)else Color.rgb(58,110,76));minHeight=dp(40);gravity=Gravity.CENTER_VERTICAL;isClickable=true
@@ -120,6 +121,14 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
     private fun huntingKey()=object:android.graphics.drawable.Drawable(){
         private val paint=android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply{color=MapLayers.HUNTING_LINE;strokeWidth=dp(2).toFloat();style=android.graphics.Paint.Style.STROKE}
         override fun draw(canvas:android.graphics.Canvas){val r=android.graphics.RectF(bounds).apply{inset(dp(2).toFloat(),dp(2).toFloat())};paint.pathEffect=android.graphics.DashPathEffect(floatArrayOf(dp(4).toFloat(),dp(2).toFloat()),0f);canvas.drawRoundRect(r,dp(2).toFloat(),dp(2).toFloat(),paint)}
+        override fun setAlpha(alpha:Int){};override fun setColorFilter(filter:android.graphics.ColorFilter?){}
+        @Deprecated("Drawable API") override fun getOpacity()=android.graphics.PixelFormat.TRANSLUCENT
+    }
+    /** The trail's red line on its dark edge, as drawn on the map. */
+    private fun teAraroaKey()=object:android.graphics.drawable.Drawable(){
+        private val paint=android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply{strokeCap=android.graphics.Paint.Cap.ROUND}
+        override fun draw(canvas:android.graphics.Canvas){val y=bounds.exactCenterY();val a=bounds.left+dp(2).toFloat();val b=bounds.right-dp(2).toFloat()
+            paint.color=MapLayers.TA_HALO;paint.strokeWidth=dp(4).toFloat();canvas.drawLine(a,y,b,y,paint);paint.color=MapLayers.TA_LINE;paint.strokeWidth=dp(2).toFloat();canvas.drawLine(a,y,b,y,paint)}
         override fun setAlpha(alpha:Int){};override fun setColorFilter(filter:android.graphics.ColorFilter?){}
         @Deprecated("Drawable API") override fun getOpacity()=android.graphics.PixelFormat.TRANSLUCENT
     }

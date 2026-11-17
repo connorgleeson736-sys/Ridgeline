@@ -71,3 +71,25 @@ the Gillespie Pass Circuit's DOC page excerpt and line are test fixtures
 
 A Milford Track DOC page excerpt is a test fixture
 (`android/app/src/test/fixtures/docpages/milford-track.html`).
+
+## Te Araroa
+
+`android/app/src/main/assets/te-araroa/` holds Te Araroa as the Te Araroa
+Trust publishes it at teararoa.org.nz (its GPS files, Google Earth file and
+section notes), licensed CC BY 4.0 and credited on every Te Araroa page;
+photographs from the Trust's website are not used. The trail's food stops are
+compiled from walkers' published resupply guides (facts only) and the Trust's
+notes. The shops and cafés at them are © OpenStreetMap contributors, available
+under the Open Database Licence (ODbL), credited on each shop's page. Live
+section alerts are read from the Trust's own site data when a section opens.
+Bushline/Ridgeline is not affiliated with or endorsed by Te Araroa Trust.
+
+The trail's name on the map is lettered in IM FELL English SC (Igino Marini's
+digitisation of the Fell types), `te-araroa/IMFellEnglishSC-Regular.ttf`, under
+the SIL Open Font License 1.1 (`te-araroa/IMFellEnglishSC-OFL.txt`).
+
+## DOC alerts
+
+Walk cards and DOC places to stay show DOC's current alerts, read live from the
+service DOC's own pages use (www.doc.govt.nz/api/alerts/guid/…), Crown
+copyright, Department of Conservation.

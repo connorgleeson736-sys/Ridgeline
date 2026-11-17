@@ -22,10 +22,21 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         val HUNTING_LINE=0xF0FF6A13.toInt();val HUNTING_TEXT=0xFFFFA25F.toInt()
         /** Hunting areas shaded by translucent blaze-orange hatching under their outline. */
         val HUNTING_HATCH=0x4DFF6A13
+        /** Te Araroa: the trail's red on a dark edge, its bypasses dashed, as on the website. */
+        val TA_LINE=0xFFEF3B5D.toInt();val TA_HALO=0xBF280A10.toInt();val TA_OPTION=0xE6EF3B5D.toInt()
+        /** Food stops and shops by kind: supermarket, store, café, send a box. */
+        fun foodColour(kind:String)=when(kind){"supermarket"->0xFF22A35A.toInt();"store"->0xFF8FD6AA.toInt();"cafe"->0xFFD08A3F.toInt();else->0xFFFFFFFF.toInt()}
+        /** Label keys: taps on them open Te Araroa's pages ([TA_NAME]: the trail). */
+        const val TA_NAME="te-araroa-name";const val TA_STOP="te-araroa-stop";const val TA_SHOP="te-araroa-shop";const val TA_PLACE="te-araroa-place"
+        /** The data zoom Te Araroa's lines are simplified for, by camera zoom. */
+        fun taZoom(zoom:Double)=when{zoom<7->5;zoom<9.5->8;zoom<12->11;else->13}
         /** DOC's walks drawn from this zoom, until the map's own tracks start (its
          * vector tiles carry tracks from zoom 12 only): lines only, no names. */
         const val FAR_TRACKS_ZOOM=9.0
         const val NEAR_TRACKS_ZOOM=12.0
+        /** The trail's name lettering (IM FELL English SC, OFL; assets/te-araroa). */
+        const val TA_FONT="te-araroa/IMFellEnglishSC-Regular.ttf"
+        const val TA_ORDER=1_000_000
         /** Large DOC walks (Great Walks, circuits, multi-day walks) named from here, one
          * zoom before the map's own track names start (zoom 12, as Capacitor). */
         const val FAR_NAMES_ZOOM=11.0
@@ -196,7 +207,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         val out=ArrayList<Placed>();val b=selection.duplicate().order(ByteOrder.LITTLE_ENDIAN);val n=b.getInt(0)
         for(k in 0 until n){val i=b.getInt(4+k*12);val ox=b.getFloat(8+k*12);val oy=b.getFloat(12+k*12)
             val row=p.atlas.labels.getOrNull(i)?:continue
-            if(!(row.label.key.startsWith(TopographyStyle.TRACK_LABELS+":")||row.label.key.startsWith(TopographyStyle.HUT_LABELS+":"))||i*3+1>=p.positions.size)continue
+            if(!(row.label.key.startsWith(TopographyStyle.TRACK_LABELS+":")||row.label.key.startsWith(TopographyStyle.HUT_LABELS+":")||row.label.key.startsWith("te-araroa"))||i*3+1>=p.positions.size)continue
             val x=p.positions[i*3]+ox*p.scale;val y=p.positions[i*3+1]+oy*p.scale
             out.add(Placed(floatArrayOf(x,y,x+row.width*p.scale,y+row.height*p.scale),row.label))}
         return out
@@ -539,7 +550,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         val state=loader.mapSettings.state
         if(state!=displayState){displayState=state;lastKey=null;schedulePublication()}
         // Overlays off and already cleared: no selection, fetching or publishing.
-        if(current.isEmpty()&&tiles.isEmpty()&&leases.isEmpty()&&mask(state).isEmpty()&&!(state.borders&&state.base==MapSettings.Base.LINZ)&&!state.hunting&&huntingTiles.isEmpty()&&!farTracks(state,view.planningPose.zoom))return@execute
+        if(current.isEmpty()&&tiles.isEmpty()&&leases.isEmpty()&&mask(state).isEmpty()&&!(state.borders&&state.base==MapSettings.Base.LINZ)&&!state.hunting&&huntingTiles.isEmpty()&&!farTracks(state,view.planningPose.zoom)&&!(state.teAraroa&&teAraroa!=null)&&taWanted.isEmpty())return@execute
         // Leading-edge throttle (was a 180 ms debounce that every camera frame
         // restarted, so tiles for new ground were not even selected until the
         // finger paused). A pending selection already reads the latest camera.
@@ -554,7 +565,8 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         val state=loader.mapSettings.state;val pose=view.planningPose
         val hunting=state.hunting&&pose.zoom>=HuntingAreas.MIN_ZOOM
         val farTracks=farTracks(state,pose.zoom)
-        if(mask(state).isEmpty()&&!(state.borders&&state.base==MapSettings.Base.LINZ&&pose.zoom>=8)&&!hunting&&!farTracks){releaseAll();current=emptyList();tiles.clear();huntingWanted=emptyList();lastKey=null;schedulePublication();return}
+        val trail=state.teAraroa&&teAraroa!=null
+        if(mask(state).isEmpty()&&!(state.borders&&state.base==MapSettings.Base.LINZ&&pose.zoom>=8)&&!hunting&&!farTracks&&!trail){releaseAll();current=emptyList();tiles.clear();huntingWanted=emptyList();taWanted=emptyList();lastKey=null;schedulePublication();return}
         val flat=if(!state.threeD)FlatSelection.plan((view.width/view.pixelScale).roundToInt(),(view.height/view.pixelScale).roundToInt(),pose,512.0,24,VECTOR_MAX_ZOOM)else null
         val wanted=if(flat!=null)flat.map{GpuUploadQueue.Id(it.z,it.x,it.y)}else{
             plan.rewind();val focus=view.surfaceFocusFor(pose)
@@ -565,6 +577,8 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         current=wanted
         if(mask(state).isEmpty()){for((id,owned)in leases.entries.toList())if(leases.remove(id,owned))owned.release(true);leaseStarted.clear();tiles.clear()}
         updateHunting(if(hunting)HuntingAreas.dataZoom(pose.zoom)else -1,wanted)
+        val trailWanted=if(trail){val z=taZoom(pose.zoom);wanted.map{id->if(id.z>=z)GpuUploadQueue.Id(z,id.x shr(id.z-z),id.y shr(id.z-z))else id}.distinct().take(96)}else emptyList()
+        if(trailWanted!=taWanted){taWanted=trailWanted;lastKey=null}
         updateDocWalks(state.tracks&&state.overlays()&&pose.zoom>=DocWalks.MIN_ZOOM||farTracks,wanted)
         schedulePublication();pump()
     }
@@ -650,6 +664,47 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
     }}.onFailure{callback(null)}}
     /** Foot tracks as the style draws them (nz-tracks): not vehicle tracks or roads. */
     private fun footTrack(p:Map<String,Any?>)=p["kind"]=="track"&&(p["track_use"]=="foot"||p["subclass"]=="foot_closed"||p["subclass"]=="foot_route_closed")
+    // ---- Te Araroa (bundled; see TeAraroa) ----
+    /** The trail, once loaded (MainActivity reads it off the main thread). */
+    @Volatile var teAraroa:TeAraroa?=null
+        set(v){field=v;runCatching{worker.execute{taCache.clear();taGroups.clear();taRevision++;lastKey=null;refresh()}}}
+    private var taWanted=emptyList<GpuUploadQueue.Id>();private var taRevision=0L
+    private val taGroups=HashMap<GpuUploadQueue.Id,LineGroup>()
+    /** The trail's lines in Mercator (main or option), simplified for a tile zoom. */
+    private val taCache=HashMap<Int,List<Pair<Boolean,List<VectorTile.Point>>>>()
+    private var taNameCache:List<Pair<String,Coordinate>>?=null
+    private fun taNames(t:TeAraroa)=taNameCache?:t.namePoints().also{taNameCache=it}
+    private fun taWidths(z:Int)=when{z<=5->2.6f to 1.3f;z<=8->3.2f to 1.7f;z<=11->4f to 2.2f;else->4.8f to 2.7f}
+    private fun taPaths(t:TeAraroa,z:Int)=taCache.getOrPut(z){
+        val tolerance=.5/(512.0*2.0.pow(z))
+        fun merc(line:List<Coordinate>)=simplify(line.map{VectorTile.Point((it.longitude+180)/360,CameraMath.mercatorY(it.latitude))},tolerance)
+        t.pieces.filter{it.line.size>=2}.map{true to merc(it.line)}+t.options.flatMap{s->s.parts.filter{it.size>=2}.map{false to merc(it)}}
+    }
+    /** Douglas–Peucker in Mercator units (ends kept). */
+    private fun simplify(points:List<VectorTile.Point>,tolerance:Double):List<VectorTile.Point>{
+        if(points.size<3)return points
+        val keep=BooleanArray(points.size);keep[0]=true;keep[points.size-1]=true
+        val stack=ArrayDeque<IntArray>();stack.add(intArrayOf(0,points.size-1))
+        while(stack.isNotEmpty()){val (a,b)=stack.removeLast().let{it[0] to it[1]};if(b-a<2)continue
+            val p=points[a];val q=points[b];val dx=q.x-p.x;val dy=q.y-p.y;val len=hypot(dx,dy)
+            var best=-1;var bd=tolerance
+            for(i in a+1 until b){val r=points[i];val d=if(len==0.0)hypot(r.x-p.x,r.y-p.y)else abs(dy*r.x-dx*r.y+q.x*p.y-q.y*p.x)/len;if(d>bd){bd=d;best=i}}
+            if(best>=0){keep[best]=true;stack.add(intArrayOf(a,best));stack.add(intArrayOf(best,b))}}
+        return points.filterIndexed{i,_->keep[i]}
+    }
+    /** The Te Araroa section (or bypass) whose line is under a tap at [zoom]: its slug. */
+    fun teAraroaAt(longitude:Double,latitude:Double,zoom:Double,callback:(String?)->Unit){runCatching{worker.execute{
+        val t=teAraroa;var found:String?=null
+        if(t!=null&&loader.mapSettings.state.teAraroa){
+            val x=(longitude+180)/360;val y=CameraMath.mercatorY(latitude);val reach=TAP_DP/(512.0*2.0.pow(zoom))
+            var best=reach
+            for(p in t.pieces){val b=p.box;if(longitude<b[0]-.05||longitude>b[2]+.05||latitude<b[1]-.05||latitude>b[3]+.05)continue
+                val path=p.line.map{VectorTile.Point((it.longitude+180)/360,CameraMath.mercatorY(it.latitude))};val d=TrackHits.distance(path,x,y);if(d<best){best=d;found=p.section}}
+            for(s in t.options)for(part in s.parts){val path=part.map{VectorTile.Point((it.longitude+180)/360,CameraMath.mercatorY(it.latitude))};val d=TrackHits.distance(path,x,y);if(d<best*.9){best=d;found=s.slug}}
+        }
+        val result=found
+        main.post{if(!closed)callback(result)}
+    }}.onFailure{callback(null)}}
     fun huntingAt(longitude:Double,latitude:Double,callback:(List<HuntingAreas.Area>)->Unit){runCatching{worker.execute{
         val x=(longitude+180)/360;val y=CameraMath.mercatorY(latitude)
         val found=huntingTiles.values.asSequence().flatten().filter{it.contains(x,y)}.distinctBy{it.id}.sortedBy{it.hectares}.toList()
@@ -693,7 +748,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         lastPublishAt=now
         val state=loader.mapSettings.state;val pose=view.planningPose;val zoom=floor(pose.zoom*4)/4
         val ordered=current.sortedWith(compareBy<GpuUploadQueue.Id>{it.z}.thenBy{it.x}.thenBy{it.y})
-        val key=listOf(state,ordered,tiles.mapValues{it.value.body.stamp?.fingerprint?:it.value.body.bytes.hashCode()},zoom,huntingRevision,huntingWanted,docRevision)
+        val key=listOf(state,ordered,tiles.mapValues{it.value.body.stamp?.fingerprint?:it.value.body.bytes.hashCode()},zoom,huntingRevision,huntingWanted,docRevision,taWanted,taRevision)
         if(key==lastKey)return;lastKey=key
         // Like MapLibre's buckets: each source tile is decoded, styled, clipped and
         // packed once per styling; a publication only concatenates cached groups,
@@ -776,6 +831,41 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
                     labels.add(TopographyStyle.Label(p,area.name,11f,HUNTING_TEXT,140.0,key=style.labelKey("hunting",area.name,p)))}
             }
         }else huntingGroups.clear()
+        // Te Araroa: its line and bypasses, then its food stops, shops and places to stay
+        // as dots (names closer in), and the trail's name once on each island.
+        val trail=teAraroa
+        if(state.teAraroa&&trail!=null){
+            taGroups.keys.retainAll(taWanted.toSet())
+            for(id in taWanted){val b=id.bounds
+                // Paint order is global (layer-major, as MapLibre): above the map's own
+                // lines (ordered by style layer), below hunting areas' outlines.
+                taGroups.getOrPut(id){
+                    val lines=ArrayList<TopographyStyle.Line>();val w=taWidths(id.z)
+                    for(path in taPaths(trail,id.z))for(part in clip(path.second,b))if(part.size>=2){
+                        if(path.first){lines.add(TopographyStyle.Line(part,TA_HALO,w.first,0f,0f,TA_ORDER));lines.add(TopographyStyle.Line(part,TA_LINE,w.second,0f,0f,TA_ORDER+2))}
+                        else lines.add(TopographyStyle.Line(part,TA_OPTION,w.second*.75f,5f,3.6f,TA_ORDER+1))}
+                    group(id.z+256,id.x,id.y,b,lines)
+                }.takeIf{it.lines>0}?.let{groups.add(it)}
+                fun inside(p:VectorTile.Point)=p.x>=b[0]&&p.x<b[2]&&p.y>=b[1]&&p.y<b[3]
+                fun merc(c:Coordinate)=VectorTile.Point((c.longitude+180)/360,CameraMath.mercatorY(c.latitude))
+                // Food stops (zoom 6 to 12.5; names from 8), then the shops and cafés at them.
+                if(zoom>=6&&zoom<12.5)for((i,s) in trail.stops.withIndex()){val p=merc(s.point);if(!inside(p))continue
+                    val r=if(zoom<10)2.6f else 3.6f
+                    labels.add(TopographyStyle.Label(p,"",r,foodColour(s.kind),40.0,circle=true,key="$TA_STOP:$i",halo=if(s.kind=="box")TA_LINE else 0xFFFFFFFF.toInt()))
+                    if(zoom>=8)labels.add(TopographyStyle.Label(p,s.name,11f,0xFFE7F7EC.toInt(),42.0,key="$TA_STOP-name:$i",anchor="top"))}
+                if(zoom>=12.5)for((i,x) in trail.shops.withIndex()){val p=merc(x.point);if(!inside(p))continue
+                    labels.add(TopographyStyle.Label(p,"",if(zoom<14)3f else 4.2f,foodColour(x.kind),44.0,circle=true,key="$TA_SHOP:$i",halo=0xFFFFFFFF.toInt()))
+                    if(zoom>=14)labels.add(TopographyStyle.Label(p,x.name,11f,0xFFECF8EF.toInt(),46.0,key="$TA_SHOP-name:$i",anchor="top"))}
+                // Places to stay the map does not show itself (huts it does): campsites, holiday parks, lodges.
+                if(zoom>=10)for((i,pl) in trail.places.withIndex()){val pt=pl.point?:continue;if(pl.approx||pl.hut)continue;val p=merc(pt);if(!inside(p))continue
+                    val lodge=pl.type=="Hostel"||pl.type=="Lodge"
+                    labels.add(TopographyStyle.Label(p,"",if(zoom<13)2.2f else 3.2f,if(lodge)TA_LINE else 0xFFFFF4F6.toInt(),48.0,circle=true,key="$TA_PLACE:$i",halo=if(lodge)0xFFFFF4F6.toInt() else TA_LINE))
+                    if(zoom>=12)labels.add(TopographyStyle.Label(p,pl.name,11f,0xFFFFE3E8.toInt(),50.0,key="$TA_PLACE-name:$i",anchor="top"))}
+                // The name: fixed, once on each island (zoom 5 to 11.5).
+                if(zoom>=5&&zoom<11.5)for((island,c) in taNames(trail)){val p=merc(c);if(inside(p))
+                    labels.add(TopographyStyle.Label(p,"Te Araroa",if(zoom<8)15f else 17f,0xFFB8152F.toInt(),3.0,key="$TA_NAME:$island",font=TA_FONT,halo=0xE0FAF3E4.toInt()))}
+            }
+        }else taGroups.clear()
         // A camera-dependent atlas order repainted/reuploaded the same strings on pans.
         // Fixed priority/key order keeps atlas slots stable; screen placement still follows camera.
         val chosen=labels.distinctBy{it.key}.sortedWith(compareBy<TopographyStyle.Label>{it.priority}.thenBy{it.key}).take(512)
