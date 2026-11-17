@@ -2,7 +2,8 @@
 //! frame topology stays valid even when its working set exceeds the atlas.
 use ridgeline_core::surface::GridRect;
 use std::collections::{BTreeMap, HashMap, HashSet};
-pub(crate) type Key = (GridRect, u8, u8);
+/// A rectangle of a tile's grid, its skirt edges, and its blocks' steps and visibility.
+pub(crate) type Key = (GridRect, u8, u128, u64);
 #[derive(Clone, Copy)]
 struct Entry {
     start: u32,
@@ -127,7 +128,8 @@ mod tests {
                 y1: 1,
             },
             0,
-            1,
+            0,
+            u64::MAX,
         )
     }
     #[test]

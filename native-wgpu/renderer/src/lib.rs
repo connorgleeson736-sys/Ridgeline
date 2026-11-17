@@ -87,6 +87,11 @@ struct Tile {
     field: Arc<ridgeline_core::heightfield::Heightfield>,
     adaptive_profile: Option<[f64; 2]>,
     adaptive_state: std::cell::Cell<adaptive::State>,
+    /// Per 16x16-cell block: errors at steps 4 and 2, lowest and highest height
+    /// (ridgeline_core::adaptive::block_profile), computed once when first drawn.
+    blocks: std::cell::OnceCell<Option<Vec<[f32; 4]>>>,
+    /// The blocks' steps last drawn (two bits each), for hysteresis.
+    block_steps: std::cell::Cell<u128>,
 }
 struct ImageTile {
     bind: Arc<wgpu::BindGroup>,
@@ -196,6 +201,8 @@ pub struct Renderer {
     exact_route_sources: HashSet<TileId>,
     next_adaptive_frame: Option<u64>,
     adaptive_levels: HashMap<TileId, u8>,
+    /// Per terrain tile this frame: its blocks' steps (two bits each) and which are in view.
+    block_plans: HashMap<TileId, (u128, u64)>,
     instance_scratch: Vec<[f32; 14]>,
     visible_scratch: Vec<ridgeline_core::surface::SurfacePatch>,
     route_anchor: [f64; 2],
@@ -568,7 +575,7 @@ impl Renderer {
             x1: 128,
             y1: 128,
         }
-        .indices()
+        .block_indices(ridgeline_core::adaptive::uniform_steps(1), u64::MAX, 0)
         .into_iter()
         .map(|i| i as u16)
         .collect::<Vec<_>>();
@@ -590,7 +597,8 @@ impl Renderer {
                         y1: 128,
                     },
                     0,
-                    1,
+                    ridgeline_core::adaptive::uniform_steps(1),
+                    u64::MAX,
                 ),
                 idx.len() as u32,
                 &HashSet::new(),
@@ -696,6 +704,7 @@ impl Renderer {
             exact_route_sources: HashSet::new(),
             next_adaptive_frame: None,
             adaptive_levels: HashMap::new(),
+            block_plans: HashMap::new(),
             instance_scratch: Vec::new(),
             visible_scratch: Vec::new(),
             route_anchor: [0.5, 0.5],
@@ -1048,6 +1057,8 @@ impl Renderer {
                 _heights: heights_texture,
                 adaptive_profile: None,
                 adaptive_state: std::cell::Cell::new(adaptive::State::new()),
+                blocks: std::cell::OnceCell::new(),
+                block_steps: std::cell::Cell::new(0),
                 used: self.clock,
                 generation: self.clock,
                 field: Arc::new(
@@ -1938,6 +1949,47 @@ impl Renderer {
                     Some(self.next_adaptive_frame.map_or(delay, |old| old.min(delay)));
             }
         }
+        // Blocks: off-screen ones are not drawn, and each takes the step its own
+        // error allows. A tile's block metadata is computed when it is first drawn,
+        // at most two tiles a frame (the rest draw by the tile's step meanwhile, and
+        // the next frame comes soon); partly measured tiles keep every block.
+        self.block_plans.clear();
+        let mut computed = 0;
+        for id in rows.iter().map(|r| r.geometry) {
+            if self.block_plans.contains_key(&id) {
+                continue;
+            }
+            let Some(tile) = self.tiles.get(&id) else {
+                continue;
+            };
+            if tile.blocks.get().is_none() && tile.field.complete() {
+                if computed < 2 {
+                    let _ = tile.blocks.set(ridgeline_core::adaptive::block_profile(tile.field.heights()));
+                    computed += 1;
+                } else {
+                    self.next_adaptive_frame = Some(self.next_adaptive_frame.map_or(1, |d| d.min(1)));
+                }
+            }
+            let exact = self.exact_route_sources.contains(&id)
+                || self.interiors.values().any(|p| p.parent == id)
+                || (!self.map_style.three_d && self.map_style.hillshade && self.map_style.basemap != 2);
+            let plan = adaptive::plan_blocks(
+                tile,
+                id,
+                matrix,
+                &route_view,
+                px_meter,
+                self.map_style.height_scale(),
+                exact,
+                self.adaptive_levels[&id],
+                ridgeline_core::surface::skirt_length(self.logical_zoom.unwrap_or(zoom)) as f32,
+            );
+            self.block_plans.insert(id, plan);
+        }
+        rows.retain(|row| {
+            ridgeline_core::surface::GridRect::for_bounds(row.geometry, row.bounds())
+                .any_block_visible(self.block_plans[&row.geometry].1)
+        });
         // Group all compatible instances, rather than only accidental
         // neighbours in quadtree order. Surface ownership remains disjoint.
         if self.image_arrays.is_some() && self.height_arrays.is_some() {
@@ -1954,7 +2006,7 @@ impl Renderer {
                     rect.x1,
                     rect.y1,
                     mask,
-                    rect.adaptive_step(self.adaptive_levels[&row.geometry]),
+                    self.block_plans[&row.geometry],
                 )
             });
         }
@@ -2022,8 +2074,8 @@ impl Renderer {
                 (
                     ridgeline_core::surface::GridRect::for_bounds(row.geometry, row.bounds()),
                     self.draw_mask(row),
-                    ridgeline_core::surface::GridRect::for_bounds(row.geometry, row.bounds())
-                        .adaptive_step(self.adaptive_levels[&row.geometry]),
+                    self.block_plans[&row.geometry].0,
+                    self.block_plans[&row.geometry].1,
                 )
             })
             .collect();
@@ -2034,7 +2086,7 @@ impl Renderer {
             if self.index_atlas.get(rect).is_none() && !overflow.contains_key(rect) {
                 let ids: Vec<u16> = rect
                     .0
-                    .adaptive_indices(rect.2, rect.1)
+                    .block_indices(rect.2, rect.3, rect.1)
                     .into_iter()
                     .map(|i| i as u16)
                     .collect();
@@ -2064,7 +2116,7 @@ impl Renderer {
         }
         self.drawn_surface_triangles = rects
             .iter()
-            .map(|(r, _, s)| r.adaptive_surface_triangles(*s))
+            .map(|(r, _, s, v)| r.block_surface_triangles(*s, *v))
             .sum();
         self.drawn_triangles = rects
             .iter()
