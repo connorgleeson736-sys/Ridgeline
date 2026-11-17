@@ -328,7 +328,7 @@ function openPicked(ctx, panel, { fromList = false, push = false } = {}) {
 /** A section (or option): its facts, alerts, profile, food, then the rest folded away. */
 function sectionPanel(ctx, d, s, { at = null, walk = null, fromList = false } = {}) {
   const ends = () => (teAraroa.dir() === 'nobo' ? [s.to, s.from] : [s.from, s.to]);
-  const sub = () => (s.alternative ? `${teAraroa.optionKind(s).label} · leaves the trail at km ${km(teAraroa.kmIn(d, ends()[0]))}, rejoins at km ${km(teAraroa.kmIn(d, ends()[1]))}` : `Section ${s.n} · ${s.region} · ${kmRange(d, s.from, s.to)}`);
+  const sub = () => (s.alternative ? `${teAraroa.optionKind(s).label} · leaves the trail at km ${km(teAraroa.kmIn(d, ends()[0]))}, rejoins at km ${km(teAraroa.kmIn(d, ends()[1]))}` : `Section ${s.n} · ${kmRange(d, s.from, s.to)}`);
   return {
     kind: 'te-araroa', key: s.slug, title: s.name, subtitle: sub(), backLabel: s.name.length > 26 ? 'Back' : s.name,
     render(body, alive, host, { restored = false } = {}) {
@@ -354,18 +354,19 @@ function sectionPanel(ctx, d, s, { at = null, walk = null, fromList = false } = 
           }
         }
         body.append(intro);
-        // Food: what is in the section, and the next place after it.
+        // Food: the next place to buy it, from the start of the section (or where the
+        // walk it was opened from joins it; a town just before the start counts, as
+        // Hamilton for Hamilton City), and towns a hitch away before it.
         if (s.from != null) {
-          const here = teAraroa.walking(d.resupply.filter((r) => teAraroa.onTrail(r) && r.km >= s.from - 0.05 && r.km <= s.to + 0.05));
-          const end = at ?? (teAraroa.dir() === 'nobo' ? s.from : s.to);
-          const next = teAraroa.foodAround(d, end).ahead;
+          const nobo = teAraroa.dir() === 'nobo', start = at ?? (nobo ? s.to : s.from);
+          const next = teAraroa.foodAround(d, nobo ? start + 1.5 : start - 1.5).ahead;
           const stop = (r) => el('button', { type: 'button', class: 'link', onclick: () => openPicked(ctx, stopPanel(ctx, d, d.resupply.indexOf(r), { fromList }), { fromList, push: true }) }, r.name);
-          const food = el('div', { class: 'ta-food-line' }, el('span', { class: 'food-dot supermarket', 'aria-hidden': 'true' }),
-            el('span', {}, here.length ? ['Food here: ', ...here.flatMap((r, i) => [i ? ', ' : '', stop(r)])] : 'No food in this section.',
-              next && !here.includes(next) ? el('small', {}, 'Next: ', stop(next), ` in ${km(Math.abs(next.km - end))} km, ${teAraroa.daysText(teAraroa.days(d, Math.min(end, next.km), Math.max(end, next.km)))}`) : null,
-              // Towns a hitch away before the next stop on the trail.
-              (() => { if (!next) return null; const lo = Math.min(end, next.km), hi = Math.max(end, next.km); const h = teAraroa.walking(d.resupply.filter((r) => !teAraroa.onTrail(r) && r.km > lo && r.km < hi)); return h.length ? el('small', {}, 'Or hitch to: ', ...h.flatMap((r, i) => [i ? ', ' : '', stop(r), ` (${km(r.off / 1000)} km off)`])) : null; })()));
-          body.append(food);
+          const gap = next ? Math.abs(next.km - start) : 0;
+          const lo = next ? Math.min(start, next.km) : 0, hi = next ? Math.max(start, next.km) : 0;
+          const hitch = next ? teAraroa.walking(d.resupply.filter((r) => !teAraroa.onTrail(r) && r.km > lo && r.km < hi)) : [];
+          body.append(el('div', { class: 'ta-food-line' }, el('span', { class: 'food-dot supermarket', 'aria-hidden': 'true' }),
+            el('span', {}, next ? ['Next food: ', stop(next), (nobo ? start - next.km : next.km - start) < 0.5 ? ' (at the start)' : ` in ${km(gap)} km`] : 'No more food stops this way.',
+              hitch.length ? el('small', {}, 'Or hitch to: ', ...hitch.flatMap((r, i) => [i ? ', ' : '', stop(r), ` (${km(r.off / 1000)} km off)`])) : null)));
         }
         // Bypasses here (or, for an option, the section it replaces).
         const options = s.alternative ? d.mains.filter((m) => Math.min(m.to, s.to) - Math.max(m.from, s.from) > 2) : d.sections.filter((o) => o.alternative && o.from != null && s.from != null && Math.min(o.to, s.to) - Math.max(o.from, s.from) > 0.3);
@@ -423,9 +424,9 @@ function sectionSteps(ctx, d, s, host, opts) {
     else ctx.sheet.show({ kind: p.kind, title: p.title, subtitle: p.subtitle, backLabel: p.backLabel, size: ctx.sheet.root.dataset.size, render: (body, alive, o) => { p.render(body, alive, ctx.sheet, o); return opts.fromList ? undefined : () => ctx.select(null); } });
   };
   const step = (t, back) => (t
-    ? el('button', { type: 'button', class: `ta-step ${back ? 'prev' : 'next'}`, title: t.name, 'aria-label': `${back ? 'Previous' : 'Next'} section: ${t.name}`, onclick: () => go(t) },
+    ? el('button', { type: 'button', class: `ta-step ${back ? 'prev' : 'next'}`, title: `${back ? 'Previous' : 'Next'}: ${t.name}`, 'aria-label': `${back ? 'Previous' : 'Next'} section: ${t.name}`, onclick: () => go(t) },
       back ? el('span', { class: 'arrow', 'aria-hidden': 'true' }, '‹') : null,
-      el('span', { class: 'ta-step-text' }, el('small', {}, back ? 'Previous' : 'Next'), el('span', { class: 'ta-step-name' }, t.name)),
+      el('span', { class: 'ta-step-name' }, t.name),
       back ? null : el('span', { class: 'arrow', 'aria-hidden': 'true' }, '›'))
     : el('span', { class: 'ta-step empty' }));
   return el('nav', { class: 'ta-steps', 'aria-label': 'Sections along the trail' }, step(prev, true), step(next, false));
@@ -479,7 +480,13 @@ function overview(ctx, d, body, alive, tab = 'sections', restored = false) {
   if (ctx.side) ctx.side.home = 'Te Araroa';
   const rows = new Map();
   // Back to the list: the whole trail highlighted again, the map left where it is.
-  if (ctx.side) ctx.side.onChange = (key) => { for (const [k, row] of rows) row.classList.toggle('open', k === key); if (!key && alive()) wholeView(false); };
+  if (ctx.side) ctx.side.onChange = (key) => { for (const [k, row] of rows) row.classList.toggle('open', k === key); if (!key && alive()) wholeView(false); else centre(rows.get(key)); };
+  // The open one about the middle of the list (computers: the list stays open beside it).
+  const centre = (row) => {
+    if (!row || !ctx.side?.available) return;
+    const r = row.getBoundingClientRect(), b = body.getBoundingClientRect();
+    body.scrollBy({ top: r.top - b.top - (b.height - r.height) / 2, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  };
   const pick = (panel) => openPicked(ctx, panel, { fromList: true });
   const draw = () => {
     body.replaceChildren();
@@ -489,7 +496,8 @@ function overview(ctx, d, body, alive, tab = 'sections', restored = false) {
     restored = true;
     const tabs = el('div', { class: 'ta-tabs', role: 'tablist' });
     const pane = el('div', { class: 'ta-pane' });
-    ctx.sheet.setAside(directionSwitch(() => { draw(); if (ctx.side?.isOpen) ctx.side.close(); }));
+    // The open section stays open, redrawn for the new direction (the map left as it is).
+    ctx.sheet.setAside(directionSwitch(() => { draw(); if (ctx.side?.isOpen && ctx.side.current) ctx.side.show(ctx.side.current, { restored: true }); }));
     body.append(tabs, pane);
     const show = (name) => {
       current = name;

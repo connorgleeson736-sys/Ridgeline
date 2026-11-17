@@ -48,15 +48,16 @@ const saveSettings = () => store.set('settings', settings);
 const memory = navigator.deviceMemory || 8, saveData = !!navigator.connection?.saveData;
 const lowPower = memory <= 2 || saveData;
 let sharp = false;
-// A phone: a small, dense screen. Its drawing buffer is small enough to draw at 2×
-// at every zoom, and its imagery is asked for half a zoom finer (style.js).
+// A phone: a small, dense screen. Its drawing buffer is small enough to draw at up to
+// 2.5× at every zoom, and its imagery is asked for half a zoom finer (style.js).
 const phone = !lowPower && (devicePixelRatio || 1) >= 2 && innerWidth * innerHeight <= 600_000;
 function pixelRatio(zoom) {
   if (zoom >= 15.3) sharp = true; else if (zoom < 14.7) sharp = false;
   const dpr = devicePixelRatio || 1, w = innerWidth, h = innerHeight;
   if (lowPower) return 1;
   if (settings.base === 'topo') return Math.max(1, Math.min(dpr, 3, Math.sqrt(8_000_000 / (w * h))));
-  return Math.max(1, Math.min(dpr, 2, sharp || phone ? 2 : 1.5, Math.sqrt((sharp || phone ? 6_000_000 : 2_800_000) / (w * h))));
+  if (phone) return Math.max(1, Math.min(dpr, 2.5, Math.sqrt(6_000_000 / (w * h))));
+  return Math.max(1, Math.min(dpr, 2, sharp ? 2 : 1.5, Math.sqrt((sharp ? 6_000_000 : 2_800_000) / (w * h))));
 }
 
 // ---- Where to start: a link, else where you were, else Aoraki ----
