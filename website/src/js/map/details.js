@@ -168,7 +168,6 @@ export function openWalk(ctx, guid, { push = false } = {}) {
         ctx.sheet.setTitle(name, subtitle);
         ctx.sheet.setPhoto(info?.thumbnail || o.image, name);
         if (line.length >= 2) { ctx.select([line]); if (!restored) ctx.fit(line); }
-        body.append(chips((o.distance || fact[0]) && `DOC: ${o.distance || fact[0]}`, (o.time || fact[1]) && `Time: ${o.time || fact[1]}`, fact[2] === 'loop' ? 'Loop' : fact[2] === 'one_way' ? 'One way' : null, (o.dogs || fact[3]) && (o.dogs || fact[3]).split('.')[0]));
         const partRow = el('div', { class: 'parts', hidden: true });
         const partText = el('div', { class: 'part-text', hidden: true });
         const intro = (o.intro || info?.introduction) ? el('p', { class: 'intro' }, o.intro || info.introduction) : null;
@@ -257,7 +256,8 @@ export function openTrack(ctx, name, tapped, pieces, { push = false } = {}) {
         if (!alive() || !tracks.length) return;
         const t = tracks[0];
         ctx.sheet.setTitle(null, [t.category, t.duration].filter(Boolean).join(' · ') || 'Track');
-        extra.append(chips(t.type, t.status && !/^open$/i.test(t.status) ? `Status: ${t.status}` : null, t.dogs && `Dogs: ${t.dogs}`));
+        // No tags (type, dogs); only a track that is not open says so.
+        if (t.status && !/^open$/i.test(t.status)) extra.append(chips(`Status: ${t.status}`));
         extra.append(el('p', { class: 'fine' }, DOC_NOTE));
       }).catch(() => {});
       body.append(el('div', { class: 'sheet-actions' }, ...[
