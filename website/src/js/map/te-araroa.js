@@ -72,6 +72,15 @@ export function roadShare(d, s) {
 }
 
 /** Southbound kilometre at a point on a piece. */
+/** The point on the main trail at a (southbound) km, or null in a gap (a ferry). */
+function pointAt(d, k) {
+  const p = d.pieces.find((x) => k >= x.from && k <= x.to);
+  if (!p?.line.length) return null;
+  const t = ((k - p.from) / Math.max(1e-9, p.to - p.from)) * (p.line.length - 1), i = Math.min(p.line.length - 2, Math.floor(t)), f = t - i;
+  if (p.line.length < 2) return p.line[0];
+  return [p.line[i][0] + (p.line[i + 1][0] - p.line[i][0]) * f, p.line[i][1] + (p.line[i + 1][1] - p.line[i][1]) * f];
+}
+
 export function kmOn(piece, p) {
   const line = piece.line, k = Math.cos((p[1] * Math.PI) / 180);
   const seg = (a, b) => Math.hypot((b[0] - a[0]) * k, b[1] - a[1]);
@@ -94,11 +103,51 @@ export function features(d) {
   // Places known only by their town are listed with their section, not drawn.
   const places = d.places.map((p, i) => ({ p, i })).filter(({ p }) => !p.approx).map(({ p, i }) => ({ type: 'Feature', properties: { i, name: p.name, type: p.type, hut: /^hut$/i.test(p.type) }, geometry: { type: 'Point', coordinates: p.point } }));
   const stops = d.resupply.map((r, i) => ({ type: 'Feature', properties: { i, name: r.name, level: r.level, kind: r.kind || (r.level === 'full' ? 'supermarket' : r.level === 'box' ? 'box' : 'store') }, geometry: { type: 'Point', coordinates: r.point } }));
-  // "Te Araroa" once on each island, fixed, at the middle of the island's trail.
+  // "Te Araroa" once on each island, fixed at the middle of the island's trail, written
+  // along it: a smoothed copy of the trail about that point, one per zoom band (longer and
+  // smoother further out), each short enough to sit within one tile and its buffer, so
+  // the label is placed once and follows the trail's general curve, not its wiggles.
   const names = [];
+  // [band, step km, (unused), shortest line km (the text's length at the band's
+  // widest zoom, and some), longest stretch of trail km].
+  const BANDS = [[0, 3, 0, 250, 1300], [1, 1, 0, 80, 420], [2, 0.25, 0, 24, 130]];
+  // A gentle curve through the stretch: x and y as cubics of the distance along it
+  // (least squares), so the lettering bends with the trail's general line, never its turns.
+  const smoothLine = (c, span, step) => {
+    const pts = [];
+    for (let k = c - span / 2; k <= c + span / 2; k += step) { const p = pointAt(d, k); if (p) pts.push(p); }
+    if (pts.length < 8) return [];
+    const ts = [0];
+    for (let i = 1; i < pts.length; i++) ts.push(ts[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+    const T = ts[ts.length - 1] || 1, deg = 3;
+    const fit = (axis) => {
+      const A = Array.from({ length: deg + 1 }, () => new Array(deg + 2).fill(0));
+      pts.forEach((p, i) => { const t = ts[i] / T; for (let r = 0; r <= deg; r++) { for (let q = 0; q <= deg; q++) A[r][q] += t ** (r + q); A[r][deg + 1] += p[axis] * t ** r; } });
+      for (let col = 0; col <= deg; col++) {
+        let piv = col; for (let r = col + 1; r <= deg; r++) if (Math.abs(A[r][col]) > Math.abs(A[piv][col])) piv = r;
+        [A[col], A[piv]] = [A[piv], A[col]];
+        for (let r = 0; r <= deg; r++) { if (r === col) continue; const f = A[r][col] / A[col][col]; for (let q = col; q <= deg + 1; q++) A[r][q] -= f * A[col][q]; }
+      }
+      return A.map((row, r) => row[deg + 1] / row[r]);
+    };
+    const cx = fit(0), cy = fit(1), out = [];
+    // The ends trimmed a little: a fitted curve strays most there.
+    for (let i = 0; i <= 60; i++) { const t = 0.06 + (0.88 * i) / 60; out.push([cx.reduce((v, k, j) => v + k * t ** j, 0), cy.reduce((v, k, j) => v + k * t ** j, 0)]); }
+    return out;
+  };
+  const kmLong = (line) => { let n = 0; for (let i = 1; i < line.length; i++) { const k = Math.cos((line[i][1] * Math.PI) / 180); n += Math.hypot((line[i][0] - line[i - 1][0]) * 111.32 * k, (line[i][1] - line[i - 1][1]) * 111.32); } return n; };
   for (const [a, b] of [[0, 1739], [1739, d.total]]) {
-    const k = (a + b) / 2, piece = d.pieces.find((x) => k >= x.from && k <= x.to);
-    if (piece?.line.length) names.push({ type: 'Feature', properties: { km: k }, geometry: { type: 'Point', coordinates: piece.line[Math.floor(((k - piece.from) / Math.max(1e-9, piece.to - piece.from)) * (piece.line.length - 1))] } });
+    const mid = (a + b) / 2;
+    for (const [band, step, , least, most] of BANDS) {
+      // The trail winds: take a longer stretch until its smoothed line fits the text.
+      let line = [];
+      for (let span = least * 1.6; span <= most; span *= 1.15) {
+        const lo = Math.max(a + 1, mid - span / 2), hi = Math.min(b - 1, mid + span / 2);
+        line = smoothLine((lo + hi) / 2, hi - lo, step);
+        if (kmLong(line) >= least) break;
+      }
+      if (line.length >= 2) names.push({ type: 'Feature', properties: { band, island: a ? 'south' : 'north' }, geometry: { type: 'LineString', coordinates: line } });
+    }
   }
   // The shops and cafés at each food stop (OpenStreetMap), shown closer in.
   const shops = (d.shops || []).map((x, i) => ({ type: 'Feature', properties: { i, name: x.name, kind: x.kind }, geometry: { type: 'Point', coordinates: x.point } }));
