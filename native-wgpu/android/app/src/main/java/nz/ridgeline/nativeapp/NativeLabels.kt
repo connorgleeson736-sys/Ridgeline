@@ -141,7 +141,7 @@ internal object NativeLabels {
      * anchor, so moving the map does not reshuffle which names are visible.
      * Labels hidden by terrain arrive unprojected and take no space. */
     /** One placed sprite: its row, its offset from its anchor (dp) and its turn (radians). */
-    private class Placed(val index:Int,val x:Float,val y:Float,val angle:Float=0f)
+    internal class Placed(val index:Int,val x:Float,val y:Float,val angle:Float=0f)
     /** Placement entries: row (int), offset x and y (dp), turn (radians, clockwise on screen). */
     const val ENTRY=16
     fun place(atlas:NativeLabelAtlas,projected:FloatArray,width:Int,height:Int,scale:Float):ByteBuffer{
@@ -179,6 +179,42 @@ internal object NativeLabels {
         }
         shown=next
         return ByteBuffer.allocateDirect(4+selected.size*ENTRY).order(ByteOrder.LITTLE_ENDIAN).apply{putInt(selected.size);for(p in selected){putInt(p.index);putFloat(p.x);putFloat(p.y);putFloat(p.angle)};rewind()}
+    }
+    /** Names along curves in an atlas: per curve, its points' rows in order and its letters' rows. */
+    internal class Curves(val curves:List<Pair<IntArray,IntArray>>,val inputs:List<ByteBuffer>,val outputs:List<ByteBuffer>)
+    fun curves(atlas:NativeLabelAtlas):Curves?{
+        val vertices=HashMap<String,ArrayList<Pair<Int,Int>>>();val glyphs=HashMap<String,ArrayList<Int>>()
+        for((i,row) in atlas.labels.withIndex()){val l=row.label;if(l.path.isEmpty())continue
+            if(l.vertex>=0)vertices.getOrPut(l.path){ArrayList()}.add(l.vertex to i)else if(l.glyph>=0)glyphs.getOrPut(l.path){ArrayList()}.add(i)}
+        val curves=vertices.mapNotNull{(path,v)->val g=glyphs[path]?:return@mapNotNull null;v.sortBy{it.first};v.map{it.second}.toIntArray() to g.toIntArray()}
+        if(curves.isEmpty())return null
+        val inputs=curves.map{(v,_)->ByteBuffer.allocateDirect(v.size*16).order(ByteOrder.LITTLE_ENDIAN).apply{for(i in v){val p=atlas.labels[i].label.point;putDouble(p.x).putDouble(p.y)};rewind()}}
+        return Curves(curves,inputs,curves.map{(v,_)->ByteBuffer.allocateDirect(v.size*12).order(ByteOrder.LITTLE_ENDIAN)})
+    }
+    /** The placement [base] with its names along curves laid out again for the
+     * camera now: [project] gives a curve's points on screen (x, y, a flag, per
+     * point; points without terrain yet included, NativeBridge.projectCurve), so
+     * the name stays at its curve's middle and follows it every frame, as
+     * MapLibre's line-center names do. */
+    fun withCurves(atlas:NativeLabelAtlas,set:Curves,base:ByteBuffer,project:(ByteBuffer,ByteBuffer)->Int,width:Int,height:Int,scale:Float):ByteBuffer{
+        val projected=FloatArray(atlas.labels.size*3)
+        project(atlas,set,projected,project)
+        val placed=curves(atlas,projected,width,height,scale).flatMap{it.first}
+        val b=base.duplicate().order(ByteOrder.LITTLE_ENDIAN);b.rewind();val n=b.int
+        val kept=ArrayList<Placed>(n+placed.size)
+        repeat(n){val i=b.int;val x=b.float;val y=b.float;val a=b.float;if(atlas.labels.getOrNull(i)?.label?.path.isNullOrEmpty())kept.add(Placed(i,x,y,a))}
+        kept.addAll(placed)
+        return ByteBuffer.allocateDirect(4+kept.size*ENTRY).order(ByteOrder.LITTLE_ENDIAN).apply{putInt(kept.size);for(p in kept){putInt(p.index);putFloat(p.x);putFloat(p.y);putFloat(p.angle)};rewind()}
+    }
+    /** Writes the curves' points and letters' anchors into [projected] (by row). */
+    fun project(atlas:NativeLabelAtlas,set:Curves,projected:FloatArray,project:(ByteBuffer,ByteBuffer)->Int){
+        for((k,curve) in set.curves.withIndex()){
+            val (v,g)=curve;val input=set.inputs[k].apply{rewind()};val output=set.outputs[k].apply{clear()}
+            if(project(input,output)!=v.size)continue;output.rewind()
+            for(i in v){projected[i*3]=output.float;projected[i*3+1]=output.float;projected[i*3+2]=output.float}
+            // The letters' shared anchor is the curve's middle point.
+            val mid=v[v.size/2];for(i in g){projected[i*3]=projected[mid*3];projected[i*3+1]=projected[mid*3+1];projected[i*3+2]=projected[mid*3+2]}
+        }
     }
     /** Names written along curves (MapLibre's line-center placement): the curve's
      * points as projected now, the letters laid along its middle, each turned to

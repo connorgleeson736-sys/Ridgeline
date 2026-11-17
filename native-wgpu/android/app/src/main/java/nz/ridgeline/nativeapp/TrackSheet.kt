@@ -64,7 +64,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         override fun onInterceptTouchEvent(e:MotionEvent):Boolean{
             when(e.actionMasked){
                 MotionEvent.ACTION_DOWN->{downX=e.rawX;downY=e.rawY;owning=false;candidate=e.y<header.bottom}
-                MotionEvent.ACTION_MOVE->if(candidate&&!owning){val dy=e.rawY-downY;if(abs(dy)>slop&&abs(dy)>abs(e.rawX-downX)){owning=true;begin(downY);return true}}
+                MotionEvent.ACTION_MOVE->if(candidate&&!owning){val dy=e.rawY-downY;if(abs(dy)>slop&&abs(dy)>abs(e.rawX-downX)){owning=true;begin(e.rawY);return true}}
                 MotionEvent.ACTION_UP,MotionEvent.ACTION_CANCEL->candidate=false
             }
             return false
@@ -220,19 +220,36 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     /** Middle: the chart and the section chips below it, with the map still usable above. */
     private fun middle()=max(compact()+dp(300),(inner()*.55f).toInt()).coerceAtMost(full())
     private fun stop(l:Int)=when(l){0->compact();1->middle();else->full()}
+    /** Where the sheet is sliding to (NaN: not sliding). */
+    private var slidingTo=Float.NaN
+    private fun mapHeight(shown:Int)=(inner()-shown+dp(24)).coerceAtLeast(dp(80))
+    private fun sizeMap(height:Int){if(map.layoutParams.height!=height)map.layoutParams=map.layoutParams.apply{this.height=height}}
     private fun place(animate:Boolean){
         val lp=panel.layoutParams as FrameLayout.LayoutParams
         if(lp.height!=full()){lp.height=full();panel.layoutParams=lp}
         val shown=stop(level);val target=(full()-shown).coerceAtLeast(0).toFloat()
-        if(animate)panel.animate().translationY(target).setDuration(180).start()else panel.translationY=target
-        // As the route sheet: the map is the space above the sheet (its rounded top overlaps by 24 dp).
-        val height=(inner()-shown+dp(24)).coerceAtLeast(dp(80))
-        if(map.layoutParams.height!=height)map.layoutParams=map.layoutParams.apply{this.height=height}
+        // As the route sheet: the map is the space above the sheet (its rounded top
+        // overlaps by 24 dp). The map is resized once, never while the sheet slides
+        // (a resize mid-slide stuttered): before a slide down (the sheet uncovers
+        // it), after a slide up.
+        val height=mapHeight(shown)
+        if(animate||!slidingTo.isNaN()){
+            if(slidingTo!=target){
+                if(map.layoutParams.height>=0&&height>map.layoutParams.height)sizeMap(height)
+                slidingTo=target
+                panel.animate().translationY(target).setDuration(220).setInterpolator(android.view.animation.DecelerateInterpolator(1.6f))
+                    .withEndAction{slidingTo=Float.NaN;if(visible&&!dragging)sizeMap(mapHeight(stop(level)))}.start()
+            }
+        }else{panel.translationY=target;sizeMap(height)}
         onCover(dp(24))
         grip.contentDescription=if(level==2)"Collapse track summary" else "Expand track summary"
     }
     private fun settle(l:Int){level=l.coerceIn(0,2);place(true)}
-    private fun begin(rawY:Float){dragging=true;startY=rawY;startShift=panel.translationY;panel.animate().cancel()}
+    private fun begin(rawY:Float){
+        dragging=true;startY=rawY;panel.animate().cancel();slidingTo=Float.NaN;startShift=panel.translationY
+        // The map fills the screen behind the sheet while it is dragged (no gap as it comes down).
+        sizeMap(mapHeight(stop(0)))
+    }
     private fun drag(rawY:Float){if(dragging)panel.translationY=(startShift+rawY-startY).coerceIn(0f,full().toFloat())}
     private fun finish(rawY:Float){
         if(!dragging)return;dragging=false
@@ -245,9 +262,12 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     private var request=0L
     private var link=""
     /** Clears the sheet for a new track or hut and slides it up. */
+    /** The next page keeps the sheet where it is (Te Araroa's previous and next). */
+    private var keepStop=false
     private fun begin(title:String,hut:Boolean):Long{
         val id=++request
-        visible=true;level=0;link="";sectionOf=false;parts.clear();partRow.removeAllViews();partScroll.visibility=View.GONE;choice=null;optionScroll.visibility=View.GONE;pageWords="";nearHuts=emptyList();recordHuts=null;pageLegs=emptyList();partText.removeAllViews();partText.visibility=View.GONE;walkRef=null
+        if(!(keepStop&&visible))level=0;keepStop=false
+        visible=true;link="";sectionOf=false;parts.clear();partRow.removeAllViews();partScroll.visibility=View.GONE;choice=null;optionScroll.visibility=View.GONE;pageWords="";nearHuts=emptyList();recordHuts=null;pageLegs=emptyList();partText.removeAllViews();partText.visibility=View.GONE;walkRef=null
         name.text=title;subtitle.text="";subtitle.visibility=View.GONE;wholeSubtitle="";closedBadge.visibility=View.GONE;subtitle.maxLines=2
         photo.setImageDrawable(null);photo.visibility=View.GONE
         val labels=if(hut)listOf("Bunks","Elevation","Bookings","From road")else listOf("Distance","Ascent","Descent","Highest")
@@ -379,7 +399,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         if(!visible)return
         visible=false;request++;loader.cancelTrackProfile();onLine(null,null);onPoint(null);onRange(emptyList());chart.clearInspection()
         if(map.layoutParams.height!=-1)map.layoutParams=map.layoutParams.apply{height=-1}
-        onCover(0);onClosed()
+        onCover(0);onClosed();slidingTo=Float.NaN
         panel.animate().translationY(full().toFloat()).setDuration(160).withEndAction{if(!visible)panel.visibility=View.GONE}.start()
     }
     fun back():Boolean{if(!visible)return false;if(level>0)settle(level-1)else if(stack.isNotEmpty())goBack()else closeOrReturn();return true}
@@ -942,7 +962,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
                 if(t!=null){
                     cell.background=NativeUi.pressable(activity,GradientDrawable().apply{setColor(Color.TRANSPARENT);cornerRadius=dpf(10f);setStroke(dp(1),NativeUi.line)});cell.isClickable=true
                     cell.contentDescription="${if(back)"Previous" else "Next"} section: ${t.name}"
-                    cell.setOnClickListener{restoring=true;showTaSection(t.slug,false,fromList)}
+                    cell.setOnClickListener{restoring=true;keepStop=true;showTaSection(t.slug,false,fromList)}
                     val name=label(t.name,13f,NativeUi.ink,true).apply{maxLines=1;ellipsize=TextUtils.TruncateAt.END;gravity=Gravity.CENTER;if(back)setPadding(0,0,dp(10),0)else setPadding(dp(10),0,0,0)}
                     val arrow=label(if(back)"‹" else "›",18f,NativeUi.ink)
                     if(back){cell.addView(arrow);cell.addView(name,LinearLayout.LayoutParams(0,-2,1f))}else{cell.addView(name,LinearLayout.LayoutParams(0,-2,1f));cell.addView(arrow)}

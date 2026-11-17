@@ -89,6 +89,24 @@ class LabelPlacementTest {
         val b=atlas(*curve("Te Araroa",3).toTypedArray())
         assertTrue(entries(b,positions(listOf(300f to 600f,500f to 600f,500f to 400f),9)).isEmpty())
     }
+    @Test fun aCurvedNameIsLaidOutAgainFromItsWholeCurveKeepingOtherNames(){
+        val rows=curve("Te Araroa",5)+listOf(label("town",10.0))
+        val a=atlas(*rows.toTypedArray())
+        val set=NativeLabels.curves(a)!!
+        assertEquals(1,set.curves.size);assertEquals(5,set.curves[0].first.size);assertEquals(9,set.curves[0].second.size)
+        // The background placement: the town, and the name's letters from an older camera.
+        val town=rows.size-1
+        val base=java.nio.ByteBuffer.allocateDirect(4+10*NativeLabels.ENTRY).order(java.nio.ByteOrder.LITTLE_ENDIAN).apply{putInt(10)
+            putInt(town).putFloat(-40f).putFloat(-8f).putFloat(0f);for(k in 0 until 9)putInt(5+k).putFloat(999f).putFloat(999f).putFloat(0f);rewind()}
+        // The curve now: a level line from x 100 to 900 at y 600 (every point projected).
+        val out=NativeLabels.withCurves(a,set,base,{_,o->for(k in 0..4)o.putFloat(100f+k*200f).putFloat(600f).putFloat(1f);5},1000,1000,1f)
+        val n=out.int;val e=List(n){Entry(out.int,out.float,out.float,out.float)}
+        assertEquals(10,e.size);assertEquals(1,e.count{it.index==town})
+        // The letters: none left from the old camera, centred on the curve's middle (its anchor, x 500).
+        val letters=e.filter{it.index!=town};assertEquals(9,letters.size);assertTrue(letters.none{it.x==999f})
+        val centres=letters.map{it.x+a.labels[it.index].width/2}
+        assertEquals(0f,(centres.first()+centres.last())/2,2f)
+    }
     @Test fun otherNamesGiveWayToACurvedName(){
         val rows=curve("Te Araroa",5)+listOf(label("town",10.0))
         val a=atlas(*rows.toTypedArray())

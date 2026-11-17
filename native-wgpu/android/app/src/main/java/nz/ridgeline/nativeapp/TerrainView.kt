@@ -144,6 +144,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     fun rangeMarkers(points:List<Coordinate>){if(points==rangeMarkers)return;rangeMarkers=points;requestFrame()}
     @Volatile private var labelPlacement:Pair<NativeLabelAtlas,ByteBuffer>?=null
     private var appliedPlacement:Pair<NativeLabelAtlas,ByteBuffer>?=null
+    private var curveAtlas:NativeLabelAtlas?=null;private var curveSet:NativeLabels.Curves?=null;private var curvePose:Triple<CameraPose,Int,Int>?=null
     private val labelProjection=ByteBuffer.allocateDirect(512*12).order(ByteOrder.LITTLE_ENDIAN)
     private var labelPose:CameraPose?=null;private var labelSize=0L;private var labelTime=0L
     /** GPU terrain visibility of every label candidate (read back a few frames
@@ -181,14 +182,41 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         for(i in 0 until points.size/3)if(points[i*3+2]>0&&!shape.getOrElse(i){false}){val dx=x-points[i*3];val dy=y-points[i*3+1];val d=dx*dx+dy*dy;if(d<best){best=d;found=i}}
         return found
     }
-    fun focus(points:List<Coordinate>,maximumZoom:Double=14.0){
+    private var focusAnimation:android.animation.ValueAnimator?=null
+    override fun onSizeChanged(w:Int,h:Int,oldw:Int,oldh:Int){
+        super.onSizeChanged(w,h,oldw,oldh)
+        // A sheet resizes the map from below: what was at the old view's middle stays
+        // where it is on screen, so the map does not jump as the sheet settles.
+        if(oldw==w&&oldh>0&&h>0&&h!=oldh&&!gestureActive&&focusAnimation==null){
+            val pose=cameraPose
+            val a=CameraMath.anchor(pose,w,oldh,pixelScale,w*.5,oldh*.5)?:return
+            CameraMath.anchored(pose,a,w,h,pixelScale,w*.5,oldh*.5)?.let{if(it!=pose){cameraPose=it;changed()}}
+        }
+    }
+    /** Frames [points]; [animate]: eased there over 900 ms (as the website's fit), a touch stops it. */
+    fun focus(points:List<Coordinate>,maximumZoom:Double=14.0,animate:Boolean=false){
         if(points.isEmpty())return
+        focusAnimation?.let{focusAnimation=null;it.removeAllListeners();it.cancel()}
         val minLon=points.minOf{it.longitude};val maxLon=points.maxOf{it.longitude}
         val minLat=points.minOf{it.latitude};val maxLat=points.maxOf{it.latitude}
         val span=max((maxLon-minLon)/360,(asinh(tan(Math.toRadians(maxLat)))-asinh(tan(Math.toRadians(minLat))))/(2*PI))
         val size=min(width/pixelScale,height/pixelScale)*.65
         val z=if(span>0)ln(size/(512*span))/ln(2.0) else 15.0
-        cameraPose=cameraPose.copy(longitude=(minLon+maxLon)/2,latitude=CameraMath.latitude((CameraMath.mercatorY(minLat)+CameraMath.mercatorY(maxLat))*.5),zoom=z.coerceIn(4.0,maximumZoom.coerceIn(4.0,maxZoom)),pitch=min(pitch,45f));changed()
+        val target=cameraPose.copy(longitude=(minLon+maxLon)/2,latitude=CameraMath.latitude((CameraMath.mercatorY(minLat)+CameraMath.mercatorY(maxLat))*.5),zoom=z.coerceIn(4.0,maximumZoom.coerceIn(4.0,maxZoom)),pitch=min(pitch,45f))
+        val from=cameraPose
+        val still=abs(target.longitude-from.longitude)<1e-9&&abs(target.latitude-from.latitude)<1e-9&&abs(target.zoom-from.zoom)<1e-6&&target.pitch==from.pitch
+        if(!animate||still||width==0||!active){cameraPose=target;changed();return}
+        stopMotion()
+        // Centre in Mercator, zoom and tilt eased together (MapLibre's ease curve).
+        val fx=(from.longitude+180)/360;val tx=(target.longitude+180)/360;val fy=CameraMath.mercatorY(from.latitude);val ty=CameraMath.mercatorY(target.latitude)
+        focusAnimation=android.animation.ValueAnimator.ofFloat(0f,1f).apply{
+            duration=900;interpolator=android.view.animation.PathInterpolator(.25f,.1f,.25f,1f)
+            addUpdateListener{if(focusAnimation!==it)return@addUpdateListener
+                val t=(it.animatedValue as Float).toDouble()
+                cameraPose=cameraPose.copy(longitude=(fx+(tx-fx)*t)*360-180,latitude=CameraMath.latitude(fy+(ty-fy)*t),zoom=from.zoom+(target.zoom-from.zoom)*t,pitch=(from.pitch+(target.pitch-from.pitch)*t).toFloat());changed()}
+            addListener(object:android.animation.AnimatorListenerAdapter(){override fun onAnimationEnd(animation:android.animation.Animator){if(focusAnimation===animation)focusAnimation=null}})
+            start()
+        }
     }
     fun goTo(point:Coordinate,minimumZoom:Double=4.0){cameraPose=cameraPose.copy(longitude=point.longitude,latitude=point.latitude,zoom=max(zoom,minimumZoom).coerceIn(4.0,maxZoom));changed()}
     var onCamera:()->Unit={}
@@ -370,7 +398,21 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         }
         if(!cameraFirst)optionalSince=0L
         val placement=labelPlacement
-        if(placement!=null&&placement!==appliedPlacement&&placement.first===appliedLayers?.atlas&&NativeBridge.placeLabels(handle,placement.second))appliedPlacement=placement
+        if(placement!=null&&placement.first===appliedLayers?.atlas){
+            // Names along curves (Te Araroa's) are laid out again whenever the camera
+            // moved, for the frame just drawn, so they follow their curve smoothly; the
+            // other names keep the background placement.
+            val atlas=placement.first
+            if(curveAtlas!==atlas){curveAtlas=atlas;curveSet=NativeLabels.curves(atlas)}
+            val curves=curveSet;val drawn=submittedPose
+            if(curves!=null&&drawn!=null){
+                val key=Triple(drawn,width,height)
+                if(placement!==appliedPlacement||key!=curvePose){
+                    val merged=NativeLabels.withCurves(atlas,curves,placement.second,{i,o->NativeBridge.projectCurve(handle,i,o)},width,height,pixelScale.toFloat())
+                    if(NativeBridge.placeLabels(handle,merged)){appliedPlacement=placement;curvePose=key}
+                }
+            }else if(placement!==appliedPlacement&&NativeBridge.placeLabels(handle,placement.second))appliedPlacement=placement
+        }
         val cursor=inspection
         if(cursor!==appliedInspection&&NativeBridge.inspect(handle,cursor.second?.longitude?:0.0,cursor.second?.latitude?:0.0,cursor.second!=null))appliedInspection=cursor
         val gps=gpsPoint
@@ -430,6 +472,8 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         uploadAdmission.rendered(renderElapsed)
         if(shown>0){presentationFailures=0
             val previous=submittedPose;submittedPose=pose;submittedFrom=requested
+            // Names along curves follow the frame just drawn: once more after the camera stops.
+            if(curveSet!=null&&curvePose?.first!=pose)requestFrame()
             val rendered=pose
             if(previous!=pose&&pose!=requested)post{if(cameraPose==requested&&live&&active)onCamera()}
             val focusNow=android.os.SystemClock.elapsedRealtime()
@@ -480,6 +524,8 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             if(atlas!=null&&atlas.labels.isNotEmpty()&&(labelPose!=pose||labelSize!=size)&&now-labelTime>=(if(gestureActive)100 else 33)){
                 val n=NativeBridge.project(handle,atlas.points,labelProjection);labelProjection.rewind();val positions=FloatArray(n*3){labelProjection.float}
                 labelVisible?.takeIf{it.size==n}?.let{visible->for(i in 0 until n)if(visible[i].toInt()==0)positions[i*3+2]=0f}
+                // A name along a curve: its whole curve, as laid out each frame (not cut short by terrain or tiles).
+                if(curveAtlas===atlas&&positions.size==atlas.labels.size*3)curveSet?.let{set->NativeLabels.project(atlas,set,positions){i,o->NativeBridge.projectCurve(handle,i,o)}}
                 labelPose=pose;labelSize=size;labelTime=now
                 post{if(live&&layerBatch?.atlas===atlas)onLayerProjection(atlas,positions)}
             }else if(atlas!=null&&atlas.labels.isNotEmpty()&&(labelPose!=pose||labelSize!=size)){
@@ -653,7 +699,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     private var pendingCoast:GestureMotion.Coast?=null
     private data class MultiRelease(val time:Long,val coast:GestureMotion.Coast,val anchor:CameraMath.Anchor,val x:Double,val y:Double,val zoom:Double,val bearing:Float,val pitch:Float)
     private var multiRelease:MultiRelease?=null
-    private fun stopMotion(){multiRelease=null;programmaticEase=false;pendingEase=null;motionAnimation?.removeAllListeners();motionAnimation?.cancel();motionAnimation=null;pendingCoast=null;motion.clear()}
+    private fun stopMotion(){focusAnimation?.let{focusAnimation=null;it.removeAllListeners();it.cancel()};multiRelease=null;programmaticEase=false;pendingEase=null;motionAnimation?.removeAllListeners();motionAnimation?.cancel();motionAnimation=null;pendingCoast=null;motion.clear()}
     private fun recordMotion(time:Long){motion.record(GestureMotion.Sample(time,touchX/pixelScale,touchY/pixelScale,touchZoom,touchBearing.toDouble(),touchPitch.toDouble()))}
     private fun startCoast(coast:GestureMotion.Coast,inertia:Boolean=true){
         val x=touchX;val y=touchY;val z=touchZoom;val b=touchBearing;val p=touchPitch

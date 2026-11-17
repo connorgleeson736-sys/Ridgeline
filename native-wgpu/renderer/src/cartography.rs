@@ -78,6 +78,16 @@ impl Renderer {
     /// collision. Terrain occlusion is decided on the GPU per label anchor
     /// (labels.wgsl), as MapLibre does, so this does no line-of-sight work.
     pub fn project_points(&self, points: &[[f64; 2]]) -> Vec<[f32; 3]> {
+        self.project_with(points, false)
+    }
+    /// The points of a curve (a name written along it), in order: a point without
+    /// terrain yet (outside the loaded tiles) takes the height interpolated between
+    /// its nearest neighbours that have it, so the whole curve projects and a name
+    /// along it does not slide as tiles come and go.
+    pub fn project_curve(&self, points: &[[f64; 2]]) -> Vec<[f32; 3]> {
+        self.project_with(points, true)
+    }
+    fn project_with(&self, points: &[[f64; 2]], curve: bool) -> Vec<[f32; 3]> {
         let Some(view) = self.last_view else {
             return vec![[0.; 3]; points.len()];
         };
@@ -93,10 +103,31 @@ impl Renderer {
         let world = 512. * 2f64.powf(view.zoom);
         let scale = self.map_style.height_scale() as f64;
         let local_z = |h: f64| (h * scale + 1. - view.elevation as f64) * ppm as f64;
+        let mut heights: Vec<Option<f64>> = points.iter().map(|p| self.terrain_height(*p)).collect();
+        if curve {
+            let known: Vec<usize> = (0..heights.len()).filter(|&i| heights[i].is_some()).collect();
+            for i in 0..heights.len() {
+                if heights[i].is_some() {
+                    continue;
+                }
+                let before = known.iter().rev().find(|&&k| k < i).copied();
+                let after = known.iter().find(|&&k| k > i).copied();
+                heights[i] = Some(match (before, after) {
+                    (Some(a), Some(b)) => {
+                        let (ha, hb) = (heights[a].unwrap(), heights[b].unwrap());
+                        ha + (hb - ha) * (i - a) as f64 / (b - a) as f64
+                    }
+                    (Some(a), None) => heights[a].unwrap(),
+                    (None, Some(b)) => heights[b].unwrap(),
+                    (None, None) => 0.,
+                });
+            }
+        }
         points
             .iter()
-            .map(|p| {
-                let Some(height) = self.terrain_height(*p) else {
+            .zip(heights)
+            .map(|(p, height)| {
+                let Some(height) = height else {
                     return [0.; 3];
                 };
                 let anchor = [
