@@ -10,7 +10,7 @@
 //   routing, elevation and search on worker threads.
 // - Camera saved in an idle callback, not on every move.
 import { Map as MapLibre, setWorkerUrl, addProtocol, getVersion, setMaxParallelImageRequests, ScaleControl, AttributionControl } from '/vendor/maplibre-gl-6.16.0/maplibre-gl.mjs';
-import { build, GROUPS, sky, hatch, badge, shown, grade, NZ_BOUNDS } from './style.js';
+import { build, GROUPS, sky, hatch, atlasLabel, shown, grade, NZ_BOUNDS } from './style.js';
 import { START as A_COLOUR, END as B_COLOUR } from './chart.js';
 import { install as installOverview, loadOverview, loadGapIndex } from './overview.js';
 import { attach as attachOverlays } from './overlays.js';
@@ -98,14 +98,14 @@ async function main() {
     locale: { 'NavigationControl.ZoomIn': 'Zoom in', 'NavigationControl.ZoomOut': 'Zoom out' },
   });
   window.bushlineMap = map;
-  // Drawn images (hunting hatching, the Te Araroa badge), added as soon as the style
+  // Drawn images (hunting hatching, the Te Araroa name), added as soon as the style
   // is in, before any tile asks for them; and again if one is ever missing.
   const images = () => {
     if (!map.hasImage('hatch')) { const h = hatch(2); map.addImage('hatch', h.image, { pixelRatio: h.pixelRatio }); }
-    if (!map.hasImage('ta-badge')) { const { image, ...o } = badge(3); map.addImage('ta-badge', image, o); }
+    if (!map.hasImage('ta-name')) { const { image, ...o } = atlasLabel(3); map.addImage('ta-name', image, o); }
   };
   map.on('style.load', images);
-  map.on('styleimagemissing', (e) => { if (e.id === 'hatch' || e.id === 'ta-badge') images(); });
+  map.on('styleimagemissing', (e) => { if (e.id === 'hatch' || e.id === 'ta-name') images(); });
   map.addControl(new ScaleControl({ maxWidth: 100, unit: 'metric' }), 'bottom-left');
   map.addControl(new AttributionControl({ compact: true, customAttribution: '<a href="/credits/">Data credits</a>' }), 'bottom-right');
 

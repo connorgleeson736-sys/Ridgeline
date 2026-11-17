@@ -182,8 +182,8 @@ function buildStyle({ topography, settings, dark, fine = false }) {
       // Closer in, each food stop splits into its shops and cafés.
       { id: 'te-araroa-shops', type: 'circle', source: 'te-araroa-shops', minzoom: 12.5, layout: { visibility: visible(shown('te-araroa-shops', settings)) }, paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 12.5, 3.4, 16, 5.5], 'circle-color': ['match', ['get', 'kind'], 'supermarket', '#22a35a', 'store', '#8fd6aa', '#d08a3f'], 'circle-stroke-color': '#ffffff', 'circle-stroke-width': 1.5, 'circle-pitch-alignment': 'viewport' } },
       { id: 'te-araroa-shops-label', type: 'symbol', source: 'te-araroa-shops', minzoom: 14, layout: { visibility: visible(shown('te-araroa-shops', settings)), 'text-field': ['get', 'name'], 'text-font': ['Open Sans Regular'], 'text-size': 11, 'text-offset': [0, 0.9], 'text-anchor': 'top', 'text-max-width': 8, 'text-padding': 3, 'symbol-sort-key': 14 }, paint: { 'text-color': '#ecf8ef', 'text-halo-color': 'rgba(12,40,24,.9)', 'text-halo-width': 1.3 } },
-      // The trail's name as a badge: white capitals on the trail's red, just above the line.
-      { id: 'te-araroa-name', type: 'symbol', source: 'te-araroa-names', minzoom: 5, maxzoom: 11.5, layout: { visibility: visible(shown('te-araroa-name', settings)), 'text-field': 'TE ARAROA', 'text-font': ['Open Sans Bold'], 'text-size': ['interpolate', ['linear'], ['zoom'], 5, 10, 10, 12], 'text-letter-spacing': 0.12, 'text-anchor': 'bottom', 'text-offset': [0, -0.9], 'icon-image': 'ta-badge', 'icon-text-fit': 'both', 'icon-text-fit-padding': [3, 9, 3, 9], 'icon-anchor': 'bottom', 'icon-allow-overlap': false, 'text-padding': 4, 'symbol-sort-key': 3 }, paint: { 'text-color': '#ffffff', 'icon-opacity': 0.96 } },
+      // The trail's name as an old atlas labels a route (atlasLabel), just above the line.
+      { id: 'te-araroa-name', type: 'symbol', source: 'te-araroa-names', minzoom: 5, maxzoom: 11.5, layout: { visibility: visible(shown('te-araroa-name', settings)), 'icon-image': 'ta-name', 'icon-size': ['interpolate', ['linear'], ['zoom'], 5, 0.85, 10, 1.1], 'icon-anchor': 'bottom', 'icon-offset': [0, -2], 'icon-padding': 4, 'symbol-sort-key': 3 }, paint: { 'icon-opacity': 0.97 } },
       // Te Araroa's campsites and holiday parks (huts are the map's own).
       { id: 'te-araroa-places', type: 'circle', source: 'te-araroa-places', minzoom: 10, filter: ['!', ['get', 'hut']], layout: { visibility: visible(shown('te-araroa-places', settings)) }, paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 1.8, 14, 3.2], 'circle-color': ['match', ['get', 'type'], 'Hostel', TE_ARAROA_COLOUR, 'Lodge', TE_ARAROA_COLOUR, '#fff4f6'], 'circle-stroke-color': ['match', ['get', 'type'], 'Hostel', '#fff4f6', 'Lodge', '#fff4f6', TE_ARAROA_COLOUR], 'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 10, 1, 14, 1.5], 'circle-pitch-alignment': 'viewport' } },
       { id: 'te-araroa-places-label', type: 'symbol', source: 'te-araroa-places', minzoom: 12, filter: ['!', ['get', 'hut']], layout: { visibility: visible(shown('te-araroa-places', settings)), 'text-field': ['get', 'name'], 'text-font': ['Open Sans Regular'], 'text-size': 11, 'text-offset': [0, 1.1], 'text-anchor': 'top', 'text-max-width': 9, 'text-padding': 4, 'symbol-sort-key': 30 }, paint: { 'text-color': '#ffe3e8', 'text-halo-color': 'rgba(50,10,20,.9)', 'text-halo-width': 1.4 } },
@@ -203,19 +203,39 @@ function buildStyle({ topography, settings, dark, fine = false }) {
   };
 }
 
-/** The Te Araroa badge: a rounded red pill with a thin white edge and a soft shadow,
- * stretched to fit its text (icon-text-fit), only its straight middle stretching. */
-export function badge(pixelRatio = 2) {
-  const r = 11, w = 2 * r + 12, h = 2 * r + 4, pr = pixelRatio;
+/** The trail's name in an old atlas's hand: spaced italic serif capitals and small
+ * capitals in dark sepia ink, a parchment halo, a hairline rule under it. Drawn here
+ * (the map's own fonts are sans-serif only) and placed as an image. */
+export function atlasLabel(pixelRatio = 3) {
+  const pr = pixelRatio, family = 'Georgia, "Times New Roman", "Noto Serif", "Droid Serif", serif';
+  const parts = [['T', 17], ['E', 12.5], [' ', 12.5], ['A', 17], ['R', 12.5], ['A', 12.5], ['R', 12.5], ['O', 12.5], ['A', 12.5]];
+  const track = 3.2, padX = 6, h = 30;
+  const measure = typeof OffscreenCanvas === 'function' ? new OffscreenCanvas(1, 1).getContext('2d') : document.createElement('canvas').getContext('2d');
+  const widths = parts.map(([ch, size]) => { measure.font = `italic ${size}px ${family}`; return ch === ' ' ? size * 0.45 : measure.measureText(ch).width; });
+  const textW = widths.reduce((x, y) => x + y, 0) + track * (parts.length - 1);
+  const w = Math.ceil(textW + padX * 2);
   const c = typeof OffscreenCanvas === 'function' ? new OffscreenCanvas(w * pr, h * pr) : Object.assign(document.createElement('canvas'), { width: w * pr, height: h * pr });
   const g = c.getContext('2d');
   g.scale(pr, pr);
-  const pill = (x, y, pw, ph) => { const rr = ph / 2; g.beginPath(); g.moveTo(x + rr, y); g.lineTo(x + pw - rr, y); g.arc(x + pw - rr, y + rr, rr, -Math.PI / 2, Math.PI / 2); g.lineTo(x + rr, y + ph); g.arc(x + rr, y + rr, rr, Math.PI / 2, (3 * Math.PI) / 2); g.closePath(); };
-  g.shadowColor = 'rgba(40,0,10,.45)'; g.shadowBlur = 3; g.shadowOffsetY = 1;
-  pill(2, 1, w - 4, h - 4); g.fillStyle = '#ffffff'; g.fill();
-  g.shadowColor = 'transparent';
-  pill(3.5, 2.5, w - 7, h - 7); g.fillStyle = TE_ARAROA_COLOUR; g.fill();
-  return { image: g.getImageData(0, 0, w * pr, h * pr), pixelRatio: pr, stretchX: [[(r + 2) * pr, (w - r - 2) * pr]], stretchY: [[(h / 2 - 1) * pr, (h / 2) * pr]], content: [(r - 1) * pr, 5 * pr, (w - r + 1) * pr, (h - 7) * pr] };
+  const base = 19, ink = '#4a2618', halo = 'rgba(247,239,220,.92)';
+  // The halo first (every letter), then the ink, so neighbours never cut each other.
+  for (const pass of ['halo', 'ink']) {
+    let x = padX;
+    parts.forEach(([ch, size], i) => {
+      g.font = `italic ${size}px ${family}`;
+      if (pass === 'halo') { g.lineJoin = 'round'; g.lineWidth = 3.2; g.strokeStyle = halo; g.strokeText(ch, x, base); } else { g.fillStyle = ink; g.fillText(ch, x, base); }
+      x += widths[i] + track;
+    });
+  }
+  // A hairline rule with a small break in the middle, as engraved maps underline a route.
+  const y = base + 5.5, mid = w / 2;
+  g.lineCap = 'round';
+  for (const [stroke, width] of [[halo, 3], [ink, 0.9]]) {
+    g.strokeStyle = stroke; g.lineWidth = width;
+    g.beginPath(); g.moveTo(padX + 6, y); g.lineTo(mid - 4, y); g.moveTo(mid + 4, y); g.lineTo(w - padX - 6, y); g.stroke();
+    g.beginPath(); g.arc(mid, y, width === 3 ? 2.2 : 1.1, 0, Math.PI * 2); g.fillStyle = stroke; g.fill();
+  }
+  return { image: g.getImageData(0, 0, w * pr, h * pr), pixelRatio: pr };
 }
 
 /** The diagonal hatching for hunting areas (the app's: blaze orange lines). */
