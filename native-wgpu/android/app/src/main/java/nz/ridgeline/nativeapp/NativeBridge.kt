@@ -34,6 +34,8 @@ object NativeBridge {
  /** 1 applied, 2 a referenced group is gone (re-send every body), 0 rejected. */
  @JvmStatic external fun cartography(handle:Long,input:ByteBuffer):Int
  @JvmStatic external fun project(handle:Long,input:ByteBuffer,output:ByteBuffer):Int
+ /** As [project], for a curve's points in order: points without terrain yet take heights between their neighbours'. */
+ @JvmStatic external fun projectCurve(handle:Long,input:ByteBuffer,output:ByteBuffer):Int
  @JvmStatic external fun labelVisibility(handle:Long,output:ByteBuffer,count:Int):Long
  @JvmStatic external fun labelMetadata(handle:Long,metadata:ByteBuffer):Boolean
  @JvmStatic external fun labelAtlas(handle:Long,width:Int,height:Int,rgba:ByteBuffer,metadata:ByteBuffer):Boolean

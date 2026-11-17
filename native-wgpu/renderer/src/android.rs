@@ -1571,6 +1571,69 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_project(
         _ => 0,
     }
 }
+/// As project, for the points of a curve in order (Renderer::project_curve).
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_projectCurve(
+    env: *mut jni::sys::JNIEnv,
+    _class: jni::sys::jclass,
+    handle: i64,
+    input: jni::sys::jobject,
+    output: jni::sys::jobject,
+) -> i32 {
+    let mut env = unsafe { jni::EnvUnowned::from_raw(env) };
+    match env
+        .with_env(|env| -> Result<i32, jni::errors::Error> {
+            let input = unsafe { jni::objects::JByteBuffer::from_raw(env, input) };
+            let output = unsafe { jni::objects::JByteBuffer::from_raw(env, output) };
+            let size = env.get_direct_buffer_capacity(&input)?;
+            if size % 16 != 0
+                || size > 512 * 16
+                || env.get_direct_buffer_capacity(&output)? < size / 16 * 12
+            {
+                return Ok(0);
+            }
+            let bytes =
+                unsafe { std::slice::from_raw_parts(env.get_direct_buffer_address(&input)?, size) };
+            let points: Vec<_> = bytes
+                .chunks_exact(16)
+                .map(|r| {
+                    [
+                        f64::from_le_bytes(r[..8].try_into().unwrap()),
+                        f64::from_le_bytes(r[8..].try_into().unwrap()),
+                    ]
+                })
+                .collect();
+            if points
+                .iter()
+                .flatten()
+                .any(|v| !v.is_finite() || !(0. ..=1.).contains(v))
+            {
+                return Ok(0);
+            }
+            let Ok(all) = states().lock() else {
+                return Ok(0);
+            };
+            let Some(state) = all.get(&(handle as u64)) else {
+                return Ok(0);
+            };
+            let projected = state.renderer.project_curve(&points);
+            let out = unsafe {
+                std::slice::from_raw_parts_mut(
+                    env.get_direct_buffer_address(&output)?,
+                    projected.len() * 12,
+                )
+            };
+            for (slot, value) in out.chunks_exact_mut(4).zip(projected.iter().flatten()) {
+                slot.copy_from_slice(&value.to_le_bytes());
+            }
+            Ok(projected.len() as i32)
+        })
+        .into_outcome()
+    {
+        jni::Outcome::Ok(v) => v,
+        _ => 0,
+    }
+}
 /// Terrain visibility of every current label candidate, for collision
 /// placement: writes one byte per label (255 visible, 0 hidden or off screen)
 /// and returns the visibility revision, or -1 before the first readback of
