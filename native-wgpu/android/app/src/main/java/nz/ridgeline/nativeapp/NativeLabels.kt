@@ -46,7 +46,12 @@ internal object NativeLabels {
     private const val SCALE=2f
     private const val WIDTH=2048
     private data class Packed(val label:TopographyStyle.Label,val text:List<String>,val x:Int,val y:Int,val width:Int,val height:Int)
-    private data class SpriteKey(val text:String,val size:Float,val color:Int,val bold:Boolean,val circle:Boolean)
+    private data class SpriteKey(val text:String,val size:Float,val color:Int,val bold:Boolean,val circle:Boolean,val font:String,val halo:Int)
+    /** Asset fonts by path (the Te Araroa name's lettering). */
+    private val fonts=HashMap<String,Typeface?>()
+    private var assetManager:android.content.res.AssetManager?=null
+    private fun face(label:TopographyStyle.Label):Typeface?=if(label.font.isEmpty())(if(label.bold)bold else regular)
+        else fonts.getOrPut(label.font){runCatching{Typeface.createFromAsset(assetManager,label.font)}.getOrNull()}?:regular
     private val sprites=LinkedHashMap<SpriteKey,Packed>()
     private var bitmap:Bitmap?=null
     private var nextX=2;private var nextY=2;private var rowHeight=0
@@ -70,6 +75,7 @@ internal object NativeLabels {
     private var regular:Typeface?=null
     private var bold:Typeface?=null
     @Synchronized fun atlas(input:List<TopographyStyle.Label>,assets:android.content.res.AssetManager):NativeLabelAtlas {
+        assetManager=assets
         if(regular==null){regular=Typeface.Builder(assets,"fonts/OpenSans.ttf").setFontVariationSettings("'wght' 400, 'wdth' 100").build();bold=Typeface.Builder(assets,"fonts/OpenSans.ttf").setFontVariationSettings("'wght' 700, 'wdth' 100").build()}
         return buildAtlas(input,true)
     }
@@ -78,10 +84,10 @@ internal object NativeLabels {
         val paint=Paint(Paint.ANTI_ALIAS_FLAG);val packed=ArrayList<Pair<TopographyStyle.Label,Packed>>();var dirty=false
         var grew=false;var top=Int.MAX_VALUE;var bottom=0
         for(label in input.take(512)){
-            val key=SpriteKey(label.text,label.size,label.color,label.bold,label.circle)
+            val key=SpriteKey(label.text,label.size,label.color,label.bold,label.circle,label.font,label.halo)
             var slot=sprites[key]
             if(slot==null){
-                paint.textSize=label.size*SCALE;paint.typeface=if(label.bold)bold else regular
+                paint.textSize=label.size*SCALE;paint.typeface=face(label);paint.letterSpacing=if(label.font.isEmpty())0f else .16f
                 val lines=if(label.circle)emptyList()else wrap(label.text,paint,label.size*SCALE*9)
                 val w=if(label.circle)ceil(label.size*2*SCALE+8).toInt()else ceil((lines.maxOfOrNull{paint.measureText(it)}?:1f)+8*SCALE).toInt()
                 val h=if(label.circle)w else ceil(lines.size*label.size*SCALE*1.25+8*SCALE).toInt()
@@ -100,10 +106,10 @@ internal object NativeLabels {
                 slot=Packed(label,lines,nextX,nextY,w,h);sprites[key]=slot;nextX+=w+2;rowHeight=max(rowHeight,h);dirty=true
                 top=min(top,slot.y);bottom=max(bottom,slot.y+h)
                 val canvas=Canvas(bitmap!!);val p=slot
-                if(label.circle){paint.style=Paint.Style.FILL;paint.color=0xff233d34.toInt();canvas.drawCircle(p.x+p.width/2f,p.y+p.height/2f,label.size*SCALE+1.5f*SCALE,paint);paint.color=label.color;canvas.drawCircle(p.x+p.width/2f,p.y+p.height/2f,label.size*SCALE,paint)}
+                if(label.circle){paint.style=Paint.Style.FILL;paint.color=if(label.halo!=0)label.halo else 0xff233d34.toInt();canvas.drawCircle(p.x+p.width/2f,p.y+p.height/2f,label.size*SCALE+1.5f*SCALE,paint);paint.color=label.color;canvas.drawCircle(p.x+p.width/2f,p.y+p.height/2f,label.size*SCALE,paint)}
                 else for((i,text)in p.text.withIndex()){
                     val tx=p.x+(p.width-paint.measureText(text))/2;val ty=p.y+4*SCALE-paint.fontMetrics.top+i*label.size*SCALE*1.25f
-                    paint.strokeJoin=Paint.Join.ROUND;paint.style=Paint.Style.STROKE;paint.strokeWidth=2.8f*SCALE;paint.color=0xe0122023.toInt();canvas.drawText(text,tx,ty,paint)
+                    paint.strokeJoin=Paint.Join.ROUND;paint.style=Paint.Style.STROKE;paint.strokeWidth=2.8f*SCALE;paint.color=if(label.halo!=0)label.halo else 0xe0122023.toInt();canvas.drawText(text,tx,ty,paint)
                     paint.style=Paint.Style.FILL;paint.color=label.color;canvas.drawText(text,tx,ty,paint)
                 }
             }

@@ -1,0 +1,29 @@
+{
+  "artifact": "Ridgeline-Native-Te-Araroa-0.1.72-Base.apk",
+  "bytes": 36889843,
+  "sha256": "11f06381741518d093445696a91f180e34ef3f1952a43a40566d8580035029f3",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.72-te-araroa",
+  "versionCode": 73,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.71 Full Audit (same package and signer)",
+  "changes": [
+    "Te Araroa, as on the website (bundled: the Trust's trail, sections, bypasses, notes and places to stay, CC BY 4.0; walkers' food stops; OpenStreetMap shops and cafés, ODbL): a new 'Te Araroa' map layer (on by default) draws the trail in red on a dark edge above the map's own lines and its bypasses dashed, simplified per zoom; food stops as dots coloured by kind (supermarket, store, café, send a box) from zoom 6 with names from 8; the shops and cafés at them from 12.5 (names from 14); campsites, holiday parks and lodges from 10 (the map's own hut dots stay); the trail's name once on each island in IM FELL English SC (bundled, OFL), the North Island's where the trail passes nearest the island's middle.",
+    "Te Araroa pages in the track sheet: the trail (Southbound/Northbound switch beside the title; Sections, Food carries with rough days, and Bypasses tabs); a section (number and km on one line, previous and next along the trail, the Trust's live alerts, elevation profile and stats with DOC's huts along it, the Trust's introduction, the next food stop and towns a hitch away, bypasses, the Trust's notes folded with 'On map' after places it names, Te Araroa page, Save as route); a food stop (its shops and cafés, the stops either side with distances and days); a shop or café (address, hours, phone, website, Google Maps); a place to stay (facts, facilities, DOC alerts for DOC places). Back (top left) returns to the page a page was opened from without moving the map; switching direction keeps the page.",
+    "Taps: the trail's line opens its section (while a Te Araroa page is open the trail is checked first, otherwise tracks first); its dots and name open their pages. Search: 'Te Araroa' and its sections by name.",
+    "DOC walks and tracks: DOC's live alerts on walk cards below the chart and introduction; the tags under walks and tracks (DOC distance/time, loop or one way, dogs, track type) are gone; 'Part of Te Araroa' at the bottom of walk and track cards, 'On Te Araroa' on huts the trail passes (within 400 m).",
+    "Map labels can take an asset font and a halo or dot-outline colour (Te Araroa's)."
+  ],
+  "tests": {
+    "kotlinJvm": "all pass, full suite: 333 tests, 6 skipped as before (new: TeAraroaTest, 7 tests on the bundled data: decoding, southbound section lines, direction, food carries and next food, sections along a line, name places, notes, Trust and DOC alert parsing, days, option kinds)",
+    "rust": "unchanged since 0.1.67"
+  },
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false,
+  "notes": "Packaged assets checked: assets/te-araroa/te-araroa.json identical to the website's data; notes.json (the build stores the .gz asset decompressed; the app reads it so, with a gzip fallback) has 93 sections; the font is a TrueType file. No phone or emulator run in this environment."
+}

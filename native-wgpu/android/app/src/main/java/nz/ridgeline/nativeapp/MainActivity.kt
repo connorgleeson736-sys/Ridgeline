@@ -21,6 +21,8 @@ class MainActivity:Activity(){
     private lateinit var offlineUi:OfflineUi
     private lateinit var layersUi:LayersUi
     private lateinit var mapLayers:MapLayers
+    /** The trail is loaded: its pages can open (set up once the sheet exists). */
+    private var teAraroaReady:(TeAraroa)->Unit={}
     private fun dp(value:Int)=(value*resources.displayMetrics.density+.5f).toInt()
     private fun night(config:android.content.res.Configuration)=(config.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK)==android.content.res.Configuration.UI_MODE_NIGHT_YES
     /** The phone's status and navigation bars over the app's background, their icons
@@ -92,6 +94,9 @@ class MainActivity:Activity(){
         root.setBackgroundColor(NativeUi.paper);systemBars()
         loader=TileLoader(this,terrain)
         mapLayers=MapLayers(terrain,loader)
+        // Te Araroa (bundled): read once off the main thread, then drawn and opened.
+        Thread({runCatching{TeAraroa.parse(assets.open("te-araroa/te-araroa.json").bufferedReader().use{it.readText()})}.getOrNull()?.let{t->
+            runOnUiThread{if(!isFinishing){mapLayers.teAraroa=t;teAraroaReady(t)}}}},"ridgeline-te-araroa").apply{isDaemon=true}.start()
         terrain.onCamera={loader.cameraChanged();mapLayers.refresh()};terrain.onData={loader.cameraChanged();mapLayers.refresh()}
         planner=PlannerUi(this,root,terrain,loader,mapHost)
         offlineUi=OfflineUi(this,root,terrain,loader,false).also{it.routes=planner.controller}
@@ -122,31 +127,63 @@ class MainActivity:Activity(){
             when{
                 place.kind=="walk"&&guid!=null->{trackSheet.showWalk(guid,place.name,at,true);true}
                 place.kind=="hut"->{trackSheet.showHut(place.name,at);true}
+                place.kind=="te-araroa"->{trackSheet.showTeAraroa();true}
+                place.kind=="te-araroa-section"->{trackSheet.showTaSection(place.alternatives.firstOrNull().orEmpty());true}
                 else->false
             }
         }
         trackSheet.walkInfo={mapLayers.walkInfo(it)}
+        // Te Araroa: its pages once the trail is read; a section saved as a route opens in the planner.
+        teAraroaReady={trackSheet.teAraroa=it}
+        mapLayers.teAraroa?.let{trackSheet.teAraroa=it}
+        // Search: "Te Araroa" first for the trail, and its sections by name (all of them
+        // when the query names the trail).
+        planner.extraResults={query,near->
+            val t=trackSheet.teAraroa;val q=query.trim().lowercase()
+            if(t==null||q.length<3)emptyList()else{
+                val trail=q.contains("araroa");val words=q.replace("te araroa","").replace("araroa","").split(' ').filter{it.length>=3}
+                val out=ArrayList<PlaceSearch.Result>()
+                fun result(kind:String,name:String,slug:String,p:Coordinate,detail:String,score:Double)=PlaceSearch.Result(PlaceSearch.Place(kind,name,listOf(slug),p.latitude,p.longitude,0.0,detail,""),score,PlaceSearch.distanceKm(near,p.latitude,p.longitude))
+                if(trail)t.pointAt(1.0)?.let{out.add(result("te-araroa","Te Araroa","",it,"Cape Reinga to Bluff",1e9))}
+                for(s in t.sections){val name=s.name.lowercase()
+                    val hit=if(words.isEmpty())trail else words.all{name.contains(it)}
+                    if(hit)t.lines(s).firstOrNull()?.firstOrNull()?.let{out.add(result("te-araroa-section",s.name,s.slug,it,if(s.alternative)TeAraroa.optionKind(s).first else "Section ${s.n} · ${s.region}",1e8-s.from))}}
+                out.take(if(trail&&words.isEmpty())12 else 6)
+            }
+        }
+        trackSheet.saveRoute={name,line->trackSheet.hide();planner.controller.import(GpxCodec.Imported(name,line))}
         planner.hutAt={x,y->mapLayers.hutAt(x,y)}
         planner.onIdleTap={x,y->
             val label=mapLayers.labelAt(x,y)
             val at=label?.let{Coordinate(it.point.x*360-180,CameraMath.latitude(it.point.y))}
             // A hut's dot (not only its name) opens the hut, marked on the map.
             val hut=if(label==null)mapLayers.hutAt(x,y)else null
+            // Te Araroa's dots and name: its pages (an index after the key's colon).
+            val ta=label?.key?.takeIf{it.startsWith("te-araroa")}
+            val taIndex=ta?.substringAfterLast(':')?.toIntOrNull()
             when{
+                ta!=null&&ta.startsWith(MapLayers.TA_NAME+":")->trackSheet.showTeAraroa()
+                ta!=null&&ta.startsWith(MapLayers.TA_STOP)&&taIndex!=null->trackSheet.showTaStop(taIndex)
+                ta!=null&&ta.startsWith(MapLayers.TA_SHOP)&&taIndex!=null->trackSheet.showTaShop(taIndex)
+                ta!=null&&ta.startsWith(MapLayers.TA_PLACE)&&taIndex!=null->trackSheet.showTaPlace(taIndex)
                 hut!=null->trackSheet.showHut(hut.first,hut.second)
                 label!=null&&at!=null&&label.key.startsWith(TopographyStyle.HUT_LABELS+":")->trackSheet.showHut(label.text,at)
                 label!=null&&at!=null&&label.ref.isNotEmpty()&&!label.section->trackSheet.showWalk(label.ref,label.text,at)
                 // A section under its own name: in the walk the map gives it.
                 label!=null&&at!=null->trackSheet.show(label.text.removeSuffix(" (mapped closed)"),at,label.ref.takeIf{label.section})
                 // The line itself, not only its name: the track or walk nearest the tap,
-                // else the hunting areas there.
+                // else Te Araroa's line (first, while one of its pages is open), else the
+                // hunting areas there.
                 else->terrain.pick(x,y){hit->if(hit==null)return@pick
-                    val tapped=Coordinate(hit[0],hit[1])
-                    mapLayers.trackAt(hit[0],hit[1],terrain.cameraPose.zoom){track->when{
+                    val tapped=Coordinate(hit[0],hit[1]);val zoom=terrain.cameraPose.zoom
+                    fun tracks(orElse:()->Unit)=mapLayers.trackAt(hit[0],hit[1],zoom){track->when{
                         track!=null&&track.walk->trackSheet.showWalk(track.ref,track.name,tapped)
                         track!=null->trackSheet.show(track.name.removeSuffix(" (mapped closed)"),tapped,track.ref.takeIf{track.section})
-                        loader.mapSettings.state.hunting->mapLayers.huntingAt(hit[0],hit[1]){areas->HuntingDetails.show(this,areas)}
-                    }}}
+                        else->orElse()
+                    }}
+                    fun hunting(){if(loader.mapSettings.state.hunting)mapLayers.huntingAt(hit[0],hit[1]){areas->HuntingDetails.show(this,areas)}}
+                    if(trackSheet.inTeAraroa)mapLayers.teAraroaAt(hit[0],hit[1],zoom){slug->if(slug!=null)trackSheet.showTaSection(slug)else tracks(::hunting)}
+                    else tracks{mapLayers.teAraroaAt(hit[0],hit[1],zoom){slug->if(slug!=null)trackSheet.showTaSection(slug)else hunting()}}}
             }
         }
         planner.onProfilePoint={terrain.inspect(it)}

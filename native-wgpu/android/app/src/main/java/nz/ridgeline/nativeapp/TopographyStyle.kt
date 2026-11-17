@@ -14,7 +14,11 @@ internal class TopographyStyle(json:String){
         /** A DOC walk's id for track names shown as their walk's (see DocWalks). */
         val ref:String="",
         /** Shown under its own name but part of the walk [ref] (a section). */
-        val section:Boolean=false)
+        val section:Boolean=false,
+        /** An asset font for the text ("" the map's Open Sans), as the Te Araroa name's. */
+        val font:String="",
+        /** The halo round the text, or a dot's outline (0: the map's dark halo). */
+        val halo:Int=0)
     data class Output(val lines:List<Line>,val labels:List<Label>)
     private val specs=JSONArray(json).let{rows->List(rows.length()){rows.getJSONObject(it)}}.onEach{spec->
         // Performance: river names start later than in Capacitor (1.5 zooms for

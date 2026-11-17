@@ -83,6 +83,8 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
     var onIdleTap:(Double,Double)->Unit={_,_->}
     /** A search result chosen: true if it opened its own summary (tracks, huts). */
     internal var onPlace:(PlaceSearch.Place)->Boolean={false}
+    /** Results ahead of the place names (Te Araroa and its sections). */
+    internal var extraResults:(String,Coordinate)->List<PlaceSearch.Result> = {_,_->emptyList()}
     /** Fills the drawer's saved-regions section under the routes (OfflineUi). */
     var savedRegions:(LinearLayout,()->Unit)->Unit={_,_->}
     var onProfilePoint:(Coordinate?)->Unit={}
@@ -105,7 +107,7 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         val engine=placeSearch
         if(engine==null){list.removeAllViews();list.addView(NativeUi.text(activity,"Loading place names…",13f).apply{setTextColor(NativeUi.muted);setPadding(0,dp(10),0,dp(10))});loadSearch();return}
         val near=terrain.cameraPose.let{Coordinate(it.longitude,it.latitude)}
-        files.execute{val results=engine.search(query,near);main.post{if(searchQuery==query&&searchResults===list)showResults(list,results)}}
+        files.execute{val results=(runCatching{extraResults(query,near)}.getOrDefault(emptyList())+engine.search(query,near)).take(30);main.post{if(searchQuery==query&&searchResults===list)showResults(list,results)}}
     }
     private fun showResults(list:LinearLayout,results:List<PlaceSearch.Result>){
         list.removeAllViews()
