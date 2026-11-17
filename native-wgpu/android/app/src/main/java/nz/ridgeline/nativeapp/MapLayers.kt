@@ -205,7 +205,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
     @Volatile private var placedTracks=emptyList<Placed>()
     private fun trackRects(p:Projection,selection:ByteBuffer):List<Placed>{
         val out=ArrayList<Placed>();val b=selection.duplicate().order(ByteOrder.LITTLE_ENDIAN);val n=b.getInt(0)
-        for(k in 0 until n){val i=b.getInt(4+k*12);val ox=b.getFloat(8+k*12);val oy=b.getFloat(12+k*12)
+        for(k in 0 until n){val e=NativeLabels.ENTRY;val i=b.getInt(4+k*e);val ox=b.getFloat(8+k*e);val oy=b.getFloat(12+k*e)
             val row=p.atlas.labels.getOrNull(i)?:continue
             if(!(row.label.key.startsWith(TopographyStyle.TRACK_LABELS+":")||row.label.key.startsWith(TopographyStyle.HUT_LABELS+":")||row.label.key.startsWith("te-araroa"))||i*3+1>=p.positions.size)continue
             val x=p.positions[i*3]+ox*p.scale;val y=p.positions[i*3+1]+oy*p.scale
@@ -220,7 +220,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         fun at(q:VectorTile.Point)=(floor(q.x*TopographyStyle.LABEL_GRID).toLong() shl 24) xor floor(q.y*TopographyStyle.LABEL_GRID).toLong()
         for(row in p.atlas.labels)if(row.label.key.startsWith(TopographyStyle.HUT_LABELS+":"))names[at(row.label.point)]=row.label.text
         val out=ArrayList<PlacedHut>();val b=selection.duplicate().order(ByteOrder.LITTLE_ENDIAN);val n=b.getInt(0)
-        for(k in 0 until n){val i=b.getInt(4+k*12);val ox=b.getFloat(8+k*12);val oy=b.getFloat(12+k*12)
+        for(k in 0 until n){val e=NativeLabels.ENTRY;val i=b.getInt(4+k*e);val ox=b.getFloat(8+k*e);val oy=b.getFloat(12+k*e)
             val row=p.atlas.labels.getOrNull(i)?:continue
             val dot=row.label.key.startsWith(TopographyStyle.HUT_DOTS+":")
             if(!(dot||row.label.key.startsWith(TopographyStyle.HUT_LABELS+":"))||i*3+1>=p.positions.size)continue
@@ -672,8 +672,8 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
     private val taGroups=HashMap<GpuUploadQueue.Id,LineGroup>()
     /** The trail's lines in Mercator (main or option), simplified for a tile zoom. */
     private val taCache=HashMap<Int,List<Pair<Boolean,List<VectorTile.Point>>>>()
-    private var taNameCache:List<Pair<String,Coordinate>>?=null
-    private fun taNames(t:TeAraroa)=taNameCache?:t.namePoints().also{taNameCache=it}
+    private var taNameCache:List<Pair<String,List<List<Coordinate>>>>?=null
+    private fun taNameCurves(t:TeAraroa)=taNameCache?:t.nameCurves().also{taNameCache=it}
     private fun taWidths(z:Int)=when{z<=5->2.6f to 1.3f;z<=8->3.2f to 1.7f;z<=11->4f to 2.2f;else->4.8f to 2.7f}
     private fun taPaths(t:TeAraroa,z:Int)=taCache.getOrPut(z){
         val tolerance=.5/(512.0*2.0.pow(z))
@@ -861,10 +861,17 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
                     val lodge=pl.type=="Hostel"||pl.type=="Lodge"
                     labels.add(TopographyStyle.Label(p,"",if(zoom<13)2.2f else 3.2f,if(lodge)TA_LINE else 0xFFFFF4F6.toInt(),48.0,circle=true,key="$TA_PLACE:$i",halo=if(lodge)0xFFFFF4F6.toInt() else TA_LINE))
                     if(zoom>=12)labels.add(TopographyStyle.Label(p,pl.name,11f,0xFFFFE3E8.toInt(),50.0,key="$TA_PLACE-name:$i",anchor="top"))}
-                // The name: fixed, once on each island (zoom 5 to 11.5).
-                if(zoom>=5&&zoom<11.5)for((island,c) in taNames(trail)){val p=merc(c);if(inside(p))
-                    labels.add(TopographyStyle.Label(p,"Te Araroa",if(zoom<8)15f else 17f,0xFFB8152F.toInt(),3.0,key="$TA_NAME:$island",font=TA_FONT,halo=0xE0FAF3E4.toInt()))}
             }
+            // The name: once on each island (zoom 5 to 11.5), written along a smoothed
+            // curve of the trail (longer and smoother further out), letter by letter.
+            if(zoom>=5&&zoom<11.5){val band=when{zoom<7->0;zoom<9->1;else->2}
+                for((island,curve) in taNameCurves(trail)){val points=curve.getOrNull(band)?:continue;if(points.size<2)continue
+                    val path="$TA_NAME:$island:$band";val size=if(zoom<8)16f else 18f
+                    val merc=points.map{VectorTile.Point((it.longitude+180)/360,CameraMath.mercatorY(it.latitude))}
+                    for((k,p) in merc.withIndex())labels.add(TopographyStyle.Label(p,"",1f,0,2.0,key="$path:v$k",path=path,vertex=k))
+                    val anchor=merc[merc.size/2]
+                    for((k,ch) in "Te Araroa".withIndex())labels.add(TopographyStyle.Label(anchor,ch.toString(),size,0xFFB8152F.toInt(),2.0,key="$path:g$k",font=TA_FONT,halo=0xE0FAF3E4.toInt(),path=path,glyph=k))
+                }}
         }else taGroups.clear()
         // A camera-dependent atlas order repainted/reuploaded the same strings on pans.
         // Fixed priority/key order keeps atlas slots stable; screen placement still follows camera.

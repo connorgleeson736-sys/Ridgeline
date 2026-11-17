@@ -137,6 +137,45 @@ internal class TeAraroa private constructor(
         return listOfNotNull(pointAt(best)?.let{"north" to it},pointAt((split+total)/2)?.let{"south" to it})
     }
 
+    /** The trail's name on each island, as the website writes it: a gentle curve
+     * through a stretch of the trail (x and y as cubics of the distance along it,
+     * least squares), one per zoom band (0: to zoom 7, 1: to 9, 2: closer), longer
+     * further out and lengthened until the curve is long enough for the name. Centred
+     * where the trail passes nearest the North Island's middle, and at the middle of
+     * the South Island's trail. Each curve has [points] points. */
+    fun nameCurves(points:Int=24):List<Pair<String,List<List<Coordinate>>>>{
+        val split=mains.firstOrNull{it.island=="SI"}?.from?:total/2
+        val northMid=run{var best=split/2;var bd=Double.MAX_VALUE;val k=cos(Math.toRadians(-39.0));var km=1.0
+            while(km<split-1){pointAt(km)?.let{p->val d=((p.longitude-175.75)*k).pow(2)+(p.latitude+39.0).pow(2);if(d<bd){bd=d;best=km}};km+=2.0};best}
+        // [step km, shortest curve km, longest stretch km] per band.
+        val bands=listOf(Triple(3.0,480.0,1700.0),Triple(1.0,135.0,640.0),Triple(.25,36.0,200.0))
+        fun fit(c:Double,span:Double,step:Double):List<Coordinate>{
+            val pts=ArrayList<Coordinate>();var k=c-span/2;while(k<=c+span/2){pointAt(k)?.let(pts::add);k+=step}
+            if(pts.size<8)return emptyList()
+            val ts=DoubleArray(pts.size);for(i in 1 until pts.size)ts[i]=ts[i-1]+hypot(pts[i].longitude-pts[i-1].longitude,pts[i].latitude-pts[i-1].latitude)
+            val t=ts.last().takeIf{it>0}?:1.0
+            fun cubic(axis:(Coordinate)->Double):DoubleArray{
+                val a=Array(4){DoubleArray(5)}
+                for((i,p) in pts.withIndex()){val u=ts[i]/t;for(r in 0..3){for(q in 0..3)a[r][q]+=u.pow(r+q);a[r][4]+=axis(p)*u.pow(r)}}
+                for(col in 0..3){var piv=col;for(r in col+1..3)if(abs(a[r][col])>abs(a[piv][col]))piv=r
+                    val tmp=a[col];a[col]=a[piv];a[piv]=tmp
+                    for(r in 0..3){if(r==col)continue;val f=a[r][col]/a[col][col];for(q in col..4)a[r][q]-=f*a[col][q]}}
+                return DoubleArray(4){a[it][4]/a[it][it]}
+            }
+            val cx=cubic{it.longitude};val cy=cubic{it.latitude}
+            // The ends trimmed a little: a fitted curve strays most there.
+            return List(points){i->val u=.06+.88*i/(points-1);Coordinate(cx[0]+cx[1]*u+cx[2]*u*u+cx[3]*u*u*u,cy[0]+cy[1]*u+cy[2]*u*u+cy[3]*u*u*u)}
+        }
+        fun km(line:List<Coordinate>)=(1 until line.size).sumOf{val k=cos(Math.toRadians(line[it].latitude));hypot((line[it].longitude-line[it-1].longitude)*111.32*k,(line[it].latitude-line[it-1].latitude)*111.32)}
+        return listOf(Triple("north",0.0 to split,northMid),Triple("south",split to total,(split+total)/2)).map{(island,range,mid)->
+            island to bands.map{(step,least,most)->
+                var line=emptyList<Coordinate>();var span=least*1.6
+                while(span<=most){val lo=max(range.first+1,mid-span/2);val hi=min(range.second-1,mid+span/2)
+                    line=fit((lo+hi)/2,hi-lo,step);if(km(line)>=least)break;span*=1.15}
+                line}
+        }
+    }
+
     companion object {
         val KINDS=mapOf("supermarket" to "Supermarket","store" to "Store","cafe" to "Café only","box" to "No shop: send a box")
         val LEVELS=mapOf("full" to "Supermarket","limited" to "Small store","box" to "Send a box")

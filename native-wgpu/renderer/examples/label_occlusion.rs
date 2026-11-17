@@ -75,7 +75,7 @@ async fn label_pixels_scaled(instance: &wgpu::Instance, heights: &[f32], anchor_
     let target = output.create_view(&Default::default());
     let point = [center[0], b[1] + (b[3] - b[1]) * anchor_at];
     r.set_label_atlas(4, 4, &[255, 0, 255, 255].repeat(16), vec![LabelSprite { point, uv: [0., 0., 1., 1.], size: [24., 12.] }]);
-    r.select_labels(vec![(0, [-12., -6.])]);
+    r.select_labels(vec![(0, [-12., -6.], 0.)]);
     if slow_still {
         // A still map on a slow phone (about 4 fps, as while tiles load): the only frames drawn are
         // the first and those the renderer asks for. The labels must end shown.

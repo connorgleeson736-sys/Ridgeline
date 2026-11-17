@@ -62,4 +62,16 @@ class TeAraroaTest{
         assertEquals("≈ 2–3 days",TeAraroa.daysText(2.0 to 3.0));assertEquals("under a day",TeAraroa.daysText(.2 to .5))
         assertEquals("Flood bypass",TeAraroa.optionKind(d.options.first{it.name.contains("Hazard Zone",true)}).first)
     }
+    @Test fun nameCurvesAreSmoothAndLongEnough(){
+        val curves=d.nameCurves(24)
+        assertEquals(listOf("north","south"),curves.map{it.first})
+        for((_,bands) in curves){assertEquals(3,bands.size)
+            for((band,line) in bands.withIndex()){assertEquals(24,line.size)
+                val km=DocTracks.length(line)/1000;assertTrue("band $band: $km km",km>=listOf(480.0,135.0,36.0)[band]*.95)
+                // No sharp turns between neighbouring points.
+                for(i in 1 until line.size-1){val a=Math.atan2(line[i].latitude-line[i-1].latitude,line[i].longitude-line[i-1].longitude);val b=Math.atan2(line[i+1].latitude-line[i].latitude,line[i+1].longitude-line[i].longitude)
+                    var t=Math.abs(a-b);if(t>Math.PI)t=2*Math.PI-t;assertTrue(t<.5)}}}
+        // The North Island's name about the island's middle (Tongariro to Taumarunui).
+        val mid=curves[0].second[2][12];assertTrue(mid.latitude<-38.5&&mid.latitude>-39.6)
+    }
 }
