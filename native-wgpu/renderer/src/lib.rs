@@ -170,7 +170,8 @@ pub struct Renderer {
     label_probe_wanted: bool,
     /// Bumped when the drawn terrain cover is rebuilt (its depth may change).
     cover_revision: u64,
-    label_selection: Vec<(usize, [f32; 2])>,
+    /// Placed sprites: row, offset (dp) and turn (radians; letters along a curve).
+    label_selection: Vec<(usize, [f32; 2], f32)>,
     label_anchor: [f64; 2],
     /// New-candidate batches keep the shown labels until their placement arrives.
     labels_stale: bool,

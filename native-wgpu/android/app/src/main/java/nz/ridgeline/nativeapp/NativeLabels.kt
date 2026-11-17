@@ -87,7 +87,7 @@ internal object NativeLabels {
             val key=SpriteKey(label.text,label.size,label.color,label.bold,label.circle,label.font,label.halo)
             var slot=sprites[key]
             if(slot==null){
-                paint.textSize=label.size*SCALE;paint.typeface=face(label);paint.letterSpacing=if(label.font.isEmpty())0f else .16f
+                paint.textSize=label.size*SCALE;paint.typeface=face(label);paint.letterSpacing=if(label.font.isEmpty()||label.path.isNotEmpty())0f else .16f
                 val lines=if(label.circle)emptyList()else wrap(label.text,paint,label.size*SCALE*9)
                 val w=if(label.circle)ceil(label.size*2*SCALE+8).toInt()else ceil((lines.maxOfOrNull{paint.measureText(it)}?:1f)+8*SCALE).toInt()
                 val h=if(label.circle)w else ceil(lines.size*label.size*SCALE*1.25+8*SCALE).toInt()
@@ -140,21 +140,32 @@ internal object NativeLabels {
      * already on screen go first within their priority, in their previous
      * anchor, so moving the map does not reshuffle which names are visible.
      * Labels hidden by terrain arrive unprojected and take no space. */
+    /** One placed sprite: its row, its offset from its anchor (dp) and its turn (radians). */
+    private class Placed(val index:Int,val x:Float,val y:Float,val angle:Float=0f)
+    /** Placement entries: row (int), offset x and y (dp), turn (radians, clockwise on screen). */
+    const val ENTRY=16
     fun place(atlas:NativeLabelAtlas,projected:FloatArray,width:Int,height:Int,scale:Float):ByteBuffer{
-        val cells=HashMap<Long,MutableList<Box>>();val selected=ArrayList<Triple<Int,Float,Float>>()
+        val cells=HashMap<Long,MutableList<Box>>();val selected=ArrayList<Placed>()
         val next=HashMap<String,String>()
         val cell=64*scale;val padding=5*scale
         // Placed line labels by name: a road or river name is not repeated
         // closer than its symbol-spacing on screen (MapLibre spaces them along the line).
         val named=HashMap<String,ArrayList<Float>>()
         fun keys(rect:Box):List<Long>{val result=ArrayList<Long>();for(y in floor(rect.top/cell).toInt()..floor(rect.bottom/cell).toInt())for(x in floor(rect.left/cell).toInt()..floor(rect.right/cell).toInt())result.add((x.toLong() shl 32)or(y.toLong() and 0xffffffffL));return result}
+        // Names along curves first (the Te Araroa name: few, and the most important),
+        // their letters taking space as any name does.
+        for(curve in curves(atlas,projected,width,height,scale)){
+            val boxes=curve.second;if(boxes.any{b->keys(b).any{k->cells[k]?.any{it.intersects(b)}==true}})continue
+            selected.addAll(curve.first);for(b in boxes)for(k in keys(b))cells.getOrPut(k){ArrayList()}.add(b)
+        }
         // More important names first (MapLibre's symbol-sort-key); among equally
         // important ones, those already shown keep their place (no reshuffling).
         val order=atlas.labels.indices.sortedWith(compareBy<Int>{atlas.labels[it].label.priority}.thenBy{if(atlas.labels[it].label.key in shown)0 else 1})
         for(i in order){val row=atlas.labels[i]
+            if(row.label.path.isNotEmpty())continue
             if(i*3+2>=projected.size||projected[i*3+2]==0f)continue
             val px=projected[i*3];val py=projected[i*3+1];if(px<0||py<0||px>width||py>height)continue
-            if(row.label.circle){selected.add(Triple(i,-row.width/2,-row.height/2));next[row.label.key]="circle";continue}
+            if(row.label.circle){selected.add(Placed(i,-row.width/2,-row.height/2));next[row.label.key]="circle";continue}
             val spacing=row.label.spacing*scale
             if(spacing>0f&&named[row.label.text]?.let{p->(p.indices step 2).any{k->val dx=p[k]-px;val dy=p[k+1]-py;dx*dx+dy*dy<spacing*spacing}}==true)continue
             val previous=shown[row.label.key]
@@ -163,10 +174,60 @@ internal object NativeLabels {
                 val rect=Box(px+ox*scale-padding,py+oy*scale-padding,px+(ox+row.width)*scale+padding,py+(oy+row.height)*scale+padding)
                 if(rect.left<0||rect.top<0||rect.right>width||rect.bottom>height)continue
                 val indexes=keys(rect);if(indexes.any{k->cells[k]?.any{it.intersects(rect)}==true})continue
-                selected.add(Triple(i,ox,oy));next[row.label.key]=anchor;if(spacing>0f)named.getOrPut(row.label.text){ArrayList()}.apply{add(px);add(py)};for(k in indexes)cells.getOrPut(k){ArrayList()}.add(rect);break
+                selected.add(Placed(i,ox,oy));next[row.label.key]=anchor;if(spacing>0f)named.getOrPut(row.label.text){ArrayList()}.apply{add(px);add(py)};for(k in indexes)cells.getOrPut(k){ArrayList()}.add(rect);break
             }
         }
         shown=next
-        return ByteBuffer.allocateDirect(4+selected.size*12).order(ByteOrder.LITTLE_ENDIAN).apply{putInt(selected.size);for((i,x,y)in selected){putInt(i);putFloat(x);putFloat(y)};rewind()}
+        return ByteBuffer.allocateDirect(4+selected.size*ENTRY).order(ByteOrder.LITTLE_ENDIAN).apply{putInt(selected.size);for(p in selected){putInt(p.index);putFloat(p.x);putFloat(p.y);putFloat(p.angle)};rewind()}
+    }
+    /** Names written along curves (MapLibre's line-center placement): the curve's
+     * points as projected now, the letters laid along its middle, each turned to
+     * the curve and kept upright, the whole name a little to the curve's left (above
+     * a line read left to right). A name is left out when its curve is off screen,
+     * too short for it, or bends too sharply between two letters. Each result: the
+     * letters' entries and their collision boxes. */
+    private fun curves(atlas:NativeLabelAtlas,projected:FloatArray,width:Int,height:Int,scale:Float):List<Pair<List<Placed>,List<Box>>>{
+        val vertices=HashMap<String,ArrayList<Pair<Int,Int>>>();val glyphs=HashMap<String,ArrayList<Pair<Int,Int>>>()
+        for((i,row) in atlas.labels.withIndex()){val l=row.label;if(l.path.isEmpty())continue
+            if(l.vertex>=0)vertices.getOrPut(l.path){ArrayList()}.add(l.vertex to i)else if(l.glyph>=0)glyphs.getOrPut(l.path){ArrayList()}.add(l.glyph to i)}
+        val out=ArrayList<Pair<List<Placed>,List<Box>>>()
+        for((path,letters) in glyphs){
+            val points=vertices[path]?.sortedBy{it.first}?.mapNotNull{(_,i)->if(i*3+2<projected.size&&projected[i*3+2]!=0f)floatArrayOf(projected[i*3],projected[i*3+1])else null}?:continue
+            if(points.size<2)continue
+            letters.sortBy{it.first}
+            val rows=letters.map{atlas.labels[it.second]}
+            val anchor=letters.first().second;if(anchor*3+2>=projected.size||projected[anchor*3+2]==0f)continue
+            val ax=projected[anchor*3];val ay=projected[anchor*3+1]
+            // Letter advances on screen (a sprite is its text and 4 dp each side), and tracking.
+            val size=rows.first().label.size
+            val advances=rows.map{max(0f,it.width-8f)*scale};val tracking=size*.2f*scale
+            val total=advances.sum()+tracking*(rows.size-1)
+            // Read left to right: a curve drawn leftwards is read from its other end.
+            val line=if(points.last()[0]<points.first()[0])points.reversed()else points
+            val run=FloatArray(line.size);for(k in 1 until line.size)run[k]=run[k-1]+hypot(line[k][0]-line[k-1][0],line[k][1]-line[k-1][1])
+            val length=run.last();if(length<total+size*scale)continue
+            fun at(d:Float):FloatArray{val s=d.coerceIn(0f,length);var k=1;while(k<line.size-1&&run[k]<s)k++
+                val span=max(1e-3f,run[k]-run[k-1]);val f=(s-run[k-1])/span
+                return floatArrayOf(line[k-1][0]+(line[k][0]-line[k-1][0])*f,line[k-1][1]+(line[k][1]-line[k-1][1])*f)}
+            var d=(length-total)/2;var previous=Float.NaN;var ok=true
+            val placed=ArrayList<Placed>();val boxes=ArrayList<Box>()
+            val lift=size*.75f*scale
+            for((k,row) in rows.withIndex()){
+                val half=advances[k]/2;val a=at(d-1f);val b=at(d+advances[k]+1f);val c=at(d+half)
+                val angle=atan2(b[1]-a[1],b[0]-a[0])
+                if(!previous.isNaN()){var turn=abs(angle-previous);if(turn>PI)turn=(2*PI).toFloat()-turn;if(turn>.7f){ok=false;break}}
+                if(advances[k]>0f)previous=angle
+                // Above the curve: its left side as read.
+                val cx=c[0]+sin(angle)*lift;val cy=c[1]-cos(angle)*lift
+                if(cx<0||cy<0||cx>width||cy>height){ok=false;break}
+                val h=row.height*scale
+                placed.add(Placed(letters[k].second,(cx-ax)/scale-row.width/2,(cy-ay)/scale-row.height/2,angle))
+                val hx=abs(cos(angle))*advances[k]/2+abs(sin(angle))*h*.35f;val hy=abs(sin(angle))*advances[k]/2+abs(cos(angle))*h*.35f
+                if(advances[k]>0f)boxes.add(Box(cx-hx,cy-hy,cx+hx,cy+hy))
+                d+=advances[k]+tracking
+            }
+            if(ok&&placed.isNotEmpty())out.add(placed to boxes)
+        }
+        return out
     }
 }

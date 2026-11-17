@@ -18,7 +18,12 @@ internal class TopographyStyle(json:String){
         /** An asset font for the text ("" the map's Open Sans), as the Te Araroa name's. */
         val font:String="",
         /** The halo round the text, or a dot's outline (0: the map's dark halo). */
-        val halo:Int=0)
+        val halo:Int=0,
+        /** A name written along a curve (as MapLibre's line labels): rows of the same
+         * [path] are its curve's points ([vertex], no sprite of their own, projected to
+         * find the curve on screen) and its letters ([glyph], in reading order, all
+         * anchored at one point), placed and turned letter by letter (NativeLabels). */
+        val path:String="",val vertex:Int=-1,val glyph:Int=-1)
     data class Output(val lines:List<Line>,val labels:List<Label>)
     private val specs=JSONArray(json).let{rows->List(rows.length()){rows.getJSONObject(it)}}.onEach{spec->
         // Performance: river names start later than in Capacitor (1.5 zooms for

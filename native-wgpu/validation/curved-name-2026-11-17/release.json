@@ -1,0 +1,27 @@
+{
+  "artifact": "Ridgeline-Native-Curved-Name-0.1.73-Base.apk",
+  "bytes": 36907095,
+  "sha256": "3242ec79f51f8587900878a10f9f3cf9c3845888bc6bf057247680e00f3b5f61",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.73-curved-name",
+  "versionCode": 74,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.72 Full Audit (same package and signer)",
+  "changes": [
+    "The Te Araroa name is written along the trail's curve, as on the website (MapLibre's line-center placement): once per island, along a smoothed curve of the trail (a cubic fitted to a stretch of it, one per zoom band: to 7, to 9, closer; longer further out and lengthened until it fits the name), in IM FELL English SC, red on a parchment halo.",
+    "Labels can be names along curves (TopographyStyle.Label path, vertex, glyph): the curve's points are projected each placement with the other names (with terrain heights), and NativeLabels lays the letters along the curve's middle on screen, each turned to the curve and kept upright (a curve drawn leftwards is read from its other end), a little to the curve's left, tracked by 0.2 em; a name is left out when its curve is off screen, too short for it, or bends more than 0.7 rad between two letters. Its letters take collision space before other names.",
+    "Renderer: a placed sprite carries a turn (placement entries are 16 bytes: row, offset x and y, turn in radians); its quad's corners are turned about its centre on the CPU when the label batch is rebuilt (no shader change). Every other label has no turn and draws as before. Terrain occlusion, fade-in and depth handling are unchanged (the name's letters share one anchor, so it is hidden or shown whole)."
+  ],
+  "tests": {
+    "kotlinJvm": "all pass, full suite: 339 tests, 6 skipped as before (new: LabelPlacementTest curve cases: letters along a line in reading order above it, a leftward curve read from its other end, letters turning with an arc, left out when too short or bending too sharply, other names giving way; TeAraroaTest.nameCurvesAreSmoothAndLongEnough)",
+    "rust": "cargo test -p ridgeline-renderer: all pass (17+1+1, 3 ignored as before); new GPU example label_turn (Vulkan, headless): a 40x10 px sprite turned a quarter draws 10x40 px about the same centre; label_occlusion passes. layer_smoke fails at its route step identically on 0.1.72 (renderer unchanged since 0.1.67), so not caused by this change."
+  },
+  "nativeLibraries": "rebuilt for arm64-v8a, armeabi-v7a and x86_64 (tools/build-android.sh steps: cargo build --release per target, stripped); all three differ from 0.1.72's",
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

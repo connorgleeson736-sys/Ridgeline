@@ -3,6 +3,7 @@ package nz.ridgeline.nativeapp
 import org.junit.Assert.*
 import org.junit.Test
 import java.nio.ByteBuffer
+import kotlin.math.abs
 
 /** Collision placement: importance first, hidden names take no space. */
 class LabelPlacementTest {
@@ -11,7 +12,7 @@ class LabelPlacementTest {
     private fun atlas(vararg rows:NativeLabelAtlas.Row)=NativeLabelAtlas(rows.toList(),1,1,ByteBuffer.allocateDirect(4),ByteBuffer.allocateDirect(4),ByteBuffer.allocateDirect(0))
     private fun placed(a:NativeLabelAtlas,positions:FloatArray):Set<String>{
         val out=NativeLabels.place(a,positions,1000,1000,1f);val n=out.int
-        return (0 until n).map{val i=out.int;out.float;out.float;a.labels[i].label.key}.toSet()
+        return (0 until n).map{val i=out.int;out.float;out.float;out.float;a.labels[i].label.key}.toSet()
     }
     @Test fun aHutNameBeatsARiverNameShownBeforeIt(){
         val a=atlas(label("hut",10.0),label("river",65.0))
@@ -38,5 +39,62 @@ class LabelPlacementTest {
         // Three pieces of the same highway 300 px apart and one 900 px away; a river nearby.
         val placed=placed(a,floatArrayOf(100f,100f,1f, 100f,400f,1f, 100f,950f,1f, 300f,250f,1f))
         assertEquals(setOf("sh1","sh3","river"),placed)
+    }
+
+    // ---- Names along curves (the Te Araroa name) ----
+    private fun curve(text:String,vertices:Int,size:Float=16f,glyphWidth:Float=20f):List<NativeLabelAtlas.Row>{
+        val p=VectorTile.Point(.5,.5)
+        val v=(0 until vertices).map{NativeLabelAtlas.Row(TopographyStyle.Label(p,"",1f,0,2.0,key="name:v$it",path="name",vertex=it),9f,9f)}
+        val g=text.mapIndexed{k,ch->NativeLabelAtlas.Row(TopographyStyle.Label(p,ch.toString(),size,0,2.0,key="name:g$k",path="name",glyph=k),glyphWidth+8f,size*1.6f)}
+        return v+g
+    }
+    private class Entry(val index:Int,val x:Float,val y:Float,val angle:Float)
+    private fun entries(a:NativeLabelAtlas,positions:FloatArray,w:Int=1000,h:Int=1000):List<Entry>{
+        val out=NativeLabels.place(a,positions,w,h,1f);val n=out.int
+        return List(n){Entry(out.int,out.float,out.float,out.float)}
+    }
+    /** Vertex positions (x, y, visible) then the letters' shared anchor at (500, 500). */
+    private fun positions(points:List<Pair<Float,Float>>,letters:Int)=(points.flatMap{listOf(it.first,it.second,1f)}+List(letters){listOf(500f,500f,1f)}.flatten()).toFloatArray()
+    @Test fun lettersFollowAStraightLineInReadingOrderAboveIt(){
+        val a=atlas(*curve("Te Araroa",5).toTypedArray())
+        val e=entries(a,positions((0..4).map{100f+it*200f to 600f},9))
+        assertEquals(9,e.size)
+        // Left to right, level, centred on the line's middle, lifted above it.
+        val centres=e.map{val row=a.labels[it.index];500f+it.x+row.width/2 to 500f+it.y+row.height/2}
+        assertTrue(centres.zipWithNext().all{(p,q)->q.first>p.first})
+        assertTrue(e.all{abs(it.angle)<1e-3})
+        assertEquals(500f,(centres.first().first+centres.last().first)/2,2f)
+        assertTrue(centres.all{it.second<600f})
+    }
+    @Test fun aCurveDrawnLeftwardsIsReadFromItsOtherEnd(){
+        val a=atlas(*curve("Te Araroa",5).toTypedArray())
+        val e=entries(a,positions((0..4).map{900f-it*200f to 600f},9))
+        val xs=e.map{500f+it.x+a.labels[it.index].width/2}
+        assertTrue(xs.zipWithNext().all{(p,q)->q>p})
+        assertTrue(e.all{abs(it.angle)<1e-3})
+    }
+    @Test fun lettersTurnWithTheCurve(){
+        // A gentle arc: letters at either end lean opposite ways.
+        val pts=(0..20).map{val t=it/20f;100f+800f*t to 600f-200f*kotlin.math.sin(t*Math.PI.toFloat())}
+        val a=atlas(*curve("Te Araroa",21).toTypedArray())
+        val e=entries(a,positions(pts,9))
+        assertEquals(9,e.size)
+        assertTrue(e.first().angle<-.05f);assertTrue(e.last().angle>.05f)
+    }
+    @Test fun aNameIsLeftOutWhereItDoesNotFitOrBendsTooSharply(){
+        val a=atlas(*curve("Te Araroa",3).toTypedArray())
+        // Too short for the name.
+        assertTrue(entries(a,positions(listOf(450f to 600f,500f to 600f,550f to 600f),9)).isEmpty())
+        // A right angle under the name.
+        val b=atlas(*curve("Te Araroa",3).toTypedArray())
+        assertTrue(entries(b,positions(listOf(300f to 600f,500f to 600f,500f to 400f),9)).isEmpty())
+    }
+    @Test fun otherNamesGiveWayToACurvedName(){
+        val rows=curve("Te Araroa",5)+listOf(label("town",10.0))
+        val a=atlas(*rows.toTypedArray())
+        // The town's name sits where the curved name is.
+        val pos=positions((0..4).map{100f+it*200f to 600f},9)+floatArrayOf(500f,585f,1f)
+        val keys=entries(a,pos).map{a.labels[it.index].label.key}
+        assertFalse("town" in keys);assertEquals(9,keys.size)
     }
 }

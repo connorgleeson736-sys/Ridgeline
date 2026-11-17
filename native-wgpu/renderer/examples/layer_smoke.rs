@@ -213,7 +213,7 @@ async fn run() {
             size: [30., 12.],
         }],
     );
-    r.select_labels(vec![(0, [10., -6.])]);
+    r.select_labels(vec![(0, [10., -6.], 0.)]);
     render(&mut r, &target, center, 11., 0., 0., 500.);
     let labels = read(&r, &output);
     let pixel = &labels[(128 * 256 + 145) * 4..][..4];

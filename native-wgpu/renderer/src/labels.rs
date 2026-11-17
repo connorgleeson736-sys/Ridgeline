@@ -461,7 +461,7 @@ impl crate::Renderer {
     pub fn label_texture_upload_bytes(&self) -> u64 {
         self.labels_gpu.uploaded_bytes
     }
-    pub fn select_labels(&mut self, selection: Vec<(usize, [f32; 2])>) {
+    pub fn select_labels(&mut self, selection: Vec<(usize, [f32; 2], f32)>) {
         if self.label_selection != selection || self.labels_stale {
             self.label_selection = selection;
             self.labels_stale = false;
@@ -495,7 +495,7 @@ impl crate::Renderer {
             .unwrap_or([0.5, 0.5]);
         let anchor = self.label_anchor;
         let mut vertices = Vec::with_capacity(self.label_selection.len() * 6);
-        for &(index, offset) in &self.label_selection {
+        for &(index, offset, angle) in &self.label_selection {
             let Some(sprite) = self.label_sprites.get(index) else {
                 continue;
             };
@@ -516,12 +516,20 @@ impl crate::Renderer {
                 (sprite.point[1] - anchor[1]) as f32,
                 height * self.map_style.height_scale(),
             ];
+            // A letter of a name along a curve is turned about its centre (screen
+            // offsets, y down); every other sprite has no turn.
+            let (sin, cos) = angle.sin_cos();
+            let centre = [
+                offset[0] + sprite.size[0] * 0.5,
+                offset[1] + sprite.size[1] * 0.5,
+            ];
             for (x, y) in [(0., 0.), (1., 0.), (0., 1.), (0., 1.), (1., 0.), (1., 1.)] {
+                let local = [sprite.size[0] * (x - 0.5), sprite.size[1] * (y - 0.5)];
                 vertices.push(Vertex {
                     anchor: a,
                     offset: [
-                        offset[0] + sprite.size[0] * x,
-                        offset[1] + sprite.size[1] * y,
+                        centre[0] + local[0] * cos - local[1] * sin,
+                        centre[1] + local[0] * sin + local[1] * cos,
                     ],
                     uv: [
                         sprite.uv[0] + sprite.uv[2] * x,

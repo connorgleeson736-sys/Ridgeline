@@ -1778,27 +1778,33 @@ pub unsafe extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_placeLabe
         .with_env(|env| -> Result<u8, jni::errors::Error> {
             let buffer = unsafe { jni::objects::JByteBuffer::from_raw(env, input) };
             let size = env.get_direct_buffer_capacity(&buffer)?;
-            if !(4..=4 + 512 * 12).contains(&size) {
+            // Per placed sprite: row, offset x and y (dp) and turn (radians), 16 bytes.
+            if !(4..=4 + 512 * 16).contains(&size) {
                 return Ok(0);
             }
             let bytes = unsafe {
                 std::slice::from_raw_parts(env.get_direct_buffer_address(&buffer)?, size)
             };
             let count = u32::from_le_bytes(bytes[..4].try_into().unwrap()) as usize;
-            if count > 512 || size != 4 + count * 12 {
+            if count > 512 || size != 4 + count * 16 {
                 return Ok(0);
             }
             let mut selection = Vec::with_capacity(count);
-            for row in bytes[4..].chunks_exact(12) {
+            for row in bytes[4..].chunks_exact(16) {
                 let index = u32::from_le_bytes(row[..4].try_into().unwrap()) as usize;
                 let offset = [
                     f32::from_le_bytes(row[4..8].try_into().unwrap()),
-                    f32::from_le_bytes(row[8..].try_into().unwrap()),
+                    f32::from_le_bytes(row[8..12].try_into().unwrap()),
                 ];
-                if index >= 512 || offset.iter().any(|v| !v.is_finite() || v.abs() > 2048.) {
+                let angle = f32::from_le_bytes(row[12..].try_into().unwrap());
+                if index >= 512
+                    || offset.iter().any(|v| !v.is_finite() || v.abs() > 2048.)
+                    || !angle.is_finite()
+                    || angle.abs() > 7.
+                {
                     return Ok(0);
                 }
-                selection.push((index, offset));
+                selection.push((index, offset, angle));
             }
             let Ok(mut all) = states().lock() else {
                 return Ok(0);
