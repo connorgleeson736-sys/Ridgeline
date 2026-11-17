@@ -136,8 +136,16 @@ export function features(d) {
     return out;
   };
   const kmLong = (line) => { let n = 0; for (let i = 1; i < line.length; i++) { const k = Math.cos((line[i][1] * Math.PI) / 180); n += Math.hypot((line[i][0] - line[i - 1][0]) * 111.32 * k, (line[i][1] - line[i - 1][1]) * 111.32); } return n; };
-  for (const [a, b] of [[0, 1739], [1739, d.total]]) {
-    const mid = (a + b) / 2;
+  // Centred where the trail passes nearest the middle of the island (the North Island's
+  // trail runs down its west side, so its middle km sits too far north-west); the South
+  // Island's at the middle of its trail.
+  const nearestKm = ([x, y], a, b) => {
+    let best = (a + b) / 2, bd = Infinity;
+    for (let k = a + 1; k < b - 1; k += 2) { const p = pointAt(d, k); if (!p) continue; const dd = ((p[0] - x) * Math.cos((y * Math.PI) / 180)) ** 2 + (p[1] - y) ** 2; if (dd < bd) { bd = dd; best = k; } }
+    return best;
+  };
+  for (const [a, b, centre] of [[0, 1739, [175.75, -39.0]], [1739, d.total, null]]) {
+    const mid = centre ? nearestKm(centre, a, b) : (a + b) / 2;
     for (const [band, step, , least, most] of BANDS) {
       // The trail winds: take a longer stretch until its smoothed line fits the text.
       let line = [];
