@@ -14,7 +14,9 @@ export class Sheet {
     this.subtitle = el('p', { class: 'sheet-subtitle' });
     // A small photo in the corner (the app's 56 dp thumbnail).
     this.photo = el('img', { class: 'thumb', alt: '', hidden: true, decoding: 'async', referrerpolicy: 'no-referrer', onerror: () => { this.photo.hidden = true; } });
-    this.head = el('header', { class: 'sheet-head' }, this.photo, el('div', { class: 'sheet-heading' }, this.title, this.subtitle));
+    // Beside the title, on the right: a panel's own control (Te Araroa's direction).
+    this.aside = el('div', { class: 'sheet-aside' });
+    this.head = el('header', { class: 'sheet-head' }, this.photo, el('div', { class: 'sheet-heading' }, this.title, this.subtitle), this.aside);
     this.body = el('div', { class: 'sheet-body' });
     root.append(this.grip, this.head, this.body);
     root.setAttribute('role', 'dialog');
@@ -52,6 +54,7 @@ export class Sheet {
     this.subtitle.hidden = !panel.subtitle;
     this.head.hidden = !panel.title;
     this.photo.hidden = true; this.photo.removeAttribute('src');
+    this.aside.replaceChildren();
     this.back.hidden = !this.stack.length;
     this.back.textContent = `‹ ${this.stack[this.stack.length - 1]?.backLabel || 'Back'}`;
     this.body.replaceChildren();
@@ -69,6 +72,8 @@ export class Sheet {
     if (title != null) { this.title.textContent = title; this.head.hidden = !title; }
     if (subtitle != null) { this.subtitle.textContent = subtitle; this.subtitle.hidden = !subtitle; }
   }
+  /** Puts a control beside the title (replacing any there). */
+  setAside(node) { this.aside.replaceChildren(...(node ? [node] : [])); }
   setPhoto(src, alt = '') {
     if (!src || !/^https:\/\//.test(src)) { this.photo.hidden = true; return; }
     this.photo.alt = alt; this.photo.src = src; this.photo.hidden = false;

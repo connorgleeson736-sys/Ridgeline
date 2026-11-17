@@ -275,8 +275,6 @@ const km = (v) => (v == null ? '' : v.toLocaleString('en-NZ', { maximumFractionD
 const nobo = (d, v) => (v == null ? null : Math.max(0, d.total - v));
 
 // ---- Te Araroa ----
-/** The Trust's time, its first part ("5 days walking, 2–3 days biking" → "5 days walking"). */
-const shortTime = (t) => (t || '').split(/[,;(]/)[0].trim();
 /** A km range as the walker meets it (southbound or northbound). */
 const kmRange = (d, a, b) => { const x = teAraroa.kmIn(d, a), y = teAraroa.kmIn(d, b); return `km ${km(Math.min(x, y))}–${km(Math.max(x, y))}`; };
 const dirWord = () => (teAraroa.dir() === 'nobo' ? 'northbound' : 'southbound');
@@ -341,9 +339,8 @@ function sectionPanel(ctx, d, s, { at = null, walk = null, fromList = false } = 
         const lines = teAraroa.sectionLines(d, s), line = teAraroa.facing(teAraroa.sectionLine(d, s));
         if (lines.length) { ctx.select(lines); if (first) ctx.fit(lines.flat()); }
         first = false;
-        if (!fromList) body.append(directionSwitch(draw));
+        host.setAside(fromList ? null : directionSwitch(draw));
         body.append(sectionSteps(ctx, d, s, host, { fromList }));
-        body.append(el('p', { class: 'ta-facts' }, [s.length && `${km(s.length)} km`, shortTime(s.time)].filter(Boolean).join(' · ')));
         if (s.alternative) body.append(el('p', { class: 'ta-why' }, teAraroa.optionKind(s).why));
         body.append(taAlertsBox(s.slug));
         const profile = line.length >= 2 ? profileBlock(ctx, line, alive) : null;
@@ -487,12 +484,13 @@ function overview(ctx, d, body, alive, tab = 'sections', restored = false) {
   const draw = () => {
     body.replaceChildren();
     rows.clear();
-    ctx.sheet.setTitle('Te Araroa', `Cape Reinga to Bluff · ${km(d.total)} km`);
+    ctx.sheet.setTitle('Te Araroa', 'Cape Reinga to Bluff');
     if (!ctx.side?.isOpen) wholeView(!restored);
     restored = true;
     const tabs = el('div', { class: 'ta-tabs', role: 'tablist' });
     const pane = el('div', { class: 'ta-pane' });
-    body.append(directionSwitch(() => { draw(); if (ctx.side?.isOpen) ctx.side.close(); }), tabs, pane);
+    ctx.sheet.setAside(directionSwitch(() => { draw(); if (ctx.side?.isOpen) ctx.side.close(); }));
+    body.append(tabs, pane);
     const show = (name) => {
       current = name;
       for (const b of tabs.children) b.setAttribute('aria-selected', String(b.dataset.tab === name));
@@ -504,7 +502,7 @@ function overview(ctx, d, body, alive, tab = 'sections', restored = false) {
           const badge = el('span', { class: 'ta-badge', hidden: true });
           const row = el('button', { type: 'button', class: 'ta-row', onclick: () => pick(sectionPanel(ctx, d, s, { fromList: true })) },
             el('span', { class: 'ta-n' }, String(s.n)),
-            el('span', { class: 'ta-name' }, s.name, el('small', {}, [`km ${Math.round(teAraroa.kmIn(d, teAraroa.dir() === 'nobo' ? s.to : s.from))}`, s.length && `${km(s.length)} km`].filter(Boolean).join(' · '))), badge);
+            el('span', { class: 'ta-name' }, s.name), badge);
           rows.set(s.slug, row); badge.dataset.slug = s.slug;
           pane.append(row);
         }
@@ -524,7 +522,7 @@ function overview(ctx, d, body, alive, tab = 'sections', restored = false) {
           const badge = el('span', { class: 'ta-badge', hidden: true });
           const row = el('button', { type: 'button', class: 'ta-row', onclick: () => pick(sectionPanel(ctx, d, o, { fromList: true })) },
             el('span', { class: 'ta-n option' }, '↳'),
-            el('span', { class: 'ta-name' }, o.name, el('small', {}, [teAraroa.optionKind(o).label, o.length && `${km(o.length)} km`, kmRange(d, o.from, o.to)].filter(Boolean).join(' · '))), badge);
+            el('span', { class: 'ta-name' }, o.name, el('small', {}, teAraroa.optionKind(o).label)), badge);
           rows.set(o.slug, row); badge.dataset.slug = o.slug;
           pane.append(row);
         }

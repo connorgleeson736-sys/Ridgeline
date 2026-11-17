@@ -15,7 +15,7 @@ export class SidePanel {
     this.backButton = el('button', { class: 'back', type: 'button', onclick: () => this.back() }, '‹ Te Araroa');
     this.root = el('aside', { class: 'side-panel', hidden: true, 'aria-label': 'Details' },
       el('div', { class: 'side-top' }, this.backButton, el('button', { class: 'close', type: 'button', 'aria-label': 'Close', onclick: () => this.close() }, '×')),
-      el('header', { class: 'sheet-head' }, el('div', { class: 'sheet-heading' }, this.title, this.subtitle)),
+      el('header', { class: 'sheet-head' }, el('div', { class: 'sheet-heading' }, this.title, this.subtitle), this.aside = el('div', { class: 'sheet-aside' })),
       this.body);
     this.root.addEventListener('keydown', (e) => { if (e.key === 'Escape') this.back(); });
     document.body.append(this.root);
@@ -46,6 +46,7 @@ export class SidePanel {
     this.subtitle.textContent = panel.subtitle || '';
     this.subtitle.hidden = !panel.subtitle;
     this.backButton.textContent = `‹ ${this.stack.length ? this.stack[this.stack.length - 1].backLabel || 'Back' : this.home || 'Back'}`;
+    this.aside.replaceChildren();
     this.body.replaceChildren();
     this.body.scrollTop = 0;
     this.root.hidden = false;
@@ -56,6 +57,7 @@ export class SidePanel {
     this.onChange?.(this.key);
   }
   back() { const prev = this.stack.pop(); if (prev) this.show(prev, { restored: true }); else this.close(); }
+  setAside(node) { this.aside.replaceChildren(...(node ? [node] : [])); }
   setTitle(title, subtitle) {
     if (title != null) this.title.textContent = title;
     if (subtitle != null) { this.subtitle.textContent = subtitle; this.subtitle.hidden = !subtitle; }
