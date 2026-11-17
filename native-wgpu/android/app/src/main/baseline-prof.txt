@@ -1,0 +1,11 @@
+# Baseline profile: the app's own code compiled ahead of time on install, not run
+# under the JIT after every update (73 versions in three weeks: most sessions ran on
+# freshly installed code). Hot, startup and post-startup: the tile pipeline,
+# terrain view, map layers, labels and sheets are all on the first minutes' path.
+# R8 stays off (JNI entry points and reflection are left untouched).
+HSPLnz/ridgeline/nativeapp/**;->**(**)**
+Lnz/ridgeline/nativeapp/**;
+HSPLokhttp3/**;->**(**)**
+Lokhttp3/**;
+HSPLokio/**;->**(**)**
+Lokio/**;

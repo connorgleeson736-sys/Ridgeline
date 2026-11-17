@@ -1,0 +1,32 @@
+{
+  "artifact": "Ridgeline-Native-Audit-Fixes-0.1.74-Base.apk",
+  "bytes": 36959996,
+  "sha256": "5d6a0316be08415eeef4c66273eeac4723cf67f8633e88d09416f3f7b885be1d",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.74-audit-fixes",
+  "versionCode": 75,
+  "buildType": "performance (not debuggable, R8 off: JNI entry points)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.73 Full Audit (same package and signer)",
+  "audit": "NATIVE_AUDIT_0.1.72_2026-11-17.md (branch claude/vibrant-ramanujan-1xi7nr)",
+  "changes": [
+    "N2: terrain requests no longer wait for the imagery catalogues to parse. Until they are ready a view is planned for terrain only (not cached); once ready it is planned again with imagery, and prediction and idle prefetch start.",
+    "N1: overview imagery (zoom 9-12 packs) comes from the edge-cached Worker (bushline-maps.connorgleeson736.workers.dev) instead of the uncached r2.dev address: tiles are cached at the edge for a year, and the whole pack is served with Range requests, byte-identical to the bucket.",
+    "N3/N4: each terrain tile's grid is split into 8x8 blocks of 16x16 cells. A block whose own box (its lowest and highest heights, skirt included) is off screen is not drawn, and each block takes the coarsest step (4, 2 or 1) its own error allows under the tile rule (0.6 px, 10 px cells; kept within 0.9 px, 13 px). Block boundaries stay at full resolution, so neighbours always meet. Block metadata is computed when a tile is first drawn, at most two tiles a frame. Default view on real LINZ elevation (renderer/examples/triangle_audit.rs, tools/triangle-audit.py): 840,184 -> 681,824 triangles at 720x1520 (-19%), 864,000 -> 749,744 at 1080x2280 (-13%); the 720x1520 frame matches a full-detail one in silhouette exactly, and with a checker texture differs in 21 of 1,094,400 pixels (sub-pixel edge shifts).",
+    "N8: sea-level terrain tiles take the fast path; a zero height still keeps its sign bit-for-bit as before (DemSeaLevelTest).",
+    "N6: a baseline profile (androidx.profileinstaller 1.4.0; the app's own code, OkHttp and Okio): assets/dexopt/baseline.prof, compiled at install instead of running under the JIT after each update. R8 stays off.",
+    "N7 (decode pools fixed at two threads) unchanged: the audit asks for a device check of the loading diagnostics first. N5 (elevation bytes) unchanged: needs pre-built meshes or a bundling service."
+  ],
+  "tests": {
+    "kotlinJvm": "all pass: 340 tests, 6 skipped as before (new: DemSeaLevelTest)",
+    "rust": "cargo test -p ridgeline-core -p ridgeline-renderer: all pass (new core tests: blocks cover the rect once and hide what is off screen; neighbouring blocks share every edge vertex whatever their steps; block profiles flat on planes and bound bumps). GPU examples label_turn and label_occlusion pass (Vulkan, headless)."
+  },
+  "nativeLibraries": "rebuilt for arm64-v8a, armeabi-v7a and x86_64 (cargo build --release per target, stripped); all three differ from 0.1.73's",
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false,
+  "sourceNote": "Built from this commit's source except that assets/map-defaults.json was written on one line in the APK (same keys and values; reformatted before commit)."
+}

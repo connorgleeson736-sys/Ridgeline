@@ -72,10 +72,20 @@ object DemSampling {
         }
         fun height(px:Int,py:Int,slot:Int):Float {
             val record=halo[slot]!!
-            val exact=record.samples[(py%256)*256+px%256]
-            // Preserve fallback interpolation and signed zero bit for bit.
-            return if(record.id.z==dz&&exact!=0f)exact
-                else sample(record,px.toDouble(),py.toDouble(),dz)
+            val lx=px%256;val ly=py%256
+            val exact=record.samples[ly*256+lx]
+            if(record.id.z!=dz)return sample(record,px.toDouble(),py.toDouble(),dz)
+            if(exact!=0f)return exact
+            // Sea level (exactly zero) as sample() gives it at a whole pixel, bit for
+            // bit, without its general path (about nine times slower on all-sea tiles):
+            // the pixel plus its right, lower and diagonal neighbours times zero, so a
+            // negative zero only when all four are negative or negative zero, and not
+            // a number when a neighbour is not finite (infinity times zero).
+            val s=record.samples;val x1=min(255,lx+1);val y1=min(255,ly+1)
+            val b=s[ly*256+x1];val c=s[y1*256+lx];val d=s[y1*256+x1]
+            if(!b.isFinite()||!c.isFinite()||!d.isFinite())return Float.NaN
+            fun negative(v:Float)=java.lang.Float.floatToRawIntBits(v)<0
+            return if(negative(exact)&&negative(b)&&negative(c)&&negative(d))-0f else 0f
         }
         for(j in 0..128){check()
             val py=(y*256.0+j*2.0)/factor-.5;val iy=floor(py).toInt();val fy=py-iy

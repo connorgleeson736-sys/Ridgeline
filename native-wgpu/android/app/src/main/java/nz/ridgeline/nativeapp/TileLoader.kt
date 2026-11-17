@@ -423,16 +423,21 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     }
     private fun loadView() {
         if (dead||!active||view.width==0||view.height==0) return
-        if(!imageryReady.isDone||imageryReady.isCompletedExceptionally)return
+        // Terrain does not wait for the imagery catalogues (overview-index and
+        // gap-atlas, about 3 MB of JSON parsed at start-up): its requests go out
+        // at once. Imagery is planned once they are read (imageryReady reruns
+        // this); until then no imagery source is planned, and nothing here
+        // touches the catalogues (their lazy reads would block on the parse).
+        val imageryOk=imageryReady.isDone&&!imageryReady.isCompletedExceptionally
         val planningPose=view.planningPose
         val key=DemandPlanKey((view.width/view.pixelScale).roundToInt().coerceAtLeast(1),
             (view.height/view.pixelScale).roundToInt().coerceAtLeast(1),planningPose,terrainDetail,imageryDetail,view.surfaceFocusFor(planningPose))
-        val plan=plans.get(key) {
+        fun build(withImagery:Boolean):Plan {
           val next=LinkedHashMap<Source,Int>()
           val imageIds=sourcePlan(false,key)
           val focus=imageIds.firstOrNull()
-          val bootstrap=focus?.takeIf{mapSettings.state.base==MapSettings.Base.LINZ&&!view.hasResidentCoverage(it.gpu(),false)}?.let{imagery.bootstrap(it.z,it.x,it.y)}
-          for(geometry in listOf(true,false)) {
+          val bootstrap=if(withImagery)focus?.takeIf{mapSettings.state.base==MapSettings.Base.LINZ&&!view.hasResidentCoverage(it.gpu(),false)}?.let{imagery.bootstrap(it.z,it.x,it.y)}else null
+          for(geometry in if(withImagery)listOf(true,false)else listOf(true)) {
             val ids=if(geometry)sourcePlan(true,key)else imageIds
             val limit=if(geometry)geometryLimit else imageLimit
             val original=SourceDemand.bounded(ids.map{it.gpu()},limit)
@@ -441,8 +446,10 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             // Coarse backdrop first: new ground never waits on fine terrain to show.
             for(id in SourceDemand.backdrop(original))next.putIfAbsent(Source(Id(id.z,id.x,id.y),geometry),0)
           }
-          Plan(next.toMap())
+          return Plan(next.toMap())
         }
+        // A terrain-only plan is not cached: once imagery is ready the same camera plans both.
+        val plan=if(imageryOk)plans.get(key){build(true)}else build(false)
         val ranked=plan.ranked
         val prior=previousPose
         // Publish the whole camera generation before any freed network slot
@@ -491,8 +498,8 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
                 schedule(source,priority,false)
             }
         }
-        if(prior!=key.pose)predict(prior,key)
-        scheduleIdle(key,viewRevision)
+        if(prior!=key.pose&&imageryOk)predict(prior,key)
+        if(imageryOk)scheduleIdle(key,viewRevision)
     }
     private fun schedule(source:Source,priority:Int,speculative:Boolean){
         val task=Task(source,priority,speculative)

@@ -54,6 +54,10 @@ impl Heightfield {
             max,
         })
     }
+    /// The (cells + 1)^2 vertex heights, row by row.
+    pub fn heights(&self) -> &[f32] {
+        &self.heights
+    }
     pub fn complete(&self) -> bool {
         self.valid == [0, 0, self.cells, self.cells]
     }

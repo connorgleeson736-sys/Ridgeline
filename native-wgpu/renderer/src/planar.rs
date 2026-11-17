@@ -55,6 +55,8 @@ impl Renderer {
                 generation: self.clock,
                 adaptive_profile: None,
                 adaptive_state: std::cell::Cell::new(adaptive::State::new()),
+                blocks: std::cell::OnceCell::new(),
+                block_steps: std::cell::Cell::new(0),
             },
         );
         self.cover_dirty = true;

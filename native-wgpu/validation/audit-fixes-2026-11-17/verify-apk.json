@@ -1,0 +1,19 @@
+{
+  "scope": "Prototype packaging only, not feature/device/visual acceptance",
+  "apk": "Ridgeline-Native-Audit-Fixes-0.1.74-Base.apk",
+  "bytes": 36959996,
+  "sha256": "5d6a0316be08415eeef4c66273eeac4723cf67f8633e88d09416f3f7b885be1d",
+  "nativeLibraries": [
+    "lib/arm64-v8a/libridgeline_renderer.so",
+    "lib/armeabi-v7a/libridgeline_renderer.so",
+    "lib/x86_64/libridgeline_renderer.so"
+  ],
+  "webRuntimeAssets": 0,
+  "webViewOrCapacitorDexReferences": 0,
+  "base": true,
+  "coarseImageryFiles": 98,
+  "originalZipFiles": 0,
+  "overviewPayloadBytes": 0,
+  "imageRanges": 0,
+  "packs": []
+}
