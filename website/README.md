@@ -59,10 +59,13 @@ overview index and compiled walks from `native-wgpu/`, `capacitor/` and
 - `data/gaps.json` (built from the app's gap atlas) marks where LINZ has no
   photography; Esri World Imagery is drawn there, as in the app. Esri's terms
   for commercial use need checking before launch.
-- Overview imagery (zooms 5 to 12) is the app's, from its bucket. `r2.dev` is
-  slow (uncached, rate-limited): serve it from a custom domain on the bucket
-  (cached by Cloudflare) and set `OVERVIEW_URL`; the test copy's Worker serves
-  it edge-cached at `/tiles/`. The bucket allows cross-origin GET requests.
+- Overview imagery (zooms 5 to 12) is the app's, from its bucket, served
+  edge-cached by the test copy's Worker (`/tiles/<pack>/<offset>.webp`, immutable;
+  `/packs/<zip>`, resumable): about 0.05 s a tile against 0.3 s from the bucket's
+  uncached, rate-limited `r2.dev` address. The app's `map-defaults.json`
+  `overviewUrl` points there and the build takes it from there (`OVERVIEW_URL`
+  overrides it; the build warns on an `r2.dev` address). When the site has its own
+  Cloudflare zone, a custom domain on the bucket is the alternative.
 
 ## Speed
 

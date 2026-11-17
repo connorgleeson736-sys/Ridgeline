@@ -44,6 +44,32 @@ export default {
       if (get) await cache.put(request, response.clone());
       return request.method === 'HEAD' ? new Response(null, { headers: response.headers }) : response;
     }
+    // The original overview ZIPs, for keeping all of them offline in the app: from the
+    // same bucket, resumable (Range requests answered 206), cached a day downstream.
+    if (env.OVERVIEWS && /^\/packs\/Ridgeline-Overviews-(NI-)?[0-9.]+-[0-9]+-of-[0-9]+\.zip$/.test(path)) {
+      // One byte range ("bytes=a-b", "bytes=a-" or "bytes=-n"), as the app resumes with.
+      const m = /^bytes=(\d*)-(\d*)$/.exec(request.headers.get('Range') || '');
+      const head = m ? await env.OVERVIEWS.head(path.slice(1)) : null;
+      if (m && !head) return new Response('Not found', { status: 404 });
+      let range = null;
+      if (m && head) {
+        const size = head.size, a = m[1] === '' ? null : +m[1], b = m[2] === '' ? null : +m[2];
+        const start = a == null ? Math.max(0, size - (b ?? 0)) : a, end = a == null ? size - 1 : Math.min(size - 1, b ?? size - 1);
+        if (start >= size || end < start) return new Response(null, { status: 416, headers: { 'Content-Range': `bytes */${size}` } });
+        range = { offset: start, length: end - start + 1 };
+      }
+      const object = await env.OVERVIEWS.get(path.slice(1), range ? { range } : {});
+      if (!object) return new Response('Not found', { status: 404 });
+      const headers = new Headers({ 'Content-Type': 'application/zip', 'Accept-Ranges': 'bytes', 'Cache-Control': 'public, max-age=86400', 'Access-Control-Allow-Origin': '*', ETag: object.httpEtag });
+      let status = 200, length = object.size;
+      if (range) {
+        length = range.length;
+        headers.set('Content-Range', `bytes ${range.offset}-${range.offset + range.length - 1}/${object.size}`);
+        status = 206;
+      }
+      headers.set('Content-Length', String(length));
+      return new Response(request.method === 'HEAD' ? null : object.body, { status, headers });
+    }
     for (const [from, to, status] of redirects) if (path === from) return Response.redirect(new URL(to, url).href, +(status || 301));
     let key = path.replace(/^\//, '');
     if (key === '' || key.endsWith('/')) key += 'index.html';

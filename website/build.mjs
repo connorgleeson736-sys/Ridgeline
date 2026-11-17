@@ -32,6 +32,9 @@ export const SITE = {
 const defaults = JSON.parse(readFileSync(join(appAssets, 'map-defaults.json'), 'utf8'));
 const linzKey = process.env.LINZ_API_KEY || defaults.linzApiKey;
 const overviewUrl = process.env.OVERVIEW_URL ?? defaults.overviewUrl ?? '';
+// r2.dev is the bucket's uncached, rate-limited development address (0.3 s a tile
+// against 0.05 s through the edge-cached Worker): never ship it by accident.
+if (/\.r2\.dev\b/.test(overviewUrl)) console.warn(`warning: overview imagery from ${overviewUrl} (uncached r2.dev); set OVERVIEW_URL to an edge-cached address`);
 if (!linzKey) throw new Error('No LINZ API key (set LINZ_API_KEY)');
 
 rmSync(out, { recursive: true, force: true });
@@ -70,6 +73,22 @@ for (const f of readdirSync(join(here, 'vendor', maplibre))) {
   writeFileSync(join(out, 'vendor', maplibre, f), body);
 }
 
+// Every module the map loads at start, found by following static imports from
+// main.js: preloaded together, instead of discovered one level at a time.
+const startModules = (() => {
+  const seen = new Set();
+  const visit = (file) => {
+    if (seen.has(file)) return;
+    seen.add(file);
+    const code = readFileSync(join(jsOut, file), 'utf8');
+    for (const m of code.matchAll(/^\s*(?:import|export)\s[^;]*?\bfrom\s*['"](\.{1,2}\/[^'"]+)['"]|^\s*import\s*['"](\.{1,2}\/[^'"]+)['"]/gm)) {
+      visit(relative(jsOut, join(jsOut, dirname(file), m[1] || m[2])).split('\\').join('/'));
+    }
+  };
+  visit('map/main.js');
+  return [...seen].slice(1).map((f) => `js/${f}`);
+})();
+
 // ---- Pages: shared header and footer, site values, versioned asset paths ----
 const partials = Object.fromEntries(readdirSync(join(src, '_partials')).map((f) => [f.replace('.html', ''), readFileSync(join(src, '_partials', f), 'utf8')]));
 const render = (html) => html
@@ -79,6 +98,7 @@ const render = (html) => html
   .replace(/\{\{dataVersion\}\}/g, dataVersion)
   .replace(/\{\{maplibre\}\}/g, `/vendor/${maplibre}`)
   .replace(/<link rel="preconnect" href="\{\{overviewOrigin\}\}"[^>]*>\n?/g, overviewUrl ? `<link rel="preconnect" href="${new URL(overviewUrl).origin}" crossorigin>\n` : '')
+  .replace(/(<link rel="modulepreload" href="\/js\/map\/main\.js">\n)/, (line) => line + startModules.map((m) => `<link rel="modulepreload" href="/${m}">\n`).join(''))
   .replace(/(["'(])\/js\//g, `$1/js/${jsVersion}/`)
   .replace(/(["'(])\/css\//g, `$1/css/${cssVersion}/`);
 const pages = [];
@@ -98,7 +118,8 @@ const walkPages = (d) => {
 walkPages(src);
 
 // ---- Map data ----
-const data = join(out, 'data');
+// Data files under their version (dataVersion): cached for good, a new version is a new path.
+const data = join(out, 'data', dataVersion);
 mkdirSync(data, { recursive: true });
 // The app's topographic style (LINZ topographic-v2), with the app's own changes:
 // river names later, other tracks named from zoom 13 (MapLayers / TopographyStyle).
@@ -245,7 +266,7 @@ writeFileSync(join(out, '_headers'), `/*
 /site.webmanifest
   Content-Type: application/manifest+json
 /data/*
-  Cache-Control: public, max-age=86400
+  Cache-Control: public, max-age=31536000, immutable
 `);
 writeFileSync(join(out, '_redirects'), '/map / 301\n/map/ / 301\n/planner / 301\n/app /about/#app 301\n');
 const urls = pages.filter((p) => !p.startsWith('404')).map((p) => SITE.domain + '/' + p.replace(/index\.html$/, ''));
