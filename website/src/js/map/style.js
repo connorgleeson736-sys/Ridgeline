@@ -85,7 +85,12 @@ export function build(options) {
   return style;
 }
 
-function buildStyle({ topography, settings, dark }) {
+function buildStyle({ topography, settings, dark, fine = false }) {
+  // Phones (small, dense screens): aerial and satellite imagery half a zoom finer.
+  // A raster source picks its tile zoom as round(zoom + log2(512 / tileSize)), so 180
+  // in place of 256 asks for the finer tile from the half-way point (about twice the
+  // tiles), which a 2–3× screen needs to look as sharp as a computer's.
+  const imageSize = fine ? 180 : 256;
   const visible = (on) => (on ? 'visible' : 'none');
   const topoLayers = topography.map((l) => {
     const layer = { ...l, layout: { ...(l.layout || {}), visibility: visible(shown(l.id, settings)) } };
@@ -111,14 +116,14 @@ function buildStyle({ topography, settings, dark }) {
     sky: sky(dark),
     sources: {
       // Overview imagery for zooms 5–12 (the app's, averaged from LINZ's zoom-13 photography), LINZ beyond.
-      aerial: { type: 'raster', tiles: [`bushline://aerial/{z}/{x}/{y}${settings.natural ? '' : '?raw'}`], tileSize: 256, maxzoom: 19, bounds: [160, -53, 185, -28], attribution: `${LINZ_ATTRIBUTION} · gaps: ${ESRI_ATTRIBUTION}` },
+      aerial: { type: 'raster', tiles: [`bushline://aerial/{z}/{x}/{y}${settings.natural ? '' : '?raw'}`], tileSize: imageSize, maxzoom: 19, bounds: [160, -53, 185, -28], attribution: `${LINZ_ATTRIBUTION} · gaps: ${ESRI_ATTRIBUTION}` },
       // Coarse covers, always resident under each base (the app's and the old website's
       // coarse cover): where finer tiles have not arrived, slightly blurred imagery shows
       // instead of a gap. A few tiles per view, from the same cached URLs.
       'aerial-cover': { type: 'raster', tiles: [`bushline://aerial/{z}/{x}/{y}${settings.natural ? '' : '?raw'}`], tileSize: 256, maxzoom: 11, bounds: [160, -53, 185, -28] },
       'satellite-cover': { type: 'raster', tiles: ['bushline://satellite/{z}/{x}/{y}'], tileSize: 256, maxzoom: 11, bounds: [160, -53, 185, -28] },
       'topo-cover': { type: 'raster', tiles: [urls.topo], tileSize: 256, maxzoom: 11, bounds: [165, -49, 180, -33] },
-      satellite: { type: 'raster', tiles: ['bushline://satellite/{z}/{x}/{y}'], tileSize: 256, maxzoom: 19, bounds: [160, -53, 185, -28], attribution: ESRI_ATTRIBUTION },
+      satellite: { type: 'raster', tiles: ['bushline://satellite/{z}/{x}/{y}'], tileSize: imageSize, maxzoom: 19, bounds: [160, -53, 185, -28], attribution: ESRI_ATTRIBUTION },
       topo: { type: 'raster', tiles: [urls.topo], tileSize: 256, maxzoom: 16, bounds: [165, -49, 180, -33], attribution: '<a href="https://www.linz.govt.nz/products-services/maps/new-zealand-topographic-maps" target="_blank" rel="noopener">Topo50 © Toitū Te Whenua LINZ</a> CC BY 4.0' },
       terrain: { type: 'raster-dem', tiles: [urls.elevation], tileSize: 256, maxzoom: 18, encoding: 'mapbox', bounds: [165, -48, 179, -34] },
       // Both read LINZ's vector tiles through one memory cache (vector.js).
