@@ -182,7 +182,8 @@ function buildStyle({ topography, settings, dark, fine = false }) {
       // Closer in, each food stop splits into its shops and cafés.
       { id: 'te-araroa-shops', type: 'circle', source: 'te-araroa-shops', minzoom: 12.5, layout: { visibility: visible(shown('te-araroa-shops', settings)) }, paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 12.5, 3.4, 16, 5.5], 'circle-color': ['match', ['get', 'kind'], 'supermarket', '#22a35a', 'store', '#8fd6aa', '#d08a3f'], 'circle-stroke-color': '#ffffff', 'circle-stroke-width': 1.5, 'circle-pitch-alignment': 'viewport' } },
       { id: 'te-araroa-shops-label', type: 'symbol', source: 'te-araroa-shops', minzoom: 14, layout: { visibility: visible(shown('te-araroa-shops', settings)), 'text-field': ['get', 'name'], 'text-font': ['Open Sans Regular'], 'text-size': 11, 'text-offset': [0, 0.9], 'text-anchor': 'top', 'text-max-width': 8, 'text-padding': 3, 'symbol-sort-key': 14 }, paint: { 'text-color': '#ecf8ef', 'text-halo-color': 'rgba(12,40,24,.9)', 'text-halo-width': 1.3 } },
-      { id: 'te-araroa-name', type: 'symbol', source: 'te-araroa-names', minzoom: 5, maxzoom: 11.5, layout: { visibility: visible(shown('te-araroa-name', settings)), 'text-field': 'Te Araroa', 'text-font': ['Open Sans Bold'], 'text-size': ['interpolate', ['linear'], ['zoom'], 5, 11, 10, 13], 'text-letter-spacing': 0.04, 'text-offset': [0, -1], 'text-anchor': 'bottom', 'text-padding': 2, 'symbol-sort-key': 3 }, paint: { 'text-color': '#ffd3dc', 'text-halo-color': 'rgba(70,8,22,.92)', 'text-halo-width': 1.6 } },
+      // The trail's name as a badge: white capitals on the trail's red, just above the line.
+      { id: 'te-araroa-name', type: 'symbol', source: 'te-araroa-names', minzoom: 5, maxzoom: 11.5, layout: { visibility: visible(shown('te-araroa-name', settings)), 'text-field': 'TE ARAROA', 'text-font': ['Open Sans Bold'], 'text-size': ['interpolate', ['linear'], ['zoom'], 5, 10, 10, 12], 'text-letter-spacing': 0.12, 'text-anchor': 'bottom', 'text-offset': [0, -0.9], 'icon-image': 'ta-badge', 'icon-text-fit': 'both', 'icon-text-fit-padding': [3, 9, 3, 9], 'icon-anchor': 'bottom', 'icon-allow-overlap': false, 'text-padding': 4, 'symbol-sort-key': 3 }, paint: { 'text-color': '#ffffff', 'icon-opacity': 0.96 } },
       // Te Araroa's campsites and holiday parks (huts are the map's own).
       { id: 'te-araroa-places', type: 'circle', source: 'te-araroa-places', minzoom: 10, filter: ['!', ['get', 'hut']], layout: { visibility: visible(shown('te-araroa-places', settings)) }, paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 1.8, 14, 3.2], 'circle-color': ['match', ['get', 'type'], 'Hostel', TE_ARAROA_COLOUR, 'Lodge', TE_ARAROA_COLOUR, '#fff4f6'], 'circle-stroke-color': ['match', ['get', 'type'], 'Hostel', '#fff4f6', 'Lodge', '#fff4f6', TE_ARAROA_COLOUR], 'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 10, 1, 14, 1.5], 'circle-pitch-alignment': 'viewport' } },
       { id: 'te-araroa-places-label', type: 'symbol', source: 'te-araroa-places', minzoom: 12, filter: ['!', ['get', 'hut']], layout: { visibility: visible(shown('te-araroa-places', settings)), 'text-field': ['get', 'name'], 'text-font': ['Open Sans Regular'], 'text-size': 11, 'text-offset': [0, 1.1], 'text-anchor': 'top', 'text-max-width': 9, 'text-padding': 4, 'symbol-sort-key': 30 }, paint: { 'text-color': '#ffe3e8', 'text-halo-color': 'rgba(50,10,20,.9)', 'text-halo-width': 1.4 } },
@@ -200,6 +201,21 @@ function buildStyle({ topography, settings, dark, fine = false }) {
       { id: 'marker', type: 'circle', source: 'marker', paint: { 'circle-radius': 6, 'circle-color': 'rgb(186,99,53)', 'circle-stroke-width': 2.5, 'circle-stroke-color': '#ffffff', 'circle-pitch-alignment': 'viewport' } },
     ],
   };
+}
+
+/** The Te Araroa badge: a rounded red pill with a thin white edge and a soft shadow,
+ * stretched to fit its text (icon-text-fit), only its straight middle stretching. */
+export function badge(pixelRatio = 2) {
+  const r = 11, w = 2 * r + 12, h = 2 * r + 4, pr = pixelRatio;
+  const c = typeof OffscreenCanvas === 'function' ? new OffscreenCanvas(w * pr, h * pr) : Object.assign(document.createElement('canvas'), { width: w * pr, height: h * pr });
+  const g = c.getContext('2d');
+  g.scale(pr, pr);
+  const pill = (x, y, pw, ph) => { const rr = ph / 2; g.beginPath(); g.moveTo(x + rr, y); g.lineTo(x + pw - rr, y); g.arc(x + pw - rr, y + rr, rr, -Math.PI / 2, Math.PI / 2); g.lineTo(x + rr, y + ph); g.arc(x + rr, y + rr, rr, Math.PI / 2, (3 * Math.PI) / 2); g.closePath(); };
+  g.shadowColor = 'rgba(40,0,10,.45)'; g.shadowBlur = 3; g.shadowOffsetY = 1;
+  pill(2, 1, w - 4, h - 4); g.fillStyle = '#ffffff'; g.fill();
+  g.shadowColor = 'transparent';
+  pill(3.5, 2.5, w - 7, h - 7); g.fillStyle = TE_ARAROA_COLOUR; g.fill();
+  return { image: g.getImageData(0, 0, w * pr, h * pr), pixelRatio: pr, stretchX: [[(r + 2) * pr, (w - r - 2) * pr]], stretchY: [[(h / 2 - 1) * pr, (h / 2) * pr]], content: [(r - 1) * pr, 5 * pr, (w - r + 1) * pr, (h - 7) * pr] };
 }
 
 /** The diagonal hatching for hunting areas (the app's: blaze orange lines). */
