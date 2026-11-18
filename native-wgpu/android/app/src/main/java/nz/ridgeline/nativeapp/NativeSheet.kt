@@ -1,6 +1,5 @@
 package nz.ridgeline.nativeapp
 
-import android.graphics.Rect
 import android.view.*
 import android.widget.*
 import kotlin.math.*
@@ -44,8 +43,10 @@ internal class NativeSheet(private val root:FrameLayout,private val map:FrameLay
     private var visible=false
     var onSnap:(Boolean)->Unit={}
     var onClose:()->Unit={}
-    /** Height of map hidden under the sheet's top edge (its rounded corners overlap the map). */
+    /** Height of the map the sheet covers now, following it while dragged (0 when hidden). */
     var onCover:(Int)->Unit={}
+    /** Height of the map the sheet covers at its stop (0 when hidden), for framing. */
+    var onInset:(Int)->Unit={}
     private fun dp(v:Int)=NativeUi.dp(context,v)
     init{
         grip.addView(View(context).apply{background=NativeUi.background(context,0xff8a9691.toInt(),3)},FrameLayout.LayoutParams(dp(32),dp(4),Gravity.CENTER))
@@ -65,13 +66,12 @@ internal class NativeSheet(private val root:FrameLayout,private val map:FrameLay
     }
     private fun begin(rawY:Float){
         startY=rawY;startHeight=panel.height;dragged=false;dragging=true
-        map.layoutParams=map.layoutParams.apply{height=root.height-root.paddingTop-root.paddingBottom};map.clipBounds=Rect(0,0,map.width,root.height-root.paddingTop-root.paddingBottom-startHeight+dp(24))
         panel.layoutParams=panel.layoutParams.apply{height=stops()[1]};panel.translationY=(stops()[1]-startHeight).toFloat()
     }
     private fun drag(rawY:Float){
         if(!dragging)return
         val delta=startY-rawY;dragged=dragged||abs(delta)>dp(4);val h=(startHeight+delta).toInt().coerceIn(stops()[0],stops()[1])
-        panel.translationY=(stops()[1]-h).toFloat();map.clipBounds=Rect(0,0,map.width,min(map.height,root.height-root.paddingTop-root.paddingBottom-h+dp(24)))
+        panel.translationY=(stops()[1]-h).toFloat();onCover(h)
     }
     /** [moved]: a drag from the sheet body (always a drag, never a tap). */
     private fun finish(rawY:Float,cancel:Boolean,moved:Boolean){
@@ -92,12 +92,13 @@ internal class NativeSheet(private val root:FrameLayout,private val map:FrameLay
     fun refresh()=settle(index)
     fun show(value:Boolean){if(visible==value)return;visible=value;panel.visibility=if(value)View.VISIBLE else View.GONE;settle(index)}
     fun settle(next:Int){
-        index=next.coerceIn(0,1);map.clipBounds=null;panel.translationY=0f
+        index=next.coerceIn(0,1);panel.translationY=0f
         val h=if(visible)stops()[index]else 0
         if(panel.layoutParams.height!=h&&visible)panel.layoutParams=panel.layoutParams.apply{height=h}
-        val mapHeight=if(visible&&root.height>0)(root.height-root.paddingTop-root.paddingBottom-h+dp(24)).coerceAtLeast(dp(80))else -1
-        if(map.layoutParams.height!=mapHeight)map.layoutParams=map.layoutParams.apply{height=mapHeight}
-        onCover(if(visible&&root.height>0)dp(24)else 0)
+        // The map keeps its size (resizing it made the renderer reload): the sheet
+        // lies over it, the map's controls ride above it and framing uses the map above.
+        if(map.layoutParams.height!=-1)map.layoutParams=map.layoutParams.apply{height=-1}
+        onCover(h);onInset(h)
         grip.contentDescription="Resize route panel · ${if(index==1)"expanded"else"compact"}"
         onSnap(index==1)
     }

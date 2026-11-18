@@ -1,0 +1,25 @@
+{
+  "artifact": "Ridgeline-Native-Fixed-Map-0.1.76-Base.apk",
+  "bytes": 36995964,
+  "sha256": "2801cfd1f89269575e1d491d6fe184f3914c05b153f2796a8e34e979a249d4f6",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.76-fixed-map",
+  "versionCode": 77,
+  "buildType": "performance (not debuggable, R8 off: JNI entry points)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.75 Full Audit (same package and signer)",
+  "changes": [
+    "The Te Araroa name is centred on its curve's middle on the ground (by length on the map, as MapLibre's line-center), not the middle of the curve as seen on screen, which shifted with perspective, tilt and what was in view. It is left out while that middle is off screen or the name does not fit around it.",
+    "The map is no longer resized for the track or route sheet (a resize made the renderer reconfigure its surface and plan tiles for a new view, so the map reloaded and jumped): the sheets slide over a map that keeps its size. The scale bar, i and credits ride on the sheet's top edge (a translation, no relayout). Framing a track or route, and going to a place, use the map above the sheet's stop (sized to it and centred in it).",
+    "Native libraries unchanged from 0.1.75."
+  ],
+  "tests": {
+    "kotlinJvm": "all pass: 342 tests, 6 skipped as before (new: LabelPlacementTest.aCurvedNameStaysAtItsCurvesMiddleOnTheGroundWhateverIsOnScreen; curve test points spread evenly on the map). PlaceSearchTest.loadTime's 150 ms limit was exceeded once in the full run under load (188 ms) and passed alone; unrelated to this change."
+  },
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

@@ -200,9 +200,11 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         val minLon=points.minOf{it.longitude};val maxLon=points.maxOf{it.longitude}
         val minLat=points.minOf{it.latitude};val maxLat=points.maxOf{it.latitude}
         val span=max((maxLon-minLon)/360,(asinh(tan(Math.toRadians(maxLat)))-asinh(tan(Math.toRadians(minLat))))/(2*PI))
-        val size=min(width/pixelScale,height/pixelScale)*.65
+        // The map above a sheet ([bottomInset]): sized to it, centred in it.
+        val visible=visibleHeight()
+        val size=min(width/pixelScale,visible/pixelScale)*.65
         val z=if(span>0)ln(size/(512*span))/ln(2.0) else 15.0
-        val target=cameraPose.copy(longitude=(minLon+maxLon)/2,latitude=CameraMath.latitude((CameraMath.mercatorY(minLat)+CameraMath.mercatorY(maxLat))*.5),zoom=z.coerceIn(4.0,maximumZoom.coerceIn(4.0,maxZoom)),pitch=min(pitch,45f))
+        val target=above(cameraPose.copy(longitude=(minLon+maxLon)/2,latitude=CameraMath.latitude((CameraMath.mercatorY(minLat)+CameraMath.mercatorY(maxLat))*.5),zoom=z.coerceIn(4.0,maximumZoom.coerceIn(4.0,maxZoom)),pitch=min(pitch,45f)))
         val from=cameraPose
         val still=abs(target.longitude-from.longitude)<1e-9&&abs(target.latitude-from.latitude)<1e-9&&abs(target.zoom-from.zoom)<1e-6&&target.pitch==from.pitch
         if(!animate||still||width==0||!active){cameraPose=target;changed();return}
@@ -218,7 +220,17 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             start()
         }
     }
-    fun goTo(point:Coordinate,minimumZoom:Double=4.0){cameraPose=cameraPose.copy(longitude=point.longitude,latitude=point.latitude,zoom=max(zoom,minimumZoom).coerceIn(4.0,maxZoom));changed()}
+    fun goTo(point:Coordinate,minimumZoom:Double=4.0){cameraPose=above(cameraPose.copy(longitude=point.longitude,latitude=point.latitude,zoom=max(zoom,minimumZoom).coerceIn(4.0,maxZoom)));changed()}
+    /** Height of the map covered by a sheet at its stop (pixels): the map keeps its
+     * size under a sheet, and framing uses the part above it. */
+    @Volatile var bottomInset=0
+    private fun visibleHeight()=(height-bottomInset).coerceAtLeast(height/3)
+    /** [pose] moved so that its centre appears in the middle of the map above the sheet. */
+    private fun above(pose:CameraPose):CameraPose{
+        val visible=visibleHeight();if(visible>=height||width==0)return pose
+        val anchor=CameraMath.Anchor((pose.longitude+180)/360,CameraMath.mercatorY(pose.latitude),pose.elevation.toDouble())
+        return CameraMath.anchored(pose,anchor,width,height,pixelScale,width*.5,visible*.5)?:pose
+    }
     var onCamera:()->Unit={}
     var onData:()->Unit={}
     internal var onInvalidUpload:(GpuUploadQueue.Tile)->Unit={}

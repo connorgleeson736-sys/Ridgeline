@@ -44,7 +44,8 @@ class LabelPlacementTest {
     // ---- Names along curves (the Te Araroa name) ----
     private fun curve(text:String,vertices:Int,size:Float=16f,glyphWidth:Float=20f):List<NativeLabelAtlas.Row>{
         val p=VectorTile.Point(.5,.5)
-        val v=(0 until vertices).map{NativeLabelAtlas.Row(TopographyStyle.Label(p,"",1f,0,2.0,key="name:v$it",path="name",vertex=it),9f,9f)}
+        // The curve's points evenly along it on the map (its middle is the middle point).
+        val v=(0 until vertices).map{NativeLabelAtlas.Row(TopographyStyle.Label(VectorTile.Point(.5+it*1e-3,.5),"",1f,0,2.0,key="name:v$it",path="name",vertex=it),9f,9f)}
         val g=text.mapIndexed{k,ch->NativeLabelAtlas.Row(TopographyStyle.Label(p,ch.toString(),size,0,2.0,key="name:g$k",path="name",glyph=k),glyphWidth+8f,size*1.6f)}
         return v+g
     }
@@ -106,6 +107,20 @@ class LabelPlacementTest {
         val letters=e.filter{it.index!=town};assertEquals(9,letters.size);assertTrue(letters.none{it.x==999f})
         val centres=letters.map{it.x+a.labels[it.index].width/2}
         assertEquals(0f,(centres.first()+centres.last())/2,2f)
+    }
+    @Test fun aCurvedNameStaysAtItsCurvesMiddleOnTheGroundWhateverIsOnScreen(){
+        val a=atlas(*curve("Te Araroa",9).toTypedArray())
+        fun centre(points:List<Pair<Float,Float>>):Float{val e=entries(a,positions(points,9),2000,1000);assertEquals(9,e.size)
+            return e.map{500f+it.x+a.labels[it.index].width/2}.let{(it.first()+it.last())/2}}
+        // Evenly spread on screen: the middle point (x 900).
+        assertEquals(900f,centre((0..8).map{100f+it*200f to 600f}),2f)
+        // In perspective the far half shrinks on screen; the name stays on the curve's
+        // middle point on the ground (x 1300 here), not the middle of what is seen.
+        val xs=listOf(100f,400f,700f,1000f,1300f,1450f,1600f,1750f,1900f)
+        assertEquals(1300f,centre(xs.map{it to 600f}),2f)
+        // The first points off the view (unprojected): still the same point.
+        val p=positions(xs.map{it to 600f},9).also{for(k in 0..1)it[k*3+2]=0f}
+        val e=entries(a,p,2000,1000);assertEquals(1300f,e.map{500f+it.x+a.labels[it.index].width/2}.let{(it.first()+it.last())/2},2f)
     }
     @Test fun otherNamesGiveWayToACurvedName(){
         val rows=curve("Te Araroa",5)+listOf(label("town",10.0))
