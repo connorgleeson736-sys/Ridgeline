@@ -257,11 +257,10 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
             val measured=values.count{it.height!=null}>=2
             stats[1].text="Ascent\n"+if(measured&&totals.complete)metres(totals.ascent)else"—";stats[2].text="Descent\n"+if(measured&&totals.complete)metres(totals.descent)else"—";stats[3].text="Highest\n${totals.high?.let(::metres)?:"—"}"
             if(values.count{it.height!=null}<2)chart.message="Elevation unavailable";chart.refreshInspection()
-            // A route that starts or ends at a hut: the hut marked on the profile there.
-            val length=values.lastOrNull()?.distance?:0.0
+            // Huts on the route (at its start or end, or passed on the way): marked on the profile.
             files.execute{
                 val search=placeSearch?:PlaceSearch.get(activity.assets)?.also{placeSearch=it}
-                val huts=search?.let{s->RouteHuts.ends(points,length,s::within)}.orEmpty()
+                val huts=search?.let{s->RouteHuts.along(values,s::within)}.orEmpty()
                 main.post{if(!closed&&profilePoints==points)chart.markers=huts}
             }
         }
