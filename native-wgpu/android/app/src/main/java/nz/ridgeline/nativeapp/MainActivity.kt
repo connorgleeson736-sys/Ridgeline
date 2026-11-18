@@ -211,10 +211,12 @@ class MainActivity:Activity(){
         mapHost.addView(compass,FrameLayout.LayoutParams(dp(34),dp(34),Gravity.TOP or Gravity.END).apply{marginEnd=dp(10);topMargin=dp(10)})
         mapHost.addView(MapControls.iconButton(this,MapControls.LayersIcon(this),"Map layers"){planner.dismissDrawer();layersUi.show()},FrameLayout.LayoutParams(dp(34),dp(34),Gravity.TOP or Gravity.END).apply{marginEnd=dp(10);topMargin=dp(52)})
         // Keep the scale bar, "i" and credits clear of the route sheet's top edge.
+        // They ride on the sheet's top edge as it moves (a translation: no relayout).
         trackSheet.onCover={cover->planner.onMapCover(cover)}
-        planner.onMapCover={cover->
-            for((view,margin) in listOf(scale to 14,info to 6,attribution to 8)){val lp=view.layoutParams as FrameLayout.LayoutParams;if(lp.bottomMargin!=dp(margin)+cover){lp.bottomMargin=dp(margin)+cover;view.layoutParams=lp}}
-        }
+        planner.onMapCover={cover->for(view in listOf(scale,info,attribution))view.translationY=-cover.toFloat()}
+        // Framing a track or route uses the map above the sheet's stop.
+        trackSheet.onInset={terrain.bottomInset=it}
+        planner.onMapInset={terrain.bottomInset=it}
         // Android redraws (and recomposites) the controls layer whenever a view
         // changes. While moving, the scale bar updates at most 4 times a second,
         // plus once when the camera settles; the compass only when the bearing changes.

@@ -228,8 +228,21 @@ internal object NativeLabels {
             if(l.vertex>=0)vertices.getOrPut(l.path){ArrayList()}.add(l.vertex to i)else if(l.glyph>=0)glyphs.getOrPut(l.path){ArrayList()}.add(l.glyph to i)}
         val out=ArrayList<Pair<List<Placed>,List<Box>>>()
         for((path,letters) in glyphs){
-            val points=vertices[path]?.sortedBy{it.first}?.mapNotNull{(_,i)->if(i*3+2<projected.size&&projected[i*3+2]!=0f)floatArrayOf(projected[i*3],projected[i*3+1])else null}?:continue
+            val all=vertices[path]?.sortedBy{it.first}?.map{it.second}?:continue
+            if(all.size<2)continue
+            fun seen(i:Int)=i*3+2<projected.size&&projected[i*3+2]!=0f
+            // The name's centre is the curve's middle on the ground (by length on the
+            // map, as MapLibre's line-center), fixed there whatever the camera does.
+            val geo=FloatArray(all.size);for(k in 1 until all.size){val p=atlas.labels[all[k-1]].label.point;val q=atlas.labels[all[k]].label.point;geo[k]=geo[k-1]+hypot(q.x-p.x,q.y-p.y).toFloat()}
+            var m=1;while(m<all.size-1&&geo[m]<geo.last()/2)m++
+            if(!seen(all[m-1])||!seen(all[m]))continue
+            val mf=((geo.last()/2-geo[m-1])/max(1e-12f,geo[m]-geo[m-1])).coerceIn(0f,1f)
+            val shown=all.filter{seen(it)}
+            val points=shown.map{floatArrayOf(projected[it*3],projected[it*3+1])}
             if(points.size<2)continue
+            val midPoint=floatArrayOf(projected[all[m-1]*3]+(projected[all[m]*3]-projected[all[m-1]*3])*mf,projected[all[m-1]*3+1]+(projected[all[m]*3+1]-projected[all[m-1]*3+1])*mf)
+            // Its distance along the curve as seen (from the first point shown).
+            var midRun=0f;run{val before=shown.indexOf(all[m-1]);for(k in 1..before)midRun+=hypot(points[k][0]-points[k-1][0],points[k][1]-points[k-1][1]);midRun+=hypot(midPoint[0]-points[before][0],midPoint[1]-points[before][1])}
             letters.sortBy{it.first}
             val rows=letters.map{atlas.labels[it.second]}
             val anchor=letters.first().second;if(anchor*3+2>=projected.size||projected[anchor*3+2]==0f)continue
@@ -239,13 +252,16 @@ internal object NativeLabels {
             val advances=rows.map{max(0f,it.width-8f)*scale};val tracking=size*.2f*scale
             val total=advances.sum()+tracking*(rows.size-1)
             // Read left to right: a curve drawn leftwards is read from its other end.
-            val line=if(points.last()[0]<points.first()[0])points.reversed()else points
+            val reversed=points.last()[0]<points.first()[0]
+            val line=if(reversed)points.reversed()else points
             val run=FloatArray(line.size);for(k in 1 until line.size)run[k]=run[k-1]+hypot(line[k][0]-line[k-1][0],line[k][1]-line[k-1][1])
             val length=run.last();if(length<total+size*scale)continue
             fun at(d:Float):FloatArray{val s=d.coerceIn(0f,length);var k=1;while(k<line.size-1&&run[k]<s)k++
                 val span=max(1e-3f,run[k]-run[k-1]);val f=(s-run[k-1])/span
                 return floatArrayOf(line[k-1][0]+(line[k][0]-line[k-1][0])*f,line[k-1][1]+(line[k][1]-line[k-1][1])*f)}
-            var d=(length-total)/2;var previous=Float.NaN;var ok=true
+            val centre=if(reversed)length-midRun else midRun
+            var d=centre-total/2;var previous=Float.NaN;var ok=true
+            if(d<0f||d+total>length)continue
             val placed=ArrayList<Placed>();val boxes=ArrayList<Box>()
             val lift=size*.75f*scale
             for((k,row) in rows.withIndex()){

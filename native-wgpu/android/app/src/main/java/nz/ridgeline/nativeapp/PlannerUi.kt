@@ -91,6 +91,8 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
     var onDrawing:(Boolean)->Unit={}
     /** Bottom map controls move above the route sheet's overlapping edge. */
     var onMapCover:(Int)->Unit={}
+    /** Height of the map the route sheet covers at its stop, for framing. */
+    var onMapInset:(Int)->Unit={}
     private var fitOpenedPending=false
     /** Offline place search (LINZ Gazetteer, DOC huts, campsites and walks),
      * loaded on first use off the main thread. */
@@ -170,7 +172,7 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
         val resize=View.OnLayoutChangeListener{_,_,top,_,bottom,_,oldTop,_,oldBottom->if(bottom-top!=oldBottom-oldTop&&!sheet.expanded())main.post{sheet.refresh()}}
         statRow.addOnLayoutChangeListener(resize);tools.addOnLayoutChangeListener(resize)
         sheet.onClose={controller.unload()}
-        sheet.onCover={onMapCover(it)}
+        sheet.onCover={onMapCover(it)};sheet.onInset={onMapInset(it)}
         sheet.onSnap={expanded->chart.visibility=if(expanded)View.VISIBLE else View.GONE;spacer.visibility=if(expanded)View.GONE else View.VISIBLE;heading.visibility=if(expanded)View.VISIBLE else View.GONE;summary.visibility=if(expanded&&controller.state.drawing)View.VISIBLE else View.GONE;if(!expanded)chart.clearInspection()}
         for(badge in rangeBadges)mapHost.addView(badge,1,android.widget.FrameLayout.LayoutParams(dp(22),dp(22)))
         terrain.onRangeMarkers={points,positions->

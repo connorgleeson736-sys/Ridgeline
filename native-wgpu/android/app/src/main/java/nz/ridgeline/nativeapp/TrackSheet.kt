@@ -22,8 +22,10 @@ import kotlin.math.*
 internal class TrackSheet(private val activity:Activity,private val root:FrameLayout,private val loader:TileLoader,private val map:FrameLayout){
     /** The tapped track ([line]) and the section in view ([part]) on the map. */
     var onLine:(List<Coordinate>?,List<Coordinate>?)->Unit={_,_->}
-    /** Height of map under the sheet's rounded top (0 when closed). */
+    /** Height of the map the sheet covers now, following it as it moves (0 when closed). */
     var onCover:(Int)->Unit={}
+    /** Height of the map the sheet covers at the stop it is at or going to (0 when closed). */
+    var onInset:(Int)->Unit={}
     /** The sheet closed: the route sheet (if open) sizes the map again. */
     var onClosed:()->Unit={}
     /** DOC's walk as DOC describes it (route, page sections, DOC line); see MapLayers.walkRoute. */
@@ -222,35 +224,29 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     private fun stop(l:Int)=when(l){0->compact();1->middle();else->full()}
     /** Where the sheet is sliding to (NaN: not sliding). */
     private var slidingTo=Float.NaN
-    private fun mapHeight(shown:Int)=(inner()-shown+dp(24)).coerceAtLeast(dp(80))
-    private fun sizeMap(height:Int){if(map.layoutParams.height!=height)map.layoutParams=map.layoutParams.apply{this.height=height}}
+    /** The map is never resized for the sheet (that made the renderer reload and the
+     * view jump): the sheet slides over it. [onCover] follows the sheet's top as it
+     * moves (the map's own controls ride above it); [onInset] gives the stop it
+     * settles at, so framing a track uses the map above the sheet. */
+    private fun cover(){onCover(if(visible&&panel.visibility==View.VISIBLE)(full()-panel.translationY).toInt().coerceAtLeast(0)else 0)}
     private fun place(animate:Boolean){
         val lp=panel.layoutParams as FrameLayout.LayoutParams
         if(lp.height!=full()){lp.height=full();panel.layoutParams=lp}
+        if(map.layoutParams.height!=-1)map.layoutParams=map.layoutParams.apply{height=-1}
         val shown=stop(level);val target=(full()-shown).coerceAtLeast(0).toFloat()
-        // As the route sheet: the map is the space above the sheet (its rounded top
-        // overlaps by 24 dp). The map is resized once, never while the sheet slides
-        // (a resize mid-slide stuttered): before a slide down (the sheet uncovers
-        // it), after a slide up.
-        val height=mapHeight(shown)
+        onInset(shown)
         if(animate||!slidingTo.isNaN()){
             if(slidingTo!=target){
-                if(map.layoutParams.height>=0&&height>map.layoutParams.height)sizeMap(height)
                 slidingTo=target
                 panel.animate().translationY(target).setDuration(220).setInterpolator(android.view.animation.DecelerateInterpolator(1.6f))
-                    .withEndAction{slidingTo=Float.NaN;if(visible&&!dragging)sizeMap(mapHeight(stop(level)))}.start()
+                    .setUpdateListener{cover()}.withEndAction{slidingTo=Float.NaN;cover()}.start()
             }
-        }else{panel.translationY=target;sizeMap(height)}
-        onCover(dp(24))
+        }else{panel.translationY=target;cover()}
         grip.contentDescription=if(level==2)"Collapse track summary" else "Expand track summary"
     }
     private fun settle(l:Int){level=l.coerceIn(0,2);place(true)}
-    private fun begin(rawY:Float){
-        dragging=true;startY=rawY;panel.animate().cancel();slidingTo=Float.NaN;startShift=panel.translationY
-        // The map fills the screen behind the sheet while it is dragged (no gap as it comes down).
-        sizeMap(mapHeight(stop(0)))
-    }
-    private fun drag(rawY:Float){if(dragging)panel.translationY=(startShift+rawY-startY).coerceIn(0f,full().toFloat())}
+    private fun begin(rawY:Float){dragging=true;startY=rawY;panel.animate().cancel();slidingTo=Float.NaN;startShift=panel.translationY}
+    private fun drag(rawY:Float){if(dragging){panel.translationY=(startShift+rawY-startY).coerceIn(0f,full().toFloat());cover()}}
     private fun finish(rawY:Float){
         if(!dragging)return;dragging=false
         val shown=full()-panel.translationY
@@ -399,8 +395,8 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         if(!visible)return
         visible=false;request++;loader.cancelTrackProfile();onLine(null,null);onPoint(null);onRange(emptyList());chart.clearInspection()
         if(map.layoutParams.height!=-1)map.layoutParams=map.layoutParams.apply{height=-1}
-        onCover(0);onClosed();slidingTo=Float.NaN
-        panel.animate().translationY(full().toFloat()).setDuration(160).withEndAction{if(!visible)panel.visibility=View.GONE}.start()
+        onInset(0);onClosed();slidingTo=Float.NaN
+        panel.animate().translationY(full().toFloat()).setDuration(160).setUpdateListener{onCover((full()-panel.translationY).toInt().coerceAtLeast(0))}.withEndAction{if(!visible)panel.visibility=View.GONE;onCover(0);onClosed()}.start()
     }
     fun back():Boolean{if(!visible)return false;if(level>0)settle(level-1)else if(stack.isNotEmpty())goBack()else closeOrReturn();return true}
 
