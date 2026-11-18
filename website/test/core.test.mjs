@@ -156,3 +156,22 @@ test('DOC page sections and legs', () => {
   const milford = docpages.legs(docpages.parse(page('milford-track')));
   assert.ok(milford.length >= 3 && /Clinton Hut/.test(milford[0].title), milford.map((l) => l.title).join(' | '));
 });
+
+test('a planned route starting or ending at a hut finds that hut (as the app\'s RouteHuts)', async () => {
+  const { PlaceSearch } = await import('../src/js/core/search.js');
+  const rows = [
+    ['hut', 'Liverpool Hut', '', '-44.5', '168.6', '', '', ''],
+    ['peak', 'Mt Liverpool', '', '-44.5003', '168.6005', '', '', ''],
+    ['hut', 'Aspiring Hut', '', '-44.4', '168.7', '', '', ''],
+  ].map((r) => r.join('\t')).join('\n');
+  const index = new PlaceSearch(rows);
+  // About 60 m from DOC's position (the map's hut symbol is a little off it).
+  assert.equal(index.nearestHut([168.6007, -44.5002]).name, 'Liverpool Hut');
+  assert.equal(index.nearestHut([168.6994, -44.4004]).name, 'Aspiring Hut');
+  // A kilometre from any hut: none (the peak beside a hut never counts).
+  assert.equal(index.nearestHut([168.62, -44.52]), null);
+  // Real data: a route starting at Mueller Hut.
+  const real = new PlaceSearch(readFileSync(new URL('../../native-wgpu/android/app/src/main/assets/search/places.tsv', import.meta.url), 'utf8'));
+  const mueller = real.entries.find((e) => e.place.kind === 'hut' && /^Mueller Hut/.test(e.place.name)).place;
+  assert.match(real.nearestHut([mueller.lon + 0.001, mueller.lat]).name, /^Mueller Hut/);
+});

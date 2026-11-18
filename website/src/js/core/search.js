@@ -65,6 +65,18 @@ export class PlaceSearch {
     }
   }
   get size() { return this.entries.length; }
+  /** The DOC hut nearest `point` ([lon, lat]) within `reach` metres, or null: a route
+   * starting or ending there (a point locked onto the map's hut symbol, which can be a
+   * little from DOC's position for it). As the app's RouteHuts. */
+  nearestHut(point, reach = 200) {
+    let best = null, bestKm = reach / 1000;
+    for (const { place } of this.entries) {
+      if (place.kind !== 'hut' || Math.abs(place.lat - point[1]) > 0.01 || Math.abs(place.lon - point[0]) > 0.02) continue;
+      const km = distanceKm(point[1], point[0], place.lat, place.lon);
+      if (km <= bestKm) { bestKm = km; best = place; }
+    }
+    return best;
+  }
   /** The place called `name` nearest `near` ([lon, lat]) within maxKm: exact, else a
    * longer name starting with it, else without generic words (the app's locate). */
   locate(name, near, maxKm = 40) {

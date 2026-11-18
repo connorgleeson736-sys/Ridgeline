@@ -8,7 +8,8 @@ import { Chart, stats } from './chart.js';
 import { chartEvents } from './details.js';
 import { meters, length, nearestOn, bounds } from '../core/geo.js';
 import { encodeRoute, decodeRoute } from '../core/share.js';
-import { data as worker } from './workers.js';
+import { data as worker, search } from './workers.js';
+import { dataUrl } from './data-url.js';
 
 // Taps reach this far: a finger's width on touch screens (the app's 22 and 24 dp),
 // less with a mouse, which points precisely.
@@ -229,6 +230,13 @@ export function attach(ctx) {
     const samples = await worker.call({ type: 'profile', points, max: 700 }).catch(() => null);
     if (token !== profileToken || !samples || !chart) return;
     chart.set(samples);
+    // A route that starts or ends at a hut: the hut marked on the profile there.
+    const total = samples[samples.length - 1]?.d || 0;
+    search.call({ type: 'huts', url: dataUrl('/data/places.tsv'), points: [points[0], points[points.length - 1]], reach: 200 }).then((names) => {
+      if (token !== profileToken || !chart || !names || !(total > 0)) return;
+      const marks = [[0, names[0]], [total, names[1]]].filter(([, n]) => n);
+      if (marks.length) chart.setMarkers(marks);
+    }).catch(() => {});
     const s = stats(samples);
     statsBox.querySelector('[data-stat=ascent]').textContent = height(s.ascent);
     statsBox.querySelector('[data-stat=descent]').textContent = height(s.descent);
