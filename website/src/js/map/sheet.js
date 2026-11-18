@@ -34,7 +34,12 @@ export class Sheet {
   get isOpen() { return !this.root.hidden; }
   /** Shows a panel: {kind, title, subtitle, size, render(body, alive) → cleanup}. `push`: Back returns here. */
   open(panel, { push = false } = {}) {
-    if (push && this.current) this.stack.push(this.current); else this.stack = [];
+    const cur = this.isOpen ? this.current : null;
+    // Opened straight from another panel (a track tapped with a route open): Back
+    // returns to it. The same panel shown again (a route redrawn) keeps the way back.
+    const same = cur && cur.kind === panel.kind && (cur.title || '') === (panel.title || '');
+    if (cur && (push || !same)) { this.stack.push(cur); if (this.stack.length > 12) this.stack.shift(); }
+    else if (!cur) this.stack = [];
     this.show(panel);
   }
   /** Shows a panel with Back leading to `back` (not shown first): a Te Araroa section
@@ -56,7 +61,8 @@ export class Sheet {
     this.photo.hidden = true; this.photo.removeAttribute('src');
     this.aside.replaceChildren();
     this.back.hidden = !this.stack.length;
-    this.back.textContent = `‹ ${this.stack[this.stack.length - 1]?.backLabel || 'Back'}`;
+    const prev = this.stack[this.stack.length - 1];
+    this.back.textContent = `‹ ${prev?.backLabel || prev?.title || 'Back'}`;
     this.body.replaceChildren();
     this.body.scrollTop = 0;
     this.root.hidden = false;
@@ -69,7 +75,8 @@ export class Sheet {
     requestAnimationFrame(() => this.root.focus({ preventScroll: true }));
   }
   setTitle(title, subtitle) {
-    if (title != null) { this.title.textContent = title; this.head.hidden = !title; }
+    // The panel keeps its title as loaded (Back to it names it).
+    if (title != null) { this.title.textContent = title; this.head.hidden = !title; if (this.current && title) this.current.title = title; }
     if (subtitle != null) { this.subtitle.textContent = subtitle; this.subtitle.hidden = !subtitle; }
   }
   /** Puts a control beside the title (replacing any there). */

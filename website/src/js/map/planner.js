@@ -245,7 +245,7 @@ export function attach(ctx) {
     if (!route) return;
     const was = sheet.current?.kind === 'route' ? sheet.root.dataset.size : null;
     sheet.open({
-      kind: 'route', size: size || was || 'expanded',
+      kind: 'route', size: size || was || 'expanded', backLabel: route.name || 'Route',
       render(body) {
         // As the app's route sheet: name, stats, chart, then Edit / Undo / Share / Delete point.
         const name = el('input', { class: 'route-name', value: route.name, 'aria-label': 'Route name', placeholder: 'Route name', maxlength: 80, oninput: (e) => { route.name = e.target.value.trim() || 'Untitled route'; persist(); } });

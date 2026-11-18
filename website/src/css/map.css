@@ -173,7 +173,7 @@ body.loading .progress { opacity: 1; }
 }
 .grip::before { content: ""; position: absolute; left: 50%; top: 12px; width: 32px; height: 4px; margin-left: -16px; border-radius: 3px; background: var(--grip); }
 .grip .close { position: absolute; right: 0; top: 0; width: 46px; height: 28px; border: 0; background: transparent; font-size: 19px; color: var(--ink); cursor: pointer; line-height: 1; }
-.grip .back { position: absolute; left: 4px; top: 0; height: 28px; padding: 0 10px; border: 0; background: transparent; color: var(--link); font-size: 13px; cursor: pointer; }
+.grip .back { position: absolute; left: 4px; top: 0; height: 28px; padding: 0 10px; border: 0; background: transparent; color: var(--link); font-size: 13px; cursor: pointer; max-width: calc(50% - 30px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* Photo | title | aside (Te Araroa's direction) on the first row; the subtitle under
    the title runs the full width, under the aside too. */
 .sheet-head { padding: 0 16px; flex: none; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; }

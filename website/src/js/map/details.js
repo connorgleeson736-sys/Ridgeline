@@ -174,7 +174,8 @@ export function openWalk(ctx, guid, { push = false } = {}) {
         let profile = null;
         if (line.length >= 2) {
           profile = profileBlock(ctx, line, alive);
-          body.append(partRow, profile, partText);
+          // Sections below the profile: the distance and other figures show at the lowest stop.
+          body.append(profile, partRow, partText);
         } else body.append(failed('DOC has no line for this walk.'));
         if (intro) body.append(intro);
         // DOC's current alerts: after the profile and summary, before the huts and DOC's sections.
