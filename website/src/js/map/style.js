@@ -85,7 +85,7 @@ export function build(options) {
   return style;
 }
 
-function buildStyle({ topography, settings, dark, fine = false }) {
+function buildStyle({ topography, settings, dark, fine = false, topoSize = 256 }) {
   // Phones (small, dense screens): aerial and satellite imagery half a zoom finer.
   // A raster source picks its tile zoom as round(zoom + log2(512 / tileSize)), so 180
   // in place of 256 asks for the finer tile from the half-way point (about twice the
@@ -126,7 +126,10 @@ function buildStyle({ topography, settings, dark, fine = false }) {
       'satellite-cover': { type: 'raster', tiles: ['bushline://satellite/{z}/{x}/{y}'], tileSize: 256, maxzoom: 11, bounds: [160, -53, 185, -28] },
       'topo-cover': { type: 'raster', tiles: [urls.topo], tileSize: 256, maxzoom: 11, bounds: [165, -49, 180, -33] },
       satellite: { type: 'raster', tiles: ['bushline://satellite/{z}/{x}/{y}'], tileSize: imageSize, maxzoom: 19, bounds: [160, -53, 185, -28], attribution: ESRI_ATTRIBUTION },
-      topo: { type: 'raster', tiles: [urls.topo], tileSize: 256, maxzoom: 16, bounds: [165, -49, 180, -33], attribution: '<a href="https://www.linz.govt.nz/products-services/maps/new-zealand-topographic-maps" target="_blank" rel="noopener">Topo50 © Toitū Te Whenua LINZ</a> CC BY 4.0' },
+      // NZ Topo: LINZ's finest real detail is zoom 17 (18 is 17 enlarged), and on dense
+      // screens a smaller tile size asks for finer tiles (main.js topoTileSize), as the
+      // app picks Topo tiles at one map pixel per screen pixel.
+      topo: { type: 'raster', tiles: [urls.topo], tileSize: topoSize, maxzoom: 17, bounds: [165, -49, 180, -33], attribution: '<a href="https://www.linz.govt.nz/products-services/maps/new-zealand-topographic-maps" target="_blank" rel="noopener">Topo50 © Toitū Te Whenua LINZ</a> CC BY 4.0' },
       terrain: { type: 'raster-dem', tiles: [urls.elevation], tileSize: 256, maxzoom: 18, encoding: 'mapbox', bounds: [165, -48, 179, -34] },
       // Both read LINZ's vector tiles through one memory cache (vector.js).
       'ridgeline-topography': { type: 'vector', tiles: ['bushline-vt://{z}/{x}/{y}'], minzoom: 0, maxzoom: 14, bounds: [165, -48, 179, -34] },

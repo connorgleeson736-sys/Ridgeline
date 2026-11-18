@@ -74,7 +74,11 @@ const view = parseView(location.hash) || store.get('view', null) || START;
 async function main() {
   if (!webglSupported()) { $('map-status').hidden = false; $('map-status').textContent = 'Your browser can’t show the 3D map (WebGL is turned off or unsupported). Try an up-to-date Chrome, Edge, Firefox or Safari.'; return; }
   const topography = await fetch(dataUrl('/data/topography-style.json')).then((r) => r.json());
-  const style = build({ topography, settings, dark: dark.matches, fine: phone });
+  // NZ Topo at about one map pixel per screen pixel: a full zoom finer on 2-3x
+  // screens (128), half a zoom on 1.5x ones (180); about 4x and 2x the tiles.
+  const dpr = devicePixelRatio || 1;
+  const topoSize = lowPower ? 256 : dpr >= 1.75 ? 128 : dpr >= 1.3 ? 180 : 256;
+  const style = build({ topography, settings, dark: dark.matches, fine: phone, topoSize });
   const map = new MapLibre({
     container: 'map',
     style,
