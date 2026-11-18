@@ -71,14 +71,16 @@ impl SkyGpu {
     }
     /// Whether any sky is above the screen's top edge at this [pitch] (degrees).
     pub fn visible(pitch: f32) -> bool {
-        pitch - 90. + (FOV_DEGREES / 2.) > -1.
+        // The top edge's ray, with the centre of perspective raised (crate::view_shift).
+        let top = ((FOV_DEGREES / 2.).to_radians().tan() * (1. + crate::view_shift())).atan().to_degrees();
+        pitch - 90. + top > -1.
     }
     pub fn draw(&mut self, queue: &wgpu::Queue, pass: &mut wgpu::RenderPass<'_>, pitch: f32) {
         let mut stops = [[0f32; 4]; 7];
         for (i, (e, c)) in STOPS.iter().enumerate() {
             stops[i] = [c[0] as f32 / 255., c[1] as f32 / 255., c[2] as f32 / 255., *e];
         }
-        let u = Uniform { params: [pitch - 90., (FOV_DEGREES / 2.).to_radians().tan(), 0., 0.], stops };
+        let u = Uniform { params: [pitch - 90., (FOV_DEGREES / 2.).to_radians().tan(), crate::view_shift(), 0.], stops };
         if self.last != Some(u) {
             queue.write_buffer(&self.uniform, 0, bytemuck::bytes_of(&u));
             self.last = Some(u);

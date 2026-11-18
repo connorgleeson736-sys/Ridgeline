@@ -1,0 +1,26 @@
+{
+  "artifact": "Ridgeline-Native-Padded-Map-0.1.77-Base.apk",
+  "bytes": 36996904,
+  "sha256": "d8b0044505e59d79e8c418c62df8006524a560b5165c5e620e9db6e1f6d06c13",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.77-padded-map",
+  "versionCode": 78,
+  "buildType": "performance (not debuggable, R8 off: JNI entry points)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.76 Full Audit (same package and signer)",
+  "changes": [
+    "Sheets over the map re-centre it smoothly (MapLibre's padding): the map keeps its size and the renderer raises the picture's centre of perspective to the middle of the map above the sheet, following the sheet every frame as it is dragged or slides (renderer set_view_shift: a clip-space shift in camera_matrix, used by drawing, tile selection, picking, label projection and the far plane, whose top edge looks further up; the sky gradient follows it; NativeBridge.viewShift). Kotlin's camera maths (CameraMath.offset, zoom and compass easing, tilt pivot) use the same raised centre. Capped at 70% of the height. Framing a track or going to a place sizes to the map above the sheet's stop; the shift centres it there.",
+    "Names go promptly when zooming out: while the coarser map-data tiles are still loading, the finer ones standing in for them are styled at the coarser zoom, so their zoom filters drop the names the map no longer shows there (they were kept until the coarser tile arrived)."
+  ],
+  "tests": {
+    "kotlinJvm": "343 tests, 6 skipped as before; all pass (new: CameraMathTest.aRaisedCentreOfPerspectiveMovesThePictureUpOnly; NativeUiPortTest cover case now expects children standing in for their parent to be styled at its zoom). PlaceSearchTest.loadTime's 150 ms limit was exceeded in the full run under load (226 ms) and passed alone.",
+    "rust": "cargo test -p ridgeline-renderer: all pass; new GPU example view_shift (Vulkan, headless): with the centre raised by half the height the camera's centre projects to clip y 0.5 and the picture equals the unshifted one moved up 64 of 256 px (100% of compared pixels)."
+  },
+  "nativeLibraries": "rebuilt for arm64-v8a, armeabi-v7a and x86_64 (new JNI entry viewShift), stripped",
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

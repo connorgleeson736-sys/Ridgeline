@@ -2326,6 +2326,18 @@ impl Renderer {
 
 /// MapLibre Mercator camera rebased around the center before Float32 conversion.
 /// Unpadded viewport, no roll. Padding/terrain collision/gesture parity remain open.
+/// How far the centre of perspective is raised, as a fraction of the view's height
+/// (0: the middle; MapLibre's bottom padding over the height): a sheet over the
+/// lower part of the map shifts the picture so the camera's centre is the middle of
+/// the map above it, without resizing the surface. One renderer per process.
+static VIEW_SHIFT: std::sync::atomic::AtomicU32 = std::sync::atomic::AtomicU32::new(0);
+pub fn set_view_shift(fraction: f32) {
+    let f = if fraction.is_finite() { fraction.clamp(0., 0.8) } else { 0. };
+    VIEW_SHIFT.store(f.to_bits(), std::sync::atomic::Ordering::Relaxed);
+}
+pub fn view_shift() -> f32 {
+    f32::from_bits(VIEW_SHIFT.load(std::sync::atomic::Ordering::Relaxed))
+}
 pub fn camera_matrix(
     width: u32,
     height: u32,
@@ -2344,14 +2356,20 @@ pub fn camera_matrix(
     let at = Vec3::ZERO;
     let eye = at + Vec3::new(-b.sin() * p.sin(), -b.cos() * p.sin(), p.cos()) * distance;
     let up = Vec3::new(b.sin() * p.cos(), b.cos() * p.cos(), p.sin());
+    let shift = view_shift();
+    // Raised centre of perspective: clip y moves up by [shift] of the view's half
+    // height per unit w (the picture moves up by shift x height / 2 pixels).
+    let raise = Mat4::from_cols(glam::Vec4::X, glam::Vec4::Y, glam::Vec4::Z, glam::Vec4::new(0., shift, 0., 1.));
     (
-        perspective(
-            36.8698976f32.to_radians(),
-            width as f32 / height as f32,
-            height as f32 / 50.,
-            camera_depth_range(height, px_meter as f64, pitch as f64, elevation as f64, 0.).1
-                as f32,
-        ) * look_at(eye, at, up),
+        raise
+            * perspective(
+                36.8698976f32.to_radians(),
+                width as f32 / height as f32,
+                height as f32 / 50.,
+                camera_depth_range_shifted(height, px_meter as f64, pitch as f64, elevation as f64, 0., shift as f64).1
+                    as f32,
+            )
+            * look_at(eye, at, up),
         px_meter,
     )
 }
@@ -2365,6 +2383,18 @@ pub fn camera_depth_range(
     elevation: f64,
     min_elevation: f64,
 ) -> (f64, f64) {
+    camera_depth_range_shifted(height, px_meter, pitch, elevation, min_elevation, 0.)
+}
+/// As [camera_depth_range], with the centre of perspective raised by [shift] of the
+/// height: the screen's top edge looks further up (MapLibre's fovAboveCenter).
+pub fn camera_depth_range_shifted(
+    height: u32,
+    px_meter: f64,
+    pitch: f64,
+    elevation: f64,
+    min_elevation: f64,
+    shift: f64,
+) -> (f64, f64) {
     let distance = height as f64 * 1.5;
     let p = pitch.to_radians();
     let cos = p.cos();
@@ -2376,7 +2406,7 @@ pub fn camera_depth_range(
     } else {
         far_distance
     };
-    let half_fov = 36.86989764584402f64.to_radians() / 2.;
+    let half_fov = ((36.86989764584402f64.to_radians() / 2.).tan() * (1. + shift)).atan();
     let length = |angle: f64| {
         angle.sin() * a
             / (std::f64::consts::FRAC_PI_2 - p - angle)

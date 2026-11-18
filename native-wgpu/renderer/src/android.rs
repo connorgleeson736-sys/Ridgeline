@@ -581,6 +581,16 @@ pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_renderScale(
         }
     });
 }
+/// The centre of perspective raised by [fraction] of the view's height (a sheet over
+/// the map's lower part): crate::set_view_shift.
+#[unsafe(no_mangle)]
+pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_viewShift(
+    _env: *mut c_void,
+    _class: *mut c_void,
+    fraction: f32,
+) {
+    protect(|| crate::set_view_shift(fraction));
+}
 /// Overlay texture pool size (1 MiB each), chosen from device RAM.
 #[unsafe(no_mangle)]
 pub extern "system" fn Java_nz_ridgeline_nativeapp_NativeBridge_overlayBudget(

@@ -11,8 +11,9 @@ struct Out { @builtin(position) pos: vec4<f32>, @location(0) ndc: vec2<f32> };
   return o;
 }
 @fragment fn fs(i: Out) -> @location(0) vec4<f32> {
-  // params.x: centre ray elevation (degrees); params.y: tan(vertical fov / 2).
-  let e = sky.params.x + degrees(atan(i.ndc.y * sky.params.y));
+  // params.x: centre ray elevation (degrees); params.y: tan(vertical fov / 2);
+  // params.z: how far the centre of perspective is raised (in clip units).
+  let e = sky.params.x + degrees(atan((i.ndc.y - sky.params.z) * sky.params.y));
   var c = sky.stops[0].rgb;
   for (var k = 1; k < 7; k++) {
     let a = sky.stops[k - 1];
