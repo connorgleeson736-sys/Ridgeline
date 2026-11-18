@@ -230,12 +230,10 @@ export function attach(ctx) {
     const samples = await worker.call({ type: 'profile', points, max: 700 }).catch(() => null);
     if (token !== profileToken || !samples || !chart) return;
     chart.set(samples);
-    // A route that starts or ends at a hut: the hut marked on the profile there.
-    const total = samples[samples.length - 1]?.d || 0;
-    search.call({ type: 'huts', url: dataUrl('/data/places.tsv'), points: [points[0], points[points.length - 1]], reach: 200 }).then((names) => {
-      if (token !== profileToken || !chart || !names || !(total > 0)) return;
-      const marks = [[0, names[0]], [total, names[1]]].filter(([, n]) => n);
-      if (marks.length) chart.setMarkers(marks);
+    // Huts on the route (at its start or end, or passed on the way): marked on the profile.
+    const line = samples.filter((s) => s.p);
+    search.call({ type: 'huts', url: dataUrl('/data/places.tsv'), points: line.map((s) => s.p), along: line.map((s) => s.d), reach: 200 }).then((marks) => {
+      if (token === profileToken && chart && marks?.length) chart.setMarkers(marks);
     }).catch(() => {});
     const s = stats(samples);
     statsBox.querySelector('[data-stat=ascent]').textContent = height(s.ascent);
@@ -251,7 +249,8 @@ export function attach(ctx) {
       render(body) {
         // As the app's route sheet: name, stats, chart, then Edit / Undo / Share / Delete point.
         const name = el('input', { class: 'route-name', value: route.name, 'aria-label': 'Route name', placeholder: 'Route name', maxlength: 80, oninput: (e) => { route.name = e.target.value.trim() || 'Untitled route'; persist(); } });
-        statsBox = el('div', { class: 'stats' }, stat('Distance', 'distance'), stat('Ascent', 'ascent'), stat('Descent', 'descent'), stat('Highest', 'high'));
+        // The stats drag the sheet too (as the app's route sheet: grip, name and stats).
+        statsBox = el('div', { class: 'stats', 'data-drag': '' }, stat('Distance', 'distance'), stat('Ascent', 'ascent'), stat('Descent', 'descent'), stat('Highest', 'high'));
         const canvas = el('canvas', { class: 'chart', role: 'img', 'aria-label': 'Elevation profile' });
         const view = new Chart(canvas, chartEvents(ctx, () => view));
         chart = view;

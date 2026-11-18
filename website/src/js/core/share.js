@@ -36,10 +36,14 @@ export function encodeRoute(route) {
   // Flags packed 6 per character.
   let packed = '';
   for (let i = 0; i < flags.length; i += 6) packed += String.fromCharCode(48 + parseInt(flags.slice(i, i + 6).padEnd(6, '0'), 2));
-  return `r=${encodeURIComponent((route.name || 'Route').slice(0, 80))}~${encodePolyline(route.points)}~${encodeURIComponent(packed)}`;
+  // ~ separates the parts: escaped inside them (a polyline can contain it).
+  const part = (t) => encodeURIComponent(t).replace(/~/g, '%7E');
+  return `r=${part((route.name || 'Route').slice(0, 80))}~${part(encodePolyline(route.points))}~${part(packed)}`;
 }
 export function decodeRoute(hash) {
-  const m = /(?:^|[#&])r=([^~]*)~([^~]+)~([^&]*)/.exec(hash);
+  // Links made before ~ was escaped can have it in the polyline: the name ends at the
+  // first ~, the flags (which never contain it) start after the last.
+  const m = /(?:^|[#&])r=([^~&]*)~([^&]+)~([^~&]*)/.exec(hash);
   if (!m) return null;
   try {
     const points = decodePolyline(decodeURIComponent(m[2]));

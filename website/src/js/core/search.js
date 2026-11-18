@@ -65,17 +65,31 @@ export class PlaceSearch {
     }
   }
   get size() { return this.entries.length; }
-  /** The DOC hut nearest `point` ([lon, lat]) within `reach` metres, or null: a route
-   * starting or ending there (a point locked onto the map's hut symbol, which can be a
-   * little from DOC's position for it). As the app's RouteHuts. */
-  nearestHut(point, reach = 200) {
-    let best = null, bestKm = reach / 1000;
+  /** DOC huts within `reach` metres of a route's line (`points` [lon, lat], `along` the
+   * profile's distance at each), at their distance along it, nearest point first; a
+   * hut at the start, at the end or passed on the way. As the app's RouteHuts. */
+  hutsAlong(points, along, reach = 200) {
+    if (!points || points.length < 2) return [];
+    let w = Infinity, e = -Infinity, s = Infinity, n = -Infinity, lat = 0;
+    for (const [x, y] of points) { w = Math.min(w, x); e = Math.max(e, x); s = Math.min(s, y); n = Math.max(n, y); lat += y; }
+    lat /= points.length;
+    const my = 111320, mx = my * Math.cos(lat * Math.PI / 180), gy = reach / my, gx = reach / mx;
+    const best = new Map();
     for (const { place } of this.entries) {
-      if (place.kind !== 'hut' || Math.abs(place.lat - point[1]) > 0.01 || Math.abs(place.lon - point[0]) > 0.02) continue;
-      const km = distanceKm(point[1], point[0], place.lat, place.lon);
-      if (km <= bestKm) { bestKm = km; best = place; }
+      if (place.kind !== 'hut' || place.lon < w - gx || place.lon > e + gx || place.lat < s - gy || place.lat > n + gy) continue;
+      const px = place.lon * mx, py = place.lat * my;
+      let near = Infinity, at = 0;
+      for (let i = 1; i < points.length; i++) {
+        const ax = points[i - 1][0] * mx, ay = points[i - 1][1] * my, dx = points[i][0] * mx - ax, dy = points[i][1] * my - ay;
+        const len = dx * dx + dy * dy, t = len > 0 ? Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / len)) : 0;
+        const d = Math.hypot(ax + dx * t - px, ay + dy * t - py);
+        if (d < near) { near = d; at = along[i - 1] + (along[i] - along[i - 1]) * t; }
+      }
+      if (near > reach) continue;
+      const key = place.name.trim().toLowerCase();
+      if (!best.has(key) || best.get(key).near > near) best.set(key, { near, at, name: place.name.trim() });
     }
-    return best;
+    return [...best.values()].sort((a, b) => a.at - b.at).map((h) => [h.at, h.name]);
   }
   /** The place called `name` nearest `near` ([lon, lat]) within maxKm: exact, else a
    * longer name starting with it, else without generic words (the app's locate). */

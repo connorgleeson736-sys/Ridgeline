@@ -163,6 +163,14 @@ body.loading .progress { opacity: 1; }
   body.sheet-open .maplibregl-ctrl-bottom-left { left: 460px; }
 }
 .grip { position: relative; height: 28px; flex: none; cursor: grab; touch-action: none; }
+/* Phones: a taller grip, and the title area drags the sheet too (the app's drag zone). */
+@media (max-width: 799.98px) {
+  .sheet .grip { height: 36px; }
+  .sheet .grip::before { top: 14px; width: 40px; margin-left: -20px; }
+  .sheet .grip .close, .sheet .grip .back { height: 36px; }
+  .sheet .sheet-head { touch-action: none; cursor: grab; padding-bottom: 6px; }
+  .sheet [data-drag] { touch-action: none; cursor: grab; }
+}
 .grip::before { content: ""; position: absolute; left: 50%; top: 12px; width: 32px; height: 4px; margin-left: -16px; border-radius: 3px; background: var(--grip); }
 .grip .close { position: absolute; right: 0; top: 0; width: 46px; height: 28px; border: 0; background: transparent; font-size: 19px; color: var(--ink); cursor: pointer; line-height: 1; }
 .grip .back { position: absolute; left: 4px; top: 0; height: 28px; padding: 0 10px; border: 0; background: transparent; color: var(--link); font-size: 13px; cursor: pointer; }

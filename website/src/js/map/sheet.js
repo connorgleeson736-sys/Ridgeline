@@ -147,13 +147,16 @@ export class Sheet {
     this.grip.addEventListener('dblclick', () => { if (!wide.matches) return; box = null; store.set('card', null); apply(); });
     apply();
   }
-  /** Drag the grip between the stops; a tap goes up one. */
+  /** Drag the sheet between its stops by its grip or its title area (the app's
+   * drag zone); a tap goes up one. A swipe of 30 px goes to the next stop that way,
+   * however far it went; a longer drag settles at the nearest. */
   dragging() {
     let start = null;
+    const STOPS = ['compact', 'expanded', 'full'];
     const down = (e) => {
-      if (e.target.closest('button') || matchMedia('(min-width: 800px)').matches) return;
-      start = { y: e.clientY, h: this.root.getBoundingClientRect().height };
-      this.grip.setPointerCapture(e.pointerId);
+      if (e.target.closest('button, a, input, select, textarea, [role=switch], .switch') || matchMedia('(min-width: 800px)').matches) return;
+      start = { y: e.clientY, h: this.root.getBoundingClientRect().height, at: STOPS.indexOf(this.root.dataset.size) };
+      e.currentTarget.setPointerCapture(e.pointerId);
       this.root.classList.add('dragging');
     };
     const move = (e) => {
@@ -165,13 +168,24 @@ export class Sheet {
       const moved = e.clientY - start.y, h = start.h - moved;
       this.root.classList.remove('dragging');
       this.root.style.height = '';
-      if (Math.abs(moved) < 6) this.toggle();
-      else this.size(h < innerHeight * 0.32 ? 'compact' : h < innerHeight * 0.72 ? 'expanded' : 'full');
+      const nearest = h < innerHeight * 0.32 ? 0 : h < innerHeight * 0.72 ? 1 : 2;
+      const at = start.at < 0 ? nearest : start.at;
+      if (Math.abs(moved) < 6) { if (e.type === 'pointerup') this.toggle(); }
+      else if (moved < -30 && nearest <= at) this.size(STOPS[Math.min(2, at + 1)]);
+      else if (moved > 30 && nearest >= at) this.size(STOPS[Math.max(0, at - 1)]);
+      else this.size(STOPS[nearest]);
       start = null;
     };
-    this.grip.addEventListener('pointerdown', down);
-    this.grip.addEventListener('pointermove', move);
-    this.grip.addEventListener('pointerup', up);
-    this.grip.addEventListener('pointercancel', up);
+    // Parts of the body marked data-drag (a route's stats) drag it as well.
+    this.body.addEventListener('pointerdown', (e) => { if (e.target.closest('[data-drag]')) down(e); });
+    this.body.addEventListener('pointermove', move);
+    this.body.addEventListener('pointerup', up);
+    this.body.addEventListener('pointercancel', up);
+    for (const t of [this.grip, this.head]) {
+      t.addEventListener('pointerdown', down);
+      t.addEventListener('pointermove', move);
+      t.addEventListener('pointerup', up);
+      t.addEventListener('pointercancel', up);
+    }
   }
 }

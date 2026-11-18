@@ -157,21 +157,40 @@ test('DOC page sections and legs', () => {
   assert.ok(milford.length >= 3 && /Clinton Hut/.test(milford[0].title), milford.map((l) => l.title).join(' | '));
 });
 
-test('a planned route starting or ending at a hut finds that hut (as the app\'s RouteHuts)', async () => {
+test('huts on a planned route: at its ends and passed on the way (as the app\'s RouteHuts)', async () => {
   const { PlaceSearch } = await import('../src/js/core/search.js');
   const rows = [
     ['hut', 'Liverpool Hut', '', '-44.5', '168.6', '', '', ''],
     ['peak', 'Mt Liverpool', '', '-44.5003', '168.6005', '', '', ''],
     ['hut', 'Aspiring Hut', '', '-44.4', '168.7', '', '', ''],
+    ['hut', 'Halfway Hut', '', '-44.4505', '168.65', '', '', ''],
+    ['hut', 'Far Hut', '', '-44.47', '168.65', '', '', ''],
   ].map((r) => r.join('\t')).join('\n');
   const index = new PlaceSearch(rows);
-  // About 60 m from DOC's position (the map's hut symbol is a little off it).
-  assert.equal(index.nearestHut([168.6007, -44.5002]).name, 'Liverpool Hut');
-  assert.equal(index.nearestHut([168.6994, -44.4004]).name, 'Aspiring Hut');
-  // A kilometre from any hut: none (the peak beside a hut never counts).
-  assert.equal(index.nearestHut([168.62, -44.52]), null);
-  // Real data: a route starting at Mueller Hut.
+  // A straight route from ~60 m off Liverpool Hut to ~60 m off Aspiring Hut, sampled every ~100 m.
+  const a = [168.6007, -44.5002], b = [168.6994, -44.4004], total = meters(a, b), n = Math.round(total / 100);
+  const points = Array.from({ length: n + 1 }, (_, i) => [a[0] + (b[0] - a[0]) * i / n, a[1] + (b[1] - a[1]) * i / n]);
+  const marks = index.hutsAlong(points, points.map((_, i) => total * i / n));
+  assert.deepEqual(marks.map((m) => m[1]), ['Liverpool Hut', 'Halfway Hut', 'Aspiring Hut']);
+  assert.ok(Math.abs(marks[0][0]) < 100 && Math.abs(marks[1][0] - total / 2) < 300 && Math.abs(marks[2][0] - total) < 100);
+  // Real data: a route past Mueller Hut.
   const real = new PlaceSearch(readFileSync(new URL('../../native-wgpu/android/app/src/main/assets/search/places.tsv', import.meta.url), 'utf8'));
   const mueller = real.entries.find((e) => e.place.kind === 'hut' && /^Mueller Hut/.test(e.place.name)).place;
-  assert.match(real.nearestHut([mueller.lon + 0.001, mueller.lat]).name, /^Mueller Hut/);
+  const past = [[mueller.lon - 0.01, mueller.lat + 0.0005], [mueller.lon + 0.01, mueller.lat + 0.0005]];
+  assert.ok(real.hutsAlong(past, [0, meters(past[0], past[1])]).some((m) => /^Mueller Hut/.test(m[1])));
+});
+
+test('shared route links whose polyline contains ~ open (old and new links)', async () => {
+  const { encodeRoute, decodeRoute } = await import('../src/js/core/share.js');
+  const points = [[170.0648, -43.7210], [170.07, -43.724], [170.079, -43.728], [170.088, -43.73]];
+  const link = encodeRoute({ name: 'Mueller ~ Sealy', points, waypoints: [0, 3] });
+  const back = decodeRoute('#' + link);
+  assert.equal(back.name, 'Mueller ~ Sealy');
+  assert.equal(back.points.length, 4);
+  assert.ok(Math.abs(back.points[3][0] - 170.088) < 1e-5);
+  // A link from before ~ was escaped: ~ inside its polyline.
+  const old = decodeRoute('#r=Test~fgziG_x~l_@vQo_@~Wgw@nKgw@~T');
+  assert.equal(old.name, 'Test');
+  assert.equal(old.points.length, 4);
+  assert.deepEqual(old.waypoints, [0, 3]);
 });
