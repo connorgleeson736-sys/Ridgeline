@@ -14,6 +14,10 @@ const DOC_ATTRIBUTION = '<a href="https://www.doc.govt.nz/" target="_blank" rel=
 export const urls = {
   aerial: `${LINZ}/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp?api=${key}`,
   topo: `${LINZ}/tiles/topo-raster/WebMercatorQuad/{z}/{x}/{y}.webp?api=${key}`,
+  // The two maps inside LINZ's topo-raster (Topo250 to its zoom 12, Topo50 from 13),
+  // each on its own, so the zoom where one gives way to the other can be chosen.
+  topo250: `${LINZ}/tiles/nz-topo250-new-zealand-mainland-gridless/WebMercatorQuad/{z}/{x}/{y}.webp?api=${key}`,
+  topo50: `${LINZ}/tiles/nz-topo50-new-zealand-mainland-gridless/WebMercatorQuad/{z}/{x}/{y}.webp?api=${key}`,
   elevation: `${LINZ}/tiles/elevation/WebMercatorQuad/{z}/{x}/{y}.png?pipeline=terrain-rgb&api=${key}`,
   vector: `${LINZ}/tiles/topographic-v2/3857/{z}/{x}/{y}.pbf?api=${key}`,
   glyphs: `${LINZ}/fonts/{fontstack}/{range}.pbf?api=${key}`,
@@ -85,7 +89,7 @@ export function build(options) {
   return style;
 }
 
-function buildStyle({ topography, settings, dark, fine = false, topoSize = 256 }) {
+function buildStyle({ topography, settings, dark, fine = false, topoSize = 256, topoSwitch = 11.5 }) {
   // Phones (small, dense screens): aerial and satellite imagery half a zoom finer.
   // A raster source picks its tile zoom as round(zoom + log2(512 / tileSize)), so 180
   // in place of 256 asks for the finer tile from the half-way point (about twice the
@@ -129,7 +133,8 @@ function buildStyle({ topography, settings, dark, fine = false, topoSize = 256 }
       // NZ Topo: LINZ's finest real detail is zoom 17 (18 is 17 enlarged), and on dense
       // screens a smaller tile size asks for finer tiles (main.js topoTileSize), as the
       // app picks Topo tiles at one map pixel per screen pixel.
-      topo: { type: 'raster', tiles: [urls.topo], tileSize: topoSize, maxzoom: 17, bounds: [165, -49, 180, -33], attribution: '<a href="https://www.linz.govt.nz/products-services/maps/new-zealand-topographic-maps" target="_blank" rel="noopener">Topo50 © Toitū Te Whenua LINZ</a> CC BY 4.0' },
+      topo: { type: 'raster', tiles: [urls.topo250], tileSize: topoSize, maxzoom: 17, bounds: [165, -49, 180, -33], attribution: '<a href="https://www.linz.govt.nz/products-services/maps/new-zealand-topographic-maps" target="_blank" rel="noopener">Topo50 © Toitū Te Whenua LINZ</a> CC BY 4.0' },
+      topo50: { type: 'raster', tiles: [urls.topo50], tileSize: topoSize, maxzoom: 17, bounds: [165, -49, 180, -33], attribution: '<a href="https://www.linz.govt.nz/products-services/maps/new-zealand-topographic-maps" target="_blank" rel="noopener">Topo50 © Toitū Te Whenua LINZ</a> CC BY 4.0' },
       terrain: { type: 'raster-dem', tiles: [urls.elevation], tileSize: 256, maxzoom: 18, encoding: 'mapbox', bounds: [165, -48, 179, -34] },
       // Both read LINZ's vector tiles through one memory cache (vector.js).
       'ridgeline-topography': { type: 'vector', tiles: ['bushline-vt://{z}/{x}/{y}'], minzoom: 0, maxzoom: 14, bounds: [165, -48, 179, -34] },
@@ -158,7 +163,9 @@ function buildStyle({ topography, settings, dark, fine = false, topoSize = 256 }
       { id: 'topo-cover', type: 'raster', source: 'topo-cover', layout: { visibility: visible(settings.base === 'topo') }, paint: { 'raster-fade-duration': 0 } },
       { id: 'aerial', type: 'raster', source: 'aerial', layout: { visibility: visible(settings.base === 'aerial') }, paint: { 'raster-fade-duration': 150, 'raster-resampling': 'linear', ...grade('aerial', settings.natural) } },
       { id: 'satellite', type: 'raster', source: 'satellite', layout: { visibility: visible(settings.base === 'satellite') }, paint: { 'raster-fade-duration': 150, 'raster-resampling': 'linear', ...grade('satellite', settings.natural) } },
-      { id: 'topo', type: 'raster', source: 'topo', layout: { visibility: visible(settings.base === 'topo') }, paint: { 'raster-fade-duration': 150 } },
+      // Topo250 below the chosen zoom, Topo50 from it (main.js topoSwitch).
+      { id: 'topo', type: 'raster', source: 'topo', maxzoom: topoSwitch, layout: { visibility: visible(settings.base === 'topo') }, paint: { 'raster-fade-duration': 150 } },
+      { id: 'topo50', type: 'raster', source: 'topo50', minzoom: topoSwitch, layout: { visibility: visible(settings.base === 'topo') }, paint: { 'raster-fade-duration': 150 } },
       ...lines,
       // Hunting permit areas: faint blaze-orange hatching inside a dashed outline.
       { id: 'hunting-fill', type: 'fill', source: 'hunting', minzoom: 7, layout: { visibility: visible(settings.hunting) }, paint: { 'fill-pattern': 'hatch', 'fill-opacity': 0.85 } },

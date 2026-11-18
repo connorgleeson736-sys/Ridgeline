@@ -43,6 +43,9 @@ const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const DEFAULTS = { base: 'aerial', natural: true, threeD: true, relief: 1, names: true, peaks: true, roads: true, tracks: true, huts: true, contours: false, hunting: false, teAraroa: true };
 const settings = { ...DEFAULTS, ...store.get('settings', {}) };
 const saveSettings = () => store.set('settings', settings);
+/** Where NZ Topo changes from Topo250 to Topo50: the chosen map zoom, or LINZ's own. */
+let autoTopoSwitch = 11.5;
+const topoSwitch = () => (Number.isFinite(settings.topoSwitch) ? settings.topoSwitch : autoTopoSwitch);
 
 // ---- Pixel budget (the old website's RidgePerformance.pixelRatio) ----
 const memory = navigator.deviceMemory || 8, saveData = !!navigator.connection?.saveData;
@@ -78,7 +81,10 @@ async function main() {
   // screens (128), half a zoom on 1.5x ones (180); about 4x and 2x the tiles.
   const dpr = devicePixelRatio || 1;
   const topoSize = lowPower ? 256 : dpr >= 1.75 ? 128 : dpr >= 1.3 ? 180 : 256;
-  const style = build({ topography, settings, dark: dark.matches, fine: phone, topoSize });
+  // LINZ's own switch from Topo250 to Topo50 (its zoom-13 tiles) at this tile size: the
+  // default for "Topo50 from zoom" (a raster source asks for round(zoom + log2(512 / size))).
+  autoTopoSwitch = Math.round((12.5 - Math.log2(512 / topoSize)) * 10) / 10;
+  const style = build({ topography, settings, dark: dark.matches, fine: phone, topoSize, topoSwitch: topoSwitch() });
   const map = new MapLibre({
     container: 'map',
     style,
@@ -219,7 +225,7 @@ async function main() {
     $('map-status').hidden = true;
     // Credits collapsed behind the (i), as in the app.
     document.querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show');
-    for (const [id, levels, ratio] of [['terrain', lowPower ? 9 : 8, lowPower ? 3 : 3.5], ['aerial', lowPower ? 7 : 6, lowPower ? 3 : 3.5], ['topo', 1, 1]]) {
+    for (const [id, levels, ratio] of [['terrain', lowPower ? 9 : 8, lowPower ? 3 : 3.5], ['aerial', lowPower ? 7 : 6, lowPower ? 3 : 3.5], ['topo', 1, 1], ['topo50', 1, 1]]) {
       try { map.setSourceTileLodParams(levels, ratio, id); } catch { /* older engines */ }
     }
     overlays.refresh();
@@ -397,6 +403,26 @@ function layers(map, panel, button, { setThreeD, overlays, labels, resize, close
   const reliefValue = el('output', {}, `${(+settings.relief).toFixed(1)}×`);
   const relief = el('input', { type: 'range', min: 1, max: 2, step: 0.1, value: settings.relief, 'aria-label': 'Terrain relief', oninput: (e) => { settings.relief = +e.target.value; reliefValue.textContent = `${settings.relief.toFixed(1)}×`; if (settings.threeD) map.setTerrain({ source: 'terrain', exaggeration: settings.relief }); saveSettings(); } });
   const topoNote = el('p', { class: 'note', hidden: true }, 'NZ Topo shows its own tracks, huts and names.');
+  // Where NZ Topo changes from the 1:250,000 map (Topo250) to the detailed 1:50,000 one (Topo50).
+  const switchValue = el('output', {});
+  const switchInput = el('input', { type: 'range', min: 8, max: 15, step: 0.5, 'aria-label': 'Zoom where Topo50 replaces Topo250', oninput: (e) => setTopoSwitch(+e.target.value) });
+  const switchReset = el('button', { class: 'link', type: 'button', onclick: () => setTopoSwitch(null) }, 'Reset');
+  const switchNow = el('span', { class: 'hint' });
+  const switchBox = el('div', { class: 'topo-switch', hidden: true },
+    el('label', { class: 'relief' }, el('span', {}, 'Topo50 from zoom'), switchValue, switchInput),
+    el('p', { class: 'note' }, 'Lower shows the detailed 1:50,000 map further out; higher keeps the 1:250,000 overview longer. ', switchNow, ' ', switchReset));
+  function showTopoSwitch() {
+    const v = topoSwitch(), auto = !Number.isFinite(settings.topoSwitch);
+    switchInput.value = v; switchValue.textContent = `${v}${auto ? ' (LINZ)' : ''}`; switchReset.hidden = auto;
+    switchNow.textContent = `The map is at zoom ${map.getZoom().toFixed(1)}.`;
+  }
+  function setTopoSwitch(v) {
+    settings.topoSwitch = v == null ? null : v; saveSettings();
+    const z = topoSwitch();
+    map.setLayerZoomRange('topo', 0, z); map.setLayerZoomRange('topo50', z, 24);
+    showTopoSwitch();
+  }
+  map.on('zoomend', () => { if (!switchBox.hidden && !panel.hidden) showTopoSwitch(); });
   // The app's "Natural imagery colour": its overview imagery and colour grade, on by default.
   const naturalInput = el('input', { type: 'checkbox', checked: settings.natural, onchange: (e) => setNatural(e.target.checked) });
   const naturalBox = el('label', { class: 'check' }, el('span', {}, 'Natural imagery colour'), naturalInput);
@@ -409,6 +435,7 @@ function layers(map, panel, button, { setThreeD, overlays, labels, resize, close
     el('div', { class: 'heading' }, el('h2', {}, 'Map layers'), el('button', { class: 'icon-button', type: 'button', 'aria-label': 'Close layers', onclick: () => close() }, '✕')),
     el('div', { class: 'bases' }, base('aerial', 'LINZ aerial'), base('satellite', 'Satellite'), base('topo', 'NZ Topo · 2D')),
     naturalBox,
+    switchBox,
     el('h3', {}, 'Topographic overlays'),
     topoNote,
     ...toggles.map(([key, label, keyClass]) => el('label', { class: 'check' }, el('span', {}, keyClass ? el('i', { class: `key ${keyClass}`, 'aria-hidden': 'true' }) : null, label), el('input', { type: 'checkbox', 'data-toggle': key, checked: settings[key], onchange: (e) => setGroup(key, e.target.checked) }))),
@@ -418,6 +445,7 @@ function layers(map, panel, button, { setThreeD, overlays, labels, resize, close
   function setBase(id, { keep3d = false } = {}) {
     settings.base = id; saveSettings();
     for (const layer of ['aerial', 'satellite', 'topo']) for (const l of [layer, `${layer}-cover`]) map.setLayoutProperty(l, 'visibility', id === layer ? 'visible' : 'none');
+    map.setLayoutProperty('topo50', 'visibility', id === 'topo' ? 'visible' : 'none');
     applyAll(); overlays.refresh(); sync(); resize();
     if (id === 'topo' && settings.threeD && !keep3d) setThreeD(false);
   }
@@ -434,8 +462,10 @@ function layers(map, panel, button, { setThreeD, overlays, labels, resize, close
     naturalInput.disabled = topo; naturalBox.classList.toggle('disabled', topo);
     for (const input of panel.querySelectorAll('[data-toggle]')) { const off = topo && input.dataset.toggle !== 'hunting'; input.disabled = off; input.closest('label').classList.toggle('disabled', off); }
     topoNote.hidden = !topo;
+    switchBox.hidden = !topo;
+    if (topo) showTopoSwitch();
   }
-  function open() { closeDrawer(); panel.hidden = false; button.setAttribute('aria-expanded', 'true'); }
+  function open() { closeDrawer(); panel.hidden = false; button.setAttribute('aria-expanded', 'true'); if (settings.base === 'topo') showTopoSwitch(); }
   function close() { panel.hidden = true; button.setAttribute('aria-expanded', 'false'); }
   button.addEventListener('click', () => (panel.hidden ? open() : close()));
   document.addEventListener('pointerdown', (e) => { if (!panel.hidden && !panel.contains(e.target) && !button.contains(e.target)) close(); });

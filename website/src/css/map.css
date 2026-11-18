@@ -419,3 +419,6 @@ body.sheet-open .maplibregl-ctrl-bottom-left, body.sheet-open .maplibregl-ctrl-b
 .ta-sub { margin: 12px 0 4px; font-size: 13px; }
 .on-map { font-size: 12px; white-space: nowrap; }
 .on-map { min-height: 0; display: inline; padding: 0; }
+/* NZ Topo: where Topo50 replaces Topo250. */
+.topo-switch .note { margin-top: 2px; }
+.topo-switch .link { border: 0; background: none; padding: 0; font: inherit; color: var(--link); cursor: pointer; text-decoration: underline; }
