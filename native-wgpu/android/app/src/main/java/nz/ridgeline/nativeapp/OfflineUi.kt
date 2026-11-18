@@ -221,6 +221,18 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
         refreshRegions()
         Toast.makeText(activity,"Resuming ${region.name}",Toast.LENGTH_SHORT).show()
     }
+    /** A download started elsewhere (a Te Araroa section's): painted [cells] with
+     * [extra] walker data and [profiles]. False when one is already running. */
+    internal fun startCorridor(title:String,cells:Map<Int,Int>,base:MapSettings.Base,extra:((String)->ByteArray?)->Unit,profiles:List<List<Coordinate>>,progress:(String)->Unit,done:()->Unit):Boolean{
+        if(downloading)return false
+        val bounds=PaintedArea.boundsOf(cells)?:return false
+        downloading=true;progressText="Preparing…";showProgress();progress(progressText)
+        try{
+            loader.downloadRegion(title,bounds,cells.values.maxOf{PaintedArea.DETAILS[it]},base,true,painted=cells,extra=extra,profiles=profiles,
+                progress={progressText=it;showProgress();progress(it)}){downloadDone();done()}
+        }catch(e:Exception){downloading=false;showProgress();throw e}
+        return true
+    }
     private fun downloadDone(){downloading=false;progressText="";showProgress();loader.cameraChanged();refreshRegions();loader.storedCoverage{stored=it;refreshOverlay(true)}}
     /** Overview imagery ZIPs: attached packs (detach) and Add (Layers > Advanced). */
     fun imageryPacks(){

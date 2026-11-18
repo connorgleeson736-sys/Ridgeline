@@ -184,7 +184,10 @@ internal class NativeImagery(
     private fun <T> produce(z:Int,x:Int,y:Int,fromBitmap:(Bitmap)->T,fromPixels:(IntArray)->T):T {
         require(z in 0..19 && x in 0 until (1 shl z) && y in 0 until (1 shl z))
         checkPreparation()
-        alternate(z,x,y)?.let{url->val ez=alternateZoom(z);return bitmap(fetch(url)).using{source->if(z<=ez)fromBitmap(source)else crop(source,x,y,1 shl(z-ez)).using(fromBitmap)}}
+        alternate(z,x,y)?.let{url->val ez=alternateZoom(z)
+            // A Topo tile not to be had (offline): LINZ's combined map, as regions saved before the choice hold it.
+            val bytes=try{fetch(url)}catch(e:Exception){val combined=combinedTopo(url)?:throw e;try{fetch(combined)}catch(_:Exception){throw e}}
+            return bitmap(bytes).using{source->if(z<=ez)fromBitmap(source)else crop(source,x,y,1 shl(z-ez)).using(fromBitmap)}}
         val selected=plan(z,x,y);val factor=selected.factor;val coarse=selected.coarse;val entry=selected.entry;val mode=selected.mode
         if(mode=="linz") return base(z,x,y).using(fromBitmap)
         val ez=minOf(z,18); val f=1 shl(z-ez)
@@ -219,11 +222,15 @@ internal class NativeImagery(
     }
     /** Finest source zoom: NZ Topo's printed maps carry no detail beyond z17
      * (LINZ's z18 is its own 2x upscale of z17); Esri imagery stops at z18. */
+    private val density=context.resources.displayMetrics.density.toDouble()
+    /** NZ Topo's tile at zoom [z]: Topo250 or Topo50 by the chosen switch (TopoLayers). */
+    internal fun topoUrl(z:Int,x:Int,y:Int)=linz(z,x,y).replace("/aerial/","/${TopoLayers.layer(z,settings().topoSwitch,density)}/")
+    private fun combinedTopo(url:String)=if("/${TopoLayers.TOPO50}/" in url||"/${TopoLayers.TOPO250}/" in url)url.replace(Regex("/nz-topo(50|250)-new-zealand-mainland-gridless/"),"/${TopoLayers.COMBINED}/")else null
     private fun alternateZoom(z:Int)=minOf(z,if(settings().base==MapSettings.Base.TOPO)TOPO_MAX_ZOOM else 18)
     private fun alternate(z:Int,x:Int,y:Int):String?{
         val mode=settings().base;if(mode==MapSettings.Base.LINZ)return null
         val ez=alternateZoom(z);val factor=1 shl(z-ez)
-        return if(mode==MapSettings.Base.TOPO)linz(ez,x/factor,y/factor).replace("/aerial/","/topo-raster/")else"https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/$ez/${y/factor}/${x/factor}"
+        return if(mode==MapSettings.Base.TOPO)topoUrl(ez,x/factor,y/factor)else"https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/$ez/${y/factor}/${x/factor}"
     }
     private fun vetoFine(mask:BooleanArray,fine:JSONArray,z:Int,x:Int,y:Int) {
         Bitmap.createBitmap(256,256,Bitmap.Config.ARGB_8888).using { survey ->

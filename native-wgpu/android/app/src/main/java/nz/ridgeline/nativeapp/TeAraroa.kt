@@ -183,7 +183,8 @@ internal class TeAraroa private constructor(
         fun sectionPage(slug:String)="https://www.teararoa.org.nz/sections/$slug/"
         const val ALERTS_PAGE="https://www.teararoa.org.nz/trail-alerts/"
         /** The Trust's live data for a section (its alerts). */
-        fun trackApi(slug:String)="https://www.teararoa.org.nz/wp-json/ta/v1/track/$slug"
+        const val TRUST_API="https://www.teararoa.org.nz/wp-json/ta/v1/"
+        fun trackApi(slug:String)="${TRUST_API}track/$slug"
 
         private fun unpack(c:JSONArray):List<Coordinate>{
             val out=ArrayList<Coordinate>(c.length()/2);var x=0L;var y=0L;var k=0
@@ -261,6 +262,11 @@ internal class TeAraroa private constructor(
     class Alert(val title:String,val status:String,val from:Double?,val to:Double?,val text:String,val date:String=""){
         companion object {
             /** The Trust's alerts for a section (its track API), images left out. */
+            /** The Trust's section data (about 600 KB) reduced to its alerts, as parseTrust
+             * reads them: what is kept for offline. Null when unreadable. */
+            fun trustAlertsOnly(text:String):String?=runCatching{
+                val a=JSONObject(text).optJSONObject("data")?.optJSONArray("alerts")?:org.json.JSONArray()
+                JSONObject().put("data",JSONObject().put("alerts",a)).toString()}.getOrNull()
             fun parseTrust(text:String):List<Alert>{
                 val d=JSONObject(text).optJSONObject("data")?:return emptyList();val a=d.optJSONArray("alerts")?:return emptyList()
                 return (0 until min(30,a.length())).mapNotNull{i->val o=a.optJSONObject(i)?:return@mapNotNull null

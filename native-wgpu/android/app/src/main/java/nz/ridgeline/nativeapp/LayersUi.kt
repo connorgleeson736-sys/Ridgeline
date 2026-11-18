@@ -1,5 +1,7 @@
 package nz.ridgeline.nativeapp
 
+import kotlin.math.roundToInt
+
 import android.app.Activity
 import android.app.AlertDialog
 import android.graphics.Color
@@ -60,6 +62,32 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
         row.addView(NativeUi.text(activity,label,14f),LinearLayout.LayoutParams(0,-2,1f));row.addView(box)
         parent.addView(row)
     }
+    /** Where NZ Topo changes from the 1:250,000 map (Topo250) to the detailed
+     * 1:50,000 one (Topo50): a map zoom, in half steps; applied on release. */
+    private fun topoSwitch(parent:LinearLayout,state:MapSettings.State){
+        val density=activity.resources.displayMetrics.density.toDouble()
+        val auto=TopoLayers.defaultSwitch(density)
+        fun shown(v:Float,isAuto:Boolean)=String.format(java.util.Locale.ROOT,"%.1f",v)+if(isAuto)" (LINZ)" else ""
+        val current=if(state.topoSwitch.isFinite())state.topoSwitch else auto
+        val row=LinearLayout(activity).apply{setPadding(0,dp(12),0,0)}
+        val value=NativeUi.text(activity,shown(current,!state.topoSwitch.isFinite()),14f)
+        row.addView(NativeUi.text(activity,"Topo50 from zoom",14f),LinearLayout.LayoutParams(0,-2,1f));row.addView(value);parent.addView(row)
+        val steps=((TopoLayers.MAX_SWITCH-TopoLayers.MIN_SWITCH)*2).toInt()
+        fun at(p:Int)=TopoLayers.MIN_SWITCH+p/2f
+        parent.addView(SeekBar(activity).apply{max=steps;progress=((current.coerceIn(TopoLayers.MIN_SWITCH,TopoLayers.MAX_SWITCH)-TopoLayers.MIN_SWITCH)*2).roundToInt();contentDescription="Zoom where Topo50 replaces Topo250"
+            progressTintList=android.content.res.ColorStateList.valueOf(NativeUi.ink);thumbTintList=progressTintList
+            setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener{
+                override fun onProgressChanged(bar:SeekBar?,v:Int,user:Boolean){if(user)value.text=shown(at(v),false)}
+                override fun onStartTrackingTouch(bar:SeekBar?){}
+                // Applied on release: each change redraws NZ Topo from the other map.
+                override fun onStopTrackingTouch(bar:SeekBar?){val v=at(bar?.progress?:return);settings.change{it.copy(topoSwitch=v)};render()}
+            })},LinearLayout.LayoutParams(-1,dp(40)))
+        val note=NativeUi.text(activity,String.format(java.util.Locale.ROOT,"Lower shows the detailed 1:50,000 map further out; higher keeps the 1:250,000 overview longer. The map is at zoom %.1f.",terrain.cameraPose.zoom),13f).apply{setTextColor(NativeUi.muted)}
+        parent.addView(note)
+        if(state.topoSwitch.isFinite())parent.addView(NativeUi.text(activity,"Reset to LINZ's",14f).apply{
+            paintFlags=paintFlags or android.graphics.Paint.UNDERLINE_TEXT_FLAG;setTextColor(if(NativeUi.dark)Color.rgb(126,196,146)else Color.rgb(58,110,76));minHeight=dp(40);gravity=Gravity.CENTER_VERTICAL;isClickable=true
+            setOnClickListener{settings.change{it.copy(topoSwitch=Float.NaN)};render()}})
+    }
     private fun slider(parent:LinearLayout,label:String,max:Int,value:Int,format:(Int)->String={it.toString()},change:(Int)->Unit){
         val row=LinearLayout(activity).apply{setPadding(0,dp(10),0,0)};val shown=NativeUi.text(activity,format(value),14f)
         row.addView(NativeUi.text(activity,label,14f),LinearLayout.LayoutParams(0,-2,1f));row.addView(shown);parent.addView(row)
@@ -91,6 +119,7 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
             bases.addView(card,LinearLayout.LayoutParams(0,-2,1f).apply{if(mode!=MapSettings.Base.TOPO)marginEnd=dp(6)})
         }
         parent.addView(bases)
+        if(state.base==MapSettings.Base.TOPO)topoSwitch(parent,state)
         legend(parent,"Map detail")
         slider(parent,"Imagery detail",DetailPolicy.MAX,loader.imageryDetail,{String.format(java.util.Locale.ROOT,"%.1f×",DetailPolicy.multiplier(it))}){loader.detail(false,it)}
         slider(parent,"Terrain detail",DetailPolicy.MAX,loader.terrainDetail,{String.format(java.util.Locale.ROOT,"%.1f×",DetailPolicy.multiplier(it))}){loader.detail(true,it)}
