@@ -1,0 +1,25 @@
+{
+  "artifact": "Ridgeline-Native-TA-Offline-0.1.80-Base.apk",
+  "bytes": 37013288,
+  "sha256": "3493251a42317daec86232f0374c19ac9770b0383ec8205953882df151cb55ed",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.80-ta-offline",
+  "versionCode": 81,
+  "buildType": "performance (not debuggable, R8 off: JNI entry points)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.79 Full Audit (same package and signer)",
+  "changes": [
+    "NZ Topo: choose where it changes from Topo250 to Topo50 (Map layers, with NZ Topo chosen: 'Topo50 from zoom', 8 to 15 in half steps, applied on release; Reset to LINZ's). LINZ's two maps are drawn from their own tile sets (nz-topo250/nz-topo50-new-zealand-mainland-gridless), Topo50 from the tile zoom the app asks for at the chosen map zoom (one map pixel per screen pixel); the default is LINZ's own switch (its zoom-13 tiles). Regions download the map as drawn; a Topo tile not to be had falls back to LINZ's combined topo-raster, which regions saved before hold.",
+    "Te Araroa offline: 'Download for offline' on the trail's page (North Island, South Island, whole trail) and on each section (this section, this and the next four, its island, the whole trail), at standard, detailed or maximum detail, with the size worked out first. A region (listed, kept and deleted in Offline maps) of the map 2 km wide along the trail and its bypasses at the chosen detail and 8 km wide at overview detail: imagery, NZ Topo, map data and elevation; plus each section's elevation profile tiles, DOC's huts along it, their DOC details and pages (hut requests now from a 0.01-degree grid point, so a hut opens offline whether tapped on the map or chosen from a list), and the Trust's current alerts, kept reduced to the alerts and shown offline with their date (also saved whenever they load). Trail notes, food stops, shops and places are bundled. Real data: each island fits one download at zoom 15 (about 8,300 and 8,100 tiles), the whole trail at zoom 14 (about 7,000 tiles)."
+  ],
+  "tests": {
+    "kotlinJvm": "all pass: 352 tests, 6 skipped as before (new: TopoLayersTest, TeAraroaOfflineTest)"
+  },
+  "nativeLibraries": "unchanged from 0.1.77",
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

@@ -66,8 +66,12 @@ internal object DocTracks {
     // DOC_Huts_DTO) and hut pages (place, bookings, facilities, photo, page;
     // DOC_Huts), both CC BY 4.0, searched about 1 km around the tapped hut.
     private const val HUT_ASSETS="DOC_Huts_DTO"
-    fun hutAssetsUrl(lon:Double,lat:Double)=query(HUT_ASSETS,"1=1","TechObjectName,SubObjectType,CharName1,CharValue1,CharName2,CharValue2,CharName3,CharValue3,CharName4,CharValue4,CharName5,CharValue5,CharName6,CharValue6,CharName7,CharValue7,CharName8,CharValue8",true,near(lon,lat,.012))
-    fun hutPagesNearUrl(lon:Double,lat:Double)=query(HUT_PAGES,"1=1","name,place,bookable,facilities,introductionThumbnail,staticLink",true,near(lon,lat,.012))
+    /** Around a hut, from a grid point (0.01°) a little wider: the same request for the
+     * same hut whether it was tapped on the map or chosen from a list (DOC's position
+     * and the map's symbol differ by metres), so a hut saved offline opens either way. */
+    private fun nearHut(lon:Double,lat:Double,r:Double)=near(Math.round(lon*100)/100.0,Math.round(lat*100)/100.0,r+.005)
+    fun hutAssetsUrl(lon:Double,lat:Double)=query(HUT_ASSETS,"1=1","TechObjectName,SubObjectType,CharName1,CharValue1,CharName2,CharValue2,CharName3,CharValue3,CharName4,CharValue4,CharName5,CharValue5,CharName6,CharValue6,CharName7,CharValue7,CharName8,CharValue8",true,nearHut(lon,lat,.012))
+    fun hutPagesNearUrl(lon:Double,lat:Double)=query(HUT_PAGES,"1=1","name,place,bookable,facilities,introductionThumbnail,staticLink",true,nearHut(lon,lat,.012))
     class HutAsset(val name:String,val category:String,val bunks:String,val roadEnd:String,val facilities:String,val status:String,val point:Coordinate){
         val closed get()=status.isNotBlank()&&!status.equals("OPEN",true)
     }

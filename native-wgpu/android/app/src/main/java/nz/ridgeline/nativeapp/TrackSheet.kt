@@ -1,6 +1,7 @@
 package nz.ridgeline.nativeapp
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.*
 import android.graphics.drawable.GradientDrawable
@@ -149,6 +150,11 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     private val saveButton=TextView(activity).apply{
         text="Save as route";textSize=14f;gravity=Gravity.CENTER;setTextColor(NativeUi.ink);setTypeface(null,Typeface.BOLD)
         background=NativeUi.pressable(activity,GradientDrawable().apply{setColor(Color.TRANSPARENT);cornerRadius=dpf(12f);setStroke(dp(1),NativeUi.line)});isClickable=true;visibility=View.GONE}
+    /** Te Araroa pages: download this stretch of trail for offline use. */
+    private val offlineButton=TextView(activity).apply{
+        text="Download for offline";textSize=14f;gravity=Gravity.CENTER;setTextColor(NativeUi.ink);setTypeface(null,Typeface.BOLD)
+        background=NativeUi.pressable(activity,GradientDrawable().apply{setColor(Color.TRANSPARENT);cornerRadius=dpf(12f);setStroke(dp(1),NativeUi.line)});isClickable=true;visibility=View.GONE}
+    private val offlineStatus=TextView(activity).apply{textSize=12.5f;setTextColor(NativeUi.muted);visibility=View.GONE}
     private val fine=TextView(activity).apply{textSize=11.5f;setTextColor(NativeUi.muted);setLineSpacing(0f,1.1f);visibility=View.GONE}
     /** One stat: small muted label, larger value (as the route sheet). */
     private inner class Stat(var label:String):TextView(activity){
@@ -196,6 +202,8 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         body.addView(sections,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(8)})
         body.addView(page,LinearLayout.LayoutParams(-1,dp(44)).apply{topMargin=dp(16)})
         body.addView(saveButton,LinearLayout.LayoutParams(-1,dp(44)).apply{topMargin=dp(10)})
+        body.addView(offlineButton,LinearLayout.LayoutParams(-1,dp(44)).apply{topMargin=dp(10)})
+        body.addView(offlineStatus,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(6)})
         body.addView(taLink,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(16)})
         body.addView(fine,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(14)})
         panel.addView(grip,LinearLayout.LayoutParams(-1,dp(28)))
@@ -272,7 +280,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         trackTitle=title;walkTitle.visibility=View.GONE;sections.removeAllViews();sections.visibility=View.GONE
         intro.visibility=View.GONE;intro.text="";factsScroll.visibility=View.GONE;facts.removeAllViews();huts.removeAllViews();huts.visibility=View.GONE;page.visibility=View.GONE;page.text="DOC page"
         aside.removeAllViews();taTop.removeAllViews();taTop.visibility=View.GONE;taBelow.removeAllViews();taBelow.visibility=View.GONE;docAlerts.removeAllViews();docAlerts.visibility=View.GONE
-        taLink.removeAllViews();taLink.visibility=View.GONE;saveButton.visibility=View.GONE;fine.visibility=View.GONE;statsRow.visibility=View.VISIBLE;chart.markers=emptyList()
+        taLink.removeAllViews();taLink.visibility=View.GONE;saveButton.visibility=View.GONE;offlineButton.visibility=View.GONE;offlineStatus.visibility=if(taDownloading)View.VISIBLE else View.GONE;fine.visibility=View.GONE;statsRow.visibility=View.VISIBLE;chart.markers=emptyList()
         onLine(null,null);onPoint(null);onRange(emptyList());loader.cancelTrackProfile();chart.showAll();lineNow=emptyList()
         if(panel.visibility!=View.VISIBLE){panel.visibility=View.VISIBLE;panel.translationY=full().toFloat()}
         panel.post{if(id==request)place(true)}
@@ -937,6 +945,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         taTop.addView(tabs,LinearLayout.LayoutParams(-1,-2));taTop.addView(list,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(6)});taTop.visibility=View.VISIBLE
         show(tab)
         fine.text="From Te Araroa Trust (teararoa.org.nz, CC BY 4.0); food stops from walkers' resupply guides.";fine.visibility=View.VISIBLE
+        offlineButton.visibility=View.VISIBLE;offlineButton.setOnClickListener{taOffline(d,null)}
         middle(id)
     }
     /** One section (or bypass): previous and next, live alerts, profile, introduction,
@@ -970,7 +979,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         if(s.alternative)taTop.addView(label(TeAraroa.optionKind(s).second),LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(8)})
         val alertBox=NativeUi.column(activity).apply{visibility=View.GONE}
         taTop.addView(alertBox,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(10)});taTop.visibility=View.VISIBLE
-        live(TeAraroa.trackApi(slug)){body->if(id==request)alerts(alertBox,body?.let{runCatching{TeAraroa.Alert.parseTrust(it)}.getOrNull()},"Trail alert","Couldn’t load Te Araroa’s current alerts.",TeAraroa.ALERTS_PAGE,d)}
+        live(TeAraroa.trackApi(slug)){body->if(id==request)alerts(alertBox,body?.let{runCatching{TeAraroa.Alert.parseTrust(it)}.getOrNull()},"Trail alert","Couldn’t load Te Araroa’s current alerts.",TeAraroa.ALERTS_PAGE,d,liveSaved[TeAraroa.trackApi(slug)])}
         // The line in walking order: map, profile and stats (DOC's huts along it marked).
         val line=d.line(s).let{if(nobo)it.reversed()else it}
         lineFound(id,line,oriented=true)
@@ -1000,6 +1009,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         }
         link=TeAraroa.sectionPage(slug);page.text="Te Araroa page";page.visibility=View.VISIBLE;page.setOnClickListener{open(link)}
         if(line.size>=2){saveButton.visibility=View.VISIBLE;saveButton.setOnClickListener{saveRoute("Te Araroa: ${s.name}",DocTracks.simplify(line,2000))}}
+        offlineButton.visibility=View.VISIBLE;offlineButton.setOnClickListener{taOffline(d,s)}
         fine.text="From Te Araroa Trust (teararoa.org.nz, CC BY 4.0). Alerts are live.";fine.visibility=View.VISIBLE
         middle(id)
     }
@@ -1115,32 +1125,124 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
                 box.addView(links("${s.n}. ${s.name}  ›" to {showTaSection(s.slug,push=true)}).apply{textSize=14f},LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(6)})
                 taLink.addView(box,LinearLayout.LayoutParams(-1,-2));taLink.visibility=View.VISIBLE}}}
     }
+    // ---- Te Araroa offline: the map along a stretch of trail and what a walker
+    // needs with it (TeAraroaOffline, TileLoader.downloadRegion) ----
+    /** Starts a region download (OfflineUi.startCorridor); false if one is running. */
+    var onOfflineDownload:(String,Map<Int,Int>,MapSettings.Base,((String)->ByteArray?)->Unit,List<List<Coordinate>>,(String)->Unit,()->Unit)->Boolean={_,_,_,_,_,_,_->false}
+    @Volatile private var taDownloading=false
+    /** [from]: the section open (null: the trail's page). */
+    private fun taOffline(d:TeAraroa,from:TeAraroa.Section?){
+        if(taDownloading){Toast.makeText(activity,"A Te Araroa download is already running.",Toast.LENGTH_SHORT).show();return}
+        val island=from?.island?:""
+        val islandName=if(island=="SI")"South Island" else "North Island"
+        val scopes=ArrayList<Pair<String,()->List<TeAraroa.Section>>>()
+        if(from!=null){
+            scopes+="This section · ${from.name.let{if(it.length<=32)it else it.take(31)+"…"}}" to {listOf(from)}
+            if(!from.alternative)scopes+="This and the next 4 sections" to {TeAraroaOffline.following(d,from,5,nobo)}
+            scopes+="All of the $islandName" to {TeAraroaOffline.island(d,island.ifBlank{"NI"})}
+        }else{
+            scopes+="North Island" to {TeAraroaOffline.island(d,"NI")}
+            scopes+="South Island" to {TeAraroaOffline.island(d,"SI")}
+        }
+        scopes+="The whole trail" to {d.mains.sortedBy{it.from}}
+        AlertDialog.Builder(activity).setTitle("Download Te Araroa for offline").setItems(scopes.map{it.first}.toTypedArray()){_,i->
+            val chosen=TeAraroaOffline.withBypasses(d,scopes[i].second())
+            val details=listOf("Standard · zoom 14" to 1,"Detailed · zoom 15" to 2,"Maximum · zoom 17" to 3)
+            AlertDialog.Builder(activity).setTitle("Map detail along the trail").setItems(details.map{it.first}.toTypedArray()){_,k->
+                confirmTaOffline(d,scopes[i].first,chosen,details[k].second)}.setNegativeButton("Cancel",null).show()
+        }.setNegativeButton("Cancel",null).show()
+    }
+    private fun confirmTaOffline(d:TeAraroa,label:String,sections:List<TeAraroa.Section>,detail:Int){
+        val base=loader.mapSettings.state.let{if(it.base==MapSettings.Base.TOPO)it.lastPhoto else it.base}
+        val wait=Toast.makeText(activity,"Working out the size…",Toast.LENGTH_SHORT);wait.show()
+        runCatching{parse.execute{
+            val cells=TeAraroaOffline.cells(d,sections,detail)
+            val tiles=PaintedArea.tilesOf(cells)
+            val estimate=if(tiles.size<=TileLoader.MAX_PAINTED_TILES)runCatching{loader.estimateTiles(tiles,base,true)}.getOrNull()else null
+            main.post{
+                if(tiles.size>TileLoader.MAX_PAINTED_TILES){
+                    AlertDialog.Builder(activity).setTitle("Too large").setMessage("$label at this detail is more than one download can hold. Choose a lower detail or fewer sections (for example one island at a time).").setPositiveButton("OK",null).show();return@post}
+                val mains=sections.count{!it.alternative};val bypasses=sections.size-mains
+                val size=estimate?.let{String.format(java.util.Locale.ROOT,"About %,.0f MB · %,d files.",it.mib,it.files)}?:""
+                val message="$size\n\n$mains section${if(mains==1)"" else "s"}${if(bypasses>0)" and $bypasses bypass${if(bypasses==1)"" else "es"}" else ""}: the map ${(TeAraroaOffline.DETAIL_HALF_METERS*2/1000).toInt()} km wide along the trail at ${PaintedArea.NAMES[detail].lowercase()} detail and ${(TeAraroaOffline.OVERVIEW_HALF_METERS*2/1000).toInt()} km wide around it, NZ Topo, elevation and the elevation profiles, DOC's huts and hut pages along the way, and the Trust's current alerts (shown, with their date, when offline).\n\nTrail notes, food stops, shops and places to stay are already in the app."
+                AlertDialog.Builder(activity).setTitle("Te Araroa · $label").setMessage(message).setNegativeButton("Cancel",null).setPositiveButton("Download"){_,_->
+                    startTaOffline(d,label,sections,cells,base)}.show()
+            }
+        }}
+    }
+    private fun startTaOffline(d:TeAraroa,label:String,sections:List<TeAraroa.Section>,cells:Map<Int,Int>,base:MapSettings.Base){
+        val extra:((String)->ByteArray?)->Unit={get->
+            val seen=HashSet<String>()
+            fun once(url:String)=if(seen.add(url))get(url)else null
+            for(s in sections){
+                // The Trust's alerts: saved for offline, reduced to the alerts (shown with
+                // their date); not kept in the region (each section's data is ~600 KB).
+                val alertsUrl=TeAraroa.trackApi(s.slug)
+                runCatching{(java.net.URL(alertsUrl).openConnection() as java.net.HttpURLConnection).run{
+                    connectTimeout=8000;readTimeout=20000;setRequestProperty("Accept","application/json")
+                    try{if(responseCode==200)inputStream.use{String(it.readBytes(),Charsets.UTF_8)}else null}finally{disconnect()}}}
+                    .getOrNull()?.let{TeAraroa.Alert.trustAlertsOnly(it)}?.let{snapshots.save(alertsUrl,it)}
+                val line=d.line(s);if(line.size<2)continue
+                // As the section's page asks for them: DOC's huts along it and their pages.
+                val b=DocTracks.bounds(line)?:continue
+                val stops=once(DocTracks.hutsUrl(b))?.let{runCatching{DocTracks.stops(DocTracks.parseHuts(String(it,Charsets.UTF_8)),line)}.getOrNull()}.orEmpty()
+                once(DocTracks.hutPagesUrl(b))
+                for(st in stops){val p=st.hut.point
+                    once(DocTracks.hutAssetsUrl(p.longitude,p.latitude))
+                    val pages=once(DocTracks.hutPagesNearUrl(p.longitude,p.latitude))?.let{runCatching{DocTracks.parseHutPages(String(it,Charsets.UTF_8))}.getOrNull()}
+                    val page=pages?.let{DocTracks.matchHut(it,st.hut.name,p,{x->x.name},{x->x.point})}?.page
+                    if(page!=null&&page.startsWith("https://"))once(page)
+                }
+            }
+        }
+        fun status(text:String){offlineStatus.text=text;offlineStatus.visibility=View.VISIBLE}
+        val started=runCatching{onOfflineDownload("Te Araroa · $label",cells,base,extra,sections.map{d.line(it)}.filter{it.size>=2},{p->status("Downloading Te Araroa · $label · $p")}){
+            taDownloading=false;status("Te Araroa · $label is saved for offline (Offline maps lists it).")
+            Toast.makeText(activity,"Te Araroa · $label downloaded for offline.",Toast.LENGTH_LONG).show()}}.getOrElse{false}
+        if(!started){Toast.makeText(activity,"Another map download is running. Try again when it finishes.",Toast.LENGTH_LONG).show();return}
+        taDownloading=true;status("Downloading Te Araroa · $label · preparing…")
+    }
+
     // ---- Live alerts (the Trust's, DOC's) ----
     private val liveIo=Executors.newFixedThreadPool(2){Thread(it,"ridgeline-live").apply{isDaemon=true}}
     private val liveCache=HashMap<String,Pair<Long,String?>>()
-    /** A live JSON request (no shared cache: alerts change), kept 10 minutes; null when unreadable. */
+    /** The last copy of each live request, kept on the phone (LiveSnapshots). */
+    private val snapshots=LiveSnapshots(activity.filesDir)
+    /** When the body last given for a live request was a saved copy: its date (ms). */
+    private val liveSaved=java.util.concurrent.ConcurrentHashMap<String,Long>()
+    /** A live JSON request (no shared cache: alerts change), kept 10 minutes; null when
+     * unreadable. Offline, the copy saved when it last loaded (or downloaded for
+     * offline), with its date in [liveSaved]. */
     private fun live(url:String,callback:(String?)->Unit){
         synchronized(liveCache){liveCache[url]}?.takeIf{it.first>System.currentTimeMillis()}?.let{callback(it.second);return}
         runCatching{liveIo.execute{
-            val body=runCatching{(java.net.URL(url).openConnection() as java.net.HttpURLConnection).run{
+            var body=runCatching{(java.net.URL(url).openConnection() as java.net.HttpURLConnection).run{
                 connectTimeout=8000;readTimeout=15000;setRequestProperty("Accept","application/json")
                 try{when(responseCode){200->inputStream.use{String(it.readBytes(),Charsets.UTF_8)};204->"[]";else->null}}finally{disconnect()}}}.getOrNull()
-            synchronized(liveCache){liveCache[url]=System.currentTimeMillis()+(if(body!=null)600_000L else 60_000L) to body}
+            // Kept small: the Trust's section data reduced to its alerts.
+            if(body!=null){snapshots.save(url,if(url.startsWith(TeAraroa.TRUST_API))TeAraroa.Alert.trustAlertsOnly(body)?:body else body);liveSaved.remove(url)}
+            else snapshots.load(url)?.let{(saved,at)->body=saved;liveSaved[url]=at}
+            synchronized(liveCache){liveCache[url]=System.currentTimeMillis()+(if(body!=null&&!liveSaved.containsKey(url))600_000L else 60_000L) to body}
             main.post{callback(body)}}}.onFailure{callback(null)}
     }
     /** DOC's current alerts for a walk, track or hut, below the chart and introduction. */
     private fun docAlertsFor(id:Long,guid:String,page:String){
-        live("https://www.doc.govt.nz/api/alerts/guid/${guid.lowercase()}"){body->
+        val url="https://www.doc.govt.nz/api/alerts/guid/${guid.lowercase()}"
+        live(url){body->
             if(id!=request)return@live
-            alerts(docAlerts,body?.let{runCatching{TeAraroa.Alert.parseDoc(it)}.getOrNull()},"DOC alert","Couldn’t load DOC’s current alerts.",page.takeIf{it.startsWith("https://")}?:"https://www.doc.govt.nz/parks-and-recreation/know-before-you-go/alerts/",null)}
+            alerts(docAlerts,body?.let{runCatching{TeAraroa.Alert.parseDoc(it)}.getOrNull()},"DOC alert","Couldn’t load DOC’s current alerts.",page.takeIf{it.startsWith("https://")}?:"https://www.doc.govt.nz/parks-and-recreation/know-before-you-go/alerts/",null,liveSaved[url])}
     }
     /** An alerts box: closures first, each folded (one alone opened); nothing when none. */
-    private fun alerts(box:LinearLayout,list:List<TeAraroa.Alert>?,noun:String,failed:String,page:String,d:TeAraroa?){
+    /** [saved]: the alerts are the copy saved then (offline), not live. */
+    private fun alerts(box:LinearLayout,list:List<TeAraroa.Alert>?,noun:String,failed:String,page:String,d:TeAraroa?,saved:Long?=null){
         box.removeAllViews()
-        if(list!=null&&list.isEmpty()){box.visibility=View.GONE;return}
+        if(list!=null&&list.isEmpty()&&saved==null){box.visibility=View.GONE;return}
         box.background=NativeUi.background(activity,if(NativeUi.dark)Color.rgb(70,44,30)else Color.rgb(253,236,224),12);box.setPadding(dp(12),dp(10),dp(12),dp(10))
         val ink=if(NativeUi.dark)Color.rgb(255,214,190)else Color.rgb(110,48,16)
         if(list==null){box.addView(links("⚠  $failed  ","Check them ↗" to {open(page)}).apply{setTextColor(ink)});box.visibility=View.VISIBLE;return}
+        if(saved!=null){val date=java.text.SimpleDateFormat("d MMM, h:mm a",java.util.Locale.getDefault()).format(java.util.Date(saved))
+            box.addView(label("Offline · ${noun.lowercase()}s as saved $date",12f,ink).apply{alpha=.85f})
+            if(list.isEmpty()){box.addView(label("None then.",13f,ink));box.visibility=View.VISIBLE;return}}
         box.addView(label("⚠  "+if(list.size==1)noun else "${list.size} ${noun}s",14f,ink,true))
         for(a in list){
             val where=if(a.from!=null&&d!=null)"km ${km(a.from)}${if(a.to!=null&&a.to!=a.from)"–${km(a.to)}" else ""} SOBO" else ""

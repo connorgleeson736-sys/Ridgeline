@@ -119,6 +119,7 @@ class MainActivity:Activity(){
         trackSheet.walkRecord={guid,callback->walkRecords.get(guid,callback)}
         trackSheet.followWalk={sections,walk,distance,time,doc,current,callback->mapLayers.followWalk(sections,walk,distance,time,doc,current,callback)}
         // Frame the track once the map has its new size (the sheet resizes it).
+        trackSheet.onOfflineDownload={title,cells,base,extra,profiles,progress,done->offlineUi.startCorridor(title,cells,base,extra,profiles,progress,done)}
         trackSheet.onFit={line->mapHost.post{terrain.post{terrain.focus(line,animate=true)}}}
         // Search: DOC walks (by their page's id) and huts open their summaries.
         planner.onPlace={place->

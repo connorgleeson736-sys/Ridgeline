@@ -618,7 +618,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         runCatching{scheduler.execute{
             val resetGeometry=before.threeD!=after.threeD||before.needsElevation()!=after.needsElevation()
             if(resetGeometry){for(task in jobs.values)if(task.source.geometry)task.cancel();clearWarm();synchronized(ready){val it=ready.entries.iterator();while(it.hasNext()){val row=it.next();if(row.key.geometry){readyBytes-=row.value.capacity();it.remove()}}};plans.clear();cameraChanged()}
-            if(before.base!=after.base||before.natural!=after.natural){plans.clear();imageryChanged()}
+            if(before.base!=after.base||before.natural!=after.natural||(after.base==MapSettings.Base.TOPO&&before.topoSwitch.toBits()!=after.topoSwitch.toBits())){plans.clear();imageryChanged()}
             view.configure(after,resetGeometry)
         }}
     }
@@ -869,13 +869,21 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     /** [base]: imagery to download; [includeTopo]: also NZ Topo and the mapped
      * overlays (Capacitor's option); [resume]: continue that region in place. */
     internal fun downloadRegion(name:String,bounds:Bounds,maxZoom:Int,base:MapSettings.Base=mapSettings.state.base,includeTopo:Boolean=true,resume:String?=null,
-                                painted:Map<Int,Int>?=null,progress:(String)->Unit,done:()->Unit){
+                                painted:Map<Int,Int>?=null,
+                                /** Run first on the download thread with a fetch that keeps what it gets in
+                                 * the region (null when not to be had): a Te Araroa download's huts and pages. */
+                                extra:(((String)->ByteArray?)->Unit)?=null,
+                                /** Lines whose elevation profiles must work offline (their preview's
+                                 * elevation tiles, and the detailed one's to the region's detail). */
+                                profiles:List<List<Coordinate>> = emptyList(),
+                                progress:(String)->Unit,done:()->Unit){
         val display=mapSettings.state.copy(base=base);val detail=if(display.base==MapSettings.Base.TOPO)minOf(maxZoom,TOPO_MAX_ZOOM)else maxZoom
         // A painted area downloads exactly its painted cells, each to its own detail.
         val tiles=if(painted!=null)PaintedArea.tilesOf(painted).map{Id(it.z,it.x,it.y)}.also{require(it.size<=MAX_PAINTED_TILES){"Too large: paint a smaller area or lower the detail."}}else regionTiles(bounds,detail)
         val encoded=painted?.let{PaintedArea.encode(it)};downloadCancel.set(false)
         val overlays=display.base!=MapSettings.Base.TOPO&&includeTopo
-        fun topoUrl(id:Id)=linz("topo-raster",id,"webp")
+        // NZ Topo as drawn now: Topo250 or Topo50 by the chosen switch (TopoLayers).
+        fun topoUrl(id:Id)=linz(TopoLayers.layer(id.z,display.topoSwitch,context.resources.displayMetrics.density.toDouble()),id,"webp")
         val downloadImagery=NativeImagery(context,::fetch,{z,x,y->linz("aerial",Id(z,x,y),"webp")},overviews,::checkPreparation,::localImage,{display},{file,offset->OverviewStream.tileUrl(overviewBase,file,offset)})
         downloadJobs.execute{
             val region=resume?.let{offline.reopen(it)}?:offline.begin(name,OfflineStore.Metadata(bounds,detail,display.base.name,overlays,encoded));regionContext.set(region);regionBatch.set(ArrayList());val demDone=HashSet<Id>()
@@ -906,6 +914,13 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
                 if((pixels==null||pixels.any{!it.isFinite()})&&id.z>0)dem(id.parent())
             }
             try{
+                // The walker's extras first (small): usable offline even if the map stops part way.
+                if(extra!=null){view.post{if(!dead)progress("huts, pages and alerts")}
+                    extra{url->checkActive();try{fetch(url)}catch(e:Exception){if(e is IllegalStateException&&downloadCancel.get())throw e;null}}}
+                for(line in profiles)for(fine in listOf(false,true)){
+                    val plan=RouteProfile.plan(line,fine,null)
+                    for(t in plan.tiles){if(fine&&t.z>detail)continue;checkActive();runCatching{fetch(linz("elevation",Id(t.z,t.x,t.y),"png"))}}
+                }
                 var index=0;var waits=0
                 while(index<tiles.size){val id=tiles[index]
                     checkActive();pace()

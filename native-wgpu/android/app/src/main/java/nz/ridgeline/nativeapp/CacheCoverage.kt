@@ -53,7 +53,7 @@ internal class CacheCoverage {
          * and finer are green; a continuous hue spectrum in between. */
         const val COARSE=10
         const val DETAILED=17
-        private val linz=Regex("/v1/tiles/(?:aerial|topo-raster)/WebMercatorQuad/(\\d+)/(\\d+)/(\\d+)\\.")
+        private val linz=Regex("/v1/tiles/(?:aerial|topo-raster|nz-topo50-new-zealand-mainland-gridless|nz-topo250-new-zealand-mainland-gridless)/WebMercatorQuad/(\\d+)/(\\d+)/(\\d+)\\.")
         private val esri=Regex("/World_Imagery/MapServer/tile/(\\d+)/(\\d+)/(\\d+)")
         fun parse(url:String):Triple<Int,Int,Int>?{
             linz.find(url)?.let{val g=it.groupValues;return Triple(g[1].toInt(),g[2].toInt(),g[3].toInt())}
