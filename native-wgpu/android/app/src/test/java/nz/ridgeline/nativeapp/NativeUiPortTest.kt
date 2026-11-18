@@ -59,7 +59,8 @@ class NativeUiPortTest {
         val parent=GpuUploadQueue.Id(11,1991,1300);val a=GpuUploadQueue.Id(12,3982,2600);val b=GpuUploadQueue.Id(12,3983,2600)
         assertEquals(listOf(LayerCover.Patch(a,a),LayerCover.Patch(parent,b)),LayerCover.display(listOf(a,b),setOf(parent,a)))
         assertEquals(listOf(LayerCover.Patch(a,a),LayerCover.Patch(b,b)),LayerCover.display(listOf(a,b),setOf(parent,a,b)))
-        assertEquals(listOf(LayerCover.Patch(a,a),LayerCover.Patch(b,b)),LayerCover.display(listOf(parent),setOf(a,b)))
+        // Children standing in for their parent (zooming out) are styled at the parent's zoom.
+        assertEquals(listOf(LayerCover.Patch(a,a,11),LayerCover.Patch(b,b,11)),LayerCover.display(listOf(parent),setOf(a,b)))
         assertTrue(LayerCover.display(listOf(GpuUploadQueue.Id(12,4000,2600)),setOf(parent,a,b)).isEmpty())
     }
 

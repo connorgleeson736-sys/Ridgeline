@@ -2,10 +2,15 @@ package nz.ridgeline.nativeapp
 import kotlin.math.*
 /** Camera-plane algebra matching the native perspective; no GPU/depth readback. */
 object CameraMath {
+    /** How far the native centre of perspective is raised, as a fraction of the
+     * view's height (a sheet over the map: NativeBridge.viewShift). */
+    @Volatile var shift=0.0
+    /** The screen point where the camera's centre appears (x, y in pixels). */
+    fun centre(width:Int,height:Int)=width*.5 to height*.5*(1-shift)
     fun offset(width:Int,height:Int,bearing:Float,pitch:Float,x:Double,y:Double,planeZ:Double=0.0):Pair<Double,Double>? {
         if(width<=0||height<=0)return null
         val b=Math.toRadians(bearing.toDouble());val p=Math.toRadians(pitch.toDouble());val distance=height*1.5
-        val sx=(x-width*.5)/distance;val sy=(height*.5-y)/distance
+        val sx=(x-width*.5)/distance;val sy=(height*.5*(1-shift)-y)/distance
         val denominator=cos(p)-sin(p)*sy;if(denominator<=.001)return null
         val t=(cos(p)*distance-planeZ)/denominator
         if(t<=0||planeZ>=cos(p)*distance*.9)return null

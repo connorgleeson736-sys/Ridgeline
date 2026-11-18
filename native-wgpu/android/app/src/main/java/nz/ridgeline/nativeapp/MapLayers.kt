@@ -767,8 +767,8 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
             // groups, which the renderer then repainted, all on this one thread, so
             // with many walk names in view new tiles' tracks waited behind it.
             val walks=state.tracks&&zoom>=DocWalks.MIN_ZOOM&&docInfos.isNotEmpty()
-            val styled=tile.styles.getOrPut(listOf(state,zoom)){Styled(style.build(tile.features,state,zoom,id.z.toDouble()))}
-            val names=if(walks)tile.walkLabels.getOrPut(listOf(state,zoom,docRevision)){style.build(marked(id,tile),state,zoom,id.z.toDouble(),withLines=false).labels}else styled.output.labels
+            val styled=tile.styles.getOrPut(listOf(state,zoom,patch.zoom)){Styled(style.build(tile.features,state,zoom,patch.zoom.toDouble()))}
+            val names=if(walks)tile.walkLabels.getOrPut(listOf(state,zoom,docRevision,patch.zoom)){style.build(marked(id,tile),state,zoom,patch.zoom.toDouble(),withLines=false).labels}else styled.output.labels
             val output=styled.output;val b=patch.clip.bounds
             groups.add(styled.groups.getOrPut(b.toList()){
                 val clipped=ArrayList<TopographyStyle.Line>()

@@ -40,4 +40,16 @@ class CameraMathTest {
   val tilted=CameraMath.anchored(pose.copy(pitch=70f),anchor,320,640,1.0,160.0,320.0)!!
   assertEquals(pose.longitude,tilted.longitude,1e-10);assertEquals(pose.latitude,tilted.latitude,1e-10)
  }
+    @Test fun aRaisedCentreOfPerspectiveMovesThePictureUpOnly(){
+        try{
+            val plain=CameraMath.offset(400,800,20f,50f,130.0,500.0)!!
+            CameraMath.shift=.5
+            // The camera's centre now appears a quarter of the height higher.
+            val centre=CameraMath.offset(400,800,20f,50f,200.0,200.0)!!
+            assertEquals(0.0,centre.first,1e-9);assertEquals(0.0,centre.second,1e-9)
+            // Any point: the ground under it is what was 200 px lower before.
+            val moved=CameraMath.offset(400,800,20f,50f,130.0,300.0)!!
+            assertEquals(plain.first,moved.first,1e-9);assertEquals(plain.second,moved.second,1e-9)
+        }finally{CameraMath.shift=0.0}
+    }
 }

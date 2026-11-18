@@ -144,7 +144,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     fun rangeMarkers(points:List<Coordinate>){if(points==rangeMarkers)return;rangeMarkers=points;requestFrame()}
     @Volatile private var labelPlacement:Pair<NativeLabelAtlas,ByteBuffer>?=null
     private var appliedPlacement:Pair<NativeLabelAtlas,ByteBuffer>?=null
-    private var curveAtlas:NativeLabelAtlas?=null;private var curveSet:NativeLabels.Curves?=null;private var curvePose:Triple<CameraPose,Int,Int>?=null
+    private var curveAtlas:NativeLabelAtlas?=null;private var curveSet:NativeLabels.Curves?=null;private var curvePose:Pair<CameraPose,List<Double>>?=null
     private val labelProjection=ByteBuffer.allocateDirect(512*12).order(ByteOrder.LITTLE_ENDIAN)
     private var labelPose:CameraPose?=null;private var labelSize=0L;private var labelTime=0L
     /** GPU terrain visibility of every label candidate (read back a few frames
@@ -204,7 +204,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         val visible=visibleHeight()
         val size=min(width/pixelScale,visible/pixelScale)*.65
         val z=if(span>0)ln(size/(512*span))/ln(2.0) else 15.0
-        val target=above(cameraPose.copy(longitude=(minLon+maxLon)/2,latitude=CameraMath.latitude((CameraMath.mercatorY(minLat)+CameraMath.mercatorY(maxLat))*.5),zoom=z.coerceIn(4.0,maximumZoom.coerceIn(4.0,maxZoom)),pitch=min(pitch,45f)))
+        val target=(cameraPose.copy(longitude=(minLon+maxLon)/2,latitude=CameraMath.latitude((CameraMath.mercatorY(minLat)+CameraMath.mercatorY(maxLat))*.5),zoom=z.coerceIn(4.0,maximumZoom.coerceIn(4.0,maxZoom)),pitch=min(pitch,45f)))
         val from=cameraPose
         val still=abs(target.longitude-from.longitude)<1e-9&&abs(target.latitude-from.latitude)<1e-9&&abs(target.zoom-from.zoom)<1e-6&&target.pitch==from.pitch
         if(!animate||still||width==0||!active){cameraPose=target;changed();return}
@@ -220,16 +220,18 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             start()
         }
     }
-    fun goTo(point:Coordinate,minimumZoom:Double=4.0){cameraPose=above(cameraPose.copy(longitude=point.longitude,latitude=point.latitude,zoom=max(zoom,minimumZoom).coerceIn(4.0,maxZoom)));changed()}
-    /** Height of the map covered by a sheet at its stop (pixels): the map keeps its
-     * size under a sheet, and framing uses the part above it. */
+    fun goTo(point:Coordinate,minimumZoom:Double=4.0){cameraPose=(cameraPose.copy(longitude=point.longitude,latitude=point.latitude,zoom=max(zoom,minimumZoom).coerceIn(4.0,maxZoom)));changed()}
+    /** Height of the map covered by a sheet at its stop (pixels): framing sizes to
+     * the map above it (the view shift centres it there). */
     @Volatile var bottomInset=0
     private fun visibleHeight()=(height-bottomInset).coerceAtLeast(height/3)
-    /** [pose] moved so that its centre appears in the middle of the map above the sheet. */
-    private fun above(pose:CameraPose):CameraPose{
-        val visible=visibleHeight();if(visible>=height||width==0)return pose
-        val anchor=CameraMath.Anchor((pose.longitude+180)/360,CameraMath.mercatorY(pose.latitude),pose.elevation.toDouble())
-        return CameraMath.anchored(pose,anchor,width,height,pixelScale,width*.5,visible*.5)?:pose
+    /** Height of the map a sheet covers now (pixels), following it as it moves: the
+     * picture's centre of perspective is raised to the middle of the map above it
+     * (MapLibre's padding), with no resize, so the map re-centres smoothly. */
+    fun cover(px:Int){
+        val f=if(height>0)(px.toDouble()/height).coerceIn(0.0,.7)else 0.0
+        if(abs(f-CameraMath.shift)<1e-4)return
+        CameraMath.shift=f;NativeBridge.viewShift(f.toFloat());labelPose=null;changed()
     }
     var onCamera:()->Unit={}
     var onData:()->Unit={}
@@ -418,7 +420,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             if(curveAtlas!==atlas){curveAtlas=atlas;curveSet=NativeLabels.curves(atlas)}
             val curves=curveSet;val drawn=submittedPose
             if(curves!=null&&drawn!=null){
-                val key=Triple(drawn,width,height)
+                val key=drawn to listOf(width.toDouble(),height.toDouble(),CameraMath.shift)
                 if(placement!==appliedPlacement||key!=curvePose){
                     val merged=NativeLabels.withCurves(atlas,curves,placement.second,{i,o->NativeBridge.projectCurve(handle,i,o)},width,height,pixelScale.toFloat())
                     if(NativeBridge.placeLabels(handle,merged)){appliedPlacement=placement;curvePose=key}
@@ -679,13 +681,13 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     // Used by controlled fixtures and explicit initialization, never terrain-follow.
     fun centerHeight(value:Float){if(value.isFinite()&&!gestureActive){cameraPose=cameraPose.copy(elevation=value);groundedPose=cameraPose;changed()}}
     fun zoomBy(delta:Double){
-        if(delta.isFinite())easeControls((zoom+delta).coerceIn(4.0,maxZoom),bearing,width*.5,height*.5)
+        if(delta.isFinite())easeControls((zoom+delta).coerceIn(4.0,maxZoom),bearing,width*.5,height*.5*(1-CameraMath.shift))
     }
     fun dimension(threeD:Boolean){cameraPose=cameraPose.copy(pitch=if(threeD)58f else 0f,elevation=if(threeD)cameraPose.elevation else 0f);surfaceFocus.clear();changed()}
     fun toggleDimension(){dimension(pitch<=1f)}
     fun northUp(){
         val difference=(((bearing+180f)%360f+360f)%360f)-180f
-        if(abs(difference)>.001f)easeControls(zoom,bearing-difference,width*.5,height*.5)
+        if(abs(difference)>.001f)easeControls(zoom,bearing-difference,width*.5,height*.5*(1-CameraMath.shift))
     }
     private var programmaticEase=false
     private var pendingEase:GestureMotion.Coast?=null
@@ -889,7 +891,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
                     // MapLibre touchPitch excludes pan/zoom/rotate and pivots about
                     // the map centre, not the arbitrary finger centroid.
                     tilting=true;gestureEpoch++;anchorPending=false;motion.clear()
-                    touchX=width*.5;touchY=height*.5
+                    touchX=width*.5;touchY=height*.5*(1-CameraMath.shift)
                     gestureAnchor=CameraMath.Anchor((longitude+180)/360,CameraMath.mercatorY(latitude),centerElevation.toDouble())
                     recordMotion(event.eventTime)
                 }

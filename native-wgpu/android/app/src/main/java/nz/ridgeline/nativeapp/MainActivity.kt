@@ -213,7 +213,7 @@ class MainActivity:Activity(){
         // Keep the scale bar, "i" and credits clear of the route sheet's top edge.
         // They ride on the sheet's top edge as it moves (a translation: no relayout).
         trackSheet.onCover={cover->planner.onMapCover(cover)}
-        planner.onMapCover={cover->for(view in listOf(scale,info,attribution))view.translationY=-cover.toFloat()}
+        planner.onMapCover={cover->for(view in listOf(scale,info,attribution))view.translationY=-cover.toFloat();terrain.cover(cover)}
         // Framing a track or route uses the map above the sheet's stop.
         trackSheet.onInset={terrain.bottomInset=it}
         planner.onMapInset={terrain.bottomInset=it}
