@@ -235,7 +235,7 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
             if(change==RouteController.Change.OPENED&&state.points.isNotEmpty()){if(state.id!=restoreId){if(fitOpenedPending)fitOpened()else terrain.focus(state.points)};restoreId=null}
             if(state.dragging){if(change==RouteController.Change.PREVIEW){loader.cancelProfile();onProfilePoint(null);profileDirty=true}}
             else if(state.points!=profilePoints||profileDirty){
-                profileDirty=false;profilePoints=state.points;profileValues=emptyList();chart.data(emptyList());onProfilePoint(null);terrain.rangeMarkers(emptyList())
+                profileDirty=false;profilePoints=state.points;profileValues=emptyList();chart.data(emptyList());chart.markers=emptyList();onProfilePoint(null);terrain.rangeMarkers(emptyList())
                 for(i in 1..3)stats[i].text=listOf("","Ascent","Descent","Highest")[i]+"\n—"
                 chart.message=if(state.points.size>=2)"Loading elevation profile…"else"Elevation will appear here"
                 loader.cancelProfile()
@@ -257,6 +257,13 @@ class PlannerUi(private val activity:Activity,private val root:FrameLayout,priva
             val measured=values.count{it.height!=null}>=2
             stats[1].text="Ascent\n"+if(measured&&totals.complete)metres(totals.ascent)else"—";stats[2].text="Descent\n"+if(measured&&totals.complete)metres(totals.descent)else"—";stats[3].text="Highest\n${totals.high?.let(::metres)?:"—"}"
             if(values.count{it.height!=null}<2)chart.message="Elevation unavailable";chart.refreshInspection()
+            // A route that starts or ends at a hut: the hut marked on the profile there.
+            val length=values.lastOrNull()?.distance?:0.0
+            files.execute{
+                val search=placeSearch?:PlaceSearch.get(activity.assets)?.also{placeSearch=it}
+                val huts=search?.let{s->RouteHuts.ends(points,length,s::within)}.orEmpty()
+                main.post{if(!closed&&profilePoints==points)chart.markers=huts}
+            }
         }
     }
     /** Camera moved: once it settles, refine the in-view part of the route at
