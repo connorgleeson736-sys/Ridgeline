@@ -47,7 +47,7 @@ object GpxCodec {
         require(points.size in 2..2000)
         val title=escape(name.trim().ifEmpty{"Mountain route"})
         return buildString {
-            append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<gpx version=\"1.1\" creator=\"Ridgeline Prototype\" xmlns=\"http://www.topografix.com/GPX/1/1\"><metadata><name>")
+            append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<gpx version=\"1.1\" creator=\"Razorback Maps\" xmlns=\"http://www.topografix.com/GPX/1/1\"><metadata><name>")
             append(title);append("</name><desc>User-drawn sketch. Unverified direct connections between waypoints.</desc></metadata><trk><name>");append(title);append("</name><trkseg>")
             for(p in points)append("<trkpt lat=\"${p.latitude}\" lon=\"${p.longitude}\"/>")
             append("</trkseg></trk></gpx>")

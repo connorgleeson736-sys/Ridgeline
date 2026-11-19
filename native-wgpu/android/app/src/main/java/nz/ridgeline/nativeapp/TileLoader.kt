@@ -113,7 +113,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     fun offlineOnly(value:Boolean){offlineOnly=value;preferences.edit().putBoolean("offlineOnly",value).apply();transport.batchDemand{for(task in jobs.values)task.cancel();clearWarm()};synchronized(ready){ready.clear();readyBytes=0};synchronized(decoded){decoded.clear()};cameraChanged()}
     val overviews=OverviewAttachments(context)
     private val attachmentJobs=Executors.newSingleThreadExecutor()
-    private val imagery = NativeImagery(context, ::fetch, {z,x,y->linz("aerial",Id(z,x,y),"webp")},overviews,::checkPreparation,::localImage,{mapSettings.state},{file,offset->OverviewStream.tileUrl(overviewBase,file,offset)},::hostedFile)
+    private val imagery = NativeImagery(context, ::fetch, {z,x,y->linz("aerial",Id(z,x,y),"webp")},overviews,::checkPreparation,::localImage,{mapSettings.state},{file,offset->OverviewStream.tileUrl(overviewBase,file,offset)},::hostedFile,{file,offset->OverviewStream.correctedUrl(overviewBase,file,offset)})
     private val imageryReady=CompletableFuture.runAsync({imagery.initialize()},attachmentJobs)
     fun attachOverview(uri:android.net.Uri,done:(String?)->Unit){attachmentJobs.execute{
         val error=try{overviews.attach(uri);imageryChanged();null}catch(e:Exception){e.message?:"Could not attach imagery ZIP."}
@@ -262,7 +262,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
     private var lastGesture=false
     private var compositionStore:PreparedTerrainCache?=null
     private val compositionLock=Any()
-    private fun imageStore():PreparedTerrainCache=synchronized(compositionLock){compositionStore?:PreparedTerrainCache(File(context.cacheDir,"native-compositions-v1"),compositionBytes,"rgba-premultiplied-gap-v2-complete-seam-deshaded:$key:"+preferences.getLong("imageryGeneration",0),256*256*4).also{compositionStore=it}}
+    private fun imageStore():PreparedTerrainCache=synchronized(compositionLock){compositionStore?:PreparedTerrainCache(File(context.cacheDir,"native-compositions-v1"),compositionBytes,"rgba-premultiplied-gap-v2-complete-seam-deshaded-q95:$key:"+preferences.getLong("imageryGeneration",0),256*256*4).also{compositionStore=it}}
     // DEM halo work cannot occupy every imagery worker. Four bounded requests,
     // shared DEM futures, and no per-halo executor multiplication.
     private val geometryWorkers = ThreadPoolExecutor(2,2,0,TimeUnit.MILLISECONDS,PriorityBlockingQueue<Runnable>())
@@ -886,7 +886,7 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
         val overlays=display.base!=MapSettings.Base.TOPO&&includeTopo
         // NZ Topo as drawn now: Topo250 or Topo50 by the chosen switch (TopoLayers).
         fun topoUrl(id:Id)=linz(TopoLayers.layer(id.z,display.topoSwitch,context.resources.displayMetrics.density.toDouble()),id,"webp")
-        val downloadImagery=NativeImagery(context,::fetch,{z,x,y->linz("aerial",Id(z,x,y),"webp")},overviews,::checkPreparation,::localImage,{display},{file,offset->OverviewStream.tileUrl(overviewBase,file,offset)},::hostedFile)
+        val downloadImagery=NativeImagery(context,::fetch,{z,x,y->linz("aerial",Id(z,x,y),"webp")},overviews,::checkPreparation,::localImage,{display},{file,offset->OverviewStream.tileUrl(overviewBase,file,offset)},::hostedFile,{file,offset->OverviewStream.correctedUrl(overviewBase,file,offset)})
         downloadJobs.execute{
             val region=resume?.let{offline.reopen(it)}?:offline.begin(name,OfflineStore.Metadata(bounds,detail,display.base.name,overlays,encoded));regionContext.set(region);regionBatch.set(ArrayList());val demDone=HashSet<Id>()
             // Pacing: network starts in the last minute (all of the app's requests).

@@ -185,7 +185,8 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         header.addView(top,LinearLayout.LayoutParams(-1,-2))
         // Stats size to their text (two lines, larger phone fonts too) and line up by their tops.
         statsRow=LinearLayout(activity).apply{isBaselineAligned=false;for((i,v) in stats.withIndex())addView(v.apply{minHeight=dp(40);maxLines=2},LinearLayout.LayoutParams(0,-2,1f).apply{if(i>0)marginStart=dp(8)})}
-        header.addView(statsRow,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(10)})
+        // The figures scroll with the page; only the name and photo stay at the top.
+        body.addView(statsRow,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(10)})
         body.addView(taTop,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(8)})
         body.addView(optionScroll,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(8)})
         fromChip.setOnClickListener{pickOption(it,true)};toChip.setOnClickListener{pickOption(it,false)}
@@ -226,7 +227,8 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     private var dragging=false;private var startY=0f;private var startShift=0f
     private fun inner()=(root.height-root.paddingTop-root.paddingBottom).takeIf{it>0}?:activity.resources.displayMetrics.heightPixels
     private fun full()=(inner()*.86f).toInt()
-    private fun compact()=dp(28)+(header.height.takeIf{it>0}?:dp(118))
+    // Collapsed: the name and photo, and the figures below them (first in the page).
+    private fun compact()=dp(28)+(header.height.takeIf{it>0}?:dp(64))+(if(statsRow.visibility==View.VISIBLE)(statsRow.height.takeIf{it>0}?:dp(44))+dp(10) else 0)
     /** Middle: the chart and the section chips below it, with the map still usable above. */
     private fun middle()=max(compact()+dp(300),(inner()*.55f).toInt()).coerceAtMost(full())
     private fun stop(l:Int)=when(l){0->compact();1->middle();else->full()}
@@ -948,7 +950,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         offlineButton.visibility=View.VISIBLE;offlineButton.setOnClickListener{taOffline(d,null)}
         middle(id)
     }
-    /** One section (or bypass): previous and next, live alerts, profile, introduction,
+    /** One section (or bypass): previous and next, profile, introduction, live alerts,
      * the next food, bypasses, the Trust's notes; [fromList]: opened from the trail page. */
     fun showTaSection(slug:String,push:Boolean=false,fromList:Boolean=false){
         val d=teAraroa?:return;val s=d.bySlug[slug]?:return
@@ -977,9 +979,9 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
             taTop.addView(steps,LinearLayout.LayoutParams(-1,-2))
         }
         if(s.alternative)taTop.addView(label(TeAraroa.optionKind(s).second),LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(8)})
-        val alertBox=NativeUi.column(activity).apply{visibility=View.GONE}
-        taTop.addView(alertBox,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(10)});taTop.visibility=View.VISIBLE
-        live(TeAraroa.trackApi(slug)){body->if(id==request)alerts(alertBox,body?.let{runCatching{TeAraroa.Alert.parseTrust(it)}.getOrNull()},"Trail alert","Couldn’t load Te Araroa’s current alerts.",TeAraroa.ALERTS_PAGE,d,liveSaved[TeAraroa.trackApi(slug)])}
+        taTop.visibility=View.VISIBLE
+        // The Trust's alerts where a walk shows DOC's: below the profile and introduction.
+        live(TeAraroa.trackApi(slug)){body->if(id==request)alerts(docAlerts,body?.let{runCatching{TeAraroa.Alert.parseTrust(it)}.getOrNull()},"Trail alert","Couldn’t load Te Araroa’s current alerts.",TeAraroa.ALERTS_PAGE,d,liveSaved[TeAraroa.trackApi(slug)])}
         // The line in walking order: map, profile and stats (DOC's huts along it marked).
         val line=d.line(s).let{if(nobo)it.reversed()else it}
         lineFound(id,line,oriented=true)

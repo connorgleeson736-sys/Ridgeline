@@ -1,7 +1,7 @@
 // The elevation profile, as the app's ElevationProfileView: "Elevation (m)"
 // and distance axes, dashed height lines, the orange line over a light fill,
 // hut marks along it. Touch or hover to inspect a point (height, distance,
-// grade); drag to measure a section from A to B (dragging backwards travels
+// grade); drag to measure a section from A to B, then drag A or B to move that end (dragging backwards travels
 // the line in reverse, so ascent and descent swap); pinch or wheel to zoom the
 // distance axis, double-tap to show it all.
 
@@ -58,12 +58,22 @@ export class Chart {
   /** onInspect(sample|null), onRange(section|null, a, b): a and b the sample points of A and B. */
   constructor(canvas, { onInspect = () => {}, onRange = () => {}, message = 'Elevation will appear here' } = {}) {
     Object.assign(this, { canvas, onInspect, onRange, message });
+    canvas.chart = this; // for tests and debugging
     this.samples = []; this.markers = []; this.cursor = null; this.range = null; this.sec = null; this.picked = -1;
     this.v0 = 0; this.v1 = 0; this.y = () => 0;
     canvas.tabIndex = 0;
-    canvas.setAttribute('aria-label', 'Elevation profile. Drag for section statistics, pinch or scroll to zoom, double-tap to show all; arrow keys inspect.');
+    canvas.setAttribute('aria-label', 'Elevation profile. Drag for section statistics (then drag its A or B end to adjust it), pinch or scroll to zoom, double-tap to show all; arrow keys inspect.');
     const pointers = new Map();
     let start = null, downX = 0, moved = false, pinch = null, lastTap = 0, lastTapX = 0;
+    // A chosen section's A or B end, picked up to move it (the other end stays).
+    let grab = null;
+    const endAt = (px, touch) => {
+      if (!this.range) return -1;
+      const tol = touch ? 20 : 9;
+      let best = -1, bd = Infinity;
+      this.range.forEach((d, k) => { const dx = Math.abs(this.x(d) - px); if (dx <= tol && dx < bd) { bd = dx; best = k; } });
+      return best;
+    };
     const local = (e) => e.clientX - canvas.getBoundingClientRect().left;
     canvas.addEventListener('pointerdown', (e) => {
       if (!this.measured) return;
@@ -77,6 +87,8 @@ export class Chart {
         this.draw();
         return;
       }
+      const end = endAt(local(e), e.pointerType !== 'mouse');
+      if (end >= 0) { grab = { end, other: this.range[1 - end] }; return; }
       start = this.dAt(local(e)); downX = local(e); moved = false; this.range = null; this.sec = null; this.onRange(null);
       this.inspect(start);
     });
@@ -95,6 +107,8 @@ export class Chart {
         return;
       }
       const d = this.dAt(local(e));
+      if (grab) { if (grab.end === 0) this.select(d, grab.other); else this.select(grab.other, d); return; }
+      if (e.pointerType === 'mouse') canvas.style.cursor = start == null && endAt(local(e), false) >= 0 ? 'ew-resize' : '';
       if (start == null) { if (e.pointerType === 'mouse' && !this.range) this.inspect(d); return; }
       moved = moved || Math.abs(local(e) - downX) >= 4;
       if (moved) this.select(start, d); else this.inspect(d);
@@ -102,6 +116,7 @@ export class Chart {
     const up = (e) => {
       pointers.delete(e.pointerId);
       if (pinch) { if (pointers.size < 2) pinch = null; return; }
+      if (grab) { grab = null; this.picked = -1; return; }
       if (start == null) return;
       const from = start, d = this.dAt(local(e));
       start = null;
@@ -114,7 +129,7 @@ export class Chart {
       this.picked = -1; this.range = null; this.sec = null; this.onRange(null); this.inspect(d);
     };
     canvas.addEventListener('pointerup', up);
-    canvas.addEventListener('pointercancel', (e) => { pointers.delete(e.pointerId); start = null; pinch = null; this.clear(); });
+    canvas.addEventListener('pointercancel', (e) => { pointers.delete(e.pointerId); start = null; pinch = null; if (grab) { grab = null; return; } this.clear(); });
     canvas.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse' && start == null && !this.range) { this.cursor = null; this.onInspect(null); this.draw(); } });
     canvas.addEventListener('dblclick', () => { this.v0 = this.v1 = 0; this.draw(); });
     // A mouse wheel zooms the distance axis about the pointer.

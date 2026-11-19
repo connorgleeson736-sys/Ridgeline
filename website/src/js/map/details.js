@@ -323,7 +323,7 @@ function openPicked(ctx, panel, { fromList = false, push = false } = {}) {
   ctx.sheet.open({ kind: panel.kind, title: panel.title, subtitle: panel.subtitle, backLabel: panel.backLabel, render: (body, alive, o) => panel.render(body, alive, ctx.sheet, o) }, { push: fromList || push });
 }
 
-/** A section (or option): its facts, alerts, profile, food, then the rest folded away. */
+/** A section (or option): its facts, profile, summary, alerts, food, then the rest folded away. */
 function sectionPanel(ctx, d, s, { at = null, walk = null, fromList = false } = {}) {
   const ends = () => (teAraroa.dir() === 'nobo' ? [s.to, s.from] : [s.from, s.to]);
   const sub = () => (s.alternative ? `${teAraroa.optionKind(s).label} · leaves the trail at km ${km(teAraroa.kmIn(d, ends()[0]))}, rejoins at km ${km(teAraroa.kmIn(d, ends()[1]))}` : `Section ${s.n} · ${kmRange(d, s.from, s.to)}`);
@@ -340,7 +340,6 @@ function sectionPanel(ctx, d, s, { at = null, walk = null, fromList = false } = 
         host.setAside(fromList ? null : directionSwitch(draw));
         body.append(sectionSteps(ctx, d, s, host, { fromList }));
         if (s.alternative) body.append(el('p', { class: 'ta-why' }, teAraroa.optionKind(s).why));
-        body.append(taAlertsBox(s.slug));
         const profile = line.length >= 2 ? profileBlock(ctx, line, alive) : null;
         const intro = el('div', { class: 'intro ta-intro' });
         if (profile) {
@@ -351,7 +350,8 @@ function sectionPanel(ctx, d, s, { at = null, walk = null, fromList = false } = 
             if (marks.length) profile.chart.setMarkers(marks);
           }
         }
-        body.append(intro);
+        // The Trust's alerts where a walk shows DOC's: after the profile and summary.
+        body.append(intro, taAlertsBox(s.slug));
         // Food: the next place to buy it, from the start of the section (or where the
         // walk it was opened from joins it; a town just before the start counts, as
         // Hamilton for Hamilton City), and towns a hitch away before it.

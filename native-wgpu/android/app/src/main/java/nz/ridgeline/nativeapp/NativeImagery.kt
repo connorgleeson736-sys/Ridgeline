@@ -43,6 +43,8 @@ internal class NativeImagery(
     private val stream:(String,Long)->String?={_,_->null},
     /** A file on the overview host by its path (shading corrections), or null when not served. */
     private val hosted:(String)->String?={null},
+    /** An overview tile already corrected for LINZ's shading, served online, or null: OverviewStream. */
+    private val streamCorrected:(String,Long)->String?={_,_->null},
 ) {
     private val catalog by lazy { json("overview-index.json") }
     private val atlas by lazy { json("gap-atlas.json") }
@@ -162,15 +164,28 @@ internal class NativeImagery(
         val length=row.getInt("bytes");if(length !in 20..1048576)return null
         return stream(row.getString("file"),row.getLong("offset"))?.let{it to length}
     }
-    private fun base(z:Int,x:Int,y:Int):Bitmap=deshade(photo(z,x,y),z,x,y)
-    private fun photo(z:Int,x:Int,y:Int):Bitmap {
-        (if(hasSaved(z,x,y)) readLocal("saved:$z/$x/$y"){saved(z,x,y)} else null)?.let{return bitmap(it)}
-        // The overview imagery served online; LINZ's own tile if it cannot be had.
+    private fun base(z:Int,x:Int,y:Int):Bitmap=photo(z,x,y).let{(b,corrected)->if(corrected)b else deshade(b,z,x,y)}
+    /** The photograph, and whether it comes already corrected for LINZ's shading. */
+    private fun photo(z:Int,x:Int,y:Int):Pair<Bitmap,Boolean> {
+        (if(hasSaved(z,x,y)) readLocal("saved:$z/$x/$y"){saved(z,x,y)} else null)?.let{return bitmap(it) to false}
+        // The overview imagery served online, corrected; the original (as regions saved
+        // before kept it) if that cannot be had; LINZ's own tile last.
+        correctedStream(z,x,y)?.let{url->
+            val bytes=ShadeCorrection.orNone({fetch(url)},checkPreparation)
+            if(bytes!=null&&OverviewStream.completeWebp(bytes))return bitmap(bytes) to true
+        }
         streamed(z,x,y)?.let{(url,length)->
             val bytes=try{fetch(url)}catch(_:java.io.IOException){null}
-            if(bytes!=null&&OverviewStream.complete(bytes,length))return bitmap(bytes)
+            if(bytes!=null&&OverviewStream.complete(bytes,length))return bitmap(bytes) to false
         }
-        return bitmap(fetch(linz(z,x,y)))
+        return bitmap(fetch(linz(z,x,y))) to false
+    }
+    /** The corrected overview tile's address online, where the phone holds none. */
+    private fun correctedStream(z:Int,x:Int,y:Int):String?{
+        if(z>12||hasSaved(z,x,y))return null
+        val entry=catalog.getJSONObject("tiles").optJSONObject("$z/$x/$y")?:return null
+        val row=entry.optJSONObject(if(settings().natural)"natural"else"raw")?:entry
+        return streamCorrected(row.getString("file"),row.getLong("offset"))
     }
     private fun rings(rows:JSONArray?):List<List<SourceGeometry.Point>> = if(rows==null) emptyList() else List(rows.length()) { i ->
         val ring=rows.getJSONArray(i)
@@ -221,7 +236,12 @@ internal class NativeImagery(
     fun inputs(z:Int,x:Int,y:Int):List<String>{
         alternate(z,x,y)?.let{return listOf(it)}
         val p=plan(z,x,y);val urls=ArrayList<String>()
-        if(p.mode=="linz"||p.mode=="boundary"){if(!hasSaved(z,x,y))urls+=streamed(z,x,y)?.first?:linz(z,x,y);shadeUrl(z,x,y)?.let{urls+=it}}
+        if(p.mode=="linz"||p.mode=="boundary"){
+            val corrected=if(hasSaved(z,x,y))null else correctedStream(z,x,y)
+            if(!hasSaved(z,x,y))urls+=corrected?:streamed(z,x,y)?.first?:linz(z,x,y)
+            // A correction only for photos that need one (not the corrected overview).
+            if(corrected==null)shadeUrl(z,x,y)?.let{urls+=it}
+        }
         if(p.mode!="linz"&&p.coarse==null){val ez=minOf(z,18);val f=1 shl(z-ez)
             urls+="https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/$ez/${y/f}/${x/f}"
             val entry=p.entry

@@ -62,6 +62,8 @@ class ElevationProfileView(context:Context):View(context){
     private val text=Paint(Paint.ANTI_ALIAS_FLAG)
     private var low=0.0;private var high=1.0;private var cursor:NativeGeo.ProfilePoint?=null
     private var start:Double?=null;private var range:Pair<Double,Double>?=null;private var downX=0f;private var moved=false
+    /** A chosen section's A (0) or B (1) end, picked up to move it; the other end stays. */
+    private var grabEnd=-1;private var grabOther=0.0
     private var section:NativeGeo.Section?=null
     private var base:Bitmap?=null;private var highlight:Bitmap?=null;private var dirty=true
     private val density=resources.displayMetrics.density
@@ -239,11 +241,15 @@ class ElevationProfileView(context:Context):View(context){
     override fun onTouchEvent(e:MotionEvent):Boolean{
         if(samples.size<2||width==0||!measured)return false
         when(e.actionMasked){
-            MotionEvent.ACTION_DOWN->{parent.requestDisallowInterceptTouchEvent(true);pinching=false;val d=distanceAt(e.x);start=d;downX=e.x;moved=false;range=null;section=null;onRange(null);inspect(d);return true}
+            MotionEvent.ACTION_DOWN->{parent.requestDisallowInterceptTouchEvent(true);pinching=false;grabEnd=-1
+                // Near A or B of the chosen section: that end moves with the finger.
+                range?.let{r->val da=abs(x(r.first)-e.x);val db=abs(x(r.second)-e.x);val tol=22*density
+                    if(min(da,db)<=tol){grabEnd=if(da<=db)0 else 1;grabOther=if(grabEnd==0)r.second else r.first;start=null;return true}}
+                val d=distanceAt(e.x);start=d;downX=e.x;moved=false;range=null;section=null;onRange(null);inspect(d);return true}
             // Two fingers zoom and pan the distance axis: the distances under
             // both fingers stay under them.
             MotionEvent.ACTION_POINTER_DOWN->if(e.pointerCount==2){
-                pinching=true;start=null;range=null;section=null;cursor=null;picked=-1;onRange(null);onLeave()
+                pinching=true;grabEnd=-1;start=null;range=null;section=null;cursor=null;picked=-1;onRange(null);onLeave()
                 if(!zoomed){v0=0.0;v1=total}
                 anchorA=distanceAt(e.getX(0));anchorB=distanceAt(e.getX(1));invalidate();return true
             }
@@ -257,10 +263,12 @@ class ElevationProfileView(context:Context):View(context){
                     else{v0=(anchorA-(xa-left)/(right-left)*span).coerceIn(0.0,total-span);v1=v0+span}
                     dirty=true;invalidate();return true
                 }
+                if(grabEnd>=0){val d=distanceAt(e.x);if(grabEnd==0)select(d,grabOther)else select(grabOther,d);return true}
                 val from=start?:return false;val d=distanceAt(e.x);moved=moved||abs(e.x-downX)>=4*density;if(moved)select(from,d)else inspect(d);return true}
             MotionEvent.ACTION_UP->{
                 parent.requestDisallowInterceptTouchEvent(false)
                 if(pinching){pinching=false;return true}
+                if(grabEnd>=0){grabEnd=-1;picked=-1;return true}
                 val from=start?:return false;start=null;val d=distanceAt(e.x)
                 if(moved){picked=-1;select(from,d);return true}
                 // Double-tap: back to the whole line.
@@ -270,7 +278,8 @@ class ElevationProfileView(context:Context):View(context){
                 val hit=markerHit(e.x,e.y)
                 if(hit>=0){picked=hit;cursor=null;range=null;section=null;onRange(null);NativeGeo.profileAt(samples,markers[hit].first)?.let{onInspect(it,false)};invalidate();performClick();return true}
                 picked=-1;range=null;section=null;onRange(null);inspect(d);performClick();return true}
-            MotionEvent.ACTION_CANCEL->{start=null;pinching=false;cursor=null;range=null;section=null;onRange(null);onLeave();parent.requestDisallowInterceptTouchEvent(false);invalidate();return true}
+            MotionEvent.ACTION_CANCEL->{if(grabEnd>=0){grabEnd=-1;parent.requestDisallowInterceptTouchEvent(false);return true}
+                start=null;pinching=false;cursor=null;range=null;section=null;onRange(null);onLeave();parent.requestDisallowInterceptTouchEvent(false);invalidate();return true}
         };return true
     }
     /** Section ends in drag order: A where the drag started, B where it is now. */

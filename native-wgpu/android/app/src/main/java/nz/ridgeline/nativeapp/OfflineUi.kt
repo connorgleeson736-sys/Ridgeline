@@ -47,7 +47,7 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
     fun diagnostics(){
         val snapshot=TextView(activity).apply{setPadding(dp(16),dp(12),dp(16),dp(12));setTextIsSelectable(true)}
         val loading=AlertDialog.Builder(activity).setTitle("Loading diagnostics").setView(ScrollView(activity).apply{addView(snapshot)}).setNegativeButton("Close",null).setNeutralButton("Copy"){_,_->
-            activity.getSystemService(android.content.ClipboardManager::class.java).setPrimaryClip(android.content.ClipData.newPlainText("Ridgeline loading",snapshot.text))
+            activity.getSystemService(android.content.ClipboardManager::class.java).setPrimaryClip(android.content.ClipData.newPlainText("Razorback Maps loading",snapshot.text))
         }.create()
         fun refresh(){if(loading.isShowing){snapshot.text=loader.loadingDiagnostics();snapshot.postDelayed({refresh()},1000)}}
         loading.show();refresh()
@@ -531,7 +531,7 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
         overlay.onChange={refreshTopoInfo()}
         val pdf=button("Save as PDF"){
             regionName=name.text.toString()
-            try{savePdf(bounds(),regionName.ifBlank{"Ridgeline map"})}catch(e:Exception){Toast.makeText(activity,e.message?:"Could not save the PDF.",Toast.LENGTH_LONG).show()}
+            try{savePdf(bounds(),regionName.ifBlank{"Razorback map"})}catch(e:Exception){Toast.makeText(activity,e.message?:"Could not save the PDF.",Toast.LENGTH_LONG).show()}
         }
         val download=NativeUi.button(activity,"Download",true){
             if(downloading){Toast.makeText(activity,"A region is already downloading.",Toast.LENGTH_SHORT).show();return@button}

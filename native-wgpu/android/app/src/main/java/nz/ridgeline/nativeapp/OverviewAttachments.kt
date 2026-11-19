@@ -43,7 +43,7 @@ class OverviewAttachments(private val context:Context):AutoCloseable {
         }
         val hash=digest.digest().joinToString(""){"%02x".format(it.toInt()and 255)}
         val record=(0 until expected.length()).map{expected.getJSONObject(it)}.firstOrNull{it.getLong("bytes")==total&&it.getString("sha256")==hash}
-            ?:throw IllegalArgumentException("This is not one of the six original Ridgeline overview ZIPs, or it is incomplete.")
+            ?:throw IllegalArgumentException("This is not one of the six original overview ZIPs, or it is incomplete.")
         val payload=record.getString("payload")
         val descriptor=context.contentResolver.openFileDescriptor(uri,"r")?:error("Cannot open imagery attachment.")
         val handle=Handle(ParcelFileDescriptor.AutoCloseInputStream(descriptor))

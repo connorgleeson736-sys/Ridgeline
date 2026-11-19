@@ -12,6 +12,15 @@ internal object OverviewStream {
         if(base.isBlank()||!file.matches(payload)||offset<0)return null
         return "${base.trimEnd('/')}/tiles/$file/$offset.webp"
     }
+    /** The same tile with LINZ's shading already taken out (the website's
+     * tools/correct-overview.py, quality 95): drawn as it is, no correction on the phone. */
+    fun correctedUrl(base:String,file:String,offset:Long):String?=tileUrl(base,file,offset)?.replace("/tiles/","/ctiles-q95/")
+    /** A whole WebP file: its RIFF header's length is the length received. */
+    fun completeWebp(bytes:ByteArray):Boolean{
+        if(bytes.size<20||String(bytes,0,4,Charsets.US_ASCII)!="RIFF"||String(bytes,8,4,Charsets.US_ASCII)!="WEBP")return false
+        val riff=(bytes[4].toLong() and 0xff) or ((bytes[5].toLong() and 0xff) shl 8) or ((bytes[6].toLong() and 0xff) shl 16) or ((bytes[7].toLong() and 0xff) shl 24)
+        return riff+8==bytes.size.toLong()
+    }
     /** Where an original overview ZIP ([name] from overview-archives.json) is served, or null. */
     fun packUrl(base:String,name:String):String?{
         if(base.isBlank()||!name.matches(Regex("Ridgeline-Overviews-(NI-)?[0-9.]+-[0-9]+-of-[0-9]+\\.zip")))return null
