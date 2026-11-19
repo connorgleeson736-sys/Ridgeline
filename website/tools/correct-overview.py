@@ -3,7 +3,8 @@ site can draw those tiles directly, with no correction file or processing.
 
 The overview tiles were averaged from LINZ's shaded zoom-13 tiles; each is divided
 by its zoom's correction (tools/shade-corrections.py: keep*255 in 4x4-tile
-blocks), exactly as src/js/workers/imagery.js does, and saved as WebP (quality 92):
+blocks), exactly as src/js/workers/imagery.js does, and saved as lossless WebP like the
+originals (QUALITY=<1-100> for lossy: 92 is a third of the size at about 41 dB):
 
     OUT/ctiles/<pack>/<offset>.webp   the hosted tiles (both colourings), same keys
                                       as /tiles/, uploaded by tools/upload-shade.mjs
@@ -22,7 +23,7 @@ from PIL import Image
 HERE = os.path.dirname(os.path.abspath(__file__))
 HOST = os.environ.get('OVERVIEW_URL', 'https://bushline-maps.connorgleeson736.workers.dev').rstrip('/')
 CTX = ssl.create_default_context(cafile='/root/.ccr/ca-bundle.crt' if os.path.exists('/root/.ccr/ca-bundle.crt') else None)
-QUALITY = 92
+QUALITY = int(os.environ.get('QUALITY', '0'))  # 0: lossless
 B = 4
 
 
@@ -67,7 +68,7 @@ def correct(data, keep):
     gain = 255.0 / np.maximum(keep.astype(np.float32), 1.0)
     a[..., :3] = np.clip(np.rint(a[..., :3] * gain[..., None]), 0, 255)
     out = io.BytesIO()
-    Image.fromarray(a.astype(np.uint8), mode).save(out, 'WEBP', quality=QUALITY, method=6)
+    Image.fromarray(a.astype(np.uint8), mode).save(out, 'WEBP', **({'quality': QUALITY, 'method': 6} if QUALITY else {'lossless': True, 'method': 4}))
     return out.getvalue()
 
 
