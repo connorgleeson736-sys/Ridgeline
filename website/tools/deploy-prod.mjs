@@ -34,10 +34,19 @@ const json = async (r) => (await r.json()).result;
 const robots = readFileSync(join(dist, 'robots.txt'), 'utf8');
 if (!robots.includes(`${domain}/sitemap.xml`)) throw new Error(`dist/ is not a production build for ${domain} (robots.txt)`);
 
+// SITE_FROM=r2: the site is already deployed as the test copy is (tools/deploy-test.mjs
+// with SITE_BUCKET/SITE_WORKER/SIGNUP_BUCKET: pages through the Worker, from R2); only
+// the domains are attached here, and the Worker's workers.dev address is turned off.
+// (Static assets need Cloudflare's one-time upload key, which a proxy that injects
+// the account token replaces.)
+const fromR2 = process.env.SITE_FROM === 'r2';
+let fileCount = 'from R2';
+if (!fromR2) {
 // ---- Static assets: a manifest of hashes; only files Cloudflare lacks are sent ----
 const files = [];
 const walk = (d) => { for (const f of readdirSync(d)) { const p = join(d, f); if (statSync(p).isDirectory()) walk(p); else files.push(relative(dist, p).split('\\').join('/')); } };
 walk(dist);
+fileCount = files.length;
 const manifest = {}, byHash = new Map();
 for (const f of files) {
   const bytes = readFileSync(join(dist, f));
@@ -70,6 +79,7 @@ form.append('metadata', new Blob([JSON.stringify({
 })], { type: 'application/json' }));
 for (const m of ['prod.js', 'doc-alerts.js', 'te-araroa.js', 'notify.js']) form.append(m, new Blob([readFileSync(join(here, 'worker', m), 'utf8')], { type: 'application/javascript+module' }), m);
 await call('PUT', `${api}/workers/scripts/${script}`, form);
+} else await call('POST', `${api}/workers/scripts/${script}/subdomain`, JSON.stringify({ enabled: false, previews_enabled: false }), { 'Content-Type': 'application/json' });
 
 // ---- Domains ----
 const zone = (await json(await call('GET', `https://api.cloudflare.com/client/v4/zones?name=${domain}`)))[0];
@@ -81,4 +91,4 @@ for (const hostname of [domain, `www.${domain}`]) {
 }
 const r2domains = (await json(await call('GET', `${api}/r2/buckets/${overviewBucket}/domains/custom`))).domains || [];
 if (!r2domains.some((d) => d.domain === tilesDomain)) await call('POST', `${api}/r2/buckets/${overviewBucket}/domains/custom`, JSON.stringify({ domain: tilesDomain, zoneId: zone.id, enabled: true, minTLS: '1.2' }), { 'Content-Type': 'application/json' });
-console.log(JSON.stringify({ files: files.length, uploaded, site: `https://${domain}/`, tiles: `https://${tilesDomain}/` }));
+console.log(JSON.stringify({ files: fileCount, site: `https://${domain}/`, tiles: `https://${tilesDomain}/` }));

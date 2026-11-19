@@ -26,6 +26,8 @@ const redirects = REDIRECTS.split('\n').map((l) => l.trim().split(/\s+/)).filter
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    // One address: www goes to the domain.
+    if (url.hostname.startsWith('www.')) return Response.redirect(`https://${url.hostname.slice(4)}${url.pathname}${url.search}`, 301);
     // "Get notified" sign-ups: the one thing posted to the site.
     if (url.pathname === '/api/notify') return request.method === 'POST' ? notify(request, env) : new Response('Method not allowed', { status: 405 });
     if (request.method !== 'GET' && request.method !== 'HEAD') return new Response('Method not allowed', { status: 405 });

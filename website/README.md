@@ -105,32 +105,40 @@ CLOUDFLARE_ACCOUNT_ID=... CLOUDFLARE_API_TOKEN=... node tools/deploy-test.mjs
 
 ## Launch (production)
 
-The same Worker and R2 setup serves the production site under its own names, on the
-real domain. Before the first launch:
+razorbackmaps.co.nz (on Cloudflare since 19 November 2026) is served by the Worker
+`razorback-maps` from the R2 bucket `razorback-site`, like the test copy, with the
+overview imagery and shading corrections straight from R2 on
+`tiles.razorbackmaps.co.nz` (no Worker; files carry a year's Cache-Control).
+`www.` redirects to the domain; the Worker's workers.dev address is off. Sign-ups go
+to the private bucket `razorback-signups`.
 
-1. **Domain.** Register `razorbackmaps.co.nz` with a New Zealand registrar and add it
-   to the Cloudflare account (free plan): Cloudflare gives two nameservers to set at
-   the registrar.
+```bash
+SITE_URL=https://razorbackmaps.co.nz OVERVIEW_URL=https://tiles.razorbackmaps.co.nz SITE_EMAIL=support@razorbackmaps.co.nz node build.mjs
+SITE_BUCKET=razorback-site SITE_WORKER=razorback-maps SIGNUP_BUCKET=razorback-signups node tools/deploy-test.mjs
+SITE_FROM=r2 node tools/deploy-prod.mjs     # domains, www, tiles.<domain>; first time only
+```
+
+(with CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN set). Build the test copy
+afterwards with `NOINDEX=1 SITE_URL=https://bushline-maps.<subdomain>.workers.dev`:
+the two builds share `dist/`.
+
+`tools/deploy-prod.mjs` without `SITE_FROM=r2` deploys the pages as Workers static
+assets instead (free and unlimited, not counted as Worker requests). It needs
+Cloudflare's one-time upload key on the upload request, which a proxy that injects
+the account token replaces, so run it from a normal computer.
+
+Still to do:
+
+1. **Email.** Cloudflare → Email → Email Routing: forward `support@razorbackmaps.co.nz`
+   to a real inbox (the site lists that address).
 2. **LINZ key.** Ask LINZ for a production Basemaps key for the website (not the
    app's), restricted to the domain if they offer it.
 3. **Esri.** The Satellite base, LINZ's few gaps and 22 West Coast overview tiles use
-   Esri World Imagery: have the Esri licence in place before launch, or build with
+   Esri World Imagery: have the Esri licence in place, or build with
    `ESRI_IMAGERY=0` (no Satellite base or gap filling; the overview tiles stay).
 4. **Data permissions.** Confirm with the Te Araroa Trust that their section data,
    notes and alerts may be shown (credited, CC BY 4.0).
-5. **Build and deploy** (sign-ups are kept in the private bucket
-   `bushline-site-prod-signups`, created on the first deploy):
-
-```bash
-LINZ_API_KEY=<production key> SITE_URL=https://razorbackmaps.co.nz OVERVIEW_URL=https://razorbackmaps.co.nz node build.mjs
-CLOUDFLARE_ACCOUNT_ID=... CLOUDFLARE_API_TOKEN=... SITE_BUCKET=bushline-site-prod SITE_WORKER=bushline-maps-prod node tools/deploy-test.mjs
-```
-
-6. **Domain to the Worker.** In Cloudflare: Workers & Pages → `bushline-maps-prod` →
-   Settings → Domains & Routes → Add custom domain: `razorbackmaps.co.nz` (and
-   `www.razorbackmaps.co.nz`). Cloudflare issues the certificate.
-7. **Search.** Submit `https://razorbackmaps.co.nz/sitemap.xml` in Google Search
-   Console. (Production builds allow indexing; only `NOINDEX=1` builds block it.)
+5. **Search.** Submit `https://razorbackmaps.co.nz/sitemap.xml` in Google Search Console.
 
 Sign-ups ("Get notified", `worker/notify.js`): one JSON object per address in the
 sign-ups bucket, `signups/<sha256 of the address>.json` with the address, the phone
