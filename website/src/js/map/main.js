@@ -100,6 +100,8 @@ async function main() {
     center: view.center, zoom: view.zoom, bearing: view.bearing,
     pitch: settings.threeD ? (view.pitch ?? 0) : 0,
     minZoom: 4.5, maxZoom: 19, maxPitch: 85, maxBounds: NZ_BOUNDS,
+    // No snapping to north when a turn ends close to it (MapLibre's 7° default).
+    bearingSnap: 0,
     pixelRatio: pixelRatio(view.zoom),
     // Tiles kept after they leave the view, per source, by the device's memory
     // (the app's RAM budget): panning back shows them at once.

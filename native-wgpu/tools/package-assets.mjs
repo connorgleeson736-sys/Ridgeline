@@ -36,6 +36,13 @@ const archiveList=JSON.parse(fs.readFileSync(path.join(root,'native-wgpu/overvie
 archiveList.files=[...archiveList.files,...north.archives];fs.writeFileSync(path.join(out,'overview-archives.json'),JSON.stringify(archiveList,null,2)+'\n');
 console.log(JSON.stringify({full,packCount:full?catalog.files.length:0,coarseImages:copied.size,gapEntries:Object.keys(gap.entries).length,overviewCoordinates:Object.keys(overview.tiles).length,northIsland:north.coordinates}));
 
+// LINZ's aerial shading corrections (website/tools/shade-corrections.py): their
+// index, and the blocks to zoom 9 bundled (NativeImagery SHADE_BUNDLED); finer
+// ones are fetched from the overview host.
+fs.copyFileSync(path.join(root,'website/data/shade-index.json'),path.join(out,'shade-index.json'));
+fs.rmSync(path.join(out,'shade'),{recursive:true,force:true});
+fs.cpSync(path.join(root,'native-wgpu/assets/shade'),path.join(out,'shade'),{recursive:true});
+
 // Retain the notice for algorithms adapted from the reference MapLibre engine.
 fs.mkdirSync(path.join(out,'licenses'),{recursive:true});
 fs.copyFileSync(path.join(root,'native-wgpu/licenses/maplibre-gl-js.txt'),path.join(out,'licenses/maplibre-gl-js.txt'));

@@ -23,6 +23,13 @@ import kotlin.math.pow
 internal const val TOPO_MAX_ZOOM=17
 /** Screen pixels (device pixels, not points) per NZ Topo tile when choosing its zoom (2D only). */
 internal const val TOPO_TARGET_PX=256.0
+/** LINZ's shading layers stop at zoom 14 (its aerial config's maxZoom). */
+internal const val SHADED_TO=14
+/** Shading corrections bundled in the app to this zoom (about 2 MB); finer ones are fetched. */
+internal const val SHADE_BUNDLED=9
+/** Correction blocks: 4x4 tiles; decoded blocks kept (1 MiB each). */
+internal const val SHADE_BLOCK=1024
+internal const val SHADE_BLOCKS_KEPT=12
 
 internal class NativeImagery(
     private val context: Context,
@@ -34,6 +41,8 @@ internal class NativeImagery(
     private val settings:()->MapSettings.State={MapSettings.State()},
     /** Where an overview tile is served online (payload, offset), or null: OverviewStream. */
     private val stream:(String,Long)->String?={_,_->null},
+    /** A file on the overview host by its path (shading corrections), or null when not served. */
+    private val hosted:(String)->String?={null},
 ) {
     private val catalog by lazy { json("overview-index.json") }
     private val atlas by lazy { json("gap-atlas.json") }
@@ -75,6 +84,52 @@ internal class NativeImagery(
         }
         return PixelPacking.rgbaOwned(pixels(bitmap),checkPreparation)
     }
+    // ---- LINZ's hillshading, taken back out ----
+    // LINZ draws an 8 m hillshade and a texture shade (black, with alpha) over its
+    // aerial tiles to zoom 14 and not beyond, so the photos turned suddenly brighter
+    // at zoom 15. Black at alpha a over a colour c gives c(1-a), so dividing by
+    // keep=(1-a1)(1-a2) gives the photograph's own colour at every zoom. The
+    // overview imagery was averaged from those shaded tiles, so it is corrected too.
+    // keep*255 comes in greyscale blocks of 4x4 tiles made ahead (the website's
+    // tools/shade-corrections.py), listed in shade-index.json: bundled to zoom
+    // SHADE_BUNDLED, from the overview host beyond (saved with offline regions).
+    private val shadeZooms by lazy { runCatching{json("shade-index.json").getJSONObject("zooms")}.getOrNull() }
+    private val shadeSets=ConcurrentHashMap<Int,Set<String>>()
+    /** The tile's correction block ("bx/by"), or null where LINZ draws no shading. */
+    private fun shadeBlock(z:Int,x:Int,y:Int):String?{
+        if(z>SHADED_TO)return null
+        val blocks=shadeSets.getOrPut(z){shadeZooms?.optJSONArray("$z")?.let{a->HashSet<String>(a.length()*2).apply{for(i in 0 until a.length())add(a.getString(i))}}?:emptySet()}
+        return "${x shr 2}/${y shr 2}".takeIf{it in blocks}
+    }
+    private fun shadeAsset(z:Int,block:String)="shade/$z/$block.webp"
+    /** The correction block's URL for a tile, when it is fetched (not bundled). */
+    internal fun shadeUrl(z:Int,x:Int,y:Int):String?=shadeBlock(z,x,y)?.takeIf{z>SHADE_BUNDLED}?.let{hosted("shade/v1/$z/$it.webp")}
+    private val shadeValues=object:LinkedHashMap<String,ByteArray>(16,.75f,true){override fun removeEldestEntry(eldest:MutableMap.MutableEntry<String,ByteArray>?)=size>SHADE_BLOCKS_KEPT}
+    private fun blockValues(z:Int,block:String):ByteArray?{
+        val key="$z/$block";synchronized(shadeValues){shadeValues[key]?.let{return it}}
+        val bytes=if(z<=SHADE_BUNDLED)readLocal("asset:${shadeAsset(z,block)}"){assetBytes(shadeAsset(z,block))}
+            else fetch(hosted("shade/v1/$z/$block.webp")?:return null)
+        checkPreparation()
+        val options=BitmapFactory.Options().apply{inScaled=false;inPreferredConfig=Bitmap.Config.ARGB_8888}
+        val image=bytes?.let{BitmapFactory.decodeByteArray(it,0,it.size,options)}?:return null
+        val values=image.using{b->
+            if(b.width!=SHADE_BLOCK||b.height!=SHADE_BLOCK)return null
+            val row=IntArray(SHADE_BLOCK);val out=ByteArray(SHADE_BLOCK*SHADE_BLOCK)
+            for(r in 0 until SHADE_BLOCK){b.getPixels(row,0,SHADE_BLOCK,0,r,SHADE_BLOCK,1);for(c in 0 until SHADE_BLOCK)out[r*SHADE_BLOCK+c]=(row[c] shr 8).toByte()}
+            out}
+        synchronized(shadeValues){shadeValues[key]=values};return values
+    }
+    /** The photograph with LINZ's shading taken out (the photo itself where there is
+     * none, or its correction cannot be had offline). */
+    private fun deshade(photo:Bitmap,z:Int,x:Int,y:Int):Bitmap{
+        val block=shadeBlock(z,x,y)?:return photo
+        val values=ShadeCorrection.orNone({blockValues(z,block)},checkPreparation)?:return photo
+        checkPreparation()
+        val px=IntArray(65536);photo.getPixels(px,0,256,0,0,256,256)
+        if(!ShadeCorrection.apply(px,values,(x and 3)*256,(y and 3)*256))return photo
+        val out=Bitmap.createBitmap(256,256,Bitmap.Config.ARGB_8888);out.setPixels(px,0,256,0,0,256,256);out.setHasAlpha(photo.hasAlpha())
+        photo.recycle();return out
+    }
     internal fun saved(z:Int,x:Int,y:Int):ByteArray? {
         val key="$z/$x/$y"
         val variant=if(settings().natural)"natural"else"raw"
@@ -107,7 +162,8 @@ internal class NativeImagery(
         val length=row.getInt("bytes");if(length !in 20..1048576)return null
         return stream(row.getString("file"),row.getLong("offset"))?.let{it to length}
     }
-    private fun base(z:Int,x:Int,y:Int):Bitmap {
+    private fun base(z:Int,x:Int,y:Int):Bitmap=deshade(photo(z,x,y),z,x,y)
+    private fun photo(z:Int,x:Int,y:Int):Bitmap {
         (if(hasSaved(z,x,y)) readLocal("saved:$z/$x/$y"){saved(z,x,y)} else null)?.let{return bitmap(it)}
         // The overview imagery served online; LINZ's own tile if it cannot be had.
         streamed(z,x,y)?.let{(url,length)->
@@ -158,13 +214,14 @@ internal class NativeImagery(
         if(settings().base!=MapSettings.Base.LINZ)return emptyList()
         val p=plan(z,x,y);val inputs=ArrayList<LocalInput>(2)
         if((p.mode=="linz"||p.mode=="boundary")&&hasSaved(z,x,y))inputs+=LocalInput("saved:$z/$x/$y"){saved(z,x,y)}
+        if((p.mode=="linz"||p.mode=="boundary")&&z<=SHADE_BUNDLED)shadeBlock(z,x,y)?.let{val name=shadeAsset(z,it);inputs+=LocalInput("asset:$name"){assetBytes(name)}}
         p.coarse?.let{val name=it.getString("url");inputs+=LocalInput("asset:$name"){assetBytes(name)}}
         return inputs
     }
     fun inputs(z:Int,x:Int,y:Int):List<String>{
         alternate(z,x,y)?.let{return listOf(it)}
         val p=plan(z,x,y);val urls=ArrayList<String>()
-        if(p.mode=="linz"||p.mode=="boundary")if(!hasSaved(z,x,y))urls+=streamed(z,x,y)?.first?:linz(z,x,y)
+        if(p.mode=="linz"||p.mode=="boundary"){if(!hasSaved(z,x,y))urls+=streamed(z,x,y)?.first?:linz(z,x,y);shadeUrl(z,x,y)?.let{urls+=it}}
         if(p.mode!="linz"&&p.coarse==null){val ez=minOf(z,18);val f=1 shl(z-ez)
             urls+="https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/$ez/${y/f}/${x/f}"
             val entry=p.entry
