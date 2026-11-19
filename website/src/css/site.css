@@ -155,3 +155,28 @@ details p { margin: 12px 0 0; color: var(--muted); }
 .notify-status { flex-basis: 100%; min-height: 1.4em; margin: 4px 0 0; color: rgb(255 255 255 / 86%); }
 .app-band .fine { color: rgb(255 255 255 / 62%); margin-top: 10px; }
 .app-band .fine a { color: inherit; }
+
+/* Walk, hut and Te Araroa pages (lib/seo-pages.mjs) */
+.place-page h1 { margin-bottom: 12px; }
+.crumbs { font-size: .88rem; color: var(--muted); margin-bottom: 10px; }
+.crumbs a { color: var(--muted); }
+.place-page .lead { font-size: 1.12rem; }
+.facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin: 22px 0; }
+.facts > div { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; }
+.facts dt { font-size: .76rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.facts dd { margin: 2px 0 0; font-weight: 600; }
+.place-page .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; margin: 22px 0; }
+.line-map { margin: 26px 0; }
+.line-svg { width: 100%; height: auto; background: var(--chip); border-radius: 14px; border: 1px solid var(--line); }
+.line-svg path { fill: none; stroke: var(--orange); stroke-width: 3.5; stroke-linejoin: round; stroke-linecap: round; }
+.line-svg .start { fill: #fff; stroke: var(--forest); stroke-width: 3; }
+.line-svg .hut-dot circle { fill: var(--forest); stroke: #fff; stroke-width: 2; }
+.line-map figcaption { font-size: .84rem; color: var(--muted); margin-top: 6px; }
+.link-list { list-style: none; padding: 0; margin: 10px 0 24px; columns: 2 260px; column-gap: 28px; }
+.link-list li { break-inside: avoid; padding: 5px 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent); }
+.link-list .note-line { font-size: .86rem; color: var(--muted); }
+.tag { font-size: .72rem; font-weight: 700; background: var(--chip); color: var(--forest-2); border-radius: 999px; padding: 1px 8px; vertical-align: 1px; }
+.place-page blockquote { margin: 12px 0; padding: 4px 0 4px 18px; border-left: 3px solid var(--line); color: var(--ink); }
+.region-nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 8px; }
+.region-nav a { font-size: .86rem; background: var(--chip); border-radius: 999px; padding: 4px 12px; text-decoration: none; }
+.prev-next { display: flex; justify-content: space-between; gap: 16px; margin: 30px 0 10px; font-weight: 600; }

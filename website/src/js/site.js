@@ -23,3 +23,12 @@ for (const form of document.querySelectorAll('[data-notify]')) {
     button.disabled = false;
   });
 }
+
+// Walk, hut and Te Araroa links between pages open the place in the 3D map; the
+// page itself stays for search engines, links opened in a new tab and no-script.
+document.addEventListener('click', (e) => {
+  const a = e.target.closest?.('a[data-map]');
+  if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  e.preventDefault();
+  location.href = a.dataset.map;
+});

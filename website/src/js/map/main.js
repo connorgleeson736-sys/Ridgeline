@@ -197,6 +197,20 @@ async function main() {
     openDrawer: () => openDrawer(),
     closeDrawer: () => closeDrawer(),
   };
+  /** Links from the walk, hut and Te Araroa pages: #w=<walk guid>, #h=<lat>,<lon>,<name>,
+   * #ta=<section slug>. */
+  function openLinked(hash) {
+    let m;
+    if ((m = /[#&]w=([0-9a-f-]{36})\b/.exec(hash))) openWalk(ctx, m[1]);
+    else if ((m = /[#&]ta=([a-z0-9-]+)/.exec(hash))) openTeAraroa(ctx, m[1]);
+    else if ((m = /[#&]h=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?),([^&]*)/.exec(hash))) {
+      const p = [+m[2], +m[1]];
+      let name = m[3]; try { name = decodeURIComponent(name); } catch { /* as written */ }
+      ctx.flyTo(p, 14);
+      openHut(ctx, name, p);
+    } else return false;
+    return true;
+  }
   if (promo) window.bushlinePromo = { walk: (guid) => openWalk(ctx, guid), teAraroa: (slug = null) => openTeAraroa(ctx, slug), sheet };
   const overlays = attachOverlays(map, () => settings);
   // Te Araroa: its line and kilometres, loaded the first time its layer is on.
@@ -247,6 +261,7 @@ async function main() {
     }
     overlays.refresh();
     if (/[#&]r=/.test(location.hash)) planner.openLink(location.hash);
+    else openLinked(location.hash);
   });
   map.on('error', (e) => { if (/WebGL|context/i.test(String(e?.error?.message))) toast('The map stopped drawing. Reload the page to continue.', 6000); });
   let loadingTimer = 0;
@@ -273,6 +288,7 @@ async function main() {
   });
   addEventListener('hashchange', () => {
     if (/[#&]r=/.test(location.hash)) { planner.openLink(location.hash); return; }
+    if (openLinked(location.hash)) return;
     const v = parseView(location.hash);
     if (v) map.jumpTo(v);
   });

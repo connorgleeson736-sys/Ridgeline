@@ -8,6 +8,7 @@
 import { createHash } from 'node:crypto';
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
+import { buildSeoPages } from './lib/seo-pages.mjs';
 import vm from 'node:vm';
 import { gunzipSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
@@ -127,6 +128,12 @@ const walkPages = (d) => {
   }
 };
 walkPages(src);
+// Walk, hut and Te Araroa section pages (lib/seo-pages.mjs), for search and sharing.
+for (const { rel, html } of buildSeoPages({ here, appAssets, domain: SITE.domain })) {
+  mkdirSync(dirname(join(out, rel)), { recursive: true });
+  writeFileSync(join(out, rel), render(html));
+  pages.push(rel);
+}
 
 // ---- Map data ----
 // Data files under their version (dataVersion): cached for good, a new version is a new path.
