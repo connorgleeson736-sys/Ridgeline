@@ -111,6 +111,11 @@ export function features(d) {
   // [band, step km, (unused), shortest line km (the text's length at the band's
   // widest zoom, and some), longest stretch of trail km].
   const BANDS = [[0, 3, 0, 480, 1700], [1, 1, 0, 135, 640], [2, 0.25, 0, 36, 200]];
+  // The North Island's name sits clear of the trail, just east of it, per band: [km
+  // along the trail from the island's middle (north is negative), km east]. The middle
+  // is at Tongariro, where the trail loops east; closer in, the name is moved north
+  // along the trail to where it runs as one line (checked against the trail on screen).
+  const NORTH_NAME = [[0, 28], [-60, 8], [-90, 1.5]];
   // A gentle curve through the stretch: x and y as cubics of the distance along it
   // (least squares), so the lettering bends with the trail's general line, never its turns.
   const smoothLine = (c, span, step) => {
@@ -145,8 +150,8 @@ export function features(d) {
     return best;
   };
   for (const [a, b, centre] of [[0, 1739, [175.75, -39.0]], [1739, d.total, null]]) {
-    const mid = centre ? nearestKm(centre, a, b) : (a + b) / 2;
     for (const [band, step, , least, most] of BANDS) {
+      const mid = centre ? nearestKm(centre, a, b) + NORTH_NAME[band][0] : (a + b) / 2;
       // The trail winds: take a longer stretch until its smoothed line fits the text.
       let line = [];
       for (let span = least * 1.6; span <= most; span *= 1.15) {
@@ -154,6 +159,8 @@ export function features(d) {
         line = smoothLine((lo + hi) / 2, hi - lo, step);
         if (kmLong(line) >= least) break;
       }
+      // The North Island's name: centred on its line (the South Island's sits above it).
+      if (!a) line = line.map(([x, y]) => [x + NORTH_NAME[band][1] / (111.32 * Math.cos((y * Math.PI) / 180)), y]);
       if (line.length >= 2) names.push({ type: 'Feature', properties: { band, island: a ? 'south' : 'north' }, geometry: { type: 'LineString', coordinates: line } });
     }
   }

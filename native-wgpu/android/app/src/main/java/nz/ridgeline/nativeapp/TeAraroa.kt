@@ -143,6 +143,10 @@ internal class TeAraroa private constructor(
      * further out and lengthened until the curve is long enough for the name. Centred
      * where the trail passes nearest the North Island's middle, and at the middle of
      * the South Island's trail. Each curve has [points] points. */
+    /** The North Island's name sits just east of the trail, clear of it, per band: km along
+     * the trail from the island's middle (north negative), km east (as on the website). The
+     * middle is at Tongariro, where the trail loops east; closer in, it moves north. */
+    private val NORTH_NAME=listOf(0.0 to 28.0,-60.0 to 8.0,-90.0 to 1.5)
     fun nameCurves(points:Int=24):List<Pair<String,List<List<Coordinate>>>>{
         val split=mains.firstOrNull{it.island=="SI"}?.from?:total/2
         val northMid=run{var best=split/2;var bd=Double.MAX_VALUE;val k=cos(Math.toRadians(-39.0));var km=1.0
@@ -167,12 +171,14 @@ internal class TeAraroa private constructor(
             return List(points){i->val u=.06+.88*i/(points-1);Coordinate(cx[0]+cx[1]*u+cx[2]*u*u+cx[3]*u*u*u,cy[0]+cy[1]*u+cy[2]*u*u+cy[3]*u*u*u)}
         }
         fun km(line:List<Coordinate>)=(1 until line.size).sumOf{val k=cos(Math.toRadians(line[it].latitude));hypot((line[it].longitude-line[it-1].longitude)*111.32*k,(line[it].latitude-line[it-1].latitude)*111.32)}
-        return listOf(Triple("north",0.0 to split,northMid),Triple("south",split to total,(split+total)/2)).map{(island,range,mid)->
-            island to bands.map{(step,least,most)->
+        return listOf(Triple("north",0.0 to split,northMid),Triple("south",split to total,(split+total)/2)).map{(island,range,centre)->
+            island to bands.mapIndexed{band,(step,least,most)->
+                val north=island=="north"
+                val mid=centre+if(north)NORTH_NAME[band].first else 0.0
                 var line=emptyList<Coordinate>();var span=least*1.6
                 while(span<=most){val lo=max(range.first+1,mid-span/2);val hi=min(range.second-1,mid+span/2)
                     line=fit((lo+hi)/2,hi-lo,step);if(km(line)>=least)break;span*=1.15}
-                line}
+                if(north)line.map{Coordinate(it.longitude+NORTH_NAME[band].second/(111.32*cos(Math.toRadians(it.latitude))),it.latitude)}else line}
         }
     }
 

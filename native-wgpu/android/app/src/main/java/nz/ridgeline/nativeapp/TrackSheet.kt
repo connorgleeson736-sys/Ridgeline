@@ -248,6 +248,9 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         if(map.layoutParams.height!=-1)map.layoutParams=map.layoutParams.apply{height=-1}
         val shown=stop(level);val target=(full()-shown).coerceAtLeast(0).toFloat()
         onInset(shown)
+        // The sheet is full height, slid down: below the middle stop its lower part is off
+        // screen, so its page ends that much lower down (the end scrolls into view).
+        val bottom=dp(18)+target.toInt();if(body.paddingBottom!=bottom)body.setPadding(body.paddingLeft,body.paddingTop,body.paddingRight,bottom)
         if(animate||!slidingTo.isNaN()){
             if(slidingTo!=target){
                 slidingTo=target
@@ -1252,14 +1255,23 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         if(saved!=null){val date=java.text.SimpleDateFormat("d MMM, h:mm a",java.util.Locale.getDefault()).format(java.util.Date(saved))
             box.addView(label("Offline · ${noun.lowercase()}s as saved $date",12f,ink).apply{alpha=.85f})
             if(list.isEmpty()){box.addView(label("None then.",13f,ink));box.visibility=View.VISIBLE;return}}
-        box.addView(label("⚠  "+if(list.size==1)noun else "${list.size} ${noun}s",14f,ink,true))
+        // Collapsed to one line (the count); tapping it shows the alerts.
+        val items=NativeUi.column(activity).apply{visibility=View.GONE}
+        val chevron=label("▸",14f,ink,true)
+        val heading=LinearLayout(activity).apply{orientation=LinearLayout.HORIZONTAL;gravity=Gravity.CENTER_VERTICAL;isClickable=true
+            contentDescription="Show ${noun.lowercase()}s"
+            setOnClickListener{val open=items.visibility!=View.VISIBLE;items.visibility=if(open)View.VISIBLE else View.GONE
+                chevron.text=if(open)"▾" else "▸";contentDescription=(if(open)"Hide " else "Show ")+"${noun.lowercase()}s"}}
+        heading.addView(label("⚠  "+if(list.size==1)noun else "${list.size} ${noun}s",14f,ink,true),LinearLayout.LayoutParams(0,-2,1f))
+        heading.addView(chevron)
+        box.addView(heading,LinearLayout.LayoutParams(-1,dp(30)));box.addView(items)
         for(a in list){
             val where=if(a.from!=null&&d!=null)"km ${km(a.from)}${if(a.to!=null&&a.to!=a.from)"–${km(a.to)}" else ""} SOBO" else ""
             val text=label(a.text,13f,ink).apply{visibility=if(list.size==1)View.VISIBLE else View.GONE}
             val head=NativeUi.column(activity).apply{isClickable=true;setPadding(0,dp(8),0,dp(4));setOnClickListener{text.visibility=if(text.visibility==View.VISIBLE)View.GONE else View.VISIBLE}}
             head.addView(label(a.title,13.5f,ink,true))
             listOf(a.status,a.date,where).filter{it.isNotBlank()}.joinToString(" · ").takeIf{it.isNotEmpty()}?.let{head.addView(label(it,12f,ink).apply{alpha=.8f})}
-            box.addView(head);box.addView(text,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(4)})
+            items.addView(head);items.addView(text,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(4)})
         }
         box.visibility=View.VISIBLE
     }

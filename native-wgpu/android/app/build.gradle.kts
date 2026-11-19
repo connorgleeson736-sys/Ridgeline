@@ -11,7 +11,7 @@ android {
  compileSdk=36
  defaultConfig { applicationId = explicitId ?: if (sideBySide) "nz.ridgeline.nativeapp.performance" else "nz.ridgeline.nativeapp"
   manifestPlaceholders["ridgelineAppLabel"] = explicitLabel ?: if (sideBySide) "Razorback Maps Performance" else "Razorback Maps"
-  minSdk=26; targetSdk=36; versionCode = 85; versionName="0.1.84-razorback"; ndk {abiFilters+=providers.gradleProperty("ridgelineAbis").getOrElse("arm64-v8a").split(",")} }
+  minSdk=26; targetSdk=36; versionCode = 86; versionName="0.1.85-razorback"; ndk {abiFilters+=providers.gradleProperty("ridgelineAbis").getOrElse("arm64-v8a").split(",")} }
  // An optional external key makes signing reproducible without committing keys.
  signingConfigs.getByName("debug") {
   providers.environmentVariable("RIDGELINE_SIGNING_KEYSTORE").orNull?.let {storeFile=file(it)}

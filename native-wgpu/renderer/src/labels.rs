@@ -1,6 +1,8 @@
 //! One cached native-font atlas and a depth-tested batch, with CPU grid collision selection.
 /// Seconds a dropped label keeps its first-shown time (see rebuild_labels).
 const LABEL_GRACE: f32 = 0.6;
+/// Grid cells (~10 m each) within which a label's earlier height and first-shown time are its own.
+const NEAR_CELLS: i64 = 4;
 /// Label continuity grid: 2^22 cells across the world (~10 m at the equator).
 const LABEL_GRID: f64 = 4_194_304.0;
 pub(crate) fn grid_key(p: [f64; 2]) -> (i64, i64) {
@@ -480,13 +482,19 @@ impl crate::Renderer {
         // The same name from a finer or coarser source tile has a slightly
         // different point (tile quantization, at most a few metres). Keyed by
         // exact bits it faded in again, so names visibly reloaded while zooming.
-        // Points within a ~10 m grid cell (or a neighbouring one) match.
+        // Points within ~40 m (four ~10 m grid cells) match: a peak from a zoom 8 tile
+        // is up to ~40 m from the same peak in a zoom 12 tile (tile precision), and
+        // matching only neighbouring cells faded it in again whenever the zoom
+        // crossed a tile level, so mountain names flickered while zooming.
         let key = grid_key;
         let near = |map: &std::collections::HashMap<(i64, i64), f32>, k: (i64, i64)| {
             map.get(&k).copied().or_else(|| {
-                (-1..=1)
-                    .flat_map(|dx| (-1..=1).map(move |dy| (k.0 + dx, k.1 + dy)))
-                    .find_map(|n| map.get(&n).copied())
+                (1..=NEAR_CELLS).find_map(|r| {
+                    (-r..=r)
+                        .flat_map(|dx| (-r..=r).map(move |dy| (k.0 + dx, k.1 + dy)))
+                        .filter(|n| (n.0 - k.0).abs() == r || (n.1 - k.1).abs() == r)
+                        .find_map(|n| map.get(&n).copied())
+                })
             })
         };
         let mut born = std::collections::HashMap::with_capacity(self.label_selection.len());

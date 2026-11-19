@@ -51,6 +51,10 @@ function safeHtml(html) {
 
 /** DOC's current alerts for a page id, filled in when they arrive; nothing shows
  * when there are none. If they cannot be read, a pointer to DOC's alerts. */
+/** The alerts folded to one line (their count); opening it lists them. */
+function alertsFold(head) {
+  return el('details', { class: 'doc-alerts-fold' }, el('summary', { class: 'doc-alerts-head' }, head));
+}
 function alertsBox(guid, page) {
   const box = el('section', { class: 'doc-alerts', hidden: true, 'aria-label': 'DOC alerts' });
   if (!guid) return box;
@@ -58,13 +62,14 @@ function alertsBox(guid, page) {
     if (list && !list.length) return;
     box.hidden = false;
     if (!list) { box.append(el('p', { class: 'doc-alerts-head' }, 'Couldn’t load DOC’s current alerts. ', docLink(page || 'https://www.doc.govt.nz/parks-and-recreation/know-before-you-go/alerts/', 'Check them on DOC ↗'))); return; }
-    box.append(el('p', { class: 'doc-alerts-head' }, list.length === 1 ? 'DOC alert' : `${list.length} DOC alerts`));
+    const fold = alertsFold(list.length === 1 ? 'DOC alert' : `${list.length} DOC alerts`);
     list.forEach((a, i) => {
       const item = el('details', { class: 'doc-alert' }, el('summary', {}, a.summary || 'Alert'),
         el('div', { class: 'doc-alert-body' }, safeHtml(a.description), (a.note || a.date) ? el('p', { class: 'muted' }, a.note || `Published ${a.date}.`) : null));
       if (i === 0 && list.length === 1) item.open = true;
-      box.append(item);
+      fold.append(item);
     });
+    box.append(fold);
   });
   return box;
 }
@@ -292,13 +297,14 @@ function taAlertsBox(slug) {
     if (!list) { box.append(el('p', { class: 'doc-alerts-head' }, 'Couldn’t load Te Araroa’s current alerts. ', docLink(teAraroa.ALERTS, 'Check them ↗'))); return; }
     const rank = (a) => (/closure/i.test(a.status) ? 0 : /warning/i.test(a.status) ? 1 : 2);
     list.sort((a, b) => rank(a) - rank(b));
-    box.append(el('p', { class: 'doc-alerts-head' }, list.length === 1 ? 'Trail alert' : `${list.length} trail alerts`));
+    const fold = alertsFold(list.length === 1 ? 'Trail alert' : `${list.length} trail alerts`);
     list.forEach((a, i) => {
       const where = a.from != null ? `km ${km(a.from)}${a.to != null && a.to !== a.from ? `–${km(a.to)}` : ''} SOBO` : '';
       const item = el('details', { class: 'doc-alert' }, el('summary', {}, a.title || 'Alert', el('small', { class: 'alert-meta' }, [a.status, where].filter(Boolean).join(' · '))), el('div', { class: 'doc-alert-body' }, safeHtml(a.description)));
       if (i === 0 && list.length === 1) item.open = true;
-      box.append(item);
+      fold.append(item);
     });
+    box.append(fold);
   });
   return box;
 }

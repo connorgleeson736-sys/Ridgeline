@@ -38,6 +38,8 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         /** The trail's name lettering (IM FELL English SC, OFL; assets/te-araroa). */
         const val TA_FONT="te-araroa/IMFellEnglishSC-Regular.ttf"
         const val TA_ORDER=1_000_000
+        /** The painted Te Araroa name's height (dp) at the middle of its zoom band. */
+        const val NAME_PX=17.0
         /** Large DOC walks (Great Walks, circuits, multi-day walks) named from here, one
          * zoom before the map's own track names start (zoom 12, as Capacitor). */
         const val FAR_NAMES_ZOOM=11.0
@@ -679,6 +681,35 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
     private val taCache=HashMap<Int,List<Pair<Boolean,List<VectorTile.Point>>>>()
     private var taNameCache:List<Pair<String,List<List<Coordinate>>>>?=null
     private fun taNameCurves(t:TeAraroa)=taNameCache?:t.nameCurves().also{taNameCache=it}
+    private var nameFont:PaintedName.Font?=null
+    /** The zoom band the name is painted for (its size on the ground), kept a little past
+     * its ends so a camera resting on one does not repaint it back and forth. */
+    private var nameBand=-1
+    /** Per island: whether its name reads from its curve's end (kept upright, turning only once clearly upside down). */
+    private val nameReversed=HashMap<String,Boolean>()
+    private val nameGroups=HashMap<String,LineGroup>()
+    /** The painted names for the camera now (one group per island, the same objects while
+     * neither the zoom band nor the reading direction changes), or null outside zoom 5–11.5. */
+    private fun paintedNames(t:TeAraroa,pose:CameraPose):List<LineGroup>?{
+        val z=pose.zoom
+        if(z<5||z>=11.5){nameBand=-1;return null}
+        if(nameBand<0||z<nameBand-.15||z>=nameBand+1.15)nameBand=floor(z).toInt().coerceIn(5,11)
+        val band=nameBand
+        val font=nameFont?:runCatching{PaintedName.font(android.graphics.Typeface.createFromAsset(view.context.assets,TA_FONT),"Te Araroa")}.getOrNull()?.also{nameFont=it}?:return null
+        // The ink NAME_PX tall at the band's middle zoom: from ~0.7x to ~1.4x that across it.
+        val height=NAME_PX/(512.0*2.0.pow(band+.5))
+        // The website's curve for these zooms: farther out, longer and smoother.
+        val curveBand=when{band<7->0;band<9->1;else->2}
+        return taNameCurves(t).mapIndexedNotNull{index,(island,curves)->
+            val curve=curves.getOrNull(curveBand)?.takeIf{it.size>=2}?.map{VectorTile.Point((it.longitude+180)/360,CameraMath.mercatorY(it.latitude))}?:return@mapIndexedNotNull null
+            val reversed=PaintedName.reversed(PaintedName.chord(font,curve,height),pose.bearing.toDouble(),nameReversed[island]).also{nameReversed[island]=it}
+            // The North Island's sits on its curve (moved east of the trail); the South
+            // Island's above it, as on the website.
+            val above=if(island=="north")0.0 else height*1.2
+            nameGroups.getOrPut("$island:$band:$reversed"){
+                group(400,index,band*2+(if(reversed)1 else 0),doubleArrayOf(0.0,0.0,1.0,1.0),PaintedName.lines(font,curve,height,reversed,above,0xFFB8152F.toInt(),0xD9FAF3E4.toInt(),TA_ORDER+3))}
+        }
+    }
     private fun taWidths(z:Int)=when{z<=5->2.6f to 1.3f;z<=8->3.2f to 1.7f;z<=11->4f to 2.2f;else->4.8f to 2.7f}
     private fun taPaths(t:TeAraroa,z:Int)=taCache.getOrPut(z){
         val tolerance=.5/(512.0*2.0.pow(z))
@@ -753,7 +784,8 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         lastPublishAt=now
         val state=loader.mapSettings.state;val pose=view.planningPose;val zoom=floor(pose.zoom*4)/4
         val ordered=current.sortedWith(compareBy<GpuUploadQueue.Id>{it.z}.thenBy{it.x}.thenBy{it.y})
-        val key=listOf(state,ordered,tiles.mapValues{it.value.body.stamp?.fingerprint?:it.value.body.bytes.hashCode()},zoom,huntingRevision,huntingWanted,docRevision,taWanted,taRevision)
+        val painted=if(state.teAraroa)teAraroa?.let{paintedNames(it,pose)}else null
+        val key=listOf(state,ordered,tiles.mapValues{it.value.body.stamp?.fingerprint?:it.value.body.bytes.hashCode()},zoom,huntingRevision,huntingWanted,docRevision,taWanted,taRevision,painted)
         if(key==lastKey)return;lastKey=key
         // Like MapLibre's buckets: each source tile is decoded, styled, clipped and
         // packed once per styling; a publication only concatenates cached groups,
@@ -853,11 +885,12 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
                 }.takeIf{it.lines>0}?.let{groups.add(it)}
                 fun inside(p:VectorTile.Point)=p.x>=b[0]&&p.x<b[2]&&p.y>=b[1]&&p.y<b[3]
                 fun merc(c:Coordinate)=VectorTile.Point((c.longitude+180)/360,CameraMath.mercatorY(c.latitude))
-                // Food stops and the shops and cafés at them: only when zoomed right in (zoom 16+).
-                if(zoom>=16)for((i,s) in trail.stops.withIndex()){val p=merc(s.point);if(!inside(p))continue
+                // Food stops (towns) from zoom 9, a level before the campsites (names from 10); the
+                // shops and cafés at them replace them from zoom 16.
+                if(zoom>=9&&zoom<16)for((i,s) in trail.stops.withIndex()){val p=merc(s.point);if(!inside(p))continue
                     val r=if(zoom<10)2.6f else 3.6f
                     labels.add(TopographyStyle.Label(p,"",r,foodColour(s.kind),40.0,circle=true,key="$TA_STOP:$i",halo=if(s.kind=="box")TA_LINE else 0xFFFFFFFF.toInt()))
-                    if(zoom>=16)labels.add(TopographyStyle.Label(p,s.name,11f,0xFFE7F7EC.toInt(),42.0,key="$TA_STOP-name:$i",anchor="top"))}
+                    if(zoom>=10)labels.add(TopographyStyle.Label(p,s.name,11f,0xFFE7F7EC.toInt(),42.0,key="$TA_STOP-name:$i",anchor="top"))}
                 if(zoom>=16)for((i,x) in trail.shops.withIndex()){val p=merc(x.point);if(!inside(p))continue
                     labels.add(TopographyStyle.Label(p,"",if(zoom<14)3f else 4.2f,foodColour(x.kind),44.0,circle=true,key="$TA_SHOP:$i",halo=0xFFFFFFFF.toInt()))
                     if(zoom>=16)labels.add(TopographyStyle.Label(p,x.name,11f,0xFFECF8EF.toInt(),46.0,key="$TA_SHOP-name:$i",anchor="top"))}
@@ -867,18 +900,9 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
                     labels.add(TopographyStyle.Label(p,"",if(zoom<13)2.2f else 3.2f,if(lodge)TA_LINE else 0xFFFFF4F6.toInt(),48.0,circle=true,key="$TA_PLACE:$i",halo=if(lodge)0xFFFFF4F6.toInt() else TA_LINE))
                     if(zoom>=12)labels.add(TopographyStyle.Label(p,pl.name,11f,0xFFFFE3E8.toInt(),50.0,key="$TA_PLACE-name:$i",anchor="top"))}
             }
-            // The name: once on each island (zoom 5 to 11.5), written along a smoothed
-            // curve of the trail, letter by letter.
-            // One curve and one size at every zoom, so the name never changes shape or
-            // jumps between zoom bands (NativeLabels lays it out as printed on the map).
-            if(zoom>=5&&zoom<11.5){val band=1
-                for((island,curve) in taNameCurves(trail)){val points=curve.getOrNull(band)?:continue;if(points.size<2)continue
-                    val path="$TA_NAME:$island";val size=17f
-                    val merc=points.map{VectorTile.Point((it.longitude+180)/360,CameraMath.mercatorY(it.latitude))}
-                    for((k,p) in merc.withIndex())labels.add(TopographyStyle.Label(p,"",1f,0,2.0,key="$path:v$k",path=path,vertex=k))
-                    val anchor=merc[merc.size/2]
-                    for((k,ch) in "Te Araroa".withIndex())labels.add(TopographyStyle.Label(anchor,ch.toString(),size,0xFFB8152F.toInt(),2.0,key="$path:g$k",font=TA_FONT,halo=0xE0FAF3E4.toInt(),path=path,glyph=k))
-                }}
+            // The name, once on each island (zoom 5 to 11.5): painted onto the map along a
+            // smoothed curve of the trail, as print on a paper map (see PaintedName).
+            painted?.let{groups.addAll(it)}
         }else taGroups.clear()
         // A camera-dependent atlas order repainted/reuploaded the same strings on pans.
         // Fixed priority/key order keeps atlas slots stable; screen placement still follows camera.

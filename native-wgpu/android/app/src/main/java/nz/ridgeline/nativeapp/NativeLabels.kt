@@ -134,8 +134,14 @@ internal object NativeLabels {
     private class Box(val left:Float,val top:Float,val right:Float,val bottom:Float){
         fun intersects(o:Box)=left<o.right&&o.left<right&&top<o.bottom&&o.top<bottom
     }
-    /** Labels shown by the previous placement and their anchors. */
-    private var shown=HashMap<String,String>()
+    /** Labels shown by the previous placement, by text: where (x, y) and their anchors.
+     * Matched by text and place, not key: the same peak from a coarser or finer tile sits
+     * up to tens of metres apart (tile precision), so its key changed as the zoom crossed
+     * a tile level, it lost its place and names flickered while zooming. */
+    private var shown=HashMap<String,ArrayList<Pair<VectorTile.Point,String>>>()
+    /** Same label: the same text within this far on the map (Mercator, ~200 m). */
+    private const val SAME_PLACE=5e-6
+    private fun previous(label:TopographyStyle.Label)=shown[label.text]?.firstOrNull{(p,_)->abs(p.x-label.point.x)<SAME_PLACE&&abs(p.y-label.point.y)<SAME_PLACE}?.second
     /** Collision placement by importance, with hysteresis among equals: labels
      * already on screen go first within their priority, in their previous
      * anchor, so moving the map does not reshuffle which names are visible.
@@ -146,7 +152,8 @@ internal object NativeLabels {
     const val ENTRY=16
     fun place(atlas:NativeLabelAtlas,projected:FloatArray,width:Int,height:Int,scale:Float):ByteBuffer{
         val cells=HashMap<Long,MutableList<Box>>();val selected=ArrayList<Placed>()
-        val next=HashMap<String,String>()
+        val next=HashMap<String,ArrayList<Pair<VectorTile.Point,String>>>()
+        fun remember(label:TopographyStyle.Label,anchor:String){next.getOrPut(label.text){ArrayList()}.add(label.point to anchor)}
         val cell=64*scale;val padding=5*scale
         // Placed line labels by name: a road or river name is not repeated
         // closer than its symbol-spacing on screen (MapLibre spaces them along the line).
@@ -160,21 +167,22 @@ internal object NativeLabels {
         }
         // More important names first (MapLibre's symbol-sort-key); among equally
         // important ones, those already shown keep their place (no reshuffling).
-        val order=atlas.labels.indices.sortedWith(compareBy<Int>{atlas.labels[it].label.priority}.thenBy{if(atlas.labels[it].label.key in shown)0 else 1})
+        val before=atlas.labels.map{previous(it.label)}
+        val order=atlas.labels.indices.sortedWith(compareBy<Int>{atlas.labels[it].label.priority}.thenBy{if(before[it]!=null)0 else 1})
         for(i in order){val row=atlas.labels[i]
             if(row.label.path.isNotEmpty())continue
             if(i*3+2>=projected.size||projected[i*3+2]==0f)continue
             val px=projected[i*3];val py=projected[i*3+1];if(px<0||py<0||px>width||py>height)continue
-            if(row.label.circle){selected.add(Placed(i,-row.width/2,-row.height/2));next[row.label.key]="circle";continue}
+            if(row.label.circle){selected.add(Placed(i,-row.width/2,-row.height/2));remember(row.label,"circle");continue}
             val spacing=row.label.spacing*scale
             if(spacing>0f&&named[row.label.text]?.let{p->(p.indices step 2).any{k->val dx=p[k]-px;val dy=p[k+1]-py;dx*dx+dy*dy<spacing*spacing}}==true)continue
-            val previous=shown[row.label.key]
+            val previous=before[i]
             val anchors=if(row.label.variable)listOf("top","bottom","left","right").sortedBy{if(it==previous)0 else 1}else listOf(row.label.anchor)
             for(anchor in anchors){val ox=when(anchor){"left"->row.label.size*.7f;"right"->-row.width-row.label.size*.7f;else->-row.width/2};val oy=when(anchor){"top"->row.label.size*.5f;"bottom"->-row.height-row.label.size*.5f;else->-row.height/2}
                 val rect=Box(px+ox*scale-padding,py+oy*scale-padding,px+(ox+row.width)*scale+padding,py+(oy+row.height)*scale+padding)
                 if(rect.left<0||rect.top<0||rect.right>width||rect.bottom>height)continue
                 val indexes=keys(rect);if(indexes.any{k->cells[k]?.any{it.intersects(rect)}==true})continue
-                selected.add(Placed(i,ox,oy));next[row.label.key]=anchor;if(spacing>0f)named.getOrPut(row.label.text){ArrayList()}.apply{add(px);add(py)};for(k in indexes)cells.getOrPut(k){ArrayList()}.add(rect);break
+                selected.add(Placed(i,ox,oy));remember(row.label,anchor);if(spacing>0f)named.getOrPut(row.label.text){ArrayList()}.apply{add(px);add(py)};for(k in indexes)cells.getOrPut(k){ArrayList()}.add(rect);break
             }
         }
         shown=next

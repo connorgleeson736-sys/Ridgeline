@@ -28,6 +28,8 @@ pub struct GroupKey {
 }
 pub struct Line {
     pub color: [f32; 4],
+    /// CSS pixels at the current zoom; negative: Mercator units on the ground
+    /// (lettering painted on the map, scaling with it).
     pub width: f32,
     pub dash: [f32; 2],
     pub order: i32,
@@ -112,10 +114,13 @@ fn segments(tile: TileId, groups: &[Arc<Group>], scale: f64, out: &mut Vec<Segme
     let b = tile.bounds();
     let s = b[2] - b[0];
     let per = SIZE as f64 / s;
+    // Texture pixels across the line: screen widths scale with the zoom band,
+    // ground widths (negative) with the tile.
+    let pixels = |w: f32| if w < 0. { -(w as f64) * per } else { w as f64 * scale };
     let mut lines: Vec<&Line> = Vec::new();
     for g in groups {
         for line in &g.lines {
-            let margin = (line.width as f64 * scale * 0.5 + 2.) / per;
+            let margin = (pixels(line.width) * 0.5 + 2.) / per;
             if intersects(line.bbox, [b[0] - margin, b[1] - margin, b[2] + margin, b[3] + margin]) {
                 lines.push(line);
             }
@@ -125,7 +130,7 @@ fn segments(tile: TileId, groups: &[Arc<Group>], scale: f64, out: &mut Vec<Segme
     lines.sort_by_key(|l| l.order);
     let to = |p: [f64; 2]| [((p[0] - b[0]) * per) as f32, ((p[1] - b[1]) * per) as f32];
     for line in lines {
-        let mut half = (line.width as f64 * scale * 0.5) as f32;
+        let mut half = (pixels(line.width) * 0.5) as f32;
         let mut color = line.color;
         if half < 0.5 {
             // Thinner than a texel: keep one texel and fade, so coverage matches.
@@ -716,8 +721,9 @@ pub fn parse_line_packet(bytes: &[u8]) -> Option<Vec<GroupInput>> {
                 || total > 2_000_000
                 || at + n * 16 > end
                 || !width.is_finite()
-                || width <= 0.
+                || width == 0.
                 || width > 40.
+                || width < -0.01
                 || dash.iter().any(|v| !v.is_finite() || *v < 0. || *v > 400.)
             {
                 return None;
@@ -795,5 +801,26 @@ mod packet_tests {
         assert!(matches!(parsed[0], GroupInput::Empty(_, 1)), "a tile without lines is sent by value, empty");
         assert!(matches!(parsed[1], GroupInput::New(_)));
         assert!(matches!(parsed[2], GroupInput::Existing(_, 3)));
+    }
+    #[test]
+    fn ground_widths_scale_with_the_tile_and_screen_widths_do_not() {
+        // A line across the middle of world tile 4/8/8, 1e-3 Mercator units wide on the ground.
+        let p = |z: u32| {
+            let n = (1u32 << z) as f64;
+            let y = 8.5 / 16.;
+            let ground = Line::new(vec![[0.5, y], [0.5 + 1. / 32., y]], [1.; 4], -1e-3, [0.; 2], 0).unwrap();
+            let screen = Line::new(vec![[0.5, y], [0.5 + 1. / 32., y]], [1.; 4], 4., [0.; 2], 0).unwrap();
+            let group = Arc::new(Group::new(GroupKey { z: 400, x: 0, y: 0, clip: [0; 4] }, 1, vec![ground, screen]));
+            let tile = TileId { z: z as u8, x: (0.5 * n) as u32, y: (y * n) as u32 };
+            let mut out = Vec::new();
+            segments(tile, &[group], 1., &mut out);
+            (out[0].params[0], out[1].params[0])
+        };
+        let (g4, s4) = p(4);
+        let (g6, s6) = p(6);
+        // Half widths in texture pixels: 1e-3 * 512 * 2^z / 2 on the ground.
+        assert!((g4 - 1e-3 * 512. * 16. / 2.).abs() < 1e-3, "{g4}");
+        assert!((g6 / g4 - 4.).abs() < 1e-3, "{g6} {g4}");
+        assert_eq!(s4, s6);
     }
 }

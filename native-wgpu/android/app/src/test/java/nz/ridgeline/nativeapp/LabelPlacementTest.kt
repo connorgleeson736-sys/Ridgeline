@@ -26,6 +26,15 @@ class LabelPlacementTest {
         assertEquals(setOf("b"),placed(a,floatArrayOf(500f,500f,0f, 505f,502f,1f)))
         assertEquals(setOf("b"),placed(a,floatArrayOf(500f,500f,1f, 505f,502f,1f)))
     }
+    @Test fun aPeakFromAnotherTileKeepsItsPlace(){
+        // The same peak from a coarser and a finer tile: another key, ~30 m apart.
+        fun peak(key:String,text:String,x:Double)=NativeLabelAtlas.Row(TopographyStyle.Label(VectorTile.Point(x,.6),text,12f,0,60.0,key=key),80f,16f)
+        val coarse=atlas(peak("peaks:Mt Aspiring:1","Mt Aspiring",.5),peak("peaks:Mt Avalanche:1","Mt Avalanche",.5001))
+        assertEquals(setOf("peaks:Mt Aspiring:1"),placed(coarse,floatArrayOf(500f,500f,1f, 505f,502f,0f)))
+        // Zoomed in a tile level: the other peak first in the list, both overlapping.
+        val fine=atlas(peak("peaks:Mt Avalanche:2","Mt Avalanche",.5001),peak("peaks:Mt Aspiring:2","Mt Aspiring",.5+7.5e-7))
+        assertEquals(setOf("peaks:Mt Aspiring:2"),placed(fine,floatArrayOf(505f,502f,1f, 500f,500f,1f)))
+    }
     @Test fun aNameHiddenByTerrainTakesNoSpace(){
         val a=atlas(label("peak behind ridge",1.0),label("hut",10.0),label("hut-dot",100.0,circle=true))
         // The peak is hidden (unprojected): the hut name and its dot are placed.
