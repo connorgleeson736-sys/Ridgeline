@@ -19,6 +19,12 @@ data class CameraPose(val longitude:Double=170.14219572,val latitude:Double=-43.
  * Camera gesture dynamics are still a prototype; see open parity gates. */
 /** Render scale while moving with "Lower resolution while moving" (44% fewer pixels). */
 private const val MOTION_SCALE=.75f
+/** Power saving: drawing scale when still and while moving; frames at most 30 a second. */
+private const val POWER_SCALE=.8f
+private const val POWER_MOTION_SCALE=.6f
+private const val POWER_FRAME_NANOS=32_000_000L
+/** Names further than this many screen widths from the view's centre are not shown. */
+private const val FAR_LABEL_SCREENS=2.5
 
 class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     // Above the decode workers (default priority): on two fast cores the
@@ -287,10 +293,15 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     private var frameTimeNanos=0L
     private var activeFrameNanos=16_666_667L
     private val vsync=Choreographer.FrameCallback{stamp->
+        // Power saving: at most 30 frames a second (a later vsync draws the frame).
+        if(powerSaving&&lastDrawNanos!=0L&&stamp-lastDrawNanos<POWER_FRAME_NANOS){queued.set(true);choreographer.postFrameCallback(vsyncAgain);return@FrameCallback}
+        lastDrawNanos=stamp
         frameTimeNanos=stamp
         display?.refreshRate?.takeIf{it.isFinite()&&it in 20f..240f}?.let{activeFrameNanos=(1_000_000_000.0/it).toLong()}
         drawFrame()
     }
+    private val vsyncAgain=Choreographer.FrameCallback{stamp->vsync.doFrame(stamp)}
+    private var lastDrawNanos=0L
     private val adaptiveWake=Runnable{requestFrame()}
     private val focusWake=Runnable{requestFrame()}
     private val retryWake=Runnable{requestFrame()}
@@ -475,7 +486,9 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             cameraPose=corrected;applyGesture()
         }}
         val renderStarted=System.nanoTime()
-        val scale=if(motionResolution&&gestureActive)MOTION_SCALE else 1f;val prepare=if(motionResolution)MOTION_SCALE else 1f
+        // Power saving: fewer pixels always, fewer still while moving.
+        val scale=if(powerSaving)(if(gestureActive)POWER_MOTION_SCALE else POWER_SCALE) else if(motionResolution&&gestureActive)MOTION_SCALE else 1f
+        val prepare=if(powerSaving)POWER_MOTION_SCALE else if(motionResolution)MOTION_SCALE else 1f
         if(scale!=appliedScale||prepare!=appliedPrepare){NativeBridge.renderScale(handle,scale,prepare);appliedScale=scale;appliedPrepare=prepare}
         coveragePacket?.let{c->if(c!==appliedCoverage){val b=c.second;if(NativeBridge.coverage(handle,c.first,b?.get(0)?:0.0,b?.get(1)?:0.0,b?.get(2)?:0.0,b?.get(3)?:0.0))appliedCoverage=c}}
         val shown=NativeBridge.render(handle,frameWidth,frameHeight,pose.longitude,pose.latitude,pose.zoom+ln(pixelScale)/ln(2.0),pose.zoom,pose.bearing,pose.pitch,pose.elevation,latched.revision,latched.inputNanos,latchedAt)
@@ -531,13 +544,19 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
                 val revision=NativeBridge.labelVisibility(handle,labelVisibilityBytes,atlas.labels.size)
                 if(revision!=labelVisibilityRevision){
                     labelVisibilityRevision=revision
+                    labelVisiblePrevious=labelVisible
                     labelVisible=if(revision<0)null else ByteArray(atlas.labels.size).also{labelVisibilityBytes.rewind();labelVisibilityBytes.get(it)}
                     labelPose=null
                 }
             }
             if(atlas!=null&&atlas.labels.isNotEmpty()&&(labelPose!=pose||labelSize!=size)&&now-labelTime>=(if(gestureActive)100 else 33)){
                 val n=NativeBridge.project(handle,atlas.points,labelProjection);labelProjection.rewind();val positions=FloatArray(n*3){labelProjection.float}
-                labelVisible?.takeIf{it.size==n}?.let{visible->for(i in 0 until n)if(visible[i].toInt()==0)positions[i*3+2]=0f}
+                // Behind terrain: hidden once two readings in a row agree, so names on a
+                // ridge's edge do not flash on and off as the view moves.
+                labelVisible?.takeIf{it.size==n}?.let{visible->val before=labelVisiblePrevious?.takeIf{it.size==n}
+                    for(i in 0 until n)if(visible[i].toInt()==0&&(before==null||before[i].toInt()==0))positions[i*3+2]=0f}
+                // Far beyond the view (towards the horizon when tilted): not shown.
+                farLabels(atlas,pose,positions,n)
                 // A name along a curve: its whole curve, as laid out each frame (not cut short by terrain or tiles).
                 if(curveAtlas===atlas&&positions.size==atlas.labels.size*3)curveSet?.let{set->NativeLabels.project(atlas,set,positions){i,o->NativeBridge.projectCurve(handle,i,o)}}
                 labelPose=pose;labelSize=size;labelTime=now
@@ -595,7 +614,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             if(live&&active)choreographer.postFrameCallbackDelayed(vsync,delay)else queued.set(false)
         }
     }
-    private fun cancelFrames(){queued.set(false);gpu.post{gpu.removeCallbacks(adaptiveWake);gpu.removeCallbacks(focusWake);gpu.removeCallbacks(retryWake);choreographer.removeFrameCallback(vsync)}}
+    private fun cancelFrames(){queued.set(false);gpu.post{gpu.removeCallbacks(adaptiveWake);gpu.removeCallbacks(focusWake);gpu.removeCallbacks(retryWake);choreographer.removeFrameCallback(vsync);choreographer.removeFrameCallback(vsyncAgain)}}
     private fun changed(){requestFrame();onCamera()}
     init{holder.addCallback(this)}
     override fun surfaceCreated(holder:SurfaceHolder) {
@@ -667,6 +686,23 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     private val displayPreferences=context.getSharedPreferences("display",0)
     /** Lower render resolution while the camera moves; full resolution when
      * still. On by default for phones with up to 4 GB of RAM (low-end GPUs). */
+    /** Power saving: 30 frames a second and fewer pixels (TileLoader also stops its idle preparation). */
+    private var labelVisiblePrevious:ByteArray?=null
+    /** Hides names more than [FAR_LABEL_SCREENS] screens from the view's centre on the
+     * ground: tilted views otherwise show names hundreds of kilometres away along the
+     * horizon. Names along curves (Te Araroa's) are laid out separately. */
+    private fun farLabels(atlas:NativeLabelAtlas,pose:CameraPose,positions:FloatArray,n:Int){
+        val span=max(width,height)/pixelScale/(512.0*2.0.pow(pose.zoom))
+        val limit=span*FAR_LABEL_SCREENS;val cx=(pose.longitude+180)/360;val cy=CameraMath.mercatorY(pose.latitude)
+        val points=atlas.points.duplicate().order(ByteOrder.LITTLE_ENDIAN);points.rewind()
+        for(i in 0 until min(n,atlas.labels.size)){
+            if(points.remaining()<16)break
+            val x=points.double;val y=points.double
+            if(atlas.labels[i].label.path.isEmpty()&&hypot(x-cx,y-cy)>limit)positions[i*3+2]=0f
+        }
+    }
+    @Volatile var powerSaving=displayPreferences.getBoolean("powerSaving",false)
+        set(value){field=value;displayPreferences.edit().putBoolean("powerSaving",value).apply();requestFrame()}
     @Volatile var motionResolution=displayPreferences.getBoolean("motionResolution",run{
         val am=context.getSystemService(android.app.ActivityManager::class.java);val info=android.app.ActivityManager.MemoryInfo();am.getMemoryInfo(info)
         am.isLowRamDevice||info.totalMem<=(4.2*(1L shl 30)).toLong()})

@@ -848,14 +848,14 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
                 }.takeIf{it.lines>0}?.let{groups.add(it)}
                 fun inside(p:VectorTile.Point)=p.x>=b[0]&&p.x<b[2]&&p.y>=b[1]&&p.y<b[3]
                 fun merc(c:Coordinate)=VectorTile.Point((c.longitude+180)/360,CameraMath.mercatorY(c.latitude))
-                // Food stops (zoom 6 to 11; names from 8), then the shops and cafés at them (from 11, names from 12.5).
+                // Food stops (zoom 6 to 11; names from 8), then the shops and cafés at them (from 11, names from 14).
                 if(zoom>=6&&zoom<11)for((i,s) in trail.stops.withIndex()){val p=merc(s.point);if(!inside(p))continue
                     val r=if(zoom<10)2.6f else 3.6f
                     labels.add(TopographyStyle.Label(p,"",r,foodColour(s.kind),40.0,circle=true,key="$TA_STOP:$i",halo=if(s.kind=="box")TA_LINE else 0xFFFFFFFF.toInt()))
                     if(zoom>=8)labels.add(TopographyStyle.Label(p,s.name,11f,0xFFE7F7EC.toInt(),42.0,key="$TA_STOP-name:$i",anchor="top"))}
                 if(zoom>=11)for((i,x) in trail.shops.withIndex()){val p=merc(x.point);if(!inside(p))continue
-                    labels.add(TopographyStyle.Label(p,"",if(zoom<12.5)3f else 4.2f,foodColour(x.kind),44.0,circle=true,key="$TA_SHOP:$i",halo=0xFFFFFFFF.toInt()))
-                    if(zoom>=12.5)labels.add(TopographyStyle.Label(p,x.name,11f,0xFFECF8EF.toInt(),46.0,key="$TA_SHOP-name:$i",anchor="top"))}
+                    labels.add(TopographyStyle.Label(p,"",if(zoom<14)3f else 4.2f,foodColour(x.kind),44.0,circle=true,key="$TA_SHOP:$i",halo=0xFFFFFFFF.toInt()))
+                    if(zoom>=14)labels.add(TopographyStyle.Label(p,x.name,11f,0xFFECF8EF.toInt(),46.0,key="$TA_SHOP-name:$i",anchor="top"))}
                 // Places to stay the map does not show itself (huts it does): campsites, holiday parks, lodges.
                 if(zoom>=10)for((i,pl) in trail.places.withIndex()){val pt=pl.point?:continue;if(pl.approx||pl.hut)continue;val p=merc(pt);if(!inside(p))continue
                     val lodge=pl.type=="Hostel"||pl.type=="Lodge"

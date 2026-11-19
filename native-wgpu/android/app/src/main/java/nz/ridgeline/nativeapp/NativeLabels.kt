@@ -222,6 +222,8 @@ internal object NativeLabels {
      * a line read left to right). A name is left out when its curve is off screen,
      * too short for it, or bends too sharply between two letters. Each result: the
      * letters' entries and their collision boxes. */
+    /** Which way each curve's name last read (true: from the curve's end), kept until it clearly turns. */
+    private val readsBack=java.util.concurrent.ConcurrentHashMap<String,Boolean>()
     private fun curves(atlas:NativeLabelAtlas,projected:FloatArray,width:Int,height:Int,scale:Float):List<Pair<List<Placed>,List<Box>>>{
         val vertices=HashMap<String,ArrayList<Pair<Int,Int>>>();val glyphs=HashMap<String,ArrayList<Pair<Int,Int>>>()
         for((i,row) in atlas.labels.withIndex()){val l=row.label;if(l.path.isEmpty())continue
@@ -237,7 +239,11 @@ internal object NativeLabels {
             var m=1;while(m<all.size-1&&geo[m]<geo.last()/2)m++
             if(!seen(all[m-1])||!seen(all[m]))continue
             val mf=((geo.last()/2-geo[m-1])/max(1e-12f,geo[m]-geo[m-1])).coerceIn(0f,1f)
-            val shown=all.filter{seen(it)}
+            // The unbroken stretch of the curve on screen through its middle: points
+            // hidden elsewhere do not bend it or move the name along it.
+            var lo=m-1;while(lo>0&&seen(all[lo-1]))lo--
+            var hi=m;while(hi<all.size-1&&seen(all[hi+1]))hi++
+            val shown=all.subList(lo,hi+1)
             val points=shown.map{floatArrayOf(projected[it*3],projected[it*3+1])}
             if(points.size<2)continue
             val midPoint=floatArrayOf(projected[all[m-1]*3]+(projected[all[m]*3]-projected[all[m-1]*3])*mf,projected[all[m-1]*3+1]+(projected[all[m]*3+1]-projected[all[m-1]*3+1])*mf)
@@ -251,8 +257,16 @@ internal object NativeLabels {
             val size=rows.first().label.size
             val advances=rows.map{max(0f,it.width-8f)*scale};val tracking=size*.2f*scale
             val total=advances.sum()+tracking*(rows.size-1)
-            // Read left to right: a curve drawn leftwards is read from its other end.
-            val reversed=points.last()[0]<points.first()[0]
+            // Read left to right: decided by the stretch the name covers, not the
+            // curve's ends, and only changed when it clearly runs the other way, so the
+            // name stays put on the map until it has to turn to stay upright.
+            val forward=FloatArray(points.size);for(k in 1 until points.size)forward[k]=forward[k-1]+hypot(points[k][0]-points[k-1][0],points[k][1]-points[k-1][1])
+            fun along(d:Float):FloatArray{val s=d.coerceIn(0f,forward.last());var k=1;while(k<points.size-1&&forward[k]<s)k++
+                val span=max(1e-3f,forward[k]-forward[k-1]);val f=(s-forward[k-1])/span
+                return floatArrayOf(points[k-1][0]+(points[k][0]-points[k-1][0])*f,points[k-1][1]+(points[k][1]-points[k-1][1])*f)}
+            val rightwards=along(midRun+total/2)[0]-along(midRun-total/2)[0]
+            val reversed=when{rightwards< -size*scale->true;rightwards>size*scale->false;else->readsBack[path]?:(rightwards<0)}
+            readsBack[path]=reversed
             val line=if(reversed)points.reversed()else points
             val run=FloatArray(line.size);for(k in 1 until line.size)run[k]=run[k-1]+hypot(line[k][0]-line[k-1][0],line[k][1]-line[k-1][1])
             val length=run.last();if(length<total+size*scale)continue

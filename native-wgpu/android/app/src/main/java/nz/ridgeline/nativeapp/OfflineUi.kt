@@ -107,6 +107,8 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
     private fun restoreStyle(){styleBefore?.let{before->styleBefore=null;loader.mapSettings.change{it.copy(threeD=before.threeD)}}}
     private fun removeFrame(){frame?.let{root.removeView(it)};frame=null}
     /** Opens the offline bar. */
+    /** Opens the Te Araroa download chooser (TrackSheet); false while the trail loads. */
+    var teAraroaDownload:()->Boolean={false}
     fun startRegion(){
         closeBar()
         val content=NativeUi.column(activity)
@@ -302,13 +304,20 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
         val eraser=TextView(activity).apply{text="Erase";textSize=12f;gravity=Gravity.CENTER;isClickable=true;setTextColor(NativeUi.ink);setOnClickListener{erasing=true;showBrush();hint("Hold, then drag to erase")};contentDescription="Eraser"}
         eraseChip=eraser
         chips.addView(eraser,LinearLayout.LayoutParams(0,dp(52),1f).apply{marginStart=dp(4)})
+        chips.addView(key,LinearLayout.LayoutParams(dp(36),dp(52)).apply{marginStart=dp(4)})
         pane.addView(chips)
         // Tools.
         val undo=NativeUi.button(activity,"Undo"){if(area.undo())areaChanged(true)};undoButton=undo
         val clear=NativeUi.button(activity,"Clear"){if(!area.isEmpty())AlertDialog.Builder(activity).setMessage("Clear the painted area?").setPositiveButton("Clear"){_,_->area.clear();areaChanged(true)}.setNegativeButton("Cancel",null).show()}
         val route=NativeUi.button(activity,"Along route"){paintRoute()}
+        // The colours explained.
+        val key=TextView(activity).apply{text="?";textSize=15f;gravity=Gravity.CENTER;setTypeface(null,android.graphics.Typeface.BOLD);setTextColor(NativeUi.ink);isClickable=true
+            contentDescription="What the colours mean";background=chipBackground(false);setOnClickListener{colourKey()}}
         pane.addView(LinearLayout(activity).apply{setPadding(0,dp(6),0,0)
             for((i,v)in listOf(undo,clear,route).withIndex())addView(v.apply{minimumHeight=0;minHeight=0},LinearLayout.LayoutParams(0,dp(36),if(i==2)1.4f else 1f).apply{if(i>0)marginStart=dp(8)})})
+        // Te Araroa: a corridor along the trail, chosen by section, island or the whole trail.
+        pane.addView(NativeUi.button(activity,"Te Araroa…"){if(!teAraroaDownload())Toast.makeText(activity,"Te Araroa is still loading. Try again in a moment.",Toast.LENGTH_SHORT).show()}.apply{minimumHeight=0;minHeight=0;contentDescription="Download Te Araroa for offline"},
+            LinearLayout.LayoutParams(-1,dp(36)).apply{topMargin=dp(6)})
         val line=NativeUi.text(activity,"",12.5f).apply{setPadding(0,dp(6),0,dp(6))};info=line
         pane.addView(line)
         val name=EditText(activity).apply{setSingleLine();hint="Name (optional)";setText(regionName);textSize=14f;filters=arrayOf(android.text.InputFilter.LengthFilter(60))}
@@ -317,6 +326,19 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
             addView(name,LinearLayout.LayoutParams(0,-2,1f));addView(download,LinearLayout.LayoutParams(dp(116),dp(44)).apply{marginStart=dp(8)})})
         showBrush();updatePaintInfo()
         return pane
+    }
+    /** What the map's colours mean on the Paint tab. */
+    private fun colourKey(){
+        val box=NativeUi.column(activity).apply{setPadding(dp(20),dp(8),dp(20),dp(4))}
+        val zoomText=arrayOf("roads, rivers and the lie of the land","tracks and huts","good detail for walking","the finest imagery and topo")
+        for(i in PaintedArea.NAMES.indices){
+            val row=LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL;setPadding(0,dp(6),0,dp(6))}
+            row.addView(View(activity).apply{background=android.graphics.drawable.GradientDrawable().apply{shape=android.graphics.drawable.GradientDrawable.OVAL;setColor(PaintedArea.COLORS[i])}},LinearLayout.LayoutParams(dp(16),dp(16)).apply{marginEnd=dp(12)})
+            row.addView(NativeUi.text(activity,"${PaintedArea.NAMES[i]} · zoom ${PaintedArea.DETAILS[i]}: ${zoomText[i]}",14f),LinearLayout.LayoutParams(0,-2,1f))
+            box.addView(row)
+        }
+        box.addView(NativeUi.text(activity,"\nStrong colour: the area you've painted, to be downloaded at that detail.\n\nFaint colour: already saved on this phone, at that detail.\n\nNo colour: nothing saved yet. Higher detail takes more space.",13.5f))
+        AlertDialog.Builder(activity).setTitle("Map colours").setView(ScrollView(activity).apply{addView(box)}).setPositiveButton("OK",null).show()
     }
     /** A detail colour: dot and name; outlined when it is the brush. */
     private fun swatch(i:Int)=LinearLayout(activity).apply{

@@ -105,6 +105,8 @@ class MainActivity:Activity(){
         // Tap a track name for its summary; tap inside a hunting permit area for its details.
         // A tap elsewhere leaves an open summary as it is (it closes with its X).
         trackSheet=TrackSheet(this,root,loader,mapHost)
+        offlineUi.teAraroaDownload={trackSheet.downloadTeAraroa()}
+        loader.powerSaving=terrain.powerSaving
         trackSheet.onLine={line,part->planner.highlightTrack(line,part)}
         trackSheet.onClosed={planner.relayout()}
         trackSheet.onPoint={terrain.inspect(it)}

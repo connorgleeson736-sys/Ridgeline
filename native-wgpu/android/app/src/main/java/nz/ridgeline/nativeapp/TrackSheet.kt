@@ -139,6 +139,8 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     /** Beside the title: Te Araroa's direction switch. */
     private val aside=FrameLayout(activity)
     private lateinit var statsRow:LinearLayout
+    /** The page below the name; scrolled back to its top when the panel is lowered, so the figures show under the name. */
+    private val bodyScroll=ScrollView(activity).apply{isVerticalScrollBarEnabled=false}
     /** Above the chart (Te Araroa: tabs and lists, or previous/next and alerts). */
     private val taTop=NativeUi.column(activity).apply{visibility=View.GONE}
     /** Below the introduction (Te Araroa: food, bypasses, a stop's or shop's details). */
@@ -209,7 +211,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         body.addView(fine,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(14)})
         panel.addView(grip,LinearLayout.LayoutParams(-1,dp(28)))
         panel.addView(header,LinearLayout.LayoutParams(-1,-2))
-        panel.addView(ScrollView(activity).apply{isVerticalScrollBarEnabled=false;addView(body)},LinearLayout.LayoutParams(-1,0,1f))
+        panel.addView(bodyScroll.apply{addView(body)},LinearLayout.LayoutParams(-1,0,1f))
         root.addView(panel,FrameLayout.LayoutParams(-1,-1,Gravity.BOTTOM))
         root.addOnLayoutChangeListener{_,_,_,_,_,_,_,_,_->if(visible&&!dragging)place(false)}
         // The compact stop follows the header (a subtitle or photo arriving).
@@ -254,7 +256,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         }else{panel.translationY=target;cover()}
         grip.contentDescription=if(level==2)"Collapse track summary" else "Expand track summary"
     }
-    private fun settle(l:Int){level=l.coerceIn(0,2);place(true)}
+    private fun settle(l:Int){level=l.coerceIn(0,2);if(level==0)bodyScroll.smoothScrollTo(0,0);place(true)}
     private fun begin(rawY:Float){dragging=true;startY=rawY;panel.animate().cancel();slidingTo=Float.NaN;startShift=panel.translationY}
     private fun drag(rawY:Float){if(dragging){panel.translationY=(startShift+rawY-startY).coerceIn(0f,full().toFloat());cover()}}
     private fun finish(rawY:Float){
@@ -1133,6 +1135,8 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     var onOfflineDownload:(String,Map<Int,Int>,MapSettings.Base,((String)->ByteArray?)->Unit,List<List<Coordinate>>,(String)->Unit,()->Unit)->Boolean={_,_,_,_,_,_,_->false}
     @Volatile private var taDownloading=false
     /** [from]: the section open (null: the trail's page). */
+    /** The Te Araroa download chooser for the whole trail (the Offline maps page). */
+    fun downloadTeAraroa():Boolean{val d=teAraroa?:return false;taOffline(d,null);return true}
     private fun taOffline(d:TeAraroa,from:TeAraroa.Section?){
         if(taDownloading){Toast.makeText(activity,"A Te Araroa download is already running.",Toast.LENGTH_SHORT).show();return}
         val island=from?.island?:""

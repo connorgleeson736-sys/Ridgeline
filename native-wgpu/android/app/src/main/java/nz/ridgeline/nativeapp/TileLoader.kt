@@ -249,7 +249,10 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             }finally{coverageBusy.set(false)}
         }}catch(_:java.util.concurrent.RejectedExecutionException){coverageBusy.set(false)}
     }
-    private val idleWork get()=prepareAhead||parentPreload
+    /** Power saving (Map layers): no idle preparation or coarser preloading. */
+    @Volatile var powerSaving=false
+        set(value){field=value;clearWarm();cameraChanged()}
+    private val idleWork get()=!powerSaving&&(prepareAhead||parentPreload)
     private var previousPose:CameraPose?=null
     private var previousFocus:SurfaceFocus?=null
     private var viewRevision=0L
@@ -555,8 +558,8 @@ class TileLoader(private val context: Context, private val view: TerrainView) {
             if(!idleWork||revision!=viewRevision||preparedRevision==revision||dead||!active||!view.canPrepareAhead||jobs.values.any{!it.speculative}||wanted.any{!resident(it)&&!view.hasResidentCoverage(it.id.gpu(),it.geometry)})return
             preparedRevision=revision
             val extras=LinkedHashSet<Source>()
-            if(parentPreload)extras.addAll(ParentPreload.plan(wanted.map{ParentPreload.Tile(it.id.z,it.id.x,it.id.y,it.geometry)},key.pose).map{Source(Id(it.z,it.x,it.y),it.geometry)}.filter{it !in wanted&&!resident(it)})
-            if(prepareAhead)for(geometry in listOf(true,false)){
+            if(parentPreload&&!powerSaving)extras.addAll(ParentPreload.plan(wanted.map{ParentPreload.Tile(it.id.z,it.id.x,it.id.y,it.geometry)},key.pose).map{Source(Id(it.z,it.x,it.y),it.geometry)}.filter{it !in wanted&&!resident(it)})
+            if(prepareAhead&&!powerSaving)for(geometry in listOf(true,false)){
                 planBuffer.rewind();val pose=key.pose
                 val count=NativeBridge.plan(key.width,key.height,pose.longitude,pose.latitude,pose.zoom,pose.bearing,pose.pitch,pose.elevation,
                     if(geometry)geometryLimit else imageLimit,DetailPolicy.target(geometry,if(geometry)key.terrainDetail else key.imageryDetail),if(geometry)22 else 19,1.3,planBuffer)
