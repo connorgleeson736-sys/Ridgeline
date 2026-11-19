@@ -15,8 +15,9 @@ import { imagery as worker } from './workers.js';
 import { dataUrl } from './data-url.js';
 
 const base = (config.overviewUrl || '').replace(/\/$/, '');
-// The overview tiles with LINZ's shading already taken out (tools/correct-overview.py).
-const TILES = config.overviewCorrected ? 'ctiles' : 'tiles';
+// The overview tiles with LINZ's shading already taken out (tools/correct-overview.py),
+// at quality 95 unless the build says otherwise.
+const TILES = config.overviewTiles || (config.overviewCorrected ? 'ctiles' : 'tiles');
 const ESRI = 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile';
 
 let overview = null, overviewLoading = null;

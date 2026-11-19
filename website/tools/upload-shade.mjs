@@ -24,7 +24,9 @@ console.log(`${todo.length} to upload, ${done.size} already there`);
 async function put(k) {
   const body = readFileSync(join(out, `${k}.webp`));
   for (let attempt = 0; ; attempt++) {
-    const r = await fetch(`${api}/shade/v1/${k}.webp`, { method: 'PUT', body, headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'image/webp', 'Cache-Control': 'public, max-age=31536000, immutable' } });
+    let r;
+    try { r = await fetch(`${api}/shade/v1/${k}.webp`, { method: 'PUT', body, headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'image/webp', 'Cache-Control': 'public, max-age=31536000, immutable' } });
+    } catch (e) { if (attempt >= 6) throw e; await new Promise((s) => setTimeout(s, 1000 * 2 ** attempt)); continue; } // dropped connection: retry
     if (r.ok) return;
     if (attempt >= 6 || (r.status < 500 && r.status !== 429)) throw new Error(`PUT ${k}: ${r.status} ${(await r.text()).slice(0, 200)}`);
     await new Promise((s) => setTimeout(s, 1000 * 2 ** attempt));

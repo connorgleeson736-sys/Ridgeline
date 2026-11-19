@@ -43,7 +43,7 @@ export default {
     // …the same with LINZ's shading taken out (/ctiles/, tools/correct-overview.py),
     // and the shading corrections (tools/shade-corrections.py):
     // /shade/v1/<z>/<bx>/<by>.webp. None ever changes.
-    if (env.OVERVIEWS && (/^\/c?tiles\/[0-9a-f]{64}\/\d+\.webp$/.test(path) || /^\/shade\/v1\/\d{1,2}\/\d{1,5}\/\d{1,5}\.webp$/.test(path))) {
+    if (env.OVERVIEWS && (/^\/(c?tiles|ctiles-q95)\/[0-9a-f]{64}\/\d+\.webp$/.test(path) || /^\/shade\/v1\/\d{1,2}\/\d{1,5}\/\d{1,5}\.webp$/.test(path))) {
       const cache = caches.default, get = request.method === 'GET', hit = get ? await cache.match(request) : null;
       if (hit) return hit;
       const object = await env.OVERVIEWS.get(path.slice(1));

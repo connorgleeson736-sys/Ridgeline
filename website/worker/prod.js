@@ -8,7 +8,7 @@ import { docAlerts } from './doc-alerts.js';
 import { teAraroa } from './te-araroa.js';
 import { notify } from './notify.js';
 
-const TILE = /^\/(tiles\/[0-9a-f]{64}\/\d+|ctiles\/[0-9a-f]{64}\/\d+|shade\/v1\/\d{1,2}\/\d{1,5}\/\d{1,5})\.webp$/;
+const TILE = /^\/(tiles\/[0-9a-f]{64}\/\d+|ctiles(-q95)?\/[0-9a-f]{64}\/\d+|shade\/v1\/\d{1,2}\/\d{1,5}\/\d{1,5})\.webp$/;
 
 export default {
   async fetch(request, env) {
