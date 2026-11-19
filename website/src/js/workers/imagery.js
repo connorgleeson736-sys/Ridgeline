@@ -78,9 +78,13 @@ async function blockGain({ block: url, x, y }, signal) {
   return any ? gain : null;
 }
 
-async function deshade(img, shade, signal) {
+/** The photograph with the shading taken out: the photo and its correction fetched together. */
+async function deshade(photo, shade, signal) {
+  const gainP = Array.isArray(shade) ? shading(shade, signal) : blockGain(shade, signal);
+  gainP.catch(() => {}); // awaited below; not unhandled if the photo fails first
+  const img = await photo;
   let gain;
-  try { gain = await (Array.isArray(shade) ? shading(shade, signal) : blockGain(shade, signal)); } catch (e) { img.close(); throw e; }
+  try { gain = await gainP; } catch (e) { img.close(); throw e; }
   if (!gain) return img;
   const c = new OffscreenCanvas(SIZE, SIZE), g = c.getContext('2d', { willReadFrequently: true });
   g.drawImage(img, 0, 0, SIZE, SIZE);
@@ -95,12 +99,11 @@ async function deshade(img, shade, signal) {
 }
 
 async function layerImage(l, signal) {
-  let img;
-  try { img = await bitmap(l.url, signal); } catch (e) {
+  const photo = bitmap(l.url, signal).catch((e) => {
     if (!l.fallback || signal.aborted) throw e;
-    img = await bitmap(l.fallback, signal); // a missing overview tile: LINZ's own
-  }
-  return l.shade ? deshade(img, l.shade, signal) : img;
+    return bitmap(l.fallback, signal); // a missing overview tile: LINZ's own
+  });
+  return l.shade ? deshade(photo, l.shade, signal) : photo;
 }
 
 async function compose({ layers }, signal) {
