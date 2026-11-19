@@ -129,7 +129,7 @@ async function main() {
   map.on('style.load', images);
   map.on('styleimagemissing', (e) => { if (e.id === 'hatch') images(); });
   map.addControl(new ScaleControl({ maxWidth: 100, unit: 'metric' }), 'bottom-left');
-  map.addControl(new AttributionControl({ compact: true, customAttribution: '<a href="/credits/">Data credits</a>' }), 'bottom-right');
+  map.addControl(new AttributionControl({ compact: true, customAttribution: '<a href="/about/#credits">Data credits</a>' }), 'bottom-right');
 
   // ---- Shared context for panels ----
   const sheet = new Sheet($('sheet'), { onClose: () => { side.close(); if (planner.active) planner.close(); select(null); marker(null); } });
@@ -227,7 +227,17 @@ async function main() {
     history.pushState(null, '', a.getAttribute('href'));
     openLinked(a.dataset.map.replace(/^\//, ''));
   });
-  if (promo) window.bushlinePromo = { walk: (guid) => openWalk(ctx, guid), teAraroa: (slug = null) => openTeAraroa(ctx, slug), sheet };
+  if (promo) window.bushlinePromo = {
+    walk: (guid) => openWalk(ctx, guid), teAraroa: (slug = null) => openTeAraroa(ctx, slug), sheet,
+    route: (gpx) => planner.promoGpx(gpx),
+    // A view as in the address (zoom/lat/lng/bearing/pitch), set after a panel has framed its line.
+    // Its centre in the middle of the map above an open panel, as the app frames it.
+    view: (v) => {
+      const [zoom, lat, lng, bearing = 0, pitch = 0] = v.split('/').map(Number);
+      const top = $('sheet').hidden ? innerHeight : $('sheet').getBoundingClientRect().top;
+      map.jumpTo({ zoom, center: [lng, lat], bearing, pitch, padding: { top: 0, left: 0, right: 0, bottom: Math.max(0, innerHeight - top) } });
+    },
+  };
   const overlays = attachOverlays(map, () => settings);
   // Te Araroa: its line and kilometres, loaded the first time its layer is on.
   let teAraroaLoaded = false;

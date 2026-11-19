@@ -3,8 +3,8 @@
 
     python3 -I tools/promo-images.py <render-dir> <site-img-dir> [<masters-dir>]
 
-Each render is three times its size on screen. Web copies are shrunk (Lanczos) to
-twice it and smaller: landscape scenes at 2400 and 1600 px wide, phone scenes at
+Each render is twice its size on screen (a little sharper than the app's own
+screen, no more). Web copies are that size or smaller (Lanczos): landscape scenes at 2400 and 1600 px wide, phone scenes at
 860 px; WebP and JPEG. The share picture (og.jpg) is 1200x630 from the hero.
 Masters (optional): the full renders as high-quality JPEG, for other uses.
 """
@@ -34,7 +34,7 @@ def main():
                 ch = round(w * 630 / 1200); top = max(0, (h - ch) // 2)
                 im.crop((0, top, w, top + ch)).resize((1200, 630), Image.Resampling.LANCZOS).save(os.path.join(dst, 'og.jpg'), 'JPEG', quality=86, optimize=True)
         else:  # phone
-            short = {'walk-gillespie': 'walk'}.get(base, base)
+            short = {'walk-gillespie': 'walk', 'route-aspiring': 'route', 'route-aspiring-close': 'route'}.get(base, base)
             save(im.resize((860, round(h * 860 / w)), Image.Resampling.LANCZOS), os.path.join(dst, short))
         print(base, im.size)
 

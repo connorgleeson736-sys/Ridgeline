@@ -1,5 +1,13 @@
 // The pages' small behaviour: app links that do not exist yet read "coming soon",
-// and the "Get notified" form (worker/notify.js).
+// the folded privacy policy and credits open when linked to, and the "Get notified"
+// form (worker/notify.js).
+const unfold = () => {
+  const target = location.hash && document.getElementById(location.hash.slice(1));
+  const fold = target && (target.matches('details') ? target : target.querySelector(':scope > .narrow > details.legal'));
+  if (fold) { fold.open = true; target.scrollIntoView(); }
+};
+addEventListener('hashchange', unfold);
+unfold();
 for (const link of document.querySelectorAll('[data-beta], [data-play]')) {
   const href = link.getAttribute('href');
   if (!href) {

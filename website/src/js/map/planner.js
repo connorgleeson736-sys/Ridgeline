@@ -412,5 +412,7 @@ export function attach(ctx) {
     undo: () => drawing && undo(),
     deleteSelected: () => drawing && selected >= 0 && deletePoint(selected),
     close() { if (drawing) setDrawing(false); clear(); },
+    /** ?promo: a GPX file's text imported and opened (the website's pictures). */
+    async promoGpx(text) { await importGpx(new File([text], 'route.gpx')); const r = saved()[0]; if (r) load(r); },
   };
 }

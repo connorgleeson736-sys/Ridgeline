@@ -192,13 +192,13 @@ export function buildSeoPages({ here, appAssets, domain, mapHtml }) {
     const article = `<h3>About ${esc(the(w.name))}</h3><p>${about}</p>
 ${secs.length ? `<h3>On Te Araroa</h3>${linkList(secs.map((s) => `<li><a href="${taUrl(s)}">Section ${s.n}: ${esc(s.name)}</a></li>`))}` : ''}
 ${near.length ? `<h3>Walks nearby</h3>${linkList(near.map(([v, d]) => `<li><a href="${walkUrl(v)}">${esc(v.name)}</a> <span class="muted">${km(d)} away</span></li>`))}` : ''}
-<p class="fine">Walk details from DOC (CC BY 4.0). <a href="${doc}" rel="noopener">DOC's page for this walk ↗</a> · <a href="/walks/">All walks</a></p>`;
+<p class="fine">Walk details from DOC (CC BY 4.0). <a href="${doc}" rel="noopener">DOC's page for this walk ↗</a></p>`;
     out.push({ rel: `walks/${w.slug}/index.html`, html: mapPage({
       path: walkUrl(w), title: `${w.name} – map, huts and distance | Razorback Maps`, description: desc, h1: w.name,
       open: `w=${w.guid}`, view: viewOf(w.lines, w.point, 12.5), panel: 'walk', article,
       jsonld: { '@context': 'https://schema.org', '@graph': [
         { '@type': 'TouristAttraction', name: w.name, url: `${D}${walkUrl(w)}`, description: strip(about), ...(w.point ? { geo: { '@type': 'GeoCoordinates', latitude: w.point[1], longitude: w.point[0] } } : {}), ...(w.image ? { image: w.image } : {}), isAccessibleForFree: true, touristType: 'Trampers' },
-        crumbList([['Walks', `${D}/walks/`], [w.name, `${D}${walkUrl(w)}`]])] } }) });
+        crumbList([['Razorback Maps', `${D}/`], [w.name, `${D}${walkUrl(w)}`]])] } }) });
   }
 
   // ---- Hut pages ----
@@ -213,13 +213,13 @@ ${near.length ? `<h3>Walks nearby</h3>${linkList(near.map(([v, d]) => `<li><a hr
 ${facts([['Booking', h.bookable ? 'Bookable – book with DOC' : 'Not bookable (first come, first served)'], ['Facilities', esc(h.facilities)], ['Location', `${h.point[1].toFixed(5)}, ${h.point[0].toFixed(5)}`]])}
 ${h.walks.length ? `<h3>Walks to the hut</h3>${linkList(h.walks.map((w) => `<li><a href="${walkUrl(w)}">${esc(w.name)}</a>${w.time ? ` <span class="muted">${esc(w.time)}</span>` : ''}</li>`))}` : ''}
 ${near.length ? `<h3>Huts nearby</h3>${linkList(near.map(([v, d]) => `<li><a href="${hutUrl(v)}">${esc(v.name)}</a> <span class="muted">${km(d)} away</span></li>`))}` : ''}
-<p class="fine">Hut details from DOC (CC BY 4.0).${h.link ? ` <a href="${esc(h.link)}" rel="noopener">DOC's page for this hut, with bookings and alerts ↗</a> ·` : ''} <a href="/huts/">All huts</a></p>`;
+<p class="fine">Hut details from DOC (CC BY 4.0).${h.link ? ` <a href="${esc(h.link)}" rel="noopener">DOC's page for this hut, with bookings and alerts ↗</a> ·` : ''}</p>`;
     out.push({ rel: `huts/${h.slug}/index.html`, html: mapPage({
       path: hutUrl(h), title: `${h.name}${h.region ? `, ${h.region}` : ''} – hut, map and walks | Razorback Maps`, description: desc, h1: h.name,
       open: `h=${h.point[1]},${h.point[0]},${encodeURIComponent(h.name)}`, view: viewOf(null, h.point, 13.5), panel: 'hut', article,
       jsonld: { '@context': 'https://schema.org', '@graph': [
         { '@type': 'Place', name: h.name, url: `${D}${hutUrl(h)}`, description: strip(about), geo: { '@type': 'GeoCoordinates', latitude: h.point[1], longitude: h.point[0] }, ...(h.thumb ? { image: h.thumb } : {}) },
-        crumbList([['Huts', `${D}/huts/`], [h.name, `${D}${hutUrl(h)}`]])] } }) });
+        crumbList([['Razorback Maps', `${D}/`], [h.name, `${D}${hutUrl(h)}`]])] } }) });
   }
 
   // ---- Te Araroa section pages ----
@@ -241,36 +241,15 @@ ${near.length ? `<h3>Huts nearby</h3>${linkList(near.map(([v, d]) => `<li><a hre
 ${places.length ? `<h3>Huts and places to stay</h3>${linkList(places.map((p) => { const type = p.type && !p.name.toLowerCase().includes(p.type.toLowerCase()) ? p.type : ''; return `<li>${hutLink(p)} <span class="muted">${[esc(type), p.km != null ? `km ${Math.round(p.km)}` : ''].filter(Boolean).join(' · ')}</span></li>`; }))}` : ''}
 ${dws.length ? `<h3>DOC walks on this section</h3>${linkList(dws.map((w) => `<li><a href="${walkUrl(w)}">${esc(w.name)}</a></li>`))}` : ''}
 ${prev || next ? `<nav class="prev-next">${prev ? `<a href="${taUrl(prev)}">← ${esc(prev.name)}</a>` : '<span></span>'}${next ? `<a href="${taUrl(next)}">${esc(next.name)} →</a>` : ''}</nav>` : ''}
-<p class="fine">Section notes from the Te Araroa Trust (CC BY 4.0). <a href="/te-araroa/">All sections</a></p>`;
+<p class="fine">Section notes from the Te Araroa Trust (CC BY 4.0).</p>`;
     out.push({ rel: `te-araroa/${s.slug}/index.html`, html: mapPage({
       path: taUrl(s), title: `Te Araroa: ${s.name} – map, huts and food | Razorback Maps`, description: desc, h1: `Te Araroa: ${s.name}`,
       open: `ta=${s.slug}`, view: viewOf(lines, null), panel: 'te-araroa', panelTitle: s.name, article,
       jsonld: { '@context': 'https://schema.org', '@graph': [
         { '@type': 'TouristAttraction', name: `Te Araroa: ${s.name}`, url: `${D}${taUrl(s)}`, description: strip(about), isAccessibleForFree: true, touristType: 'Trampers' },
-        crumbList([['Te Araroa', `${D}/te-araroa/`], [s.name, `${D}${taUrl(s)}`]])] } }) });
+        crumbList([['Razorback Maps', `${D}/`], [s.name, `${D}${taUrl(s)}`]])] } }) });
   }
 
-  // ---- Indexes ----
-  const grouped = (items, key) => { const m = new Map(); for (const x of items) { const k = key(x) || 'Other'; (m.get(k) || m.set(k, []).get(k)).push(x); } return [...m].sort((a, b) => (a[0] === 'Other') - (b[0] === 'Other') || a[0].localeCompare(b[0])); };
-  const regionNav = (groups) => `<nav class="region-nav">${groups.map(([r]) => `<a href="#${slugify(r)}">${esc(r)}</a>`).join('')}</nav>`;
-  const wg = grouped(walks, (w) => w.region);
-  out.push({ rel: 'walks/index.html', html: page({ path: '/walks/', title: 'DOC walks and tramping tracks in New Zealand – maps | Razorback Maps', h1: 'Walks and tramping tracks',
-    description: `All ${walks.length} DOC walks and tramping tracks in Aotearoa New Zealand by region, each with its distance, time, huts along the way and a 3D map.`,
-    body: `<p class="lead">Every walk and tramping track on DOC's website – ${walks.length} of them – by region. Each has its distance, time and grade, the huts along it, and opens in the 3D map with an elevation profile.</p>${regionNav(wg)}${wg.map(([r, ws]) => `<h2 id="${slugify(r)}">${esc(r)}</h2>${linkList(ws.sort((a, b) => a.name.localeCompare(b.name)).map((w) => `<li><a href="${walkUrl(w)}">${esc(w.name)}</a>${w.time ? ` <span class="muted">${esc(w.time)}</span>` : ''}</li>`))}`).join('')}` }) });
-  const hg = grouped(huts, (h) => h.region);
-  out.push({ rel: 'huts/index.html', html: page({ path: '/huts/', title: 'DOC huts in New Zealand – maps and walks | Razorback Maps', h1: 'Huts',
-    description: `All ${huts.length} DOC huts in Aotearoa New Zealand by region: location, booking, facilities, the walks to each and a 3D map.`,
-    body: `<p class="lead">DOC's ${huts.length} huts by region, with booking, facilities, the walks that reach them and huts nearby.</p>${regionNav(hg)}${hg.map(([r, hs]) => `<h2 id="${slugify(r)}">${esc(r)}</h2>${linkList(hs.sort((a, b) => a.name.localeCompare(b.name)).map((h) => `<li><a href="${hutUrl(h)}">${esc(h.name)}</a>${h.bookable ? ' <span class="tag">Bookable</span>' : ''}</li>`))}`).join('')}` }) });
-  if (sections.length) {
-    const byIsland = (isl) => main.filter((s) => s.island === isl);
-    const row = (s) => `<li><a href="${taUrl(s)}">${s.alternative ? '' : `${s.n}. `}${esc(s.name)}</a> <span class="muted">${s.length} km${s.region ? ` · ${esc(s.region)}` : ''}</span></li>`;
-    out.push({ rel: 'te-araroa/index.html', html: page({ path: '/te-araroa/', title: 'Te Araroa trail sections – maps, huts and food | Razorback Maps', h1: 'Te Araroa, section by section',
-      description: `All ${main.length} sections of Te Araroa, the ${Math.round(ta.total)} km trail from Cape Reinga to Bluff: maps, huts and campsites with trail km, food stops and profiles.`,
-      body: `<p class="lead">Te Araroa runs ${Math.round(ta.total)} km from Cape Reinga to Bluff. Each section has its huts and places to stay with their trail km, the food stops along it, and opens in the 3D map with its profile and the Trust's live alerts.</p>
-<h2 id="north-island">North Island</h2>${linkList(byIsland('NI').map(row))}
-<h2 id="south-island">South Island</h2>${linkList(byIsland('SI').map(row))}
-${sections.some((s) => s.alternative) ? `<h2 id="alternatives">Alternatives and bypasses</h2>${linkList(sections.filter((s) => s.alternative).map(row))}` : ''}` }) });
-  }
   // Links to other places in a place's text open them in the map already running
   // (js/map/main.js follows data-map); the href is the place's own page.
   const mapOf = new Map();

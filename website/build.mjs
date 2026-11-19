@@ -294,7 +294,10 @@ writeFileSync(join(out, '_headers'), `/*
 /data/*
   Cache-Control: public, max-age=31536000, immutable
 `);
-writeFileSync(join(out, '_redirects'), '/map / 301\n/map/ / 301\n/planner / 301\n/app /about/#app 301\n');
+// One page (/about/): the old pages lead to its sections; the walk, hut and Te Araroa
+// lists to the map (each place's own page still opens it).
+const moved = [['/map', '/'], ['/planner', '/'], ['/app', '/about/#app'], ['/support', '/about/#support'], ['/privacy', '/about/#privacy'], ['/credits', '/about/#credits'], ['/walks', '/'], ['/huts', '/'], ['/te-araroa', '/']];
+writeFileSync(join(out, '_redirects'), moved.flatMap(([from, to]) => [`${from} ${to} 301`, `${from}/ ${to} 301`]).join('\n') + '\n');
 const urls = pages.filter((p) => !p.startsWith('404')).map((p) => SITE.domain + '/' + p.replace(/index\.html$/, ''));
 writeFileSync(join(out, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `  <url><loc>${u}</loc></url>`).join('\n')}\n</urlset>\n`);
 // NOINDEX=1: a test copy (pages.dev) that search engines leave alone.
