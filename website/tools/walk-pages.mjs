@@ -24,7 +24,7 @@ await Promise.all(Array.from({ length: 4 }, async () => {
     let ok = false;
     for (let attempt = 0; attempt < 3 && !ok; attempt++) {
       try {
-        const r = await fetch(a.walkingAndTrampingWebPage, { headers: { 'User-Agent': 'BushlineMapsBuild/1.0' } });
+        const r = await fetch(a.walkingAndTrampingWebPage, { headers: { 'User-Agent': 'RazorbackMapsBuild/1.0' } });
         if (!r.ok) throw new Error(r.status);
         const html = await r.text();
         pages[guid] = { o: overview(html), s: parse(html) };

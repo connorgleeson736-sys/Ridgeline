@@ -24,7 +24,7 @@ export const SCENES = {
   'tongariro': { size: [1600, 900], view: '12.45/-39.172/175.63/195/70' },
   'walk-gillespie': { size: [430, 932], view: '12/-44.24/169.04/20/58', open: ['walk', '515e0210-ba1a-4750-8297-a892aba9a23e'] },
   'te-araroa': { size: [430, 932], view: '12/-39.15/175.62/200/58', open: ['teAraroa', 'tongariro-alpine-crossing-to-crater'] },
-  'topo': { size: [430, 932], view: '13.6/-42.915/171.58/0/0', settings: { base: 'topo', threeD: false } },
+  'topo': { size: [430, 932], view: '13.2/-44.727/168.1755/0/0', settings: { base: 'topo', threeD: false } },
 };
 
 async function ready(page, quiet = 2500, limit = 240_000) {

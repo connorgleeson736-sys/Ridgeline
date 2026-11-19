@@ -1,6 +1,6 @@
-# Bushline Maps website
+# Razorback Maps website
 
-The site for bushlinemaps.co.nz: the web map at `/` (a browser version of the
+The site for razorbackmaps.co.nz: the web map at `/` (a browser version of the
 Android app's map without the offline features), and the about, support,
 privacy and credits pages. Old `/map/` links redirect to `/`. It is a static site, built for Cloudflare Pages.
 
@@ -22,14 +22,14 @@ overview index and compiled walks from `native-wgpu/`, `capacitor/` and
 - Output directory: `dist`
 - Environment variables:
   - `LINZ_API_KEY`: the LINZ Basemaps key the site uses. Restrict it to
-    `bushlinemaps.co.nz` in the LINZ Basemaps key settings. Without it the
+    `razorbackmaps.co.nz` in the LINZ Basemaps key settings. Without it the
     build uses the app's key.
   - `SITE_LEGAL_NAME`: the business's legal name, for the footer and
     privacy policy.
-  - `SITE_EMAIL`: the support address (defaults to support@bushlinemaps.co.nz).
+  - `SITE_EMAIL`: the support address (defaults to support@razorbackmaps.co.nz).
   - `BETA_URL` and `PLAY_URL`: the Play closed-test opt-in link and the
     store listing, once they exist. Until then the buttons read "coming soon".
-- Custom domain: add `bushlinemaps.co.nz` and `www.bushlinemaps.co.nz`.
+- Custom domain: add `razorbackmaps.co.nz` and `www.razorbackmaps.co.nz`.
 - `functions/api/doc-alerts/[guid].js` (a Pages Function) relays DOC's current
   alerts for a walk or hut (`worker/doc-alerts.js`): browsers cannot read DOC's
   alert service from another site. Cached at the edge for 10 minutes. The test
@@ -108,7 +108,7 @@ CLOUDFLARE_ACCOUNT_ID=... CLOUDFLARE_API_TOKEN=... node tools/deploy-test.mjs
 The same Worker and R2 setup serves the production site under its own names, on the
 real domain. Before the first launch:
 
-1. **Domain.** Register `bushlinemaps.co.nz` with a New Zealand registrar and add it
+1. **Domain.** Register `razorbackmaps.co.nz` with a New Zealand registrar and add it
    to the Cloudflare account (free plan): Cloudflare gives two nameservers to set at
    the registrar.
 2. **LINZ key.** Ask LINZ for a production Basemaps key for the website (not the
@@ -122,14 +122,14 @@ real domain. Before the first launch:
    `bushline-site-prod-signups`, created on the first deploy):
 
 ```bash
-LINZ_API_KEY=<production key> SITE_URL=https://bushlinemaps.co.nz OVERVIEW_URL=https://bushlinemaps.co.nz node build.mjs
+LINZ_API_KEY=<production key> SITE_URL=https://razorbackmaps.co.nz OVERVIEW_URL=https://razorbackmaps.co.nz node build.mjs
 CLOUDFLARE_ACCOUNT_ID=... CLOUDFLARE_API_TOKEN=... SITE_BUCKET=bushline-site-prod SITE_WORKER=bushline-maps-prod node tools/deploy-test.mjs
 ```
 
 6. **Domain to the Worker.** In Cloudflare: Workers & Pages → `bushline-maps-prod` →
-   Settings → Domains & Routes → Add custom domain: `bushlinemaps.co.nz` (and
-   `www.bushlinemaps.co.nz`). Cloudflare issues the certificate.
-7. **Search.** Submit `https://bushlinemaps.co.nz/sitemap.xml` in Google Search
+   Settings → Domains & Routes → Add custom domain: `razorbackmaps.co.nz` (and
+   `www.razorbackmaps.co.nz`). Cloudflare issues the certificate.
+7. **Search.** Submit `https://razorbackmaps.co.nz/sitemap.xml` in Google Search
    Console. (Production builds allow indexing; only `NOINDEX=1` builds block it.)
 
 Sign-ups ("Get notified", `worker/notify.js`): one JSON object per address in the

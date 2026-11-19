@@ -1,4 +1,4 @@
-// Bushline Maps on the web: the app's map in a browser.
+// Razorback Maps on the web: the app's map in a browser.
 //
 // Speed, from the app and the old website's measurements:
 // - MapLibre's terrain and imagery tile LOD as the old website tuned it, the
@@ -172,8 +172,13 @@ async function main() {
     const padding = sheetPadding(), pitch = settings.threeD ? Math.min(map.getPitch() || 50, 55) : 0;
     const cam = map.cameraForBounds([[b[0], b[1]], [b[2], b[3]]], { padding, maxZoom: 15, bearing: map.getBearing(), pitch: 0 });
     if (!cam) return;
-    // No padding on the move itself: MapLibre keeps it, and the next fit would count it twice.
-    map.easeTo({ center: cam.center, zoom: Math.max(5, cam.zoom - (pitch ? 0.35 : 0)), bearing: map.getBearing(), pitch, duration: reducedMotion ? 0 : 900 });
+    // The box's middle at the middle of the map beside the panel, after the tilt (a flat
+    // fit's centre, tilted, sinks towards the panel). No padding on the move itself:
+    // MapLibre keeps it, and the next fit would count it twice; an offset does not.
+    const merc = (lat) => Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360));
+    const midLat = (Math.atan(Math.exp((merc(b[1]) + merc(b[3])) / 2)) - Math.PI / 4) * 360 / Math.PI;
+    const offset = [(padding.left - padding.right) / 2, (padding.top - padding.bottom) / 2];
+    map.easeTo({ center: [(b[0] + b[2]) / 2, midLat], offset, zoom: Math.max(5, cam.zoom - (pitch ? 0.35 : 0)), bearing: map.getBearing(), pitch, duration: reducedMotion ? 0 : 900 });
   }
   function fit(line) { let w = 180, s = 0, e = 0, n = -90; for (const [x, y] of line) { w = Math.min(w, x); e = Math.max(e, x); s = Math.min(s, y); n = Math.max(n, y); } fitBox([w, s, e, n]); }
   const ctx = {

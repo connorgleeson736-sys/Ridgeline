@@ -118,7 +118,7 @@ function buildStyle({ topography, settings, dark, fine = false, topoSize = 256, 
   const symbols = topoLayers.filter((l) => l.type === 'symbol' || l.type === 'circle');
   return {
     version: 8,
-    name: 'Bushline Maps',
+    name: 'Razorback Maps',
     glyphs: urls.glyphs,
     // Fonts drawn on the device: the old-map lettering of the Te Araroa name (OFL).
     'font-faces': { 'IM Fell English SC': new URL('/fonts/im-fell-english-sc/IMFellEnglishSC-Regular.ttf', location.href).href },

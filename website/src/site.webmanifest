@@ -1,6 +1,6 @@
 {
-  "name": "Bushline Maps",
-  "short_name": "Bushline",
+  "name": "Razorback Maps",
+  "short_name": "Razorback",
   "description": "3D topo maps of New Zealand for trampers and hunters.",
   "start_url": "/map/",
   "display": "standalone",

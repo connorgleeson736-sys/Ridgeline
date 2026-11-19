@@ -1,4 +1,4 @@
-// Builds the Bushline Maps website into dist/ for Cloudflare Pages (static).
+// Builds the Razorback Maps website into dist/ for Cloudflare Pages (static).
 //
 //   LINZ_API_KEY=... node build.mjs        (or read from the app's map-defaults.json)
 //
@@ -18,11 +18,11 @@ const src = join(here, 'src'), out = join(here, 'dist');
 const appAssets = join(repo, 'native-wgpu/android/app/src/main/assets');
 
 export const SITE = {
-  name: 'Bushline Maps',
+  name: 'Razorback Maps',
   // The legal business name for the footer and privacy policy (as on the NZBN / company register).
-  legalName: process.env.SITE_LEGAL_NAME || 'Bushline Maps',
-  domain: process.env.SITE_URL || 'https://bushlinemaps.co.nz',
-  email: process.env.SITE_EMAIL || 'support@bushlinemaps.co.nz',
+  legalName: process.env.SITE_LEGAL_NAME || 'Razorback Maps',
+  domain: process.env.SITE_URL || 'https://razorbackmaps.co.nz',
+  email: process.env.SITE_EMAIL || 'support@razorbackmaps.co.nz',
   // Google Play listing and the closed test's opt-in page, once they exist.
   playUrl: process.env.PLAY_URL || '',
   betaUrl: process.env.BETA_URL || '',

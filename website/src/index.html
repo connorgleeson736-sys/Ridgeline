@@ -4,15 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#233d34">
-<title>Map – Bushline Maps</title>
-<meta name="description" content="The Bushline Maps 3D topo map of New Zealand: LINZ aerial imagery and NZ Topo over real terrain, every DOC walk and hut, hunting areas, and a route planner that follows the tracks.">
+<title>Map – Razorback Maps</title>
+<meta name="description" content="The Razorback Maps 3D topo map of New Zealand: LINZ aerial imagery and NZ Topo over real terrain, every DOC walk and hut, hunting areas, and a route planner that follows the tracks.">
 <link rel="canonical" href="{{site.domain}}/">
 <link rel="icon" href="/img/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="icon" href="/img/favicon-48.png" sizes="48x48" type="image/png">
 <link rel="apple-touch-icon" href="/img/kea-180.png">
 <link rel="manifest" href="/site.webmanifest">
-<meta property="og:site_name" content="Bushline Maps">
-<meta property="og:title" content="Bushline Maps – the 3D topo map of New Zealand">
+<meta property="og:site_name" content="Razorback Maps">
+<meta property="og:title" content="Razorback Maps – the 3D topo map of New Zealand">
 <meta property="og:description" content="Real 3D terrain, every DOC walk and hut, and routes that follow the tracks.">
 <meta property="og:image" content="{{site.domain}}/img/promo/og.jpg">
 <meta property="og:url" content="{{site.domain}}/">
@@ -30,14 +30,14 @@
 <link rel="stylesheet" href="/css/map.css">
 </head>
 <body class="map-page">
-<h1 class="visually-hidden">Bushline Maps – 3D topo map of New Zealand</h1>
+<h1 class="visually-hidden">Razorback Maps – 3D topo map of New Zealand</h1>
 <div id="map" aria-label="Map of New Zealand"></div>
 <p id="map-status" class="map-status" role="status"><span class="spinner"></span>Bringing the mountains into view…</p>
 <div class="progress" aria-hidden="true"></div>
 
 <!-- The app's map chrome: kea (routes and search) and locate on the left;
      2D | 3D, compass and layers on the right; scale and credits at the bottom. -->
-<button id="launcher" class="launcher" type="button" aria-label="Search and saved routes" aria-controls="drawer" aria-expanded="false" title="Bushline Maps – search and routes"><img src="/img/kea-96.png" alt="" width="44" height="44"></button>
+<button id="launcher" class="launcher" type="button" aria-label="Search and saved routes" aria-controls="drawer" aria-expanded="false" title="Razorback Maps – search and routes"><img src="/img/kea-96.png" alt="" width="44" height="44"></button>
 <button id="locate" class="tile locate" type="button" aria-label="Show my location"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><circle cx="12" cy="12" r="7"/><path d="M12 5V1M12 23v-4M5 12H1M23 12h-4"/><circle cx="12" cy="12" r="3" class="fill"/></svg></button>
 <div id="perspective" class="perspective" role="group" aria-label="Map perspective"><button type="button" data-view="2d" aria-label="Show the map in 2D">2D</button><button type="button" data-view="3d" aria-label="Show the map in 3D">3D</button></div>
 <button id="compass" class="tile compass" type="button" aria-label="Reset bearing to north"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M12 2.5 8.6 12h6.8Z" class="n"/><path d="M12 21.5 15.4 12H8.6Z" class="s"/></svg></button>

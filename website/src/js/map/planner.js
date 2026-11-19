@@ -260,7 +260,7 @@ export function attach(ctx) {
           el('button', { class: 'btn', type: 'button', onclick: share, disabled: route.legs.length < 2 }, 'Share'),
           el('button', { class: 'btn danger', type: 'button', onclick: () => deletePoint(selected), disabled: !drawing || selected < 0 }, 'Delete point'));
         body.append(name, statsBox, el('div', { class: 'chart-wrap grow' }, canvas), tools);
-        if (!drawing) body.append(el('div', { class: 'app-cta route-extra' }, el('p', {}, 'Take your routes offline on the hill with the Bushline Maps Android app.'), el('a', { class: 'btn', href: '/about/#app' }, 'Get the app')));
+        if (!drawing) body.append(el('div', { class: 'app-cta route-extra' }, el('p', {}, 'Take your routes offline on the hill with the Razorback Maps Android app.'), el('a', { class: 'btn', href: '/about/#app' }, 'Get the app')));
         updateStats();
         updateProfile();
         return () => { chart = null; statsBox = null; ctx.marker(null); ctx.range(null); };
@@ -286,7 +286,7 @@ export function attach(ctx) {
     const { points, waypoints } = flatten(route.legs);
     const link = `${location.origin}/#${encodeRoute({ name: route.name, points, waypoints })}`;
     const done = () => toast('Link copied. Open it on your phone to take the route with you.');
-    if (navigator.share && matchMedia('(pointer: coarse)').matches) navigator.share({ title: route.name, text: `${route.name} – Bushline Maps`, url: link }).catch(() => {});
+    if (navigator.share && matchMedia('(pointer: coarse)').matches) navigator.share({ title: route.name, text: `${route.name} – Razorback Maps`, url: link }).catch(() => {});
     else navigator.clipboard?.writeText(link).then(done, () => prompt('Copy this link:', link));
   }
   function reverse() {
