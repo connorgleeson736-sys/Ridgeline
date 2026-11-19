@@ -67,6 +67,22 @@ overview index and compiled walks from `native-wgpu/`, `capacitor/` and
   overrides it; the build warns on an `r2.dev` address). When the site has its own
   Cloudflare zone, a custom domain on the bucket is the alternative.
 
+### Aerial shading corrections
+
+LINZ darkens its aerial tiles up to zoom 14 with an 8 m hillshade and texture
+shade, then stops, so the photos would brighten suddenly at zoom 15. The site
+takes the shading back out (`src/js/workers/imagery.js`) using corrections made
+once ahead: both layers combined into greyscale blocks of 4×4 tiles (zooms 0–14,
+about 7,800 blocks, about 600 MB), kept in the overview bucket and served
+edge-cached at `/shade/v1/`. The shading never changes, so this only needs
+redoing if LINZ changes those layers.
+
+    python3 -I tools/shade-corrections.py OUT_DIR 14     # ~1.5 h, resumable
+    CLOUDFLARE_ACCOUNT_ID=… CLOUDFLARE_API_TOKEN=… node tools/upload-shade.mjs OUT_DIR
+
+The upload writes `data/shade-index.json`; rebuild and deploy after it. A zoom
+missing from the index falls back to LINZ's own shading layers (slower).
+
 ## Speed
 
 The map uses the old website's measured MapLibre settings (tile LOD, a pixel
