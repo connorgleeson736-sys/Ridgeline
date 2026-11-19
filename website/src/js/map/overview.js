@@ -1,8 +1,9 @@
 // The aerial imagery, composed as the app's NativeImagery does:
 // - zooms 5–12: the app's overview imagery (natural or LINZ's own colour),
 //   LINZ's tiles beyond;
-// - to zoom 14, LINZ's hillshading taken back out (workers/imagery.js), so the
-//   colours match zoom 15 and beyond, where LINZ draws none;
+// - to zoom 14, LINZ's hillshading taken back out (workers/imagery.js) with
+//   corrections made ahead, so the colours match zoom 15 and beyond, where LINZ
+//   draws none;
 // - where LINZ's photography has gaps (the app's gap atlas of LINZ capture
 //   areas), Esri World Imagery inside the outlines and LINZ outside.
 // Composed on a background thread. One source for all zooms, so MapLibre's
@@ -44,7 +45,26 @@ const fill = (t, z, x, y) => t.replace('{z}', z).replace('{x}', x).replace('{y}'
 const linz = (z, x, y) => fill(urls.aerial, z, x, y);
 // LINZ's shading layers stop at zoom 14 (its aerial config's maxZoom).
 const SHADED_TO = 14;
-const shade = (z, x, y) => (z <= SHADED_TO ? urls.shade.map((t) => fill(t, z, x, y)) : null);
+// The corrections, made ahead (tools/shade-corrections.py) and served with the
+// overview imagery in blocks of 4×4 tiles; the index lists each finished zoom's
+// blocks (a tile outside them has no shading). A zoom not yet made: LINZ's two
+// shading layers themselves.
+let shadeIndex = null, shadeLoading = null;
+function loadShadeIndex() {
+  if (!base) return Promise.resolve(null);
+  return shadeLoading || (shadeLoading = fetch(dataUrl('/data/shade.json')).then((r) => (r.ok ? r.json() : null)).then((s) => {
+    if (s) shadeIndex = Object.fromEntries(Object.entries(s.zooms).map(([z, b]) => [z, new Set(b)]));
+    return shadeIndex;
+  }).catch(() => null));
+}
+async function shade(z, x, y) {
+  if (z > SHADED_TO) return null;
+  if (!shadeIndex) await loadShadeIndex();
+  const blocks = shadeIndex?.[z];
+  if (!blocks) return urls.shade.map((t) => fill(t, z, x, y));
+  const bx = x >> 2, by = y >> 2;
+  return blocks.has(`${bx}/${by}`) ? { block: `${base}/shade/v1/${z}/${bx}/${by}.webp`, x: (x & 3) * 256, y: (y & 3) * 256 } : null;
+}
 /** The base photograph for a tile: overview imagery where the app has it, else LINZ. */
 function baseUrl(z, x, y, natural) {
   const k = `${z}/${x}/${y}`;
@@ -106,6 +126,7 @@ async function bytes(url, signal) {
 }
 
 export function install(maplibregl) {
+  loadShadeIndex(); // alongside the overview's index, not after it
   maplibregl.addProtocol('bushline', async (params, abort) => {
     const m = /^bushline:\/\/(aerial|satellite)\/(\d+)\/(\d+)\/(\d+)/.exec(params.url);
     if (!m) throw new Error('Unknown tile');
@@ -119,7 +140,7 @@ export function install(maplibregl) {
     if (z <= 12 && !overview) await loadOverview();
     const p = config.esri ? await plan(z, x, y) : { mode: 'linz' };
     const own = baseUrl(z, x, y, !/[?&]raw/.test(params.url));
-    const sh = shade(z, x, y);
+    const sh = await shade(z, x, y);
     const photo = { url: own, fallback: own !== linz(z, x, y) ? linz(z, x, y) : null, shade: sh };
     if (p.mode === 'linz' && !sh) {
       let r = await fetch(own, { signal: abort.signal });

@@ -8,6 +8,8 @@
 // dividing by the product of (1−a) for both layers gives back the photograph's own
 // colour at every zoom (checked against zoom 15: within about 1%). The app's
 // overview imagery was averaged from these shaded tiles, so it is de-shaded too.
+// The two layers come combined, made ahead, from our own host (blocks below);
+// LINZ's own only for a zoom not made yet.
 const SIZE = 256;
 
 async function bitmap(url, signal) {
@@ -42,9 +44,43 @@ async function shading(urls, signal) {
   return keep;
 }
 
-async function deshade(img, urls, signal) {
+// Correction blocks (tools/shade-corrections.py): 4×4 tiles of keep·255 as greyscale,
+// decoded once and shared by the tiles in them (recently used kept).
+const BLOCK = SIZE * 4, BLOCKS_KEPT = 24;
+const blocks = new Map(); // url → Promise<Uint8Array>
+function block(url) {
+  let p = blocks.get(url);
+  if (p) { blocks.delete(url); blocks.set(url, p); return p; }
+  p = (async () => {
+    const img = await bitmap(url); // not cancelled with one tile: its neighbours want it too
+    const c = new OffscreenCanvas(BLOCK, BLOCK), g = c.getContext('2d', { willReadFrequently: true });
+    g.drawImage(img, 0, 0, BLOCK, BLOCK);
+    img.close();
+    const rgba = g.getImageData(0, 0, BLOCK, BLOCK).data, v = new Uint8Array(BLOCK * BLOCK);
+    for (let i = 0, j = 0; i < v.length; i++, j += 4) v[i] = rgba[j];
+    return v;
+  })();
+  p.catch(() => blocks.delete(url));
+  blocks.set(url, p);
+  while (blocks.size > BLOCKS_KEPT) blocks.delete(blocks.keys().next().value);
+  return p;
+}
+const GAIN = Float32Array.from({ length: 256 }, (_, v) => 255 / Math.max(v, 1));
+async function blockGain({ block: url, x, y }, signal) {
+  const v = await block(url);
+  if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
+  const gain = new Float32Array(SIZE * SIZE);
+  let any = false;
+  for (let r = 0; r < SIZE; r++) {
+    const row = (y + r) * BLOCK + x;
+    for (let c = 0; c < SIZE; c++) { const k = v[row + c]; gain[r * SIZE + c] = GAIN[k]; if (k !== 255) any = true; }
+  }
+  return any ? gain : null;
+}
+
+async function deshade(img, shade, signal) {
   let gain;
-  try { gain = await shading(urls, signal); } catch (e) { img.close(); throw e; }
+  try { gain = await (Array.isArray(shade) ? shading(shade, signal) : blockGain(shade, signal)); } catch (e) { img.close(); throw e; }
   if (!gain) return img;
   const c = new OffscreenCanvas(SIZE, SIZE), g = c.getContext('2d', { willReadFrequently: true });
   g.drawImage(img, 0, 0, SIZE, SIZE);

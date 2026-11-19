@@ -233,6 +233,8 @@ for (const [k, e] of Object.entries(atlas.coarse || {})) {
 writeFileSync(join(data, 'gaps.json'), JSON.stringify(gaps.entries));
 // The small part the first tiles need: which zoom-13 tiles have gaps, and the coarse images.
 writeFileSync(join(data, 'gaps-index.json'), JSON.stringify({ z: gaps.z, keys: Object.keys(gaps.entries), coarse: gaps.coarse }));
+// The aerial imagery's shading corrections (tools/shade-corrections.py): which blocks exist.
+if (existsSync(join(here, 'data/shade-index.json'))) writeFileSync(join(data, 'shade.json'), readFileSync(join(here, 'data/shade-index.json')));
 
 // ---- Hosting: headers, sitemap, robots ----
 const connect = ["'self'", 'https://basemaps.linz.govt.nz', 'https://services1.arcgis.com', ...(esri ? ['https://services.arcgisonline.com'] : [])];
