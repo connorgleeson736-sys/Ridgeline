@@ -97,8 +97,9 @@ real domain. Before the first launch:
    the registrar.
 2. **LINZ key.** Ask LINZ for a production Basemaps key for the website (not the
    app's), restricted to the domain if they offer it.
-3. **Esri.** Leave `ESRI_IMAGERY` unset: the map is LINZ only (no Satellite base, no
-   Esri in LINZ's few gaps) until there is an Esri licence for a commercial product.
+3. **Esri.** The Satellite base, LINZ's few gaps and 22 West Coast overview tiles use
+   Esri World Imagery: have the Esri licence in place before launch, or build with
+   `ESRI_IMAGERY=0` (no Satellite base or gap filling; the overview tiles stay).
 4. **Data permissions.** Confirm with the Te Araroa Trust that their section data,
    notes and alerts may be shown (credited, CC BY 4.0).
 5. **Build and deploy** (sign-ups are kept in the private bucket
@@ -129,7 +130,3 @@ saved at twice it:
 SITE=https://bushline-maps.<subdomain>.workers.dev NODE_PATH=$(npm root -g) node tools/promo-shots.mjs promo
 python3 -I tools/promo-images.py promo src/img/promo
 ```
-
-Zoomed-out imagery (zooms 4–8) is LINZ's current zoom-9 photography averaged down:
-`python3 -I tools/linz-coarse.py <work-dir> data/linz-coarse` (re-run when LINZ
-publishes new imagery).

@@ -1,21 +1,35 @@
-// The aerial imagery:
-// - zooms 4–8: LINZ's current zoom-9 photography averaged down (tools/linz-coarse.py),
-//   where LINZ itself draws a satellite mosaic, so colours match every zoom;
-// - zoom 9 on: LINZ's own tiles;
-// - only with Esri's licence (build ESRI_IMAGERY=1): Esri World Imagery inside the
-//   outlines where LINZ has no photography (the app's gap atlas), and the Satellite base.
-// One source for all zooms, so MapLibre's parent-tile fallback works across the
-// switch. Requests are cancelled with the tile.
+// The aerial imagery, composed as the app's NativeImagery does:
+// - zooms 5–12: the app's overview imagery (natural or LINZ's own colour),
+//   LINZ's tiles beyond;
+// - to zoom 14, LINZ's hillshading taken back out (workers/imagery.js), so the
+//   colours match zoom 15 and beyond, where LINZ draws none;
+// - where LINZ's photography has gaps (the app's gap atlas of LINZ capture
+//   areas), Esri World Imagery inside the outlines and LINZ outside.
+// Composed on a background thread. One source for all zooms, so MapLibre's
+// parent-tile fallback works across the switches. Requests are cancelled with
+// the tile.
 import config from './config.js';
 import { urls } from './style.js';
-import { data as worker } from './workers.js';
+import { imagery as worker } from './workers.js';
 import { dataUrl } from './data-url.js';
 
-const coarse = config.coarse ? { base: config.coarse.base, keys: new Set(config.coarse.keys) } : null;
+const base = (config.overviewUrl || '').replace(/\/$/, '');
 const ESRI = 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile';
 
-/** Kept for main.js: the zoomed-out imagery's index is in the page's config now. */
-export function loadOverview() { return Promise.resolve(null); }
+let overview = null, overviewLoading = null;
+export function loadOverview() {
+  if (!base) return Promise.resolve(null);
+  return overviewLoading || (overviewLoading = fetch(dataUrl('/data/overview.json')).then((r) => (r.ok ? r.json() : null)).then((o) => {
+    if (!o) return null;
+    const tiles = new Map();
+    for (const [z, rows] of Object.entries(o.zooms)) {
+      let x = 0;
+      for (let i = 0; i < rows.length; i += 6) { x += rows[i]; tiles.set(`${z}/${x}/${rows[i + 1]}`, rows.slice(i + 2, i + 6)); }
+    }
+    overview = { files: o.files, tiles, coarse: o.coarse };
+    return overview;
+  }).catch(() => null));
+}
 // The gap index (small, preloaded) says which tiles touch a gap; only those wait
 // for the outlines themselves.
 let gapIndex = null, indexLoading = null, gapShapes = null, shapesLoading = null;
@@ -26,10 +40,20 @@ function loadGapShapes() {
   return shapesLoading || (shapesLoading = fetch(dataUrl('/data/gaps.json')).then((r) => (r.ok ? r.json() : null)).then((g) => { gapShapes = g; return g; }).catch(() => null));
 }
 
-const linz = (z, x, y) => urls.aerial.replace('{z}', z).replace('{x}', x).replace('{y}', y);
-/** The base photograph for a tile: LINZ's averaged down at zooms 4-8, else LINZ's own. */
-function baseUrl(z, x, y) {
-  if (coarse && z <= 8 && coarse.keys.has(`${z}/${x}/${y}`)) return `${coarse.base}/${z}/${x}/${y}.webp`;
+const fill = (t, z, x, y) => t.replace('{z}', z).replace('{x}', x).replace('{y}', y);
+const linz = (z, x, y) => fill(urls.aerial, z, x, y);
+// LINZ's shading layers stop at zoom 14 (its aerial config's maxZoom).
+const SHADED_TO = 14;
+const shade = (z, x, y) => (z <= SHADED_TO ? urls.shade.map((t) => fill(t, z, x, y)) : null);
+/** The base photograph for a tile: overview imagery where the app has it, else LINZ. */
+function baseUrl(z, x, y, natural) {
+  const k = `${z}/${x}/${y}`;
+  if (overview && z <= 12) {
+    const t = overview.tiles.get(k);
+    if (t) return natural ? `${base}/tiles/${overview.files[t[0]]}/${t[1]}.webp` : `${base}/tiles/${overview.files[t[2]]}/${t[3]}.webp`;
+    const c = overview.coarse[k];
+    if (c) return natural ? c[0] : c[1];
+  }
   return linz(z, x, y);
 }
 
@@ -87,32 +111,36 @@ export function install(maplibregl) {
     if (!m) throw new Error('Unknown tile');
     const [z, x, y] = m.slice(2).map(Number);
     if (m[1] === 'satellite') {
-      if (!config.esri) throw new Error('Satellite imagery needs Esri\'s licence');
+      if (!config.esri) throw new Error('Satellite imagery is turned off');
       const t = esriTile(z, x, y);
       if (!t.crop) { const r = await bytes(t.url, abort.signal); return { data: await r.arrayBuffer() }; }
-      return { data: await worker.call({ type: 'compose', layers: [{ url: t.url, crop: t.crop }] }) };
+      return { data: await worker.call({ type: 'compose', layers: [{ url: t.url, crop: t.crop }] }, abort.signal) };
     }
+    if (z <= 12 && !overview) await loadOverview();
     const p = config.esri ? await plan(z, x, y) : { mode: 'linz' };
-    const own = baseUrl(z, x, y);
-    if (p.mode === 'linz') {
+    const own = baseUrl(z, x, y, !/[?&]raw/.test(params.url));
+    const sh = shade(z, x, y);
+    const photo = { url: own, fallback: own !== linz(z, x, y) ? linz(z, x, y) : null, shade: sh };
+    if (p.mode === 'linz' && !sh) {
       let r = await fetch(own, { signal: abort.signal });
-      // A missing averaged tile: LINZ's own.
-      if (!r.ok && own !== linz(z, x, y)) r = await bytes(linz(z, x, y), abort.signal);
+      // A missing overview tile: LINZ's own.
+      if (!r.ok && photo.fallback) r = await bytes(photo.fallback, abort.signal);
       if (!r.ok) throw new Error(`Tile ${r.status}`);
       return { data: await r.arrayBuffer() };
     }
-    // Esri where LINZ has no photography: whole tiles, or inside the outline.
+    // De-shaded LINZ, with Esri where LINZ has no photography: whole tiles, or
+    // inside the outline.
     let layers;
-    if (p.coarse) layers = p.mode === 'esri' ? [{ url: p.coarse }] : [{ url: own }, { url: p.coarse }];
+    if (p.mode === 'linz') layers = [photo];
+    else if (p.coarse) layers = p.mode === 'esri' ? [{ url: p.coarse }] : [photo, { url: p.coarse }];
     else {
       const e = esriTile(z, x, y);
       if (p.mode === 'esri') layers = [{ url: e.url, crop: e.crop }];
       else {
         const f = 2 ** (z - p.mz), dx = (p.mx * f - x) * 256, dy = (p.my * f - y) * 256;
-        layers = [{ url: own }, { url: e.url, crop: e.crop, clip: p.outer.map((ring) => ring.map(([px, py]) => [px * f + dx, py * f + dy])) }];
+        layers = [photo, { url: e.url, crop: e.crop, clip: p.outer.map((ring) => ring.map(([px, py]) => [px * f + dx, py * f + dy])) }];
       }
     }
-    if (abort.signal.aborted) throw new DOMException('Aborted', 'AbortError');
-    return { data: await worker.call({ type: 'compose', layers }) };
+    return { data: await worker.call({ type: 'compose', layers }, abort.signal) };
   });
 }

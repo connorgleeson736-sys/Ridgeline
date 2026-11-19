@@ -1,4 +1,4 @@
-// Calls into the map's two worker threads, as promises.
+// Calls into the map's worker threads, as promises.
 import config from './config.js';
 
 function client(url, { key = false } = {}) {
@@ -18,9 +18,23 @@ function client(url, { key = false } = {}) {
     return worker;
   };
   return {
-    call(message) { const id = next++; return new Promise((resolve, reject) => { waiting.set(id, { resolve, reject }); start().postMessage({ ...message, id }); }); },
+    /** With a signal, aborting it tells the worker to drop the call (`cancel`). */
+    call(message, signal) {
+      const id = next++;
+      return new Promise((resolve, reject) => {
+        if (signal?.aborted) return reject(new DOMException('Aborted', 'AbortError'));
+        waiting.set(id, { resolve, reject });
+        start().postMessage({ ...message, id });
+        signal?.addEventListener('abort', () => {
+          if (!waiting.delete(id)) return;
+          worker?.postMessage({ type: 'cancel', target: id });
+          reject(new DOMException('Aborted', 'AbortError'));
+        }, { once: true });
+      });
+    },
     post(message) { start().postMessage(message); },
   };
 }
 export const data = client('../workers/data.js', { key: true });
 export const search = client('../workers/search.js');
+export const imagery = client('../workers/imagery.js');

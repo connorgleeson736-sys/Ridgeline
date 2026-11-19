@@ -150,35 +150,6 @@ async function profile({ points, max = 600 }) {
   });
 }
 
-// ---- Imagery composition (the app's NativeImagery): layers drawn in order,
-// each optionally cropped (a coarser tile's quarter) and clipped (even-odd
-// outline in tile pixels). Returns a lossless PNG for MapLibre. ----
-async function compose({ layers }) {
-  const canvas = new OffscreenCanvas(256, 256);
-  const g = canvas.getContext('2d');
-  const images = await Promise.all(layers.map(async (l) => {
-    const r = await fetch(l.url);
-    if (!r.ok) throw new Error(`Tile ${r.status}`);
-    return createImageBitmap(await r.blob());
-  }));
-  layers.forEach((l, i) => {
-    const img = images[i];
-    g.save();
-    if (l.clip) {
-      g.beginPath();
-      for (const ring of l.clip) ring.forEach(([x, y], k) => (k ? g.lineTo(x, y) : g.moveTo(x, y)));
-      g.clip('evenodd');
-    }
-    if (l.crop) {
-      const [sx, sy, size] = l.crop, k = img.width / 256;
-      g.drawImage(img, sx * k, sy * k, size * k, size * k, 0, 0, 256, 256);
-    } else g.drawImage(img, 0, 0, 256, 256);
-    g.restore();
-    img.close();
-  });
-  return (await canvas.convertToBlob({ type: 'image/png' })).arrayBuffer();
-}
-
 // ---- Messages: {id, type, ...} → {id, result} or {id, error} ----
 let latestDrag = null, dragging = false;
 async function runDrag() {
@@ -205,7 +176,7 @@ self.onmessage = async (event) => {
   }
   if (m.type === 'dragEnd') { dragGraph = null; dragToken = -1; return; }
   try {
-    const result = m.type === 'follow' ? await follow(m) : m.type === 'dragStart' ? await dragStart(m) : m.type === 'profile' ? await profile(m) : m.type === 'compose' ? await compose(m) : null;
+    const result = m.type === 'follow' ? await follow(m) : m.type === 'dragStart' ? await dragStart(m) : m.type === 'profile' ? await profile(m) : null;
     postMessage({ id: m.id, result });
   } catch (error) {
     postMessage({ id: m.id, error: String(error?.message || error) });

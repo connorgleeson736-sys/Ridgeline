@@ -13,6 +13,9 @@ const DOC_ATTRIBUTION = '<a href="https://www.doc.govt.nz/" target="_blank" rel=
 
 export const urls = {
   aerial: `${LINZ}/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp?api=${key}`,
+  // LINZ's aerial tiles to zoom 14 are darkened by these two layers (black with
+  // alpha); overview.js takes them back out so every zoom has zoom 15's colours.
+  shade: ['geographx-nz-dem-2012-8m', 'geographx-nz-texture-shade-2012-8m'].map((l) => `${LINZ}/tiles/${l}/WebMercatorQuad/{z}/{x}/{y}.png?api=${key}`),
   topo: `${LINZ}/tiles/topo-raster/WebMercatorQuad/{z}/{x}/{y}.webp?api=${key}`,
   // The two maps inside LINZ's topo-raster (Topo250 to its zoom 12, Topo50 from 13),
   // each on its own, so the zoom where one gives way to the other can be chosen.
