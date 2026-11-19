@@ -89,12 +89,12 @@ export function build(options) {
   return style;
 }
 
-function buildStyle({ topography, settings, dark, fine = false, topoSize = 256, topoSwitch = 11.5 }) {
+function buildStyle({ topography, settings, dark, fine = false, topoSize = 256, topoSwitch = 11.5, imageSize: forcedSize }) {
   // Phones (small, dense screens): aerial and satellite imagery half a zoom finer.
   // A raster source picks its tile zoom as round(zoom + log2(512 / tileSize)), so 180
   // in place of 256 asks for the finer tile from the half-way point (about twice the
   // tiles), which a 2–3× screen needs to look as sharp as a computer's.
-  const imageSize = fine ? 180 : 256;
+  const imageSize = forcedSize || (fine ? 180 : 256);
   const visible = (on) => (on ? 'visible' : 'none');
   const topoLayers = topography.map((l) => {
     const layer = { ...l, layout: { ...(l.layout || {}), visibility: visible(shown(l.id, settings)) } };
@@ -122,7 +122,7 @@ function buildStyle({ topography, settings, dark, fine = false, topoSize = 256, 
     sky: sky(dark),
     sources: {
       // Overview imagery for zooms 5–12 (the app's, averaged from LINZ's zoom-13 photography), LINZ beyond.
-      aerial: { type: 'raster', tiles: [`bushline://aerial/{z}/{x}/{y}${settings.natural ? '' : '?raw'}`], tileSize: imageSize, maxzoom: 19, bounds: [160, -53, 185, -28], attribution: `${LINZ_ATTRIBUTION} · gaps: ${ESRI_ATTRIBUTION}` },
+      aerial: { type: 'raster', tiles: [`bushline://aerial/{z}/{x}/{y}${settings.natural ? '' : '?raw'}`], tileSize: imageSize, maxzoom: 19, bounds: [160, -53, 185, -28], attribution: config.esri ? `${LINZ_ATTRIBUTION} · gaps: ${ESRI_ATTRIBUTION}` : LINZ_ATTRIBUTION },
       // Coarse covers, always resident under each base (the app's and the old website's
       // coarse cover): where finer tiles have not arrived, slightly blurred imagery shows
       // instead of a gap. A few tiles per view, from the same cached URLs.

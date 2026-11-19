@@ -9,6 +9,7 @@
 // - Data overlays fetched nearest-centre first and drawn once per batch;
 //   routing, elevation and search on worker threads.
 // - Camera saved in an idle callback, not on every move.
+import config from './config.js';
 import { Map as MapLibre, setWorkerUrl, addProtocol, getVersion, setMaxParallelImageRequests, ScaleControl, AttributionControl } from '/vendor/maplibre-gl-6.16.0/maplibre-gl.mjs';
 import { build, GROUPS, sky, hatch, shown, grade, NZ_BOUNDS } from './style.js';
 import { START as A_COLOUR, END as B_COLOUR } from './chart.js';
@@ -42,6 +43,8 @@ const coarse = matchMedia('(pointer: coarse)').matches;
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const DEFAULTS = { base: 'aerial', natural: true, threeD: true, relief: 1, names: true, peaks: true, roads: true, tracks: true, huts: true, contours: false, hunting: false, teAraroa: true };
 const settings = { ...DEFAULTS, ...store.get('settings', {}) };
+// Satellite (Esri) only with Esri's licence (build ESRI_IMAGERY=1).
+if (settings.base === 'satellite' && !config.esri) settings.base = 'aerial';
 const saveSettings = () => store.set('settings', settings);
 /** Where NZ Topo changes from Topo250 to Topo50: the chosen map zoom, or LINZ's own. */
 let autoTopoSwitch = 11.5;
@@ -50,11 +53,16 @@ const topoSwitch = () => (Number.isFinite(settings.topoSwitch) ? settings.topoSw
 // ---- Pixel budget (the old website's RidgePerformance.pixelRatio) ----
 const memory = navigator.deviceMemory || 8, saveData = !!navigator.connection?.saveData;
 const lowPower = memory <= 2 || saveData;
+// ?promo: pictures for the website (tools/promo-shots.mjs): no controls, drawn at the
+// screen's full density with imagery tiles to match, no fades.
+const promo = /[?&]promo\b/.test(location.search);
+if (promo) document.body.classList.add('promo');
 let sharp = false;
 // A phone: a small, dense screen. Its drawing buffer is small enough to draw at up to
 // 2.5× at every zoom, and its imagery is asked for half a zoom finer (style.js).
 const phone = !lowPower && (devicePixelRatio || 1) >= 2 && innerWidth * innerHeight <= 600_000;
 function pixelRatio(zoom) {
+  if (promo) return Math.min(devicePixelRatio || 1, 4);
   if (zoom >= 15.3) sharp = true; else if (zoom < 14.7) sharp = false;
   const dpr = devicePixelRatio || 1, w = innerWidth, h = innerHeight;
   if (lowPower) return 1;
@@ -84,7 +92,8 @@ async function main() {
   // LINZ's own switch from Topo250 to Topo50 (its zoom-13 tiles) at this tile size: the
   // default for "Topo50 from zoom" (a raster source asks for round(zoom + log2(512 / size))).
   autoTopoSwitch = Math.round((12.5 - Math.log2(512 / topoSize)) * 10) / 10;
-  const style = build({ topography, settings, dark: dark.matches, fine: phone, topoSize, topoSwitch: topoSwitch() });
+  const promoSize = promo ? Math.max(64, Math.round(256 / Math.min(dpr, 4))) : undefined;
+  const style = build({ topography, settings, dark: dark.matches, fine: phone, topoSize: promoSize || topoSize, topoSwitch: topoSwitch(), imageSize: promoSize });
   const map = new MapLibre({
     container: 'map',
     style,
@@ -94,13 +103,13 @@ async function main() {
     pixelRatio: pixelRatio(view.zoom),
     // Tiles kept after they leave the view, per source, by the device's memory
     // (the app's RAM budget): panning back shows them at once.
-    maxTileCacheSize: saveData ? 120 : memory <= 2 ? 160 : memory <= 4 ? 360 : 640,
+    maxTileCacheSize: promo ? 4000 : saveData ? 120 : memory <= 2 ? 160 : memory <= 4 ? 360 : 640,
     maxTileCacheZoomLevels: 8,
     cancelPendingTileRequestsWhileZooming: false,
     centerClampedToGround: true,
     refreshExpiredTiles: false,
     renderWorldCopies: false,
-    fadeDuration: 150,
+    fadeDuration: promo ? 0 : 150,
     anisotropicFilterPitch: 35,
     attributionControl: false,
     canvasContextAttributes: { antialias: false, alpha: false, preserveDrawingBuffer: false, powerPreference: 'default' },
@@ -181,6 +190,7 @@ async function main() {
     openDrawer: () => openDrawer(),
     closeDrawer: () => closeDrawer(),
   };
+  if (promo) window.bushlinePromo = { walk: (guid) => openWalk(ctx, guid), teAraroa: (slug = null) => openTeAraroa(ctx, slug), sheet };
   const overlays = attachOverlays(map, () => settings);
   // Te Araroa: its line and kilometres, loaded the first time its layer is on.
   let teAraroaLoaded = false;
@@ -433,7 +443,7 @@ function layers(map, panel, button, { setThreeD, overlays, labels, resize, close
   }
   panel.append(
     el('div', { class: 'heading' }, el('h2', {}, 'Map layers'), el('button', { class: 'icon-button', type: 'button', 'aria-label': 'Close layers', onclick: () => close() }, '✕')),
-    el('div', { class: 'bases' }, base('aerial', 'LINZ aerial'), base('satellite', 'Satellite'), base('topo', 'NZ Topo · 2D')),
+    el('div', { class: 'bases' }, base('aerial', 'LINZ aerial'), config.esri ? base('satellite', 'Satellite') : null, base('topo', 'NZ Topo · 2D')),
     naturalBox,
     switchBox,
     el('h3', {}, 'Topographic overlays'),

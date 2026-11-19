@@ -86,3 +86,50 @@ so search engines skip it:
 NOINDEX=1 SITE_URL=https://bushline-maps.<subdomain>.workers.dev node build.mjs
 CLOUDFLARE_ACCOUNT_ID=... CLOUDFLARE_API_TOKEN=... node tools/deploy-test.mjs
 ```
+
+## Launch (production)
+
+The same Worker and R2 setup serves the production site under its own names, on the
+real domain. Before the first launch:
+
+1. **Domain.** Register `bushlinemaps.co.nz` with a New Zealand registrar and add it
+   to the Cloudflare account (free plan): Cloudflare gives two nameservers to set at
+   the registrar.
+2. **LINZ key.** Ask LINZ for a production Basemaps key for the website (not the
+   app's), restricted to the domain if they offer it.
+3. **Esri.** Leave `ESRI_IMAGERY` unset: the map is LINZ only (no Satellite base, no
+   Esri in LINZ's few gaps) until there is an Esri licence for a commercial product.
+4. **Data permissions.** Confirm with the Te Araroa Trust that their section data,
+   notes and alerts may be shown (credited, CC BY 4.0).
+5. **Build and deploy** (sign-ups are kept in the private bucket
+   `bushline-site-prod-signups`, created on the first deploy):
+
+```bash
+LINZ_API_KEY=<production key> SITE_URL=https://bushlinemaps.co.nz OVERVIEW_URL=https://bushlinemaps.co.nz node build.mjs
+CLOUDFLARE_ACCOUNT_ID=... CLOUDFLARE_API_TOKEN=... SITE_BUCKET=bushline-site-prod SITE_WORKER=bushline-maps-prod node tools/deploy-test.mjs
+```
+
+6. **Domain to the Worker.** In Cloudflare: Workers & Pages → `bushline-maps-prod` →
+   Settings → Domains & Routes → Add custom domain: `bushlinemaps.co.nz` (and
+   `www.bushlinemaps.co.nz`). Cloudflare issues the certificate.
+7. **Search.** Submit `https://bushlinemaps.co.nz/sitemap.xml` in Google Search
+   Console. (Production builds allow indexing; only `NOINDEX=1` builds block it.)
+
+Sign-ups ("Get notified", `worker/notify.js`): one JSON object per address in the
+sign-ups bucket, `signups/<sha256 of the address>.json` with the address, the phone
+chosen and the date. Download them from the R2 bucket in the Cloudflare dashboard.
+
+### Pictures
+
+The app page's pictures are rendered from the map itself (`?promo`: no controls,
+full screen density, imagery tiles to match), three times their size on screen and
+saved at twice it:
+
+```bash
+SITE=https://bushline-maps.<subdomain>.workers.dev NODE_PATH=$(npm root -g) node tools/promo-shots.mjs promo
+python3 -I tools/promo-images.py promo src/img/promo
+```
+
+Zoomed-out imagery (zooms 4–8) is LINZ's current zoom-9 photography averaged down:
+`python3 -I tools/linz-coarse.py <work-dir> data/linz-coarse` (re-run when LINZ
+publishes new imagery).

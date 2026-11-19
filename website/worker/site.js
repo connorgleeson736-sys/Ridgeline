@@ -4,6 +4,7 @@
 // HEADERS and REDIRECTS are filled in by tools/deploy-test.mjs.
 import { docAlerts } from './doc-alerts.js';
 import { teAraroa } from './te-araroa.js';
+import { notify } from './notify.js';
 
 const HEADERS = __HEADERS__;
 const REDIRECTS = __REDIRECTS__;
@@ -25,6 +26,8 @@ const redirects = REDIRECTS.split('\n').map((l) => l.trim().split(/\s+/)).filter
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    // "Get notified" sign-ups: the one thing posted to the site.
+    if (url.pathname === '/api/notify') return request.method === 'POST' ? notify(request, env) : new Response('Method not allowed', { status: 405 });
     if (request.method !== 'GET' && request.method !== 'HEAD') return new Response('Method not allowed', { status: 405 });
     let path = decodeURIComponent(url.pathname);
     // DOC's current alerts (as functions/api/doc-alerts on Pages).

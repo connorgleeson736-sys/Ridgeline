@@ -422,3 +422,6 @@ body.sheet-open .maplibregl-ctrl-bottom-left, body.sheet-open .maplibregl-ctrl-b
 /* NZ Topo: where Topo50 replaces Topo250. */
 .topo-switch .note { margin-top: 2px; }
 .topo-switch .link { border: 0; background: none; padding: 0; font: inherit; color: var(--link); cursor: pointer; text-decoration: underline; }
+/* ?promo (tools/promo-shots.mjs): the map alone, for the website's pictures. */
+body.promo #launcher, body.promo #locate, body.promo #perspective, body.promo #compass, body.promo #layers-button,
+body.promo .maplibregl-ctrl-bottom-left, body.promo .maplibregl-ctrl-bottom-right, body.promo #map-status, body.promo .progress, body.promo #notes { display: none !important; }

@@ -26,7 +26,9 @@ async function call(method, url, body, headers = {}) {
 }
 
 const buckets = await (await call('GET', `${api}/r2/buckets`)).json();
-if (!buckets.result.buckets.some((b) => b.name === bucket)) await call('POST', `${api}/r2/buckets`, JSON.stringify({ name: bucket }), { 'Content-Type': 'application/json' });
+// The site's files, and the "Get notified" sign-ups (private: the Worker never serves it).
+const signups = process.env.SIGNUP_BUCKET || `${bucket}-signups`;
+for (const name of [bucket, signups]) if (!buckets.result.buckets.some((b) => b.name === name)) await call('POST', `${api}/r2/buckets`, JSON.stringify({ name }), { 'Content-Type': 'application/json' });
 
 const files = [];
 const walk = (d) => { for (const f of readdirSync(d)) { const p = join(d, f); if (statSync(p).isDirectory()) walk(p); else files.push(relative(dist, p).split('\\').join('/')); } };
@@ -51,10 +53,11 @@ const source = readFileSync(join(here, 'worker/site.js'), 'utf8')
   .replace('__HEADERS__', JSON.stringify(readFileSync(join(dist, '_headers'), 'utf8')))
   .replace('__REDIRECTS__', JSON.stringify(readFileSync(join(dist, '_redirects'), 'utf8')));
 const form = new FormData();
-form.append('metadata', new Blob([JSON.stringify({ main_module: 'site.js', compatibility_date: '2026-10-01', bindings: [{ type: 'r2_bucket', name: 'SITE', bucket_name: bucket }, { type: 'r2_bucket', name: 'OVERVIEWS', bucket_name: process.env.OVERVIEW_BUCKET || 'ridgeline-overviews' }] })], { type: 'application/json' }));
+form.append('metadata', new Blob([JSON.stringify({ main_module: 'site.js', compatibility_date: '2026-10-01', bindings: [{ type: 'r2_bucket', name: 'SITE', bucket_name: bucket }, { type: 'r2_bucket', name: 'OVERVIEWS', bucket_name: process.env.OVERVIEW_BUCKET || 'ridgeline-overviews' }, { type: 'r2_bucket', name: 'SIGNUPS', bucket_name: signups }] })], { type: 'application/json' }));
 form.append('site.js', new Blob([source], { type: 'application/javascript+module' }), 'site.js');
 form.append('doc-alerts.js', new Blob([readFileSync(join(here, 'worker/doc-alerts.js'), 'utf8')], { type: 'application/javascript+module' }), 'doc-alerts.js');
 form.append('te-araroa.js', new Blob([readFileSync(join(here, 'worker/te-araroa.js'), 'utf8')], { type: 'application/javascript+module' }), 'te-araroa.js');
+form.append('notify.js', new Blob([readFileSync(join(here, 'worker/notify.js'), 'utf8')], { type: 'application/javascript+module' }), 'notify.js');
 await call('PUT', `${api}/workers/scripts/${script}`, form);
 await call('POST', `${api}/workers/scripts/${script}/subdomain`, JSON.stringify({ enabled: true, previews_enabled: false }), { 'Content-Type': 'application/json' });
 const sub = (await (await call('GET', `${api}/workers/subdomain`)).json()).result.subdomain;
