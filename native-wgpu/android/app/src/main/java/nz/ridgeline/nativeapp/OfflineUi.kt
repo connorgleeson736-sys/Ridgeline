@@ -304,15 +304,15 @@ class OfflineUi(private val activity:Activity,private val root:FrameLayout,priva
         val eraser=TextView(activity).apply{text="Erase";textSize=12f;gravity=Gravity.CENTER;isClickable=true;setTextColor(NativeUi.ink);setOnClickListener{erasing=true;showBrush();hint("Hold, then drag to erase")};contentDescription="Eraser"}
         eraseChip=eraser
         chips.addView(eraser,LinearLayout.LayoutParams(0,dp(52),1f).apply{marginStart=dp(4)})
+        // The colours explained.
+        val key=TextView(activity).apply{text="?";textSize=15f;gravity=Gravity.CENTER;setTypeface(null,android.graphics.Typeface.BOLD);setTextColor(NativeUi.ink);isClickable=true
+            contentDescription="What the colours mean";background=chipBackground(false);setOnClickListener{colourKey()}}
         chips.addView(key,LinearLayout.LayoutParams(dp(36),dp(52)).apply{marginStart=dp(4)})
         pane.addView(chips)
         // Tools.
         val undo=NativeUi.button(activity,"Undo"){if(area.undo())areaChanged(true)};undoButton=undo
         val clear=NativeUi.button(activity,"Clear"){if(!area.isEmpty())AlertDialog.Builder(activity).setMessage("Clear the painted area?").setPositiveButton("Clear"){_,_->area.clear();areaChanged(true)}.setNegativeButton("Cancel",null).show()}
         val route=NativeUi.button(activity,"Along route"){paintRoute()}
-        // The colours explained.
-        val key=TextView(activity).apply{text="?";textSize=15f;gravity=Gravity.CENTER;setTypeface(null,android.graphics.Typeface.BOLD);setTextColor(NativeUi.ink);isClickable=true
-            contentDescription="What the colours mean";background=chipBackground(false);setOnClickListener{colourKey()}}
         pane.addView(LinearLayout(activity).apply{setPadding(0,dp(6),0,0)
             for((i,v)in listOf(undo,clear,route).withIndex())addView(v.apply{minimumHeight=0;minHeight=0},LinearLayout.LayoutParams(0,dp(36),if(i==2)1.4f else 1f).apply{if(i>0)marginStart=dp(8)})})
         // Te Araroa: a corridor along the trail, chosen by section, island or the whole trail.

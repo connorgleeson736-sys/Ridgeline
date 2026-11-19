@@ -292,7 +292,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
     private val choreographer by lazy{Choreographer.getInstance()}
     private var frameTimeNanos=0L
     private var activeFrameNanos=16_666_667L
-    private val vsync=Choreographer.FrameCallback{stamp->
+    private val vsync:Choreographer.FrameCallback=Choreographer.FrameCallback{stamp->
         // Power saving: at most 30 frames a second (a later vsync draws the frame).
         if(powerSaving&&lastDrawNanos!=0L&&stamp-lastDrawNanos<POWER_FRAME_NANOS){queued.set(true);choreographer.postFrameCallback(vsyncAgain);return@FrameCallback}
         lastDrawNanos=stamp
@@ -300,7 +300,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
         display?.refreshRate?.takeIf{it.isFinite()&&it in 20f..240f}?.let{activeFrameNanos=(1_000_000_000.0/it).toLong()}
         drawFrame()
     }
-    private val vsyncAgain=Choreographer.FrameCallback{stamp->vsync.doFrame(stamp)}
+    private val vsyncAgain:Choreographer.FrameCallback=Choreographer.FrameCallback{stamp->vsync.doFrame(stamp)}
     private var lastDrawNanos=0L
     private val adaptiveWake=Runnable{requestFrame()}
     private val focusWake=Runnable{requestFrame()}
