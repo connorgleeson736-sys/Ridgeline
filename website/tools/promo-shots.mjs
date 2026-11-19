@@ -56,7 +56,8 @@ for (const [name, scene] of Object.entries(SCENES)) {
     await ready(page);
   }
   const ok = await ready(page, 4000);
-  await page.screenshot({ path: join(out, `${name}.png`) });
+  // A large software-rendered frame takes a while to capture.
+  await page.screenshot({ path: join(out, `${name}.png`), timeout: 300_000, animations: 'disabled' });
   console.log(`${name}: ${w * DSF}x${h * DSF}${ok ? '' : ' (not all tiles loaded)'} in ${((Date.now() - t0) / 1000).toFixed(0)} s`);
   await ctx.close();
 }
