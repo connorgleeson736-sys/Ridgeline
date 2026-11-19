@@ -17,7 +17,9 @@ const auth = { Authorization: `Bearer ${token}` };
 const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.json': 'application/json', '.tsv': 'text/tab-separated-values; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.xml': 'application/xml', '.txt': 'text/plain; charset=utf-8', '.webmanifest': 'application/manifest+json', '.ttf': 'font/ttf' };
 async function call(method, url, body, headers = {}) {
   for (let attempt = 0; ; attempt++) {
-    const r = await fetch(url, { method, body, headers: { ...auth, ...headers } });
+    let r;
+    try { r = await fetch(url, { method, body, headers: { ...auth, ...headers } });
+    } catch (e) { if (attempt >= 5) throw e; await new Promise((s) => setTimeout(s, 1500 * 2 ** attempt)); continue; } // dropped connection: retry
     if (r.ok) return r;
     // Retry server errors and rate limits (429), backing off.
     if (attempt >= 5 || (r.status < 500 && r.status !== 429)) throw new Error(`${method} ${url.replace(api, '')}: ${r.status} ${(await r.text()).slice(0, 300)}`);

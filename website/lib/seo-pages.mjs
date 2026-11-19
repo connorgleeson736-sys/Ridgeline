@@ -34,21 +34,6 @@ function bbox(lines) { const b = [180, 90, -180, -90]; for (const l of lines) fo
 const length = (lines) => lines.reduce((s, l) => s + l.slice(1).reduce((t, p, i) => t + metres(l[i], p), 0), 0);
 const mercY = (lat) => Math.log(Math.tan(Math.PI / 4 + (lat * rad) / 2));
 
-/** A small line drawing: the lines in mercator, huts as dots, start as a ring. */
-function lineSvg(lines, { dots = [], start = null, label = '' } = {}) {
-  if (!lines.length) return '';
-  const b = bbox(lines.concat(dots.map((d) => [d.point]), start ? [[start]] : []));
-  const x0 = b[0], x1 = b[2], y0 = mercY(b[3]), y1 = mercY(b[1]);
-  const span = Math.max((x1 - x0) * rad, y0 - y1, 1e-6);
-  const W = 640, H = 400, pad = 28, s = Math.min((W - 2 * pad) / Math.max((x1 - x0) * rad, 1e-9), (H - 2 * pad) / Math.max(y0 - y1, 1e-9), (W - 2 * pad) / span * 4);
-  const ox = (W - (x1 - x0) * rad * s) / 2, oy = (H - (y0 - y1) * s) / 2;
-  const P = ([x, y]) => [ox + (x - x0) * rad * s, oy + (y0 - mercY(y)) * s].map((v) => Math.round(v * 10) / 10);
-  const d = lines.map((l) => 'M' + l.map((p) => P(p).join(' ')).join('L')).join('');
-  const hut = dots.map((h) => { const [x, y] = P(h.point); return `<g class="hut-dot"><circle cx="${x}" cy="${y}" r="5.5"/><title>${esc(h.name)}</title></g>`; }).join('');
-  const st = start ? (() => { const [x, y] = P(start); return `<circle class="start" cx="${x}" cy="${y}" r="6"/>`; })() : '';
-  return `<svg class="line-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(label)}"><path d="${d}"/>${st}${hut}</svg>`;
-}
-
 function page({ path, title, description, h1, crumbs, body, jsonld }) {
   return `<!doctype html>
 <html lang="en-NZ">
@@ -75,11 +60,40 @@ ${body}
 </html>
 `;
 }
+/** A place's page as the map itself (src/index.html): its own title, description and
+ * structured data; the map starts on the place (data-view), opens it (data-open) and
+ * keeps the page's text last in its panel (#place-text; js/map/sheet.js). */
+let mapTemplate = '';
+function mapPage({ path, title, description, h1, jsonld, open, view, panel, panelTitle = '', article }) {
+  let html = mapTemplate;
+  const swap = (from, to) => { if (!html.includes(from)) throw new Error(`map page template: ${from}`); html = html.replace(from, to); };
+  swap(/<title>[^<]*<\/title>/.exec(html)?.[0] || '<title>', `<title>${esc(title)}</title>`);
+  swap(/<meta name="description" content="[^"]*">/.exec(html)?.[0] || '<meta name="description"', `<meta name="description" content="${esc(description)}">`);
+  swap('<link rel="canonical" href="{{site.domain}}/">', `<link rel="canonical" href="{{site.domain}}${path}">`);
+  swap(/<meta property="og:title" content="[^"]*">/.exec(html)?.[0] || 'og:title', `<meta property="og:title" content="${esc(h1)}">`);
+  swap(/<meta property="og:description" content="[^"]*">/.exec(html)?.[0] || 'og:description', `<meta property="og:description" content="${esc(description)}">`);
+  swap('<meta property="og:url" content="{{site.domain}}/">', `<meta property="og:url" content="{{site.domain}}${path}">`);
+  swap('</head>', `<script type="application/ld+json">${JSON.stringify(jsonld).replace(/</g, '\\u003c').replace(/\{\{/g, '{\\u007b')}</script>\n</head>`);
+  swap('<body class="map-page">', `<body class="map-page" data-open="${esc(open)}" data-view="${esc(view)}" data-panel="${esc(panel)}"${panelTitle ? ` data-panel-title="${esc(panelTitle)}"` : ''}>`);
+  swap(/<h1 class="visually-hidden">[^<]*<\/h1>/.exec(html)?.[0] || '<h1', `<h1 class="visually-hidden">${esc(h1)}</h1>`);
+  swap('<aside id="sheet" class="sheet" hidden></aside>', `<aside id="sheet" class="sheet" hidden></aside>\n<article id="place-text" class="place-text">${article}</article>`);
+  return html;
+}
+/** The map's opening view (zoom/lat/lon/bearing/pitch) around lines or a point; the
+ * map frames the place exactly once it opens. */
+function viewOf(lines, point, zoom = 13.5) {
+  if (!lines?.length) return point ? `${zoom}/${point[1]}/${point[0]}/0/50` : '';
+  const b = bbox(lines), dx = (b[2] - b[0]) / 360, dy = (mercY(b[3]) - mercY(b[1])) / (2 * Math.PI);
+  const z = Math.max(6, Math.min(15, Math.log2(Math.min(600 / Math.max(dx * 512, 1e-9), 450 / Math.max(dy * 512, 1e-9))) - 0.4));
+  const lat = (Math.atan(Math.exp((mercY(b[1]) + mercY(b[3])) / 2)) * 2 - Math.PI / 2) / rad;
+  return `${z.toFixed(2)}/${lat.toFixed(5)}/${((b[0] + b[2]) / 2).toFixed(5)}/0/50`;
+}
 const facts = (rows) => `<dl class="facts">${rows.filter(([, v]) => v).map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${v}</dd></div>`).join('')}</dl>`;
 const crumbList = (items) => ({ '@type': 'BreadcrumbList', itemListElement: items.map(([name, url], i) => ({ '@type': 'ListItem', position: i + 1, name, item: url })) });
 const linkList = (items) => `<ul class="link-list">${items.join('')}</ul>`;
 
-export function buildSeoPages({ here, appAssets, domain }) {
+export function buildSeoPages({ here, appAssets, domain, mapHtml }) {
+  mapTemplate = mapHtml;
   const seoFile = join(here, 'data/seo-data.json.gz');
   if (!existsSync(seoFile)) return [];
   const seo = JSON.parse(gunzipSync(readFileSync(seoFile)));
@@ -174,23 +188,17 @@ export function buildSeoPages({ here, appAssets, domain }) {
     if (w.huts.length) about += ` Huts along the way: ${list(w.huts.map((h) => `<a href="${hutUrl(h)}">${esc(h.name)}</a>`))}.`;
     if (secs.length) about += ` It is part of Te Araroa (${list(secs.map((s) => `<a href="${taUrl(s)}">${esc(s.name)}</a>`))}).`;
     const desc = `${w.name}: ${[w.distance, w.time, level].filter(Boolean).join(', ')}${w.region ? `, ${w.region}` : ''}. Map in 3D, huts along the way and the elevation profile.`;
-    const body = `
-<p class="lead">${about}</p>
-${facts([['Distance', esc(w.distance) || (w.length ? `${km(w.length)} of mapped track` : '')], ['Time', esc(w.time)], ['Grade', esc(level)], ['Type', shapeText], ['Region', esc(w.region)], ['Dogs', esc(w.dogs)]])}
-<p class="actions"><a class="button" href="/#w=${w.guid}">Open in the 3D map</a> <span class="muted">Elevation profile, huts and DOC alerts</span></p>
-${w.lines.length ? `<figure class="line-map">${lineSvg(w.lines, { dots: w.huts, start: w.lines[0][0], label: `Map of the ${w.name}` })}<figcaption>The track as DOC maps it${w.huts.length ? '; huts marked' : ''}. North is up.</figcaption></figure>` : ''}
-${w.huts.length ? `<h2>Huts along the way</h2>${linkList(w.huts.map((h) => `<li><a href="${hutUrl(h)}">${esc(h.name)}</a>${h.bookable ? ' <span class="tag">Bookable</span>' : ''}</li>`))}` : ''}
-${w.intro ? `<h2>About the walk</h2><blockquote>${esc(w.intro)}</blockquote><p class="fine">From DOC's page for this walk (CC BY 4.0). <a href="https://www.doc.govt.nz/link/${w.guid.replace(/-/g, '')}.aspx" rel="noopener">Full description, alerts and conditions on DOC ↗</a></p>` : `<p class="fine"><a href="https://www.doc.govt.nz/link/${w.guid.replace(/-/g, '')}.aspx" rel="noopener">DOC's page for this walk ↗</a></p>`}
-${secs.length ? `<h2>On Te Araroa</h2>${linkList(secs.map((s) => `<li><a href="${taUrl(s)}">Section ${s.n}: ${esc(s.name)}</a></li>`))}` : ''}
-${near.length ? `<h2>Walks nearby</h2>${linkList(near.map(([v, d]) => `<li><a href="${walkUrl(v)}">${esc(v.name)}</a> <span class="muted">${km(d)} away</span></li>`))}` : ''}
-<p class="fine">Check DOC for alerts and conditions before you go, and carry a map, compass and personal locator beacon.</p>`;
-    out.push({ rel: `walks/${w.slug}/index.html`, html: page({
+    const doc = `https://www.doc.govt.nz/link/${w.guid.replace(/-/g, '')}.aspx`;
+    const article = `<h3>About ${esc(the(w.name))}</h3><p>${about}</p>
+${secs.length ? `<h3>On Te Araroa</h3>${linkList(secs.map((s) => `<li><a href="${taUrl(s)}">Section ${s.n}: ${esc(s.name)}</a></li>`))}` : ''}
+${near.length ? `<h3>Walks nearby</h3>${linkList(near.map(([v, d]) => `<li><a href="${walkUrl(v)}">${esc(v.name)}</a> <span class="muted">${km(d)} away</span></li>`))}` : ''}
+<p class="fine">Walk details from DOC (CC BY 4.0). <a href="${doc}" rel="noopener">DOC's page for this walk ↗</a> · <a href="/walks/">All walks</a></p>`;
+    out.push({ rel: `walks/${w.slug}/index.html`, html: mapPage({
       path: walkUrl(w), title: `${w.name} – map, huts and distance | Razorback Maps`, description: desc, h1: w.name,
-      crumbs: `<a href="/walks/">Walks</a>${w.region ? ` › <a href="/walks/#${slugify(w.region)}">${esc(w.region)}</a>` : ''}`,
+      open: `w=${w.guid}`, view: viewOf(w.lines, w.point, 12.5), panel: 'walk', article,
       jsonld: { '@context': 'https://schema.org', '@graph': [
         { '@type': 'TouristAttraction', name: w.name, url: `${D}${walkUrl(w)}`, description: strip(about), ...(w.point ? { geo: { '@type': 'GeoCoordinates', latitude: w.point[1], longitude: w.point[0] } } : {}), ...(w.image ? { image: w.image } : {}), isAccessibleForFree: true, touristType: 'Trampers' },
-        crumbList([['Walks', `${D}/walks/`], [w.name, `${D}${walkUrl(w)}`]])] },
-      body }) });
+        crumbList([['Walks', `${D}/walks/`], [w.name, `${D}${walkUrl(w)}`]])] } }) });
   }
 
   // ---- Hut pages ----
@@ -201,22 +209,17 @@ ${near.length ? `<h2>Walks nearby</h2>${linkList(near.map(([v, d]) => `<li><a hr
     if (h.walks.length) about += ` It is on ${list(h.walks.map((w) => `<a href="${walkUrl(w)}">${esc(the(w.name))}</a>`))}.`;
     if (h.ta) about += ` Te Araroa passes it at km ${Math.round(h.ta.km)}, in <a href="${taUrl(h.ta.section)}">${esc(h.ta.section.name)}</a>.`;
     const desc = `${h.name}${where ? `, ${where}` : ''}: ${h.bookable ? 'bookable DOC hut' : 'DOC hut'}${h.walks.length ? ` on ${the(h.walks[0].name)}` : ''}. Location, facilities, walks to it and huts nearby, in 3D.`;
-    const lines = h.walks.flatMap((w) => w.lines);
-    const body = `
-<p class="lead">${about}</p>
-${facts([['Region', esc(h.region)], ['Place', esc(h.place)], ['Booking', h.bookable ? 'Bookable – book with DOC' : 'Not bookable (first come, first served)'], ['Facilities', esc(h.facilities)], ['Location', `${h.point[1].toFixed(5)}, ${h.point[0].toFixed(5)}`]])}
-<p class="actions"><a class="button" href="/#h=${h.point[1]},${h.point[0]},${encodeURIComponent(h.name)}">Open in the 3D map</a></p>
-${lines.length ? `<figure class="line-map">${lineSvg(lines, { dots: [h], label: `Tracks to ${h.name}` })}<figcaption>${esc(h.name)} and the tracks to it. North is up.</figcaption></figure>` : ''}
-${h.walks.length ? `<h2>Walks to the hut</h2>${linkList(h.walks.map((w) => `<li><a href="${walkUrl(w)}">${esc(w.name)}</a>${w.time ? ` <span class="muted">${esc(w.time)}</span>` : ''}</li>`))}` : ''}
-${near.length ? `<h2>Huts nearby</h2>${linkList(near.map(([v, d]) => `<li><a href="${hutUrl(v)}">${esc(v.name)}</a> <span class="muted">${km(d)} away</span></li>`))}` : ''}
-<p class="fine">From DOC's hut data (CC BY 4.0).${h.link ? ` <a href="${esc(h.link)}" rel="noopener">DOC's page for this hut, with bookings and alerts ↗</a>` : ''}</p>`;
-    out.push({ rel: `huts/${h.slug}/index.html`, html: page({
+    const article = `<h3>About ${esc(h.name)}</h3><p>${about}</p>
+${facts([['Booking', h.bookable ? 'Bookable – book with DOC' : 'Not bookable (first come, first served)'], ['Facilities', esc(h.facilities)], ['Location', `${h.point[1].toFixed(5)}, ${h.point[0].toFixed(5)}`]])}
+${h.walks.length ? `<h3>Walks to the hut</h3>${linkList(h.walks.map((w) => `<li><a href="${walkUrl(w)}">${esc(w.name)}</a>${w.time ? ` <span class="muted">${esc(w.time)}</span>` : ''}</li>`))}` : ''}
+${near.length ? `<h3>Huts nearby</h3>${linkList(near.map(([v, d]) => `<li><a href="${hutUrl(v)}">${esc(v.name)}</a> <span class="muted">${km(d)} away</span></li>`))}` : ''}
+<p class="fine">Hut details from DOC (CC BY 4.0).${h.link ? ` <a href="${esc(h.link)}" rel="noopener">DOC's page for this hut, with bookings and alerts ↗</a> ·` : ''} <a href="/huts/">All huts</a></p>`;
+    out.push({ rel: `huts/${h.slug}/index.html`, html: mapPage({
       path: hutUrl(h), title: `${h.name}${h.region ? `, ${h.region}` : ''} – hut, map and walks | Razorback Maps`, description: desc, h1: h.name,
-      crumbs: `<a href="/huts/">Huts</a>${h.region ? ` › <a href="/huts/#${slugify(h.region)}">${esc(h.region)}</a>` : ''}`,
+      open: `h=${h.point[1]},${h.point[0]},${encodeURIComponent(h.name)}`, view: viewOf(null, h.point, 13.5), panel: 'hut', article,
       jsonld: { '@context': 'https://schema.org', '@graph': [
         { '@type': 'Place', name: h.name, url: `${D}${hutUrl(h)}`, description: strip(about), geo: { '@type': 'GeoCoordinates', latitude: h.point[1], longitude: h.point[0] }, ...(h.thumb ? { image: h.thumb } : {}) },
-        crumbList([['Huts', `${D}/huts/`], [h.name, `${D}${hutUrl(h)}`]])] },
-      body }) });
+        crumbList([['Huts', `${D}/huts/`], [h.name, `${D}${hutUrl(h)}`]])] } }) });
   }
 
   // ---- Te Araroa section pages ----
@@ -234,24 +237,17 @@ ${near.length ? `<h2>Huts nearby</h2>${linkList(near.map(([v, d]) => `<li><a hre
     const hutLink = (p) => { const h = huts.find((x) => x.name.toLowerCase() === p.name.toLowerCase() && metres(x.point, p.point) < 1000); return h ? `<a href="${hutUrl(h)}">${esc(p.name)}</a>` : esc(p.name); };
     const desc = `Te Araroa ${s.alternative ? 'alternative' : `section ${s.n}`}: ${s.name}, ${s.length} km${s.region ? `, ${s.region}` : ''}. Map in 3D, huts and campsites with trail km, food stops and the elevation profile.`;
     const lines = taLines.get(s.slug) || [];
-    const body = `
-<p class="lead">${about}</p>
-${facts([['Length', s.length ? `${s.length} km` : ''], ['Time', esc(s.time)], ['Region', esc(s.region)], ['Island', island], ['Trail km (southbound)', !s.alternative && s.from != null ? `${Math.round(s.from)}–${Math.round(s.to)}` : '']])}
-<p class="actions"><a class="button" href="/#ta=${s.slug}">Open in the 3D map</a> <span class="muted">Profile, live trail alerts and food stops</span></p>
-${lines.length ? `<figure class="line-map">${lineSvg(lines, { label: `Map of ${s.name}` })}<figcaption>The trail through this section. North is up.</figcaption></figure>` : ''}
-${intro ? `<h2>About the section</h2><blockquote>${esc(intro).replace(/\n/g, '</p><p>')}</blockquote><p class="fine">From the Te Araroa Trust's notes (CC BY 4.0).</p>` : ''}
-${places.length ? `<h2>Huts and places to stay</h2>${linkList(places.map((p) => `<li>${hutLink(p)} <span class="muted">${esc(p.type || '')}${p.km != null ? ` · km ${Math.round(p.km)}` : ''}</span></li>`))}` : ''}
-${stops.length ? `<h2>Food and resupply</h2>${linkList(stops.map((r) => `<li>${esc(r.name)} <span class="muted">km ${Math.round(r.km)}${r.bounce ? ' · bounce box' : ''}</span>${r.note ? `<br><span class="note-line">${esc(r.note)}</span>` : ''}</li>`))}` : ''}
-${dws.length ? `<h2>DOC walks on this section</h2>${linkList(dws.map((w) => `<li><a href="${walkUrl(w)}">${esc(w.name)}</a></li>`))}` : ''}
+    const article = `<h3>About this section</h3><p>${about}</p>
+${places.length ? `<h3>Huts and places to stay</h3>${linkList(places.map((p) => { const type = p.type && !p.name.toLowerCase().includes(p.type.toLowerCase()) ? p.type : ''; return `<li>${hutLink(p)} <span class="muted">${[esc(type), p.km != null ? `km ${Math.round(p.km)}` : ''].filter(Boolean).join(' · ')}</span></li>`; }))}` : ''}
+${dws.length ? `<h3>DOC walks on this section</h3>${linkList(dws.map((w) => `<li><a href="${walkUrl(w)}">${esc(w.name)}</a></li>`))}` : ''}
 ${prev || next ? `<nav class="prev-next">${prev ? `<a href="${taUrl(prev)}">← ${esc(prev.name)}</a>` : '<span></span>'}${next ? `<a href="${taUrl(next)}">${esc(next.name)} →</a>` : ''}</nav>` : ''}
-<p class="fine">Check the Te Araroa Trust's trail status and alerts before you go.</p>`;
-    out.push({ rel: `te-araroa/${s.slug}/index.html`, html: page({
-      path: taUrl(s), title: `Te Araroa: ${s.name} – map, huts and food | Razorback Maps`, description: desc, h1: s.name,
-      crumbs: `<a href="/te-araroa/">Te Araroa</a> › ${esc(island)}`,
+<p class="fine">Section notes from the Te Araroa Trust (CC BY 4.0). <a href="/te-araroa/">All sections</a></p>`;
+    out.push({ rel: `te-araroa/${s.slug}/index.html`, html: mapPage({
+      path: taUrl(s), title: `Te Araroa: ${s.name} – map, huts and food | Razorback Maps`, description: desc, h1: `Te Araroa: ${s.name}`,
+      open: `ta=${s.slug}`, view: viewOf(lines, null), panel: 'te-araroa', panelTitle: s.name, article,
       jsonld: { '@context': 'https://schema.org', '@graph': [
         { '@type': 'TouristAttraction', name: `Te Araroa: ${s.name}`, url: `${D}${taUrl(s)}`, description: strip(about), isAccessibleForFree: true, touristType: 'Trampers' },
-        crumbList([['Te Araroa', `${D}/te-araroa/`], [s.name, `${D}${taUrl(s)}`]])] },
-      body }) });
+        crumbList([['Te Araroa', `${D}/te-araroa/`], [s.name, `${D}${taUrl(s)}`]])] } }) });
   }
 
   // ---- Indexes ----
@@ -275,14 +271,13 @@ ${prev || next ? `<nav class="prev-next">${prev ? `<a href="${taUrl(prev)}">← 
 <h2 id="south-island">South Island</h2>${linkList(byIsland('SI').map(row))}
 ${sections.some((s) => s.alternative) ? `<h2 id="alternatives">Alternatives and bypasses</h2>${linkList(sections.filter((s) => s.alternative).map(row))}` : ''}` }) });
   }
-  // Links between these pages open the place in the 3D map when clicked (js/site.js
-  // follows data-map); the href stays the page's, so search engines follow it and a
-  // new tab still opens the page.
+  // Links to other places in a place's text open them in the map already running
+  // (js/map/main.js follows data-map); the href is the place's own page.
   const mapOf = new Map();
   for (const w of walks) mapOf.set(walkUrl(w), `/#w=${w.guid}`);
   for (const h of huts) mapOf.set(hutUrl(h), `/#h=${h.point[1]},${h.point[0]},${encodeURIComponent(h.name)}`);
   for (const s of sections) mapOf.set(taUrl(s), `/#ta=${s.slug}`);
   for (const o of out) o.html = o.html.replace(/<a href="(\/(?:walks|huts|te-araroa)\/[^"\/]+\/)"/g, (m, url) => (mapOf.has(url) ? `<a href="${url}" data-map="${esc(mapOf.get(url))}"` : m))
-    .replace('</main>', '</main>\n<script type="module" src="/js/site.js"></script>');
+;
   return out;
 }

@@ -425,3 +425,18 @@ body.sheet-open .maplibregl-ctrl-bottom-left, body.sheet-open .maplibregl-ctrl-b
 /* ?promo (tools/promo-shots.mjs): the map alone, for the website's pictures. */
 body.promo #launcher, body.promo #locate, body.promo #perspective, body.promo #compass, body.promo #layers-button,
 body.promo .maplibregl-ctrl-bottom-left, body.promo .maplibregl-ctrl-bottom-right, body.promo #map-status, body.promo .progress, body.promo #notes { display: none !important; }
+
+/* A walk, hut or Te Araroa page's own text (lib/seo-pages.mjs): last in its place's
+   panel (js/map/sheet.js), not shown before the panel takes it. */
+.place-text { display: none; }
+.sheet-body > .place-text { display: block; border-top: 1px solid var(--line); margin-top: 14px; padding-top: 4px; font-size: 13.5px; line-height: 1.5; }
+.place-text p { margin: 4px 0 8px; }
+.place-text a { color: var(--link); }
+.place-text .muted { color: var(--muted); }
+.place-text .link-list { list-style: none; padding: 0; margin: 2px 0 8px; }
+.place-text .link-list li { padding: 3px 0; }
+.place-text .facts { display: grid; grid-template-columns: max-content 1fr; gap: 2px 12px; margin: 6px 0 10px; }
+.place-text .facts > div { display: contents; }
+.place-text .facts dt { color: var(--muted); }
+.place-text .facts dd { margin: 0; }
+.place-text .prev-next { display: flex; justify-content: space-between; gap: 12px; margin: 8px 0; font-weight: 600; }

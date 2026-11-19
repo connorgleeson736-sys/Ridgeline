@@ -22,7 +22,9 @@ const auth = { Authorization: `Bearer ${token}` };
 
 async function call(method, url, body, headers = {}, bearer = auth) {
   for (let attempt = 0; ; attempt++) {
-    const r = await fetch(url, { method, body, headers: { ...bearer, ...headers } });
+    let r;
+    try { r = await fetch(url, { method, body, headers: { ...bearer, ...headers } });
+    } catch (e) { if (attempt >= 5) throw e; await new Promise((s) => setTimeout(s, 1500 * 2 ** attempt)); continue; } // dropped connection: retry
     if (r.ok) return r;
     if (attempt >= 5 || (r.status < 500 && r.status !== 429)) throw new Error(`${method} ${url.replace(api, '')}: ${r.status} ${(await r.text()).slice(0, 400)}`);
     await new Promise((s) => setTimeout(s, 1500 * 2 ** attempt));

@@ -28,6 +28,10 @@ export class Sheet {
     root.addEventListener('keydown', (e) => { if (e.key === 'Escape') this.close(); });
     this.stack = [];
     this.token = 0;
+    // A page's own text (a walk, hut or Te Araroa page: lib/seo-pages.mjs), kept last in
+    // its place's panel however the panel fills itself in.
+    this.extra = null; this.extraPanel = null; this.extraTest = null;
+    new MutationObserver(() => this.syncExtra()).observe(this.body, { childList: true });
     this.dragging();
     this.card();
   }
@@ -73,6 +77,14 @@ export class Sheet {
     const r = panel.render?.(this.body, () => token === this.token, { restored });
     if (typeof r === 'function') this.cleanup = r;
     requestAnimationFrame(() => this.root.focus({ preventScroll: true }));
+  }
+  /** Keeps `node` at the end of the first panel `test` accepts (and of it alone). */
+  attachExtra(node, test) { this.extra = node; this.extraTest = test; if (this.isOpen && test(this.current)) this.extraPanel = this.current; this.syncExtra(); }
+  syncExtra() {
+    if (!this.extra) return;
+    if (!this.extraPanel && this.current && this.extraTest?.(this.current)) this.extraPanel = this.current;
+    if (this.current === this.extraPanel && this.isOpen) { if (this.body.lastChild !== this.extra) this.body.append(this.extra); }
+    else if (this.extra.parentNode === this.body) this.extra.remove();
   }
   setTitle(title, subtitle) {
     // The panel keeps its title as loaded (Back to it names it).

@@ -129,7 +129,7 @@ const walkPages = (d) => {
 };
 walkPages(src);
 // Walk, hut and Te Araroa section pages (lib/seo-pages.mjs), for search and sharing.
-for (const { rel, html } of buildSeoPages({ here, appAssets, domain: SITE.domain })) {
+for (const { rel, html } of buildSeoPages({ here, appAssets, domain: SITE.domain, mapHtml: readFileSync(join(src, 'index.html'), 'utf8') })) {
   mkdirSync(dirname(join(out, rel)), { recursive: true });
   writeFileSync(join(out, rel), render(html));
   pages.push(rel);

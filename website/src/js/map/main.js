@@ -80,7 +80,9 @@ function parseView(hash) {
   return { zoom, center: [lng, lat], bearing: bearing || 0, pitch: pitch || 0 };
 }
 const START = { center: [170.105, -43.7], zoom: 11.7, bearing: -18, pitch: 62 };
-const view = parseView(location.hash) || store.get('view', null) || START;
+// A walk, hut or Te Araroa page (lib/seo-pages.mjs) starts on its place.
+const pageView = parseView(`#${document.body.dataset.view || ''}`);
+const view = parseView(location.hash) || pageView || store.get('view', null) || START;
 
 async function main() {
   if (!webglSupported()) { $('map-status').hidden = false; $('map-status').textContent = 'Your browser can’t show the 3D map (WebGL is turned off or unsupported). Try an up-to-date Chrome, Edge, Firefox or Safari.'; return; }
@@ -211,6 +213,20 @@ async function main() {
     } else return false;
     return true;
   }
+  /** A walk, hut or Te Araroa page: its place opened, the page's text last in its panel,
+   * and links to other places opened here rather than reloading the map. */
+  function openPage() {
+    const b = document.body.dataset, text = document.getElementById('place-text');
+    if (text) sheet.attachExtra(text, (p) => p?.kind === b.panel && (!b.panelTitle || p.title === b.panelTitle));
+    openLinked(`#${b.open}`);
+  }
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest?.('#place-text a[data-map]');
+    if (!a || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    history.pushState(null, '', a.getAttribute('href'));
+    openLinked(a.dataset.map.replace(/^\//, ''));
+  });
   if (promo) window.bushlinePromo = { walk: (guid) => openWalk(ctx, guid), teAraroa: (slug = null) => openTeAraroa(ctx, slug), sheet };
   const overlays = attachOverlays(map, () => settings);
   // Te Araroa: its line and kilometres, loaded the first time its layer is on.
@@ -261,7 +277,7 @@ async function main() {
     }
     overlays.refresh();
     if (/[#&]r=/.test(location.hash)) planner.openLink(location.hash);
-    else openLinked(location.hash);
+    else if (!openLinked(location.hash) && document.body.dataset.open) openPage();
   });
   map.on('error', (e) => { if (/WebGL|context/i.test(String(e?.error?.message))) toast('The map stopped drawing. Reload the page to continue.', 6000); });
   let loadingTimer = 0;
