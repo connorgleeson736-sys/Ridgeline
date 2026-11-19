@@ -292,4 +292,4 @@ const urls = pages.filter((p) => !p.startsWith('404')).map((p) => SITE.domain + 
 writeFileSync(join(out, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `  <url><loc>${u}</loc></url>`).join('\n')}\n</urlset>\n`);
 // NOINDEX=1: a test copy (pages.dev) that search engines leave alone.
 writeFileSync(join(out, 'robots.txt'), process.env.NOINDEX ? 'User-agent: *\nDisallow: /\n' : `User-agent: *\nAllow: /\nSitemap: ${SITE.domain}/sitemap.xml\n`);
-console.log(JSON.stringify({ pages: pages.length, js: jsVersion, css: cssVersion, walks: Object.keys(meta).length, overviewTiles: Object.keys(overview.tiles).length, coarse: Object.keys(overview.coarse).length, esri, overviewCorrected, overviewTiles }));
+console.log(JSON.stringify({ pages: pages.length, js: jsVersion, css: cssVersion, walks: Object.keys(meta).length, overviewTiles: Object.keys(overview.tiles).length, coarse: Object.keys(overview.coarse).length, esri, overviewCorrected, tilesPath: overviewTiles }));
