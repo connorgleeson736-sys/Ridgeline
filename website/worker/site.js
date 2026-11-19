@@ -38,9 +38,10 @@ export default {
     if (ta && request.method === 'GET') return teAraroa(ta[1]);
     // The app's overview imagery, from its bucket, cached at Cloudflare's edge
     // (r2.dev is uncached and rate-limited): /tiles/<pack>/<offset>.webp.
-    // …and the aerial imagery's shading corrections (tools/shade-corrections.py):
-    // /shade/v1/<z>/<bx>/<by>.webp. Neither ever changes.
-    if (env.OVERVIEWS && (/^\/tiles\/[0-9a-f]{64}\/\d+\.webp$/.test(path) || /^\/shade\/v1\/\d{1,2}\/\d{1,5}\/\d{1,5}\.webp$/.test(path))) {
+    // …the same with LINZ's shading taken out (/ctiles/, tools/correct-overview.py),
+    // and the shading corrections (tools/shade-corrections.py):
+    // /shade/v1/<z>/<bx>/<by>.webp. None ever changes.
+    if (env.OVERVIEWS && (/^\/c?tiles\/[0-9a-f]{64}\/\d+\.webp$/.test(path) || /^\/shade\/v1\/\d{1,2}\/\d{1,5}\/\d{1,5}\.webp$/.test(path))) {
       const cache = caches.default, get = request.method === 'GET', hit = get ? await cache.match(request) : null;
       if (hit) return hit;
       const object = await env.OVERVIEWS.get(path.slice(1));

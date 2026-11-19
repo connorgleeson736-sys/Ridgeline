@@ -99,11 +99,21 @@ async function deshade(photo, shade, signal) {
 }
 
 async function layerImage(l, signal) {
+  let shade = l.shade;
   const photo = bitmap(l.url, signal).catch((e) => {
     if (!l.fallback || signal.aborted) throw e;
+    if (!shade && l.fallbackShade) throw Object.assign(new Error('fallback'), { fallback: true });
     return bitmap(l.fallback, signal); // a missing overview tile: LINZ's own
   });
-  return l.shade ? deshade(photo, l.shade, signal) : photo;
+  if (!shade && l.fallbackShade) {
+    // A corrected overview tile is drawn as it is; LINZ's in its place is corrected.
+    try { return await photo; } catch (e) {
+      if (!e.fallback) throw e;
+      shade = l.fallbackShade;
+      return deshade(bitmap(l.fallback, signal), shade, signal);
+    }
+  }
+  return shade ? deshade(photo, shade, signal) : photo;
 }
 
 async function compose({ layers }, signal) {

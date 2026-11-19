@@ -15,6 +15,8 @@ import { imagery as worker } from './workers.js';
 import { dataUrl } from './data-url.js';
 
 const base = (config.overviewUrl || '').replace(/\/$/, '');
+// The overview tiles with LINZ's shading already taken out (tools/correct-overview.py).
+const TILES = config.overviewCorrected ? 'ctiles' : 'tiles';
 const ESRI = 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile';
 
 let overview = null, overviewLoading = null;
@@ -70,7 +72,7 @@ function baseUrl(z, x, y, natural) {
   const k = `${z}/${x}/${y}`;
   if (overview && z <= 12) {
     const t = overview.tiles.get(k);
-    if (t) return natural ? `${base}/tiles/${overview.files[t[0]]}/${t[1]}.webp` : `${base}/tiles/${overview.files[t[2]]}/${t[3]}.webp`;
+    if (t) return `${base}/${TILES}/${overview.files[natural ? t[0] : t[2]]}/${natural ? t[1] : t[3]}.webp`;
     const c = overview.coarse[k];
     if (c) return natural ? c[0] : c[1];
   }
@@ -140,14 +142,18 @@ export function install(maplibregl) {
     if (z <= 12 && !overview) await loadOverview();
     const p = config.esri ? await plan(z, x, y) : { mode: 'linz' };
     const own = baseUrl(z, x, y, !/[?&]raw/.test(params.url));
-    const sh = await shade(z, x, y);
-    const photo = { url: own, fallback: own !== linz(z, x, y) ? linz(z, x, y) : null, shade: sh };
-    if (p.mode === 'linz' && !sh) {
-      let r = await fetch(own, { signal: abort.signal });
-      // A missing overview tile: LINZ's own.
-      if (!r.ok && photo.fallback) r = await bytes(photo.fallback, abort.signal);
-      if (!r.ok) throw new Error(`Tile ${r.status}`);
-      return { data: await r.arrayBuffer() };
+    // The overview's own tiles come corrected; LINZ's (and the overview's when not
+    // corrected) take their correction here. A missing overview tile falls back to
+    // LINZ's, corrected.
+    const ours = own !== linz(z, x, y), ready = ours && config.overviewCorrected;
+    const lshade = await shade(z, x, y);
+    const photo = { url: own, fallback: ours ? linz(z, x, y) : null, shade: ready ? null : lshade, fallbackShade: lshade };
+    if (p.mode === 'linz' && !photo.shade) {
+      const r = await fetch(own, { signal: abort.signal });
+      if (r.ok) return { data: await r.arrayBuffer() };
+      if (!photo.fallback) throw new Error(`Tile ${r.status}`);
+      if (!lshade) return { data: await (await bytes(photo.fallback, abort.signal)).arrayBuffer() };
+      return { data: await worker.call({ type: 'compose', layers: [{ url: photo.fallback, shade: lshade }] }, abort.signal) };
     }
     // De-shaded LINZ, with Esri where LINZ has no photography: whole tiles, or
     // inside the outline.

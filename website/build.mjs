@@ -40,6 +40,10 @@ if (!linzKey) throw new Error('No LINZ API key (set LINZ_API_KEY)');
 // Esri in 22 West Coast tiles too). On by default (an Esri licence is being arranged);
 // ESRI_IMAGERY=0 builds the map without the Satellite base and gap filling.
 const esri = process.env.ESRI_IMAGERY !== '0';
+// The overview imagery with LINZ's shading already taken out (tools/correct-overview.py):
+// hosted under /ctiles/, coarse tiles from imagery-corrected/. Off: the originals,
+// corrected in the browser like LINZ's own tiles.
+const overviewCorrected = process.env.OVERVIEW_CORRECTED !== '0' && existsSync(join(here, 'imagery-corrected'));
 
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
@@ -58,7 +62,7 @@ const dataVersion = (() => {
   for (const f of [join(appAssets, 'topography-style.json'), join(appAssets, 'search/places.tsv'), join(appAssets, 'walks/walks.json'), join(repo, 'capacitor/overview-catalog.json'), join(repo, 'native-wgpu/assets/overviews/north-island.json'), join(repo, 'public/south-overviews.js'), join(repo, 'public/gap-imagery-atlas.js')]) if (existsSync(f)) h.update(readFileSync(f));
   return h.digest('hex').slice(0, 10);
 })();
-const config = `export default ${JSON.stringify({ linzKey, overviewUrl, playUrl: SITE.playUrl, betaUrl: SITE.betaUrl, version: SITE.updated, dataVersion, esri })};\n`;
+const config = `export default ${JSON.stringify({ linzKey, overviewUrl, playUrl: SITE.playUrl, betaUrl: SITE.betaUrl, version: SITE.updated, dataVersion, esri, overviewCorrected })};\n`;
 const jsVersion = createHash('sha256').update(hashOf(join(src, 'js'))).update(config).digest('hex').slice(0, 10);
 const cssVersion = hashOf(join(src, 'css'));
 const jsOut = join(out, 'js', jsVersion), cssOut = join(out, 'css', cssVersion);
@@ -198,7 +202,13 @@ const southText = readFileSync(join(repo, 'public/south-overviews.js'), 'utf8');
 const ctx = {}; vm.runInNewContext(southText, ctx);
 const south = ctx.RidgeSouthOverviews;
 mkdirSync(join(out, 'imagery'), { recursive: true });
-const coarseFile = (from, name) => { const to = join(out, 'imagery', name); if (!existsSync(to)) cpSync(from, to); return `/imagery/${name}`; };
+// (Corrected ones under their own path: /imagery/ is cached as immutable.)
+const coarseFile = (from, name) => {
+  if (overviewCorrected) { from = join(here, 'imagery-corrected', name); if (!existsSync(from)) throw new Error(`imagery-corrected/${name} missing: run tools/correct-overview.py`); name = `c/${name}`; }
+  const to = join(out, 'imagery', name);
+  if (!existsSync(to)) { mkdirSync(dirname(to), { recursive: true }); cpSync(from, to); }
+  return `/imagery/${name}`;
+};
 for (const [k, e] of Object.entries(south.tiles)) {
   if (+k.split('/')[0] > 8 || north.coarse[k]) continue;
   const urls = ['natural', 'raw'].map((v) => variant(e, v).url?.replace(/^\//, ''));
@@ -279,4 +289,4 @@ const urls = pages.filter((p) => !p.startsWith('404')).map((p) => SITE.domain + 
 writeFileSync(join(out, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `  <url><loc>${u}</loc></url>`).join('\n')}\n</urlset>\n`);
 // NOINDEX=1: a test copy (pages.dev) that search engines leave alone.
 writeFileSync(join(out, 'robots.txt'), process.env.NOINDEX ? 'User-agent: *\nDisallow: /\n' : `User-agent: *\nAllow: /\nSitemap: ${SITE.domain}/sitemap.xml\n`);
-console.log(JSON.stringify({ pages: pages.length, js: jsVersion, css: cssVersion, walks: Object.keys(meta).length, overviewTiles: Object.keys(overview.tiles).length, coarse: Object.keys(overview.coarse).length, esri }));
+console.log(JSON.stringify({ pages: pages.length, js: jsVersion, css: cssVersion, walks: Object.keys(meta).length, overviewTiles: Object.keys(overview.tiles).length, coarse: Object.keys(overview.coarse).length, esri, overviewCorrected }));
