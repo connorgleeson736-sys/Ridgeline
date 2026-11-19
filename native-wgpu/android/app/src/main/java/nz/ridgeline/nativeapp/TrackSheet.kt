@@ -171,7 +171,8 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         grip.addView(View(activity).apply{background=NativeUi.background(activity,0xff8a9691.toInt(),3)},FrameLayout.LayoutParams(dp(32),dp(4),Gravity.CENTER))
         grip.addView(NativeUi.button(activity,"×"){closeOrReturn()}.apply{contentDescription="Close track summary";background=null;textSize=19f;setPadding(0,0,0,0)},FrameLayout.LayoutParams(dp(46),dp(28),Gravity.END))
         grip.addView(backButton,FrameLayout.LayoutParams(-2,dp(28),Gravity.START))
-        backButton.setOnClickListener{goBack()}
+        // On a Te Araroa section Back always leads to the whole trail (as on the website), the map left where it is.
+        backButton.setOnClickListener{if(taBack){stack.clear();returnTo=null;restoring=true;keepView=true;showTeAraroa(false)}else goBack()}
         grip.setOnClickListener{settle(if(level<2)level+1 else 1)}
         header.isClickable=true;header.setOnClickListener{settle(if(level<2)level+1 else 1)}
         val top=LinearLayout(activity).apply{gravity=Gravity.CENTER_VERTICAL}
@@ -382,7 +383,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     private var keepView=false
     /** Pages to go back to (Back, top left): from a Te Araroa page to what it opened. */
     private val stack=ArrayList<Pair<String,()->Unit>>()
-    private var currentLabel="";private var currentTa=false
+    private var currentLabel="";private var currentTa=false;private var taBack=false
     /** A Te Araroa page is open (taps on the trail stay in it). */
     val inTeAraroa get()=visible&&currentTa
     /** [push]: Back returns to the page open now (always so from a Te Araroa page). */
@@ -392,7 +393,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         else{stack.clear()
             if(hut){if(visible&&!currentIsHut&&current!=null)returnTo=current else if(!visible)returnTo=null}
             else returnTo=null}
-        current=again;currentIsHut=hut;currentLabel=label;currentTa=ta
+        current=again;currentIsHut=hut;currentLabel=label;currentTa=ta;taBack=false
         backButton.text="‹ ${stack.lastOrNull()?.first.orEmpty()}";backButton.visibility=if(stack.isEmpty())View.GONE else View.VISIBLE
     }
     /** Back to the page this one was opened from, the map left where it is. */
@@ -403,7 +404,7 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
         if(again!=null&&visible){returnTo=null;restoring=true;keepView=true;again()}else hide()
     }
     fun hide(){
-        returnTo=null;stack.clear();backButton.visibility=View.GONE;currentTa=false
+        returnTo=null;stack.clear();backButton.visibility=View.GONE;currentTa=false;taBack=false
         if(!visible)return
         visible=false;request++;loader.cancelTrackProfile();onLine(null,null);onPoint(null);onRange(emptyList());chart.clearInspection()
         if(map.layoutParams.height!=-1)map.layoutParams=map.layoutParams.apply{height=-1}
@@ -957,6 +958,8 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     fun showTaSection(slug:String,push:Boolean=false,fromList:Boolean=false){
         val d=teAraroa?:return;val s=d.bySlug[slug]?:return
         remember({showTaSection(slug,false,fromList)},false,shortName(s.name),true,push)
+        // "‹ Te Araroa" takes precedence over any earlier page.
+        stack.clear();returnTo=null;taBack=true;backButton.text="‹ Te Araroa";backButton.visibility=View.VISIBLE
         val id=begin(s.name,false);fitNext=false
         fun sub()=if(s.alternative)"${TeAraroa.optionKind(s).first} · leaves the trail at km ${km(kmIn(d,if(nobo)s.to else s.from))}, rejoins at km ${km(kmIn(d,if(nobo)s.from else s.to))}"
             else "Section ${s.n} · ${kmRange(d,s.from,s.to)}"

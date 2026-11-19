@@ -20,9 +20,14 @@ fn before(a:vec3<f32>)->vec4<f32>{return scene.previous*local(a);}
  // depth at the anchor's pixel with the anchor raised by a small margin
  // (20 m plus 1.5 px of ground, for mesh detail and depth precision). Every vertex of a label reads the
  // same texel, so a label is hidden or shown whole, never cut by a slope.
+ // Without the previous frame's depth (the drawing resolution just changed, as it
+ // does when a finger touches or leaves the map), names stay shown for that frame
+ // rather than all blinking out.
+ var visible=1.;
+ if(scene.time.y>=.5){
  let size=vec2<f32>(textureDimensions(terrain));
  let q=before(anchor);
- if(q.w<=0.||scene.time.y<.5){o.position=vec4<f32>(2.,2.,2.,1.);return o;}
+ if(q.w<=0.){o.position=vec4<f32>(2.,2.,2.,1.);return o;}
  let ndc=q.xy/q.w;
  let pixel=clamp(floor(vec2<f32>((ndc.x*.5+.5)*size.x,(.5-ndc.y*.5)*size.y)),vec2<f32>(0.),size-1.);
  let at=(pixel+.5)/size;
@@ -32,8 +37,9 @@ fn before(a:vec3<f32>)->vec4<f32>{return scene.previous*local(a);}
  let d0=near.z/near.w;let d1=nearer.z/nearer.w;
  // Fully visible when the terrain at the anchor is no nearer than d0, hidden
  // at d1 and nearer, faded in four steps between: no popping as the camera moves.
- var visible=0.;
+ visible=0.;
  for(var k=0;k<4;k++){visible+=textureSampleCompareLevel(terrain,terrain_compare,at,mix(d0,d1,f32(k)/3.))*.25;}
+ }
  // New labels fade in over 0.2 s instead of popping.
  visible*=clamp((scene.time.x-born)/.2,0.,1.);
  o.alpha=visible;

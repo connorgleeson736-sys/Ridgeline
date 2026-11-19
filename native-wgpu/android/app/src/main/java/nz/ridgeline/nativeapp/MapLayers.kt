@@ -27,6 +27,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         /** Food stops and shops by kind: supermarket, store, café, send a box. */
         fun foodColour(kind:String)=when(kind){"supermarket"->0xFF22A35A.toInt();"store"->0xFF8FD6AA.toInt();"cafe"->0xFFD08A3F.toInt();else->0xFFFFFFFF.toInt()}
         /** Label keys: taps on them open Te Araroa's pages ([TA_NAME]: the trail). */
+        const val POWER_PLACEMENT_MILLIS=200L;const val POWER_SELECTION_MILLIS=250L
         const val TA_NAME="te-araroa-name";const val TA_STOP="te-araroa-stop";const val TA_SHOP="te-araroa-shop";const val TA_PLACE="te-araroa-place"
         /** The data zoom Te Araroa's lines are simplified for, by camera zoom. */
         fun taZoom(zoom:Double)=when{zoom<7->5;zoom<9.5->8;zoom<12->11;else->13}
@@ -185,10 +186,13 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         projection.set(Projection(projectionRevision.incrementAndGet(),data,positions,view.width,view.height,view.pixelScale.toFloat()))
         schedulePlacement()
     }}
+    private var lastPlacementAt=0L
     private fun schedulePlacement(){
         if(closed||!placementQueued.compareAndSet(false,true))return
-        runCatching{worker.execute{
-            try{
+        // Power saving: labels placed at most every 200 ms instead of every frame.
+        val wait=if(view.powerSaving)(POWER_PLACEMENT_MILLIS-(android.os.SystemClock.uptimeMillis()-lastPlacementAt)).coerceIn(0,POWER_PLACEMENT_MILLIS)else 0L
+        runCatching{worker.schedule({
+            try{lastPlacementAt=android.os.SystemClock.uptimeMillis()
                 val next=projection.getAndSet(null)
                 if(next!=null&&!closed&&active){val start=System.nanoTime();val selection=NativeLabels.place(next.atlas,next.positions,next.width,next.height,next.scale)
                     placedTracks=trackRects(next,selection);placedHuts=hutRects(next,selection)
@@ -196,7 +200,7 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
                     diagnostics=diagnostics.substringBefore("\nLabel placement:")+"\nLabel placement: ${selection.getInt(0)}/${next.atlas.labels.size} · ${(System.nanoTime()-start)/1_000_000} ms · background"
                 }
             }finally{placementQueued.set(false);if(projection.get()!=null)schedulePlacement()}
-        }}.onFailure{placementQueued.set(false)}
+        },wait,TimeUnit.MILLISECONDS)}.onFailure{placementQueued.set(false)}
     }
     fun snapshot()=diagnostics
     /** Screen boxes (left, top, right, bottom in view pixels) of the track
@@ -555,7 +559,8 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
         // restarted, so tiles for new ground were not even selected until the
         // finger paused). A pending selection already reads the latest camera.
         if(timer?.isDone==false)return@execute
-        val wait=(SELECTION_MILLIS-(android.os.SystemClock.uptimeMillis()-lastSelectionAt)).coerceIn(0,SELECTION_MILLIS)
+        val every=if(view.powerSaving)POWER_SELECTION_MILLIS else SELECTION_MILLIS
+        val wait=(every-(android.os.SystemClock.uptimeMillis()-lastSelectionAt)).coerceIn(0,every)
         timer=worker.schedule({lastSelectionAt=android.os.SystemClock.uptimeMillis();try{update()}catch(_:Exception){diagnostics="Topographic view selection failed; imagery and routes remain available."}},wait,TimeUnit.MILLISECONDS)
     }}}
     private fun mask(state:MapSettings.State)=style.sourceLayers(state,view.planningPose.zoom)
@@ -848,14 +853,14 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
                 }.takeIf{it.lines>0}?.let{groups.add(it)}
                 fun inside(p:VectorTile.Point)=p.x>=b[0]&&p.x<b[2]&&p.y>=b[1]&&p.y<b[3]
                 fun merc(c:Coordinate)=VectorTile.Point((c.longitude+180)/360,CameraMath.mercatorY(c.latitude))
-                // Food stops (zoom 6 to 11; names from 8), then the shops and cafés at them (from 11, names from 14).
-                if(zoom>=6&&zoom<11)for((i,s) in trail.stops.withIndex()){val p=merc(s.point);if(!inside(p))continue
+                // Food stops and the shops and cafés at them: only when zoomed right in (zoom 16+).
+                if(zoom>=16)for((i,s) in trail.stops.withIndex()){val p=merc(s.point);if(!inside(p))continue
                     val r=if(zoom<10)2.6f else 3.6f
                     labels.add(TopographyStyle.Label(p,"",r,foodColour(s.kind),40.0,circle=true,key="$TA_STOP:$i",halo=if(s.kind=="box")TA_LINE else 0xFFFFFFFF.toInt()))
-                    if(zoom>=8)labels.add(TopographyStyle.Label(p,s.name,11f,0xFFE7F7EC.toInt(),42.0,key="$TA_STOP-name:$i",anchor="top"))}
-                if(zoom>=11)for((i,x) in trail.shops.withIndex()){val p=merc(x.point);if(!inside(p))continue
+                    if(zoom>=16)labels.add(TopographyStyle.Label(p,s.name,11f,0xFFE7F7EC.toInt(),42.0,key="$TA_STOP-name:$i",anchor="top"))}
+                if(zoom>=16)for((i,x) in trail.shops.withIndex()){val p=merc(x.point);if(!inside(p))continue
                     labels.add(TopographyStyle.Label(p,"",if(zoom<14)3f else 4.2f,foodColour(x.kind),44.0,circle=true,key="$TA_SHOP:$i",halo=0xFFFFFFFF.toInt()))
-                    if(zoom>=14)labels.add(TopographyStyle.Label(p,x.name,11f,0xFFECF8EF.toInt(),46.0,key="$TA_SHOP-name:$i",anchor="top"))}
+                    if(zoom>=16)labels.add(TopographyStyle.Label(p,x.name,11f,0xFFECF8EF.toInt(),46.0,key="$TA_SHOP-name:$i",anchor="top"))}
                 // Places to stay the map does not show itself (huts it does): campsites, holiday parks, lodges.
                 if(zoom>=10)for((i,pl) in trail.places.withIndex()){val pt=pl.point?:continue;if(pl.approx||pl.hut)continue;val p=merc(pt);if(!inside(p))continue
                     val lodge=pl.type=="Hostel"||pl.type=="Lodge"
@@ -863,10 +868,12 @@ internal class MapLayers(private val view:TerrainView,private val loader:TileLoa
                     if(zoom>=12)labels.add(TopographyStyle.Label(p,pl.name,11f,0xFFFFE3E8.toInt(),50.0,key="$TA_PLACE-name:$i",anchor="top"))}
             }
             // The name: once on each island (zoom 5 to 11.5), written along a smoothed
-            // curve of the trail (longer and smoother further out), letter by letter.
-            if(zoom>=5&&zoom<11.5){val band=when{zoom<7->0;zoom<9->1;else->2}
+            // curve of the trail, letter by letter.
+            // One curve and one size at every zoom, so the name never changes shape or
+            // jumps between zoom bands (NativeLabels lays it out as printed on the map).
+            if(zoom>=5&&zoom<11.5){val band=1
                 for((island,curve) in taNameCurves(trail)){val points=curve.getOrNull(band)?:continue;if(points.size<2)continue
-                    val path="$TA_NAME:$island:$band";val size=if(zoom<8)16f else 18f
+                    val path="$TA_NAME:$island";val size=17f
                     val merc=points.map{VectorTile.Point((it.longitude+180)/360,CameraMath.mercatorY(it.latitude))}
                     for((k,p) in merc.withIndex())labels.add(TopographyStyle.Label(p,"",1f,0,2.0,key="$path:v$k",path=path,vertex=k))
                     val anchor=merc[merc.size/2]

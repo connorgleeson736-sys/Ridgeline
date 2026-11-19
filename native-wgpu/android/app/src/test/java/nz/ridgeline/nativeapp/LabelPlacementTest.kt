@@ -82,13 +82,13 @@ class LabelPlacementTest {
         assertEquals(9,e.size)
         assertTrue(e.first().angle<-.05f);assertTrue(e.last().angle>.05f)
     }
-    @Test fun aNameIsLeftOutWhereItDoesNotFitOrBendsTooSharply(){
+    @Test fun aNameIsLeftOutWhereItDoesNotFitButStaysPaintedOnABend(){
         val a=atlas(*curve("Te Araroa",3).toTypedArray())
         // Too short for the name.
         assertTrue(entries(a,positions(listOf(450f to 600f,500f to 600f,550f to 600f),9)).isEmpty())
-        // A right angle under the name.
+        // A right angle under the name: still drawn (it does not come and go as the map moves).
         val b=atlas(*curve("Te Araroa",3).toTypedArray())
-        assertTrue(entries(b,positions(listOf(300f to 600f,500f to 600f,500f to 400f),9)).isEmpty())
+        assertEquals(9,entries(b,positions(listOf(300f to 600f,500f to 600f,500f to 400f),9)).size)
     }
     @Test fun aCurvedNameIsLaidOutAgainFromItsWholeCurveKeepingOtherNames(){
         val rows=curve("Te Araroa",5)+listOf(label("town",10.0))
@@ -110,8 +110,9 @@ class LabelPlacementTest {
     }
     @Test fun aCurvedNameStaysAtItsCurvesMiddleOnTheGroundWhateverIsOnScreen(){
         val a=atlas(*curve("Te Araroa",9).toTypedArray())
-        fun centre(points:List<Pair<Float,Float>>):Float{val e=entries(a,positions(points,9),2000,1000);assertEquals(9,e.size)
-            return e.map{500f+it.x+a.labels[it.index].width/2}.let{(it.first()+it.last())/2}}
+        // The middle letter's centre (all letters are the same width here).
+        fun middle(e:List<Entry>)=e.single{a.labels[it.index].label.glyph==4}.let{500f+it.x+a.labels[it.index].width/2}
+        fun centre(points:List<Pair<Float,Float>>):Float{val e=entries(a,positions(points,9),2000,1000);assertEquals(9,e.size);return middle(e)}
         // Evenly spread on screen: the middle point (x 900).
         assertEquals(900f,centre((0..8).map{100f+it*200f to 600f}),2f)
         // In perspective the far half shrinks on screen; the name stays on the curve's
@@ -120,7 +121,7 @@ class LabelPlacementTest {
         assertEquals(1300f,centre(xs.map{it to 600f}),2f)
         // The first points off the view (unprojected): still the same point.
         val p=positions(xs.map{it to 600f},9).also{for(k in 0..1)it[k*3+2]=0f}
-        val e=entries(a,p,2000,1000);assertEquals(1300f,e.map{500f+it.x+a.labels[it.index].width/2}.let{(it.first()+it.last())/2},2f)
+        assertEquals(1300f,middle(entries(a,p,2000,1000)),2f)
     }
     @Test fun otherNamesGiveWayToACurvedName(){
         val rows=curve("Te Araroa",5)+listOf(label("town",10.0))

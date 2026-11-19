@@ -196,10 +196,10 @@ internal object NativeLabels {
      * point; points without terrain yet included, NativeBridge.projectCurve), so
      * the name stays at its curve's middle and follows it every frame, as
      * MapLibre's line-center names do. */
-    fun withCurves(atlas:NativeLabelAtlas,set:Curves,base:ByteBuffer,project:(ByteBuffer,ByteBuffer)->Int,width:Int,height:Int,scale:Float):ByteBuffer{
+    fun withCurves(atlas:NativeLabelAtlas,set:Curves,base:ByteBuffer,project:(ByteBuffer,ByteBuffer)->Int,width:Int,height:Int,scale:Float,zoom:Double?=null):ByteBuffer{
         val projected=FloatArray(atlas.labels.size*3)
         project(atlas,set,projected,project)
-        val placed=curves(atlas,projected,width,height,scale).flatMap{it.first}
+        val placed=curves(atlas,projected,width,height,scale,zoom).flatMap{it.first}
         val b=base.duplicate().order(ByteOrder.LITTLE_ENDIAN);b.rewind();val n=b.int
         val kept=ArrayList<Placed>(n+placed.size)
         repeat(n){val i=b.int;val x=b.float;val y=b.float;val a=b.float;if(atlas.labels.getOrNull(i)?.label?.path.isNullOrEmpty())kept.add(Placed(i,x,y,a))}
@@ -216,15 +216,18 @@ internal object NativeLabels {
             val mid=v[v.size/2];for(i in g){projected[i*3]=projected[mid*3];projected[i*3+1]=projected[mid*3+1];projected[i*3+2]=projected[mid*3+2]}
         }
     }
-    /** Names written along curves (MapLibre's line-center placement): the curve's
-     * points as projected now, the letters laid along its middle, each turned to
-     * the curve and kept upright, the whole name a little to the curve's left (above
-     * a line read left to right). A name is left out when its curve is off screen,
-     * too short for it, or bends too sharply between two letters. Each result: the
-     * letters' entries and their collision boxes. */
-    /** Which way each curve's name last read (true: from the curve's end), kept until it clearly turns. */
-    private val readsBack=java.util.concurrent.ConcurrentHashMap<String,Boolean>()
-    private fun curves(atlas:NativeLabelAtlas,projected:FloatArray,width:Int,height:Int,scale:Float):List<Pair<List<Placed>,List<Box>>>{
+    /** A curve's name as laid out on the map: the zoom it was last spaced for and
+     * which way it reads (turned only to stay upright). */
+    private class PathLayout(var zoom:Double,var reversed:Boolean)
+    private val pathLayouts=java.util.concurrent.ConcurrentHashMap<String,PathLayout>()
+    /** Names written along curves, as if printed on the map: each letter at a fixed
+     * place along the curve (by its length on the ground, from the curve's middle),
+     * projected with the map, so it does not slide or turn as the camera pans, rotates
+     * or tilts; the letters are turned to the curve as drawn and kept upright, the
+     * whole name a little to the curve's left (above a line read left to right).
+     * [zoom]: the camera's zoom (dp); null keeps the last layout (or none yet). Each
+     * result: the letters' entries and their collision boxes. */
+    private fun curves(atlas:NativeLabelAtlas,projected:FloatArray,width:Int,height:Int,scale:Float,zoom:Double?=null):List<Pair<List<Placed>,List<Box>>>{
         val vertices=HashMap<String,ArrayList<Pair<Int,Int>>>();val glyphs=HashMap<String,ArrayList<Pair<Int,Int>>>()
         for((i,row) in atlas.labels.withIndex()){val l=row.label;if(l.path.isEmpty())continue
             if(l.vertex>=0)vertices.getOrPut(l.path){ArrayList()}.add(l.vertex to i)else if(l.glyph>=0)glyphs.getOrPut(l.path){ArrayList()}.add(l.glyph to i)}
@@ -233,66 +236,62 @@ internal object NativeLabels {
             val all=vertices[path]?.sortedBy{it.first}?.map{it.second}?:continue
             if(all.size<2)continue
             fun seen(i:Int)=i*3+2<projected.size&&projected[i*3+2]!=0f
-            // The name's centre is the curve's middle on the ground (by length on the
-            // map, as MapLibre's line-center), fixed there whatever the camera does.
-            val geo=FloatArray(all.size);for(k in 1 until all.size){val p=atlas.labels[all[k-1]].label.point;val q=atlas.labels[all[k]].label.point;geo[k]=geo[k-1]+hypot(q.x-p.x,q.y-p.y).toFloat()}
-            var m=1;while(m<all.size-1&&geo[m]<geo.last()/2)m++
-            if(!seen(all[m-1])||!seen(all[m]))continue
-            val mf=((geo.last()/2-geo[m-1])/max(1e-12f,geo[m]-geo[m-1])).coerceIn(0f,1f)
-            // The unbroken stretch of the curve on screen through its middle: points
-            // hidden elsewhere do not bend it or move the name along it.
-            var lo=m-1;while(lo>0&&seen(all[lo-1]))lo--
-            var hi=m;while(hi<all.size-1&&seen(all[hi+1]))hi++
-            val shown=all.subList(lo,hi+1)
-            val points=shown.map{floatArrayOf(projected[it*3],projected[it*3+1])}
-            if(points.size<2)continue
-            val midPoint=floatArrayOf(projected[all[m-1]*3]+(projected[all[m]*3]-projected[all[m-1]*3])*mf,projected[all[m-1]*3+1]+(projected[all[m]*3+1]-projected[all[m-1]*3+1])*mf)
-            // Its distance along the curve as seen (from the first point shown).
-            var midRun=0f;run{val before=shown.indexOf(all[m-1]);for(k in 1..before)midRun+=hypot(points[k][0]-points[k-1][0],points[k][1]-points[k-1][1]);midRun+=hypot(midPoint[0]-points[before][0],midPoint[1]-points[before][1])}
+            val world=all.map{atlas.labels[it].label.point}
+            val geo=DoubleArray(all.size);for(k in 1 until all.size)geo[k]=geo[k-1]+hypot(world[k].x-world[k-1].x,world[k].y-world[k-1].y)
+            val length=geo.last();if(length<=0.0)continue
+            val mid=length/2
+            /** The curve's point [s] along it (ground length) on screen, or null where hidden. */
+            fun screen(s:Double):FloatArray?{
+                val t=s.coerceIn(0.0,length);var k=1;while(k<all.size-1&&geo[k]<t)k++
+                val a=all[k-1];val b=all[k];if(!seen(a)||!seen(b))return null
+                val f=((t-geo[k-1])/max(1e-15,geo[k]-geo[k-1])).toFloat()
+                return floatArrayOf(projected[a*3]+(projected[b*3]-projected[a*3])*f,projected[a*3+1]+(projected[b*3+1]-projected[a*3+1])*f)
+            }
             letters.sortBy{it.first}
             val rows=letters.map{atlas.labels[it.second]}
             val anchor=letters.first().second;if(anchor*3+2>=projected.size||projected[anchor*3+2]==0f)continue
             val ax=projected[anchor*3];val ay=projected[anchor*3+1]
-            // Letter advances on screen (a sprite is its text and 4 dp each side), and tracking.
             val size=rows.first().label.size
             val advances=rows.map{max(0f,it.width-8f)*scale};val tracking=size*.2f*scale
             val total=advances.sum()+tracking*(rows.size-1)
-            // Read left to right: decided by the stretch the name covers, not the
-            // curve's ends, and only changed when it clearly runs the other way, so the
-            // name stays put on the map until it has to turn to stay upright.
-            val forward=FloatArray(points.size);for(k in 1 until points.size)forward[k]=forward[k-1]+hypot(points[k][0]-points[k-1][0],points[k][1]-points[k-1][1])
-            fun along(d:Float):FloatArray{val s=d.coerceIn(0f,forward.last());var k=1;while(k<points.size-1&&forward[k]<s)k++
-                val span=max(1e-3f,forward[k]-forward[k-1]);val f=(s-forward[k-1])/span
-                return floatArrayOf(points[k-1][0]+(points[k][0]-points[k-1][0])*f,points[k-1][1]+(points[k][1]-points[k-1][1])*f)}
-            val rightwards=along(midRun+total/2)[0]-along(midRun-total/2)[0]
-            val reversed=when{rightwards< -size*scale->true;rightwards>size*scale->false;else->readsBack[path]?:(rightwards<0)}
-            readsBack[path]=reversed
-            val line=if(reversed)points.reversed()else points
-            val run=FloatArray(line.size);for(k in 1 until line.size)run[k]=run[k-1]+hypot(line[k][0]-line[k-1][0],line[k][1]-line[k-1][1])
-            val length=run.last();if(length<total+size*scale)continue
-            fun at(d:Float):FloatArray{val s=d.coerceIn(0f,length);var k=1;while(k<line.size-1&&run[k]<s)k++
-                val span=max(1e-3f,run[k]-run[k-1]);val f=(s-run[k-1])/span
-                return floatArrayOf(line[k-1][0]+(line[k][0]-line[k-1][0])*f,line[k-1][1]+(line[k][1]-line[k-1][1])*f)}
-            val centre=if(reversed)length-midRun else midRun
-            var d=centre-total/2;var previous=Float.NaN;var ok=true
-            if(d<0f||d+total>length)continue
+            // Spaced on the ground for the camera's zoom: panning, turning and tilting
+            // change nothing; zooming keeps letters and gaps the same size on screen
+            // (no re-spacing jumps).
+            val state=pathLayouts[path]
+            // With no camera zoom (background placement before any frame): the zoom at
+            // which the curve's visible stretch is as long on screen as it is now.
+            fun estimated():Double?{var px=0.0;var ground=0.0
+                for(k in 1 until all.size)if(seen(all[k-1])&&seen(all[k])){
+                    px+=hypot((projected[all[k]*3]-projected[all[k-1]*3]).toDouble(),(projected[all[k]*3+1]-projected[all[k-1]*3+1]).toDouble());ground+=geo[k]-geo[k-1]}
+                return if(px>0.0&&ground>0.0)ln(px/(ground*512.0*scale))/ln(2.0)else null}
+            val layoutZoom=zoom?:state?.zoom?:estimated()?:continue
+            val perWorld=512.0*2.0.pow(layoutZoom)*scale // pixels per Mercator unit, flat
+            val span=total/perWorld;if(span>length*.95)continue
+            // Read left to right: across the name's stretch on screen, turned only when it
+            // clearly runs right to left (and back only when clearly left to right).
+            val s0=screen(mid-span/2);val s1=screen(mid+span/2)
+            val across=if(s0!=null&&s1!=null)s1[0]-s0[0] else null
+            val reversed=when{across==null->state?.reversed?:false;across< -size*scale->true;across>size*scale->false;else->state?.reversed?:(across<0)}
+            if(zoom!=null)pathLayouts[path]=PathLayout(layoutZoom,reversed)
             val placed=ArrayList<Placed>();val boxes=ArrayList<Box>()
             val lift=size*.75f*scale
+            var d=0.0
             for((k,row) in rows.withIndex()){
-                val half=advances[k]/2;val a=at(d-1f);val b=at(d+advances[k]+1f);val c=at(d+half)
+                val advance=advances[k]/perWorld
+                // The letter's centre along the curve, in reading order.
+                val centre=if(reversed)mid+span/2-d-advance/2 else mid-span/2+d+advance/2
+                d+=(advances[k]+tracking)/perWorld
+                val step=max(advance/2,span*.03)*(if(reversed)-1 else 1)
+                val c=screen(centre)?:continue;val a=screen(centre-step)?:continue;val b=screen(centre+step)?:continue
                 val angle=atan2(b[1]-a[1],b[0]-a[0])
-                if(!previous.isNaN()){var turn=abs(angle-previous);if(turn>PI)turn=(2*PI).toFloat()-turn;if(turn>.7f){ok=false;break}}
-                if(advances[k]>0f)previous=angle
                 // Above the curve: its left side as read.
                 val cx=c[0]+sin(angle)*lift;val cy=c[1]-cos(angle)*lift
-                if(cx<0||cy<0||cx>width||cy>height){ok=false;break}
                 val h=row.height*scale
                 placed.add(Placed(letters[k].second,(cx-ax)/scale-row.width/2,(cy-ay)/scale-row.height/2,angle))
                 val hx=abs(cos(angle))*advances[k]/2+abs(sin(angle))*h*.35f;val hy=abs(sin(angle))*advances[k]/2+abs(cos(angle))*h*.35f
                 if(advances[k]>0f)boxes.add(Box(cx-hx,cy-hy,cx+hx,cy+hy))
-                d+=advances[k]+tracking
             }
-            if(ok&&placed.isNotEmpty())out.add(placed to boxes)
+            if(placed.isNotEmpty())out.add(placed to boxes)
         }
         return out
     }

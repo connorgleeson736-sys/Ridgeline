@@ -45,6 +45,8 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
         if(advanced)advanced(content)else basic(content)
         cover.addView(panel,FrameLayout.LayoutParams(minOf(dp(296),activity.resources.displayMetrics.widthPixels-dp(82)),-1,Gravity.TOP or Gravity.END).apply{topMargin=dp(52);bottomMargin=dp(16);marginEnd=dp(10)})
         // The holder does not intercept touches; only the panel is clickable.
+        // Above any bottom bar (they are raised 12 dp): the layers open in front of them.
+        cover.elevation=dp(30).toFloat()
         root.addView(cover,FrameLayout.LayoutParams(-1,-1));overlay=cover
     }
     private fun closeButton(action:()->Unit)=TextView(activity).apply{text="✕";textSize=18f;gravity=Gravity.CENTER;setTextColor(NativeUi.ink);background=NativeUi.pressable(activity,null);isClickable=true;setOnClickListener{action()}}
@@ -204,7 +206,7 @@ internal class LayersUi(private val activity:Activity,private val root:FrameLayo
         parent.addView(NativeUi.text(activity,"Tints the terrain by how detailed the imagery stored on this phone is (automatic cache and saved regions): red little or none, through yellow, to green detailed. Shows what will be sharp offline.",12f).apply{setTextColor(NativeUi.muted)})
         check(parent,"Downloaded maps only",loader.offlineOnly){loader.offlineOnly(it)}
         check(parent,"Power saving",terrain.powerSaving){terrain.powerSaving=it;loader.powerSaving=it}
-        parent.addView(NativeUi.text(activity,"Saves battery: draws the map at up to 30 frames a second and slightly lower resolution, and stops preparing nearby areas in the background. Maps load as you look at them.",11.5f).apply{setTextColor(NativeUi.muted);setPadding(0,0,0,dp(6))})
+        parent.addView(NativeUi.text(activity,"Saves battery: draws the map at up to 20 frames a second and lower resolution, updates labels and map layers less often, and stops preparing nearby areas in the background. Maps load as you look at them.",11.5f).apply{setTextColor(NativeUi.muted);setPadding(0,0,0,dp(6))})
         parent.addView(NativeUi.button(activity,"Offline maps"){dismiss();offline.startRegion()})
         parent.addView(NativeUi.button(activity,"GPU textures: "+arrayOf("Automatic","Compatibility","Texture arrays")[loader.textureBackend.coerceIn(0,2)]){offline.gpuTextures{render()}})
         parent.addView(NativeUi.button(activity,"Overview imagery ZIPs (${loader.overviews.list().size}/${loader.overviews.total})"){dismiss();offline.imageryPacks()})

@@ -1,4 +1,6 @@
 //! One cached native-font atlas and a depth-tested batch, with CPU grid collision selection.
+/// Seconds a dropped label keeps its first-shown time (see rebuild_labels).
+const LABEL_GRACE: f32 = 0.6;
 /// Label continuity grid: 2^22 cells across the world (~10 m at the equator).
 const LABEL_GRID: f64 = 4_194_304.0;
 pub(crate) fn grid_key(p: [f64; 2]) -> (i64, i64) {
@@ -541,6 +543,18 @@ impl crate::Renderer {
         }
         // Labels shown now keep their first-shown time; others fade in anew.
         self.label_fade_until = born.values().map(|b| b + 0.2).fold(0., f32::max);
+        // A label dropped by one placement and back within LABEL_GRACE seconds
+        // (collision jitter while moving) keeps its first-shown time, so it
+        // reappears at once instead of flashing in from transparent again.
+        for k in born.keys() {
+            self.label_seen.insert(*k, now);
+        }
+        self.label_seen.retain(|_, seen| now - *seen < LABEL_GRACE);
+        for (k, first) in std::mem::take(&mut self.label_born) {
+            if self.label_seen.contains_key(&k) {
+                born.entry(k).or_insert(first);
+            }
+        }
         self.label_born = born;
         if self.label_heights.len() > 4096 {
             self.label_heights.clear();

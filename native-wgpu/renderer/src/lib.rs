@@ -181,6 +181,7 @@ pub struct Renderer {
     /// New-candidate batches keep the shown labels until their placement arrives.
     labels_stale: bool,
     label_born: HashMap<(i64, i64), f32>,
+    label_seen: HashMap<(i64, i64), f32>,
     label_heights: HashMap<(i64, i64), f32>,
     label_fade_until: f32,
     label_clock: std::time::Instant,
@@ -686,6 +687,7 @@ impl Renderer {
             label_anchor: [0.5, 0.5],
             labels_stale: false,
             label_born: HashMap::new(),
+            label_seen: HashMap::new(),
             label_heights: HashMap::new(),
             label_fade_until: 0.,
             label_clock: std::time::Instant::now(),

@@ -20,9 +20,10 @@ data class CameraPose(val longitude:Double=170.14219572,val latitude:Double=-43.
 /** Render scale while moving with "Lower resolution while moving" (44% fewer pixels). */
 private const val MOTION_SCALE=.75f
 /** Power saving: drawing scale when still and while moving; frames at most 30 a second. */
-private const val POWER_SCALE=.8f
+// Power saving: one fixed 60% render scale (no resize on touch), at most 20 frames a second.
+private const val POWER_SCALE=.6f
 private const val POWER_MOTION_SCALE=.6f
-private const val POWER_FRAME_NANOS=32_000_000L
+private const val POWER_FRAME_NANOS=50_000_000L
 /** Names further than this many screen widths from the view's centre are not shown. */
 private const val FAR_LABEL_SCREENS=2.5
 
@@ -433,7 +434,7 @@ class TerrainView(context:Context):SurfaceView(context),SurfaceHolder.Callback {
             if(curves!=null&&drawn!=null){
                 val key=drawn to listOf(width.toDouble(),height.toDouble(),CameraMath.shift)
                 if(placement!==appliedPlacement||key!=curvePose){
-                    val merged=NativeLabels.withCurves(atlas,curves,placement.second,{i,o->NativeBridge.projectCurve(handle,i,o)},width,height,pixelScale.toFloat())
+                    val merged=NativeLabels.withCurves(atlas,curves,placement.second,{i,o->NativeBridge.projectCurve(handle,i,o)},width,height,pixelScale.toFloat(),drawn.zoom)
                     if(NativeBridge.placeLabels(handle,merged)){appliedPlacement=placement;curvePose=key}
                 }
             }else if(placement!==appliedPlacement&&NativeBridge.placeLabels(handle,placement.second))appliedPlacement=placement
