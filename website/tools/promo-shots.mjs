@@ -40,7 +40,7 @@ export const SCENES = {
   // Hunting areas shaded over 3D terrain, one opened (its permit details).
   'hunting': { size: [430, 932], view: '10.9/-39.21/176.0/30/58', settings: { hunting: true }, hunting: [176.0, -39.2], after: '10.9/-39.2/176.0/30/58' },
   // A long Te Araroa section, its profile and notes open.
-  'te-araroa': { size: [430, 932], view: '10.2/-41.5/173.1/0/55', open: ['teAraroa', 'richmond-alpine-track'], after: '9.65/-41.6/173.18/-38/56' },
+  'te-araroa': { size: [430, 932], view: '8.45/-35.2/173.5/-0.8/31', open: ['teAraroa', 'the-northland-forests'], after: '8.45/-35.2/173.5/-0.8/31' },
   'topo': { size: [430, 932], view: '12.68/-44.729/168.186/0/0', settings: { base: 'topo', threeD: false } },
 };
 
