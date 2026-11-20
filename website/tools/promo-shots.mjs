@@ -25,12 +25,15 @@ export const SCENES = {
   'walk-gillespie': { size: [430, 932], view: '10.6/-44.2/169.1/0/55', open: ['walk', '515e0210-ba1a-4750-8297-a892aba9a23e'], after: '10.3/-44.205/169.1/-8/56' },
   'route-aspiring': { size: [430, 932], view: '11.6/-44.4/168.7/10/60', route: 'mt-aspiring-via-bevan-col.gpx', after: '11.65/-44.395/168.70/14/63' },
   // The app's offline maps (Paint tab): painted cells over the 3D map and the paint panel.
-  'offline': { size: [430, 932], view: '10.45/-41.935/172.752/186/54', after: '10.45/-41.935/172.752/186/54', offline: {
+  'offline': { size: [430, 932], view: '10.6/-41.955/172.745/12/56', after: '10.6/-41.955/172.745/12/56', offline: {
     name: 'Travers-Sabine',
-    // [detail (0 Overview … 3 Maximum), brush radius km, path [lng, lat]] painted in order.
+    // DOC's line for the walk, painted as in the app: [detail (0 Overview … 3 Maximum),
+    // brush radius km, which part ([south, north] latitudes; null: all)] in order.
+    walk: '86358329-fa21-453e-a111-62abc4a83b77',
     strokes: [
-      [2, 0.9, [[172.842, -41.806], [172.822, -41.8757], [172.817, -41.8704], [172.795, -41.93], [172.7687, -41.9748], [172.7499, -42.0203], [172.732, -42.0263], [172.71, -42.02], [172.684, -42.0078], [172.6557, -42.058], [172.684, -42.0078], [172.682, -41.95], [172.6807, -41.9014], [172.71, -41.875], [172.7518, -41.8522], [172.80, -41.83], [172.842, -41.806]]],
-      [3, 0.75, [[172.7687, -41.9748], [172.7499, -42.0203], [172.732, -42.0263], [172.71, -42.02], [172.684, -42.0078]]],
+      [1, 0.8, null],
+      // High detail where it matters: the alpine crossing, John Tait Hut to West Sabine Hut.
+      [3, 1.15, [-42.04, -41.972]],
     ] } },
   'topo': { size: [430, 932], view: '12.68/-44.729/168.186/0/0', settings: { base: 'topo', threeD: false } },
 };
@@ -73,7 +76,23 @@ function estimate(cells) {
   return { files, mb: (files * 30) / 1024 };
 }
 async function paintOffline(page, spec) {
-  const cells = paintCells(spec.strokes), n = 2 ** 16;
+  // The walk's own line from DOC, through the site's module.
+  const paths = await page.evaluate(async (guid) => {
+    const main = document.querySelector('script[src*="/map/main.js"]').getAttribute('src');
+    return (await import(main.replace('main.js', 'doc.js'))).walkLine(guid);
+  }, spec.walk);
+  const strokes = [];
+  for (const [detail, km, part] of spec.strokes)
+    for (const path of paths) {
+      // Runs of the line within the part's latitudes.
+      let run = [];
+      for (const p of path) {
+        if (!part || (p[1] >= part[0] && p[1] <= part[1])) run.push(p);
+        else { if (run.length > 1) strokes.push([detail, km, run]); run = []; }
+      }
+      if (run.length > 1) strokes.push([detail, km, run]);
+    }
+  const cells = paintCells(strokes), n = 2 ** 16;
   const features = [...cells].map(([key, d]) => {
     const [x, y] = key.split('/').map(Number);
     const ring = [[x, y], [x + 1, y], [x + 1, y + 1], [x, y + 1], [x, y]].map(([a, b]) => unmerc([a / n, b / n]));
