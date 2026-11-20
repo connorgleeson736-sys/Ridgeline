@@ -155,12 +155,18 @@ details p { margin: 12px 0 0; color: var(--muted); }
 .notify-status { flex-basis: 100%; min-height: 1.4em; margin: 4px 0 0; color: rgb(255 255 255 / 86%); }
 .app-band .fine { color: rgb(255 255 255 / 62%); margin-top: 10px; }
 .app-band .fine a { color: inherit; }
-/* With the offline picture: text left, the phone right; stacked on phones. */
+/* Beside the sign-up: the app's icon and name; stacked on phones. */
 .app-band.with-phone { max-width: 1000px; grid-template-columns: 1.4fr 1fr; text-align: left; gap: 48px; }
 .app-band.with-phone .notify { justify-content: flex-start; }
-.app-band.with-phone .phone { margin: 0; }
-.app-band.with-phone .phone img { display: block; width: 100%; max-width: 320px; height: auto; margin-left: auto; aspect-ratio: 430 / 932; border-radius: 28px; border: 6px solid #0f1c16; box-shadow: 0 18px 48px rgb(0 0 0 / 35%); }
-@media (max-width: 860px) { .app-band.with-phone { grid-template-columns: 1fr; text-align: center; } .app-band.with-phone .notify { justify-content: center; } .app-band.with-phone .phone img { margin: 0 auto; max-width: 300px; } }
+.brand-mark { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; }
+.brand-mark img { width: 100%; max-width: 200px; height: auto; border-radius: 22%; box-shadow: 0 18px 48px rgb(0 0 0 / 35%); }
+.brand-mark p { margin: 8px 0 0; font-size: 1.6rem; color: #fff; letter-spacing: -.01em; }
+.brand-mark span { font-size: .9rem; color: rgb(255 255 255 / 62%); }
+@media (max-width: 860px) { .app-band.with-phone { grid-template-columns: 1fr; text-align: center; } .app-band.with-phone .notify { justify-content: center; } .brand-mark { order: -1; } .brand-mark img { max-width: 120px; } }
+/* Four phones: four across, two on tablets, one on phones. */
+.trio.four { grid-template-columns: repeat(4, 1fr); gap: 24px; }
+@media (max-width: 1100px) { .trio.four { grid-template-columns: repeat(2, 1fr); max-width: 720px; margin: 0 auto; gap: 40px 32px; } }
+@media (max-width: 600px) { .trio.four { grid-template-columns: 1fr; max-width: 360px; gap: 48px; } }
 
 /* Walk, hut and Te Araroa pages (lib/seo-pages.mjs) */
 .place-page h1 { margin-bottom: 12px; }

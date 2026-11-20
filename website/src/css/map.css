@@ -444,3 +444,6 @@ body.promo .maplibregl-ctrl-bottom-left, body.promo .maplibregl-ctrl-bottom-righ
 .place-text .facts dt { color: var(--muted); }
 .place-text .facts dd { margin: 0; }
 .place-text .prev-next { display: flex; justify-content: space-between; gap: 12px; margin: 8px 0; font-weight: 600; }
+
+/* ?promo pictures: the map as the app shows it, without the website's "get the app" notes. */
+body.promo .app-cta { display: none !important; }
