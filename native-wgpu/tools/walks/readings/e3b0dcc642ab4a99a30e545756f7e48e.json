@@ -1,0 +1,142 @@
+{
+ "guid": "e3b0dcc6-42ab-4a99-a30e-545756f7e48e",
+ "kind": "loop",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Leatham Molesworth Route loop from Bottom Gordon Hut via Severn and Saxton Huts",
+   "shape": "loop",
+   "start": {
+    "name": "Bottom Gordon Hut",
+    "quote": "It starts at Bottom Gordon Hut",
+    "ref": "T3"
+   },
+   "end": {
+    "name": "Bottom Gordon Hut",
+    "quote": "back to Bottom Gordon Hut",
+    "ref": "T3"
+   },
+   "via": [
+    {
+     "name": "Top Leatham Hut",
+     "quote": "arrive at Top Leatham Hut",
+     "ref": "T10"
+    },
+    {
+     "name": "Severn Saddle",
+     "quote": "across to the Severn Saddle (1500 m)",
+     "ref": "T8"
+    },
+    {
+     "name": "Severn River",
+     "quote": "head down into the Severn River on the true left",
+     "ref": null
+    },
+    {
+     "name": "Severn Hut",
+     "quote": "near new Severn Hut",
+     "ref": null
+    },
+    {
+     "name": "Boundary Stream",
+     "quote": "locally know as Boundary Stream",
+     "ref": null
+    },
+    {
+     "name": "Saxton Hut",
+     "quote": "The Saxton Hut is situated on a river terrace at this confluence",
+     "ref": null
+    },
+    {
+     "name": "Team Hut",
+     "quote": "pass the Team Hut",
+     "ref": null
+    },
+    {
+     "name": "Saxton River",
+     "quote": "At times you will have to ford the river",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Oyster Creek",
+     "quote": "Oyster Creek",
+     "ref": null
+    },
+    {
+     "name": "Saxton Saddle",
+     "quote": "head up the hill to Saxton Saddle",
+     "ref": "T7"
+    },
+    {
+     "name": "Gordon Stream",
+     "quote": "Sidle down Gordon Stream on the true left",
+     "ref": "T5"
+    },
+    {
+     "name": "Top Gordon Hut",
+     "quote": "Top Gordon Hut is located on a sunny terrace",
+     "ref": "T9"
+    },
+    {
+     "name": "Gordon Stream",
+     "quote": "Leave the hut and cross Gordon Stream",
+     "ref": "T5",
+     "how": "ford"
+    }
+   ],
+   "direction": null,
+   "time": "4 - 5 days",
+   "distance": "56 km loop",
+   "evidence": [
+    "It starts at Bottom Gordon Hut in the Leatham Conservation Area, and travels via Severn and Saxton Huts in the Molesworth Recreation Reserve, around to Top Gordon Hut and back to Bottom Gordon Hut.",
+    "The track continues on the true left for the final section along some flats and across a swing bridge back to Bottom Gordon Hut."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Bottom Gordon Hut",
+   "quote": "Bottom Gordon Hut",
+   "ref": "T3"
+  },
+  {
+   "name": "Top Leatham Hut",
+   "quote": "arrive at Top Leatham Hut",
+   "ref": "T10"
+  },
+  {
+   "name": "Severn Hut",
+   "quote": "near new Severn Hut",
+   "ref": null
+  },
+  {
+   "name": "Saxton Hut",
+   "quote": "The Saxton Hut is situated on a river terrace",
+   "ref": null
+  },
+  {
+   "name": "Team Hut",
+   "quote": "pass the Team Hut",
+   "ref": null
+  },
+  {
+   "name": "Top Gordon Hut",
+   "quote": "Top Gordon Hut is located on a sunny terrace",
+   "ref": "T9"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Clarence River",
+   "quote": "especially the Clarence River, may be uncrossable",
+   "ref": null,
+   "why": "other"
+  }
+ ],
+ "doubts": "The first leg (Bottom Gordon Hut to Top Leatham Hut) says to cross 'the river' and 'the main river' but does not name it, so no ford is recorded there. Gordon Stream is named in the packet only later, so the first-leg river is not assumed to be it. The ford of Gordon Stream on the final leg is recorded from 'cross Gordon Stream' with no bridge mentioned at that point (a swing bridge is only mentioned at the end). Team Hut is 'not for public accommodation' but the way passes it, so it is in huts per rule 12. Severn Hut, Saxton Hut, the Severn and Saxton rivers, Oyster Creek and Boundary Stream have no packet entries, so their refs are null (T4 'Boundary' is a peak, not the stream). Between Severn Hut and Boundary Stream the route crosses an unnamed high point (1764 m) given only by grid reference, not recorded as a via. The page does not say clockwise or anticlockwise, so direction is null."
+}

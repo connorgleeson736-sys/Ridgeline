@@ -1,0 +1,30 @@
+{
+  "artifact": "Ridgeline-Native-Overlays-Fixed-0.1.30-Base.apk",
+  "bytes": 33749730,
+  "sha256": "63d9e90f8b3b7ffccbaa70a5a470b3675ee6076500dbd04885aedc3dd364c8c8",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.30-overlays-fixed",
+  "versionCode": 31,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.29 Full Audit (same package and signer)",
+  "changes": [
+    "fix (regression from 0.1.27): the labelAtlasRows JNI export returned u8 while Kotlin declared Int; on ARM64 the upper bits of the return register are unspecified, so new label atlases were usually treated as not applied and retried every frame, resetting the renderer's labels each frame",
+    "labelAtlasRows now returns i32; any result other than 1 falls back to a whole-atlas upload instead of retrying",
+    "new NativeSignatureTest: every Kotlin external in NativeBridge must return the JNI type its Rust export returns (fails on 0.1.29)"
+  ],
+  "tests": {
+    "kotlinJvm": "188 tests, 0 failures (new NativeSignatureTest)",
+    "rust": "cargo test --workspace: all pass",
+    "gpu": "label_occlusion, overlay_drape pass on Vulkan and GLES"
+  },
+  "lintErrors": 0,
+  "originalAssetsIdentical": 623,
+  "jniExportsPerAbi": 48,
+  "loadAlignment": "0x4000",
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

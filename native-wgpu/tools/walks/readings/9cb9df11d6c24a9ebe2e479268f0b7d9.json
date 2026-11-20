@@ -1,0 +1,165 @@
+{
+ "guid": "9cb9df11-d6c2-4a9e-be2e-479268f0b7d9",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Road end to Uruwhenua Road via Anatoki and Waingaro Forks Huts",
+   "shape": "one_way",
+   "start": {
+    "name": "Road end",
+    "quote": "Road end to Anatoki Forks Hut",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Uruwhenua Road",
+    "quote": "Uruwhenua Road is reached",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Go Ahead Creek",
+     "quote": "From the car park follow the markers and ford Go Ahead Creek",
+     "ref": "T7",
+     "how": "ford"
+    },
+    {
+     "name": "Anatoki Bend",
+     "quote": "The track then descends in a zigzag fashion to the Anatoki Bend.",
+     "ref": null
+    },
+    {
+     "name": "Anatoki Forks Hut",
+     "quote": "Once at the Anatoki Forks Hut (standard hut, 6 bunks)",
+     "ref": "T5"
+    },
+    {
+     "name": "left branch junction",
+     "quote": "take the left branch at a junction",
+     "ref": null
+    },
+    {
+     "name": "Stanley River",
+     "quote": "descending for 40 minutes to the Stanley River",
+     "ref": null
+    },
+    {
+     "name": "Lake Stanley",
+     "quote": "you reach the western end of Lake Stanley",
+     "ref": "T9"
+    },
+    {
+     "name": "Soper Shelter",
+     "quote": "On the true right of the South Branch of the Stanley River, at the western end of Lake Stanley is Soper Shelter.",
+     "ref": "T13"
+    },
+    {
+     "name": "Lake Stanley eastern end",
+     "quote": "A further hour and you reach the eastern end of the lake.",
+     "ref": "T9"
+    },
+    {
+     "name": "Waingaro and Stanley Rivers junction",
+     "quote": "the junction of the Waingaro and Stanley Rivers",
+     "ref": null
+    },
+    {
+     "name": "Waingaro Forks Hut",
+     "quote": "onto the historic Waingaro Forks Hut",
+     "ref": "T18"
+    },
+    {
+     "name": "Waingaro River",
+     "quote": "A 200 metre walk upstream leads to a swingbridge across the rocky gorge of the Waingaro River.",
+     "ref": "T19"
+    },
+    {
+     "name": "Lockett Range",
+     "quote": "up the Lockett Range",
+     "ref": "T10"
+    },
+    {
+     "name": "Skeet Creek",
+     "quote": "Skeet Creek is reached",
+     "ref": "T12"
+    },
+    {
+     "name": "turn-off to Riordans Hut",
+     "quote": "the turn-off to Riordans Hut is reached",
+     "ref": null
+    },
+    {
+     "name": "Kill Devil Ridge",
+     "quote": "down the Kill Devil Ridge to the end of the track",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "3-5 days",
+   "distance": null,
+   "evidence": [
+    "From the car park follow the markers and ford Go Ahead Creek before sidling up the hill to join onto an old benched gold miner’s track.",
+    "The track then descends in a zigzag fashion to the Anatoki Bend.",
+    "Uruwhenua Road is reached and a further 3 kilometres will take you back to the State Highway near Lindsay’s Bridge."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [
+  {
+   "name": "State Highway near Lindsay's Bridge",
+   "quote": "a further 3 kilometres will take you back to the State Highway near Lindsay’s Bridge",
+   "ref": null,
+   "from": "Uruwhenua Road",
+   "how": "road"
+  }
+ ],
+ "side_trips": [
+  {
+   "name": "Riordans Hut",
+   "quote": "From the turnoff it’s a further 30 minutes to Riordans Hut.",
+   "ref": "T11",
+   "from": "turn-off to Riordans Hut"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Anatoki Forks Hut",
+   "quote": "Once at the Anatoki Forks Hut (standard hut, 6 bunks)",
+   "ref": "T5"
+  },
+  {
+   "name": "Waingaro Forks Hut",
+   "quote": "onto the historic Waingaro Forks Hut",
+   "ref": "T18"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Riordans Hut",
+   "quote": "From the turnoff it’s a further 30 minutes to Riordans Hut.",
+   "ref": "T11",
+   "why": "side trip"
+  },
+  {
+   "name": "Tin Hut",
+   "quote": "Look out for the restored Tin Hut, located in bush 60 metres below the track.",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "Adelaide Tarn Hut",
+   "quote": "The right branch crosses the Anatoki River and climbs steeply towards Adelaide Tarn Hut.",
+   "ref": "T4",
+   "why": "other walk"
+  },
+  {
+   "name": "Tākaka",
+   "quote": "1 km south of Tākaka Township",
+   "ref": null,
+   "why": "nearby"
+  }
+ ],
+ "doubts": "Kind one_way: the page gives three legs (Road end to Anatoki Forks Hut, Anatoki Forks Hut to Waingaro Forks Hut, Waingaro Forks Hut to road end) of one track, so they are one way, not separate ways. The time for the whole is DOC's '3-5 days'; no distance is given for the whole way (the leg distances are 17 km and 18 km, not summed). The start is the small car park at the end of Kotinga Road; I matched it to road end F1, where the Anatoki Track meets the road, but F2 (an unnamed track meeting the same road a few metres away) could be the car park, so this is not certain. The end is Uruwhenua Road, which has no feature or name entry, so its ref is null. The State Highway 3 km beyond it is recorded as an exit by road. Stanley River is named three times in the gazetteer with no way to say which, so its ref is null. Lake Stanley is one entry. Soper Shelter is recorded as a via, but the text does not say it has bunks, so it is not in huts. Riordans Hut is a 30 minute side trip from the turn-off and is both a side trip and not_on_route. The Tin Hut is 60 m below the track and is not walked. Ford is recorded only for Go Ahead Creek, which the text tells you to ford; the Anatoki and Stanley rivers are described as easily crossed in normal flows without an instruction to cross. Waingaro Track is named in the history section but is not described as a separate way."
+}

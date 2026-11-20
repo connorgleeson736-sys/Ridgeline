@@ -1,0 +1,20 @@
+{
+  "sourceCommit": "8ac2e3db62817161af54513cb89638ad3e693bfb",
+  "artifact": "Ridgeline-Native-Cold-Loading-0.1.3-Base.apk",
+  "bytes": 32056524,
+  "sha256": "7ef1d43793d7b858e82f442a112d5159deb23f21f1d3c8a617a94fde0e721059",
+  "versionName": "0.1.3-cold-loading",
+  "versionCode": 4,
+  "applicationId": "nz.ridgeline.nativeapp.performance",
+  "signerSha256": "03ef64214daee8c59cad6571ce5036579237d553c040837ce996f80efa898ae7",
+  "updates012InPlace": true,
+  "rustNativeLibraries": "All three ABI libraries byte-identical to 0.1.2; this pass changes Kotlin loading/admission/UI only.",
+  "assetsAndNativeFilesByteIdenticalTo012": 621,
+  "noSessionCa": true,
+  "signatureV2Verified": true,
+  "zip16KiBAlignmentVerified": true,
+  "targetedChecksPassed": 7,
+  "fullSuiteAndLintRun": false,
+  "physicalDeviceRun": false,
+  "buildResult": "assembleDebug BUILD SUCCESSFUL in 4s"
+}

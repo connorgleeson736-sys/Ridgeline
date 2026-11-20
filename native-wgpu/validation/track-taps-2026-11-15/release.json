@@ -1,0 +1,26 @@
+{
+  "artifact": "Ridgeline-Native-Track-Taps-0.1.63-Base.apk",
+  "bytes": 36300225,
+  "sha256": "33d0745e14cb155ff288f9433a53cf2240750523630348f549ee17409bb45e87",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.63-track-taps",
+  "versionCode": 64,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.62 Full Audit (same package and signer)",
+  "changes": [
+    "Track names one zoom earlier: other named tracks from tile zoom 13 (was 14); Great Walks and large DOC walks (circuits, crossings, multi-day walks) from zoom 11 (was 12), named from DOC's own walk lines until the map's tracks start at 12.",
+    "Tapping a track line (not only its name) opens its summary, as its name would: the map's track (or its large walk) from zoom 12, DOC's walk below; within 18 dp of the line. Otherwise the tap goes to hunting areas as before.",
+    "Search field: a small clear (x) button inside it while it has text."
+  ],
+  "tests": {
+    "kotlinJvm": "all pass (new: track line hit distance; track name zoom 13)",
+    "rust": "unchanged"
+  },
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

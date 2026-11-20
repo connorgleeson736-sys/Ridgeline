@@ -1,0 +1,127 @@
+{
+ "guid": "a5180a24-b720-4c45-8ec6-ac37314588d5",
+ "kind": "network",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Dawson Falls to Waingongoro Hut",
+   "shape": "one_way",
+   "start": {
+    "name": "Dawson Falls Visitor Centre",
+    "quote": "Follow the Wilkies Pool Loop Track from just above the visitor centre",
+    "ref": "T7"
+   },
+   "end": {
+    "name": "Waingongoro Hut",
+    "quote": "Follow this downhill, past the 24 m high Waingongoro swing bridge, to the hut.",
+    "ref": "T10"
+   },
+   "via": [
+    {
+     "name": "Wilkies Pool Loop Track",
+     "quote": "Follow the Wilkies Pool Loop Track from just above the visitor centre",
+     "ref": "T5"
+    },
+    {
+     "name": "Kapuni Stream",
+     "quote": "rock hopping across the Kapuni Stream",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Ridge Track",
+     "quote": "Join the Ridge Track and climb uphill to meet the Waingongoro Track.",
+     "ref": "T3"
+    },
+    {
+     "name": "Waingongoro Track",
+     "quote": "to meet the Waingongoro Track",
+     "ref": "T4"
+    },
+    {
+     "name": "Waingongoro swing bridge",
+     "quote": "past the 24 m high Waingongoro swing bridge",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "1 hr 30 min",
+   "distance": "2.3 km",
+   "evidence": [
+    "Follow the Wilkies Pool Loop Track from just above the visitor centre, rock hopping across the Kapuni Stream.",
+    "Follow this downhill, past the 24 m high Waingongoro swing bridge, to the hut.",
+    "Return the same way or via Wilkies Pools."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "East Egmont to Waingongoro Hut",
+   "shape": "one_way",
+   "start": {
+    "name": "Ngāti Ruanui Stratford Mountain House",
+    "quote": "From Ngāti Ruanui Stratford Mountain House",
+    "ref": "T8"
+   },
+   "end": {
+    "name": "Waingongoro Hut",
+    "quote": "Across the bridge a short track leads down to the hut.",
+    "ref": "T10"
+   },
+   "via": [
+    {
+     "name": "several unbridged streams",
+     "quote": "the track crosses several unbridged streams before reaching the Waingongoro swing bridge",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Waingongoro swing bridge",
+     "quote": "before reaching the Waingongoro swing bridge",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "1 hr 30 min",
+   "distance": "2.9 km",
+   "evidence": [
+    "From Ngāti Ruanui Stratford Mountain House, the track crosses several unbridged streams before reaching the Waingongoro swing bridge.",
+    "Across the bridge a short track leads down to the hut.",
+    "Return the same way."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Kapuni Loop Track entrance",
+   "quote": "From the visitor centre walk 50 m down Manaia Road to the Kapuni Loop Track entrance.",
+   "ref": "F3",
+   "onto": "Ridge Track"
+  }
+ ],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Waingongoro Hut",
+   "quote": "Follow this downhill, past the 24 m high Waingongoro swing bridge, to the hut.",
+   "ref": "T10"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Te Papa-Kura-o-Taranaki",
+   "quote": "Check the Te Papa-Kura-o-Taranaki weather forecast before you go.",
+   "ref": "T9",
+   "why": "other"
+  },
+  {
+   "name": "Waingongoro River",
+   "quote": "overlooking Waingongoro River",
+   "ref": null,
+   "why": "view"
+  }
+ ],
+ "doubts": "Network: the page describes two tracks to the same hut, each with its own heading, time and distance, so each is its own way; the Dawson Falls way is main. Both start from a place the text names (the visitor centre, and the Stratford Mountain House under the East Egmont heading) and end at Waingongoro Hut. The visitor centre is matched to the place entry Dawson Falls (T7), which sits at the visitor centre; the Stratford Mountain House is matched to East Egmont (T8) from the heading; both are judgements. The Dawson Falls way can return the same way or via Wilkies Pools; the page gives only that return option, so it is not a separate way and the way is one way to the hut. The alternate access via the Kapuni Loop Track entrance is an access point onto the Ridge Track, matched to road end F3 (where the Kapuni Loop Track meets Manaia Road). The Kapuni Stream is rock hopped (ford) because the text says so, with no bridge given; the bridge lower down it is only in the alternate access, which is not recorded as a via. The several unbridged streams on the East Egmont way are recorded as a ford with a null name. The time and distance are per heading, copied as given."
+}

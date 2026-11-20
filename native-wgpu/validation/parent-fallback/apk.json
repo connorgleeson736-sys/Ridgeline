@@ -1,0 +1,36 @@
+{
+  "sourceCheckpoint": "da2579c08999168ba7e2edd65beb83c8abcb982a",
+  "bytes": 31930328,
+  "sha256": "c5c0b9654998a663d560bc644eb2f2666f175b09dd8ebabc4fe24d505c59c8aa",
+  "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86_64"
+  ],
+  "largeOverviewPacks": 0,
+  "managedSessionCa": false,
+  "signatureVerified": true,
+  "alignment16KiBVerified": true,
+  "focusedJvmTests": 11,
+  "rustCoreRendererCliTests": [
+    27,
+    4,
+    1
+  ],
+  "fineOnlyDemandFullFramePixelsIdentical": {
+    "vulkan": true,
+    "glesArrays": true
+  },
+  "phoneTested": false,
+  "parentFallback": {
+    "residentBackdrop": "nearest available ancestor retained even after a fine target arrives",
+    "preparedRam": "nearest prepared ancestor restored for ideal leaves, even when fine GPU tiles are ready; fallback requests do not recursively restore more backgrounds",
+    "uploadAdmission": "ancestors of current targets admitted and prioritized; unrelated demand pruned",
+    "eviction": "owners protected; oldest nonowners or detail with resident ancestor evicted first",
+    "physicalSourceCeilingPerPool": 192,
+    "relatedReplacementTransientSlots": 1,
+    "softCountCoverageDebt": true,
+    "arbitraryHttpCacheHitsRestoredDirectly": false
+  },
+  "nativeLibrariesByteIdenticalTo": "1fd7000d8e5f56b1cce668bb66be43e5ac354de8"
+}

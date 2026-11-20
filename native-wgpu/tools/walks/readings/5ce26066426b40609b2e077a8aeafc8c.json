@@ -1,0 +1,81 @@
+{
+ "guid": "5ce26066-426b-4060-9b2e-077a8aeafc8c",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Tongariro Alpine Crossing from Mangatepōpō Road end to Ketetahi Road",
+   "shape": "one_way",
+   "start": {
+    "name": "Mangatepōpō Road end",
+    "quote": "Mangatepōpō Road end",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Ketetahi Road",
+    "quote": "Ketetahi Road",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Mangatepōpō Valley",
+     "quote": "Mangatepōpō Valley",
+     "ref": null
+    },
+    {
+     "name": "South Crater",
+     "quote": "South Crater",
+     "ref": null
+    },
+    {
+     "name": "Red Crater",
+     "quote": "Red Crater",
+     "ref": null
+    },
+    {
+     "name": "Emerald Lakes",
+     "quote": "Ngā Rotopounamu-Emerald Lakes",
+     "ref": "T3"
+    },
+    {
+     "name": "Blue Lake",
+     "quote": "Blue Lake",
+     "ref": "T2"
+    }
+   ],
+   "direction": null,
+   "time": "Nov-Apr: 7-8 hr | May-Oct: 9 hr",
+   "distance": "20.2 km one way",
+   "evidence": [
+    "This challenging trip begins at 1120 m following a well-formed boardwalk in a gradual climb through the Mangatepōpō Valley.",
+    "The track ends at Ketetahi Road at an altitude of 760 m."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Soda Springs Walk",
+   "quote": "Soda Springs Walk",
+   "ref": "L1",
+   "why": "other walk"
+  },
+  {
+   "name": "Taranaki Falls Walking Track",
+   "quote": "Taranaki Falls Walking Track",
+   "ref": "L2",
+   "why": "other walk"
+  },
+  {
+   "name": "Tama Lakes Track",
+   "quote": "Tama Lakes Track",
+   "ref": "L3",
+   "why": "other walk"
+  }
+ ],
+ "doubts": "Start ref F1 is the Mangatepopo Road track start; text says 'Mangatepōpō Road end' (in the hazardous weather advisory). Ketetahi Road has no matching entry."
+}

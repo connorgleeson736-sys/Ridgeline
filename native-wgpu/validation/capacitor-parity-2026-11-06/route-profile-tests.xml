@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="nz.ridgeline.nativeapp.RouteProfileTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-11-06T08:16:25.166Z" hostname="vm" time="0.08">
+  <properties/>
+  <testcase name="anUnavailableTileFallsBackToACoarserAncestor" classname="nz.ridgeline.nativeapp.RouteProfileTest" time="0.017"/>
+  <testcase name="chartKeepsExtremesAndGapsWhenDecimating" classname="nz.ridgeline.nativeapp.RouteProfileTest" time="0.006"/>
+  <testcase name="focusSamplesMatchCapacitorClipping" classname="nz.ridgeline.nativeapp.RouteProfileTest" time="0.001"/>
+  <testcase name="focusBoundsNeedZoom15" classname="nz.ridgeline.nativeapp.RouteProfileTest" time="0.0"/>
+  <testcase name="aSampleOnATileEdgeReadsTheNeighbouringTile" classname="nz.ridgeline.nativeapp.RouteProfileTest" time="0.007"/>
+  <testcase name="aLongRouteLowersZoomToStayWithinTheTileBudget" classname="nz.ridgeline.nativeapp.RouteProfileTest" time="0.009"/>
+  <testcase name="inViewSamplesUseTwoMetreSpacingAtZ17" classname="nz.ridgeline.nativeapp.RouteProfileTest" time="0.006"/>
+  <testcase name="heightsArePixelCentreBilinearFromTheFetchedTiles" classname="nz.ridgeline.nativeapp.RouteProfileTest" time="0.031"/>
+  <testcase name="aShortRouteIsSampledEveryFiveMetresFromZ17" classname="nz.ridgeline.nativeapp.RouteProfileTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,13 @@
+{
+  "baseline": "Ridgeline-Capacitor-Latency-Audit-0.19.0-Base.apk",
+  "artifact": "Ridgeline-Capacitor-Additional-Audit-0.20.0-Base.apk",
+  "originalImageBinaryGeojsonAssetsByteIdentical": 1134,
+  "coarseOverviews": 67,
+  "largeOverviewPacks": 0,
+  "mapAndTerrainWorkersUnchanged": true,
+  "allPackagedPublicAssetsMatchSyncedAssets": true,
+  "preparedTerrainCacheAbsent": true,
+  "newDiskSliderPresent": true,
+  "nativeSharedLibraries": 0,
+  "cookReferenceAndSessionCAAbsent": true
+}

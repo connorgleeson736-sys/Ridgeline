@@ -1,0 +1,303 @@
+{
+ "guid": "86358329-fa21-453e-a111-62abc4a83b77",
+ "kind": "loop",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Travers-Sabine Circuit",
+   "shape": "loop",
+   "start": {
+    "name": "St Arnaud",
+    "quote": "St Arnaud to Lakehead Hut/Coldwater Hut",
+    "ref": "T39"
+   },
+   "end": {
+    "name": "St Arnaud village",
+    "quote": "down Mount Robert Road to St Arnaud village",
+    "ref": "T39"
+   },
+   "via": [
+    {
+     "name": "Lakehead Track",
+     "quote": "the Lakehead Track wanders through forest",
+     "ref": "T6"
+    },
+    {
+     "name": "Lakehead Hut",
+     "quote": "Lakehead Hut is 15 min on from the jetty.",
+     "ref": "T28"
+    },
+    {
+     "name": "Travers River flats",
+     "quote": "walk up the Travers River flats through forest and clearings",
+     "ref": "T43"
+    },
+    {
+     "name": "Hopeless Creek",
+     "quote": "as the track nears Hopeless Creek",
+     "ref": "T19"
+    },
+    {
+     "name": "John Tait Hut",
+     "quote": "emerge to the welcome sight of John Tait Hut",
+     "ref": "T22"
+    },
+    {
+     "name": "Cupola Creek",
+     "quote": "Continue beyond John Tait Hut to Cupola Creek chasm",
+     "ref": "T17"
+    },
+    {
+     "name": "Travers River",
+     "quote": "eventually the Travers River via a short bridge",
+     "ref": "T43"
+    },
+    {
+     "name": "Upper Travers Hut",
+     "quote": "where Upper Travers Hut nestles at the base of the east face of Mount Travers.",
+     "ref": "T45"
+    },
+    {
+     "name": "Travers River",
+     "quote": "Cross the Travers River near the hut",
+     "ref": "T43"
+    },
+    {
+     "name": "Poukirikiri/Travers Saddle",
+     "quote": "Poukirikiri/Travers Saddle is an alpine pass requiring ice axes",
+     "ref": "T33"
+    },
+    {
+     "name": "East Branch Sabine River",
+     "quote": "a bridge crosses the deep chasm of the East Branch Sabine River",
+     "ref": null
+    },
+    {
+     "name": "West Sabine Hut",
+     "quote": "heading upstream a short distance to West Sabine Hut",
+     "ref": "T47"
+    },
+    {
+     "name": "West Branch Sabine River",
+     "quote": "Use the swing bridge upstream of the hut to cross the West Branch Sabine River",
+     "ref": null
+    },
+    {
+     "name": "Sabine Hut",
+     "quote": "Easy walking leads to Sabine Hut",
+     "ref": "T35"
+    },
+    {
+     "name": "Howard Saddle",
+     "quote": "before climbing to Howard Saddle",
+     "ref": null
+    },
+    {
+     "name": "Speargrass Hut",
+     "quote": "from where it descends to a clearing above Speargrass Hut",
+     "ref": "T38"
+    },
+    {
+     "name": "Te Horowai/Speargrass Creek",
+     "quote": "cross the bridge over Te Horowai/Speargrass Creek and enter the forest",
+     "ref": "T40"
+    },
+    {
+     "name": "Mount Robert car park",
+     "quote": "climbing gradually for some distance to Mount Robert car park",
+     "ref": null
+    },
+    {
+     "name": "Mount Robert Road",
+     "quote": "down Mount Robert Road to St Arnaud village",
+     "ref": null,
+     "how": "road"
+    }
+   ],
+   "direction": null,
+   "time": "4 - 7 days",
+   "distance": "80 km loop",
+   "evidence": [
+    "The circuit is best walked as described below because crossing the Poukirikiri/Travers Saddle is easier from the Travers side.",
+    "### St Arnaud to Lakehead Hut/Coldwater Hut",
+    "From Kerr Bay: Beginning at the eastern end of the bay, the Lakehead Track wanders through forest, crossing several shallow streams and shingle screes.",
+    "From Sabine Hut there are two ways to finish the tramp: either by tramping via Speargrass Hut and the Speargrass Valley, or taking the Rotoroa Water Taxi to Rotoroa village.",
+    "From here, it is 1 hr 30 min down Mount Robert Road to St Arnaud village."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Kerr Bay",
+   "quote": "From Kerr Bay: Beginning at the eastern end of the bay",
+   "ref": "T23",
+   "onto": "Lakehead Track"
+  },
+  {
+   "name": "West Bay",
+   "quote": "From West Bay: Walk up Mount Robert Road",
+   "ref": "T46",
+   "onto": "Mount Robert Road"
+  },
+  {
+   "name": "head of Lake Rotoiti",
+   "quote": "water taxi to the head of Lake Rotoiti to start their trip",
+   "ref": null,
+   "onto": null
+  }
+ ],
+ "exits": [
+  {
+   "name": "Rotoroa village",
+   "quote": "taking the Rotoroa Water Taxi to Rotoroa village",
+   "ref": null,
+   "from": "Sabine Hut",
+   "how": "boat"
+  }
+ ],
+ "side_trips": [
+  {
+   "name": "Hukere Stream",
+   "quote": "Hukere Stream, 4 hr",
+   "ref": "T21",
+   "from": "junction with the Travers Track"
+  },
+  {
+   "name": "Hopeless Hut",
+   "quote": "Follow the river to Hopeless Hut",
+   "ref": "L2",
+   "from": null
+  },
+  {
+   "name": "Cupola Hut",
+   "quote": "A strenuous climb leads to the lofty perch of Cupola Hut",
+   "ref": "L3",
+   "from": null
+  },
+  {
+   "name": "Rotomairewhenua/Blue Lake",
+   "quote": "Head upstream from the West Branch Sabine swing bridge",
+   "ref": null,
+   "from": "West Branch Sabine swing bridge"
+  },
+  {
+   "name": "Rotomaninitua/Lake Angelus via Mount Cedric",
+   "quote": "The track begins behind Sabine Hut and climbs very steeply",
+   "ref": "T34",
+   "from": "Sabine Hut"
+  },
+  {
+   "name": "Travers Falls",
+   "quote": "to Travers Falls",
+   "ref": "T41",
+   "from": null
+  },
+  {
+   "name": "Whisky Falls",
+   "quote": "The short diversion to Whisky Falls is worthwhile.",
+   "ref": "T48",
+   "from": null
+  }
+ ],
+ "huts": [
+  {
+   "name": "Lakehead Hut",
+   "quote": "Lakehead Hut is 15 min on from the jetty.",
+   "ref": "T28"
+  },
+  {
+   "name": "John Tait Hut",
+   "quote": "emerge to the welcome sight of John Tait Hut",
+   "ref": "T22"
+  },
+  {
+   "name": "Upper Travers Hut",
+   "quote": "where Upper Travers Hut nestles at the base of the east face of Mount Travers.",
+   "ref": "T45"
+  },
+  {
+   "name": "West Sabine Hut",
+   "quote": "heading upstream a short distance to West Sabine Hut",
+   "ref": "T47"
+  },
+  {
+   "name": "Sabine Hut",
+   "quote": "Easy walking leads to Sabine Hut",
+   "ref": "T35"
+  },
+  {
+   "name": "Speargrass Hut",
+   "quote": "from where it descends to a clearing above Speargrass Hut",
+   "ref": "T38"
+  },
+  {
+   "name": "Coldwater Hut",
+   "quote": "Coldwater Hut",
+   "ref": "T16"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Coldwater Hut",
+   "quote": "Follow the lake shore to Coldwater Hut",
+   "ref": "T16",
+   "why": "other"
+  },
+  {
+   "name": "Hopeless Hut",
+   "quote": "Follow the river to Hopeless Hut",
+   "ref": "L2",
+   "why": "side trip"
+  },
+  {
+   "name": "Cupola Hut",
+   "quote": "A strenuous climb leads to the lofty perch of Cupola Hut",
+   "ref": "L3",
+   "why": "side trip"
+  },
+  {
+   "name": "Blue Lake Hut",
+   "quote": "a high basin containing Blue Lake Hut",
+   "ref": null,
+   "why": "side trip"
+  },
+  {
+   "name": "Mount Travers",
+   "quote": "Mount Travers can be glimpsed",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Mount Hopeless",
+   "quote": "superb views of Mount Hopeless",
+   "ref": "T30",
+   "why": "view"
+  },
+  {
+   "name": "Lake Rotoroa",
+   "quote": "expansive views over Lake Rotoroa",
+   "ref": "T27",
+   "why": "view"
+  },
+  {
+   "name": "Angelus Hut tracks and routes",
+   "quote": "More about Angelus Hut tracks and routes",
+   "ref": "L1",
+   "why": "other walk"
+  },
+  {
+   "name": "Blue Lake Track",
+   "quote": "Blue Lake Track",
+   "ref": "T1",
+   "why": "other walk"
+  },
+  {
+   "name": "Te Araroa Trail",
+   "quote": "This track is part of Te Araroa Trail.",
+   "ref": null,
+   "why": "other"
+  }
+ ],
+ "doubts": "The circuit starts and ends at St Arnaud (the heading and the final walk down Mount Robert Road to St Arnaud village); Kerr Bay and West Bay are alternative starts on the first leg, given as access points, and the Coldwater Hut leg from West Bay is not the main way. The page's first leg from Kerr Bay is taken as the main route, which then reaches Lakehead Hut. The Mount Robert car park and Howard Saddle are named on the way without features; the car park is not matched to a road end. The Mount Robert Road walk is given as a road how because the text says 'down Mount Robert Road' on foot. The 'Hukere Stream' side trip is named by its heading; its destination is Rotomaninitua/Lake Angelus, and its from is the junction with the Travers Track, which is not clearly on the main way. The 'Blue Lake' side trip's from is the West Branch Sabine swing bridge, which the main way crosses near West Sabine Hut. Only the Travers River crossing near Upper Travers Hut is given without a how; the page does not say whether the river crossings are fords. The Travers Falls and Whisky Falls side trips have no stated from. The time and distance are DOC's (4 - 7 days, 80 km loop)."
+}

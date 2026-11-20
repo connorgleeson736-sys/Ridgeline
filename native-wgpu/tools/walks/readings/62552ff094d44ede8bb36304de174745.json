@@ -1,0 +1,223 @@
+{
+ "guid": "62552ff0-94d4-4ede-8bb3-6304de174745",
+ "kind": "loop",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "North West Circuit from Halfmoon Bay",
+   "shape": "loop",
+   "start": {
+    "name": "Halfmoon Bay",
+    "quote": "Halfmoon Bay",
+    "ref": "T20"
+   },
+   "end": {
+    "name": "Halfmoon Bay",
+    "quote": "Halfmoon Bay",
+    "ref": "T20"
+   },
+   "via": [
+    {
+     "name": "road to Horseshoe Bay",
+     "quote": "Follow the road to Horseshoe Bay",
+     "ref": null,
+     "how": "road"
+    },
+    {
+     "name": "Horseshoe Bay",
+     "quote": "Horseshoe Bay",
+     "ref": "T22"
+    },
+    {
+     "name": "Lee Bay",
+     "quote": "Lee Bay",
+     "ref": "T26"
+    },
+    {
+     "name": "Little River",
+     "quote": "Little River",
+     "ref": "T28"
+    },
+    {
+     "name": "Maori Beach",
+     "quote": "Maori Beach",
+     "ref": "T32"
+    },
+    {
+     "name": "Port William Hut",
+     "quote": "Port William Hut",
+     "ref": "L3"
+    },
+    {
+     "name": "Bungaree Hut",
+     "quote": "Bungaree Hut",
+     "ref": "L4"
+    },
+    {
+     "name": "Murray River",
+     "quote": "Murray River",
+     "ref": "T38",
+     "how": "ford"
+    },
+    {
+     "name": "Christmas Village Hut",
+     "quote": "Christmas Village Hut",
+     "ref": "L5"
+    },
+    {
+     "name": "Yankee River Hut",
+     "quote": "Yankee River Hut",
+     "ref": "L6"
+    },
+    {
+     "name": "Long Harry Hut",
+     "quote": "Long Harry Hut",
+     "ref": "L7"
+    },
+    {
+     "name": "river at East Ruggedy Beach",
+     "quote": "a river crossing",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "East Ruggedy Hut",
+     "quote": "East Ruggedy Hut",
+     "ref": "L8"
+    },
+    {
+     "name": "Big Hellfire Hut",
+     "quote": "Big Hellfire Hut",
+     "ref": "L9"
+    },
+    {
+     "name": "Mason Bay",
+     "quote": "Mason Bay",
+     "ref": "T33"
+    },
+    {
+     "name": "Mason Bay Hut",
+     "quote": "Mason Bay Hut",
+     "ref": "L10"
+    },
+    {
+     "name": "Freshwater Hut",
+     "quote": "Freshwater Hut",
+     "ref": "L11"
+    },
+    {
+     "name": "North Arm Hut",
+     "quote": "North Arm Hut",
+     "ref": "L12"
+    },
+    {
+     "name": "Kaipipi Road",
+     "quote": "the former Kaipipi Road",
+     "ref": null,
+     "how": "road"
+    }
+   ],
+   "direction": null,
+   "time": "9 - 11 days",
+   "distance": "125 km loop",
+   "evidence": [
+    "### Halfmoon Bay to Port William Hut",
+    "### North Arm Hut to Halfmoon Bay",
+    "From there it follows the former Kaipipi Road to Halfmoon Bay."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Mason Bay beach",
+   "quote": "fly in to Mason Bay beach (tide dependent)",
+   "ref": "T33",
+   "onto": "walk through to Freshwater River"
+  }
+ ],
+ "exits": [
+  {
+   "name": "water taxi from Freshwater Landing",
+   "quote": "A water taxi pick-up from Freshwater Landing back to Oban can be arranged before you set off.",
+   "ref": null,
+   "from": "Freshwater Hut",
+   "how": "boat"
+  },
+  {
+   "name": "Rakiura Track turn-off to North Arm",
+   "quote": "the Rakiura Track turn-off to North Arm",
+   "ref": "T3",
+   "from": "Maori Beach",
+   "how": "track"
+  }
+ ],
+ "side_trips": [
+  {
+   "name": "Mt. Anglem/Hananui",
+   "quote": "Side trip: Christmas Village Hut to Mt. Anglem/Hananui",
+   "ref": "T2",
+   "from": "Christmas Village Hut"
+  },
+  {
+   "name": "Rocky Mountain Track",
+   "quote": "Side trip: Rocky Mountain Track",
+   "ref": "T4",
+   "from": "Freshwater Hut"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Port William Hut",
+   "quote": "Port William Hut",
+   "ref": "L3"
+  },
+  {
+   "name": "Bungaree Hut",
+   "quote": "Bungaree Hut",
+   "ref": "L4"
+  },
+  {
+   "name": "Christmas Village Hut",
+   "quote": "Christmas Village Hut",
+   "ref": "L5"
+  },
+  {
+   "name": "Yankee River Hut",
+   "quote": "Yankee River Hut",
+   "ref": "L6"
+  },
+  {
+   "name": "Long Harry Hut",
+   "quote": "Long Harry Hut",
+   "ref": "L7"
+  },
+  {
+   "name": "East Ruggedy Hut",
+   "quote": "East Ruggedy Hut",
+   "ref": "L8"
+  },
+  {
+   "name": "Big Hellfire Hut",
+   "quote": "Big Hellfire Hut",
+   "ref": "L9"
+  },
+  {
+   "name": "Mason Bay Hut",
+   "quote": "Mason Bay Hut",
+   "ref": "L10"
+  },
+  {
+   "name": "Freshwater Hut",
+   "quote": "Freshwater Hut",
+   "ref": "L11"
+  },
+  {
+   "name": "North Arm Hut",
+   "quote": "North Arm Hut",
+   "ref": "L12"
+  }
+ ],
+ "not_on_route": [],
+ "doubts": "Direction is not stated. The page text says the Rakiura Track turn-off to North Arm is passed after Maori Beach; recorded as an exit (track). Water taxi exit is from Freshwater Landing (placed at Freshwater Hut by my inference). The East Ruggedy river crossing and Murray River are fords; Yankee and Smoky Rivers have swing bridges so not fords. Smoky River may be waded optionally; not recorded."
+}

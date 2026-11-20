@@ -1,0 +1,120 @@
+{
+ "guid": "6404b2da-6883-4b0c-920c-0b1296855bc2",
+ "kind": "out_and_back",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Historic Walkway to Waikino",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Karangahake Hall",
+    "quote": "Karangahake Hall",
+    "ref": null
+   },
+   "end": {
+    "name": "Waikino Station",
+    "quote": "Waikino Station",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Western Portal Bridge",
+     "quote": "Western Portal Bridge",
+     "ref": null
+    },
+    {
+     "name": "rail tunnel",
+     "quote": "1100 m former rail tunnel",
+     "ref": null
+    },
+    {
+     "name": "Eastern Portal Bridge",
+     "quote": "Eastern Portal Bridge",
+     "ref": null
+    },
+    {
+     "name": "Owharoa Falls",
+     "quote": "Owharoa Falls",
+     "ref": "T8"
+    },
+    {
+     "name": "Victoria Battery",
+     "quote": "Victoria Battery",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "4 hr return",
+   "distance": "4.3 km",
+   "evidence": [
+    "The walkway follows the railway line through the gorge and then opens out alongside the Ohinemuri River, passing through the huge Victoria Battery complex and terminating at the Waikino Station where a cafe and train rides can be investigated.",
+    "Return the same way or have your friends pick you up!",
+    "Starting at Karangahake Hall, walk through the foundations of the Crown Battery before climbing up onto the Western Portal Bridge over the river."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Rail Tunnel Loop",
+   "shape": "loop",
+   "start": {
+    "name": "Karangahake Hall",
+    "quote": "Karangahake Hall",
+    "ref": null
+   },
+   "end": {
+    "name": "Karangahake Hall",
+    "quote": "Karangahake Hall",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Crown Battery",
+     "quote": "Crown Battery",
+     "ref": null
+    },
+    {
+     "name": "Western Portal Bridge",
+     "quote": "Western Portal Bridge",
+     "ref": null
+    },
+    {
+     "name": "rail tunnel",
+     "quote": "1100 m former rail tunnel",
+     "ref": null
+    },
+    {
+     "name": "Eastern Portal Bridge",
+     "quote": "Eastern Portal Bridge",
+     "ref": null
+    },
+    {
+     "name": "Ohinemuri River",
+     "quote": "downstream along the river",
+     "ref": "T7"
+    }
+   ],
+   "direction": null,
+   "time": "45 min return",
+   "distance": "2.5 km",
+   "evidence": [
+    "Starting at Karangahake Hall, walk through the foundations of the Crown Battery before climbing up onto the Western Portal Bridge over the river.",
+    "From here there is a choice of completing the loop back to Karangahake, by walking downstream along the river, or you can choose to continue on the Historic Walkway by going upstream towards Waikino."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Karangahake Domain Car Park",
+   "quote": "Karangahake Domain Car Park on SH2",
+   "ref": null,
+   "onto": null
+  }
+ ],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [],
+ "doubts": "Page describes the walkway in two sections; the Historic Walkway section itself starts at the Eastern Portal Bridge, but the full walkway is taken as starting at Karangahake Hall (where the page says to park and start the loop). The 4 hr return time and 4.3 km are the section's own figures. Victoria Battery 'short walk through the remains' is on the way to Waikino Station; the separate Victoria Battery Site heading is a walk from the cafe."
+}

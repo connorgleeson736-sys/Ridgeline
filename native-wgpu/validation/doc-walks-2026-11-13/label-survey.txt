@@ -1,0 +1,73 @@
+== Gillespie Pass Circuit [3 - 4 days · Advanced tramping track · 56 km loop] DOC line 64.9 km; legs 5 (route 51.1 km); walk 51.1 km (DOC's legs); summary line 51.1 km; intro true; photo true
+   Wilkin Valley Track (24.5 km on DOC's line): own name, opens 'Wilkin Valley tracks' 24.5 km
+   Gillespie Pass Circuit Track (22.5 km on DOC's line): named 'Gillespie Pass Circuit' below z15 22.5 km
+   Siberia Track (9.5 km on DOC's line): named 'Gillespie Pass Circuit' below z15 9.5 km
+   Blue-Young Link Track (5.7 km on DOC's line): named 'Gillespie Pass Circuit' below z15 5.7 km
+   Blue Pools Walk (1.5 km on DOC's line): own name, opens 'Blue Pools Track' 1.5 km
+== Rees-Dart Track [4-5 days one way · Advanced tramping track · 63 km one way] DOC line 59.9 km; legs 3 (route 17.8 km); walk 59.9 km (DOC's line, end to end); summary line 59.9 km; intro true; photo true
+   Dart Track (37.3 km on DOC's line): named 'Rees-Dart Track' below z15 37.3 km
+   Rees Track (20.0 km on DOC's line): named 'Rees-Dart Track' below z15 20.0 km
+   Rees-Dart Track (1.9 km on DOC's line): named 'Rees-Dart Track' below z15 1.9 km
+== Milford Track [4 days · Intermediate tramping track · 53.5 km one way] DOC line 52.0 km; legs 4 (route 51.4 km); walk 51.4 km (DOC's legs); summary line 51.4 km; intro true; photo true
+   Milford Track (50.2 km on DOC's line): named 'Milford Track' below z15 50.2 km
+   (unnamed) (0.1 km on DOC's line): own name, opens 'Milford Track' 0.1 km
+== Wilkin Valley - East Matukituki Traverse [7 - 10 hr · Expert route · ] DOC line 38.3 km; legs 2 (route 33.3 km); walk 33.3 km (DOC's legs); summary line 33.3 km; intro true; photo true
+   East Matukituki Track (16.8 km on DOC's line): named 'Wilkin Valley - East Matukituki Traverse' below z15 13.5 km; own name, opens 'Kitchener Track to Aspiring Flats' 3.3 km
+   Rabbit Pass Route (14.4 km on DOC's line): named 'Wilkin Valley - East Matukituki Traverse' below z15 14.4 km
+   South Branch Wilkin Track (2.9 km on DOC's line): named 'Wilkin Valley - East Matukituki Traverse' below z15 2.9 km
+   Kitchener Track (1.4 km on DOC's line): own name, opens 'Kitchener Track to Aspiring Flats' 1.4 km
+   (unnamed) (0.1 km on DOC's line): own name, opens 'Kitchener Track to Aspiring Flats' 0.1 km
+== Kepler Track [3-4 days · Intermediate tramping track · 60 km loop] DOC line 59.5 km; legs 6 (route 59.5 km); walk 59.5 km (DOC's legs); summary line 59.5 km; intro true; photo true
+   Kepler Track (56.1 km on DOC's line): named 'Kepler Track' below z15 56.1 km
+   Iris Burn Falls Track (1.3 km on DOC's line): own name, opens 'Kepler Track' 1.3 km
+   (unnamed) (0.2 km on DOC's line): own name, opens 'Kepler Track: Rainbow Reach to Shallow Bay or Moturau Hut' 0.2 km
+== Routeburn Track [2-4 days · Intermediate tramping track · 33 km one way] DOC line 32.3 km; legs 4 (route 19.9 km); walk 32.3 km (DOC's whole line); summary line 33.3 km; intro true; photo true
+   Routeburn Track (28.6 km on DOC's line): named 'Routeburn Track' below z15 28.6 km
+   Routeburn Nature Walk (2.3 km on DOC's line): own name, opens 'Routeburn Nature Walk' 2.3 km
+== Tongariro Northern Circuit [3-4 days · Intermediate tramping track · 35.5 km one way] DOC line 32.5 km; legs 6; walk 32.7 km (DOC's line, end to end); summary line 32.7 km; intro true; photo true
+   Waihohonu-Oturere Track (12.7 km on DOC's line): named 'Tongariro Northern Circuit' below z15 12.7 km
+   Tongariro Northern Circuit (8.6 km on DOC's line): named 'Tongariro Northern Circuit' below z15 8.6 km
+   Tongariro Crossing (7.4 km on DOC's line): named 'Tongariro Alpine Crossing' below z15 7.4 km
+   Tama Lakes Track (1.8 km on DOC's line): own name, opens 'Tama Lakes Track' 1.8 km
+   Tongariro Alpine Crossing (0.3 km on DOC's line): named 'Tongariro Alpine Crossing' below z15 0.3 km
+   Mangatepopo Track (0.0 km on DOC's line): named 'Tongariro Alpine Crossing' below z15 0.0 km
+== Abel Tasman Coast Track [3–5 days one way · Intermediate tramping track · 60 km one way] DOC line 54.3 km; legs 7 (route 54.8 km); walk 54.8 km (DOC's legs); summary line 54.8 km; intro true; photo true
+   Coast Track (38.9 km on DOC's line): named 'Abel Tasman Coast Track' below z15 37.7 km; named 'Inland Track' below z15 1.0 km; own name, opens 'Tōtaranui to Waiharakeke Bay' 0.3 km
+   Anapai Bay Track (8.1 km on DOC's line): named 'Abel Tasman Coast Track' below z15 8.1 km
+   Inland Track (2.4 km on DOC's line): named 'Inland Track' below z15 2.4 km
+   Inland  Track (2.1 km on DOC's line): named 'Abel Tasman Coast Track' below z15 2.1 km
+   Stilwell Bay Track (0.1 km on DOC's line): named 'Abel Tasman Coast Track' below z15 0.1 km
+   Abel Tasman Coast Track (0.0 km on DOC's line): named 'Abel Tasman Coast Track' below z15 0.0 km
+   Falls River Track (0.0 km on DOC's line): named 'Abel Tasman Coast Track' below z15 0.0 km
+== Travers-Sabine Circuit [4 - 7 days · Advanced tramping track · 80 km loop] DOC line 85.1 km; legs 6; walk 85.1 km (DOC's whole line); summary line 86.4 km; intro true; photo true
+   Upper Travers Valley Track (15.2 km on DOC's line): named 'Travers-Sabine Circuit' below z15 15.2 km
+   Sabine Track (13.3 km on DOC's line): named 'Travers-Sabine Circuit' below z15 13.3 km
+   Lakehead Track (12.0 km on DOC's line): named 'Lake Rotoiti Circuit' below z15 7.4 km; named 'Travers-Sabine Circuit' below z15 4.7 km
+   Sabine-Speargrass Track (8.7 km on DOC's line): named 'Travers-Sabine Circuit' below z15 8.7 km
+   Travers Saddle Track (8.1 km on DOC's line): named 'Travers-Sabine Circuit' below z15 8.1 km
+   Lakeside Track (8.0 km on DOC's line): named 'Lake Rotoiti Circuit' below z15 8.0 km
+   Speargrass Track (6.5 km on DOC's line): own name, opens 'Speargrass Track' 6.5 km
+   Lower Travers Valley Track (5.4 km on DOC's line): named 'Travers-Sabine Circuit' below z15 5.4 km
+   Loop Track (2.6 km on DOC's line): named 'Travers-Sabine Circuit' below z15 2.6 km
+   Honeydew Track (1.2 km on DOC's line): named 'Lake Rotoiti Circuit' below z15 1.2 km
+   Hopeless Track (0.2 km on DOC's line): named 'Travers-Sabine Circuit' below z15 0.2 km
+   Speargrass Creek Route (0.1 km on DOC's line): own name, opens 'Angelus Hut via Speargrass Track and Speargrass Creek Route' 0.1 km
+   Mt Robert Viewpoint Track (0.0 km on DOC's line): own name, opens 'Angelus Hut tracks and routes' 0.0 km; named 'Travers-Sabine Circuit' below z15 0.0 km
+== Roys Peak Track [5-6 hr return · Easy to intermediate walking track · 16 km return via same track] DOC line 6.9 km; legs 0; walk 6.9 km (DOC's line, end to end); summary line 6.9 km; intro true; photo true
+   Roys Peak Track (7.3 km on DOC's line): own name, opens 'Roys Peak Track' 7.3 km
+== St James Walkway [5 days · Easy to intermediate walking track · 66 km one way] DOC line 63.1 km; legs 5 (route 62.6 km); walk 62.6 km (DOC's legs); summary line 62.6 km; intro true; photo true
+   Saint James Walkway (61.5 km on DOC's line): named 'St James Walkway' below z15 61.5 km
+   Alpine Nature Walk (0.1 km on DOC's line): own name, opens 'Alpine Nature Walk' 0.1 km
+== Heaphy Track [4-6 days · Intermediate tramping track · 78.4 km one way] DOC line 72.2 km; legs 6 (route 71.9 km); walk 71.9 km (DOC's legs); summary line 71.9 km; intro true; photo true
+   Heaphy Track (68.9 km on DOC's line): named 'Heaphy Track' below z15 68.9 km
+   (unnamed) (0.1 km on DOC's line): own name, opens 'Kōhaihai area short walks' 0.1 km
+== Paparoa Track [3 days one way · Intermediate tramping track · 55 km one way] DOC line 51.3 km; legs 4 (route 51.3 km); walk 51.3 km (DOC's legs); summary line 51.3 km; intro true; photo true
+   Paparoa Track (46.8 km on DOC's line): named 'Paparoa Track' below z15 46.8 km
+   Pororari River Track (3.0 km on DOC's line): own name, opens 'Pororari River Track' 3.0 km
+   Croesus Track (0.2 km on DOC's line): named 'Croesus Track' below z15 0.2 km
+== Queen Charlotte Track [3-5 days · Intermediate tramping track · 73.5 km one way] DOC line 67.1 km; legs 6 (route 63.2 km); walk 63.2 km (DOC's legs); summary line 63.2 km; intro true; photo true
+   Queen Charlotte Track (64.3 km on DOC's line): named 'Queen Charlotte Track' below z15 64.3 km
+   (unnamed) (0.1 km on DOC's line): own name, no DOC walk 0.1 km
+== Wilkin Valley tracks [4–5 days · Advanced tramping track · ] DOC line 32.3 km; legs 2; walk 32.8 km (DOC's line, end to end); summary line 32.8 km; intro true; photo true
+   Wilkin Valley Track (24.5 km on DOC's line): own name, opens 'Wilkin Valley tracks' 24.5 km
+   North Branch Wilkin Track (7.8 km on DOC's line): own name, opens 'Wilkin Valley tracks' 7.8 km

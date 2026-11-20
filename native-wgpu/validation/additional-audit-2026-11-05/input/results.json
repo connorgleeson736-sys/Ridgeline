@@ -1,0 +1,102 @@
+{
+  "source_head": "3f4d9b8dedf8e3c53ed24f1c148712def00d1692",
+  "source_sha256": {
+    "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/TerrainView.kt": "a6c9c823eba5562047405534dd3a43e97416f6fc863972fb921da85250f21615",
+    "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/UploadAdmission.kt": "6811bfd4f5636ba20b2dd1900760fc264837232beb2d7c8cc7a8402ed17e17d0",
+    "native-wgpu/renderer/src/adaptive.rs": "787455f6e0ca3df909837423621412670440c14a991195bfabe7eb545df83154",
+    "native-wgpu/renderer/src/lib.rs": "3438be1a46e33e8ca43fd24b2a0d46d3cbb66867a9524d0631363ba1eff98973",
+    "native-wgpu/renderer/src/android.rs": "fc6193b6cc3269be0b74700b368702a8db67e3738dc0fe8137a13b94f9a449a5",
+    "native-wgpu/renderer/src/cartography.rs": "5b7edbe6deb1bc4fd02988a553a3355e7af951f08714db9d51dd865870c251eb",
+    "native-wgpu/renderer/src/routes.rs": "2ab8b33d18a639345b4cab78ee1db3a0b1ab1f5bb3d7063c28a7661a2fd1c53a",
+    "native-wgpu/core/src/adaptive.rs": "f2139c5e5cb74cfc8dd83efd5079a44de309898ac1beeb7557bfcb3c82f8540d"
+  },
+  "cold_mesh": {
+    "scope": "policy/topology port; no GPU timing or image-parity claim",
+    "topology_cases": 18,
+    "trace": [
+      {
+        "time_ms": 0,
+        "qualified_target": 4,
+        "baseline": 1,
+        "candidate": 4
+      },
+      {
+        "time_ms": 16,
+        "qualified_target": 4,
+        "baseline": 1,
+        "candidate": 4
+      },
+      {
+        "time_ms": 100,
+        "qualified_target": 4,
+        "baseline": 1,
+        "candidate": 4
+      },
+      {
+        "time_ms": 349,
+        "qualified_target": 4,
+        "baseline": 1,
+        "candidate": 4
+      },
+      {
+        "time_ms": 350,
+        "qualified_target": 4,
+        "baseline": 4,
+        "candidate": 4
+      },
+      {
+        "time_ms": 360,
+        "qualified_target": 1,
+        "baseline": 1,
+        "candidate": 1
+      }
+    ],
+    "surface_triangles_before": 32768,
+    "surface_triangles_after": 2680,
+    "surface_reduction_percent": 91.8212890625,
+    "with_four_skirts_before": 33792,
+    "with_four_skirts_after": 3704,
+    "all_skirts_reduction_percent": 89.03882575757575
+  },
+  "overlay_delta": {
+    "scope": "synthetic byte-stream equivalence; no GPU upload timings",
+    "equivalence_cases": 101,
+    "instances": 320000,
+    "changed_patches": 1,
+    "total_patches": 32,
+    "baseline_bytes": 20480000,
+    "candidate_payload_bytes": 640000,
+    "payload_reduction_percent": 96.875,
+    "maximum_source_payload_bytes": 21333312,
+    "constraints": "Preserve path-major/cover-major order, alpha, phase, anchors and generation. Draw metadata/call overhead not counted; arena allocator/reclamation not implemented."
+  },
+  "scheduling": {
+    "scope": "explicit event schedules; NOT measured Android timings",
+    "worker_ready_ms": 7,
+    "frame_return_ms": 6,
+    "polling_callback_ms": 50.0,
+    "completion_wake_callback_ms": 16.666666666666668,
+    "example_overlay_submission_improvement_ms": 33.33333333333333,
+    "late_pose_example": {
+      "acquire_resume_ms": 12,
+      "new_input_ms": 8,
+      "baseline_pose": "A",
+      "candidate_pose": "B"
+    },
+    "one_refresh_ms": {
+      "60Hz": 16.666666666666668,
+      "90Hz": 11.11111111111111,
+      "120Hz": 8.333333333333334
+    }
+  },
+  "upload_admission": {
+    "scope": "admission-predicate counterexample; 20 ms is a chosen input, not a measured tile cost",
+    "optional_upload_predicted_ns": 20000000,
+    "real_allowance_ns": 0,
+    "forced_allowance_ns": 1,
+    "baseline_admits_optional": true,
+    "candidate_admits_optional": false,
+    "current_cap_bytes": 665600,
+    "fix": "Use a real deadline and actual display interval, check predicted cost including the first optional upload; reserve explicit urgent coverage exception and starvation policy."
+  }
+}

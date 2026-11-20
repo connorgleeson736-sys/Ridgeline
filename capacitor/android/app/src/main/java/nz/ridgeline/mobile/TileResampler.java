@@ -6,13 +6,18 @@ import java.io.IOException;
 
 /** Enlarge saved ancestor detail without inventing elevation or changing RGB encoding. */
 final class TileResampler {
+  record Parent(byte[] data, int z, int x, int y) {}
   static byte[] parent(TileArchive archive, TileAddress request) throws IOException {
+    Parent p=parentWithSource(archive,request);
+    return p==null?null:p.data();
+  }
+  static Parent parentWithSource(TileArchive archive, TileAddress request) throws IOException {
     if (!request.raster() || request.z < 1) return null;
     for (int z = request.z - 1; z >= 0; z--) {
       int shift = request.z - z;
       TileAddress p = TileAddress.tile(request.kind, z, request.x >> shift, request.y >> shift);
       byte[] bytes = archive.read(p);
-      if (bytes != null) return crop(bytes, request, shift);
+      if (bytes != null) return new Parent(crop(bytes, request, shift), z, p.x, p.y);
     }
     return null;
   }

@@ -1,0 +1,1 @@
+{"scope":"Production transport cancellation replay: 8 active plus 64 queued obsolete sources. Backend network admissions, not TCP requests, bytes or phone latency.","beforeAdmissions":72,"afterAdmissions":8,"unnecessaryAdmissionsBefore":64,"unnecessaryAdmissionsAfter":0,"freshFocusAdmitted":true}

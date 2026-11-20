@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="nz.ridgeline.nativeapp.PreparedShortcutTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-11-01T05:48:00.884Z" hostname="bc071fb25b4a" time="1.287">
+  <properties/>
+  <testcase name="adoptionRejectsChangedProvenanceAndGenerationAndCancellationKeepsRealReadCaps" classname="nz.ridgeline.nativeapp.PreparedShortcutTest" time="0.026"/>
+  <testcase name="benchmarkValidLateFileBeatsLongSourceRebuildAndKeepsExactBytes" classname="nz.ridgeline.nativeapp.PreparedShortcutTest" time="1.26"/>
+  <system-out><![CDATA[{"scope":"Production PreparedShortcut, DerivedReadGate and real lossless PreparedTerrainCache file. File released at 40 ms, ordinary cache deadline 12 ms, injected fallback-source service 350 ms. Host critical-path fixture, not phone latency.","beforeMs":[367.56557, 363.223311, 363.162464],"afterMs":[41.986294, 40.871914, 42.935099],"beforeMedianMs":363.223311,"afterMedianMs":41.986294,"savedMedianMs":321.23701700000004,"samePreparedBytes":true,"dependenciesRechecked":true}
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

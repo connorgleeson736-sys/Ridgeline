@@ -1,0 +1,12 @@
+{
+  "reference": "android-preview-download /0.18.0 Full",
+  "source": "d880143418ac46ece98adff0b3b2fbaedf044d46",
+  "apkSha256": "b4d286f5d6835447237eecaa15d5ee9a8bdf2870d56133c699f0b9ec3a173ffd",
+  "directDefault": true,
+  "cookSubstitution": false,
+  "exactGapEntries": 630,
+  "exactCoarseCoordinates": 58,
+  "exactCoarsePhotoFiles": 67,
+  "exactOriginalPackPayloads": 6,
+  "scope": "Packaged reference routing/assets, not real-terrain visual parity"
+}

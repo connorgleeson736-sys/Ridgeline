@@ -1,0 +1,84 @@
+//! Cloud CPU workload only. Does not predict phone FPS or download completion.
+use ridgeline_renderer::{
+    mercator,
+    selection::{View, plan, plan_with_target},
+};
+fn main() {
+    for (label, width, height, zoom) in [
+        ("logical", 411, 731, 11.9),
+        ("physical", 1080, 1920, 11.9 + 2.625f64.log2()),
+    ] {
+        let ids = plan(
+            &View {
+                width,
+                height,
+                center: mercator(170.14219572, -43.5955671),
+                zoom,
+                bearing: -24.,
+                pitch: 58.,
+                elevation: 3724.,
+            },
+            96,
+        );
+        let mut levels = std::collections::BTreeMap::new();
+        for id in &ids {
+            *levels.entry(id.z).or_insert(0) += 1;
+        }
+        println!(
+            "Selection basis {label}: {} tiles, zooms {levels:?}",
+            ids.len()
+        );
+    }
+    let view = View {
+        width: 411,
+        height: 731,
+        center: mercator(170.14219572, -43.5955671),
+        zoom: 11.9,
+        bearing: -24.,
+        pitch: 58.,
+        elevation: 3724.,
+    };
+    for (label, target, ceiling, budget) in [
+        ("independent geometry", 431., 22, 64),
+        ("independent images", 256. / 2f64.powf(0.25), 19, 128),
+    ] {
+        let ids = plan_with_target(&view, budget, target, ceiling);
+        let mut levels = std::collections::BTreeMap::new();
+        for id in &ids {
+            *levels.entry(id.z).or_insert(0) += 1;
+        }
+        println!(
+            "Raw visible leaf selection {label}: {} tiles, zooms {levels:?}; excludes fallback ancestors",
+            ids.len()
+        );
+    }
+    let mut times = Vec::new();
+    let mut counts = Vec::new();
+    for i in 0..600 {
+        let view = View {
+            width: 1080,
+            height: 1920,
+            center: mercator(170.14219572 + (i % 50) as f64 * 0.0001, -43.5955671),
+            zoom: 13.3 + (i % 20) as f64 * 0.02,
+            bearing: -24. + (i % 80) as f32,
+            pitch: 58.,
+            elevation: 3724.,
+        };
+        let start = std::time::Instant::now();
+        let ids = std::hint::black_box(plan(&view, 96));
+        if i >= 100 {
+            times.push(start.elapsed().as_secs_f64() * 1e6);
+            counts.push(ids.len());
+        }
+    }
+    times.sort_by(f64::total_cmp);
+    counts.sort();
+    println!(
+        "{{\"scope\":\"warmed cloud CPU / native quadtree selection only, not phone speed\",\"samples\":{},\"medianUs\":{},\"p95Us\":{},\"minTiles\":{},\"maxTiles\":{},\"budget\":96}}",
+        times.len(),
+        times[times.len() / 2],
+        times[times.len() * 95 / 100],
+        counts[0],
+        counts[counts.len() - 1]
+    );
+}

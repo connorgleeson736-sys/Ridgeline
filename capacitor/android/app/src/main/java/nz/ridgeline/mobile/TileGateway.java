@@ -10,7 +10,7 @@ import java.util.Map;
 
 final class TileGateway {
   private final TileRequestRegistry requests;
-  private final ConnectivityManager connectivity;
+  private final TileConnectivity connectivity;
   private final Context context;
 
   TileGateway(Context context) {
@@ -20,12 +20,11 @@ final class TileGateway {
   TileGateway(Context context, TileRequestRegistry requests) {
     this.context = context.getApplicationContext();
     this.requests = requests;
-    connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+    connectivity = TileConnectivity.get(context);
   }
 
   private boolean connected() {
-    NetworkCapabilities caps = connectivity.getNetworkCapabilities(connectivity.getActiveNetwork());
-    return caps != null && caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+    return connectivity.connected();
   }
 
   public WebResourceResponse intercept(WebResourceRequest request) {
@@ -55,8 +54,9 @@ final class TileGateway {
     try {
       if (demand.cancelled()) return response(499, "text/plain", new byte[0]);
       TileArchive archive = TileArchive.get(context);
-      byte[] data = archive.read(tile);
-      if (data != null) return response(200, tile.mime(), data);
+      TileAddress saved = tile.saved();
+      byte[] data = archive.read(saved);
+      if (data != null) return response(200, saved.mime(), data);
       int failure = 404;
       String retryAfter = null;
       if (!"1".equals(header(request, "X-Ridge-Only-Saved"))
@@ -83,8 +83,16 @@ final class TileGateway {
             retryAfter = ((TileNetwork.HttpFailure) e).retryAfter;
         }
       if (demand.cancelled()) return response(499, "text/plain", new byte[0]);
-      data = TileResampler.parent(archive, tile);
-      if (data != null) return response(200, "image/png", data, "no-store", null);
+      TileResampler.Parent parent = TileResampler.parentWithSource(archive, saved);
+      if (parent != null) {
+        Map<String,String> h=headers("no-store",retryAfter);
+        h.put("X-Ridge-Fallback",parent.z()+"/"+parent.x()+"/"+parent.y());
+        boolean retry=!archive.offlineOnly() && (!connected()
+            || "1".equals(header(request,"X-Ridge-Only-Saved"))
+            || failure==408 || failure==429 || failure>=500);
+        h.put("X-Ridge-Fallback-Retry",retry?"1":"0");
+        return new WebResourceResponse("image/png",null,200,"OK",h,new ByteArrayInputStream(parent.data()));
+      }
       return response(
           failure,
           "text/plain",

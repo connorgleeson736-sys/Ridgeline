@@ -1,0 +1,119 @@
+{
+ "guid": "5b553a8c-0a3f-48dc-95b6-a52300294cca",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Kapowairua (Spirits Bay) to Te Paki Stream",
+   "shape": "one_way",
+   "start": {
+    "name": "Kapowairua (Spirits Bay)",
+    "quote": "Kapowairua (Spirits Bay)",
+    "ref": "T5"
+   },
+   "end": {
+    "name": "Te Paki Stream",
+    "quote": "Te Paki Stream",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Waitahora Lagoon",
+     "quote": "Waitahora Lagoon",
+     "ref": "T14"
+    },
+    {
+     "name": "Pandora",
+     "quote": "Pandora",
+     "ref": "T7"
+    },
+    {
+     "name": "Tapotupotu Bay",
+     "quote": "Tapotupotu Bay",
+     "ref": "T9"
+    },
+    {
+     "name": "Sandy Bay",
+     "quote": "Sandy Bay",
+     "ref": "T8"
+    },
+    {
+     "name": "Cape Reinga/Te Rerenga Wairua",
+     "quote": "Cape Reinga/Te Rerenga Wairua",
+     "ref": "T4"
+    },
+    {
+     "name": "Te Werahi Beach",
+     "quote": "Te Werahi Beach",
+     "ref": "T13"
+    },
+    {
+     "name": "Twilight Beach",
+     "quote": "Twilight Beach",
+     "ref": null
+    },
+    {
+     "name": "Te-Oneroa-a-Tōhē/Ninety Mile Beach",
+     "quote": "Te-Oneroa-a-Tōhē/Ninety Mile Beach",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "4-5 days, see individual track descriptions for times",
+   "distance": "48 km total one way",
+   "evidence": [
+    "The track follows the coastline from Kapowairua (Spirits Bay) on the North-eastern Coast, past Cape Reinga/Te Rerenga Wairua (where the Te Araroa Trail starts) and finishes at Te Paki Stream on the West Coast.",
+    "The track ends here."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Tapotupotu",
+   "quote": "Tapotupotu – turn off SH1 2 km south of Te Rerenga Wairua",
+   "ref": "T9",
+   "onto": "Te Paki Coastal Track"
+  },
+  {
+   "name": "Cape Reinga/Te Rerenga Wairua",
+   "quote": "Cape Reinga/Te Rerenga Wairua – follow SH1 north",
+   "ref": "T4",
+   "onto": "Te Paki Coastal Track"
+  }
+ ],
+ "exits": [
+  {
+   "name": "Pandora Track towards SH1",
+   "quote": "head towards SH1 via the Pandora Track",
+   "ref": null,
+   "from": "junction between Pandora and Tapotupotu Bay",
+   "how": "track"
+  },
+  {
+   "name": "road to Waitiki from Te Paki Stream parking area",
+   "quote": "It is approximately 9 km to Waitiki via the road from here.",
+   "ref": null,
+   "from": "Te Paki Stream",
+   "how": "road"
+  }
+ ],
+ "side_trips": [
+  {
+   "name": "Cape Maria Van Diemen",
+   "quote": "a side trip to Cape Maria Van Diemen",
+   "ref": "T2",
+   "from": "Te Werahi Beach"
+  }
+ ],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Ahipara",
+   "quote": "Ahipara",
+   "ref": null,
+   "why": "other"
+  }
+ ],
+ "doubts": "Four campsites are mentioned but not named, so no huts. Te Paki Stream end (parking area) has no matching entry. Quotes for access points are as in the text (Tapotupotu quote uses an en dash). Via order follows section headings. Cape Reinga ref T4 (coast) chosen over T3 (place). Section 'Cape Reinga to Te Werahi Beach Track' is 2 km return, treated as part of the way."
+}

@@ -1,0 +1,60 @@
+{
+ "guid": "1377f392-77cb-4d71-877e-a1166ed194e1",
+ "kind": "out_and_back",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Whangārei Heads Road to Motukiore Island",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Whangārei Heads Road, just past the Pines Golf Course",
+    "quote": "Whangārei Heads Road",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Motukiore Island",
+    "quote": "Motukiore Island",
+    "ref": "T3"
+   },
+   "via": [
+    {
+     "name": "mangroves",
+     "quote": "mangroves",
+     "ref": null
+    },
+    {
+     "name": "sandspit",
+     "quote": "sandspit",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "2hr 30 min",
+   "distance": null,
+   "evidence": [
+    "The track starts off Whangārei Heads Road just past the Pines Golf Course.",
+    "The sandspit out to the island is walkable at low tide only.",
+    "Crossing is only possible up to 2 hours either side of low tide."
+   ]
+  }
+ ],
+ "access_points": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Pines Golf Course",
+   "quote": "Pines Golf Course",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "Manganese Point",
+   "quote": "Manganese Point",
+   "ref": "T2",
+   "why": "nearby"
+  }
+ ],
+ "doubts": "The text does not say explicitly that you return the same way; out and back is inferred from the island being reached only by the tidal sandspit. On the island you 'can roam as you like' between the pā at the southern end and the homestead site at the northern end, so the turning point is just the island. The carpark is 200 m beyond where the track starts; the start ref is the road end where Motukiore Track meets Whangārei Heads Road."
+}

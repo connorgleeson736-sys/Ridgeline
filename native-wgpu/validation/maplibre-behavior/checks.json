@@ -1,0 +1,21 @@
+{
+  "sourceCheckpoint": "40d278887128b50a6c8bb8209683ed4580b6068f",
+  "scope": "Three focused gesture tests pass; Kotlin compilation and all three optimized JNI ABIs/build pass. Vulkan/GLES shared-grid checks and dedicated CPU terrain-clearance/payload checks pass. Signature and normal Base payload verified. No new Android runtime/phone performance or complete MapLibre-equivalence claim.",
+  "terrainPayloadBytes": {
+    "previousPerTile": 399384,
+    "currentPerTile": 66564,
+    "sharedGridOnce": 266256,
+    "gpuAllocationOverheadIncluded": false
+  },
+  "apk": {
+    "bytes": 31559809,
+    "sha256": "301488d08668ea2375263598ce44fb95678e74f4e64e135c9c912bc545208d67"
+  },
+  "phoneBenchmark": false,
+  "newAndroidRuntimeRun": false,
+  "focusedGestureTests": {
+    "tests": "3",
+    "failures": "0",
+    "errors": "0"
+  }
+}

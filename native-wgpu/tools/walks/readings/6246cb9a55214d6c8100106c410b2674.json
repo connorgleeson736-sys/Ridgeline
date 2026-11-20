@@ -1,0 +1,205 @@
+{
+ "guid": "6246cb9a-5521-4d6c-8100-106c410b2674",
+ "kind": "network",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Long Gully car park to Timaru Creek Road (complete Grandview Ridge Track)",
+   "shape": "one_way",
+   "start": {
+    "name": "Long Gully car park",
+    "quote": "Long Gully car park",
+    "ref": null
+   },
+   "end": {
+    "name": "Timaru Creek Road",
+    "quote": "Timaru Creek Road",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Grandview Ridge Track",
+     "quote": "Grandview Ridge Track",
+     "ref": "T5"
+    },
+    {
+     "name": "Pakituhi Hut",
+     "quote": "Pakituhi Hut",
+     "ref": "T16"
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": "43.5 km to exit via Breast Hill Track, 37.5 km to exit before the Breast Hill Track junction via Pakituhi Hut",
+   "evidence": [
+    "### Long Gully car park to Timaru Creek Road",
+    "This is the complete Grandview Ridge Track (previously known as Grandview Range Track) and provides great views of the upper Clutha Valley and the peaks beyond."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Long Gully car park to Nook Road carpark",
+   "shape": "one_way",
+   "start": {
+    "name": "Long Gully car park",
+    "quote": "Long Gully car park",
+    "ref": null
+   },
+   "end": {
+    "name": "Nook Road carpark",
+    "quote": "Nook Road carpark",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Grandview Ridge Track",
+     "quote": "Grandview Ridge Track",
+     "ref": "T5"
+    },
+    {
+     "name": "Grandview Mountain Track",
+     "quote": "Grandview Mountain Track",
+     "ref": "T4"
+    }
+   ],
+   "direction": null,
+   "time": "9-11 hr",
+   "distance": "29 km",
+   "evidence": [
+    "### Long Gully car park to Nook Road carpark"
+   ]
+  },
+  {
+   "id": "W3",
+   "main": false,
+   "label": "Long Gully car park to Sandy Point car park via Deep Gully Track",
+   "shape": "one_way",
+   "start": {
+    "name": "Long Gully car park",
+    "quote": "Long Gully car park",
+    "ref": null
+   },
+   "end": {
+    "name": "Sandy Point car park",
+    "quote": "Sandy Point car park",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Deep Gully Track",
+     "quote": "Deep Gully Track",
+     "ref": "T2"
+    }
+   ],
+   "direction": null,
+   "time": "3-5 hr",
+   "distance": "11.5 km one way",
+   "evidence": [
+    "### Long Gully car park to Sandy Point car park via Deep Gully Track"
+   ]
+  },
+  {
+   "id": "W4",
+   "main": false,
+   "label": "Long Gully car park to Sandy Point car park via Eastern Hill Track",
+   "shape": "one_way",
+   "start": {
+    "name": "Long Gully car park",
+    "quote": "Long Gully car park",
+    "ref": null
+   },
+   "end": {
+    "name": "Sandy Point car park",
+    "quote": "Sandy Point car park",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Eastern Hill Track",
+     "quote": "Eastern Hill Track",
+     "ref": "T3"
+    }
+   ],
+   "direction": null,
+   "time": "3-5 hr",
+   "distance": "11 km one way",
+   "evidence": [
+    "### Long Gully car park to Sandy Point car park via Eastern Hill Track"
+   ]
+  },
+  {
+   "id": "W5",
+   "main": false,
+   "label": "Deep Gully-Eastern Hills Loop",
+   "shape": "loop",
+   "start": {
+    "name": "Sandy Point car park",
+    "quote": "Sandy Point car park",
+    "ref": null
+   },
+   "end": {
+    "name": "Sandy Point car park",
+    "quote": "Sandy Point car park",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Deep Gully",
+     "quote": "Deep Gully",
+     "ref": "T10"
+    },
+    {
+     "name": "Grandview Ridge track",
+     "quote": "Grandview Ridge track",
+     "ref": "T5"
+    },
+    {
+     "name": "Eastern Hills track",
+     "quote": "Eastern Hills track",
+     "ref": "T3"
+    }
+   ],
+   "direction": null,
+   "time": "3-5 hr",
+   "distance": "10.5 km",
+   "evidence": [
+    "The track starts across the road from the Sandy Point car park.",
+    "Turn right to follow the Grandview Ridge track for 500 m before branching off and descending down the Eastern Hills track back to the starting point."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Timaru Creek Road",
+   "quote": "Timaru Creek Road - approximately 7 km from Hāwea township",
+   "ref": null,
+   "onto": "Timaru Creek/Breast Hill Track to Pakituhi Hut and Grandview Ridge Junction"
+  },
+  {
+   "name": "Nook Road carpark",
+   "quote": "Nook Road carpark - approximately 5 km from Hāwea township",
+   "ref": null,
+   "onto": "Grandview Mountain Track"
+  }
+ ],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Pakituhi Hut",
+   "quote": "Pakituhi Hut",
+   "ref": "T16"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Awa Nohoaka Conservation Area access tracks",
+   "quote": "Awa Nohoaka Conservation Area access tracks",
+   "ref": "L1",
+   "why": "other walk"
+  }
+ ],
+ "doubts": "Network page: no single walk, so each option with a start and end is a way. W1 treated as main (first option); its distance text has two exit options. Via for W1 is partial (Timaru Creek/Breast Hill Track not matched to a map entry). Car parks have no clearly matching road-end feature, so refs null. The Timaru Creek Road and Nook Road quotes use a hyphen as in the text (checked by validator). Eastern Hill Track in the heading is matched to map track Eastern Hills Track."
+}

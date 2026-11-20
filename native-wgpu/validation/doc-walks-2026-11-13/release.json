@@ -1,0 +1,29 @@
+{
+  "artifact": "Ridgeline-Native-DOC-Walks-0.1.48-Base.apk",
+  "bytes": 34001698,
+  "sha256": "ffc2ac317267864915af74d07da9d7248ebd7a285353b74c120a8694e48fdef4",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.48-doc-walks",
+  "versionCode": 49,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.47 Full Audit (same package and signer)",
+  "changes": [
+    "Walks come from DOC's walk lines (DOC_WebsiteWalkingandTrampingLns_DTO, every DOC walk, each linked to its DOC page by id) and DOC's page: name, introduction, photo, distance, time, difficulty and dog access are read from the page itself (og:title, og:image, the page's key details), so walks missing from DOC's 'Walking Experiences' list (the Milford, Heaphy and other Great Walks) are complete. Map labels for unlisted walks also take names from their pages.",
+    "A walk's extent: of DOC's legs (when they cover most of DOC's line), the line's longest end-to-end path (no side trips), and DOC's whole line, the one nearest the distance DOC states on the page ('63 km one way', '80 km loop', return walks halved); DOC's legs are kept when about as near (they give DOC's direction). The Rees-Dart is DOC's whole line again (DOC describes only the Rees side while a slip closes the Dart); the Gillespie Pass Circuit is the circuit without the Wilkin extension to Top Forks.",
+    "Map labels: a track matching a DOC walk's name (DOC's whole line, generic words ignored) belongs to that walk; otherwise a track on a large walk (circuit, traverse, multi-day; the walk itself, not its side trips) shows that walk's name below zoom 15, the most specific large walk where several run together (Travers-Sabine, not the Te Araroa section up the Travers); otherwise a track opens the most specific DOC walk along it under its own name. Label names no longer wait for or depend on a walk's legs.",
+    "Taps: a track that is a DOC walk (by name, or its line runs along the track and is not much longer) opens the whole walk; a section of a larger walk opens as a section with 'Part of …' and DOC's covering leg.",
+    "Legs: 'Day 1 – Glade Wharf to Clinton Hut' headings read (days are not places); 'via …' dropped from leg ends ('Heaphy Hut via Lewis Shelter'); every DOC line piece end can be a walk end; routes that retrace themselves are rejected."
+  ],
+  "dataChecks": "Label survey on live DOC and LINZ data (validation/doc-walks-2026-11-13/label-survey.txt, the app's own DocWalks.mark over DOC's data tiles and the map's tracks along 15 walks: Gillespie Pass, Rees-Dart, Milford, Wilkin-East Matukituki Traverse, Kepler, Routeburn, Tongariro Northern Circuit, Abel Tasman, Travers-Sabine, Roys Peak, St James, Heaphy, Paparoa, Queen Charlotte, Wilkin Valley tracks): no stretch of a walk's track of 1 km or more is left without its DOC walk; side trips (Iris Burn Falls, Top Forks) keep their own names. DOC survey (226 walks): every page parses with its summary; 52 of 96 large walks with legs follow them within DOC's distances, the others use DOC's line.",
+  "tests": {
+    "kotlinJvm": "256 tests, 0 failures (PlaceSearchLoadTimeTest is timing-sensitive under load and passed on rerun; new: WalkRoutesTest Milford page and extent, DocWalksTest label precedence)",
+    "rust": "unchanged (native libraries byte-identical to 0.1.47)"
+  },
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

@@ -1,0 +1,28 @@
+{
+  "artifact": "Ridgeline-Native-Paint-Switch-0.1.38-Base.apk",
+  "bytes": 33822010,
+  "sha256": "7891632671bb0b72c93a62cdc44e8a9840c45b3ef7a6d899904b123b1612469c",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.38-paint-switch",
+  "versionCode": 39,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.37 Full Audit (same package and signer)",
+  "changes": [
+    "Paint tab: Move / Paint switch (the user's choice of option 1). The bar opens in Move: one finger moves the map as usual. Paint (or choosing a colour or Erase) makes one finger paint. Two fingers always move the map.",
+    "Region tab (renamed from 'Topo map') restored to the 0.1.36 region download: page size or Custom with orientation, region name, map content (LINZ aerial / Satellite / NZ Topo) and detail zoom 13-17, NZ Topo & overlays, area/size/file estimate, Save as PDF and Download, plus folded coordinates. Switches to 2D north-up; 3D comes back when you leave.",
+    "Sharp PDFs: the map is stitched from the displayed map's tiles (NZ Topo, LINZ aerial or satellite) at about 200 dpi (NZ Topo capped at z17, satellite z18), four tiles at a time with progress and Cancel; a missing tile uses its parent. The open route is drawn on top. Was a screen capture at about 75 dpi. Overlays drawn by the app (tracks, huts, names on aerial) are not in the PDF; NZ Topo has them printed.",
+    "Show stored map detail turns on quickly: cached imagery tiles are recorded as they arrive in a small saved index (native-stored-tiles-v1.bin), so the tint no longer opens every disk-cache entry (about 10 s reported). Saved regions are read from their metadata only, not a size sum over every stored tile. Once per session the index is checked against the cache in the background and the tint refreshes."
+  ],
+  "tests": {
+    "kotlinJvm": "209 tests, 0 failures (new: PrintMapTest x2, StoredTileIndexTest x2)",
+    "rust": "unchanged (native libraries byte-identical to 0.1.37)"
+  },
+  "lintErrors": 0,
+  "assetsIdenticalTo0137": "626 of 628; only the generated dexopt baseline profiles differ",
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

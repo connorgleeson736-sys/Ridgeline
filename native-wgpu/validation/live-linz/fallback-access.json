@@ -1,0 +1,20 @@
+[
+  {
+    "provider": "Esri",
+    "status": 200,
+    "dimensions": [
+      256,
+      256
+    ],
+    "bytes": 24021
+  },
+  {
+    "provider": "Terrarium fallback",
+    "status": 200,
+    "dimensions": [
+      256,
+      256
+    ],
+    "bytes": 149572
+  }
+]

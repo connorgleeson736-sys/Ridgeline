@@ -1,0 +1,529 @@
+{
+ "guid": "1aafceec-8207-4d4b-967d-97c3eacde6da",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Alpine Route, Hacket road end to Tarn Hut",
+   "shape": "one_way",
+   "start": {
+    "name": "Hacket road end",
+    "quote": "Hacket road end",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Tarn Hut",
+    "quote": "Tarn Hut",
+    "ref": "T28"
+   },
+   "via": [
+    {
+     "name": "Roding River footbridge",
+     "quote": "It crosses a wooden footbridge across the Roding River",
+     "ref": "T24"
+    },
+    {
+     "name": "Hacket Creek suspension bridge",
+     "quote": "a suspension bridge across the Hacket Creek",
+     "ref": "T12"
+    },
+    {
+     "name": "Miner River",
+     "quote": "the junction of the Miner River",
+     "ref": "T17"
+    },
+    {
+     "name": "Browning Stream",
+     "quote": "the junction of the Browning Stream",
+     "ref": "T9"
+    },
+    {
+     "name": "Hacket Hut",
+     "quote": "Hacket Hut",
+     "ref": "T13"
+    },
+    {
+     "name": "Hacket Creek",
+     "quote": "crossing the creek a number of times",
+     "ref": "T12",
+     "how": "ford"
+    },
+    {
+     "name": "Pyramid Rock",
+     "quote": "Pyramid Rock",
+     "ref": "T23"
+    },
+    {
+     "name": "Starveall Hut",
+     "quote": "Starveall Hut",
+     "ref": "T27"
+    },
+    {
+     "name": "Mt Starveall",
+     "quote": "Mt Starveall",
+     "ref": "T19"
+    },
+    {
+     "name": "Slaty Peak",
+     "quote": "Slaty Peak",
+     "ref": "T26"
+    },
+    {
+     "name": "Slaty Hut",
+     "quote": "Slaty Hut",
+     "ref": "T25"
+    },
+    {
+     "name": "Ada Flat",
+     "quote": "Ada Flat",
+     "ref": "T6"
+    },
+    {
+     "name": "Old Man Peak",
+     "quote": "Old Man Peak (1514 m)",
+     "ref": "T20"
+    },
+    {
+     "name": "Old Man Hut",
+     "quote": "Old Man Hut",
+     "ref": "T21"
+    },
+    {
+     "name": "Little Rintoul",
+     "quote": "Little Rintoul (1643 m)",
+     "ref": null
+    },
+    {
+     "name": "Mt Rintoul",
+     "quote": "Mt Rintoul summit (1731 m)",
+     "ref": "T18"
+    },
+    {
+     "name": "Rintoul Hut",
+     "quote": "Rintoul Hut",
+     "ref": null
+    },
+    {
+     "name": "Purple Top",
+     "quote": "Purple Top (1532 m)",
+     "ref": "T22"
+    },
+    {
+     "name": "Bishops Cap",
+     "quote": "Bishops Cap (1425 m)",
+     "ref": "T7"
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "Most trampers start from the Hacket road-end, 29 km south of Nelson and walk through to Starveall Hut to begin the Alpine Route.",
+    "Tarn Hut is located at the edge of a small tarn, to the east of the main ridge, and is reached on a sign-posted access track.",
+    "There are two options from Tarn Hut to leave Alpine Route:"
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Alpine Route to Wairoa road end",
+   "shape": "one_way",
+   "start": {
+    "name": "Hacket road end",
+    "quote": "Hacket road end",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Wairoa road end",
+    "quote": "Tarn Hut to Wairoa road end",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Roding River footbridge",
+     "quote": "It crosses a wooden footbridge across the Roding River",
+     "ref": "T24"
+    },
+    {
+     "name": "Hacket Creek suspension bridge",
+     "quote": "a suspension bridge across the Hacket Creek",
+     "ref": "T12"
+    },
+    {
+     "name": "Miner River",
+     "quote": "the junction of the Miner River",
+     "ref": "T17"
+    },
+    {
+     "name": "Browning Stream",
+     "quote": "the junction of the Browning Stream",
+     "ref": "T9"
+    },
+    {
+     "name": "Hacket Hut",
+     "quote": "Hacket Hut",
+     "ref": "T13"
+    },
+    {
+     "name": "Hacket Creek",
+     "quote": "crossing the creek a number of times",
+     "ref": "T12",
+     "how": "ford"
+    },
+    {
+     "name": "Pyramid Rock",
+     "quote": "Pyramid Rock",
+     "ref": "T23"
+    },
+    {
+     "name": "Starveall Hut",
+     "quote": "Starveall Hut",
+     "ref": "T27"
+    },
+    {
+     "name": "Mt Starveall",
+     "quote": "Mt Starveall",
+     "ref": "T19"
+    },
+    {
+     "name": "Slaty Peak",
+     "quote": "Slaty Peak",
+     "ref": "T26"
+    },
+    {
+     "name": "Slaty Hut",
+     "quote": "Slaty Hut",
+     "ref": "T25"
+    },
+    {
+     "name": "Ada Flat",
+     "quote": "Ada Flat",
+     "ref": "T6"
+    },
+    {
+     "name": "Old Man Peak",
+     "quote": "Old Man Peak (1514 m)",
+     "ref": "T20"
+    },
+    {
+     "name": "Old Man Hut",
+     "quote": "Old Man Hut",
+     "ref": "T21"
+    },
+    {
+     "name": "Little Rintoul",
+     "quote": "Little Rintoul (1643 m)",
+     "ref": null
+    },
+    {
+     "name": "Mt Rintoul",
+     "quote": "Mt Rintoul summit (1731 m)",
+     "ref": "T18"
+    },
+    {
+     "name": "Rintoul Hut",
+     "quote": "Rintoul Hut",
+     "ref": null
+    },
+    {
+     "name": "Purple Top",
+     "quote": "Purple Top (1532 m)",
+     "ref": "T22"
+    },
+    {
+     "name": "Bishops Cap",
+     "quote": "Bishops Cap (1425 m)",
+     "ref": "T7"
+    },
+    {
+     "name": "Tarn Hut",
+     "quote": "Tarn Hut",
+     "ref": "T28"
+    },
+    {
+     "name": "junction before Bushy Top",
+     "quote": "a sign-posted junction shortly before Bushy Top",
+     "ref": "T10"
+    },
+    {
+     "name": "Mid Wairoa Hut",
+     "quote": "Mid Wairoa Hut",
+     "ref": "T16"
+    },
+    {
+     "name": "Wairoa River swingbridge",
+     "quote": "A swingbridge crosses the river just downstream from the Mid Wairoa Hut.",
+     "ref": null
+    },
+    {
+     "name": "forestry road",
+     "quote": "onto a forestry road, which must be followed for about 4 km",
+     "ref": null,
+     "how": "road"
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "From Tarn Hut, they complete the trip by descending to either Wairoa road-end, inland from Wakefield, or to the Goulter road-end, on the north bank of the Wairau River.",
+    "From here, the track leads down the ridge to a sign-posted junction shortly before Bushy Top, with the right-hand track leading to the Wairoa road end."
+   ]
+  },
+  {
+   "id": "W3",
+   "main": false,
+   "label": "Alpine Route to Goulter road end",
+   "shape": "one_way",
+   "start": {
+    "name": "Hacket road end",
+    "quote": "Hacket road end",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Goulter road end",
+    "quote": "Tarn Hut to Goulter road end",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Roding River footbridge",
+     "quote": "It crosses a wooden footbridge across the Roding River",
+     "ref": "T24"
+    },
+    {
+     "name": "Hacket Creek suspension bridge",
+     "quote": "a suspension bridge across the Hacket Creek",
+     "ref": "T12"
+    },
+    {
+     "name": "Miner River",
+     "quote": "the junction of the Miner River",
+     "ref": "T17"
+    },
+    {
+     "name": "Browning Stream",
+     "quote": "the junction of the Browning Stream",
+     "ref": "T9"
+    },
+    {
+     "name": "Hacket Hut",
+     "quote": "Hacket Hut",
+     "ref": "T13"
+    },
+    {
+     "name": "Hacket Creek",
+     "quote": "crossing the creek a number of times",
+     "ref": "T12",
+     "how": "ford"
+    },
+    {
+     "name": "Pyramid Rock",
+     "quote": "Pyramid Rock",
+     "ref": "T23"
+    },
+    {
+     "name": "Starveall Hut",
+     "quote": "Starveall Hut",
+     "ref": "T27"
+    },
+    {
+     "name": "Mt Starveall",
+     "quote": "Mt Starveall",
+     "ref": "T19"
+    },
+    {
+     "name": "Slaty Peak",
+     "quote": "Slaty Peak",
+     "ref": "T26"
+    },
+    {
+     "name": "Slaty Hut",
+     "quote": "Slaty Hut",
+     "ref": "T25"
+    },
+    {
+     "name": "Ada Flat",
+     "quote": "Ada Flat",
+     "ref": "T6"
+    },
+    {
+     "name": "Old Man Peak",
+     "quote": "Old Man Peak (1514 m)",
+     "ref": "T20"
+    },
+    {
+     "name": "Old Man Hut",
+     "quote": "Old Man Hut",
+     "ref": "T21"
+    },
+    {
+     "name": "Little Rintoul",
+     "quote": "Little Rintoul (1643 m)",
+     "ref": null
+    },
+    {
+     "name": "Mt Rintoul",
+     "quote": "Mt Rintoul summit (1731 m)",
+     "ref": "T18"
+    },
+    {
+     "name": "Rintoul Hut",
+     "quote": "Rintoul Hut",
+     "ref": null
+    },
+    {
+     "name": "Purple Top",
+     "quote": "Purple Top (1532 m)",
+     "ref": "T22"
+    },
+    {
+     "name": "Bishops Cap",
+     "quote": "Bishops Cap (1425 m)",
+     "ref": "T7"
+    },
+    {
+     "name": "Tarn Hut",
+     "quote": "Tarn Hut",
+     "ref": "T28"
+    },
+    {
+     "name": "junction before Bushy Top",
+     "quote": "a sign-posted junction shortly before Bushy Top",
+     "ref": "T10"
+    },
+    {
+     "name": "Bushy Top",
+     "quote": "Bushy Top (1257 m)",
+     "ref": "T10"
+    },
+    {
+     "name": "Goulter River",
+     "quote": "The river is not bridged and no attempts should be made to cross it while in flood.",
+     "ref": "T11",
+     "how": "ford"
+    },
+    {
+     "name": "Lower Goulter Hut",
+     "quote": "Lower Goulter Hut",
+     "ref": "T15"
+    },
+    {
+     "name": "Tiphead Stream",
+     "quote": "Tiphead Stream",
+     "ref": "T29"
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "At the sign-posted junction shortly before Bushy Top (see above), the left-hand branch leads to the Goulter road end.",
+    "The track climbs over Bushy Top (1257 m) before descending down a prominent spur to the Goulter River opposite the Lower Goulter Hut."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Goulter River",
+   "quote": "accessible on tracks from the Goulter River",
+   "ref": "T11",
+   "onto": "Alpine Route"
+  },
+  {
+   "name": "Lake Chalice",
+   "quote": "Lake Chalice",
+   "ref": "T14",
+   "onto": "Alpine Route"
+  },
+  {
+   "name": "Te Hoiere/Pelorus River",
+   "quote": "via the Te Hoiere/Pelorus River",
+   "ref": null,
+   "onto": "Alpine Route"
+  }
+ ],
+ "exits": [
+  {
+   "name": "Goulter River",
+   "quote": "From Old Man Hut, it is also possible to head directly down to the Goulter River.",
+   "ref": "T11",
+   "from": "Old Man Hut",
+   "how": "track"
+  },
+  {
+   "name": "Lake Chalice or the Forks/Top Valley",
+   "quote": "the left-hand route leading down to Lake Chalice or to the Forks/Top Valley",
+   "ref": "T14",
+   "from": "Old Man Peak",
+   "how": "track"
+  }
+ ],
+ "side_trips": [
+  {
+   "name": "Mt Starveall summit",
+   "quote": "detour to the Mt Starveall summit (1,511 m)",
+   "ref": null,
+   "from": "Starveall Hut"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Hacket Hut",
+   "quote": "Hacket Hut",
+   "ref": "T13"
+  },
+  {
+   "name": "Starveall Hut",
+   "quote": "Starveall Hut",
+   "ref": "T27"
+  },
+  {
+   "name": "Slaty Hut",
+   "quote": "Slaty Hut",
+   "ref": "T25"
+  },
+  {
+   "name": "Old Man Hut",
+   "quote": "Old Man Hut",
+   "ref": "T21"
+  },
+  {
+   "name": "Rintoul Hut",
+   "quote": "Rintoul Hut",
+   "ref": null
+  },
+  {
+   "name": "Tarn Hut",
+   "quote": "Tarn Hut",
+   "ref": "T28"
+  },
+  {
+   "name": "Mid Wairoa Hut",
+   "quote": "Mid Wairoa Hut",
+   "ref": "T16"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Browning Hut",
+   "quote": "Browning Hut",
+   "ref": "T8",
+   "why": "side trip"
+  },
+  {
+   "name": "Red Hills Route",
+   "quote": "Red Hills Route",
+   "ref": "L1",
+   "why": "other walk"
+  },
+  {
+   "name": "Richmond Ranges Te Araroa route",
+   "quote": "Richmond Ranges Te Araroa Route",
+   "ref": "L2",
+   "why": "other walk"
+  }
+ ],
+ "doubts": "Main way taken as Hacket road end to Tarn Hut (the Alpine Route proper); the two exits from Tarn Hut have their own headings so are W2 and W3. Rintoul Hut has no name entry. Times given only per leg, so null. Wairoa River swingbridge is just downstream of Mid Wairoa Hut. Goulter River crossing is inferred (hut is opposite)."
+}

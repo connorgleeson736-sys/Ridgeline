@@ -1,0 +1,29 @@
+{
+  "artifact": "Ridgeline-Native-Hold-To-Paint-0.1.39-Base.apk",
+  "bytes": 33822018,
+  "sha256": "7422fe834d85cfd1dba7c9643894c0f9aed0dd6ecafcf67e9d5ff89524dc5cb8",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.39-hold-to-paint",
+  "versionCode": 40,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.38 Full Audit (same package and signer)",
+  "changes": [
+    "Region and painted downloads up to 30,000 image tiles (was 2,000 and 20,000). Downloaded files are committed 48 per transaction; downloads pace themselves to under 900 network requests a minute (all of the app's requests, under LINZ's standard-key limit) and on HTTP 429 pause 30 s doubling to 5 min and retry the same tile (up to 6 times).",
+    "Hold to paint: the map moves normally; press and hold 280 ms without moving (with a haptic tick), then drag, to paint or erase. A second finger keeps the stroke and moves the map. The Move/Paint switch is gone. A short note at the top of the map, styled like the map status, says how to paint when the bar opens and when a colour or Erase is chosen.",
+    "Fixed: the region frame (and the brush outline) were drawn underneath the map since 0.1.37 (the map is inside a container, so its index in the root was -1), so no box appeared. Both are now added just under the offline bar.",
+    "Offline bar simplified: Advanced and Saved regions removed. Painted downloads use the imagery shown on the map, with NZ Topo and overlays. Overview imagery ZIPs moved to Layers > Advanced.",
+    "Saved regions are listed in the routes drawer under the saved routes: an overview image (the region's imagery from its own tiles, with painted cells or the region outline), name, type and detail, status and size, with View, Resume, Rename and Delete."
+  ],
+  "tests": {
+    "kotlinJvm": "209 tests, 0 failures (one run hit PlaceSearch's 150 ms timing limit at 156 ms while the machine was busy; the rerun passed)",
+    "rust": "unchanged (native libraries byte-identical to 0.1.38)"
+  },
+  "lintErrors": 0,
+  "assetsIdenticalTo0138": "626 of 628; only the generated dexopt baseline profiles differ",
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

@@ -1,0 +1,25 @@
+   Compiling ridgeline-renderer v0.1.0 (/workspace/Ridgeline/native-wgpu/renderer)
+warning: method `matches_style` is never used
+  --> renderer/src/picking_snapshot.rs:56:19
+   |
+41 | impl PickingSnapshot {
+   | -------------------- method in this implementation
+...
+56 |     pub(crate) fn matches_style(&self, three_d: bool, relief: f32) -> bool {
+   |                   ^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `ridgeline-renderer` (lib) generated 1 warning
+    Finished `release` profile [optimized] target(s) in 59.77s
+     Running `native-wgpu/target/release/examples/layer_smoke`
+PASS native route GPU: 1536 affected pixels, visible draped line/waypoints, unchanged geometry uploads on idle/pan. Synthetic height fixture; not phone performance.
+PASS route-only invalidation: no cartography job or upload
+Line batch bytes: expanded 29952, instanced 4992; identical pixels
+Progressive terrain calls: 5
+Progressive terrain calls: 5
+Progressive terrain calls: 5
+Progressive terrain calls: 6
+PASS audit progressive: four quadrant owners, measured parent rims, snapshot parity/immutability, complete frames pixel-identical; no fake full acknowledgements
+PASS audit plane sharing, unchanged pixels, metadata-only labels and dirty-row upload
+PASS native layers: cartographic line, depth-tested native-font atlas, projection, ungraded nearest Topo, relief picking/clearance and sky on actual GPU. Synthetic source fixture, not device/visual acceptance.

@@ -83,12 +83,42 @@ function choose(previous,target,time){
 function attach(map,{engine=root.maplibregl,enabled=()=>true,clock=()=>root.performance.now(),timers=root,document=root.document}={}){
  const api=engine?.ridgeAdaptiveTerrainAPI,supported=api?.version==='6.14.0';
  let dead=false,lost=false,current=null,undoTerrain=null,painter=null,undoPainter=null,frameLevels=new Map(),history=new Map(),profiles=new WeakMap(),queue=new Map(),active=null,idle=null,timeout=null,wake=null;
+ let profileWorker=null,workerBusy=null,workerFailed=false,workerDEM=null;
  const meshes=new Map(),shapes=new Map(),counts={32:0,64:0,128:0},metrics={analysed:0,analysisSlices:0,analysisMs:0,failedAnalyses:0,switches:0,triangles:0,nativeTriangles:0};
  const activeMode=()=>!dead&&!lost&&supported&&enabled()&&!document?.hidden;
  const hasWork=()=>!!active||queue.size>0;
  function clearIdle(){if(idle!==null)timers.cancelIdleCallback?.(idle);if(timeout!==null)timers.clearTimeout(timeout);idle=timeout=null;}
- function cancelWork(){clearIdle();queue.clear();active=null;}
- function schedule(){if(!activeMode()||!hasWork()||idle!==null||timeout!==null||map.isMoving?.())return;
+ function cancelWork(){clearIdle();queue.clear();active=null;profileWorker?.terminate();profileWorker=null;workerBusy=null;workerDEM=null;}
+ function saveProfile(job,result){
+  if(!valid(job))return;
+  let entries=profiles.get(job.dem);if(!entries){entries=new Map();profiles.set(job.dem,entries);}
+  const margin=Math.max(.01,Math.max(Math.abs(result.min),Math.abs(result.max))*2e-6);
+  entries.set(job.key,{data:job.data,revision:job.revision,min:result.min,max:result.max,errors:{32:result.errors[32]+margin,64:result.errors[64]+margin}});
+  while(entries.size>64)entries.delete(entries.keys().next().value);metrics.analysed++;map.triggerRepaint();
+ }
+ function workerStep(){
+  if(workerFailed||typeof root.Worker!=='function')return false;
+  if(workerBusy)return true;
+  if(!active){const first=queue.entries().next().value;if(!first)return true;queue.delete(first[0]);active=first[1];}
+  const job=active,dem=job.dem;
+  if(!valid(job)){active=null;schedule();return true;}
+  if(!ArrayBuffer.isView(dem.data)||!dem.getUnpackVector||dem.data.byteLength>8*1024*1024)return false;
+  try{
+   if(!profileWorker){
+    const owner=profileWorker=new root.Worker('./adaptive-terrain-worker.js');
+    owner.onmessage=event=>{if(profileWorker!==owner)return;const job=workerBusy;workerBusy=null;if(active===job){active=null;if(event.data.error)metrics.failedAnalyses++;else saveProfile(job,event.data);}schedule();};
+    owner.onerror=()=>{if(profileWorker!==owner)return;owner.terminate();profileWorker=null;workerBusy=null;workerDEM=null;workerFailed=true;metrics.failedAnalyses++;schedule();};
+   }
+   // Copy only the admitted job. Never transfer or detach native DEM pixels.
+   const same=workerDEM?.dem===dem&&workerDEM.data===job.data&&workerDEM.revision===job.revision;
+   const bytes=same?null:new Uint8Array(dem.data.buffer,dem.data.byteOffset,dem.data.byteLength).slice().buffer;
+   workerBusy=job;profileWorker.postMessage({bytes,dim:dem.dim,stride:dem.stride,unpack:dem.getUnpackVector(),id:{canonical:job.id.canonical},sourceId:{canonical:job.sourceId.canonical},revision:job.revision},bytes?[bytes]:[]);
+   workerDEM={dem,data:job.data,revision:job.revision,bytes:dem.data.byteLength};return true;
+  }catch{profileWorker?.terminate();profileWorker=null;workerBusy=null;workerDEM=null;workerFailed=true;return false;}
+ }
+ function schedule(){if(!activeMode()||!hasWork()||idle!==null||timeout!==null)return;
+  if(workerStep())return;
+  if(map.isMoving?.())return;
   if(typeof timers.requestIdleCallback==='function')idle=timers.requestIdleCallback(drain);
   else timeout=timers.setTimeout(()=>drain({timeRemaining:()=>3}),40);
  }
@@ -163,7 +193,7 @@ function attach(map,{engine=root.maplibregl,enabled=()=>true,clock=()=>root.perf
  }
  function data(event){if(event.tile?.dem){api.invalidate(event.tile.dem);map.triggerRepaint();}}
  function refresh(){if(!supported||dead)return;cancelWork();history.clear();frameLevels.clear();painter?.markTerrainDepthDirty?.();sync();map.triggerRepaint();}
- function onStart(){cancelWork();}
+ function onStart(){schedule();}
  function onEnd(){schedule();map.triggerRepaint();}
  function onLost(){lost=true;cancelWork();frameLevels.clear();history.clear();if(wake!==null)timers.clearTimeout(wake);wake=null;}
  function onRestored(){lost=false;releaseMeshes();profiles=new WeakMap();current=null;sync();refresh();}
@@ -171,7 +201,7 @@ function attach(map,{engine=root.maplibregl,enabled=()=>true,clock=()=>root.perf
  function destroy(){if(dead)return;dead=true;cancelWork();if(wake!==null)timers.clearTimeout(wake);undoTerrain?.();undoPainter?.();releaseMeshes();history.clear();frameLevels.clear();for(const [event,fn]of listeners)map.off(event,fn);document?.removeEventListener?.('visibilitychange',visibility);}
  const listeners=[['terrain',sync],['sourcedata',data],['movestart',onStart],['moveend',onEnd],['webglcontextlost',onLost],['webglcontextrestored',onRestored],['remove',destroy]];
  if(supported){for(const [event,fn]of listeners)map.on(event,fn);document?.addEventListener?.('visibilitychange',visibility);sync();}
- return{refresh,destroy,stats:()=>({adaptiveTerrain:{supported,enabled:activeMode(),grids:{...counts},...metrics,queuedAnalyses:queue.size,activeAnalysis:!!active,indexBytes:[...shapes.values()].reduce((n,s)=>n+s.indices.byteLength,0),temporaryAnalysisBytes:active?.heights?.byteLength||0}})};
+ return{refresh,destroy,stats:()=>({adaptiveTerrain:{supported,enabled:activeMode(),grids:{...counts},...metrics,queuedAnalyses:queue.size,activeAnalysis:!!active,workerAnalysis:!!workerBusy,workerSnapshotBytes:workerDEM?.bytes||0,indexBytes:[...shapes.values()].reduce((n,s)=>n+s.indices.byteLength,0),temporaryAnalysisBytes:active?.heights?.byteLength||0}})};
 }
 const api={geometry,profileJob,advance,projection,levelFor,choose,attach};if(typeof module!=='undefined')module.exports=api;else root.RidgeAdaptiveTerrain=api;
 })(globalThis);

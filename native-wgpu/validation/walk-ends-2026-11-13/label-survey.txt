@@ -1,0 +1,15 @@
+== Liverpool Track [6 hr 30 min one way · Advanced tramping track · 15 km one way from car park return via same track] DOC line 14.6 km; legs 3 (route 14.6 km); walk 14.6 km (DOC's legs); summary line 14.6 km; intro true; photo true
+   West Matukituki Track (8.4 km on DOC's line): own name, opens 'West Matukituki Track' 8.4 km
+   (unnamed) (5.4 km on DOC's line): own name, opens 'Liverpool Track' 5.4 km
+   Liverpool Track (1.4 km on DOC's line): own name, opens 'Liverpool Track' 1.4 km
+== Wharfedale/Townshend Track [1–2 days · Intermediate tramping track · ] DOC line 14.2 km; legs 1 (route 12.8 km); walk 12.8 km (DOC's legs); summary line 12.8 km; intro true; photo true
+   Wharfedale Track (9.9 km on DOC's line): named 'Wharfedale/Townshend Track' below z15 9.9 km
+== Gillespie Pass Circuit [3 - 4 days · Advanced tramping track · 56 km loop] DOC line 64.9 km; legs 5 (route 51.1 km); walk 51.1 km (DOC's legs); summary line 51.1 km; intro true; photo true
+   Wilkin Valley Track (24.5 km on DOC's line): own name, opens 'Wilkin Valley tracks' 24.5 km
+   Gillespie Pass Circuit Track (22.5 km on DOC's line): named 'Gillespie Pass Circuit' below z15 22.5 km
+   Siberia Track (9.5 km on DOC's line): named 'Gillespie Pass Circuit' below z15 9.5 km
+   Blue-Young Link Track (5.7 km on DOC's line): named 'Gillespie Pass Circuit' below z15 5.7 km
+   Blue Pools Walk (1.5 km on DOC's line): own name, opens 'Blue Pools Track' 1.5 km
+== Greenstone and Caples tracks [4 days · Intermediate tramping track · ] DOC line 58.3 km; legs 6 (route 58.4 km); walk 58.4 km (DOC's legs); summary line 58.4 km; intro true; photo true
+   Greenstone Track (33.7 km on DOC's line): named 'Greenstone and Caples tracks' below z15 33.7 km
+   Caples Track (24.7 km on DOC's line): named 'Greenstone and Caples tracks' below z15 24.7 km

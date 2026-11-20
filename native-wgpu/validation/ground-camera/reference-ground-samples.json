@@ -1,0 +1,26 @@
+{
+  "source": {
+    "host": "basemaps.linz.govt.nz",
+    "path": "/v1/tiles/elevation/WebMercatorQuad/11/1991/1300.png",
+    "sha256": "1e76b737ce62f42bcf1e74250d57aaf5d196d029714fd7e039fe3ba9b227d8e7",
+    "bytes": 117952,
+    "cacheHit": true
+  },
+  "lonLat": [
+    170.14219572,
+    -43.5955671
+  ],
+  "heightsMetres": [
+    3651.2,
+    3566.4,
+    3668,
+    3589.6
+  ],
+  "fraction": [
+    0.03197124268626794,
+    0.014294559136033058
+  ],
+  "referenceFloat64Metres": 3648.731912109524,
+  "unitToleranceMetres": 0.001,
+  "scope": "Original DEM pixel-centre interpolation only; native/reference geometry LOD equivalence remains unverified"
+}

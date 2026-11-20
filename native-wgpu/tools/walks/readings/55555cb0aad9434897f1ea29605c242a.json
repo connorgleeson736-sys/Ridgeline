@@ -1,0 +1,81 @@
+{
+ "guid": "55555cb0-aad9-4348-97f1-ea29605c242a",
+ "kind": "out_and_back",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Car park to Brewster Hut",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Car park (Fantail Falls)",
+    "quote": "Car park",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Brewster Hut",
+    "quote": "Brewster Hut",
+    "ref": "T4"
+   },
+   "via": [
+    {
+     "name": "Haast River",
+     "quote": "Haast River",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "bush line",
+     "quote": "bush line",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "6 – 8 hr return",
+   "distance": "5 km return via same track",
+   "evidence": [
+    "### Car park to Brewster Hut",
+    "The track starts from Fantail Falls.",
+    "After crossing the Haast River, the track climbs steadily through beech forest to the bush line.",
+    "Brewster Track ends at the hut and there is no track to Mt Armstrong or Brewster Glacier."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Brewster Hut",
+   "quote": "Brewster Hut",
+   "ref": "T4"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Mt Armstrong",
+   "quote": "Mt Armstrong",
+   "ref": "T6",
+   "why": "nearby"
+  },
+  {
+   "name": "Brewster Glacier",
+   "quote": "Brewster Glacier",
+   "ref": "T3",
+   "why": "nearby"
+  },
+  {
+   "name": "Blue Pools Track",
+   "quote": "Blue Pools Track",
+   "ref": "L1",
+   "why": "other walk"
+  },
+  {
+   "name": "Isthmus Peak Track",
+   "quote": "Isthmus Peak Track",
+   "ref": "L2",
+   "why": "other walk"
+  }
+ ],
+ "doubts": "Start is the 'Car park' at Fantail Falls; ref F1 is the Fantail Falls Walk road end on the highway, a best fit."
+}

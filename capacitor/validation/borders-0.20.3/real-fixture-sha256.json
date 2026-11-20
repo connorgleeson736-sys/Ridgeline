@@ -1,0 +1,12 @@
+{
+  "purpose": "Live Rolling Pin photo pixels used for the controlled replay; Esri wait is injected, not measured network latency.",
+  "sha256": {
+    "17-126961-83598-aerial.png": "272f99c3934811a80bf508689868702845293303c24a19ae7bb5f81198b8e777",
+    "17-126961-83596-esri.png": "473a7795e7356d03c88df86050b0b6588fe4d0e4b83f0acf1c6ffb7d2b4ad22d",
+    "17-126961-83599-otago-2017-2019-0.3m.png": "b6f8ebda80bfb0945a61acd6755a55114dbb7387ff04143328ef0141ad0c9c85",
+    "17-126961-83596-otago-2017-2019-0.3m.png": "b73495577a840065cd2be502233102a03e61de84d415efe82d89a8800d33144a",
+    "17-126961-83596-aerial.png": "c7c3e6f44d3ca599670e433cc503fac44a657e73bc144a027b15ca8603e25864",
+    "17-126961-83599-aerial.png": "9efdbf51a48af19931418b05ab61b8e9f48cd7eeca903e3bf3fc9a99a5a68393",
+    "17-126961-83598-otago-2017-2019-0.3m.png": "053fa89fbc3cbfa3718d732193bbce10afe39f99e7c1ffbdd9e04c962948a4df"
+  }
+}

@@ -1,0 +1,251 @@
+{
+  "gles-batch": {
+    "1": {
+      "uploadCpuMedianUs": 2999,
+      "renderCpuMedianUs": 9793,
+      "uploadAndRenderCpuMedianUs": 12673,
+      "includingGpuDrainMedianUs": 29936,
+      "appQueueSubmitCalls": 5,
+      "mipStandaloneSubmissions": [
+        4,
+        4,
+        4
+      ],
+      "batchedChains": [
+        0,
+        0,
+        0
+      ],
+      "cpuMips": [
+        false,
+        false,
+        false
+      ],
+      "pixelHashes": [
+        "88893fef2f6075d5",
+        "88893fef2f6075d5",
+        "88893fef2f6075d5"
+      ]
+    },
+    "2": {
+      "uploadCpuMedianUs": 2507,
+      "renderCpuMedianUs": 13227,
+      "uploadAndRenderCpuMedianUs": 15904,
+      "includingGpuDrainMedianUs": 29154,
+      "appQueueSubmitCalls": 2,
+      "mipStandaloneSubmissions": [
+        0,
+        0,
+        0
+      ],
+      "batchedChains": [
+        4,
+        4,
+        4
+      ],
+      "cpuMips": [
+        false,
+        false,
+        false
+      ],
+      "pixelHashes": [
+        "88893fef2f6075d5",
+        "88893fef2f6075d5",
+        "88893fef2f6075d5"
+      ]
+    },
+    "3": {
+      "uploadCpuMedianUs": 514,
+      "renderCpuMedianUs": 11419,
+      "uploadAndRenderCpuMedianUs": 11917,
+      "includingGpuDrainMedianUs": 25310,
+      "appQueueSubmitCalls": 1,
+      "mipStandaloneSubmissions": [
+        0,
+        0,
+        0
+      ],
+      "batchedChains": [
+        4,
+        4,
+        4
+      ],
+      "cpuMips": [
+        false,
+        false,
+        false
+      ],
+      "pixelHashes": [
+        "88893fef2f6075d5",
+        "88893fef2f6075d5",
+        "88893fef2f6075d5"
+      ]
+    }
+  },
+  "vulkan-separate-batch": {
+    "1": {
+      "uploadCpuMedianUs": 3322,
+      "renderCpuMedianUs": 36812,
+      "uploadAndRenderCpuMedianUs": 40091,
+      "includingGpuDrainMedianUs": 40127,
+      "appQueueSubmitCalls": 5,
+      "mipStandaloneSubmissions": [
+        4,
+        4,
+        4
+      ],
+      "batchedChains": [
+        0,
+        0,
+        0
+      ],
+      "cpuMips": [
+        false,
+        false,
+        false
+      ],
+      "pixelHashes": [
+        "9a315a692dcd18ef",
+        "9a315a692dcd18ef",
+        "9a315a692dcd18ef"
+      ]
+    },
+    "2": {
+      "uploadCpuMedianUs": 754,
+      "renderCpuMedianUs": 30849,
+      "uploadAndRenderCpuMedianUs": 31603,
+      "includingGpuDrainMedianUs": 31671,
+      "appQueueSubmitCalls": 2,
+      "mipStandaloneSubmissions": [
+        0,
+        0,
+        0
+      ],
+      "batchedChains": [
+        4,
+        4,
+        4
+      ],
+      "cpuMips": [
+        false,
+        false,
+        false
+      ],
+      "pixelHashes": [
+        "9a315a692dcd18ef",
+        "9a315a692dcd18ef",
+        "9a315a692dcd18ef"
+      ]
+    },
+    "3": {
+      "uploadCpuMedianUs": 597,
+      "renderCpuMedianUs": 321,
+      "uploadAndRenderCpuMedianUs": 918,
+      "includingGpuDrainMedianUs": 42649,
+      "appQueueSubmitCalls": 1,
+      "mipStandaloneSubmissions": [
+        0,
+        0,
+        0
+      ],
+      "batchedChains": [
+        4,
+        4,
+        4
+      ],
+      "cpuMips": [
+        false,
+        false,
+        false
+      ],
+      "pixelHashes": [
+        "9a315a692dcd18ef",
+        "9a315a692dcd18ef",
+        "9a315a692dcd18ef"
+      ]
+    }
+  },
+  "vulkan-batch": {
+    "1": {
+      "uploadCpuMedianUs": 3977,
+      "renderCpuMedianUs": 40184,
+      "uploadAndRenderCpuMedianUs": 44378,
+      "includingGpuDrainMedianUs": 44422,
+      "appQueueSubmitCalls": 5,
+      "mipStandaloneSubmissions": [
+        4,
+        4,
+        4
+      ],
+      "batchedChains": [
+        0,
+        0,
+        0
+      ],
+      "cpuMips": [
+        false,
+        false,
+        false
+      ],
+      "pixelHashes": [
+        "9a315a692dcd18ef",
+        "9a315a692dcd18ef",
+        "9a315a692dcd18ef"
+      ]
+    },
+    "2": {
+      "uploadCpuMedianUs": 778,
+      "renderCpuMedianUs": 34512,
+      "uploadAndRenderCpuMedianUs": 35381,
+      "includingGpuDrainMedianUs": 35448,
+      "appQueueSubmitCalls": 2,
+      "mipStandaloneSubmissions": [
+        0,
+        0,
+        0
+      ],
+      "batchedChains": [
+        4,
+        4,
+        4
+      ],
+      "cpuMips": [
+        false,
+        false,
+        false
+      ],
+      "pixelHashes": [
+        "9a315a692dcd18ef",
+        "9a315a692dcd18ef",
+        "9a315a692dcd18ef"
+      ]
+    },
+    "3": {
+      "uploadCpuMedianUs": 637,
+      "renderCpuMedianUs": 242,
+      "uploadAndRenderCpuMedianUs": 879,
+      "includingGpuDrainMedianUs": 30295,
+      "appQueueSubmitCalls": 1,
+      "mipStandaloneSubmissions": [
+        0,
+        0,
+        0
+      ],
+      "batchedChains": [
+        4,
+        4,
+        4
+      ],
+      "cpuMips": [
+        false,
+        false,
+        false
+      ],
+      "pixelHashes": [
+        "9a315a692dcd18ef",
+        "9a315a692dcd18ef",
+        "9a315a692dcd18ef"
+      ]
+    }
+  }
+}

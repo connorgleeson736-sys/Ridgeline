@@ -1,0 +1,86 @@
+{
+ "guid": "c06fd4c9-0350-44f7-8d2f-ff2756f2bc0e",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Makahu Saddle carpark to Mackintosh Track junction",
+   "shape": "one_way",
+   "start": {
+    "name": "Makahu Saddle carpark",
+    "quote": "From the Makahu Saddle carpark",
+    "ref": null
+   },
+   "end": {
+    "name": "track junction with the Lakes carpark to Mackintosh carpark track",
+    "quote": "a track junction with the track from Lakes carpark to Mackintosh carpark via Mackintosh Hut",
+    "ref": "L2"
+   },
+   "via": [
+    {
+     "name": "Ngahere Base",
+     "quote": "Ngahere Base",
+     "ref": null
+    },
+    {
+     "name": "old road",
+     "quote": "follows an old road down to the stream",
+     "ref": null,
+     "how": "road"
+    },
+    {
+     "name": "Matauria Ridge Track",
+     "quote": "the Matauria Ridge Track turns to the right",
+     "ref": null
+    },
+    {
+     "name": "Matauria Ridge",
+     "quote": "From this wide, open ridge",
+     "ref": "T6"
+    },
+    {
+     "name": "Donald River",
+     "quote": "It crosses the river – there is no bridge, so assess the river carefully before crossing.",
+     "ref": "T2",
+     "how": "ford"
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "From the Makahu Saddle carpark, a track leads to Ngahere Base (the former hydrological survey base) then follows an old road down to the stream.",
+    "Across the bridge, the Matauria Ridge Track turns to the right (the Ngahere Loop Track climbs straight ahead).",
+    "It crosses the river – there is no bridge, so assess the river carefully before crossing.",
+    "It reaches a track junction with the track from Lakes carpark to Mackintosh carpark via Mackintosh Hut.",
+    "This junction is not far from Mackintosh Hut."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Ngahere Loop Track",
+   "quote": "Ngahere Loop Track",
+   "ref": "L1",
+   "why": "other walk"
+  },
+  {
+   "name": "Mackintosh Hut",
+   "quote": "This junction is not far from Mackintosh Hut.",
+   "ref": "T5",
+   "why": "nearby"
+  },
+  {
+   "name": "Kaweka Range",
+   "quote": "across to the main Kaweka Range",
+   "ref": "T4",
+   "why": "view"
+  }
+ ],
+ "doubts": "No feature for the Makahu Saddle carpark, so the start has no ref. The end is the track junction with the Lakes carpark to Mackintosh carpark track, given ref L2 (that linked walk); the page does not place the junction exactly. The page gives no time or distance and does not say the walk is returned the same way; shape one_way is taken from the page title 'Makahu Saddle to Mackintosh Track Junction', which is not in the description text. The ridge is taken as Matauria Ridge (T6) from the track name. The old road has no name in the text; it is recorded as 'old road'. Mackintosh Hut is near the end but not passed by the way, so it is not_on_route."
+}

@@ -1,0 +1,45 @@
+{
+  "translation": {
+    "gesture": "translation at fixed zoom",
+    "changes": [
+      {
+        "at": 100,
+        "reduction": 1.25,
+        "speed": 1.208286440990836
+      },
+      {
+        "at": 400,
+        "reduction": 2,
+        "speed": 3.138920192290091
+      },
+      {
+        "at": 2350,
+        "reduction": 0,
+        "speed": 0
+      }
+    ],
+    "atStop": {
+      "motionDetailEnabled": true,
+      "motionDetailReduction": 2,
+      "motionViewSpeed": 4.25707945828972
+    },
+    "after349ms": 2,
+    "after350ms": 0
+  },
+  "orbit": {
+    "gesture": "120 degree orbit with pitch changes, fixed centre/zoom",
+    "changes": [],
+    "atStop": {
+      "motionDetailEnabled": true,
+      "motionDetailReduction": 0,
+      "motionViewSpeed": 0
+    },
+    "after349ms": 0,
+    "after350ms": 0
+  },
+  "findings": {
+    "fullDetailRequestPolicyHeldAfterTranslationMs": 350,
+    "rotationDoesNotTriggerMotionReduction": true
+  },
+  "caveat": "Deterministic policy/event timing, not image-ready timing or measured phone FPS. Request rescheduling/rendering adds its own time."
+}

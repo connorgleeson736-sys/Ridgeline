@@ -1,0 +1,5 @@
+android-native-activity.cpp	3dd6c4877b0922d4f3175a0569267efc564a1e8a98e8074cfc0cff1641d2f56b	https://raw.githubusercontent.com/android/ndk-samples/main/native-activity/app/src/main/cpp/main.cpp
+maplibre-native-android.md	1aa873185c6bf48a4ea6de46149f5e69aadd31cb6e27ac258813be268af3af32	https://raw.githubusercontent.com/maplibre/maplibre-native/main/platform/android/README.md
+maplibre-mercator-transform.ts	50b88d9fea8938bacd95fa36256644198dab55e47119d69a262bd2f3b3d39c57	https://raw.githubusercontent.com/maplibre/maplibre-gl-js/main/src/geo/projection/mercator_transform.ts
+maplibre-style-terrain.json	db60f7934fabf500e9e53533ff1b1be23af416e09213416386dbfa223a6343d2	https://raw.githubusercontent.com/maplibre/maplibre-style-spec/main/src/reference/v8.json
+wgpu-30.0.1-surface.rs	13df4577966d4bcc10aba4b8950023ec17a7cd3933019df1cf1f7f139e92b9a3	https://raw.githubusercontent.com/gfx-rs/wgpu/v30.0.1/wgpu/src/api/surface.rs

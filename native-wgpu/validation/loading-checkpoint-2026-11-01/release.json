@@ -1,0 +1,97 @@
+{
+  "sourceCommit": "d831d2f3ddc9c301e0b2282fa58912d3940dd222",
+  "branch": "native-renderer-performance",
+  "versionName": "0.1.2-loading-checkpoint",
+  "versionCode": 3,
+  "applicationId": "nz.ridgeline.nativeapp.performance",
+  "launcherLabel": "Ridgeline Native Performance",
+  "artifact": "Ridgeline-Native-Performance-2026-11-01-Base.apk",
+  "bytes": 32040144,
+  "sha256": "8dcee8432de6d61fb2f6a11303b95edbfea91698104f8e26c26623d9dd56f24c",
+  "signerSha256": "03ef64214daee8c59cad6571ce5036579237d553c040837ce996f80efa898ae7",
+  "newSigningKey": true,
+  "sideBySideInstall": true,
+  "privateKeyBackup": "Uploaded to the owner-only Google Drive folder requested by the user; no key material is in Git.",
+  "previousNativeApk": {
+    "artifact": "Ridgeline-Native-Performance-2026-10-31-Base.apk",
+    "versionName": "0.1.1-performance-checkpoint",
+    "versionCode": 2,
+    "sourceCommit": "150ad30e5db269a549769fb011667c31ec975178",
+    "sha256": "5c41854d52fc08b6c5496c455593d5969834201c2205bb18d494bf0414358043",
+    "role": "Source/package baseline; not a physical-device benchmark"
+  },
+  "nativeLibraries": [
+    {
+      "path": "lib/arm64-v8a/libridgeline_renderer.so",
+      "bytes": 4579392,
+      "sha256": "e56f1019ffaedeb277148b0413f3e0cee7d15ae772e68506d54fbe4b9e7eb074",
+      "elfClass": 64,
+      "loadSegmentAlignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "profile": "release (optimized), stripped"
+    },
+    {
+      "path": "lib/armeabi-v7a/libridgeline_renderer.so",
+      "bytes": 3146376,
+      "sha256": "23700b9d6d782ad05a7df4ed10db76408ccfd55b420cba01a95b7e95339d5c99",
+      "elfClass": 32,
+      "loadSegmentAlignments": [
+        4096,
+        4096,
+        4096
+      ],
+      "profile": "release (optimized), stripped"
+    },
+    {
+      "path": "lib/x86_64/libridgeline_renderer.so",
+      "bytes": 5194504,
+      "sha256": "27bfcb27763a5bd9a3d2431ee11a4fb75ed933eeb5b6f7555ffb3aafe22bc9f2",
+      "elfClass": 64,
+      "loadSegmentAlignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "profile": "release (optimized), stripped"
+    }
+  ],
+  "unchangedAssetFiles": 618,
+  "allPreviousAssetsByteIdentical": true,
+  "coarseImages": 67,
+  "largeOverviewPacks": 0,
+  "managedSessionCaBundled": false,
+  "packagingChecks": {
+    "signature": "APK v2 verified",
+    "zipAlignment": "16 KiB native ZIP alignment verified",
+    "elfAlignment": "64-bit >=16 KiB; ARMv7 >=4 KiB",
+    "nativeOnlyAssets": "verified"
+  },
+  "validation": {
+    "scope": "Build/package verification only; no phone installation or performance acceptance.",
+    "rustHostBeforeStop": {
+      "passed": 39,
+      "failed": 0,
+      "ignored": 6
+    },
+    "androidUnitBeforeStop": {
+      "tests": 99,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 5,
+      "failedCases": [
+        {
+          "class": "nz.ridgeline.nativeapp.TileTransportTest",
+          "name": "actualHttpDiskHitFinishesWhileAllForegroundNetworkSlotsAreBlocked",
+          "type": "java.util.concurrent.TimeoutException"
+        }
+      ]
+    },
+    "androidUnitStatus": "One unresolved HTTP cache fixture timeout. No rerun after user instructed stopping tests.",
+    "lint": "Stopped at user request; no completion claimed.",
+    "finalBuildCommand": "./gradlew --max-workers=2 -p native-wgpu/android -PridgelineSideBySide=true -PridgelineAbis=arm64-v8a,armeabi-v7a,x86_64 :app:assembleDebug",
+    "finalBuildResult": "BUILD SUCCESSFUL in 19s; no test or lint tasks requested."
+  }
+}

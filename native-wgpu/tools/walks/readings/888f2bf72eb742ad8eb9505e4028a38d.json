@@ -1,0 +1,70 @@
+{
+ "guid": "888f2bf7-2eb7-42ad-8eb9-505e4028a38d",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Caving trip through Cave Stream",
+   "shape": "one_way",
+   "start": {
+    "name": "stream outlet/cave entrance",
+    "quote": "at the stream outlet/cave entrance (the start of this trip)",
+    "ref": null
+   },
+   "end": {
+    "name": "stream inlet/cave exit",
+    "quote": "A 3 m waterfall by the stream inlet/cave exit",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Broken River",
+     "quote": "Broken River is difficult to cross to access the cave",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "cave passage",
+     "quote": "The cave passage meanders and twists in pitch darkness for 594 m between the two entrances.",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "1 hr",
+   "distance": "594 m",
+   "evidence": [
+    "The deepest section is usually at the first corner at the stream outlet/cave entrance (the start of this trip).",
+    "The cave passage meanders and twists in pitch darkness for 594 m between the two entrances.",
+    "Cavers are recommended to enter the cave at the stream outlet and walk against the flow of the stream.",
+    "A 3 m waterfall by the stream inlet/cave exit, which you will need to climb a ladder to get around"
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Cave Stream Reserve car park",
+   "quote": "Cave Stream Reserve is on SH73, between the Broken River road bridge and Craigieburn Forest Park entrance",
+   "ref": null,
+   "onto": "track leading down to Broken River"
+  }
+ ],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Cave Stream Loop Walk",
+   "quote": "Cave Stream Loop Walk offers a family-friendly alternative",
+   "ref": "L1",
+   "why": "other walk"
+  },
+  {
+   "name": "Mistletoe Flats Campsite",
+   "quote": "Mistletoe Flats Campsite is nearby at Craigieburn Forest Park",
+   "ref": "L2",
+   "why": "nearby"
+  }
+ ],
+ "doubts": "The trip is given as one way: it enters at the stream outlet (the start of the trip) and the end is the stream inlet/cave exit, where the 3 m waterfall and ladder are. The page does not describe a return. The Broken River crossing is read from 'Broken River is difficult to cross to access the cave', which implies the trip crosses it, so it is a ford via; the page does not say how it is crossed. The Cave Stream Reserve car park is an access point (its onto is the track down to Broken River, from the text's warning that rocks may fall onto that track). The start has no feature, so no ref. The time is DOC's '1 hr'; the distance is the cave passage's 594 m, which the text gives for that passage."
+}

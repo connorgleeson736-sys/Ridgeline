@@ -1,0 +1,174 @@
+// The aerial imagery, composed as the app's NativeImagery does:
+// - zooms 5–12: the app's overview imagery (natural or LINZ's own colour),
+//   LINZ's tiles beyond;
+// - to zoom 14, LINZ's hillshading taken back out (workers/imagery.js) with
+//   corrections made ahead, so the colours match zoom 15 and beyond, where LINZ
+//   draws none;
+// - where LINZ's photography has gaps (the app's gap atlas of LINZ capture
+//   areas), Esri World Imagery inside the outlines and LINZ outside.
+// Composed on a background thread. One source for all zooms, so MapLibre's
+// parent-tile fallback works across the switches. Requests are cancelled with
+// the tile.
+import config from './config.js';
+import { urls } from './style.js';
+import { imagery as worker } from './workers.js';
+import { dataUrl } from './data-url.js';
+
+const base = (config.overviewUrl || '').replace(/\/$/, '');
+// The overview tiles with LINZ's shading already taken out (tools/correct-overview.py),
+// at quality 95 unless the build says otherwise.
+const TILES = config.overviewTiles || (config.overviewCorrected ? 'ctiles' : 'tiles');
+const ESRI = 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile';
+
+let overview = null, overviewLoading = null;
+export function loadOverview() {
+  if (!base) return Promise.resolve(null);
+  return overviewLoading || (overviewLoading = fetch(dataUrl('/data/overview.json')).then((r) => (r.ok ? r.json() : null)).then((o) => {
+    if (!o) return null;
+    const tiles = new Map();
+    for (const [z, rows] of Object.entries(o.zooms)) {
+      let x = 0;
+      for (let i = 0; i < rows.length; i += 6) { x += rows[i]; tiles.set(`${z}/${x}/${rows[i + 1]}`, rows.slice(i + 2, i + 6)); }
+    }
+    overview = { files: o.files, tiles, coarse: o.coarse };
+    return overview;
+  }).catch(() => null));
+}
+// The gap index (small, preloaded) says which tiles touch a gap; only those wait
+// for the outlines themselves.
+let gapIndex = null, indexLoading = null, gapShapes = null, shapesLoading = null;
+export function loadGapIndex() {
+  return indexLoading || (indexLoading = fetch(dataUrl('/data/gaps-index.json')).then((r) => (r.ok ? r.json() : null)).then((g) => { if (g) gapIndex = { ...g, keys: new Set(g.keys) }; return gapIndex; }).catch(() => null));
+}
+function loadGapShapes() {
+  return shapesLoading || (shapesLoading = fetch(dataUrl('/data/gaps.json')).then((r) => (r.ok ? r.json() : null)).then((g) => { gapShapes = g; return g; }).catch(() => null));
+}
+
+const fill = (t, z, x, y) => t.replace('{z}', z).replace('{x}', x).replace('{y}', y);
+const linz = (z, x, y) => fill(urls.aerial, z, x, y);
+// LINZ's shading layers stop at zoom 14 (its aerial config's maxZoom).
+const SHADED_TO = 14;
+// The corrections, made ahead (tools/shade-corrections.py) and served with the
+// overview imagery in blocks of 4×4 tiles; the index lists each finished zoom's
+// blocks (a tile outside them has no shading). A zoom not yet made: LINZ's two
+// shading layers themselves.
+let shadeIndex = null, shadeLoading = null;
+function loadShadeIndex() {
+  if (!base) return Promise.resolve(null);
+  return shadeLoading || (shadeLoading = fetch(dataUrl('/data/shade.json')).then((r) => (r.ok ? r.json() : null)).then((s) => {
+    if (s) shadeIndex = Object.fromEntries(Object.entries(s.zooms).map(([z, b]) => [z, new Set(b)]));
+    return shadeIndex;
+  }).catch(() => null));
+}
+async function shade(z, x, y) {
+  if (z > SHADED_TO) return null;
+  if (!shadeIndex) await loadShadeIndex();
+  const blocks = shadeIndex?.[z];
+  if (!blocks) return urls.shade.map((t) => fill(t, z, x, y));
+  const bx = x >> 2, by = y >> 2;
+  return blocks.has(`${bx}/${by}`) ? { block: `${base}/shade/v1/${z}/${bx}/${by}.webp`, x: (x & 3) * 256, y: (y & 3) * 256 } : null;
+}
+/** The base photograph for a tile: overview imagery where the app has it, else LINZ. */
+function baseUrl(z, x, y, natural) {
+  const k = `${z}/${x}/${y}`;
+  if (overview && z <= 12) {
+    const t = overview.tiles.get(k);
+    if (t) return `${base}/${TILES}/${overview.files[natural ? t[0] : t[2]]}/${natural ? t[1] : t[3]}.webp`;
+    const c = overview.coarse[k];
+    if (c) return natural ? c[0] : c[1];
+  }
+  return linz(z, x, y);
+}
+
+// ---- The app's SourceGeometry: which source a tile takes ----
+function relation(rings, box) {
+  for (const ring of rings) for (let i = 1; i < ring.length; i++) {
+    const a = ring[i - 1], b = ring[i];
+    if (Math.max(a[0], b[0]) >= box[0] && Math.min(a[0], b[0]) <= box[2] && Math.max(a[1], b[1]) >= box[1] && Math.min(a[1], b[1]) <= box[3]) return 0;
+  }
+  const x = (box[0] + box[2]) / 2, y = (box[1] + box[3]) / 2;
+  let hit = false;
+  for (const ring of rings) for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const a = ring[i], b = ring[j];
+    if ((a[1] > y) !== (b[1] > y) && x < ((b[0] - a[0]) * (y - a[1])) / (b[1] - a[1]) + a[0]) hit = !hit;
+  }
+  return hit ? 1 : -1;
+}
+async function plan(z, x, y) {
+  if (z >= 9 && !gapIndex) await loadGapIndex();
+  if (!gapIndex) return { mode: 'linz' };
+  const az = gapIndex.z;
+  if (z < az) {
+    const c = gapIndex.coarse[`${z}/${x}/${y}`];
+    return c ? { mode: c[1] ? 'esri' : 'boundary', coarse: c[0] } : { mode: 'linz' };
+  }
+  const f = 2 ** (z - az), mx = Math.floor(x / f), my = Math.floor(y / f), key = `${mx}/${my}`;
+  if (!gapIndex.keys.has(key)) return { mode: 'linz' };
+  if (!gapShapes) await loadGapShapes();
+  const e = gapShapes?.[key];
+  if (!e) return { mode: 'linz' };
+  const [outer, seams, vector, inner] = e;
+  const size = 256 / f, px = x * size - mx * 256, py = y * size - my * 256;
+  const box = [px - 2, py - 2, px + size + 2, py + size + 2];
+  let mode;
+  if (seams.length && relation(seams, box) !== -1) mode = 'boundary';
+  else if (relation(outer, box) === -1) mode = 'linz';
+  else if (relation(vector ? outer : inner, box) === 1) mode = 'esri';
+  else mode = 'boundary';
+  return { mode, outer, mz: az, mx, my };
+}
+function esriTile(z, x, y) {
+  const ez = Math.min(z, 18), f = 2 ** (z - ez);
+  return { url: `${ESRI}/${ez}/${Math.floor(y / f)}/${Math.floor(x / f)}`, crop: f > 1 ? [((x % f) * 256) / f, ((y % f) * 256) / f, 256 / f] : null };
+}
+
+async function bytes(url, signal) {
+  const r = await fetch(url, { signal });
+  if (!r.ok) throw new Error(`Tile ${r.status}`);
+  return r;
+}
+
+export function install(maplibregl) {
+  loadShadeIndex(); // alongside the overview's index, not after it
+  maplibregl.addProtocol('bushline', async (params, abort) => {
+    const m = /^bushline:\/\/(aerial|satellite)\/(\d+)\/(\d+)\/(\d+)/.exec(params.url);
+    if (!m) throw new Error('Unknown tile');
+    const [z, x, y] = m.slice(2).map(Number);
+    if (m[1] === 'satellite') {
+      if (!config.esri) throw new Error('Satellite imagery is turned off');
+      const t = esriTile(z, x, y);
+      if (!t.crop) { const r = await bytes(t.url, abort.signal); return { data: await r.arrayBuffer() }; }
+      return { data: await worker.call({ type: 'compose', layers: [{ url: t.url, crop: t.crop }] }, abort.signal) };
+    }
+    if (z <= 12 && !overview) await loadOverview();
+    const p = config.esri ? await plan(z, x, y) : { mode: 'linz' };
+    const own = baseUrl(z, x, y, !/[?&]raw/.test(params.url));
+    // The overview's own tiles come corrected; LINZ's (and the overview's when not
+    // corrected) take their correction here. A missing overview tile falls back to
+    // LINZ's, corrected.
+    const ours = own !== linz(z, x, y), ready = ours && config.overviewCorrected;
+    const lshade = await shade(z, x, y);
+    const photo = { url: own, fallback: ours ? linz(z, x, y) : null, shade: ready ? null : lshade, fallbackShade: lshade };
+    if (p.mode === 'linz' && !photo.shade) {
+      const r = await fetch(own, { signal: abort.signal });
+      if (r.ok) return { data: await r.arrayBuffer() };
+      if (!photo.fallback) throw new Error(`Tile ${r.status}`);
+      if (!lshade) return { data: await (await bytes(photo.fallback, abort.signal)).arrayBuffer() };
+      return { data: await worker.call({ type: 'compose', layers: [{ url: photo.fallback, shade: lshade }] }, abort.signal) };
+    }
+    // De-shaded LINZ, with Esri where LINZ has no photography: whole tiles, or
+    // inside the outline.
+    let layers;
+    if (p.mode === 'linz') layers = [photo];
+    else if (p.coarse) layers = p.mode === 'esri' ? [{ url: p.coarse }] : [photo, { url: p.coarse }];
+    else {
+      const e = esriTile(z, x, y);
+      if (p.mode === 'esri') layers = [{ url: e.url, crop: e.crop }];
+      else {
+        const f = 2 ** (z - p.mz), dx = (p.mx * f - x) * 256, dy = (p.my * f - y) * 256;
+        layers = [photo, { url: e.url, crop: e.crop, clip: p.outer.map((ring) => ring.map(([px, py]) => [px * f + dx, py * f + dy])) }];
+      }
+    }
+    return { data: await worker.call({ type: 'compose', layers }, abort.signal) };
+  });
+}

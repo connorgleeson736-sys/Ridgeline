@@ -1,0 +1,36 @@
+{
+  "live": {
+    "exactEqual": true,
+    "changedPixels": 0,
+    "changes": [],
+    "beforeRgbSha256": "c5246b3340652950d16a37285ec8a70226024339c6f4a8ac9c390f19a3ff1162",
+    "afterRgbSha256": "c5246b3340652950d16a37285ec8a70226024339c6f4a8ac9c390f19a3ff1162"
+  },
+  "oblique": {
+    "exactEqual": false,
+    "changedPixels": 1,
+    "changes": [
+      {
+        "x": 3,
+        "y": 56,
+        "before": [
+          255,
+          255,
+          255
+        ],
+        "after": [
+          182,
+          182,
+          162
+        ]
+      }
+    ],
+    "beforeRgbSha256": "71da79078621c15aec1760ff93b5e13612b19723d92a37174c62435283b96897",
+    "afterRgbSha256": "9b4b3bab1e01c87d8b712d20f0f7cc9904ea0fc3b95ed0477b9fbef2ef17678b"
+  },
+  "scope": "Native before/after mechanism comparison, not authoritative0.18visual parity. Strict oblique equality fails by1boundary pixel; recorded without relaxing equality.",
+  "boundaryPickUV": [
+    0.3593450721,
+    0.5000111955
+  ]
+}

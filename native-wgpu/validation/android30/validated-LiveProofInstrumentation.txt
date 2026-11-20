@@ -1,0 +1,4 @@
+INSTRUMENTATION_RESULT: nativeLiveProof=PASS: production TileLoader, real source pools, rendered terrain picking
+INSTRUMENTATION_RESULT: pickedLonLatHeight=170.14190780126034,-43.595099224916105,3688.406470926
+INSTRUMENTATION_RESULT: scope=Live Android integration only; not cross-LOD, visual parity or phone performance
+INSTRUMENTATION_CODE: -1

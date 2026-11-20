@@ -1,0 +1,4 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.04s
+     Running `native-wgpu/target/debug/examples/gpu_smoke --gles --cpu-mips`
+Skirt discontinuity fixture repaired 36093 exposed background pixels
+PASS GPU: exact grade, fine-child/coarse-parent ownership, no fallback holes, independent image/geometry LOD and exact crop UV, trilinear mipmap average, bounded 24-tile residency. Synthetic geometry; no phone benchmark or real-terrain parity claim.

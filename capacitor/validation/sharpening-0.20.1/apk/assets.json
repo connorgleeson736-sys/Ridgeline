@@ -1,0 +1,17 @@
+{
+  "baseline": "Ridgeline-Capacitor-Additional-Audit-0.20.0-Base.apk",
+  "originalImageBinaryGeojsonAssetsByteIdentical": 1134,
+  "allPublicAssetsExceptTwoFixModulesByteIdentical": true,
+  "changedPublicAssets": [
+    "assets/public/native-residency.js",
+    "assets/public/terrain-streaming.js"
+  ],
+  "allPackagedPublicAssetsMatchSyncedAssets": true,
+  "engineWorkersAndShadersUnchanged": true,
+  "engineSha256": "418e23a87cf64cbbd02a29a1edd77a8f43ced39184b32d032eec2613762bc5e9",
+  "preparedTerrainCacheAbsent": true,
+  "coarseOverviews": 67,
+  "largeOverviewPacks": 0,
+  "nativeSharedLibraries": 0,
+  "cookReferenceAndSessionCAAbsent": true
+}

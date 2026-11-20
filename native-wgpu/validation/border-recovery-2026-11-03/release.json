@@ -1,0 +1,90 @@
+{
+  "sourceCommit": "aab3c12c38db3304ebd0f628f3c674d5e0922962",
+  "nativeBuildSourceCommit": "c0a420d90680660bbb7dd883c0b33de477774767",
+  "rendererLibrariesReusedFrom": "Ridgeline-Native-Latency-Audit-0.1.10-Base.apk",
+  "artifact": "Ridgeline-Native-Imagery-Border-Recovery-0.1.11-Base.apk",
+  "bytes": 32716613,
+  "sha256": "f871578201586c074bad30003d95eb584f454ec1ad45ef7275a60c4db2995c00",
+  "versionName": "0.1.11-border-recovery",
+  "versionCode": 12,
+  "applicationId": "nz.ridgeline.nativeapp.performance",
+  "signerSha256": "03ef64214daee8c59cad6571ce5036579237d553c040837ce996f80efa898ae7",
+  "updatesNative010InPlace": true,
+  "originalAssetsByteIdenticalTo010": 621,
+  "additionalAssets": [],
+  "noSessionCa": true,
+  "signatureV2Verified": true,
+  "zip16KiBAlignmentVerified": true,
+  "nativeLibraries": [
+    {
+      "path": "lib/arm64-v8a/libridgeline_renderer.so",
+      "bytes": 4671632,
+      "sha256": "7fed5a9806ccfec2d57287dfaaffbc7568f9bc4329ec1f6064cd1dcb07b49bb3",
+      "loadSegmentAlignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "profile": "release opt-level=3 thin-LTO, stripped",
+      "allNativeBridgeExportsVerified": 38,
+      "byteIdenticalTo010": true
+    },
+    {
+      "path": "lib/armeabi-v7a/libridgeline_renderer.so",
+      "bytes": 3218776,
+      "sha256": "66da1428f6cacc9b54d5eef2f746c95d9894ef189ac99577a236ca6a32d7897e",
+      "loadSegmentAlignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "profile": "release opt-level=3 thin-LTO, stripped",
+      "allNativeBridgeExportsVerified": 38,
+      "byteIdenticalTo010": true
+    },
+    {
+      "path": "lib/x86_64/libridgeline_renderer.so",
+      "bytes": 5306504,
+      "sha256": "f74774a41daf69527249224e7fc26e6a8fd5fed27e8e8aebf84ae4951427200a",
+      "loadSegmentAlignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "profile": "release opt-level=3 thin-LTO, stripped",
+      "allNativeBridgeExportsVerified": 38,
+      "byteIdenticalTo010": true
+    }
+  ],
+  "targetedJVMChecksPassed": 4,
+  "fullSuiteOrLintRun": false,
+  "physicalDeviceRun": false,
+  "phoneSpeedupMeasured": false,
+  "rustOrGpuCodeChanged": false,
+  "controlledResults": {
+    "realHttpTransientFailures": 4,
+    "subsequentSuccessRequest": 5,
+    "successBytesUnchanged": true,
+    "permanent404RequestCount": 4,
+    "retryDelaysAdvancedVirtually": true,
+    "cookTile": [
+      17,
+      127471,
+      83202
+    ],
+    "cookSourceResponses": [
+      200,
+      200,
+      200
+    ],
+    "referenceAndNativeMaskMatch": true,
+    "esriSelectedPixels": 36308,
+    "pixelsDifferentFromLinzOnlyFailureFallback": 29213
+  },
+  "limitations": [
+    "No phone trace or exact on-device failure reproduction.",
+    "Complete border imagery still waits for all required seam sources; no source-resolution reduction or speculative seam.",
+    "Existing Esri detail ceiling remains z18."
+  ],
+  "report": "../../research/IMAGERY-BORDER-RECOVERY-2026-11-03.md"
+}

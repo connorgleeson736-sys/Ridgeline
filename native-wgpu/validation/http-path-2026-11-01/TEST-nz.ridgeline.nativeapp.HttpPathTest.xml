@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="nz.ridgeline.nativeapp.HttpPathTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-01T07:06:19.424Z" hostname="bc071fb25b4a" time="4.445">
+  <properties/>
+  <testcase name="benchmarkColdWireDeliveryDoesNotWaitForHttpCachePublication" classname="nz.ridgeline.nativeapp.HttpPathTest" time="1.595"/>
+  <testcase name="fullCachePreservesFreshnessGzipVaryConditionalValidationAndRedirects" classname="nz.ridgeline.nativeapp.HttpPathTest" time="0.023"/>
+  <testcase name="existingOkHttp4CacheEntriesRemainReadableWithoutNetwork" classname="nz.ridgeline.nativeapp.HttpPathTest" time="0.008"/>
+  <testcase name="fiftyDownloadBurstRemainsPersistedWithZeroTransportRamAndAHeldCacheWriter" classname="nz.ridgeline.nativeapp.HttpPathTest" time="0.095"/>
+  <testcase name="benchmarkFastFallbackEscapesAnUnresponsiveFirstAddress" classname="nz.ridgeline.nativeapp.HttpPathTest" time="2.723"/>
+  <system-out><![CDATA[{"scope":"Actual OkHttp HTTP response with disk-cache monitor held for 500ms only after provider headers arrive. Full-size cache publication deferred, same bytes and one wire request per trial; not phone/Wi-Fi latency.","beforeMs":[517.665787, 503.397001, 505.143157],"afterMs":[4.388786, 2.113048, 2.556544],"beforeMedianMs":505.143157,"afterMedianMs":2.556544,"savedMedianMs":502.586613,"trials":3,"sameBytes":true,"pendingPublicationReusable":true}
+{"scope":"Actual OkHttp route planner, injected 650ms unresponsive IPv6 socket and working loopback IPv4 server, one real HTTP GET per trial. Fast fallback disabled reproduces 4.x sequential routing; not a phone IPv6 diagnosis.","beforeMs":[653.470117, 651.825643, 651.937793],"afterMs":[256.433489, 251.875282, 251.802321],"beforeMedianMs":651.937793,"afterMedianMs":251.875282,"savedMedianMs":400.0625110000001,"trials":3,"httpRequests":6,"sameBytes":true}
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

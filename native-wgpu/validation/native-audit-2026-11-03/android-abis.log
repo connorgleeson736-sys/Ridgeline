@@ -1,0 +1,6 @@
+Building aarch64-linux-android
+Copied and stripped arm64-v8a
+Building armv7-linux-androideabi
+Copied and stripped armeabi-v7a
+Building x86_64-linux-android
+Copied and stripped x86_64

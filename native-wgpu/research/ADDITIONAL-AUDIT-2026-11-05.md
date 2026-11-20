@@ -1,0 +1,37 @@
+# Native additional latency audit — 5 November 2026
+
+Scope: native Rust/wgpu Android renderer. Baseline `3f4d9b8dedf8e3c53ed24f1c148712def00d1692`; installed-artifact reference is Native 0.1.11 Border Recovery (versionCode 12), not the separate Capacitor preview branch. The supplied audit is preserved in [validation input](../validation/additional-audit-2026-11-05/input/FINDINGS.md), with its original checksum. No route-planning algorithm was changed.
+
+## Implemented audit findings
+
+1. **Sample input after surface acquisition.** Android publishes immutable camera packets independently of the renderer mutex. Surface acquire and render are separate JNI calls; the newest pose/revision/time is read after the blocking acquire. Camera safety, drawing, picking snapshot and label bookkeeping share that packet. Size/generation/lifecycle changes discard acquired frames. Optional work happens before acquisition. Vulkan requests maximum frame latency one where supported; GLES retains its supported pacing. GPU completion remains distinct from presentation.
+
+   When available, the enabled Vulkan GOOGLE display timing extension tags actual swapchain presents and reads actual presentation timestamps. A known two-frame display backlog defers another acquire. Driver failures/stale feedback fall back after 100 ms; GLES/unsupported devices explicitly report timing unavailable. Acquisition duration, camera revision/latch time, outstanding submissions, actual presentation feedback and overlay upload counters are exposed without per-frame diagnostic strings. JNI return is never called presentation time. This is optional backend integration, not a claim of handset display-latency measurements or Swappy integration.
+
+2. **Carry cached fragments through to GPU storage.** Workers retain ordered Arc-backed fragments instead of flattening a new complete stream. Deltas compare against the acknowledged GPU front, never a superseded worker result. Small equal-layout updates fit one admitted frame. Larger equal-layout changes copy the front on-device and stage only dirty ranges; reshaped/reordered fragments use a coherent full replacement. Writes are capped at 64 KiB each and admitted against the shared remaining deadline. The old front stays visible until completion; anchor, exact-source constraints, waypoints and metadata commit together. There is one reusable spare buffer and one pending generation, rather than an append-only arena or thousands of draw calls. All bytes/costs of the GPU copy remain work and are accounted separately from host uploads.
+
+   Variable-length geometry still needs bounded full staging; this is a deliberate fallback, not a claim that every audit arena experiment was implemented literally. Cancellation returns staged storage for reuse. Buffers are retained through submitted use by wgpu. Empty overlays release replacement storage.
+
+   Cartography and route draping run on bounded, latest-only background workers. Completion wakes the GPU handler directly with generation guards and frame-request coalescing, replacing the old 32 ms completion polling delay. Known pending GPU staging still schedules frames. Flat constant-height subdivisions are removed only where all three heights are exactly equal on the same original straight segment; endpoints and every real height change are retained.
+
+3. **Apply the first qualified terrain level immediately.** Newly evaluated sources use the existing qualified adaptive result without the initial 350 ms full-density period. Existing-source hysteresis and immediate refinement remain. The 0.6 px bound, cell-span threshold, exact route/interior constraints, unsafe/absent profiles and hillshade rules remain. Full imagery resolution and DEM samples are preserved.
+
+4. **Enforce the first optional-work prediction.** Zero remaining allowance admits no ordinary first upload. Budgets use the active display interval and current callback lateness, rather than assuming 60 Hz. Rust overlay uploads and route/label preparation share remaining allowance. Missing coverage has a bounded explicit exception. A known expensive tile/atlas/allocation can make progress after 250 ms idle; this is an intentional non-preemptible maintenance exception, never a hidden zero-budget gesture admission. Upload estimates adapt to observed cost. This cannot preempt a driver call already executing, and it does not promise every maintenance operation fits one refresh.
+
+## Capacitor overlay alignment
+
+The requested differences were line thickness, joins and colours. Active routes use Capacitor's `#e87944`, 3 CSS-pixel line, white 6 px halo at 0.85 opacity; passive routes retain `#518999` at 0.9. Waypoints retain matching fill/stroke sizes and selected colour. Perspective-correct reconstruction of screen-space line coordinates fixes width distortion on pitched terrain. Antialiasing is centred on the nominal stroke width with a one-physical-pixel guard, rather than shrinking the apparent line. Round caps/joins remain; removing redundant flat subdivisions reduces repeated translucent cap blending. Dashes retain a continuous world-distance phase.
+
+Topographic lines render in the reference style's layer order across tiles, keeping all casing below its fill. Labels use packaged Open Sans regular/bold with the upstream OFL licence and matched hut stroke colour. Font/atlas construction remains cached background work. This is visual alignment, not a claim of identical MapLibre label placement or all junction pixels; terrain-dependent overlapping round caps can still differ from MapLibre's connected line mesh.
+
+## Focused validation and measured limits
+
+- Full Android Kotlin source compilation; four focused JVM cases cover upload admission, active refresh intervals and input publication during a blocked simulated acquire.
+- Renderer library: 16 passed, 3 intentionally ignored benchmarks. Actual Vulkan and GLES buffer readback verifies exact ordered bytes, cancelled/unapplied bases, zero-budget admission and coherent publication.
+- Synthetic 20-path × 32-patch × 500-instance workload: one changed patch uploads **640,000 instead of 20,480,000 host-to-GPU bytes (96.875% less)**. The larger two-patch case uploads 1,280,000 host bytes plus a separate 20,480,000-byte device copy. Neither number is a phone latency or FPS measurement.
+- Actual Vulkan and GLES route smoke renders verify the exact active centre colour, visible draped line/waypoints, and no repeated geometry uploads on idle/pan. Controlled synthetic terrain; no phone or emulator was available.
+- Release packaging verifies all three optimized ABIs, JNI exports, signer, package/version, 16 KiB ELF/APK alignment and preservation of baseline imagery/terrain assets. See the adjacent validation record for final artifact details.
+
+Primary mechanisms were checked against the supplied audit and wgpu 30.0.1 source: [surface configuration](https://docs.rs/wgpu/30.0.1/wgpu/type.SurfaceConfiguration.html), [GPU-completion semantics](https://docs.rs/wgpu/30.0.1/wgpu/struct.Queue.html#method.on_submitted_work_done), [Android buffer stuffing](https://developer.android.com/games/sdk/frame-pacing), and [GOOGLE display timing](https://registry.khronos.org/vulkan/specs/latest/man/html/VK_GOOGLE_display_timing.html).
+
+Conditional refresh savings in the audit must not be added together. Device p50/p95 input-to-present, missed-frame rates, dense-map screenshots and cold-tile responsiveness still require the same handset/settings and supported backend A/B runs.

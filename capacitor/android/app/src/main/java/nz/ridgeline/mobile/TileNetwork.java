@@ -21,14 +21,41 @@ final class TileNetwork {
 
   static final int MAX = 8 * 1024 * 1024;
   private static TileHttpClient instance;
+  private static volatile int activeCacheMB = -1;
+  private static volatile long activeCacheBytes;
+
+  static int diskCacheMB(Context context) {
+    return DiskCacheBudget.normalize(context.getSharedPreferences("mobile", Context.MODE_PRIVATE)
+        .getInt("automaticDiskCacheMB", DiskCacheBudget.DEFAULT_MB));
+  }
+
+  static void diskCacheMB(Context context, int value) throws IOException {
+    if (!context.getSharedPreferences("mobile", Context.MODE_PRIVATE).edit()
+        .putInt("automaticDiskCacheMB", DiskCacheBudget.normalize(value)).commit())
+      throw new IOException("The disk cache setting could not be saved.");
+  }
+
+  static long activeCacheBytes(Context context) {
+    return activeCacheMB < 0 ? DiskCacheBudget.total(diskCacheMB(context), context.getCacheDir().getUsableSpace()) : activeCacheBytes;
+  }
+
+  static boolean cacheRestartRequired(Context context) {
+    return activeCacheMB >= 0 && activeCacheMB != diskCacheMB(context);
+  }
 
   static synchronized TileHttpClient client(Context context) {
-    if (instance == null)
+    if (instance == null) {
+      int requested = diskCacheMB(context);
+      long budget = DiskCacheBudget.total(requested, context.getCacheDir().getUsableSpace());
       instance =
           new TileHttpClient(
               TileHttpClient.create(
-                  new File(context.getApplicationContext().getCacheDir(), "map-http-v1")),
+                  new File(context.getApplicationContext().getCacheDir(), "map-http-v1"),
+                  budget),
               TileNetwork::validate);
+      activeCacheBytes = budget;
+      activeCacheMB = requested;
+    }
     return instance;
   }
 

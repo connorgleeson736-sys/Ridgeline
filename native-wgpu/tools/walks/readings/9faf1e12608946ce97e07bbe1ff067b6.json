@@ -1,0 +1,149 @@
+{
+ "guid": "9faf1e12-6089-46ce-97e0-7bbe1ff067b6",
+ "kind": "loop",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Dundas Circuit from Putara Road end",
+   "shape": "loop",
+   "start": {
+    "name": "Putara Road end",
+    "quote": "The track begins at the end of Putara Road in Mangatainoka Valley.",
+    "ref": null
+   },
+   "end": {
+    "name": "Putara Road end",
+    "quote": "and to Putara Road end",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Mangatainoka River",
+     "quote": "A swing bridge crosses the Mangatainoka River",
+     "ref": null
+    },
+    {
+     "name": "Herepai Ridge",
+     "quote": "the track climbs steeply to Herepai Ridge",
+     "ref": null
+    },
+    {
+     "name": "Herepai Hut",
+     "quote": "the track to the right leads 1.5 km to Herepai Hut",
+     "ref": "T8"
+    },
+    {
+     "name": "Herepai Peak",
+     "quote": "From Herepai Hut, follow the sign to Herepai Peak.",
+     "ref": "T7"
+    },
+    {
+     "name": "Dundas Hut",
+     "quote": "From Dundas Hut, the track descends all the way into the upper Ruamahanga valley.",
+     "ref": "T6"
+    },
+    {
+     "name": "Ruamahanga River",
+     "quote": "After crossing the river, the track climbs steeply up to Cattle Ridge.",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Cattle Ridge",
+     "quote": "the track climbs steeply up to Cattle Ridge",
+     "ref": "T4"
+    },
+    {
+     "name": "Cattle Ridge Hut",
+     "quote": "Cattle Ridge Hut is situated on the open tops with excellent views over the Wairarapa.",
+     "ref": "T5"
+    },
+    {
+     "name": "Ruamahanga valley",
+     "quote": "the track descends steeply into the Ruamahanga valley",
+     "ref": null
+    },
+    {
+     "name": "Ruamahanga River bridge",
+     "quote": "It crosses a bridge over the Ruamahanga River",
+     "ref": null
+    },
+    {
+     "name": "Roaring Stag Hut",
+     "quote": "then arrives at Roaring Stag Hut",
+     "ref": "T10"
+    },
+    {
+     "name": "Roaring Stag Track",
+     "quote": "take Roaring Stag Track",
+     "ref": "T1"
+    },
+    {
+     "name": "unbridged streams",
+     "quote": "The track crosses several streams (unbridged)",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Putara-Herepai Track junction",
+     "quote": "meet the junction with the Putara-Herepai Track",
+     "ref": null
+    },
+    {
+     "name": "Mangatainoka Valley",
+     "quote": "follow the track back down into the Mangatainoka Valley",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "3 days",
+   "distance": null,
+   "evidence": [
+    "The track begins at the end of Putara Road in Mangatainoka Valley.",
+    "From Roaring Stag Hut, take Roaring Stag Track.",
+    "From this junction, follow the track back down into the Mangatainoka Valley and to Putara Road end."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Herepai Hut",
+   "quote": "the track to the right leads 1.5 km to Herepai Hut",
+   "ref": "T8"
+  },
+  {
+   "name": "Dundas Hut",
+   "quote": "From Dundas Hut, the track descends all the way into the upper Ruamahanga valley.",
+   "ref": "T6"
+  },
+  {
+   "name": "Cattle Ridge Hut",
+   "quote": "Cattle Ridge Hut is situated on the open tops with excellent views over the Wairarapa.",
+   "ref": "T5"
+  },
+  {
+   "name": "Roaring Stag Hut",
+   "quote": "then arrives at Roaring Stag Hut",
+   "ref": "T10"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Arete Hut",
+   "quote": "Weather forecast for Arete Hut",
+   "ref": "T3",
+   "why": "other"
+  },
+  {
+   "name": "Wairarapa",
+   "quote": "excellent views over the Wairarapa",
+   "ref": null,
+   "why": "view"
+  }
+ ],
+ "doubts": "Loop: the circuit is described from Putara Road end and comes back to it. The three road-end features (F1, F2, F3) are all 'where an unnamed track meets PUTARA ROAD', so I could not tell which one is the start or the end; both are recorded by name with null refs. The direction is not stated, so it is null. Herepai Peak is recorded as a via because the text says to follow the sign to it and then the route to Dundas Hut begins from the bushline; the page does not say whether the peak is a side trip. Herepai Hut is recorded as on the way because the section begins at it, though it is reached by a 1.5 km track off the junction. The Ruamahanga River is recorded as a ford because the text says the track crosses it, and the bridge on the lower Ruamahanga is recorded with no how. The several unbridged streams are recorded as a ford with a null name. The Ruamahanga River is not in the names list, so no ref. The time '3 days' is DOC's summary; the section times are not summed and no distance is given for the whole way (the sections are 5 km, 5.2 km, 2.3 km and 7 km)."
+}

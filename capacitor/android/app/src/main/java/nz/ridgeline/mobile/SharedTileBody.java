@@ -83,8 +83,15 @@ final class SharedTileBody {
 
       @Override
       public int read() throws IOException {
-        byte[] b = new byte[1];
-        return read(b, 0, 1) < 0 ? -1 : b[0] & 255;
+        synchronized (SharedTileBody.this) {
+          while (true) {
+            if (closed || cancelled.getAsBoolean()) throw TileDispatcher.abort();
+            if (error != null) throw error;
+            if (position < size) return buffer[position++] & 255;
+            if (complete) return -1;
+            waitForData();
+          }
+        }
       }
 
       @Override

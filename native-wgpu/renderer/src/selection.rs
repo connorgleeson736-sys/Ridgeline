@@ -1,0 +1,454 @@
+//! Conservative native viewport selection. Real DEM extrema and measured LOD
+//! transition/seam acceptance are still required before production parity.
+use crate::{TileId, camera_matrix};
+use glam::{Mat4, Vec4};
+use std::{cmp::Ordering, collections::BinaryHeap};
+
+#[derive(Clone, Copy)]
+pub struct View {
+    pub width: u32,
+    pub height: u32,
+    pub center: [f64; 2],
+    pub zoom: f64,
+    pub bearing: f32,
+    pub pitch: f32,
+    pub elevation: f32,
+}
+#[derive(Clone, Copy)]
+pub struct SurfaceFocus {
+    pub center: [f64; 2],
+    pub range: f64,
+}
+struct Candidate {
+    id: TileId,
+    score: f64,
+    focus: u8,
+}
+impl PartialEq for Candidate {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+            && self.score.to_bits() == other.score.to_bits()
+            && self.focus == other.focus
+    }
+}
+impl Eq for Candidate {}
+impl PartialOrd for Candidate {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+impl Ord for Candidate {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.focus
+            .cmp(&other.focus)
+            .then_with(|| self.score.total_cmp(&other.score))
+            .then_with(|| {
+                (self.id.z, self.id.x, self.id.y).cmp(&(other.id.z, other.id.x, other.id.y))
+            })
+    }
+}
+/// A non-overlapping quadtree cover within NZ. Budget limits requests, never
+/// removes an existing parent in favour of an unready child.
+pub fn plan(view: &View, budget: usize) -> Vec<TileId> {
+    plan_with_target(view, budget, 256., 19)
+}
+pub fn plan_with_target(view: &View, budget: usize, target: f64, max_zoom: u8) -> Vec<TileId> {
+    plan_with_margin(view, budget, target, max_zoom, 1.0)
+}
+pub fn plan_with_margin(
+    view: &View,
+    budget: usize,
+    target: f64,
+    max_zoom: u8,
+    margin: f64,
+) -> Vec<TileId> {
+    plan_with_margin_using(view, budget, target, max_zoom, margin, TileId::bounds)
+}
+pub fn plan_with_surface_focus(
+    view: &View,
+    budget: usize,
+    target: f64,
+    max_zoom: u8,
+    margin: f64,
+    focus: Option<SurfaceFocus>,
+) -> Vec<TileId> {
+    plan_using(
+        view,
+        budget,
+        target,
+        max_zoom,
+        margin,
+        TileId::bounds,
+        focus,
+    )
+}
+fn plan_with_margin_using(
+    view: &View,
+    budget: usize,
+    target: f64,
+    max_zoom: u8,
+    margin: f64,
+    bounds: impl Fn(TileId) -> [f64; 4],
+) -> Vec<TileId> {
+    plan_using(view, budget, target, max_zoom, margin, bounds, None)
+}
+fn plan_using(
+    view: &View,
+    budget: usize,
+    target: f64,
+    max_zoom: u8,
+    margin: f64,
+    bounds: impl Fn(TileId) -> [f64; 4],
+    focus: Option<SurfaceFocus>,
+) -> Vec<TileId> {
+    let focus = focus.filter(|f| {
+        f.center
+            .iter()
+            .all(|x| x.is_finite() && (0.0..=1.0).contains(x))
+            && f.range.is_finite()
+            && f.range > 1e-12
+    });
+    let target = target.clamp(32., 1024.);
+    let max_zoom = max_zoom.clamp(4, 22);
+    let (matrix, ppm) = camera_matrix(
+        view.width,
+        view.height,
+        view.center,
+        view.zoom,
+        view.bearing,
+        view.pitch,
+        view.elevation,
+    );
+    let margin = margin.clamp(1.0, 1.5) as f32;
+    let matrix = Mat4::from_scale(glam::Vec3::new(1.0 / margin, 1.0 / margin, 1.0)) * matrix;
+    let world = 512. * 2f64.powf(view.zoom);
+    let distance_to_center = view.height as f64 * 1.5;
+    let pitch = (view.pitch as f64).to_radians();
+    let bearing = (view.bearing as f64).to_radians();
+    let eye = [
+        -bearing.sin() * pitch.sin() * distance_to_center,
+        -bearing.cos() * pitch.sin() * distance_to_center,
+    ];
+    let vertical_distance = pitch.cos() * distance_to_center;
+    // Like MapLibre Native's tileLodMinRadius, reserve fine cover around the
+    // surface focus before spending the remaining budget at the horizon.
+    let pivot_range = distance_to_center / world;
+    let surface_ratio = focus.map_or(1.0, |f| (pivot_range / f.range).max(1.0));
+    let focus_zoom = (view.zoom + (512. / target).log2() + surface_ratio.log2())
+        .ceil()
+        .clamp(4., max_zoom as f64);
+    let focus_radius = 2f64.powf(-focus_zoom);
+    let primary = focus.map_or(view.center, |f| f.center);
+    let nz0 = crate::mercator(165., -33.);
+    let nz1 = crate::mercator(180., -49.);
+    let candidate = |id: TileId| -> Option<Candidate> {
+        let b = bounds(id);
+        if b[2] < nz0[0] || b[0] > nz1[0] || b[3] < nz0[1] || b[1] > nz1[1] {
+            return None;
+        }
+        let x0 = ((b[0] - view.center[0]) * world) as f32;
+        let x1 = ((b[2] - view.center[0]) * world) as f32;
+        let y0 = ((view.center[1] - b[1]) * world) as f32;
+        let y1 = ((view.center[1] - b[3]) * world) as f32;
+        // Conservative NZ elevations, not a fabricated height field. Used only for
+        // visibility until resident real DEM extrema are available.
+        let lo = [x0, y1, (-100. - view.elevation) * ppm];
+        let hi = [x1, y0, (4000. - view.elevation) * ppm];
+        if !visible_box(matrix, lo, hi) {
+            return None;
+        }
+        // MapLibre Native's distance mode measures distance to the tile bounds,
+        // with a sqrt(cos(pitch-to-tile)) area correction. Projected centre depth
+        // alone gives every flat-camera tile the same priority: conservative tall
+        // terrain boxes then consume the budget far away and strand the focus at z16.
+        let dx = (x0 as f64 - eye[0]).max(0.).max(eye[0] - x1 as f64);
+        let dy = (y1 as f64 - eye[1]).max(0.).max(eye[1] - y0 as f64);
+        let distance = (dx * dx + dy * dy + vertical_distance * vertical_distance).sqrt();
+        let cosine = vertical_distance / distance;
+        let size = (b[2] - b[0]) * world;
+        let score = size * distance_to_center / distance * (cosine / pitch.cos()).sqrt();
+        let pivot_focus = if b[0] <= view.center[0]
+            && view.center[0] < b[2]
+            && b[1] <= view.center[1]
+            && view.center[1] < b[3]
+        {
+            2
+        } else if b[0] < view.center[0] + focus_radius
+            && b[2] > view.center[0] - focus_radius
+            && b[1] < view.center[1] + focus_radius
+            && b[3] > view.center[1] - focus_radius
+        {
+            1
+        } else {
+            0
+        };
+        let priority = if focus.is_some() {
+            if b[0] <= primary[0] && primary[0] < b[2] && b[1] <= primary[1] && primary[1] < b[3] {
+                4
+            } else if b[0] < primary[0] + focus_radius
+                && b[2] > primary[0] - focus_radius
+                && b[1] < primary[1] + focus_radius
+                && b[3] > primary[1] - focus_radius
+            {
+                3
+            } else {
+                pivot_focus
+            }
+        } else {
+            pivot_focus
+        };
+        Some(Candidate {
+            id,
+            score,
+            focus: priority,
+        })
+    };
+    let Some(root) = candidate(TileId { z: 0, x: 0, y: 0 }) else {
+        return Vec::new();
+    };
+    let budget = budget.clamp(16, 512);
+    let mut pending = BinaryHeap::with_capacity(budget);
+    let mut leaves = Vec::with_capacity(budget);
+    pending.push(root);
+    while let Some(next) = pending.pop() {
+        let surface_detail = focus.is_some() && next.focus >= 3 && (next.id.z as f64) < focus_zoom;
+        if next.id.z >= max_zoom || (next.score <= target && next.id.z >= 4 && !surface_detail) {
+            leaves.push(next);
+            continue;
+        }
+        let children = next.id.children().map(&candidate);
+        let count = children.iter().flatten().count();
+        if pending.len() + leaves.len() + count > budget {
+            leaves.push(next);
+            continue;
+        }
+        pending.extend(children.into_iter().flatten());
+    }
+    // Match refinement priority at admission too. Distance to a tile's centre
+    // misranks a large tile covering the focus behind a small nearby tile.
+    leaves.sort_by(|a, b| {
+        if let Some(f) = focus {
+            let priority = |c: &Candidate| {
+                let q = bounds(c.id);
+                let distance = |p: [f64; 2]| {
+                    ((q[0] - p[0]).max(0.).max(p[0] - q[2]))
+                        .hypot((q[1] - p[1]).max(0.).max(p[1] - q[3]))
+                };
+                (distance(f.center) / f.range).min(distance(view.center) / pivot_range + 0.15)
+            };
+            return priority(a)
+                .total_cmp(&priority(b))
+                .then_with(|| b.focus.cmp(&a.focus))
+                .then_with(|| b.score.total_cmp(&a.score))
+                .then_with(|| (a.id.z, a.id.x, a.id.y).cmp(&(b.id.z, b.id.x, b.id.y)));
+        }
+        let distance = |c: &Candidate| {
+            let b = bounds(c.id);
+            let dx = (b[0] - view.center[0]).max(0.).max(view.center[0] - b[2]);
+            let dy = (b[1] - view.center[1]).max(0.).max(view.center[1] - b[3]);
+            dx * dx + dy * dy
+        };
+        b.focus
+            .cmp(&a.focus)
+            .then_with(|| distance(a).total_cmp(&distance(b)))
+            .then_with(|| b.score.total_cmp(&a.score))
+            .then_with(|| (a.id.z, a.id.x, a.id.y).cmp(&(b.id.z, b.id.x, b.id.y)))
+    });
+    leaves.into_iter().map(|c| c.id).collect()
+}
+pub(crate) fn visible_box(matrix: Mat4, lo: [f32; 3], hi: [f32; 3]) -> bool {
+    let points: [Vec4; 8] = std::array::from_fn(|i| {
+        matrix
+            * Vec4::new(
+                if i & 1 == 0 { lo[0] } else { hi[0] },
+                if i & 2 == 0 { lo[1] } else { hi[1] },
+                if i & 4 == 0 { lo[2] } else { hi[2] },
+                1.,
+            )
+    });
+    !(0..6).any(|plane| {
+        points.iter().all(|p| match plane {
+            0 => p.x < -p.w,
+            1 => p.x > p.w,
+            2 => p.y < -p.w,
+            3 => p.y > p.w,
+            4 => p.z < 0.,
+            _ => p.z > p.w,
+        })
+    })
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn surface_focus_missing_or_invalid_preserves_the_old_plan() {
+        for i in 0..24 {
+            let view=workload(i);
+            let expected=plan_with_margin(&view,72,215.,19,1.0);
+            for focus in [None,Some(SurfaceFocus{center:view.center,range:f64::NAN}),Some(SurfaceFocus{center:[f64::NAN,0.5],range:0.01})] {
+                assert_eq!(expected,plan_with_surface_focus(&view,72,215.,19,1.0,focus));
+            }
+        }
+    }
+    #[test]
+    fn surface_focus_prioritizes_the_first_actual_terrain_intersection() {
+        let view=View{width:320,height:640,center:crate::mercator(170.14219572,-43.5955671),zoom:12.,bearing:0.,pitch:70.,elevation:0.};
+        // Same CPU heightfield ray intersection used by Renderer::pick: a real
+        // 129x129 elevated surface lies between the eye and navigation pivot.
+        let (matrix,ppm)=camera_matrix(view.width,view.height,view.center,view.zoom,view.bearing,view.pitch,view.elevation);
+        let inverse=matrix.inverse();let a=inverse*Vec4::new(0.,0.,0.,1.);let b=inverse*Vec4::new(0.,0.,1.,1.);
+        let origin=a.truncate()/a.w;let direction=(b.truncate()/b.w-origin).normalize();
+        let id=TileId{z:8,x:248,y:162};let bounds=id.bounds();let span=bounds[2]-bounds[0];let world=512.*2f64.powf(view.zoom);
+        let field=ridgeline_core::heightfield::Heightfield::new(128,vec![3000.;129*129].into_boxed_slice()).unwrap();
+        let ray=ridgeline_core::heightfield::Ray{
+            origin:[(view.center[0]+origin.x as f64/world-bounds[0])/span,(view.center[1]-origin.y as f64/world-bounds[1])/span,origin.z as f64/ppm as f64],
+            direction:[direction.x as f64/world/span,-direction.y as f64/world/span,direction.z as f64/ppm as f64]};
+        let hit=field.intersect_region(ray,[0.,0.,1.,1.]).expect("visible elevated surface");
+        let point=[bounds[0]+hit.point[0]*span,bounds[1]+hit.point[1]*span];
+        let d=view.height as f64*1.5/world;let pitch=(view.pitch as f64).to_radians();
+        let range=((point[0]-view.center[0]).powi(2)+(point[1]-view.center[1]-pitch.sin()*d).powi(2)+(hit.point[2]*ppm as f64/world-pitch.cos()*d).powi(2)).sqrt();
+        let focus=SurfaceFocus{center:point,range};let target=TileId{z:22,x:(point[0]*(1u32<<22)as f64)as u32,y:(point[1]*(1u32<<22)as f64)as u32};
+        let before=plan_with_margin(&view,72,215.,19,1.);
+        let after=plan_with_surface_focus(&view,72,215.,19,1.,Some(focus));
+        assert!(after[0].contains(target),"first request must cover measured face");
+        let old=before.iter().position(|id|id.contains(target)).unwrap();
+        assert!(after[0].z>=before[old].z);
+        assert!(after.len()<=72);assert!(after.iter().all(|id|id.z<=19));
+        for (i,a) in after.iter().enumerate(){for b in &after[i+1..]{assert!(!a.contains(*b)&&!b.contains(*a));}}
+        println!("SURFACE_FOCUS: old face request rank={old}, level={}; new rank=0, level={}; before sources={}, after sources={}, real hit height={}",before[old].z,after[0].z,before.len(),after.len(),hit.point[2]);
+    }
+    fn old_bounds(id: TileId) -> [f64; 4] {
+        let n = 2f64.powi(id.z as i32);
+        [
+            id.x as f64 / n,
+            id.y as f64 / n,
+            (id.x as f64 + 1.) / n,
+            (id.y as f64 + 1.) / n,
+        ]
+    }
+    fn workload(i: usize) -> View {
+        View {
+            width: if i % 3 == 0 { 320 } else { 1080 },
+            height: if i % 3 == 0 { 640 } else { 1920 },
+            center: crate::mercator(170.14219572 + (i % 50) as f64 * 0.0001, -43.5955671),
+            zoom: [4., 8., 11.9, 16., 19., 22.][i % 6],
+            bearing: -180. + (i % 360) as f32,
+            pitch: [0., 45., 58., 75., 85.][i % 5],
+            elevation: if i % 2 == 0 { 0. } else { 3724. },
+        }
+    }
+    #[test]
+    fn optimized_selection_preserves_every_ordered_leaf() {
+        for i in 0..600 {
+            let view = workload(i);
+            for (budget, target, max) in [(48, 431., 22), (96, 256. / 2f64.powf(0.25), 19)] {
+                let old = plan_with_margin_using(&view, budget, target, max, 1., old_bounds);
+                let new = plan_with_margin(&view, budget, target, max, 1.);
+                assert_eq!(old, new, "ordered selection scene {i}");
+            }
+        }
+    }
+    #[test]
+    #[ignore = "explicit release CPU selection A/B"]
+    fn benchmark_selection_paths() {
+        let mut samples: [Vec<u128>; 2] = std::array::from_fn(|_| Vec::new());
+        for i in 0..660 {
+            let view = workload(i);
+            for arm in if i % 2 == 0 { [0, 1] } else { [1, 0] } {
+                let start = std::time::Instant::now();
+                for (budget, target, max) in [(48, 431., 22), (96, 256. / 2f64.powf(0.25), 19)] {
+                    std::hint::black_box(match arm {
+                        0 => plan_with_margin_using(&view, budget, target, max, 1., old_bounds),
+                        _ => plan_with_margin(&view, budget, target, max, 1.),
+                    });
+                }
+                if i >= 60 {
+                    samples[arm].push(start.elapsed().as_nanos());
+                }
+            }
+        }
+        let mut sorted = samples.clone();
+        for row in &mut sorted {
+            row.sort_unstable();
+        }
+        let report = format!(
+            "{{\"scope\":\"Release host CPU: exact tile bounds in both complete terrain and image plans per changed camera, 600 alternating scenes, no HTTP or decode\",\"beforeMedianNs\":{},\"afterMedianNs\":{},\"beforeNs\":{:?},\"afterNs\":{:?}}}",
+            sorted[0][300], sorted[1][300], samples[0], samples[1]
+        );
+        println!("{report}");
+        if let Ok(path) = std::env::var("RIDGELINE_SELECTION_BENCH_OUTPUT") {
+            std::fs::write(path, report).unwrap();
+        }
+    }
+    #[test]
+    fn close_zoom_keeps_maximum_source_detail_at_the_surface_focus() {
+        let center = crate::mercator(170.14219572, -43.5955671);
+        for pitch in [0., 45., 58., 75., 80.] {
+            let view = View {
+                width: 320,
+                height: 640,
+                center,
+                zoom: 19.,
+                bearing: -24.,
+                pitch,
+                elevation: 3670.,
+            };
+            for (budget, target, maximum) in [(36, 431., 22), (72, 256. / 2f64.powf(0.25), 19)] {
+                let ids = plan_with_target(&view, budget, target, maximum);
+                let focus = TileId {
+                    z: 22,
+                    x: (center[0] * (1u32 << 22) as f64) as u32,
+                    y: (center[1] * (1u32 << 22) as f64) as u32,
+                };
+                let selected = ids.iter().find(|id| id.contains(focus)).unwrap();
+                println!(
+                    "close detail pitch={pitch} sourceMax={maximum} centerLevel={} count={}",
+                    selected.z,
+                    ids.len()
+                );
+                assert!(
+                    selected.z >= 19,
+                    "close center remains coarse: {}",
+                    selected.z
+                );
+            }
+        }
+    }
+    #[test]
+    fn covers_center_without_overlap_or_unbounded_requests() {
+        for pitch in [0., 58., 85.] {
+            for zoom in [5., 11.9, 17., 20.] {
+                let center = crate::mercator(170.14219572, -43.5955671);
+                let view = View {
+                    width: 1080,
+                    height: 1920,
+                    center,
+                    zoom,
+                    bearing: -24.,
+                    pitch,
+                    elevation: 3724.,
+                };
+                let ids = plan(&view, 96);
+                assert!(!ids.is_empty());
+                assert!(ids.len() <= 96);
+                let target = TileId {
+                    z: 22,
+                    x: (center[0] * (1u32 << 22) as f64) as u32,
+                    y: (center[1] * (1u32 << 22) as f64) as u32,
+                };
+                assert!(
+                    ids.iter().any(|id| id.contains(target)),
+                    "center missing at zoom {zoom} pitch {pitch}"
+                );
+                for (a, id) in ids.iter().enumerate() {
+                    assert!(id.z <= 19);
+                    for (b, other) in ids.iter().enumerate() {
+                        if a != b {
+                            assert!(!id.contains(*other));
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

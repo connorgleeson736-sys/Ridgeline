@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="nz.ridgeline.nativeapp.DemSamplingTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-30T02:54:47.601Z" hostname="5085ef76c66b" time="0.276">
+  <properties/>
+  <testcase name="cameraGroundUsesPixelCentersAndActualNeighborsWithoutFabricatedFallback" classname="nz.ridgeline.nativeapp.DemSamplingTest" time="0.021"/>
+  <testcase name="genuineReferenceDemCenterMatchesCaptured0_18GroundHeight" classname="nz.ridgeline.nativeapp.DemSamplingTest" time="0.001"/>
+  <testcase name="interiorOverscaledMeshNeedsOneOriginalDemInsteadOfNine" classname="nz.ridgeline.nativeapp.DemSamplingTest" time="0.044"/>
+  <testcase name="completeHeightBuffersRemainBitIdenticalIncludingParentsAndWorldEdges" classname="nz.ridgeline.nativeapp.DemSamplingTest" time="0.163"/>
+  <testcase name="referenceTerrainOwnershipRetainsAllVerticesAndTheOriginalSourceCeiling" classname="nz.ridgeline.nativeapp.DemSamplingTest" time="0.042"/>
+  <testcase name="parentGroundSamplingRetainsTheRealParentRatherThanAZeroOrChildInvention" classname="nz.ridgeline.nativeapp.DemSamplingTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,26 @@
+{
+  "artifact": "Ridgeline-Native-Long-Walks-0.1.51-Base.apk",
+  "bytes": 34001702,
+  "sha256": "0dbb17e59be6766bc8f5b81c43888b41d72d99a07354839c3f70479994f38997",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.51-long-walks",
+  "versionCode": 52,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.50 Full Audit (same package and signer)",
+  "changes": [
+    "Long walks are drawn: the renderer accepts at most 2,000 points a line (the route editor's limit) and refuses the whole line packet otherwise, so a walk's highlight built from the map's tracks over that (Greenstone and Caples tracks: 2,509 points) drew nothing (and the packet was offered again every frame). Highlighted lines are simplified for drawing only (Douglas-Peucker from 1 m, to at most 2,000 points); distances, profiles and sections use every point.",
+    "DOC page text: every HTML 4 named character reference (252, generated from the HTML 4 table) plus the macron vowels is decoded; the Liverpool Track's '&bull;' was not in the earlier hand-written list of about 40. DOC's '<br>&bull; …' lines become dot points."
+  ],
+  "dataChecks": "Map line points along DOC's walk lines: Greenstone and Caples 2,509 (over the limit), Gillespie Pass 1,262. DOC survey (232 pages): no undecoded character references left in any page's text; extents unchanged (no walk where a line nearer DOC's stated distance was available and not chosen).",
+  "tests": {
+    "kotlinJvm": "260 tests, 0 failures (new: DOC bullet lines, entity decoding, drawing simplification)",
+    "rust": "unchanged (native libraries byte-identical to 0.1.50)"
+  },
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

@@ -1,0 +1,30 @@
+{
+  "artifact": "Ridgeline-Native-Walk-Fixes-0.1.49-Base.apk",
+  "bytes": 34001702,
+  "sha256": "b0ef7760c069776a0a05c24fcf984fc2e29786b56942f8ba7d58740891eca83f",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.49-walk-fixes",
+  "versionCode": 50,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.48 Full Audit (same package and signer)",
+  "changes": [
+    "Legs: distances written in the time line ('2 to 3 hr, 9 km') are read; legs follow DOC's listing order from each place (side legs listed later, 'McKellar Hut to Lake Howden', are not taken), a summary leg replaced by its listed parts.",
+    "'A and B tracks' (Greenstone and Caples tracks) is one walk, not a collection, so it is a large walk.",
+    "Labels: a track whose name is part of a walk's name ('Greenstone Track' in 'Greenstone and Caples tracks', 'Rees Track' in 'Rees-Dart Track') belongs to that walk first (of two, the walk naming it first: not the Mavora - Greenstone Walkway); a track named like a DOC walk whose line stops short (the Ben Lomond Track summit section beyond DOC's line) is that walk.",
+    "Summaries: the map's tracks named like the walk or the tapped track join DOC's line (Ben Lomond to the summit); walks with no DOC line (Mount Iron Track) use the map's tracks of their name; a section label opens within the walk the map gives it (Greenstone Track at zoom 15+ as part of Greenstone and Caples).",
+    "Extents: without a stated distance, DOC's legs only when they cover at least half of DOC's line, and never a small piece of it; stated distances with several figures ('10 km | 20 km return', 'Various…') are not used, 'one way … return via same track' is not halved.",
+    "Track sheet: the middle height fits the chart and the section chips (at least compact + 300 dp, 55% of the screen); dragging on a track's elevation chart shows A and B on the map, as for routes."
+  ],
+  "dataChecks": "Label survey (label-survey.txt; the app's own DocWalks.mark on live DOC and LINZ data): Greenstone and Caples (Greenstone Track and Caples Track both named the walk, 60.3 km by DOC's four legs), Ben Lomond (summit section beyond DOC's line opens DOC's Ben Lomond Track), Mavora - Greenstone (its Greenstone Track section belongs to Greenstone and Caples), Tekapo Mt John, White Cliffs, Five Mile Loop, Sefton Ridge, Hump Ridge, Motatapu. Extent survey (extent-survey.txt, 232 DOC walks): no walk where a line nearer DOC's stated distance was available and not chosen; 35 walks whose DOC line itself is far from DOC's stated distance (listed) rely on the map's same-named tracks.",
+  "tests": {
+    "kotlinJvm": "257 tests, 0 failures (PriorityPipelineTest.queuedDiskReadsFollowPromotionInsteadOfFifo and PlaceSearchLoadTimeTest are timing-sensitive under full-suite load and passed alone; files unchanged)",
+    "rust": "unchanged (native libraries byte-identical to 0.1.48)"
+  },
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

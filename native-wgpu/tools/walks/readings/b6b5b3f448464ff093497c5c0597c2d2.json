@@ -1,0 +1,248 @@
+{
+ "guid": "b6b5b3f4-4846-4ff0-9349-7c5c0597c2d2",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Pelorus Track, from the car park at the end of Mt Richmond Road to the Hacket picnic area",
+   "shape": "one_way",
+   "start": {
+    "name": "car park at the end of Mt Richmond Road",
+    "quote": "From the car park at the end of Mt Richmond Road",
+    "ref": "F2"
+   },
+   "end": {
+    "name": "Hacket roadend and picnic area",
+    "quote": "From here it is about an hour to the Hacket roadend and picnic area",
+    "ref": "F1"
+   },
+   "via": [
+    {
+     "name": "Te Hoiere/Pelorus River",
+     "quote": "the track follows the Te Hoiere/Pelorus River for an hour to Emerald Pool",
+     "ref": "T26"
+    },
+    {
+     "name": "Emerald Pool",
+     "quote": "to Emerald Pool, an ideal fishing, swimming and picnicking spot",
+     "ref": null
+    },
+    {
+     "name": "Captains Creek Hut",
+     "quote": "and Captains Creek Hut",
+     "ref": "T12"
+    },
+    {
+     "name": "Captain Creek",
+     "quote": "crossing Captain Creek first",
+     "ref": "T11"
+    },
+    {
+     "name": "Fishtail Stream",
+     "quote": "the Pelorus and Fishtail Stream via swingbridges",
+     "ref": "T16"
+    },
+    {
+     "name": "Middy Creek Hut",
+     "quote": "follows it to Middy Creek Hut",
+     "ref": "T20"
+    },
+    {
+     "name": "Te Hoiere/Pelorus River",
+     "quote": "Just upstream of Middy Creek Hut a swingbridge crosses the Pelorus again",
+     "ref": "T26"
+    },
+    {
+     "name": "junction with Rocks Track",
+     "quote": "The track climbs steeply to the junction with Rocks Track.",
+     "ref": null
+    },
+    {
+     "name": "Roebuck Creek",
+     "quote": "the track crosses Roebuck Creek on a swingbridge",
+     "ref": "T24"
+    },
+    {
+     "name": "Te Hoiere/Pelorus River",
+     "quote": "ford the Pelorus on foot or cross it using a swingbridge 200 m upstream",
+     "ref": "T26",
+     "how": "ford"
+    },
+    {
+     "name": "Roebuck Hut",
+     "quote": "Roebuck Hut is just across the Te Hoiere/Pelorus River",
+     "ref": "T25"
+    },
+    {
+     "name": "Tōtara Saddle",
+     "quote": "From Tōtara Saddle (690 m) descend steeply for 30 min to Browning Hut",
+     "ref": "T28"
+    },
+    {
+     "name": "Browning Hut",
+     "quote": "to Browning Hut beside Browning Stream",
+     "ref": "T8"
+    },
+    {
+     "name": "Browning Stream",
+     "quote": "Just below Browning Hut cross Browning Stream",
+     "ref": "T9"
+    },
+    {
+     "name": "junction of Browning and Hacket Creeks",
+     "quote": "just before the junction of Browning and Hacket Creeks",
+     "ref": null
+    },
+    {
+     "name": "Hacket River",
+     "quote": "a suspension bridge crosses the Hacket River",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "3-4 days",
+   "distance": null,
+   "evidence": [
+    "From the car park at the end of Mt Richmond Road, the track follows the Te Hoiere/Pelorus River for an hour to Emerald Pool, an ideal fishing, swimming and picnicking spot.",
+    "Just below Browning Hut cross Browning Stream and walk through a lovely section of forest.",
+    "From here it is about an hour to the Hacket roadend and picnic area, through a mixture of plantation and native forests.",
+    "Just downstream of this area a suspension bridge crosses the Hacket River from where it's a short walk to the car park."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Exit to Nelson City over the Bryant Range",
+   "shape": "one_way",
+   "start": {
+    "name": "Middy Creek Hut",
+    "quote": "walk over the Bryant Range from Middy Creek Hut to Nelson City",
+    "ref": "T20"
+   },
+   "end": {
+    "name": "Brook Street in Nelson City",
+    "quote": "To the left the track leads steeply down to Brook Street in Nelson City.",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Rocks Track",
+     "quote": "The Rocks Track climbs steadily from the junction for about 600 m up a ridge",
+     "ref": null
+    },
+    {
+     "name": "Rocks Hut",
+     "quote": "meets the Bryant Range near Rocks Hut",
+     "ref": "T23"
+    },
+    {
+     "name": "Dun Saddle",
+     "quote": "The route leads from Rocks Hut to a junction at Dun Saddle",
+     "ref": "T15"
+    },
+    {
+     "name": "Coppermine Saddle",
+     "quote": "joining the Dun Mountain Trail at Coppermine Saddle",
+     "ref": "T13"
+    },
+    {
+     "name": "Windy Point",
+     "quote": "From Coppermine Saddle the track rounds Windy Point",
+     "ref": "T29"
+    },
+    {
+     "name": "Third House Shelter",
+     "quote": "The track continues to Third House Shelter.",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "An alternative exit is to walk over the Bryant Range from Middy Creek Hut to Nelson City.",
+    "The route leads from Rocks Hut to a junction at Dun Saddle.",
+    "To the left the track leads steeply down to Brook Street in Nelson City."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Dun Mountain Walkway (Brook Valley)",
+   "quote": "From Nelson, access the track via the Dun Mountain Walkway.",
+   "ref": null,
+   "onto": null
+  }
+ ],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Whispering Falls",
+   "quote": "the delicate Whispering Falls (30 min)",
+   "ref": null,
+   "from": null
+  },
+  {
+   "name": "old chromite mine and the bullock track",
+   "quote": "an old chromite mine and the bullock track (30 min)",
+   "ref": null,
+   "from": null
+  }
+ ],
+ "huts": [
+  {
+   "name": "Captains Creek Hut",
+   "quote": "Captains Creek Hut",
+   "ref": "T12"
+  },
+  {
+   "name": "Middy Creek Hut",
+   "quote": "Middy Creek Hut",
+   "ref": "T20"
+  },
+  {
+   "name": "Roebuck Hut",
+   "quote": "Roebuck Hut",
+   "ref": "T25"
+  },
+  {
+   "name": "Browning Hut",
+   "quote": "Browning Hut",
+   "ref": "T8"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Rocks Hut to Tōtara Saddle track",
+   "quote": "From Rocks Hut, this track wanders through a landscape of rock outcrops and hillocks.",
+   "ref": null,
+   "why": "other walk"
+  },
+  {
+   "name": "Maungatapu track",
+   "quote": "This track, actually a 4WD pylon maintenance road, climbs over Maungatapu Saddle",
+   "ref": "T5",
+   "why": "other walk"
+  },
+  {
+   "name": "Mt Fell",
+   "quote": "The route from Middy Creek Hut on the Pelorus Track to Mt Fell has many fallen trees.",
+   "ref": "T21",
+   "why": "other walk"
+  },
+  {
+   "name": "Dun Mountain Trail",
+   "quote": "The Dun Mountain Trail continues straight ahead along the old railway line",
+   "ref": "T3",
+   "why": "other walk"
+  },
+  {
+   "name": "Pelorus Bridge Scenic Reserve",
+   "quote": "turn onto Maungatapu Road at Pelorus Bridge Scenic Reserve",
+   "ref": null,
+   "why": "nearby"
+  }
+ ],
+ "doubts": "The main way is the whole track as the page presents it (Roadend to Hacket picnic area); its start F2 is the Pelorus Track meeting Mount Richmond Road, matching the text's car park at the end of Mt Richmond Road, and its end F1 is taken as the Hacket roadend (the Hacket Track meets Aniseed Valley Road), which the text names as the Hacket car park end. The Roebuck Hut crossing is given as an option: ford on foot or the swingbridge 200 m upstream, so it is recorded as ford. The Exit to Nelson City has its own heading without a time; its end is Brook Street, and the Dun Mountain Trail continues along the old railway line to a point further along Brook Street, which is not walked by that way. The Middy Creek Hut to Rocks Hut and Rocks Hut to The Brook sections have their own times, which are not combined. Time 3-4 days is DOC's summary; no distances for the main way. The Rocks Hut to Tōtara Saddle, Maungatapu and Mt Fell entries sit under 'Other tracks' or as a route off this track and are not ways for this walk."
+}

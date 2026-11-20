@@ -2,6 +2,7 @@
  * This template runs inside the pinned bundle and uses its private helpers. */
 let Un;
 (function(e){
+ const STAGED_ITEMS=16,STAGED_BYTES=16*1024*1024,PROMISE_BYTES=1024*1024;let stagedItems=0,stagedBytes=0;
  let pending=new Set(),byKey=new Map(),n=0,r=0,i={},ready=[],cold=[],policy=null,dirty=false,serial=0,cachedActive=0,cachedStreak=0,scheduled=false,policyEvaluations=0,rebuilds=0;
  const moving=()=>{for(const key of Object.keys(i))if(i[key]())return true;return false;};
  const limit=()=>Math.max(1,moving()?On.MAX_PARALLEL_IMAGE_REQUESTS_PER_FRAME:On.MAX_PARALLEL_IMAGE_REQUESTS);
@@ -20,8 +21,12 @@ let Un;
  function defer(){if(scheduled)return;scheduled=true;Promise.resolve().then(()=>{scheduled=false;pump();});}
  function pump(){
   if(!pending.size){ready=[];cold=[];byKey.clear();return;}
-  if(dirty||ready.length+cold.length>pending.size*2+64)rebuild();
-  while(n<limit()){
+  const overgrown=ready.length+cold.length>pending.size*2+64;
+  // Dirty priorities cannot affect admission while every slot is occupied.
+  // Keep the dirty flag until capacity returns; still bound stale heap nodes.
+  if(n>=limit()&&!overgrown)return;
+  if(dirty||overgrown)rebuild();
+  while(n<limit()&&stagedItems+n<STAGED_ITEMS&&stagedBytes+(n+1)*PROMISE_BYTES<=STAGED_BYTES){
    const a=top(ready),b=n-cachedActive<limit()-reserve()?top(cold):null;
    const job=a&&!(cachedStreak>=3&&b)?pop(ready):b?pop(cold):null;if(!job)break;
    const current=info(job).cached===true;if(!current&&job.ridgeCached&&n-cachedActive>=limit()-reserve()){job.ridgeCached=false;push(cold,job);continue;}job.ridgeCached=current;
@@ -32,8 +37,8 @@ let Un;
  e.setPolicy=f=>{policy=typeof f==='function'?f:null;dirty=true;pump();};
  e.pump=()=>{dirty=true;pump();};
  e.notifyReady=key=>{if(byKey.has(key)){dirty=true;defer();}};
- e.stats=()=>({active:n,cachedActive,queued:pending.size,moving:moving(),limit:limit(),cachedReserve:reserve(),policyEvaluations,queueRebuilds:rebuilds});
- e.resetRequestQueue=()=>{for(const j of pending){j.abortController.signal.removeEventListener('abort',j.cancelQueued);j.onError(new un());}pending=new Set();byKey.clear();ready=[];cold=[];n=0;r=0;i={};cachedActive=0;cachedStreak=0;dirty=false;};
+ e.stats=()=>({active:n,stagedItems,stagedBytes,stagingItemLimit:STAGED_ITEMS,stagingByteLimit:STAGED_BYTES,cachedActive,queued:pending.size,moving:moving(),limit:limit(),cachedReserve:reserve(),policyEvaluations,queueRebuilds:rebuilds,activeDecodes:decoding,queuedDecodes:decodeWaiting.size,decodeLimit:decodeCap()});
+ e.resetRequestQueue=()=>{for(const j of pending){j.abortController.signal.removeEventListener('abort',j.cancelQueued);j.onError(new un());}pending=new Set();byKey.clear();ready=[];cold=[];r=0;i={};cachedStreak=0;dirty=false;};
  e.addThrottleControl=f=>{const key=r++;i[key]=f;return key;};
  e.removeThrottleControl=key=>{delete i[key];pump();};
  e.transformAndGetImage=async(manager,url,type,controller,refresh=true,options)=>{const request=await manager.transformRequest(url,type);fn(controller.signal);return e.getImage(request,controller,refresh,options);};
@@ -44,18 +49,32 @@ let Un;
   if(controller.signal.aborted){reject(new un(controller.signal.reason));return;}
   j.ridgeAttempt=globalThis.RidgeTileTrace?.url('native-image-queued',request.url);pending.add(j);track(j);controller.signal.addEventListener('abort',j.cancelQueued,{once:true});index(j);pump();
  });
+ let decoding=0,decodeLimit=null;const decodeWaiting=new Set();
+ const decodeCap=()=>decodeLimit??limit();
+ function pumpDecodes(){while(decodeWaiting.size&&decoding<decodeCap()){let best;for(const job of decodeWaiting){const score=info(job.owner).priority;if(!best||(Number.isFinite(score)?score:0)<best.score)best={job,score:Number.isFinite(score)?score:0};}decodeWaiting.delete(best.job);best.job.start();}}
+ e.setDecodeLimit=value=>{decodeLimit=value==null?null:Math.max(1,Math.min(96,Math.floor(Number(value)||1)));pumpDecodes();};
+ async function prepareImage(data,options,signal,onStart,owner){
+  fn(signal);
+  if(decoding<decodeCap()&&!decodeWaiting.size){decoding++;try{onStart();return await decode(data,options);}finally{decoding--;pumpDecodes();}}
+  return new Promise((resolve,reject)=>{
+  const job={owner,start(){signal.removeEventListener('abort',cancel);if(signal.aborted){reject(new un(signal.reason));return;}decoding++;onStart();
+   Promise.resolve().then(()=>decode(data,options)).then(resolve,reject).finally(()=>{decoding--;pumpDecodes();});
+  }},cancel=()=>{if(decodeWaiting.delete(job)){reject(new un(signal.reason));pumpDecodes();}};
+  if(signal.aborted){reject(new un(signal.reason));return;}decodeWaiting.add(job);signal.addEventListener('abort',cancel,{once:true});pumpDecodes();
+ });}
  const decode=(data,options)=>typeof createImageBitmap==='function'?Gt(data,options):Kt(data);
  async function run(j){
+  let delivery=true,staged=0;const release=()=>{if(!delivery)return;delivery=false;n--;if(j.ridgeCached)cachedActive--;pump();};
   j.state='running';if(j.ridgeCached)cachedActive++;trace('native-image-admitted',j,{active:n+1,queued:pending.size});n++;
   const {requestParameters:request,supportImageRefresh:refresh,imageBitmapOptions:options,abortController:controller}=j;
   const element=refresh===false&&!options&&!Bt(self)&&!kn(request.url)&&(!request.headers||Object.keys(request.headers).every(k=>k==='accept'));
   try{
-   const response=await(element?loadElement(request,controller):Rn(request,controller));delete j.abortController;j.state='completed';
+   trace('image-delivery-start',j);const response=await(element?loadElement(request,controller):Rn(request,controller));trace('image-delivery-finished',j);if(controller.signal.aborted){response.data?.close?.();fn(controller.signal);}delete j.abortController;j.state='completed';
    if(response.data instanceof HTMLImageElement||Wt(response.data))j.onSuccess(response);
    else if(!response.data||response.data.byteLength===0)j.onSuccess({data:null,cacheControl:response.cacheControl,expires:response.expires});
-   else{trace('decode-start',j);const data=await decode(response.data,options);trace('decode-finished',j);j.onSuccess({data,cacheControl:response.cacheControl,expires:response.expires});}
+   else{fn(controller.signal);const size=response.data.byteLength;if(size<=PROMISE_BYTES&&stagedItems<STAGED_ITEMS&&stagedBytes+size+n*PROMISE_BYTES<=STAGED_BYTES){staged=size;stagedItems++;stagedBytes+=size;release();}trace('decode-queued',j);const data=await prepareImage(response.data,options,controller.signal,()=>trace('decode-start',j),j);trace('decode-finished',j);if(controller.signal.aborted){data?.close?.();fn(controller.signal);}j.onSuccess({data,cacheControl:response.cacheControl,expires:response.expires});}
   }catch(error){delete j.abortController;j.onError(nt(error));}
-  finally{n--;if(j.ridgeCached)cachedActive--;pump();}
+  finally{if(staged){stagedItems--;stagedBytes-=staged;}release();pump();}
  }
  function loadElement(request,controller){return new Promise((resolve,reject)=>{
   const image=new Image(),url=request.url,credentials=request.credentials;

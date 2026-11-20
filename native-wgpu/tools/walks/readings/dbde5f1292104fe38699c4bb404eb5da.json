@@ -1,0 +1,150 @@
+{
+ "guid": "dbde5f12-9210-4fe3-8699-c4bb404eb5da",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Nydia Track from Duncan Bay to Kaiuma Bay",
+   "shape": "one_way",
+   "start": {
+    "name": "Duncan Bay road end and carpark",
+    "quote": "The track starts at the road end and carpark at Duncan Bay.",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Kaiuma Bay car park",
+    "quote": "sidles around to a point above Kaiuma Bay, before dropping to the car park",
+    "ref": "F3"
+   },
+   "via": [
+    {
+     "name": "Pipi Beach",
+     "quote": "Pipi Beach, 15 min from the track start, is a good picnic spot.",
+     "ref": null
+    },
+    {
+     "name": "Ngāwhakawhiti Bay",
+     "quote": "At Ngawhakawhiti Bay the track climbs to Nydia Saddle",
+     "ref": "T9"
+    },
+    {
+     "name": "Nydia Saddle",
+     "quote": "the track climbs to Nydia Saddle (347 m)",
+     "ref": "T12"
+    },
+    {
+     "name": "Nydia Bay campsite",
+     "quote": "drops steeply down to the campsite in Nydia Bay",
+     "ref": "T11"
+    },
+    {
+     "name": "wide stream before the Nydia Lodge turn-off",
+     "quote": "Just before the lodge turn-off you have to ford a wide stream.",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Nydia Lodge turn-off",
+     "quote": "Nydia Lodge is a 30 min walk around the shore from the turn-off.",
+     "ref": null
+    },
+    {
+     "name": "stream crossed twice after the turn-off",
+     "quote": "crossing it twice",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Kaiuma Saddle",
+     "quote": "The climb to Kaiuma Saddle (387 m)",
+     "ref": "T8"
+    },
+    {
+     "name": "stream after Kaiuma Saddle",
+     "quote": "the track drops quickly to cross a stream",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Kaiuma Bay",
+     "quote": "sidles around to a point above Kaiuma Bay",
+     "ref": "T7"
+    }
+   ],
+   "direction": null,
+   "time": "9.5 hr",
+   "distance": "27 km one way",
+   "evidence": [
+    "Duncan Bay to Nydia Bay campsite (4 hr)",
+    "Nydia Lodge turn-off to Kaiuma Bay (4 hr)",
+    "The track starts at the road end and carpark at Duncan Bay.",
+    "The track then climbs a little into the forest and sidles around to a point above Kaiuma Bay, before dropping to the car park.",
+    "Travel 21 km to the track start on the roadside marked with a large sign."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Shag Point (by boat)",
+   "quote": "Another option is to take a boat to Shag Point, 4 km from the track end at Kaiuma.",
+   "ref": "T13",
+   "onto": null
+  },
+  {
+   "name": "Nydia Bay (by boat)",
+   "quote": "take passengers from Havelock to Shag Point, Nydia Bay or Duncan Bay",
+   "ref": "T10",
+   "onto": null
+  }
+ ],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Nydia Lodge",
+   "quote": "Nydia Lodge is a 30 min walk around the shore from the turn-off.",
+   "ref": null,
+   "from": "Nydia Lodge turn-off"
+  }
+ ],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Nydia Lodge",
+   "quote": "Nydia Lodge sleeps up to 50 people",
+   "ref": null,
+   "why": "side trip"
+  },
+  {
+   "name": "Tennyson Inlet",
+   "quote": "take in the great views of Tennyson Inlet",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Tapuae-o-Uenuku",
+   "quote": "Tapuae-o-Uenuku (2885 m)",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Inland Kaikoura mountains",
+   "quote": "in the distant Inland Kaikoura mountains",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Opouri Saddle",
+   "quote": "wonderful views from Opouri Saddle",
+   "ref": "T18",
+   "why": "other"
+  },
+  {
+   "name": "Havelock",
+   "quote": "From Havelock, turn off at Te Hoiere Road",
+   "ref": "T6",
+   "why": "other"
+  }
+ ],
+ "doubts": "Start: F1 (Nydia Track meets Duncan Bay Road) is the road end and carpark at Duncan Bay. End: F3 (Nydia Track meets Kaiuma Bay Road) is taken as the Kaiuma car park, since the text says the track drops to the car park from above Kaiuma Bay and names the track; F4 (an unnamed track meets Kaiuma Bay Road) is about 500 m west and was not chosen. The text's 'car park' at Kaiuma is not otherwise named. Fords: the stream before the Nydia Lodge turn-off is stated to be forded; the stream crossed twice after the turn-off and the stream after Kaiuma Saddle are recorded as fords because the page describes unbridged crossings and no bridge is named there. The Nydia Lodge is a 30 min walk from the turn-off and is recorded as a side trip, not a hut on the way. The Shag Point and Nydia Bay boat access points do not say which track they join (Shag Point is 4 km from the track end at Kaiuma). The Tennyson Inlet view has no ref because two names of that inlet (T15 place, T16 coast) lie at different points. The Duncan Bay and Kaiuma distances are DOC's; the way's distance is copied from DOC's summary, not from a heading."
+}

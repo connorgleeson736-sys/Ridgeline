@@ -1,0 +1,114 @@
+Shek Harn Historic Reserve Track [4 km return via same track]: line 1.4 km -> unchanged
+Smugglers Bay Loop Track [3 km loop]: line 1.9 km -> unchanged
+Punakaiki – Pororari Loop [11 km loop]: line 7.2 km -> unchanged
+Slapjack Saddle Track [24.5 km one way one way]: line 16.0 km -> unchanged
+Five Mile Loop Track [3.8 km loop]: line 2.0 km -> unchanged
+Roaring Meg Pack Track [18 km one way]: line 13.2 km -> unchanged
+Te Aroha Summit Track [3.9 km one way]: line 1.4 km -> unchanged
+Mākara Walkway [7 km loop]: line 4.1 km -> unchanged
+Red Tarns Track [4 km return via same track]: line 0.6 km -> 1.7 km
+Fossil Point Track [2 km one way]: line 1.3 km -> unchanged
+Minnehaha Walk [1.2 km loop]: line 0.4 km -> unchanged
+Third Branch Track [1.3 km loop]: line 0.7 km -> unchanged
+Long Hilly (Round Hill) Walking Track [2.7 km loop]: line 2.0 km -> 2.0 km
+Pukaki Kettle Hole Track [4 km return via same track]: line 1.2 km -> unchanged
+Tui Mine Track (from Te Aroha Summit to town) [8.4 km from summit one way]: line 3.6 km -> unchanged
+Highcliff Track [4 km return loop]: line 2.1 km -> unchanged
+Waterworks Walk [1 km return via same track]: line 0.0 km -> unchanged
+Tuhoto Ariki Trail [5 km one way]: line 3.5 km -> unchanged
+Luggate Creek Track [1.5 km one way]: line 0.9 km -> unchanged
+Tekapo Mt John Walkway [8.9 km loop]: line 3.3 km -> unchanged
+Waikiti Route [8.2 km one way]: line 3.2 km -> 7.9 km
+Whakapapaiti Valley Track [16 km loop]: line 10.4 km -> unchanged
+Big Rimu Walk [2.2 km return via same track]: line 0.7 km -> unchanged
+Lake Gault Track [8 km return via same track]: line 2.9 km -> unchanged
+Flagstaff Hill Track [2.5 km loop]: line 1.7 km -> unchanged
+Devils Punchbowl Walking Track [2 km return via same track]: line 0.7 km -> unchanged
+Pororari River - Bullock Creek Road Track [15 km loop]: line 9.6 km -> unchanged
+Puhoi to Remiger Road Track [5 km one way]: line 1.2 km -> unchanged
+Falls Creek Route [21 km return via same track]: line 3.6 km -> unchanged
+Brian O’Lyn Route [8.4 km one way]: line 2.4 km -> unchanged
+Ross Goldfield Water Race Walkway [2.5 km loop]: line 1.1 km -> unchanged
+Kura Tāwhiti Access Track [1.7 km loop]: line 1.1 km -> unchanged
+Boyd Creek Track [6.5 km one way]: line 4.9 km -> unchanged
+George Sound Route [17.8 km one way]: line 0.6 km -> unchanged
+Brunner Mine Site Walk [2 km loop]: line 0.7 km -> unchanged
+Te Kauri Park Circuit Walk [2.5 km loop]: line 1.0 km -> unchanged
+Butchers Dam Loop Track [2.5 km loop]: line 1.7 km -> unchanged
+Taraire Ridge Track [8.9 km loop]: line 5.1 km -> unchanged
+Water Race Tunnel Track [1.6 km one way]: line 0.8 km -> unchanged
+Hideaway Hut Route [6 km return via same track]: line 2.0 km -> unchanged
+Homestead Run [15 km loop]: line 7.1 km -> unchanged
+Cowans Hill Track [3.2 km one way]: line 1.8 km -> unchanged
+Roberts Point Track [12.3 km return via same track]: line 3.7 km -> unchanged
+Pillar Point Lighthouse Track [1.5 km one way]: line 1.1 km -> unchanged
+Atiwhakatu Track [7.2 km one way]: line 5.0 km -> unchanged
+Tupapakurua Falls Track [11 km return return via same track]: line 3.0 km -> unchanged
+Tongariro Alpine Crossing [20.2 km one way]: line 0.3 km -> unchanged
+Rocky Mountain Track [7 km loop]: line 1.5 km -> unchanged
+Tirohanga Dunes Trail [20 km return via same track]: line 4.5 km -> unchanged
+Grahams Bush Walkway [6.8 km return return via same track]: line 2.1 km -> unchanged
+Mount Pureora via Toitoi Track [5.8 km return via same track]: line 1.8 km -> unchanged
+Tahurangi Translator Tower round trip [7.5 km loop]: line 3.6 km -> unchanged
+Lower Circuit Track [4 km loop]: line 1.4 km -> unchanged
+Waipohatu Waterfalls Track [6.5 km loop]: line 4.6 km -> 5.3 km
+Twizel River Trail [12 km one way]: line 3.6 km -> unchanged
+Mavora - Greenstone Walkway [50 km one way]: line 33.7 km -> area too large
+Deep Stream Track [2 km one way]: line 1.2 km -> unchanged
+Sawyers and Parsons Creek to Freehold Creek Track [12 km one way]: line 6.1 km -> unchanged
+Eliza Mine Loop Track [7 km loop]: line 4.9 km -> 6.5 km
+Catchpool Loop Walk [1.6 km loop]: line 0.7 km -> unchanged
+Lake Wānaka Lookout Track [3.5 km return via same track]: line 1.3 km -> unchanged
+Huriawa Pā Walk [2.4 km loop]: line 1.0 km -> unchanged
+Ridge Loop Track [1.9 km loop]: line 0.9 km -> unchanged
+Headlands Track [1.6 km loop]: line 0.8 km -> unchanged
+Te Hapua Bay Track [2.5 km one way return via same track]: line 0.5 km -> 2.0 km
+Remutaka Rail Trail [18 km (Kaitoke to Cross Creek carpark) one way]: line 3.3 km -> unchanged
+Ballroom Overhang Track [12 km return via same track]: line 1.0 km -> unchanged
+Motatapu Track [49 km one way]: line 32.0 km -> area too large
+Mapoutahi Track [3 km return via same track]: line 0.2 km -> unchanged
+Forest Walk [1.3 km one way]: line 0.7 km -> unchanged
+White Pine Bush Scenic Reserve walks [800 m /1.6 km loop]: line 1.2 km -> 1.4 km
+Lankey Creek Tram Track [4 km loop]: line 2.8 km -> 3.8 km
+Dusky Track [84 km one way]: line 50.1 km -> area too large
+Lower Wairaki Hut to Upper Wairaki Hut Route [8.5 km one way]: line 5.4 km -> 7.7 km
+Gunns Bush Track [4.1 km return via same track]: line 1.2 km -> unchanged
+Sefton Ridge Track [4.3 km loop]: line 2.3 km -> unchanged
+Opito Point Pā Walk [1 km return via same track]: line 0.3 km -> unchanged
+Circle Walk and Circle Loop Track [1.7 km loop]: line 1.2 km -> unchanged
+Tasman Glacier View Track [1.5 km return via same track]: line 0.4 km -> unchanged
+Te Rereatukahia Hut Track [9.5–15 km one way]: line 4.3 km -> unchanged
+Awakiki Bush Track [2.7 km loop]: line 1.2 km -> unchanged
+Boundary Creek Track [12 km return via same track]: line 2.3 km -> unchanged
+Thomas River Track [2 km one way]: line 1.4 km -> 2.2 km
+Angelus Hut via Travers and Cascade Track/Route [9.4 km one way]: line 5.4 km -> unchanged
+Kaituna Wetland Loop Track [4.4 km loop]: line 2.3 km -> unchanged
+Moraine Walk [4 km return via same track]: line 0.6 km -> unchanged
+Hāwea River Track [14 km one way]: line 5.3 km -> unchanged
+Mt McIntosh Loop Track [18 km loop]: line 13.1 km -> unchanged
+Homes Ridge Track [5 km one way]: line 3.3 km -> unchanged
+Croesus Battery [2 km one way]: line 0.8 km -> unchanged
+Aparima Huts/Spence Burn Junction Route [5 km one way]: line 2.1 km -> unchanged
+Cardrona-Cromwell Pack Track [25 km one way]: line 15.8 km -> unchanged
+Borland Nature Walk [2.2km loop]: line 1.6 km -> unchanged
+Denniston Brakehead walks [2 km loop]: line 1.5 km -> unchanged
+Te Arapiki o Tawhaki [4 km loop]: line 2.4 km -> 3.2 km
+Ngatoro Loop Track [1.2 km loop]: line 0.8 km -> unchanged
+Stony River (Hangatahua) Walkway [3 km return via same track]: line 0.5 km -> unchanged
+Hawksbury lagoon and beach walk [4 km loop]: line 1.6 km -> unchanged
+Hump Ridge Track [61.5 km loop]: line 44.1 km -> area too large
+Ōkārito Trig Walk [4.2 km return via same track]: line 0.9 km -> unchanged
+White Cliffs Walkway Track [22 km return via same track]: line 6.7 km -> 8.7 km
+Inland Track [41.1 km one way]: line 28.1 km -> unchanged
+Leatham Molesworth Route [56 km loop]: line 23.6 km -> unchanged
+North-South Track [82 km one way]: line 19.4 km -> unchanged
+Motuihe Island tracks [1 to 6.5 km return via same track]: line 2.0 km -> unchanged
+Union Creek Track [3 km loop]: line 1.8 km -> unchanged
+Butterfields Wetland Walk [2.5km loop]: line 1.1 km -> unchanged
+Horopito Track [12 km one way]: line 7.5 km -> 9.2 km
+Ohakune Old Coach Road [15 km one way]: line 11.2 km -> 11.5 km
+Cookson Kauri Walk [6 km return via same track]: line 2.1 km -> unchanged
+Kōkōwai Track round trip [12 km loop]: line 6.3 km -> unchanged
+Silverpeaks Circuit Track [24 km loop]: line 0.5 km -> unchanged
+Smiths Stream Hut track [6 km one way]: line 4.4 km -> unchanged
+short 113, extended 14

@@ -13,6 +13,8 @@ public class MainActivity extends BridgeActivity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     registerPlugin(RidgelineOfflinePlugin.class);
+    // Overlap native storage, cache-journal and provider connection setup with WebView start-up.
+    NativeWarmup.start(this);
     super.onCreate(savedInstanceState);
     if (bridge == null || bridge.getWebView() == null) return;
     View parent = (View) bridge.getWebView().getParent();

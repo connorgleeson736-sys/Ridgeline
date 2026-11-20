@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="nz.ridgeline.nativeapp.NativeUiPortTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-01T20:33:03.142Z" hostname="04cbfa2fe828" time="0.42">
+  <properties/>
+  <testcase name="realLinzTileRetainsEnabledNamesWhenDisabledLayersAreSkipped" classname="nz.ridgeline.nativeapp.NativeUiPortTest" time="0.315"/>
+  <testcase name="decoderSkipsUnknownLengthFieldsAndRejectsTruncatedWireData" classname="nz.ridgeline.nativeapp.NativeUiPortTest" time="0.001"/>
+  <testcase name="flatCoverContainsRotatedViewportAndKeepsNearestDetailWithinBudget" classname="nz.ridgeline.nativeapp.NativeUiPortTest" time="0.014"/>
+  <testcase name="visibleVectorParentBridgesOnlyMissingChildrenAndRetiresWhenCovered" classname="nz.ridgeline.nativeapp.NativeUiPortTest" time="0.002"/>
+  <testcase name="chartSectionMatchesCapacitorEndpointInterpolationAndMissingGaps" classname="nz.ridgeline.nativeapp.NativeUiPortTest" time="0.006"/>
+  <testcase name="visibleBackgroundLayerEscapesHeldCacheWithoutPromotingItsNetworkClass" classname="nz.ridgeline.nativeapp.NativeUiPortTest" time="0.081"/>
+  <system-out><![CDATA[{"scope":"Host JVM real LINZ MVT; identical enabled names, skipped disabled source-layer geometry. Not phone FPS.","sourceTileBytes":41926,"fullFeatures":135,"enabledFeatures":20,"beforeMs":[5.3984809, 3.715386, 2.413637, 1.455174, 1.2466846],"afterMs":[0.149369, 0.1335097, 0.0633849, 0.0481526, 0.0526426],"beforeMedianMs":2.413637,"afterMedianMs":0.0633849,"visibleLabels":1,"allLayersLines":119}
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

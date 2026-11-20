@@ -1,0 +1,370 @@
+   prose starts: [Urchin Campsite off Kaimanawa Road, Tree Trunk Gorge Road]
+== Tree Trunk Gorge tracks [] DOC line 10.3 km; 52 map pieces; 185 ms
+   leg: Popular mountain bike option: Tree Trunk Gorge - SH1 Loop Track | 2 - 4 hr mountain bike | 17.0 km -> one way 17.0
+   note: Popular mountain bike option: Tree Trunk Gorge - SH1 Loop Track: ends not found
+   note: Urchin Campsite off Kaimanawa Road: 10408 m in 1 hr 30 min
+   note: Tree Trunk Gorge Road: not joined
+   lifts 0; peaks [Urchin]
+   no options
+== Lake Clearwater tracks [] DOC line 12.0 km; 46 map pieces; 65 ms
+   leg: Lake Clearwater to Mount Guy summit | 3 hr one way | 4.3 km -> one way 4.3
+   leg: Lake Clearwater to Mystery Lake | 4 hr one way | 11.8 km -> one way 11.8
+   lifts 0; peaks [Mount Guy, Dogs Hill]
+   starts: [Lake Clearwater]; ends: [Mount Guy summit, Mystery Lake]
+   Lake Clearwater -> Mount Guy summit: 3.28 km (DOC 4.3 km); DOC line covered 25%; on DOC line 100%; tracks [Lake Clearwater Circuit Track, Mt Guy Track]
+   Lake Clearwater -> Mystery Lake: 10.68 km (DOC 11.8 km); DOC line covered 57%; on DOC line 59%; tracks [Lake Clearwater Circuit Track, Lake Clearwater Western Link Track, Mystery Lake Track]
+== Rodger Inlet Track [10 km to hut, 3.5 km to bushline return via same track] DOC line 11.6 km; 23 map pieces; 23 ms
+   leg: Lake Monowai Car Park to Rodger Inlet Hut | 6 hr | 10.0 km -> one way 10.0
+   note: one way, covering 69% of DOC's line
+   lifts 0; peaks [Rocky Top, Cleughearn Peak, Mount Cuthbert, Hindley Peak, Edge Peak]
+   no options
+== Hakarimata Walkway [12 km one way] DOC line 13.6 km; 150 map pieces; 37 ms
+   leg: Southern section: Hakarimata Rail Trail to summit view tower | 2 hr | 3.5 km -> one way 3.5
+   leg: Northern section: Parker Road to summit view tower | 4.5 hr | 6.0 km -> one way 6.0
+   note: Southern section: Hakarimata Rail Trail to summit view tower: ends not found
+   note: Northern section: Parker Road to summit view tower: ends not found
+   lifts 2; peaks [Te Puroa, Hakarimata, Havelock Hill, Taupiri]
+   no options
+== Whirinaki Recreation Camp tracks [] DOC line 2.9 km; 45 map pieces; 16 ms
+   leg: Loop Track to River | 30 min | 1.0 km -> one way 1.0
+   note: Loop Track to River: ends not found
+   lifts 0; peaks [Otukopeka, Tikorangi, Te Pakira, Wekanui]
+   no options
+== South Mavora Lake walking tracks [] DOC line 16.9 km; 43 map pieces; 4 ms
+   leg: Lake Mavora to the Kiwi Burn Hut | 4 hr | null km -> one way null
+   note: Lake Mavora to the Kiwi Burn Hut: no distance
+   lifts 0; peaks [Snowdon Peak, Bare Peak, Mount Cerberus, Mount Eldon, Bald Hill, Mount Campbell]
+   no options
+== Holdsworth - Kaitoke Track: area too large
+== Gibbs Hill Track [] DOC line 8.5 km; 81 map pieces; 25 ms
+   leg: Loop: Wainui – Gibbs Hill – Tōtaranui – road back to Wainui | 5 hr 30 min (walking); 2 hr 30 min (biking) | 23.0 km -> one way 23.0
+   leg: Tōtaranui – Gibbs Hill return |  | 9.0 km -> one way 4.5
+   note: Loop: Wainui – Gibbs Hill – Tōtaranui – road back to Wainui: ends not found
+   note: Tōtaranui – Gibbs Hill return: not joined
+   lifts 0; peaks [Taupō Hill, Centre Peak, Gibbs Hill, Tōtaranui]
+   no options
+== Kauaeranga Kauri Trail (Pinnacles Walk) [6 km one way] DOC line 6.3 km; 62 map pieces; 60 ms
+   leg: Kauaeranga Road end – Hydro Camp via Webb Creek Track – Pinnacles Hut | 2 hr 30 min – 3 hr one way | 6.0 km -> one way 6.0
+   note: one way, covering 63% of DOC's line
+   lifts 0; peaks [Mount Rowe, Table Mountain, Tauranikau, Hihi, Ben Bolt]
+   no options
+== Whakaipo Bay tracks [] DOC line 22.1 km; 58 map pieces; 20 ms
+   leg: Whakaipo Bay to Kinloch (W2K) |  | 14.0 km -> one way 14.0
+   note: Whakaipo Bay to Kinloch (W2K): not joined
+   lifts 0; peaks [Te Kauwae, Ngangautu, Tuhingamata]
+   no options
+== Whataroa, Butler and Perth valleys tracks: area too large
+== Kumeti Road end tramping tracks [] DOC line 13.6 km; 91 map pieces; 5 ms
+   leg: Kumeti Road to Kiritaki Hut | 5-6 hr | null km -> one way null
+   leg: Kumeti Road to Opawe Road | 6-7 hr | null km -> one way null
+   note: Kumeti Road to Kiritaki Hut: no distance
+   note: Kumeti Road to Opawe Road: no distance
+   lifts 0; peaks [Ross Peak, Maharahara, Matanginui]
+   no options
+== Wetland Track [3.3 km one way] DOC line 2.5 km; 27 map pieces; 48 ms
+   leg: Northern Junction to Billy Goat Point | 1 hr 10 min one way | 3.3 km -> one way 3.3
+   leg: Northern Junction to Waikarapupu | 50 min one way | 2.1 km -> one way 2.1
+   note: Northern Junction to Billy Goat Point: 668 m
+   note: Northern Junction to Waikarapupu: ends not found
+   lifts 0; peaks []
+   no options
+== Lawrence Road tramping tracks [] DOC line 5.3 km; 57 map pieces; 2 ms
+   leg: Lawrence Road to Lotkow Road | 2 - 3 hr | null km -> one way null
+   note: Lawrence Road to Lotkow Road: no distance
+   lifts 0; peaks [Boar Hill, Don Juan]
+   no options
+   prose starts: [Woodville, Ashhurst end]
+== Manawatu Gorge Track [11.2 km one way] DOC line 6.9 km; 94 map pieces; 23 ms
+   note: Lawrence Road to Lotkow Road: no distance
+   note: Woodville: not found
+   lifts 1; peaks [Adams Peak]
+   no options
+== Wharfedale/Townshend Track [] DOC line 14.2 km; 74 map pieces; 20 ms
+   leg: View Hill car park to Wharfedale Hut | 5 hr one way | 15.0 km -> one way 15.0
+   note: View Hill car park to Wharfedale Hut: 1432 m
+   lifts 0; peaks [Mount Oxford]
+   no options
+== Lodestone summit [] DOC line 6.8 km; 25 map pieces; 51 ms
+   leg: Flora car park - Lodestone | 2 hr | 2.0 km -> one way 2.0
+   leg: Flora car park to Lodestone - Flora Hut - Flora car park | 4 - 5 hr | 7.5 km -> one way 7.5
+   note: Flora car park - Lodestone: 3321 m
+   note: Flora car park to Lodestone - Flora Hut - Flora car park: 3321 m
+   lifts 0; peaks [Mount Hodder, Lodestone, Mount McMahon]
+   no options
+   prose starts: [Hut Creek Track, Jacks Pass]
+== Bridge Hill Track [600 m one way] DOC line 0.7 km; 51 map pieces; 19 ms
+   note: Flora car park - Lodestone: 3321 m
+   note: Flora car park to Lodestone - Flora Hut - Flora car park: 3321 m
+   note: Jacks Pass: not found
+   lifts 0; peaks [Mount Wall, Bridge Hill, Helicopter Hill, Flock Hill]
+   no options
+== Grandview Ridge tracks [] DOC line 35.6 km; 254 map pieces; 85 ms
+   leg: Long Gully car park to Timaru Creek Road |  | 37.5 km -> one way 37.5
+   leg: Long Gully car park to Nook Road carpark | 9-11 hr | 29.0 km -> one way 29.0
+   leg: Long Gully car park to Sandy Point car park via Deep Gully Track | 3-5 hr | 11.5 km -> one way 11.5
+   leg: Long Gully car park to Sandy Point car park via Eastern Hill Track | 3-5 hr | 11.0 km -> one way 11.0
+   note: Long Gully car park to Timaru Creek Road: ends not found
+   note: Long Gully car park to Nook Road carpark: ends not found
+   note: Long Gully car park to Sandy Point car park via Deep Gully Track: not joined
+   note: Long Gully car park to Sandy Point car park via Eastern Hill Track: not joined
+   lifts 1; peaks [Breast Hill, Breast Peak, Grandview Mountain, Bluenose, Trig Hill]
+   no options
+== Karangahake Gorge Historic Walkway [] DOC line 7.5 km; 136 map pieces; 27 ms
+   leg: Historic Walkway to Waikino | 4 hr return | 4.3 km -> one way 2.2
+   note: Historic Walkway to Waikino: not joined
+   lifts 0; peaks [Karangahake, Pukekauri]
+   no options
+== Mount William Walkway [] DOC line 4.4 km; 27 map pieces; 40 ms
+   leg: McMillan Rd car park to Mount William summit | 1 hr 30 min one way | 2.5 km -> one way 2.5
+   leg: Mount William summit on to Puketutu trig and Puketutu Rd | 1 hr 30 min one way | 2.0 km -> one way 2.0
+   note: Mount William summit on to Puketutu trig and Puketutu Rd: ends not found
+   note: one way, covering 53% of DOC's line
+   lifts 0; peaks [Puketūtū, Mount William, Pinnacle Hill]
+   no options
+   prose starts: [Forest Hill North Picnic Area, Tussock Creek Picnic Area]
+== Derek Turnbull Track [11 km return via same track] DOC line 4.5 km; 93 map pieces; 42 ms
+   note: Mount William summit on to Puketutu trig and Puketutu Rd: ends not found
+   note: one way, covering 53% of DOC's line
+   note: Forest Hill North Picnic Area: not found
+   lifts 0; peaks [Forest Hill, Sharks Tooth Hill]
+   no options
+== Maketawa Hut Circuit [6.5 km loop] DOC line 6.8 km; 79 map pieces; 57 ms
+   leg: Egmont Road end (North Egmont) to Maketawa Hut via Maketawa Track | 1 hr 30 min | 3.1 km -> one way 3.1
+   leg: Egmont Road end (North Egmont) to Maketawa Hut via Translator Road | 1 hr 15 min | 3.4 km -> one way 3.4
+   note: one way, covering 33% of DOC's line
+   lifts 5; peaks [Hook Hill, Taranaki Maunga, Sharks Tooth, Bobs Knob, Fanthams Peak, Tahurangi, Humphries Castle, Warwick Castle, The Knoll, The Plateau, Jacksons Lookout]
+   no options
+== Cluden and Lauder Basin tracks: area too large
+== Ben Lomond Track [11 km return via same track] DOC line 3.6 km; 80 map pieces; 32 ms
+   leg: Tiki Trail to Ben Lomond Summit | 6-8 hr return | 14.0 km -> one way 7.0
+   leg: Tiki Trail to Ben Lomond Saddle | 5 hr return | 10.0 km -> one way 5.0
+   leg: Skyline Gondola top complex to Ben Lomond Saddle | 3-4 hr return | 7.0 km -> one way 3.5
+   lifts 2; peaks [Ben Lomond, Bowen Peak]
+   starts: [Tiki Trail, Skyline Gondola top complex]; ends: [Ben Lomond Summit, Ben Lomond Saddle]
+   Tiki Trail -> Ben Lomond Summit: 6.33 km (DOC 7.0 km); DOC line covered 100%; on DOC line 59%; tracks [Tiki Track, Ben Lomond Walkway]
+   Tiki Trail -> Ben Lomond Saddle: 5.10 km (DOC 5.0 km); DOC line covered 100%; on DOC line 72%; tracks [Tiki Track, Ben Lomond Walkway]
+   Skyline Gondola top complex -> Ben Lomond Saddle: 3.75 km (DOC 3.5 km); DOC line covered 100%; on DOC line 98%; tracks [Ben Lomond Walkway]
+   Skyline Gondola top complex -> Ben Lomond Summit: 4.98 km (combined); DOC line covered 100%; on DOC line 76%; tracks [Ben Lomond Walkway]
+== Dingle Burn Track: area too large
+== Casey Saddle - Binser Saddle Route [] DOC line 42.6 km; 71 map pieces; 6 ms
+   leg: Andrews Shelter to the new Casey Hut | 6 - 8 hr | null km -> one way null
+   leg: Casey Hut to Pete Stream (Poulter River) | 4 - 5 hr | null km -> one way null
+   note: Andrews Shelter to the new Casey Hut: no distance
+   note: Casey Hut to Pete Stream (Poulter River): no distance
+   lifts 0; peaks [Smooth Peak, Mount Valiant, Woolshed Hill, Cass Hill, Sugar Loaf, Green Hill, Og, Castle Hill, Brown Hill, Mount Binser, Forest Peak, Peveril Peak]
+   no options
+   prose starts: [Clarke Flat, Te Wanahu Flat]
+== Acland Falls Track [600-800 m one way] DOC line 1.6 km; 41 map pieces; 23 ms
+   note: Andrews Shelter to the new Casey Hut: no distance
+   note: Casey Hut to Pete Stream (Poulter River): no distance
+   note: Te Wanahu Flat: not found
+   lifts 0; peaks []
+   no options
+== Mahaukura Track [9 km one way] DOC line 6.6 km; 101 map pieces; 26 ms
+   leg: Tirohanga to Mahaukura round trip | 8–11 hr return | 17.0 km -> one way 8.5
+   lifts 0; peaks [The Cone, Tahuanui, Pirongia Mountain, Pirongia, Hihikiwi, Te Akeohikopiro, Kohatupiko, Ruapane, Tirohanga, Mahaukura, Tihitoetoe, Tiwarawara]
+   starts: [Tirohanga]; ends: [Mahaukura round trip]
+   Tirohanga -> Mahaukura round trip: 7.33 km (DOC 8.5 km); DOC line covered 100%; on DOC line 89%; tracks [Tirohanga Track, Mahaukura Track]
+== Tirohanga Track [] DOC line 1.9 km; 28 map pieces; 12 ms
+   leg: Tirohanga to Mahaukura round trip | 8–11 hr return | 17.0 km -> one way 8.5
+   note: Tirohanga to Mahaukura round trip: 3345 m
+   lifts 0; peaks [Tahuanui, Pirongia Mountain, Pirongia, Ruapane, Tirohanga, Mahaukura, Wharauroa]
+   no options
+== Kawakawa Bay tracks [] DOC line 15.9 km; 140 map pieces; 22 ms
+   leg: Kinloch to Kawakawa (K2K) track |  | 9.0 km -> one way 9.0
+   note: Kinloch to Kawakawa (K2K) track: 6020 m
+   lifts 0; peaks [Te Kawerauta, Motumoa, Te Kauwae, Marotiri, Ngangautu]
+   no options
+== Black Hill Hut tracks [] DOC line 9.2 km; 51 map pieces; 2 ms
+   leg: Lees Valley Road to Black Hill Hut (Black Hill Track) | 3 hr from Townshend Track | null km -> one way null
+   leg: View Hill car park to Black Hill Hut | 3 hr from Wharfedale Track | null km -> one way null
+   note: Lees Valley Road to Black Hill Hut (Black Hill Track): no distance
+   note: View Hill car park to Black Hill Hut: no distance
+   lifts 0; peaks [Black Hill, Wilson Hill, Mount Oxford]
+   no options
+== Track to Woolshed Creek Hut [5.1 km one way] DOC line 4.9 km; 99 map pieces; 25 ms
+   leg: Optional circuit route: Woolshed Creek Hut to Woolshed Creek car park via Bus Stop and South Face tracks | 3 hr | 6.4 km -> one way 6.4
+   note: Optional circuit route: Woolshed Creek Hut to Woolshed Creek car park via Bus Stop and South Face tracks: not joined
+   lifts 0; peaks [Woolmer Hill]
+   no options
+== Stafford Bay Route [] DOC line 16.6 km; 20 map pieces; 28 ms
+   leg: Jackson Bay to Smoothwater River tramping track | 45 min, 2.7 km | 2.7 km -> one way 2.7
+   leg: Smoothwater River to Stafford Hut – inland route | 3 hr, 7 km | 7.0 km -> one way 7.0
+   leg: Smoothwater River to Stafford Bay – coastal route | 4 hr, 5.8 km | 5.8 km -> one way 5.8
+   note: Jackson Bay to Smoothwater River tramping track: not joined
+   lifts 0; peaks [Mount Eleanor, McArthur Knob, Clarke Hill]
+   starts: [Smoothwater River]; ends: [Stafford Hut, Stafford Bay]
+   Smoothwater River -> Stafford Hut: 6.50 km (DOC 7.0 km); DOC line covered 44%; on DOC line 100%; tracks []
+   Smoothwater River -> Stafford Bay: 6.88 km (DOC 5.8 km); DOC line covered 46%; on DOC line 100%; tracks []
+== Camp Saddle Track [] DOC line 2.4 km; 43 map pieces; 2 ms
+   leg: Camp Saddle to Lyndon Saddle (no track) | 1 - 2 hr one way | null km -> one way null
+   leg: Camp Saddle to Craigieburn Edge Track (no track) | 2 hr one way | null km -> one way null
+   note: Camp Saddle to Lyndon Saddle (no track): no distance
+   note: Camp Saddle to Craigieburn Edge Track (no track): no distance
+   lifts 7; peaks [Mount Cockayne, Hamilton Peak, Nervous Knob, Mount Wall, Bridge Hill, Mount Manson, Helicopter Hill]
+   no options
+   prose starts: [Catchpool car park, Sunny Grove]
+== Papatahi Crossing [] DOC line 20.5 km; 217 map pieces; 37 ms
+   note: Camp Saddle to Lyndon Saddle (no track): no distance
+   note: Camp Saddle to Craigieburn Edge Track (no track): no distance
+   note: Catchpool car park: covers 24% of DOC's line
+   note: Sunny Grove: not found
+   lifts 0; peaks [Waengapū, Mount Grace, Baker, McKerrow, Tapokopoko, Mount Matthews, Papatahi, Maunganui]
+   no options
+== Mount Adams Route [] DOC line 6.1 km; 67 map pieces; 2 ms
+   leg: State Highway 6 – bush edge | 5 hr | null km -> one way null
+   note: State Highway 6 – bush edge: no distance
+   lifts 0; peaks [Mount Adams]
+   no options
+== Ryde Falls tracks [] DOC line 9.2 km; 97 map pieces; 33 ms
+   leg: Coopers Creek car park to Ryde Falls (Ryde Falls Track) | 3 hr one way | 7.0 km -> one way 7.0
+   leg: View Hill car park to Ryde Falls | 1–2 hr one way | 3.0 km -> one way 3.0
+   note: Coopers Creek car park to Ryde Falls (Ryde Falls Track): not joined
+   note: one way, covering 22% of DOC's line
+   lifts 0; peaks [Mount Oxford, Oxford Hill]
+   no options
+   prose starts: [Wainuiomata, Catchpool Valley]
+== McKerrow Track [] DOC line 6.9 km; 177 map pieces; 34 ms
+   note: Coopers Creek car park to Ryde Falls (Ryde Falls Track): not joined
+   note: one way, covering 22% of DOC's line
+   note: Wainuiomata: not joined
+   note: Catchpool Valley: covers 54% of DOC's line
+   lifts 0; peaks [Lowry, Mount Grace, Baker, Crowther, McKerrow, Puketaha, Mount Matthews]
+   no options
+== Te Ara Mangawhero [12.95 km loop] DOC line 6.6 km; 63 map pieces; 25 ms
+   leg: Uphill climb to campground loop junction |  | 4.2 km -> one way 4.2
+   leg: Climb to the end of Phase 1 |  | 2.5 km -> one way 2.5
+   note: Uphill climb to campground loop junction: ends not found
+   note: Climb to the end of Phase 1: ends not found
+   lifts 0; peaks [Rongokaupo, Raetihi]
+   no options
+== Whareroa Farm tracks [] DOC line 7.8 km; 114 map pieces; 18 ms
+   leg: Carpark to Campbell's Mill Road |  | 2.5 km -> one way 2.5
+   note: Carpark to Campbell's Mill Road: ends not found
+   lifts 0; peaks [Wainui, Titi]
+   no options
+== Waianakarua Circuit Route [] DOC line 16.6 km; 52 map pieces; 31 ms
+   leg: Mt Misery Road Carpark to Staircase Hut via Tabletop | 6 hrs | 12.5 km -> one way 12.5
+   leg: Mt Misery Road Carpark to Staircase Hut via Staircase Ridge | 5 hrs | 8.5 km -> one way 8.5
+   note: Mt Misery Road Carpark to Staircase Hut via Tabletop: ends not found
+   note: Mt Misery Road Carpark to Staircase Hut via Staircase Ridge: ends not found
+   lifts 0; peaks [Prominent Peak, Mount Fortune, Table Hill, Fern Hill]
+   no options
+== Upper Aparima/Spence Burn Route [] DOC line 10.1 km; 41 map pieces; 19 ms
+   leg: Spence Burn junction to Aparima Forks Hut | 1 hr 15 min | 4.0 km -> one way 4.0
+   leg: Spence Burn junction to Spence Hut | 2 hr 30 min - 3 hr | 7.0 km -> one way 7.0
+   note: Spence Burn junction to Aparima Forks Hut: 10123 m
+   note: Spence Burn junction to Spence Hut: 10123 m
+   lifts 0; peaks [Spence Peak, Wairaki Peaks, Aparima Peaks, McLean Peaks, Gladstone Peak]
+   no options
+   prose starts: [Glen Lyon Road, Lake Ohau Road]
+== Lake Ōhau Track [8 km one way] DOC line 8.6 km; 57 map pieces; 35 ms
+   note: Spence Burn junction to Aparima Forks Hut: 10123 m
+   note: Spence Burn junction to Spence Hut: 10123 m
+   note: Glen Lyon Road: not found
+   note: Lake Ohau Road: not found
+   lifts 0; peaks []
+   no options
+== Dawson Falls - Stratford Plateau tracks [] DOC line 8.7 km; 70 map pieces; 21 ms
+   leg: Dawson Falls - Stratford Plateau Track | 1 hr 20 min to the Plateau | 3.1 km -> one way 3.1
+   leg: Dawson Falls - Stratford Plateau - Enchanted Track - Waingongoro Track | 3 hr 30 min to 4 hr return | 7.8 km -> one way 3.9
+   note: Dawson Falls - Stratford Plateau - Enchanted Track - Waingongoro Track: a circuit
+   note: one way, covering 20% of DOC's line
+   lifts 5; peaks [Humphries Castle, Warwick Castle, The Knoll, The Plateau, Jacksons Lookout, Hasties Hill]
+   no options
+   prose starts: [Aoraki/ Mount Cook National Park Visitor Centre (on Kea Point Track), White Horse Hill car park (on Kea Point Track)]
+== Sealy Tarns Track [] DOC line 1.6 km; 24 map pieces; 33 ms
+   note: Dawson Falls - Stratford Plateau - Enchanted Track - Waingongoro Track: a circuit
+   note: one way, covering 20% of DOC's line
+   lifts 0; peaks [Mount Ollivier, Kitchener, White Horse Hill, Foliage Hill]
+   starts: [Aoraki/ Mount Cook National Park Visitor Centre, White Horse Hill car park]; ends: [Sealy Tarns]
+   Aoraki/ Mount Cook National Park Visitor Centre -> Sealy Tarns: 3.72 km (combined); DOC line covered 100%; on DOC line 46%; tracks [Kea Point Track, Sealy Tarns Track]
+   White Horse Hill car park -> Sealy Tarns: 1.88 km (combined); DOC line covered 100%; on DOC line 89%; tracks [Sealy Tarns Track]
+   prose starts: [Punchbowl, Bealey Chasm, Temple Basin car parks]
+== Arthur’s Pass Walking Track [6.8 km return via same track] DOC line 3.6 km; 30 map pieces; 62 ms
+   note: Dawson Falls - Stratford Plateau - Enchanted Track - Waingongoro Track: a circuit
+   note: one way, covering 20% of DOC's line
+   lifts 6; peaks [Mount Philistine, Avalanche Peak, Lyell Peak, Warnocks Knob, Hills Peak, Mount Cassidy, Mount Stuart, Phipps Peak, Mount Temple, Blimit, Mount Aicken, Mount O'Malley]
+   starts: [Punchbowl, Temple Basin car parks]; ends: [Arthur’s Pass Walking]
+   Punchbowl -> Arthur’s Pass Walking: 3.24 km (combined); DOC line covered 83%; on DOC line 100%; tracks [Dobson Nature Walk, Arthur's Pass Walking Track]
+   Temple Basin car parks -> Arthur’s Pass Walking: 4.19 km (combined); DOC line covered 69%; on DOC line 70%; tracks [Temple Basin Track, Arthur's Pass Walking Track]
+== Kapiti Island tracks and walks [] DOC line 9.8 km; 24 map pieces; 1 ms
+   leg: Beach Landing to Shelter Track | 5 min one way | null km -> one way null
+   note: Beach Landing to Shelter Track: no distance
+   lifts 0; peaks [Tuteremoana, Arapawaiti]
+   no options
+== Cone Ridge Tracks [] DOC line 5.1 km; 56 map pieces; 31 ms
+   leg: Waiohine Road End to Cone Hut/Cone Saddle | 2-3 hours | 4.23 km -> one way 4.2
+   leg: Totara Flats Hut to Neill Forks Hut, via Cone Ridge | 4-5 hours | 5.54 km -> one way 5.5
+   note: Waiohine Road End to Cone Hut/Cone Saddle: ends not found
+   note: Totara Flats Hut to Neill Forks Hut, via Cone Ridge: 9% on DOC's line
+   lifts 0; peaks [Tuiti, Tunui, Maungahuka, Neill, Concertina Knob, Cone]
+   no options
+== Rotary Ride and Waikato River Track [] DOC line 6.6 km; 101 map pieces; 30 ms
+   leg: Rotary Ride: Spa Park to Huka Falls | 30 min mountain bike | 6.0 km -> one way 6.0
+   note: Rotary Ride: Spa Park to Huka Falls: 931 m
+   lifts 0; peaks [Karapiti, Wairakei, Kiorehae]
+   no options
+== Grandview Mountain Track [18 km return via same track] DOC line 8.6 km; 48 map pieces; 28 ms
+   leg: Nook Road car park – Grandview Mountain | 4 to 6 hr | 18.0 km -> one way 18.0
+   leg: Grandview Mountain Track – Breast Hill-Timaru Creek Track (Nook Road car park to Timaru Creek Road near Gladstone) | 9 to 12 hr | 26.0 km -> one way 26.0
+   note: Nook Road car park – Grandview Mountain: 8795 m
+   note: Grandview Mountain Track – Breast Hill-Timaru Creek Track (Nook Road car park to Timaru Creek Road near Gladstone): 2737 m
+   lifts 0; peaks [Cameron Hill, Breast Peak, Grandview Mountain]
+   no options
+== Quailburn Track [1.5 km | 5.5 km return via same track] DOC line 1.5 km; 41 map pieces; 24 ms
+   leg: Quailburn Track to bushline | 30 min | 1.5 km -> one way 1.5
+   leg: Quailburn bushline to East Ahuriri Hut (derelict) | 1 hr 30 min | 4.0 km -> one way 4.0
+   note: Quailburn Track to bushline: not joined
+   note: Quailburn bushline to East Ahuriri Hut (derelict): ends not found
+   lifts 0; peaks []
+   no options
+   prose starts: [Stirling Point, Gunpit road]
+== Glory Track [2 km one way] DOC line 2.0 km; 29 map pieces; 22 ms
+   note: Quailburn Track to bushline: not joined
+   note: Quailburn bushline to East Ahuriri Hut (derelict): ends not found
+   note: Stirling Point: covers 10% of DOC's line
+   note: Gunpit road: not found
+   lifts 0; peaks [The Bluff/Motupōhue]
+   no options
+== Pukawa Bay walks [] DOC line 3.1 km; 28 map pieces; 9 ms
+   leg: Pukawa to Omori | 1 hr 20 min one way | 1.4 km -> one way 1.4
+   note: Pukawa to Omori: 1811 m
+   lifts 0; peaks [Pukekaikiore]
+   no options
+== Buckland Peaks Track [11 km return via same track] DOC line 4.5 km; 37 map pieces; 19 ms
+   leg: Car park to track head | 1 hr | 6.0 km -> one way 6.0
+   leg: Buckland Peaks Track to Buckland Peak Hut | 4 hr | 4.53 km -> one way 4.5
+   leg: Buckland Peaks Hut to Buckland Peaks (unmarked route) | 1 hour | null km -> one way null
+   note: Car park to track head: ends not found
+   note: Buckland Peaks Hut to Buckland Peaks (unmarked route): no distance
+   lifts 0; peaks [Buckland Peaks]
+   starts: [Buckland Peaks Track]; ends: [Buckland Peak Hut]
+   Buckland Peaks Track -> Buckland Peak Hut: 4.56 km (DOC 4.5 km); DOC line covered 100%; on DOC line 100%; tracks [Buckland Peaks Track]
+== Wether Range tracks [] DOC line 10.4 km; 225 map pieces; 29 ms
+   leg: Shortcut Road to Wether Range Conservation Area | 2 hr | 6.5 km -> one way 6.5
+   leg: SH8 to Wether Range Conservation Area | 1.5 hr | 3.0 km -> one way 3.0
+   note: Shortcut Road to Wether Range Conservation Area: ends not found
+   note: SH8 to Wether Range Conservation Area: ends not found
+   lifts 0; peaks []
+   no options
+== Moeraki Valley Track [] DOC line 14.0 km; 20 map pieces; 1 ms
+   leg: SH6 to Horseshoe Flat Hut tramping track | 4 hr 30 min | null km -> one way null
+   leg: Horseshoe Flat Hut to Middle Head Hut route | 2 hr | null km -> one way null
+   leg: Middle Head Hut to Middle Head Basin route | 2 hr | null km -> one way null
+   note: SH6 to Horseshoe Flat Hut tramping track: no distance
+   note: Horseshoe Flat Hut to Middle Head Hut route: no distance
+   note: Middle Head Hut to Middle Head Basin route: no distance
+   lifts 0; peaks [Mount Clarke, Canaurd Hill, Rainytop, Mariners Peak, Ranganui, Mount Kinnaird, Plover Crag, Power Knob, Eureka]
+   no options
+== Tiritiri Matangi Island walks [] DOC line 12.1 km; 45 map pieces; 2 ms
+   leg: Wattle Track (wharf to lighthouse) | 40 min one way | null km -> one way null
+   leg: Kawerau Track (north end of Hobbs Beach to Ridge Road) | 30-40 min one way | null km -> one way null
+   leg: Ridge Road/Track (end of Kawerau Track to lighthouse) | 25 minutes one way | null km -> one way null
+   leg: Ngāti Paoa Track, Northeast Bay Track and East Coast Track (Kawerau Track to Northeast Bay to lighthouse) | 2 hr one way | null km -> one way null
+   note: Wattle Track (wharf to lighthouse): no distance
+   note: Kawerau Track (north end of Hobbs Beach to Ridge Road): no distance
+   note: Ridge Road/Track (end of Kawerau Track to lighthouse): no distance
+   note: Ngāti Paoa Track, Northeast Bay Track and East Coast Track (Kawerau Track to Northeast Bay to lighthouse): no distance
+   lifts 0; peaks []
+   no options

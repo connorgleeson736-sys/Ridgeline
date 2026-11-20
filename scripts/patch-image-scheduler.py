@@ -35,5 +35,6 @@ s=p.read_text()
 a=min(s.index('let Un;'),s.index('/* RIDGE_SCHEDULER_V2') if '/* RIDGE_SCHEDULER_V2' in s else len(s)); b=s.index('var Wn=class',a)
 s=s[:a]+Path(__file__).with_name('maplibre-image-queue.js').read_text()+s[b:]
 s=s.replace('pumpImageRequestQueue=Un.pump;', 'pumpImageRequestQueue=Un.pump,notifyImageRequestBytesReady=Un.notifyReady;')
+s=s.replace('notifyImageRequestBytesReady=Un.notifyReady;', 'notifyImageRequestBytesReady=Un.notifyReady,setImageDecodeLimit=Un.setDecodeLimit;')
 p.write_text(s)
 meta=Path('public/assets/maplibre-provenance.json');d=json.loads(meta.read_text());d.setdefault('upstream_files',dict(d['files']));d['files']['maplibre-gl.mjs']=hashlib.sha256(p.read_bytes()).hexdigest();d['patches']=[r for r in d.get('patches',[]) if r['id']!='RIDGE_SCHEDULER_V2']+[{'id':'RIDGE_SCHEDULER_V2','script':'scripts/patch-image-scheduler.py','scope':'Indexed image admission, adaptive ready reserve, optional tracing and bounded moving RTT refresh; no shaders or terrain data changes.'}];meta.write_text(json.dumps(d,indent=2)+'\n')

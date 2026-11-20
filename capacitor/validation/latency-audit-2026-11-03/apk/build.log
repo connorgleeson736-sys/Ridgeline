@@ -1,0 +1,172 @@
+Starting a Gradle Daemon (subsequent builds will be faster)
+
+> Configure project :app
+WARNING: BuildType(latencyAudit): resValue 'string/app_name' value is being replaced.
+WARNING: BuildType(latencyAudit): resValue 'string/title_activity_main' value is being replaced.
+WARNING: Using flatDir should be avoided because it doesn't support any meta-data formats.
+
+> Configure project :capacitor-cordova-android-plugins
+WARNING: Using flatDir should be avoided because it doesn't support any meta-data formats.
+
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preLatencyAuditBuild UP-TO-DATE
+> Task :app:mergeLatencyAuditJniLibFolders
+> Task :capacitor-android:preBuild UP-TO-DATE
+> Task :capacitor-android:preReleaseBuild UP-TO-DATE
+> Task :capacitor-android:mergeReleaseJniLibFolders
+> Task :capacitor-android:mergeReleaseNativeLibs NO-SOURCE
+> Task :capacitor-cordova-android-plugins:preBuild UP-TO-DATE
+> Task :capacitor-cordova-android-plugins:preReleaseBuild UP-TO-DATE
+> Task :capacitor-android:copyReleaseJniLibsProjectOnly
+> Task :capacitor-cordova-android-plugins:mergeReleaseJniLibFolders
+> Task :capacitor-cordova-android-plugins:mergeReleaseNativeLibs NO-SOURCE
+> Task :capacitor-cordova-android-plugins:copyReleaseJniLibsProjectOnly
+> Task :capacitor-android:prepareReleaseArtProfile
+> Task :app:mergeLatencyAuditNativeLibs NO-SOURCE
+> Task :app:stripLatencyAuditDebugSymbols NO-SOURCE
+> Task :app:extractLatencyAuditNativeSymbolTables NO-SOURCE
+> Task :app:mergeLatencyAuditNativeDebugMetadata NO-SOURCE
+> Task :capacitor-cordova-android-plugins:prepareReleaseArtProfile
+> Task :capacitor-android:generateReleaseResValues
+> Task :app:mergeLatencyAuditArtProfile
+> Task :capacitor-android:generateReleaseResources
+> Task :app:expandLatencyAuditL8ArtProfileWildcards
+> Task :capacitor-android:packageReleaseResources
+> Task :capacitor-android:processReleaseNavigationResources
+> Task :capacitor-android:javaPreCompileRelease
+> Task :capacitor-cordova-android-plugins:generateReleaseResValues
+> Task :capacitor-cordova-android-plugins:generateReleaseResources
+> Task :capacitor-cordova-android-plugins:packageReleaseResources
+> Task :capacitor-cordova-android-plugins:processReleaseNavigationResources
+> Task :capacitor-android:parseReleaseLocalResources
+> Task :capacitor-cordova-android-plugins:parseReleaseLocalResources
+> Task :capacitor-android:generateReleaseRFile
+> Task :capacitor-cordova-android-plugins:generateReleaseRFile
+
+> Task :capacitor-android:compileReleaseJavaWithJavac
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :capacitor-cordova-android-plugins:javaPreCompileRelease
+> Task :capacitor-cordova-android-plugins:compileReleaseJavaWithJavac NO-SOURCE
+> Task :capacitor-cordova-android-plugins:bundleLibRuntimeToDirRelease
+> Task :capacitor-android:bundleLibRuntimeToDirRelease
+> Task :app:checkLatencyAuditDuplicateClasses
+> Task :app:javaPreCompileLatencyAudit
+> Task :capacitor-android:writeReleaseAarMetadata
+> Task :capacitor-cordova-android-plugins:writeReleaseAarMetadata
+> Task :app:checkLatencyAuditAarMetadata
+> Task :app:processLatencyAuditNavigationResources
+> Task :app:compileLatencyAuditNavigationResources
+> Task :app:generateLatencyAuditResValues
+> Task :app:mapLatencyAuditSourceSetPaths
+> Task :app:generateLatencyAuditResources
+> Task :app:createLatencyAuditCompatibleScreenManifests
+> Task :app:extractDeepLinksLatencyAudit
+> Task :capacitor-android:extractDeepLinksRelease
+> Task :capacitor-android:processReleaseManifest
+> Task :capacitor-cordova-android-plugins:extractDeepLinksRelease
+> Task :capacitor-cordova-android-plugins:processReleaseManifest
+> Task :app:processLatencyAuditMainManifest
+> Task :app:processLatencyAuditManifest
+> Task :app:processLatencyAuditManifestForPackage
+> Task :capacitor-android:bundleLibCompileToJarRelease
+> Task :capacitor-cordova-android-plugins:bundleLibCompileToJarRelease
+> Task :app:desugarLatencyAuditFileDependencies
+> Task :app:mergeLatencyAuditStartupProfile
+> Task :app:mergeLatencyAuditResources
+> Task :app:mergeExtDexLatencyAudit
+> Task :app:packageLatencyAuditResources
+> Task :app:parseLatencyAuditLocalResources
+> Task :capacitor-android:compileReleaseLibraryResources
+> Task :capacitor-cordova-android-plugins:compileReleaseLibraryResources
+> Task :capacitor-android:bundleLibRuntimeToJarRelease
+> Task :app:processLatencyAuditResources
+
+> Task :app:compileLatencyAuditJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :app:dexBuilderLatencyAudit
+> Task :capacitor-cordova-android-plugins:bundleLibRuntimeToJarRelease
+> Task :app:mergeDexLatencyAudit
+> Task :app:mergeLatencyAuditGlobalSynthetics
+> Task :app:mergeLatencyAuditShaders
+> Task :app:compileLatencyAuditShaders NO-SOURCE
+> Task :app:generateLatencyAuditAssets UP-TO-DATE
+> Task :capacitor-android:mergeReleaseShaders
+> Task :capacitor-android:compileReleaseShaders NO-SOURCE
+> Task :capacitor-android:generateReleaseAssets UP-TO-DATE
+> Task :capacitor-android:mergeReleaseAssets
+> Task :capacitor-cordova-android-plugins:mergeReleaseShaders
+> Task :capacitor-cordova-android-plugins:compileReleaseShaders NO-SOURCE
+> Task :capacitor-cordova-android-plugins:generateReleaseAssets UP-TO-DATE
+> Task :capacitor-cordova-android-plugins:mergeReleaseAssets
+> Task :app:mergeLatencyAuditAssets
+> Task :app:compressLatencyAuditAssets
+> Task :app:extractLatencyAuditVersionControlInfo
+> Task :app:extractProguardFiles
+> Task :capacitor-android:processReleaseJavaRes NO-SOURCE
+> Task :capacitor-android:createFullJarRelease
+> Task :capacitor-android:extractProguardFiles
+> Task :capacitor-android:generateReleaseLintModel
+> Task :capacitor-android:prepareLintJarForPublish
+> Task :capacitor-cordova-android-plugins:processReleaseJavaRes NO-SOURCE
+> Task :capacitor-cordova-android-plugins:createFullJarRelease
+> Task :capacitor-cordova-android-plugins:extractProguardFiles
+> Task :app:l8DexDesugarLibLatencyAudit
+> Task :capacitor-cordova-android-plugins:generateReleaseLintModel
+> Task :capacitor-cordova-android-plugins:prepareLintJarForPublish
+> Task :app:compileLatencyAuditArtProfile
+> Task :app:generateLatencyAuditLintVitalReportModel
+> Task :capacitor-android:stripReleaseDebugSymbols NO-SOURCE
+> Task :capacitor-android:copyReleaseJniLibsProjectAndLocalJars
+> Task :capacitor-android:extractDeepLinksForAarRelease
+> Task :capacitor-android:checkReleaseAarMetadata
+> Task :capacitor-android:extractReleaseAnnotations
+> Task :capacitor-android:mergeReleaseGeneratedProguardFiles
+> Task :capacitor-android:mergeReleaseConsumerProguardFiles
+> Task :capacitor-cordova-android-plugins:checkReleaseAarMetadata
+> Task :capacitor-cordova-android-plugins:stripReleaseDebugSymbols NO-SOURCE
+> Task :capacitor-cordova-android-plugins:copyReleaseJniLibsProjectAndLocalJars
+> Task :capacitor-cordova-android-plugins:extractDeepLinksForAarRelease
+> Task :capacitor-android:mergeReleaseJavaResource
+> Task :capacitor-cordova-android-plugins:extractReleaseAnnotations
+> Task :capacitor-android:syncReleaseLibJars
+> Task :capacitor-android:bundleReleaseLocalLintAar
+> Task :capacitor-cordova-android-plugins:mergeReleaseGeneratedProguardFiles
+> Task :capacitor-cordova-android-plugins:mergeReleaseConsumerProguardFiles
+> Task :capacitor-cordova-android-plugins:mergeReleaseJavaResource
+> Task :capacitor-cordova-android-plugins:syncReleaseLibJars
+> Task :capacitor-cordova-android-plugins:bundleReleaseLocalLintAar
+> Task :capacitor-android:writeReleaseLintModelMetadata
+> Task :capacitor-cordova-android-plugins:lintVitalAnalyzeRelease
+> Task :capacitor-cordova-android-plugins:writeReleaseLintModelMetadata
+> Task :capacitor-android:generateReleaseLintVitalModel
+> Task :capacitor-cordova-android-plugins:generateReleaseLintVitalModel
+> Task :app:processLatencyAuditJavaRes NO-SOURCE
+> Task :app:mergeLatencyAuditJavaResource
+> Task :app:optimizeLatencyAuditResources
+> Task :app:collectLatencyAuditDependencies
+> Task :app:sdkLatencyAuditDependencyData
+> Task :app:validateSigningLatencyAudit
+> Task :app:writeLatencyAuditAppMetadata
+> Task :app:writeLatencyAuditSigningConfigVersions
+> Task :capacitor-android:lintVitalAnalyzeRelease
+> Task :app:lintVitalAnalyzeLatencyAudit
+> Task :app:lintVitalReportLatencyAudit
+> Task :app:lintVitalLatencyAudit
+> Task :app:packageLatencyAudit
+> Task :app:createLatencyAuditApkListingFileRedirect
+> Task :app:assembleLatencyAudit
+
+[Incubating] Problems report is available at: file:///workspace/Ridgeline-capacitor/capacitor/android/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 4m 10s
+118 actionable tasks: 118 executed

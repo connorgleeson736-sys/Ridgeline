@@ -1,0 +1,151 @@
+{
+ "guid": "f46e42cd-a7bd-43a3-a189-3406872ee723",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Cape Foulwind Walkway, Tauranga Bay car park to Cape Foulwind car park",
+   "shape": "one_way",
+   "start": {
+    "name": "Tauranga Bay car park",
+    "quote": "From Tauranga Bay car park, follow the signs to the seal colony viewpoint.",
+    "ref": "T4"
+   },
+   "end": {
+    "name": "Cape Foulwind car park",
+    "quote": "From the lighthouse, it’s another 15 min to Cape Foulwind car park.",
+    "ref": "F1"
+   },
+   "via": [
+    {
+     "name": "seal colony viewpoint",
+     "quote": "Continue to the seal colony viewpoint.",
+     "ref": null
+    },
+    {
+     "name": "Cape Foulwind lighthouse lookout",
+     "quote": "to the Cape Foulwind lighthouse lookout",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "1 hr 15 min one way",
+   "distance": "3.4 km one way",
+   "evidence": [
+    "You can walk Cape Foulwind Walkway from either end. Most people start at Tauranga Bay.",
+    "There is a car park at both ends of the walkway. Start at Tauranga Bay for the seal colony, or Cape Foulwind for the lighthouse.",
+    "From Tauranga Bay car park, follow the signs to the seal colony viewpoint.",
+    "From the seal colony viewpoint, follow the signs to Cape Foulwind.",
+    "From the lighthouse, it’s another 15 min to Cape Foulwind car park."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Tauranga Bay car park to seal colony viewpoint",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Tauranga Bay car park",
+    "quote": "Tauranga Bay car park to seal colony viewpoint",
+    "ref": "T4"
+   },
+   "end": {
+    "name": "seal colony viewpoint",
+    "quote": "Continue to the seal colony viewpoint.",
+    "ref": null
+   },
+   "via": [],
+   "direction": null,
+   "time": "30 min",
+   "distance": "1 km (return)",
+   "evidence": [
+    "From Tauranga Bay car park, follow the signs to the seal colony viewpoint.",
+    "Return to the car park the same way you came, or continue to Cape Foulwind."
+   ]
+  },
+  {
+   "id": "W3",
+   "main": false,
+   "label": "Tauranga Bay car park to Cape Foulwind lighthouse",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Tauranga Bay car park",
+    "quote": "Tauranga Bay car park to Cape Foulwind lighthouse",
+    "ref": "T4"
+   },
+   "end": {
+    "name": "Cape Foulwind lighthouse lookout",
+    "quote": "to the Cape Foulwind lighthouse lookout",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "seal colony viewpoint",
+     "quote": "From the seal colony viewpoint, follow the signs to Cape Foulwind.",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "2 hr",
+   "distance": "5.8 km (return)",
+   "evidence": [
+    "From the seal colony viewpoint, follow the signs to Cape Foulwind.",
+    "You’ll walk above the rugged coastline and through New Zealand flax/harakeke to the Cape Foulwind lighthouse lookout."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Cape Foulwind car park",
+   "quote": "Start at Tauranga Bay for the seal colony, or Cape Foulwind for the lighthouse.",
+   "ref": "F1",
+   "onto": "Cape Foulwind Walkway"
+  }
+ ],
+ "exits": [
+  {
+   "name": "Kawatiri Coastal Trail",
+   "quote": "return via Kawatiri Coastal Trail",
+   "ref": null,
+   "from": "Cape Foulwind car park",
+   "how": "track"
+  }
+ ],
+ "side_trips": [
+  {
+   "name": "Wall Island lookout",
+   "quote": "Take the short side track to Wall Island lookout",
+   "ref": null,
+   "from": null
+  }
+ ],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Wall Island",
+   "quote": "Wall Island",
+   "ref": "T5",
+   "why": "view"
+  },
+  {
+   "name": "The Steeples",
+   "quote": "rocky islets known as The Steeples",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Westport",
+   "quote": "Cape Foulwind Walkway is 15 min by car from Westport.",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "Omau",
+   "quote": "the coastal settlement of Omau",
+   "ref": null,
+   "why": "nearby"
+  }
+ ],
+ "doubts": "Start: the Tauranga Bay car park has no road-end feature; T4 is the Tauranga Bay coast name, so the ref is a judgement that the car park is at the bay. End: F1 is the road end where an unnamed track meets Lighthouse Road, which the text says leads to the Cape Foulwind car park. The walkway can be walked from either end, which is the same route reversed, so it is an access point rather than a separate way. W2 and W3 have their own headings and times ('30 min / 1 km (return)' and '2 hr / 5.8 km (return)'), so they are separate out and back ways; the time and distance are split from those lines. The text says the Kawatiri Coastal Trail can be used to return from the Cape Foulwind car park end; its exit point is taken as that car park. The Wall Island lookout side track is not stated to leave from any named place on the way, so from is null. Cape Foulwind lighthouse lookout has no feature or name entry, so its ref is null."
+}

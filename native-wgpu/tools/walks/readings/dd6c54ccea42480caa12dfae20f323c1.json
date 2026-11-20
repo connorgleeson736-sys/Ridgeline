@@ -1,0 +1,249 @@
+{
+ "guid": "dd6c54cc-ea42-480c-aa12-dfae20f323c1",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Toaroha road end over the Toaroha Range and Lathrop Saddle to Lake Kaniere Road carpark",
+   "shape": "one_way",
+   "start": {
+    "name": "Toaroha road end car park",
+    "quote": "From the car park follow the rough farm road down to river level",
+    "ref": "F2"
+   },
+   "end": {
+    "name": "Carpark at Lake Kaniere Road",
+    "quote": "an old farm track leads to the carpark at the Lake Kaniere Road",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Toaroha Canyon",
+     "quote": "climbs steadily above the Toaroha Canyon",
+     "ref": "T12"
+    },
+    {
+     "name": "Cedar Flat Bridge",
+     "quote": "leads to the Cedar Flat Bridge which is crossed",
+     "ref": null
+    },
+    {
+     "name": "Cedar Flat Hut",
+     "quote": "Roadend to Cedar Flat Hut",
+     "ref": "T3"
+    },
+    {
+     "name": "Adventure Ridge",
+     "quote": "up adventure ridge itself",
+     "ref": "T2"
+    },
+    {
+     "name": "Adventure Ridge Bivouac",
+     "quote": "to Adventure Ridge Bivouac",
+     "ref": null
+    },
+    {
+     "name": "Toaroha Range",
+     "quote": "directly to the ridgeline of the Toaroha Range",
+     "ref": "T13"
+    },
+    {
+     "name": "Top Kokatahi Hut",
+     "quote": "Adventure Ridge Bivouac to Top Kokatahi Hut",
+     "ref": "T16"
+    },
+    {
+     "name": "Kokatahi River",
+     "quote": "Cross the Kokatahi to pick up the cut track on the true right",
+     "ref": "T7",
+     "how": "ford"
+    },
+    {
+     "name": "Top Kokatahi swing bridge",
+     "quote": "Top Kokatahi swing bridge",
+     "ref": null
+    },
+    {
+     "name": "Cableway",
+     "quote": "Cross this cableway to the true right",
+     "ref": null
+    },
+    {
+     "name": "Crawford Junction Hut",
+     "quote": "follow this to Crawford Junction Hut",
+     "ref": "T5"
+    },
+    {
+     "name": "Crawford Creek",
+     "quote": "down to the bed of Crawford Creek",
+     "ref": "T4"
+    },
+    {
+     "name": "Farquharson Creek",
+     "quote": "Cross Farquharson Creek and rejoin the track on the far bank",
+     "ref": "T6",
+     "how": "ford"
+    },
+    {
+     "name": "Top Crawford Hut",
+     "quote": "Crawford Junction Hut to Top Crawford Hut",
+     "ref": "T15"
+    },
+    {
+     "name": "Crawford Creek",
+     "quote": "Cross to the true right bank and pick up the large orange triangle",
+     "ref": "T4",
+     "how": "ford"
+    },
+    {
+     "name": "Lathrop Saddle",
+     "quote": "to Lathrop Saddle",
+     "ref": "T8"
+    },
+    {
+     "name": "Browning Bivouac",
+     "quote": "down a steep spur to Browning Bivouac",
+     "ref": null
+    },
+    {
+     "name": "Styx Valley track",
+     "quote": "eventually joining up with the Styx Valley track",
+     "ref": null
+    },
+    {
+     "name": "Grassy Flats Hut",
+     "quote": "a 5-minute walk upstream to Grassy Flats Hut",
+     "ref": null
+    },
+    {
+     "name": "Styx River",
+     "quote": "From the hut head downstream and re-cross Styx River",
+     "ref": "T11",
+     "how": "ford"
+    },
+    {
+     "name": "Styx River",
+     "quote": "The river must be crossed to pick up the route on the true left",
+     "ref": "T11",
+     "how": "ford"
+    },
+    {
+     "name": "Mid-Styx Hut",
+     "quote": "Grassy Flats Hut to Mid-Styx Hut",
+     "ref": "T9"
+    },
+    {
+     "name": "Tyndall Creek",
+     "quote": "dropping steeping into Tyndall Creek",
+     "ref": "T17"
+    },
+    {
+     "name": "Tyndall Creek",
+     "quote": "Once in Tyndall Creek cross to the true left",
+     "ref": "T17",
+     "how": "ford"
+    },
+    {
+     "name": "Styx River",
+     "quote": "The Styx is crossed again",
+     "ref": "T11",
+     "how": "ford"
+    }
+   ],
+   "direction": null,
+   "time": "3-4 days",
+   "distance": null,
+   "evidence": [
+    "From the car park follow the rough farm road down to river level, then pick up the orange triangular markers and follow these across the open flats to the bush line and the start of the track.",
+    "Turn off the Kokatahi/Lake Kaniere circuit road at the signpost 'Access to Toaroha Valley', cross the bridge over the Kokatahi River and follow the road as far as your vehicle will allow.",
+    "The route then travels downstream on the true left of the Styx River. The Styx is crossed again to and an old farm track leads to the carpark at the Lake Kaniere Road."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Hot springs up Wren Creek",
+   "quote": "a short distance up Wren Creek",
+   "ref": "T18",
+   "from": "Cedar Flat Hut"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Cedar Flat Hut",
+   "quote": "Roadend to Cedar Flat Hut",
+   "ref": "T3"
+  },
+  {
+   "name": "Adventure Ridge Bivouac",
+   "quote": "to Adventure Ridge Bivouac",
+   "ref": null
+  },
+  {
+   "name": "Top Kokatahi Hut",
+   "quote": "Adventure Ridge Bivouac to Top Kokatahi Hut",
+   "ref": "T16"
+  },
+  {
+   "name": "Crawford Junction Hut",
+   "quote": "follow this to Crawford Junction Hut",
+   "ref": "T5"
+  },
+  {
+   "name": "Top Crawford Hut",
+   "quote": "Crawford Junction Hut to Top Crawford Hut",
+   "ref": "T15"
+  },
+  {
+   "name": "Browning Bivouac",
+   "quote": "down a steep spur to Browning Bivouac",
+   "ref": null
+  },
+  {
+   "name": "Grassy Flats Hut",
+   "quote": "a 5-minute walk upstream to Grassy Flats Hut",
+   "ref": null
+  },
+  {
+   "name": "Mid-Styx Hut",
+   "quote": "Grassy Flats Hut to Mid-Styx Hut",
+   "ref": "T9"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Zit Saddle",
+   "quote": "about 500 m north of Zit Saddle",
+   "ref": "T20",
+   "why": "nearby"
+  },
+  {
+   "name": "Snowball Creek",
+   "quote": "south of Snowball Creek",
+   "ref": "T10",
+   "why": "nearby"
+  },
+  {
+   "name": "Toaroha River",
+   "quote": "enters the Toaroha River",
+   "ref": "T14",
+   "why": "nearby"
+  },
+  {
+   "name": "Arahura Track",
+   "quote": "The alternative via the Arahura Track",
+   "ref": null,
+   "why": "other walk"
+  },
+  {
+   "name": "Hot springs up Wren Creek",
+   "quote": "a short distance up Wren Creek",
+   "ref": "T18",
+   "why": "side trip"
+  }
+ ],
+ "doubts": "Start: the text names no road. F2 (an unnamed track meeting Middlebranch Road) is the only road-end feature that fits a car park reached by the road over the Kokatahi bridge, but the text does not name it, so the ref is likely rather than certain. F1 is at the Cedar Flat Bridge, not a road end. End: no feature for the car park at Lake Kaniere Road, so null. The route crosses the Toaroha Range ridgeline about 500 m north of Zit Saddle, so Zit Saddle is not walked. The Kokatahi is crossed (recorded once as a ford; the text says it is crossed three times). The cableway, Top Kokatahi swing bridge, Cedar Flat Bridge and the Visitor-free stream crossings are recorded as the page names them; unnamed creeks are not listed. The text does not say whether the Tyndall Creek and Styx River crossings in the final section are fords as such; they are recorded as fords because the text says to cross them. Grassy Flats Hut has no link and no map name, so ref is null. The alternative Arahura Track is not a way of this walk, so it is only not_on_route."
+}

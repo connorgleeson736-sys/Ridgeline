@@ -1,0 +1,5 @@
+INSTRUMENTATION_RESULT: nativeDataProof=PASS: exact Float64 route storage, CRUD order, transaction limit rollback, database reopen, native GPX round trip
+INSTRUMENTATION_RESULT: nativeProof=PASS: Vulkan/wgpu independent geometry/image uploads and crop, exact terrain pick, six APK pack range decodes, surface destruction/recreation, rotated activity
+INSTRUMENTATION_RESULT: remainingNativeSurfaces=0
+INSTRUMENTATION_RESULT: scope=Synthetic flat height fixture; not real-terrain parity or phone performance
+INSTRUMENTATION_CODE: -1

@@ -1,0 +1,126 @@
+{
+ "guid": "aea2205e-4315-42ce-b032-5740f3b7e44c",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Jackson Bay car park to Stafford Hut – inland route",
+   "shape": "one_way",
+   "start": {
+    "name": "small car park approximately 500 m before Jackson Bay",
+    "quote": "starts at a small car park approximately 500 m before Jackson Bay",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Stafford Hut",
+    "quote": "Stafford Hut",
+    "ref": "T8"
+   },
+   "via": [
+    {
+     "name": "historic track",
+     "quote": "joins a historic track",
+     "ref": null
+    },
+    {
+     "name": "Smoothwater River",
+     "quote": "Smoothwater River",
+     "ref": "T6"
+    },
+    {
+     "name": "Kakapo Creek",
+     "quote": "Kakapo Creek",
+     "ref": "T4"
+    },
+    {
+     "name": "Stafford Saddle",
+     "quote": "Stafford Saddle",
+     "ref": "T10"
+    },
+    {
+     "name": "Stafford River",
+     "quote": "Stafford River",
+     "ref": "T9"
+    }
+   ],
+   "direction": null,
+   "time": "4 hr one way",
+   "distance": null,
+   "evidence": [
+    "The route to Stafford Bay starts at a small car park approximately 500 m before Jackson Bay.",
+    "The track initially climbs steeply away from the road until it joins a historic track, which once formed part of the road. Follow this well-marked tramping track to the Smoothwater River.",
+    "The marked track goes up Kakapo Creek.",
+    "After about an hour, the track veers away from the creek to the right and starts to climb to Stafford Saddle.",
+    "Follow the river downstream, crossing where necessary, until markers on the true left for the short track to Stafford Hut, which is located 200 m upstream of the beach."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Smoothwater River to Stafford Bay – coastal route",
+   "shape": "one_way",
+   "start": {
+    "name": "car park",
+    "quote": "Follow the track from the car park to Smoothwater River",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Stafford Hut",
+    "quote": "Stafford Hut is 150 m up the river, on the true left",
+    "ref": "T8"
+   },
+   "via": [
+    {
+     "name": "Smoothwater River",
+     "quote": "Smoothwater River",
+     "ref": "T6"
+    },
+    {
+     "name": "Smoothwater Bay",
+     "quote": "Smoothwater Bay",
+     "ref": "T5"
+    },
+    {
+     "name": "Homminy Cove",
+     "quote": "Homminy Cove",
+     "ref": "T1"
+    },
+    {
+     "name": "Stafford River",
+     "quote": "Stafford River",
+     "ref": "T9"
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "Follow the track from the car park to Smoothwater River, which takes about 45 minutes.",
+    "Head downstream along the bush track that follows the Smoothwater River.",
+    "From Smoothwater Bay the track becomes a route. Head south to Stafford Bay.",
+    "Further down the coast there are two very steep headlands either side of Homminy Cove that require great care.",
+    "Once you have crossed both headlands continue south along the coast until you reach Stafford River. Stafford Hut is 150 m up the river, on the true left.",
+    "Warning: Do not attempt this coastal track in the reverse direction."
+   ]
+  }
+ ],
+ "access_points": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Stafford Hut",
+   "quote": "Stafford Hut",
+   "ref": "T8"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Jackson Bay",
+   "quote": "Jackson Bay is 51 km south of Haast",
+   "ref": "T2",
+   "why": "nearby"
+  }
+ ],
+ "doubts": "The text describes the route to Stafford Hut only; it does not say how trampers return (the warning not to do the coastal track in reverse suggests returning by the inland route). Shape one_way follows DOC's '4 hr one way'. The coastal route's heading gives 'Time: 4 hr, 5.8 km' for the Smoothwater River to Stafford Bay section only, so W2's time and distance are left null. Start ref F1 is the only road end; the text places the car park 500 m before Jackson Bay."
+}

@@ -180,4 +180,49 @@ public class TileDispatcherTest {
       }
     }
   }
+  @Test
+  public void slowCancellationDoesNotHoldTheDispatcherMonitor() throws Exception {
+    try (TileDispatcher<String> d = new TileDispatcher<>(2, 1)) {
+      CountDownLatch entered = new CountDownLatch(1), unblock = new CountDownLatch(1);
+      var lease = d.acquire("slow", new TileDemand(0), p -> {
+        p.onCancel(() -> {
+          entered.countDown();
+          try { unblock.await(); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+        });
+        p.publish("ready");
+        unblock.await();
+      });
+      lease.await();
+      ExecutorService threads = Executors.newFixedThreadPool(2);
+      try {
+        Future<?> cancelling = threads.submit(lease::close);
+        assertTrue(entered.await(3, TimeUnit.SECONDS));
+        Future<String> other = threads.submit(() -> {
+          try (var fast = d.acquire("fast", new TileDemand(0), p -> { p.complete(); p.publish("fast"); })) {
+            return fast.await();
+          }
+        });
+        assertEquals("fast", other.get(1, TimeUnit.SECONDS));
+        unblock.countDown();
+        cancelling.get(3, TimeUnit.SECONDS);
+      } finally { unblock.countDown(); threads.shutdownNow(); }
+    }
+  }
+  @Test
+  public void completedBodiesAreNeverSharedWithANewRequestBeforeWorkerCleanup() throws Exception {
+    try (TileDispatcher<String> d = new TileDispatcher<>(2, 1)) {
+      CountDownLatch completed = new CountDownLatch(1), cleanup = new CountDownLatch(1);
+      var first = d.acquire("tile", new TileDemand(0), p -> {
+        p.publish("old"); p.complete(); completed.countDown(); cleanup.await();
+      });
+      try {
+        assertEquals("old", first.await());
+        assertTrue(completed.await(3, TimeUnit.SECONDS));
+        try (var next = d.acquire("tile", new TileDemand(0), p -> { p.publish("new"); p.complete(); })) {
+          assertEquals("new", next.await());
+        }
+        assertEquals(2, (long) d.stats().get("started"));
+      } finally { cleanup.countDown(); first.close(); }
+    }
+  }
 }

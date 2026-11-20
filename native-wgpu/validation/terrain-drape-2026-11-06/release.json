@@ -1,0 +1,34 @@
+{
+  "artifact": "Ridgeline-Native-Terrain-Drape-0.1.19-Base.apk",
+  "bytes": 32737123,
+  "sha256": "307200648ede317c9f0dd1e8e554e7d488b1faaf74a245e7f4638902b084c06f",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.19-terrain-drape",
+  "versionCode": 20,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.18 Full Audit (same package and signer)",
+  "changes": [
+    "topographic lines painted into per-image-tile overlay textures (512x512 RGBA pool, 32-64 layers, never a multiple of 6) and composited in the terrain shader, like MapLibre terrain render-to-texture",
+    "repaint only tiles whose source-tile line groups or quarter-zoom band change; per-frame paint budget",
+    "CPU drape worker and draped 3D line geometry removed",
+    "Kotlin packs each source tile's lines once per styling; publication concatenates cached groups",
+    "no overlay selection, texture or painting while overlays are off",
+    "compact Map layers and Saved routes panels; routes card closes on open; sheet rounded top; bottom controls above sheet; reverse chart drag swaps ascent/descent; fixed-size scale bar"
+  ],
+  "tests": {
+    "kotlinJvm": "171 tests, 0 failures",
+    "rust": "cargo test --workspace: all pass",
+    "gpu": "overlay_drape (new; Vulkan and GLES), overlay_parity (Vulkan and GLES), progressive_multi, waypoint_occlusion, route_smoke pass; layer_smoke fails at its pre-existing route assertion as before"
+  },
+  "lintErrors": 0,
+  "originalAssetsIdentical": 623,
+  "jniExportsPerAbi": 43,
+  "loadAlignment": "0x4000",
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false,
+  "uiSeenOnDevice": false
+}

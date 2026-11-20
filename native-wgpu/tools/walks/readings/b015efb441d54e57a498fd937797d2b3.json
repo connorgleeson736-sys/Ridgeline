@@ -1,0 +1,75 @@
+{
+ "guid": "b015efb4-41d5-4e57-a498-fd937797d2b3",
+ "kind": "out_and_back",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Tasman Glacier View Track, from Tasman Valley car park to the viewpoint",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Tasman Valley car park",
+    "quote": "From Tasman Valley car park",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Tasman Glacier View viewpoint",
+    "quote": "The viewpoint is at the top of a rocky wall of glacial debris, called ‘moraine’.",
+    "ref": null
+   },
+   "via": [],
+   "direction": null,
+   "time": "30 min return",
+   "distance": "1.5 km return via same track",
+   "evidence": [
+    "From Tasman Valley car park, follow the signposted gravel track to Tasman Glacier View.",
+    "The viewpoint is at the top of a rocky wall of glacial debris, called ‘moraine’.",
+    "Return to the car park the same way you came."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Blue Lakes",
+   "quote": "From the main track, you can take a side trip to the Blue Lakes.",
+   "ref": "T3",
+   "from": null
+  }
+ ],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Tasman Lake",
+   "quote": "Views of Tasman Lake towards Haupapa/Tasman Glacier",
+   "ref": "T6",
+   "why": "view"
+  },
+  {
+   "name": "Haupapa / Tasman Glacier",
+   "quote": "glimpse the mighty Haupapa/Tasman Glacier at the lake’s far end",
+   "ref": "T4",
+   "why": "view"
+  },
+  {
+   "name": "Aoraki/Mount Cook",
+   "quote": "see Aoraki/Mount Cook and the snowy peaks of the Southern Alps",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Tasman Lake and River Track",
+   "quote": "Tasman Lake and River Track is accessible from Tasman Glacier View Track.",
+   "ref": "L1",
+   "why": "other walk"
+  },
+  {
+   "name": "White Horse Hill Campsite",
+   "quote": "Camping is available at White Horse Hill Campsite (15 min by car).",
+   "ref": "L2",
+   "why": "nearby"
+  }
+ ],
+ "doubts": "The start is the Tasman Valley car park, taken as road end F1, the only road end on Tasman Valley Road. That feature is labelled as where the Ball Hut Route meets Tasman Valley Road, not this track, so the ref is a judgment. The side trip's departure point is only 'the main track' and is not a named place, so from is null."
+}

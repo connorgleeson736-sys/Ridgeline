@@ -22,15 +22,12 @@ function attach(map,{enabled=()=>false,lowPower=()=>false,engine=root.maplibregl
   if(dead||!supported)return;
   const managers=map.style?.tileManagers||{};
   for(const id of ['linz','satellite','topo','terrain','terrain-fallback','shade-dem'])wrap(managers[id]);
-  wrap(map.terrain?.tileManager);wake();
- }
- function wake(){
-  if(timer!==null||!active())return;
-  timer=root.setTimeout(()=>{timer=null;if(!active())return;map.triggerRepaint();wake();},33);
+  // The terrain surface manager must retain the actual camera draw cover.
+  // Its DEM source manager above still requests/retains the warm ring.
  }
  function refresh(){lastTransform=null;lastExpanded=null;stamp='';sync();if(timer!==null&&!active()){root.clearTimeout(timer);timer=null;}map._update?.(true);map.triggerRepaint();}
  function destroy(){if(dead)return;dead=true;if(timer!==null)root.clearTimeout(timer);for(const [manager,{original,update}]of wrapped)if(manager.update===update)manager.update=original;wrapped.clear();for(const [event,fn]of listeners)map.off(event,fn);root.document?.removeEventListener?.('visibilitychange',refresh);}
- const listeners=[['terrain',sync],['styledata',sync],['render',wake],['remove',destroy]];
+ const listeners=[['terrain',sync],['styledata',sync],['remove',destroy]];
  if(supported){for(const [event,fn]of listeners)map.on(event,fn);root.document?.addEventListener?.('visibilitychange',refresh);sync();}
  return{refresh,destroy,stats:()=>({aggressiveCoverage:active(),coverageViewportScale:active()?3:1,coverageUpdates:updates})};
 }

@@ -1,0 +1,47 @@
+{
+  "fixture": "Shared paced HTTP at 5 Mbps, original photo/Esri already resident, 8 survey inputs, Chromium Canvas; not handset/end-to-end timing",
+  "alphaChecks": 8,
+  "compositeChecks": 56,
+  "replay": [
+    {
+      "trial": 0,
+      "format": "png",
+      "bytes": 485822,
+      "imageReadyMs": 790.5999999977648
+    },
+    {
+      "trial": 0,
+      "format": "webp",
+      "bytes": 58066,
+      "imageReadyMs": 144.19999999925494
+    },
+    {
+      "trial": 1,
+      "format": "webp",
+      "bytes": 58066,
+      "imageReadyMs": 134.80000000074506
+    },
+    {
+      "trial": 1,
+      "format": "png",
+      "bytes": 485822,
+      "imageReadyMs": 791.6999999992549
+    },
+    {
+      "trial": 2,
+      "format": "png",
+      "bytes": 485822,
+      "imageReadyMs": 798.8000000007451
+    },
+    {
+      "trial": 2,
+      "format": "webp",
+      "bytes": 58066,
+      "imageReadyMs": 148.19999999925494
+    }
+  ],
+  "pngMedianMs": 791.6999999992549,
+  "webpMedianMs": 144.19999999925494,
+  "medianSavingMs": 647.5,
+  "totalPacedBytes": 1631664
+}

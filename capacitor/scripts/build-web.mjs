@@ -7,6 +7,7 @@ import {optimiseWeb} from './optimise-web.mjs';
 import {createReadStream} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {resetWebsiteRenderPreferences} from '../mobile/render-preferences.js';
+import {additionalEngine} from './additional-latency.mjs';
 
 const base=fileURLToPath(new URL('../',import.meta.url)), source=path.resolve(base,'../public'), out=path.join(base,'www');
 await rm(out,{recursive:true,force:true});await mkdir(out,{recursive:true});
@@ -25,9 +26,14 @@ const {default:vm}=await import('node:vm');const holder={};vm.runInNewContext(aw
 const south=holder.RidgeSouthOverviews,ranges=new Map();
 for(const [coord,variants] of Object.entries(overview.tiles)){
  const converted={};for(const [mode,r] of Object.entries(variants)){const url=`https://localhost/_ridge/overviews/${r.file}/${r.offset}/${r.bytes}`;converted[mode]={url,range:r};ranges.set(url,[r.file,r.offset,r.bytes]);}
- south.tiles[coord]=converted;
+ // Identical natural/raw variants (5,233 of 5,255) use the single-row form the
+ // reader already accepts for both grades, halving the catalogue.
+ const rows=Object.values(converted);
+ south.tiles[coord]=rows.length&&rows.every(row=>row.url===rows[0].url)?rows[0]:converted;
 }
-await writeFile(path.join(out,'south-overviews.js'),`(function(r){r.RidgeSouthOverviews=${JSON.stringify(south)};})(globalThis);\n`);
+// A JSON string literal parses several times faster than an equivalent object
+// literal, and this catalogue is parsed on the main thread at the first South Island tile.
+await writeFile(path.join(out,'south-overviews.js'),`(function(r){r.RidgeSouthOverviews=JSON.parse(${JSON.stringify(JSON.stringify(south))});})(globalThis);\n`);
 const bundled=process.env.RIDGELINE_BUNDLE_OVERVIEWS!=='0';
 if(bundled){
  const data=process.env.RIDGELINE_OVERVIEW_DATA||path.join(base,'overview-data');await mkdir(path.join(out,'overview-packs'),{recursive:true});
@@ -77,13 +83,15 @@ const hosts=[['https://basemaps.linz.govt.nz','https://localhost/_ridge/linz'],[
 for(const name of await readdir(out))if(/\.(?:m?js)$/.test(name)){
  let text=optimiseWeb(name,await readFile(path.join(out,name),'utf8'));for(const [from,to] of hosts)text=text.replaceAll(from,to);
  text=text.replaceAll("u.hostname==='basemaps.linz.govt.nz'&&u.pathname.match(","u.hostname==='localhost'&&u.pathname.replace(/^\\/_ridge\\/linz/,'').match(");
- if(name==='gap-imagery.js')text=text.replace("if(fail)throw fail.reason;","if(fail&&fineRequests.length&&a?.ok&&b?.ok)return base(url,options);if(fail)throw fail.reason;");
+ // A failed seam donor is a failed fine tile. Never publish LINZ-only pixels
+ // as a successful completed boundary response; retain the existing parent.
  // Server-side packed overviews are not part of a static Capacitor app.
  // Keep bundled overviews; read the provider for other tiles.
  if(name==='topographic-overlays.js')text=replace(text,'maxzoom:15','maxzoom:14');
  if(name==='topographic-overlays.js'){
   text=replace(text,"const show=!!s[group(l.id)]&&!rasterTopo&&(!l.id.startsWith('nz-peaks')||peaks)","const show=(l.id.startsWith('nz-peaks')?peaks:!!s[group(l.id)])&&!rasterTopo");
  }
+ if(name==='loading-controls.js')text=replace(text,"max:200,value:0","max:200,value:100");
  if(name==='linz-topo.js'){text=replace(text,'maxzoom:16','maxzoom:18');text=replace(text,'tileSize:256','tileSize:(root.devicePixelRatio||1)>1?128:256');}
  if(name==='performance.js')text=replace(text,"setRatio(lowPower()?1:native);return;", "const source=map.getSource('topo'),size=(lowPower()?1:native)>1?128:256;if(source&&source.tileSize!==size){source.tileSize=size;map._update?.(true);}setRatio(lowPower()?1:native);return;");
  // Keep the app drawing buffer stable during gestures; retain frame-health reporting.
@@ -111,9 +119,36 @@ for(const name of await readdir(out))if(/\.(?:m?js)$/.test(name)){
   text=replace(text," const listeners=[['movestart',start]", " const hidden=()=>{if(root.document?.hidden)cancelPredictions();};root.document?.addEventListener?.('visibilitychange',hidden);\n const listeners=[['movestart',start]");
   text=replace(text,'function destroy(){if(dead)return;dead=true;',"function destroy(){if(dead)return;dead=true;root.document?.removeEventListener?.('visibilitychange',hidden);");
  }
+ // Off-screen reloads of tiles that still hold a texture/DEM no longer bypass
+ // the pending limit: their transfer is cancelled (freeing its image-queue
+ // slot for visible tiles) while the old decoded data stays resident. The tile
+ // reloads when it returns to view. Nearly finished DEM decodes (no live
+ // request controller) and explicit prepare-ahead jobs are left to complete.
+ if(name==='raster-residency.js'){
+  text=replace(text,"const entries=new Map(),adapters=new Map();let total=0,","const entries=new Map(),adapters=new Map();let obsoleteReleased=0,total=0,");
+  text=replace(text,"for(const tile of entries.keys())if(['loading','reloading','expired'].includes(tile.state)&&++count>=pendingLimit)","for(const tile of entries.keys())if(!tile._ridgeReloadOnReturn&&['loading','reloading','expired'].includes(tile.state)&&++count>=pendingLimit)");
+  text=replace(text,"  const bump=()=>{","  function release(tile){const entry=entries.get(tile);if(!entry||!tile.abortController||!['loading','reloading','expired'].includes(tile.state)||typeof manager._abortTile!=='function')return;if(entry.pending){entry.pending=false;pendingCount--;}tile._ridgeReloadOnReturn=true;obsoleteReleased++;manager._abortTile(tile);}\n  function reloadWhenSettled(tile,tries=0){if(dead||manager.getTile?.(tile.tileID)!==tile)return;if(['loading','reloading','expired'].includes(tile.state)){if(tries<120)root.setTimeout(()=>reloadWhenSettled(tile,tries+1),16);return;}if((tile.state==='errored'||tile.state==='loaded')&&(tile.texture||tile.dem)&&typeof manager._reloadTile==='function'){tile.state='loaded';manager._reloadTile(tile.tileID.key,'reloading');}}\n  const bump=()=>{");
+  text=replace(text,"  cache.getAndRemove=function(id){const tile=original.getAndRemove.call(this,id);if(tile){bump();forget(tile);","  cache.getAndRemove=function(id){const tile=original.getAndRemove.call(this,id);if(tile){bump();forget(tile);\n   if(tile._ridgeReloadOnReturn){delete tile._ridgeReloadOnReturn;if(tile.texture||tile.dem){if(tile.state==='errored')tile.state='loaded';Promise.resolve().then(()=>reloadWhenSettled(tile));root.RidgeTileTrace?.emit('source-adopted',sourceId,tile.tileID.canonical,{tier:'native-source'});reuses++;return tile;}}");
+  text=replace(text,"tile.uses--;this._inViewTiles.deleteTileById(id);this._clearTileReloadTimer(id);cache.add(tile.tileID,tile,tile.getExpiryTimeout());return;","const holds=(tile.texture||tile.dem)&&!options?.prepareAhead&&!pendingRoom();tile.uses--;this._inViewTiles.deleteTileById(id);this._clearTileReloadTimer(id);cache.add(tile.tileID,tile,tile.getExpiryTimeout());if(holds)release(tile);return;");
+  text=replace(text,"pendingLimit,pendingOffscreen:pendingCount})","pendingLimit,pendingOffscreen:pendingCount,obsoleteReleased})");
+ }
+ // Seam masks use only survey alpha. Request LINZ's lossless-alpha WebP (89%
+ // fewer bytes; alpha identical to PNG on 1,064 tiles across all 46 surveys)
+ // and fall back to the original PNG if a WebP response is unavailable.
+ // Displayed photographs and elevation are unchanged.
+ if(name==='gap-imagery.js'){
+  text=replace(text,"/${Math.floor(x/ff)}/${Math.floor(y/ff)}.png`);address.searchParams.set('api',u.searchParams.get('api')||'');return{url:address.href,z:fineZ};});","/${Math.floor(x/ff)}/${Math.floor(y/ff)}.webp`);address.searchParams.set('api',u.searchParams.get('api')||'');const png=new URL(address.href);png.pathname=png.pathname.replace(/\\.webp$/,'.png');return{url:address.href,png:png.href,z:fineZ};});");
+  text=replace(text," let dead=false;const stats={gapInterior:0,gapBoundary:0,gapOverview:0,gapEsriWaitsAvoided:0};"," let dead=false;const stats={gapInterior:0,gapBoundary:0,gapOverview:0,gapEsriWaitsAvoided:0,gapMaskPngFallbacks:0};\n const cancelled=()=>Object.assign(Error('Cancelled'),{name:'AbortError'});\n async function maskFetch(row,options){let response;try{response=await fetcher(row.url,options);}catch(error){if(dead||options.signal?.aborted||error?.name==='AbortError')throw error;stats.gapMaskPngFallbacks++;return fetcher(row.png,options);}\n  if(response.ok)return response;await response.body?.cancel();if(dead||options.signal?.aborted)throw cancelled();stats.gapMaskPngFallbacks++;return fetcher(row.png,options);}");
+  if(text.split('fineRequests.map(row=>fetcher(row.url,options))').length!==3)throw Error('Website integration changed: survey mask requests');
+  text=text.replaceAll('fineRequests.map(row=>fetcher(row.url,options))','fineRequests.map(row=>maskFetch(row,options))');
+ }
+ // Motion detail: focused full detail is restored at moveend instead of a fixed
+ // 350 ms later. This only returns detail sooner; in-motion reductions, their
+ // thresholds and hysteresis remain the website's.
+ if(name==='motion-detail.js')text=replace(text,"function end(){moving=false;previous=null;clear();timer=root.setTimeout(()=>{timer=null;if(dead||moving)return;smoothed=0;apply(0);},350);}","function end(){moving=false;previous=null;clear();if(dead)return;smoothed=0;apply(0);}");
  if(name==='terrain-core.js')text=replace(text,'/terrain-worker.js?v=5','/native-terrain-worker.js');
  if(name==='regional-imagery.js'){
-  text=replace(text,'/regional-imagery-worker.js?v=8','/native-regional-worker.js');
+  text=replace(text,'/regional-imagery-worker.js?v=9','/native-regional-worker.js?v=2');
   text=replace(text,'if(entry){',"if(entry&&(entry.url||entry[compensate?'natural':'raw']?.url)){");
   text=replace(text,"if(!/^\\/assets\\/south-overviews-v1\\/[a-f0-9]{24}\\.webp$/.test(row.url))", "if(!/^\\/assets\\/south-overviews-v1\\/[a-f0-9]{24}\\.webp$/.test(row.url)&&!/^https:\\/\\/localhost\\/_ridge\\/overviews\\/[a-f0-9]{64}\\/\\d+\\/\\d+$/.test(row.url))");
   const start=text.indexOf('   const headers=new Headers(options.headers);'),end=text.indexOf('  const asset=baked',start);
@@ -124,16 +159,27 @@ for(const name of await readdir(out))if(/\.(?:m?js)$/.test(name)){
 }
 await cp(path.join(base,'mobile/native-transport.js'),path.join(out,'native-transport.js'));
 await cp(path.join(base,'mobile/native-bitmap-cache.js'),path.join(out,'native-bitmap-cache.js'));
+await cp(path.join(base,'mobile/tile-retry.js'),path.join(out,'tile-retry.js'));
+const enginePath=path.join(out,'assets/maplibre-gl.mjs');
+const auditEngine=additionalEngine(await readFile(enginePath,'utf8'),await readFile(path.join(base,'../scripts/maplibre-image-queue.js'),'utf8'));
+await writeFile(enginePath,auditEngine);
+const provenancePath=path.join(out,'assets/maplibre-provenance.json'),provenance=JSON.parse(await readFile(provenancePath,'utf8'));
+provenance.files['maplibre-gl.mjs']=createHash('sha256').update(auditEngine).digest('hex');
+provenance.patches.push({id:'RIDGE_ADDITIONAL_LATENCY_V1',script:'capacitor/scripts/additional-latency.mjs',scope:'App-only touch listener guard and owned composite/fallback metadata delivery. Renderer/detail preserved.'});
+await writeFile(provenancePath,JSON.stringify(provenance,null,2)+'\n');
 await writeFile(path.join(out,'native-transport-worker.mjs'),"import './native-transport.js';globalThis.RidgeNativeTransport.installWorker();\n");
 await writeFile(path.join(out,'native-map-worker.mjs'),"import './native-transport-worker.mjs';import './assets/maplibre-gl-worker.mjs?v=6.14.0';\n");
 await writeFile(path.join(out,'native-terrain-worker.js'),"importScripts('/native-transport.js');RidgeNativeTransport.installWorker();importScripts('/terrain-worker.js?v=5');\n");
-await writeFile(path.join(out,'native-regional-worker.js'),"importScripts('/native-transport.js');RidgeNativeTransport.installWorker();importScripts('/regional-imagery-worker.js?v=8');\n");
+await writeFile(path.join(out,'native-regional-worker.js'),"importScripts('/native-transport.js');RidgeNativeTransport.installWorker();importScripts('/regional-imagery-worker.js?v=9');\n");
 const {document}=parseHTML(await readFile(path.join(out,'index.html'),'utf8'));
 document.documentElement.setAttribute('data-overviews-bundled',String(bundled));
-const nativeBootstrap=document.createElement('script');nativeBootstrap.textContent=await readFile(path.join(base,'mobile/native-transport.js'),'utf8')+'\nRidgeNativeTransport.installPage();';document.head.prepend(nativeBootstrap);
+const nativeBootstrap=document.createElement('script');nativeBootstrap.textContent=await readFile(path.join(base,'mobile/image-result.js'),'utf8')+'\n'+await readFile(path.join(base,'mobile/native-transport.js'),'utf8')+'\nRidgeNativeTransport.installPage();';document.head.prepend(nativeBootstrap);
 const renderDefaults=document.createElement('script');renderDefaults.textContent='try{('+resetWebsiteRenderPreferences.toString()+')(localStorage);}catch{}';document.head.prepend(renderDefaults);
 const $=id=>{const el=document.getElementById(id);if(!el)throw Error('Missing website control '+id);return el;};
 document.querySelector('meta[name=viewport]').setAttribute('content','width=device-width,initial-scale=1,viewport-fit=cover');
+// Every provider read goes through https://localhost/_ridge/ and native OkHttp,
+// which warms its own pooled connections. WebView sockets to the providers are never used.
+for(const link of document.querySelectorAll('link[rel=preconnect]'))link.remove();
 const panel=$('layers-panel'),heading=panel.firstElementChild,advanced=document.createElement('section'),basic=document.createElement('section');
 advanced.id='layers-advanced';advanced.hidden=true;advanced.setAttribute('role','tabpanel');advanced.setAttribute('aria-labelledby','advanced-tab');
 basic.id='layers-basic';basic.setAttribute('role','tabpanel');basic.setAttribute('aria-labelledby','basic-tab');
@@ -155,6 +201,9 @@ const note=document.createElement('p');note.textContent='3D terrain · Original 
 const tabs=document.createElement('div');tabs.className='layers-tabs';tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label','Layer settings');
 tabs.innerHTML='<button id="basic-tab" role="tab" aria-controls="layers-basic" aria-selected="true">Layers</button><button id="advanced-tab" role="tab" aria-controls="layers-advanced" aria-selected="false" tabindex="-1">Advanced</button>';
 panel.append(tabs,basic,advanced);
+const diskCache=document.createElement('fieldset');diskCache.className='detail-controls';
+diskCache.innerHTML='<legend>Automatic disk cache</legend><label for="automatic-disk-cache">Original map tiles <output id="automatic-disk-cache-value">256 MB</output></label><input id="automatic-disk-cache" type="range" min="0" max="1000" step="1" value="256" aria-describedby="automatic-disk-cache-help automatic-disk-cache-status"><p id="automatic-disk-cache-help">Keep recently used imagery and elevation responses on this device. Older cached tiles are removed when full. Saved offline maps are separate. Changes apply after restarting the app.</p><p id="automatic-disk-cache-status" role="status"></p>';
+advanced.prepend(diskCache);
 const about=document.createElement('details');about.innerHTML='<summary>Licences &amp; data sources</summary><p>Summits adapted from NZAC / ClimbNZ; Aoraki Tai Poutini (Rob Frost, 2018). CC BY-NC-SA 3.0 NZ. Imagery and terrain attribution appears on the map.</p>';
 for(const [name,file] of [['Capacitor','licenses/capacitor.txt'],['MapLibre','assets/maplibre-LICENSE.txt'],['Native HTTP libraries','licenses/apache-2.0.txt'],['Third-party notices','licenses/NOTICE.txt']]){const row=document.createElement('details'),title=document.createElement('summary'),text=document.createElement('pre');title.textContent=name;text.textContent=await readFile(path.join(out,file),'utf8');text.style.cssText='white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px;max-height:300px;overflow:auto';row.append(title,text);about.append(row);}advanced.append(about);
 const css=document.createElement('link');css.rel='stylesheet';css.href='/mobile.css';document.head.append(css);

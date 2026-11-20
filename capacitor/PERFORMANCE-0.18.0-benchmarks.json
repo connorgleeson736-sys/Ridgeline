@@ -1,0 +1,116 @@
+{
+  "referenceBranch": "android-preview-download",
+  "referenceCommit": "160cd38d44e2c7440fb52c998fc245ccf8b186f2",
+  "baselineApkSha256": "6e40929e6697ea9b158235f8fa780192331649bdc268be2d00666f7bd8752294",
+  "devicePerformanceMeasured": false,
+  "benchmarks": {
+    "lod": {
+      "reference": "android-preview-download / 0.17.0 Full",
+      "scope": "Native LOD arithmetic only, warmed cloud CPU; not whole-app performance",
+      "exactPolicyComparisons": 57512,
+      "exactOrderedCoverScenes": 64,
+      "totalSelectedTiles": 1306,
+      "batchTiles": 4096,
+      "beforeMs": 3.183189333333333,
+      "afterMs": 0.49557363333333343,
+      "samplesMs": [
+        [
+          3.4146217999999995,
+          3.3313651666666657,
+          3.183189333333333,
+          3.197667999999999,
+          3.0493037666666662,
+          3.757978300000002,
+          3.026819766666669,
+          3.0122961666666623,
+          3.018579666666665
+        ],
+        [
+          0.6511493333333325,
+          0.489832633333333,
+          0.49557363333333343,
+          0.596579566666666,
+          0.5273603333333351,
+          0.5959285666666649,
+          0.46035110000000257,
+          0.4316577666666717,
+          0.4651299999999992
+        ]
+      ],
+      "checksum": 31238966.42795546,
+      "speedRatio": 6.423241914470966
+    },
+    "matrix": {
+      "reference": "android-preview-download / 0.17.0 Full",
+      "scope": "Native regular projection with the existing geographic prefilter in both versions, warmed cloud CPU; not phone FPS",
+      "exactMatrixCases": 600,
+      "independentOutputOwnership": true,
+      "maxCachedMatrices": 128,
+      "maxMatrixPayloadBytes": 8192,
+      "beforeMs": 0.07698489999999993,
+      "afterMs": 0.05400058000000001,
+      "samplesMs": [
+        [
+          0.08544837999999999,
+          0.10915489999999978,
+          0.08696067000000028,
+          0.07036058999999967,
+          0.06659199,
+          0.0769355200000001,
+          0.07698489999999993,
+          0.0692585200000002,
+          0.08393959999999993
+        ],
+        [
+          0.05703426000000007,
+          0.07810750000000014,
+          0.045680300000000215,
+          0.05400058000000001,
+          0.04588280999999995,
+          0.059385710000000244,
+          0.05420319000000006,
+          0.04525997000000018,
+          0.0444403299999999
+        ]
+      ],
+      "speedRatio": 1.4256309839635037
+    },
+    "dem": {
+      "reference": "android-preview-download / 0.17.0 Full",
+      "scope": "Sparse native DEM ancestor lookup only, warmed cloud CPU; not whole-app performance",
+      "exactLookupCases": 2500,
+      "identicalLookupOrder": true,
+      "temporaryTileIdsPer512Queries": [
+        8192,
+        0
+      ],
+      "beforeMs": 0.8835153333333323,
+      "afterMs": 0.3905055999999983,
+      "samplesMs": [
+        [
+          0.9017675666666671,
+          0.8835153333333323,
+          0.8732324666666671,
+          0.8791353999999993,
+          0.8677491999999991,
+          0.8846166999999999,
+          0.9027681000000011,
+          0.8887949666666676,
+          0.8719321666666663
+        ],
+        [
+          0.38380846666666835,
+          0.3857641000000001,
+          0.37634520000000105,
+          0.3846223666666655,
+          0.41491946666666685,
+          0.4111888000000003,
+          0.3927523000000008,
+          0.3905055999999983,
+          0.4270902000000016
+        ]
+      ],
+      "speedRatio": 2.2624908153259162
+    }
+  }
+}

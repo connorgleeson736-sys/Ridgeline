@@ -1,0 +1,167 @@
+{
+ "guid": "0fba802c-2c5d-4952-8d3a-bfedc86ebf26",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Douglas Range Route, west to east from the Aorere Valley to the Cobb",
+   "shape": "one_way",
+   "start": {
+    "name": "Road end, track start behind the intentions shelter",
+    "quote": "The track starts just across the paddock behind the intentions shelter.",
+    "ref": null
+   },
+   "end": {
+    "name": "Trilobite Hut and road end",
+    "quote": "Trilobite Hut/roadend",
+    "ref": "T30"
+   },
+   "via": [
+    {
+     "name": "Lookout Knob",
+     "quote": "Lookout Knob",
+     "ref": "T24"
+    },
+    {
+     "name": "Beathams Clearing",
+     "quote": "Beathams Clearing",
+     "ref": null
+    },
+    {
+     "name": "The Pulpit",
+     "quote": "the Pulpit",
+     "ref": "T29"
+    },
+    {
+     "name": "Cow Saddle",
+     "quote": "Cow Saddle",
+     "ref": "T17"
+    },
+    {
+     "name": "Boulder Lake",
+     "quote": "Boulder Lake",
+     "ref": "T10"
+    },
+    {
+     "name": "Boulder Lake Hut",
+     "quote": "Boulder Lake Hut",
+     "ref": "T11"
+    },
+    {
+     "name": "Green Saddle",
+     "quote": "Green Saddle",
+     "ref": "T20"
+    },
+    {
+     "name": "Needles Eye",
+     "quote": "Needles Eye",
+     "ref": "T26"
+    },
+    {
+     "name": "Adelaide Tarn Hut",
+     "quote": "Adelaide Tarn Hut",
+     "ref": "T6"
+    },
+    {
+     "name": "Lonely Lake Hut",
+     "quote": "Lonely Lake Hut",
+     "ref": null
+    },
+    {
+     "name": "Fenella Hut",
+     "quote": "Fenella Hut",
+     "ref": "T19"
+    },
+    {
+     "name": "Cobb Hut",
+     "quote": "Cobb Hut",
+     "ref": "T14"
+    },
+    {
+     "name": "Chaffeys Hut",
+     "quote": "Chaffeys Hut",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "5-7 days",
+   "distance": null,
+   "evidence": [
+    "The route is described west to east (from the Aorere Valley end).",
+    "This guide covers the route linking the Aorere Valley to the Cobb reservoir via Boulder Lake, Adelaide Tarn, Lonely Lake and the Cobb Valley.",
+    "### Fenella Hut to Trilobite Hut/roadend (4-5 hr)"
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [
+  {
+   "name": "Anatoki Forks Hut via Yuletide Peak",
+   "quote": "If going from Boulder Lake to Anatoki Forks Hut (standard hut, 6 bunks) directly",
+   "ref": "T7",
+   "from": "Boulder Lake Hut",
+   "how": "track"
+  }
+ ],
+ "side_trips": [
+  {
+   "name": "dam wall and waterfall",
+   "quote": "Side trip to dam wall and waterfall, the source of the Boulder River",
+   "ref": null,
+   "from": "Kiwi Creek"
+  },
+  {
+   "name": "Lake Cobb and Round Lake",
+   "quote": "A short side walk takes you to Lake Cobb and Round Lake above it.",
+   "ref": null,
+   "from": "Cobb Hut"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Boulder Lake Hut",
+   "quote": "Boulder Lake Hut",
+   "ref": "T11"
+  },
+  {
+   "name": "Adelaide Tarn Hut",
+   "quote": "Adelaide Tarn Hut",
+   "ref": "T6"
+  },
+  {
+   "name": "Lonely Lake Hut",
+   "quote": "Lonely Lake Hut",
+   "ref": null
+  },
+  {
+   "name": "Fenella Hut",
+   "quote": "Fenella Hut",
+   "ref": "T19"
+  },
+  {
+   "name": "Cobb Hut",
+   "quote": "Cobb Hut",
+   "ref": "T14"
+  },
+  {
+   "name": "Chaffeys Hut",
+   "quote": "Chaffeys Hut",
+   "ref": null
+  },
+  {
+   "name": "Trilobite Hut",
+   "quote": "Trilobite Hut",
+   "ref": "T30"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Anatoki Forks Hut",
+   "quote": "Anatoki Forks Hut",
+   "ref": "T7",
+   "why": "other"
+  }
+ ],
+ "doubts": "Start road end not matched: features F1 (unnamed track at James Road) and F2 (Boulder Lake Track at James Road Right Branch) are both nearby and the text does not decide. The page text gives sections in the order Adelaide Tarn Hut to Lonely Lake Hut, so via follows that. The Anatoki Forks direct option is recorded as an exit, not a way. Chaffeys Hut is passed on the way down the Cobb Valley."
+}

@@ -1,0 +1,75 @@
+{
+ "guid": "6cfac693-234c-49a1-baea-9882d93d85a1",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Māori Saddle Route to Mataketake Hut",
+   "shape": "one_way",
+   "start": {
+    "name": "turn off to Māori Saddle Route",
+    "quote": "The turn off to Māori Saddle Route is signposted 10 min after Māori Saddle Hut",
+    "ref": null
+   },
+   "end": {
+    "name": "Mataketake Hut",
+    "quote": "Mataketake Hut",
+    "ref": "L3"
+   },
+   "via": [
+    {
+     "name": "pole markers at the edge of the open tops",
+     "quote": "pole markers at the edge of the open tops",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "9 hrs one way from SH6",
+   "distance": null,
+   "evidence": [
+    "Māori Saddle Route is started from the Historic Haast to Paringa Cattle Track.",
+    "From the bush edge markers, follow the poled route for about 20 minutes to Mataketake Hut."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [
+  {
+   "name": "Mica Mine Tops Route",
+   "quote": "Mica Mine Tops Route",
+   "ref": "L4",
+   "from": "Mataketake Hut",
+   "how": "track"
+  }
+ ],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Mataketake Hut",
+   "quote": "Mataketake Hut",
+   "ref": "L3"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Historic Haast to Paringa Cattle Track",
+   "quote": "Historic Haast to Paringa Cattle Track",
+   "ref": "L1",
+   "why": "other walk"
+  },
+  {
+   "name": "Māori Saddle Hut",
+   "quote": "Māori Saddle Hut",
+   "ref": "L2",
+   "why": "nearby"
+  },
+  {
+   "name": "Lake Dime",
+   "quote": "Lake Dime",
+   "ref": "T4",
+   "why": "view"
+  }
+ ],
+ "doubts": "The route starts at the signposted turn off on the Cattle Track, 10 min past Māori Saddle Hut (no feature), so start ref null; DOC's time counts from SH6. Shape one_way to the hut (a dead end); the text says to return via this route or Mica Mine Tops Route depending on weather, recorded as an exit. Section heading 'Turn off to Mataketake Hut' gives no separate time."
+}

@@ -1,0 +1,46 @@
+{
+  "nativeBaseline": "93be86cbfa54f80333850c85d99f7134b2b79308",
+  "websiteMain": "c0b394125bc35f6236c645c68a4a3bb94d88ce55",
+  "previewReference": "39431dad230945919a7b7d9d0ef2e86db8492ead",
+  "referenceCapacitorSource": "d880143418ac46ece98adff0b3b2fbaedf044d46",
+  "rust": {
+    "testsPassed": 39,
+    "optInBenchmarksIgnored": 6
+  },
+  "jvm": {
+    "focusedTestsPassed": 34,
+    "compiler": "2.2.21",
+    "target": "21",
+    "androidApiClasses": "org.robolectric:android-all:16-robolectric-13921718",
+    "allProductionAndTestSourcesTypeChecked": true
+  },
+  "softwareVulkanGpuSmoke": true,
+  "androidGradleBuild": false,
+  "newApk": false,
+  "physicalDeviceBenchmark": false,
+  "websiteCapacitorOlderAndroidUnchanged": true,
+  "sourceSha256": {
+    "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/DemandPlanCache.kt": "25d174b6b5ac0e831acffb7a84a76d968f9971b03ffab2c6560d5c1935a2d140",
+    "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/GpuUploadQueue.kt": "0f4fd7f42fab3498d7d75b39a32ef931cc0f431dc9b759a0a76b497a295e197d",
+    "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/OfflineUi.kt": "ebf73e3b64b18c1630f382d4155f3e5e2d81cd9b37df9b96790763d0f394ef4a",
+    "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/ResidentCoverage.kt": "00e5e156271feceb21497eeb29b2d249656304dfa20561e7d508114227fd752f",
+    "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/SourceDemand.kt": "dfb3532fe8add442e2184dc20e9d06072cacd06f90f27ae963c08b9526ff7b7e",
+    "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/TerrainView.kt": "9777a2132a3662e641cee0a8f2dd2809426e2f1c5a4d866614e7bcd20c942791",
+    "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/TileLoader.kt": "333975faff5c5e3598d664f8c41948cff23ada151dcbf955840f51d046279429",
+    "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/TileTransport.kt": "b8010ac4de2e9204c849be51b4fa805bccd936a97c63227806602fe8a5cd04b0",
+    "native-wgpu/android/app/src/test/java/nz/ridgeline/nativeapp/DemandPlanCacheTest.kt": "5e9e241eaece2376315aa1b8cc6462861b1a025796f7cb04d92e735eb346931e",
+    "native-wgpu/android/app/src/test/java/nz/ridgeline/nativeapp/GpuUploadQueueTest.kt": "7b97fcfa781dcfe837bfa1d56c7272f7801887d8ee0874394e2e43870951e7b7",
+    "native-wgpu/android/app/src/test/java/nz/ridgeline/nativeapp/ResidentCoverageTest.kt": "13702cdb333ae136019b0ad21c5477e1e9987dbc0ae804be23aab07e5a257c31",
+    "native-wgpu/android/app/src/test/java/nz/ridgeline/nativeapp/SourceDemandTest.kt": "91f4cee759f0b2a8f0f14dfab373686554a7e8fded1ac604b25758f5047a05d7",
+    "native-wgpu/core/src/lib.rs": "253afccd7f859d1be5f90f65adbb6f93c137eb4c0cf8859e213d39452ac9e8ad",
+    "native-wgpu/renderer/src/lib.rs": "1057fc501b25029a3817da6e674246e615896722e1813cdd87d81a869f053985",
+    "native-wgpu/renderer/src/seams.rs": "9278bf8b7195acf4b63a2a7aeeaf4f805a27dbc9dbb089cd34c90eff75e6dc83",
+    "native-wgpu/renderer/src/selection.rs": "c19dd6edda7fd7721f5692abc323bc4a8772553878abecb40f77dca879a19ca7",
+    "native-wgpu/android/app/src/main/java/nz/ridgeline/nativeapp/DetailPolicy.kt": "2c7ee9f7559069f4798568fddfd83962398b0c40952897d7e3e6c67423dbf157",
+    "native-wgpu/android/app/src/test/java/nz/ridgeline/nativeapp/BaselineTileTransport.kt": "b7d0e32acd9770c6afd580f3646f141e3905364e2e8a1def8a13dad125a4d455",
+    "native-wgpu/android/app/src/test/java/nz/ridgeline/nativeapp/DetailPolicyTest.kt": "6ccdf0b0be23c6bcf3277fb21caec43df24acbb6b163987db892b7bbe5b9f8ef",
+    "native-wgpu/android/app/src/test/java/nz/ridgeline/nativeapp/PriorityPipelineTest.kt": "8e0dfda6769f5f1e45d5c4305b1adde3e0d1b8dd9cfadff99989d94d4bf9e1ec",
+    "native-wgpu/core/src/source_selection_reference.rs": "b0607b4c39d4aa821fd44f1694b9db00fd19a4132d2d2cbdae6d64e643b58c02",
+    "native-wgpu/core/src/source_selection_tests.rs": "4338a03f53f95a1ba44d483e1f6a8e69e90e7616135e149286405b9f27d4da56"
+  }
+}

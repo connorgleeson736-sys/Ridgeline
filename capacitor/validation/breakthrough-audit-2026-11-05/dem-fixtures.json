@@ -1,0 +1,173 @@
+[
+  {
+    "name": "Cook",
+    "tile": [
+      13,
+      7967,
+      5200
+    ],
+    "sourceTile": [
+      12,
+      3983,
+      2600
+    ],
+    "file": "cook-13.f64",
+    "sourceSha256": "999468bab1578b2de5d4f68754d89ec6657e7c8c6e756984e443777d8decf5c4",
+    "sampledSha256": "0056d647d9d518b526504298bca062c7ee3ca51ea18133805793d0d9e0e21942",
+    "sourceBytes": 155298,
+    "min": 1836.7000000000003,
+    "max": 3694.3500000000013
+  },
+  {
+    "name": "Cook",
+    "tile": [
+      15,
+      31870,
+      20801
+    ],
+    "sourceTile": [
+      14,
+      15935,
+      10400
+    ],
+    "file": "cook-15.f64",
+    "sourceSha256": "8cf41a49e6de5295bda27b1c3f6cf8879e40533b1eb945d72c226e40bd526d81",
+    "sampledSha256": "150c137b076a0df6c4c9e6098d5425ed7f8fc794b99bab9b2d7aa9844d239a0d",
+    "sourceBytes": 137069,
+    "min": 2803.0499999999993,
+    "max": 3713.325
+  },
+  {
+    "name": "Cook",
+    "tile": [
+      17,
+      127482,
+      83207
+    ],
+    "sourceTile": [
+      16,
+      63741,
+      41603
+    ],
+    "file": "cook-17.f64",
+    "sourceSha256": "b2c7c127b8eaf642f72d639fe6bdbf0bf8b37690b829e360bc78a8d202c4a727",
+    "sampledSha256": "201d5ab48680019e98c8ad86ce570938c08f7dec913743af8334055a87b7aba4",
+    "sourceBytes": 107703,
+    "min": 3422.100000000002,
+    "max": 3716.9999999999995
+  },
+  {
+    "name": "Rolling Pin",
+    "tile": [
+      13,
+      7935,
+      5224
+    ],
+    "sourceTile": [
+      12,
+      3967,
+      2612
+    ],
+    "file": "rolling-pin-13.f64",
+    "sourceSha256": "d60d1d63d2237c8f2036a0ac3c2ca4a66525c5756dde8f645691953d23daa486",
+    "sampledSha256": "0856f5da5bb35f7d88bb255f394b8edab8840d369bad1717d5832434d2f17111",
+    "sourceBytes": 150978,
+    "min": 653.3999999999996,
+    "max": 2326.625
+  },
+  {
+    "name": "Rolling Pin",
+    "tile": [
+      15,
+      31740,
+      20899
+    ],
+    "sourceTile": [
+      14,
+      15870,
+      10449
+    ],
+    "file": "rolling-pin-15.f64",
+    "sourceSha256": "632f254ee619694b2f0ccf38585d3f41c80bdef383c4817dc719b19a3ff247d2",
+    "sampledSha256": "9b98088f91af6a57101356dabc66a3503d65e3b9344a605de113a91eb9c51570",
+    "sourceBytes": 117396,
+    "min": 1819.2750000000005,
+    "max": 2236.4250000000006
+  },
+  {
+    "name": "Rolling Pin",
+    "tile": [
+      17,
+      126961,
+      83596
+    ],
+    "sourceTile": [
+      16,
+      63480,
+      41798
+    ],
+    "file": "rolling-pin-17.f64",
+    "sourceSha256": "7b8327d0fb19d0aa69acd74e2e545e09b619f634885430ad5e5114b94b822f6f",
+    "sampledSha256": "31517b0fbcce6bbc58b5bf85cd1f8d4cc646b78db2e9b6791333d99a76e2abcb",
+    "sourceBytes": 90844,
+    "min": 2023.3500000000013,
+    "max": 2238.9000000000015
+  },
+  {
+    "name": "Wellington",
+    "tile": [
+      13,
+      8073,
+      5129
+    ],
+    "sourceTile": [
+      12,
+      4036,
+      2564
+    ],
+    "file": "wellington-13.f64",
+    "sourceSha256": "3e23f475621e076761424f88b0c2eadfa91cc0cf7b82201d1cc49c04274cf80d",
+    "sampledSha256": "bd0c40338e93472fcc449c31577b7a31e929e8fa98801fa6266ea872d4fe89a8",
+    "sourceBytes": 97730,
+    "min": -1.5,
+    "max": 188.1250000000009
+  },
+  {
+    "name": "Wellington",
+    "tile": [
+      15,
+      32292,
+      20517
+    ],
+    "sourceTile": [
+      14,
+      16146,
+      10258
+    ],
+    "file": "wellington-15.f64",
+    "sourceSha256": "8ed7794dc37c7dfd899174a72f4dc678cfa4dc29d2788b323720c03876ddd0b3",
+    "sampledSha256": "3025ca22263d62b626e2db9797fc3a9c8d2281ef3343281a5cb8342486bccd32",
+    "sourceBytes": 48575,
+    "min": -1.5,
+    "max": 80.40000000000146
+  },
+  {
+    "name": "Wellington",
+    "tile": [
+      17,
+      129170,
+      82069
+    ],
+    "sourceTile": [
+      16,
+      64585,
+      41034
+    ],
+    "file": "wellington-17.f64",
+    "sourceSha256": "b6556437824ad7b7b6afede3b41b08ff1b24f8543f1d741304b3661de46660cf",
+    "sampledSha256": "64f877db3932717177ea317b176b6c3ff7be3fd3e8e90f55c2ac50a684199b2b",
+    "sourceBytes": 20403,
+    "min": -1.5750000000002728,
+    "max": 4.299999999999727
+  }
+]

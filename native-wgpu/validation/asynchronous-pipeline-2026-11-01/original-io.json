@@ -1,0 +1,1 @@
+{"scope":"Host JVM, production SharedLocalReads, two CPU workers and two original-image reads held for 250 ms. Measures ready-image CPU queue latency, not phone speed or storage throughput.","trials":3,"beforeMs":[250.615316, 250.344952, 250.253564],"afterMs":[0.172942, 0.120402, 0.061663],"beforeMedianMs":250.344952,"afterMedianMs":0.120402,"sameBytes":true}

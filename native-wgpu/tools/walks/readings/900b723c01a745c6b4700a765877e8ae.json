@@ -1,0 +1,256 @@
+{
+ "guid": "900b723c-01a7-45c6-b470-0a765877e8ae",
+ "kind": "network",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Bellbird Walk from the car park near the east jetty at Kerr Bay",
+   "shape": "loop",
+   "start": {
+    "name": "car park near the east jetty at Kerr Bay",
+    "quote": "The track begins at the car park near the east jetty at Kerr Bay",
+    "ref": null
+   },
+   "end": {
+    "name": "car park near the east jetty at Kerr Bay",
+    "quote": "The pathway returns through a small wetland area",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "small wetland area",
+     "quote": "The pathway returns through a small wetland area where sedges, rushes, ferns and mosses thrive",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "15 min",
+   "distance": null,
+   "evidence": [
+    "The track begins at the car park near the east jetty at Kerr Bay.",
+    "The pathway returns through a small wetland area where sedges, rushes, ferns and mosses thrive.",
+    "Getting there: The walk starts at the end of Kerr Bay Road in St Arnaud."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Honeydew Walk branching off the Bellbird Walk",
+   "shape": null,
+   "start": {
+    "name": "end of Kerr Bay Road (Bellbird Walk)",
+    "quote": "Start on the Bellbird Walk at the end of Kerr Bay Road in St Arnaud",
+    "ref": null
+   },
+   "end": null,
+   "via": [
+    {
+     "name": "Bellbird Walk",
+     "quote": "This walk branches off from the Bellbird Walk.",
+     "ref": "T1"
+    }
+   ],
+   "direction": null,
+   "time": "45 min",
+   "distance": null,
+   "evidence": [
+    "This walk branches off from the Bellbird Walk.",
+    "It takes you further into the Rotoiti Nature Recovery Project area along a high-standard track.",
+    "Getting there: Start on the Bellbird Walk at the end of Kerr Bay Road in St Arnaud."
+   ]
+  },
+  {
+   "id": "W3",
+   "main": false,
+   "label": "Loop Track via Bellbird and Honeydew walks and the Lakehead Track",
+   "shape": "loop",
+   "start": {
+    "name": "end of Kerr Bay Road (Bellbird Walk)",
+    "quote": "Start on the Bellbird Walk at the end of Kerr Bay Road in St Arnaud",
+    "ref": null
+   },
+   "end": {
+    "name": "end of Kerr Bay Road (Bellbird Walk)",
+    "quote": "which returns to the car park",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Bellbird Walk",
+     "quote": "Start the track by taking the Bellbird Walk and Honeydew Walk",
+     "ref": "T1"
+    },
+    {
+     "name": "Honeydew Walk",
+     "quote": "Start the track by taking the Bellbird Walk and Honeydew Walk",
+     "ref": "T3"
+    },
+    {
+     "name": "St Arnaud Range/Loop Track",
+     "quote": "turning left to follow the St Arnaud Range/Loop Track",
+     "ref": null
+    },
+    {
+     "name": "junction at a creek",
+     "quote": "the track climbs a series of terraces to a junction at a creek",
+     "ref": null
+    },
+    {
+     "name": "lakeshore",
+     "quote": "until you re-emerge at the lakeshore",
+     "ref": null
+    },
+    {
+     "name": "Lakehead Track",
+     "quote": "join the Lakehead Track",
+     "ref": "T6"
+    }
+   ],
+   "direction": null,
+   "time": "1 hr 30 min",
+   "distance": null,
+   "evidence": [
+    "Start the track by taking the Bellbird Walk and Honeydew Walk before turning left to follow the St Arnaud Range/Loop Track.",
+    "From here, the track climbs a series of terraces to a junction at a creek and then loops back and down until you re-emerge at the lakeshore and join the Lakehead Track, which returns to the car park."
+   ]
+  },
+  {
+   "id": "W4",
+   "main": false,
+   "label": "Black Valley Walk from Kerr Bay Campsite",
+   "shape": null,
+   "start": {
+    "name": "Kerr Bay Campsite",
+    "quote": "The walk starts in the Kerr Bay Campsite",
+    "ref": "T13"
+   },
+   "end": null,
+   "via": [
+    {
+     "name": "Black Valley Stream",
+     "quote": "This walk follows the Black Valley Stream through majestic beech forest",
+     "ref": "T10"
+    }
+   ],
+   "direction": null,
+   "time": "30 min",
+   "distance": null,
+   "evidence": [
+    "This walk follows the Black Valley Stream through majestic beech forest.",
+    "Getting there: The walk starts in the Kerr Bay Campsite, on Kerr Bay Road in St Arnaud."
+   ]
+  },
+  {
+   "id": "W5",
+   "main": false,
+   "label": "Brunner Peninsula Nature Walk",
+   "shape": "loop",
+   "start": {
+    "name": "western side of Kerr Bay",
+    "quote": "This walk starts at the western side of Kerr Bay.",
+    "ref": null
+   },
+   "end": {
+    "name": "western side of Kerr Bay",
+    "quote": "Return via Baxter Street or Cotterell Street and View Road.",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Brunner Peninsula",
+     "quote": "It follows the peninsula around into West Bay",
+     "ref": "T11"
+    },
+    {
+     "name": "West Bay",
+     "quote": "It follows the peninsula around into West Bay",
+     "ref": "T17"
+    },
+    {
+     "name": "Baxter Street or Cotterell Street and View Road",
+     "quote": "Return via Baxter Street or Cotterell Street and View Road.",
+     "ref": null,
+     "how": "road"
+    }
+   ],
+   "direction": null,
+   "time": "1 hr",
+   "distance": null,
+   "evidence": [
+    "This walk starts at the western side of Kerr Bay.",
+    "It follows the peninsula around into West Bay, twice crossing the Alpine Fault.",
+    "Return via Baxter Street or Cotterell Street and View Road."
+   ]
+  },
+  {
+   "id": "W6",
+   "main": false,
+   "label": "Brunner Peninsula longer walk returning via Rotoiti Lodge and Ward Street",
+   "shape": "loop",
+   "start": {
+    "name": "western side of Kerr Bay",
+    "quote": "This walk starts at the western side of Kerr Bay.",
+    "ref": null
+   },
+   "end": {
+    "name": "western side of Kerr Bay",
+    "quote": "returning to Kerr Bay via Rotoiti Lodge and Ward Street",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Brunner Peninsula",
+     "quote": "It follows the peninsula around into West Bay",
+     "ref": "T11"
+    },
+    {
+     "name": "West Bay",
+     "quote": "It follows the peninsula around into West Bay",
+     "ref": "T17"
+    },
+    {
+     "name": "next junction",
+     "quote": "continue to the next junction and turn right",
+     "ref": null
+    },
+    {
+     "name": "Rotoiti Lodge",
+     "quote": "returning to Kerr Bay via Rotoiti Lodge and Ward Street",
+     "ref": null
+    },
+    {
+     "name": "Ward Street",
+     "quote": "returning to Kerr Bay via Rotoiti Lodge and Ward Street",
+     "ref": null,
+     "how": "road"
+    }
+   ],
+   "direction": null,
+   "time": "1 h 30 min",
+   "distance": null,
+   "evidence": [
+    "For a longer walk (1 h 30 min) continue to the next junction and turn right, returning to Kerr Bay via Rotoiti Lodge and Ward Street."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Nelson Lakes Visitor Centre",
+   "quote": "just below the Nelson Lakes Visitor Centre",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "Rotoiti Nature Recovery Project area",
+   "quote": "The Rotoiti Nature Recovery Project area extends south along the eastern lake shore of Lake Rotoiti",
+   "ref": null,
+   "why": "other"
+  }
+ ],
+ "doubts": "This page describes several separate short walks from Kerr Bay in St Arnaud, so kind is network; W1 (Bellbird Walk) is main only because it is listed first. No road-end feature is clearly the Bellbird Walk car park 'near the east jetty' or the Brunner Peninsula start 'on Kerr Bay Road, just below the Nelson Lakes Visitor Centre'; F6 (where Kerr Bay Track meets Kerr Bay Road) is the only feature on Kerr Bay Road and could be either, so no start ref is given. The Bellbird Walk is a loop because the pathway returns through a wetland; the start and end are the same car park. Honeydew Walk (W2) and Black Valley Walk (W4) give no end and no shape. The Honeydew Walk is matched to map track T3 'Honeydew Track' by name only. The Loop Track's 'St Arnaud Range/Loop Track' could be map track T7 'Loop Track' or T9 'St. Arnaud Range Track', so no ref. W3 ends at the car park, the Lakehead Track returning to it. The Brunner Peninsula walk (W5) returns by streets (Baxter Street or Cotterell Street and View Road) and is recorded as a loop back to its start; the 1 h 30 min longer walk (W6) is a separate way with its own time, returning to Kerr Bay via Rotoiti Lodge and Ward Street. Where on the peninsula the 'next junction' is, the text does not say. No whole-way distances are given."
+}

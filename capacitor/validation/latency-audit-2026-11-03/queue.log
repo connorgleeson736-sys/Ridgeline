@@ -1,0 +1,18 @@
+✔ one readiness scan per visible imagery source, without stale results (2.243344ms)
+✔ failed composition closes finished and late decoded images without waiting for another decode (10.708328ms)
+✔ evicted worker masks stay alive until the borrowing composition releases them (11.109223ms)
+✔ cancelled decode releases its bitmap and image admission slot (4.682157ms)
+✔ paint fallback classification is shared only within the current preparation (2.07621ms)
+✔ encoded-input response consumers remain independent (65.179639ms)
+✔ fetch and decode concurrency can be tuned independently without changing source bytes (4.672534ms)
+✔ gap pass-through performs catalogue selection once through the real regional wrapper (12.292788ms)
+✔ diagnostics distinguish image delivery, decode admission and decode execution (3.696993ms)
+✔ a saturated image queue defers priority rebuilds but uses the latest priorities on admission (6.507177ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 245.637782

@@ -1,0 +1,29 @@
+{
+  "artifact": "Ridgeline-Native-Huts-Circuits-0.1.46-Base.apk",
+  "bytes": 33968938,
+  "sha256": "8a40e6bca30524125cdc45aa73ed783e3dab5095739ba3f59f3ff68e56507e93",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.46-huts-circuits",
+  "versionCode": 47,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.45 Full Audit (same package and signer)",
+  "changes": [
+    "Hut and bivouac cards: tap a hut name on the map (or a hut in a track's hut list, or a hut search result) for DOC's photo, category and place, a Closed badge when DOC lists it closed, bunks, elevation (z17 LINZ elevation at the hut), bookings and walk time from the road end, facilities, DOC's introduction and page sections (About this hut, Fees and bookings, Getting there, Know before you go), and DOC's page. Data: DOC_Huts_DTO and DOC_Huts (CC BY 4.0) within about 1 km, matched by name (Hut/Biv/Bivouac spellings) else the nearest within 250 m; the hut's doc.govt.nz page (text only).",
+    "Circuits take precedence: DOC's walk list (once, ~50 KB compressed) and walk lines per zoom-10 data tile in view (from camera zoom 11.5, tracks on) mark map track pieces lying at least 70% within 50 m of a large DOC walk (circuit, traverse, crossing, walkway or multi-day; not collections such as 'Wilkin Valley tracks'; the longest walk wins). Those pieces are named by their walk like a Great Walk (from tile zoom 12, priority 15) until camera zoom 15, then by their own name: the map's Siberia Track reads 'Gillespie Pass Circuit' until 15. Unnamed pieces along the walk take its name.",
+    "Tapping a circuit name opens the whole walk: DOC's name, difficulty and time at once (from the walk list), page text requested at the tap, and the map's own track pieces along DOC's line (every zoom-14 tile it crosses, pieces mostly within 40 m), falling back to DOC's line where the map has gaps (under 70% of its length).",
+    "Search opens summaries: DOC walks (by the id in their DOC link) open the walk's summary and frame its line; huts open the hut card. Other places still show a point.",
+    "Latency: DOC walk lookups by name and by place now run in parallel (a renamed track no longer waits for the name lookup to fail); map track tiles are followed six at a time (was three); circuit taps skip the name lookup; DOC's site and data connections are kept warm while track names are on screen (re-warmed every 4 minutes); the DOC track query is generalised to ~10 m. Hut page sections without DOC's text-block wrapper are read too."
+  ],
+  "dataChecks": "Real data (fixtures): all Siberia Track pieces in eight LINZ tiles are matched to DOC's Gillespie Pass Circuit (not the 'Wilkin Valley tracks' collection) and labelled 'Gillespie Pass Circuit' at zoom 14 and 'Siberia Track' at 15.5; Siberia Hut's DOC page gives its introduction and four sections.",
+  "tests": {
+    "kotlinJvm": "245 tests, 0 failures (new: DocWalksTest x4, DocHutsTest x4)",
+    "rust": "unchanged (native libraries byte-identical to 0.1.45)"
+  },
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

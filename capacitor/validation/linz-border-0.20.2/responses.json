@@ -1,0 +1,98 @@
+[
+  {
+    "tile": [
+      17,
+      127471,
+      83202
+    ],
+    "source": "aerial",
+    "status": 200,
+    "bytes": 5658,
+    "alphaPixels": 65536,
+    "seconds": 1.246
+  },
+  {
+    "tile": [
+      17,
+      127471,
+      83202
+    ],
+    "source": "canterbury-2015-2016-0.3m",
+    "status": 200,
+    "bytes": 48403,
+    "alphaPixels": 29228,
+    "seconds": 0.821
+  },
+  {
+    "tile": [
+      17,
+      127473,
+      83202
+    ],
+    "source": "aerial",
+    "status": 200,
+    "bytes": 8598,
+    "alphaPixels": 65536,
+    "seconds": 1.23
+  },
+  {
+    "tile": [
+      17,
+      127473,
+      83202
+    ],
+    "source": "canterbury-2015-2016-0.3m",
+    "status": 200,
+    "bytes": 89469,
+    "alphaPixels": 65529,
+    "seconds": 1.688
+  },
+  {
+    "tile": [
+      17,
+      127474,
+      83202
+    ],
+    "source": "aerial",
+    "status": 200,
+    "bytes": 7410,
+    "alphaPixels": 65536,
+    "seconds": 0.798
+  },
+  {
+    "tile": [
+      17,
+      127474,
+      83202
+    ],
+    "source": "canterbury-2015-2016-0.3m",
+    "status": 200,
+    "bytes": 79401,
+    "alphaPixels": 65536,
+    "seconds": 0.935
+  },
+  {
+    "tile": [
+      17,
+      127474,
+      83203
+    ],
+    "source": "aerial",
+    "status": 200,
+    "bytes": 2058,
+    "alphaPixels": 65536,
+    "seconds": 0.843
+  },
+  {
+    "tile": [
+      17,
+      127474,
+      83203
+    ],
+    "source": "canterbury-2015-2016-0.3m",
+    "status": 200,
+    "bytes": 47371,
+    "alphaPixels": 65536,
+    "seconds": 1.488
+  }
+]

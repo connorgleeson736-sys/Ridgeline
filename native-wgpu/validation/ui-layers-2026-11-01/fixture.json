@@ -1,0 +1,8 @@
+{
+  "source": "LINZ topographic-v2 /3857/12/3983/2600.pbf",
+  "provider": "Toit\u016b Te Whenua LINZ",
+  "licence": "CC BY 4.0",
+  "credentialsRecorded": false,
+  "decompressedBytes": 41926,
+  "sha256": "fe98b116fb10a5061055b64b61b5c7e5a09a541442bfac4af9035b94db42379d"
+}

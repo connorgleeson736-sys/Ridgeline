@@ -1,0 +1,17 @@
+{
+  "sourceCheckpoint": "22858d0c64c7273c8cf69479d1ea8df61cc335bf",
+  "scope": "Two focused adaptive invariants pass. Vulkan/GLES fixtures pass; plane uses 8952 instead of 32768 surface triangles with identical pixels; route sources keep full geometry; warm residency and memory pressure assertions pass. All six original ZIP headers match native reader layout. Kotlin/all three optimized JNI ABIs/assembly/signature pass. Android document-picker persistence and phone performance remain unverified.",
+  "apk": {
+    "bytes": 31614320,
+    "sha256": "0c96a6896546e6b5c588fa8f5bef361ac7a649b2ad48af009d5f2a0d17e3cac4"
+  },
+  "phoneFpsClaim": false,
+  "newAndroidRuntimeRun": false,
+  "originalArchiveHeaders": 6,
+  "adaptivePlaneSurfaceTriangles": {
+    "before": 32768,
+    "after": 8952,
+    "pixelsIdentical": true
+  },
+  "terrainIndexBytes": 2
+}

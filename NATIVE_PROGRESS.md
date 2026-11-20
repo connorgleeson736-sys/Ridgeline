@@ -1,0 +1,1744 @@
+# Durable progress log
+
+## 2026-11-03 — Mount Cook imagery-border recovery / 0.1.11
+
+User reports blurry native tiles around LINZ/Esri borders near Mt Cook.
+Found survey transport error returning LINZ-only pixels as completed tile, then
+persisting composition without failed donor provenance; removed false success.
+Bumped only composed-image namespace, keeping valid original HTTP caches/data.
+Also found fourth transient failure has no automatic wakeup in stationary view;
+IO/408/429/5xx now continue bounded15s retries while wanted/active/currentfailure.
+Permanent HTTP/decode failures keep established finite retries. No resolution or
+seam/pixel/math changes. Live Cook17/127471/83202 probe: all3sources200, complete
+composition restores36,308Esri pixels vs bad fallback (29,213different). Reference
+mask matches native. Four focused JVM checks pass, including real HTTP4x503→200
+recovery and finite404control; retry delays virtual. No phone failure trace/run.
+Source/report: native-wgpu/research/IMAGERY-BORDER-RECOVERY-2026-11-03.md.
+Sourceaab3c12. Versioncode12/name0.1.11-border-recovery; same signer/package.
+APK Ridgeline-Native-Imagery-Border-Recovery-0.1.11-Base.apk,32,716,613bytes,
+SHA256f871578201586c074bad30003d95eb584f454ec1ad45ef7275a60c4db2995c00.
+Assembly/signature/ZIP+ELF16KiB checks pass; all621assets and3optimized renderer
+libraries byte-identical to0.1.10; all38JNIexports perABI; no sessionCA/WebView.
+Exact release/download record: validation/border-recovery-2026-11-03.
+
+## 2026-11-03 — Native audit implementation / signed 0.1.10 APK
+
+Implemented supplied native0.1.9 audit: submitted-scene picking snapshot and
+independent input worker; camera-first bounded optional uploads; national boundary
+index/cache; isolated route invalidation and per-terrain cartography fragments;
+stable label slots/metadata/dirty-row texture updates; shared explicit unshaded
+2D resource and direct plane admission. Existing bounded background cartography
+and label placement retained. Experimental single focus measured interior is
+OFF by default, conservative parent/skirt joins only, exact parent rim ownership.
+No unsafe planar quad. Full imagery/terrain detail and original assets retained.
+Focused JVM/Rust/production Vulkan/GLES evidence and restrictions are in
+native-wgpu/research/NATIVE-LATENCY-AUDIT-2026-11-03.md and validation/native-audit.
+Version code11/name0.1.10-native-audit; same native Performance package/signing key.
+Final Kotlin APK source655de14 (Rust inputs identical to native build c0a420d).
+All3optimized Android JNI builds and APK assembly pass. Signed artifact
+Ridgeline-Native-Latency-Audit-0.1.10-Base.apk,32,716,605bytes,
+SHA2562cdfc17f0e3e8c2146f88dd3b0f6497ffa485641a9899f279e1f3e0047ccd26c.
+Same signer as0.1.9; all621original APK assets unchanged; all38JNIexports perABI,
+ZIP/ELF16KiB alignment, native-only payload and no sessionCA verified.
+Exact packaging/publication record: validation/native-audit-2026-11-03.
+No handset speed or installation-execution claim.
+
+## 2026-11-02 — Capacitor UI/layers/route checkpoint APK 0.1.9
+
+Latest user explicitly requests the Capacitor UI, all route features and every
+map layer, and specifically asks to modify the existing route editor directly.
+Reference refreshed/pinned at0.18.0 d880143; native renderer/0.1.8 HTTP fixes kept.
+Direct existing-editor port, route drawer/sheet/combination/chart/GPX sharing;
+all map-layer groups and persisted Advanced controls implemented. Unshaded2D
+skips DEM/halo downloads with separate planar cover; source pixels unchanged.
+One shared/background MVT stream, native cached font atlas, useful cached parents,
+disabled-layer skipping; cached instanced line batches use6x fewer upload bytes.
+Profiles stay background and refine from resident realDEM without extraHTTP.
+11unique focused JVM checks, finalKotlin compile, hostRust releasecheck and actual
+Vulkan/GLES graphics fixtures pass. All3optimized AndroidJNI releasebuilds pass.
+FinalAPK source d258866d31509174c01aa0022094015d687566c2, code10,
+Ridgeline-Native-UI-Layers-0.1.9-Base.apk,32,513,845bytes,
+SHA2566faf1d0b4f0466834048859781aeb3fb05aaff236404935d2bfdf1102ebedf23.
+Same Performance package/key; all619baseline APK assets byte-identical (618source
+plusSDKpublic-suffix data); adds onlystyleJSON/boundaryGeoJSON. Signature and
+ZIP/ELF16KiB alignment,33JNIexports perABI, native-only payload pass. No sessionCA,
+WebView or largepacks. No device connected; no phone speed/interaction claim.
+Report: native-wgpu/research/UI-LAYERS-MIGRATION-2026-11-02.md. Remaining native
+font/line-label differences, dense3D drape costs and unported paper-frame/PDF
+offline workflows are explicit. Do not claim full-app/device/pixel-perfect parity.
+Exact record: native-wgpu/validation/ui-layers-2026-11-01/release.json.
+
+## 2026-11-01 — HTTP-specific latency improvements, APK 0.1.8
+
+Investigated HTTP intervals sometimes exceeding five seconds. Found synchronous
+OkHttp cache metadata/body writes after provider headers, beyond the earlier
+local-cache escape deadline. Genuine cold misses now deliver through the
+cache-free client, then publish asynchronously into the same full-size HTTP
+cache. One background-priority writer, 512 queued jobs and 8 MiB aggregate payload
+cap; temporary handoff bytes remain reusable even with retained RAM at zero.
+Stale entries retain standard conditional validation and may still incur SDK
+cache writes; diagnostics now exposes that remaining path.
+
+Upgraded OkHttp 4.12.0 to compatible 5.3.2 with fast fallback explicitly enabled.
+Alternative TCP addresses race after 250 ms; losing attempts cancel without
+duplicate tile HTTP requests. Inspected 5.5.1 but it requires compileSdk37; kept
+SDK36 and existing TLS/proxy/hostname verification. No forced IPv4 or speculative
+duplicate-request hedge. Safe public preconnect API absent in the pinned version.
+
+Phase metrics distinguish dispatch/cache, DNS, connect including TLS, TLS,
+provider headers, raw-source reads and outer cache/body processing. Fixed-size
+body-rate buckets report observed payload throughput over about five seconds.
+Oldest uncanceled phase plus latest/longest records and cache-publication counts
+appear in the scrollable/copyable Loading diagnostics. Queries/credentials omitted.
+
+Three alternating real-loopback HTTP pairs each: 500 ms cache-monitor hold after
+headers gives 505.143→2.557 ms (502.587 ms saved); injected 650 ms unresponsive
+first socket with working second address gives 651.938→251.875 ms (400.063 ms
+saved). Same bytes, one actual GET per trial. Host fixtures do not identify the
+cause or prove the magnitude of the user's phone stall.
+
+Eight distinct focused JVM checks pass; no broad suite/lint or phone run.
+Checks cover actual 4.12 disk-cache compatibility/readability, freshness, ETag/304,
+Vary, gzip/chunked gzip, redirects, no-store, pending must-revalidate policy,
+retired HTTP calls and all 50 responses persisting across a held-cache burst.
+Pinned internal cache ABI is isolated in a Java adapter, with upgrade checks.
+Failed buffered writes abort instead of committing a partial body.
+
+Final app source9b7e82fbe9e33dce2f70c81d1ab80624f7bd1f83. APK
+Ridgeline-Native-HTTP-Latency-0.1.8-Base.apk, code9,32,219,650bytes,
+SHA2567b6934099becce7b93eefb0be9923028be9e8709b203243f31534a697f5454fe.
+Same Performance package/key, in-place update over0.1.2–0.1.7. Signature and
+ZIP16KiB/ELF alignment verified; all618original assets and3native libraries
+byte-identical to0.1.7. SDK adds PublicSuffixDatabase.list. No sessionCA/WebView/
+bigpacks; renderer/detail/route planning unchanged. Report/validation:
+native-wgpu/research/HTTP-LATENCY-2026-11-01.md and
+native-wgpu/validation/http-path-2026-11-01/release.json.
+
+## 2026-11-01 — eight pipeline/latency improvements, APK 0.1.7
+
+User asked for continuing broad performance work, then prioritized improvements
+that can avoid more than200ms. Implemented shared prioritized original-file I/O
+independent of CPU decoding; async metadata initialization; bounded two-tile
+offline prefetch reusing source leases even with zeroRAM; acknowledged/retryable
+GPU admission; Vulkan merged mip/frame submissions; real read-handle publication
+to bypass SQLiteOpenHelper's inherited monitor; independent region-list queries;
+and asynchronous HTTP disk-cache close during teardown. Capacity releases wake
+GPU retries instead of waiting up to512ms on a stale deadline.
+
+Follow-up added revalidated late prepared-cache adoption while waiting on sources
+or at CPU checkpoints. Keeps12msheadstart,2readers/16pending cap and legacy API;
+rechecks current provenance/expiry/imageryGeneration/eligibility, rejects stale
+hits, preserves shared consumers, and never publishes an obsolete late result.
+
+First source3681a4a, late-cache b2e102d, final app source
+36f94778587447c5519623bea318f2d0e0b5e072. All Rust production trees remain identical
+between first and final source. ARM64/ARMv7/x86_64 rebuilt release/stripped with
+new typed-admission JNI exports; legacy exports and surface focus preserved.
+ThirdABIbuild hit disk limit after Cargo target cleanup retained large dependency
+files; explicit completed-target cargo cleans freed space and x86_64 then built.
+Final APK repackaged from a fresh packaging directory to omit incremental unused
+bodies; no repeated full tests/lint.
+
+Eleven distinct targeted JVM checks pass; ack test extended/rerun for capacity
+wakes. Actual lossless cache/injected350ms source fixture363.223→41.986ms,
+321.237ms saved. Helper-style250mswriter hold250.218→0.000431ms with production
+PublishedReadHandle. Original-I/O ready CPU queue250.345→0.120ms. Offline fixture
+about2x faster with same12requests/bytes,2background cap,0retainedRAM. Host only.
+
+GPU A/B/C: existing5submits, split2submits, merged1submit for4images+frame.
+Three alternating warmed trials on Vulkan arrays, Vulkan separate and GLES
+separate; identical frame pixels, all9checker mips and2-layer mip probe pass.
+Vulkan merged CPU submission improves strongly in software fixtures; GPU-drain
+results differ by layout. GLES measurements varied/regressed in an earlier round,
+so Android enables batching only on Vulkan. No phone/FPS claim or quality cut.
+
+Pinned AOSP Android16 source confirms SQLiteOpenHelper.getReadableDatabase locks
+on the same helper. Read-only handles are not cached; writers publish writable
+handles, initialization uses CAS, committed resource availability cannot be
+replaced by an older empty snapshot. Durable transactions and ownership remain.
+
+APK Ridgeline-Native-Latency-0.1.7-Base.apk, code8,32,092,956bytes,
+SHA2569432908850999d937293a6efc85c5b40ef7aedfa10683f67d3cf2ae111330dbb.
+Same Performance package/key, in-place update from0.1.2–0.1.6. Signature,
+ZIP16KiB/ELF alignment, new JNI exports and all618unchanged assets verified.
+No sessionCA/WebView/bigpacks. Report and exact validation:
+native-wgpu/research/ASYNCHRONOUS-PIPELINE-2026-11-01.md and
+native-wgpu/validation/asynchronous-pipeline-2026-11-01/release.json.
+
+Next major candidates remain correlated tile-to-present tracing, conservative
+measured terrain bounds, in-flight allocation accounting, classified retries,
+and device-proven pipeline caching/pacing. Route planning untouched.
+
+## 2026-11-01 — persistent live download-job sliders and APK 0.1.6
+
+Added moving, stationary and background download sliders, each 1–50, under
+Offline / imagery. Defaults remain 8/12/2; reset restores them. Preferences
+persist and apply immediately. Lowering caps drains admitted work normally.
+Transport remains the admission controller; ordinary and isolated HTTP queues
+accommodate up to 50 foreground + 50 background transfers. Imagery reservation
+scales down at small limits so one-slot terrain progress remains possible.
+
+Two focused JVM checks pass: live admission/movement/growth/shrink/background/
+one-slot terrain/clamping, plus 50 simultaneous actual HTTP transfers on each
+HTTP path and queued request 51. Fixed an ordering assumption in the fixture:
+the two independent local readers may finish in either order. No full suite,
+lint or phone benchmark. Preserved the renderer and all prior improvements.
+
+Source f6f5ea0682945d3e42fc73f392b298e57ea2c37d. APK 0.1.6-download-controls,
+code7, 32,056,100bytes; SHA256
+ed429e5d4ebdef8bba39382bada421b4f4ed84f415fdcf9330488ee9a0ce093e.
+Same Performance package/key, in-place update from0.1.2–0.1.5. Signature/version/
+ZIP16KiB alignment verified; all618assets and all3optimized native libraries
+byte-identical to0.1.5. Research and release record:
+native-wgpu/research/DOWNLOAD-CONTROLS-2026-11-01.md and
+native-wgpu/validation/download-controls-2026-11-01/release.json.
+
+## 2026-11-01 — application-wide performance audit delivered
+
+Surface-focus 0.1.5 implementation/APK already complete at publication8c06ca6,
+sourceb0d76de. User then requested a full audit and cutting-edge research report.
+Reviewed startup/lifecycle/input/selection/IO/decode/caches/storage/offline/GPU/
+memory/presentation/UI/build paths; inventoried63production source/shader/manifest
+files. No application code changes or new tests for the audit; no phone timing.
+
+Report: native-wgpu/research/FULL-APP-PERFORMANCE-AUDIT-2026-11-01.md.
+23ranked findings with pinned anchors/source hashes and CSV in
+native-wgpu/validation/full-audit-2026-11-01. Key verified paths: direct attached
+ZIP/asset reads on image workers, GPU queue item removed before a failed upload
+without requeue, generic1/4/15s retries, saved-reader/writer common monitor,
+irreversible12msderived-cache miss, broadheightprisms, discarded offline image
+composition, startup GPU diagnostic indefinite waits. Conditions and phone
+frequency remain unmeasured; these are not claims of the user's root cause.
+
+Research assessed dependency-aware visual-benefit scheduling, measured bounds,
+pipeline caches/binaries, batched mip submissions/staging, QUIC/Cronet, virtual
+texturing/visibility feedback, optional Vulkan features, ADPF/pacing, profiles/PGO.
+Report includes compatibility/quality constraints and smallest useful checks.
+Corrected earlier GPU-budget claim: Android already calls coordinated byte
+retention. Perfetto FrameTimeline requires Android12+ and retrieved docs warn
+about SurfaceView support; it is not automatic native-map FPS instrumentation.
+
+## 2026-11-01 — measured visible-surface detail focus
+
+User explicitly selected implementing MapLibre-style focus on the terrain face
+under the centre ray. Implemented independent measured SurfaceFocus via existing
+CPU terrain picker after a successful frame; no GPU readback or extra downloads.
+Reuses the centre hit for existing idle camera recentering. Bounded240ms gesture
+sampling, deferred cover-dirty wake, stable-hit bands and stale/off-screen/resize/
+GPU-loss rejection. Imagery arrivals also dirty focus because they can make
+previously untextured terrain drawable. Missing hits preserve previous policy.
+
+DemandPlanKey includes focus; a new planFocused JNI feeds both geometry and
+imagery Rust plans. Existing plan JNI retained. Refine the measured face first,
+account for nearer hit range, retain pivot as secondary, order source admission
+by normalized surface/pivot distance. Source defaults/ceilings/budgets and pixels
+unchanged; no elevation-bound or route changes. Future prediction clears current
+measured focus, and focus changes invalidate old idle preparation.
+
+TwoRust and twoKotlin targeted checks pass; no broad suite/lint. Actual CPU
+heightfield-ray fixture with synthetic3000m surface: oldface rank33/zoom15 to
+rank0/zoom16,72sources both. Exact previous ordered selection preserved for
+missing/invalid focus over24views. No phone latency/stall-resolution claim.
+Audit/evidence: research/SURFACE-FOCUS-2026-11-01.md and
+validation/surface-focus-2026-11-01/.
+
+Source b0d76de4d551ee5ae68a18ce02e9bc210196ca84. APK0.1.5-surface-focus/code6,
+32,056,100bytes;SHA2568530a2bb0f871226621be3db06c55b49cac966174081723ba10e7f4dbdf82122.
+All3optimized JNI ABIs rebuilt with new export. SamePerformance package/key for
+in-place update. Signature/ZIP16KiB and64-bitELF16KiB verified;ARMv7ELF4KiB.
+All618assets unchanged. Loading diagnostics displays focus versus pivot fallback.
+
+## 2026-11-01 — actual off-screen HTTP ownership below the loader
+
+User requested a structural review of off-screen requests occupying slots.
+Found canceled calls remain in OkHttp's Dispatcher until their worker/callback
+exits, including uninterruptible cache-monitor waits. TileTransport freed logical
+permits correctly, but the cache-free client shared that underlying dispatcher.
+Current-view requests could therefore wait behind canceled off-screen work.
+
+Source db36617a595ef0058c43622864f2bb603a6223b7 isolates the cache-free queue
+(bounded14, existing12foreground+2background ceiling), routes new network work
+there when the ordinary dispatcher still has retired calls, and closes the owned
+dispatcher with transport. Connection pool/proxy/TLS and healthy normal cache
+path remain. Added real underlying/canceled running and queued counts to Loading
+diagnostics. Old blocked callbacks can still exist; they cannot occupy the
+isolated queue. No extra live source permits, source-selection/detail/Rust/route
+changes. Conservative frustum bounds reviewed; not tightened without actual DEM
+extrema, so some conservative off-screen candidates remain possible.
+
+One focused actual-OkHttp regression, four alternating trials: two canceled old
+calls confirmed blocked on real DiskLruCache monitor, holding two HTTP slots;
+current image253.320→1.952ms with250ms controlled lock hold. Current bytes match,
+no canceled request reaches server. No broad suite/lint or phone causality claim.
+Audit/evidence: research/RETIRED-HTTP-2026-11-01.md and
+validation/retired-http-2026-11-01/.
+
+Built0.1.4-current-view/code5 from that source,32,056,520bytes,
+SHA25679f0654dfff7c91944f5c84d879d61018191a37ad846db3cdd1f8b684c8ed2dd.
+Same Performance package/key, updates0.1.3 in place. All618assets and3optimized
+JNI libraries unchanged; APK signing/16KiB ZIP alignment verified. Build3seconds.
+
+## 2026-11-01 — sharper-image network capacity; CPU storage/decode waits
+
+User clarified new areas first show coarse imagery, then stay blurry for 10+s.
+Source `8ac2e3db62817161af54513cb89638ad3e693bfb`: publish pending image demand
+before source fan-out and reserve two existing foreground slots for images.
+Eight delayed terrain requests can otherwise block even top-priority image work.
+Controlled 250ms terrain / 5ms image replay: 255.914 → 5.457ms, six alternating
+trials, unchanged image bytes, maximum eight foreground transfers.
+
+Optional prepared/composition disk I/O now uses two independent readers with
+12ms miss deadline and 16-operation bound; CPU tasks suspend. Real cache lock
+held250ms fixture: foreground mesh251.516→13.775ms, identical bytes from genuine
+decoded LINZ DEMs, completing before unlock. Healthy hit0.853→1.465ms overhead.
+Shared PNG consumers yield CPU workers and keep bounded completed results across
+continuation; composition initialization no longer owns camera scheduler monitor.
+Cold first coverage may use original coarse assets plus genuine coarse terrain,
+within source budgets and preserving all fine targets. Secondary to blurry-image
+complaint. Cache-free HTTP winners persist asynchronously to a <=16MiB share of
+the existing disposable allowance; derived budgets reduced, total not increased.
+No route, Rust/shader, source resolution or sampling changes.
+
+Added Offline / imagery → Loading diagnostics (live HTTP/CPU/GPU queue snapshot,
+current request ages, cache/retry counts, Copy; no API keys/URLs). HTTP timing
+includes cache/connection/provider/body, not a Wi-Fi-only measurement.
+Seven focused checks pass; old isolated actual HTTP cache check passes (historical
+suite timeout not reproduced). No broad tests/lint or physical-phone claims.
+
+Built 0.1.3-cold-loading, code4, 32,056,524 bytes, same Performance package/key as
+0.1.2 for in-place update. SHA256
+7ef1d43793d7b858e82f442a112d5159deb23f21f1d3c8a617a94fde0e721059.
+All618assets and3optimized JNI libraries byte-identical to0.1.2. APK signing and
+16KiB ZIP alignment pass. Evidence: validation/pipeline-waits-2026-11-01;
+audit: research/COLD-REFINEMENT-2026-11-01.md.
+
+## 2026-11-01 — loading checkpoint APK
+
+Built all loading improvements through `0b936a0` plus packaging source
+`d831d2f3ddc9c301e0b2282fa58912d3940dd222`. Version 0.1.2-loading-checkpoint,
+code 3, 32,040,144 bytes; SHA-256
+`8dcee8432de6d61fb2f6a11303b95edbfea91698104f8e26c26623d9dd56f24c`.
+Dated APK: `native-wgpu/checkpoints/Ridgeline-Native-Performance-2026-11-01-Base.apk`.
+All three ABIs are optimized. APK v2 signature, ZIP16KiB and 64-bit ELF16KiB
+alignment verified; ARMv7 ELF4KiB. All 618 assets match the previous Base exactly.
+No large packs or session CA. Previous native baseline was 0.1.1 from source
+`150ad30e5db269a549769fb011667c31ec975178`, dated 2026-10-31.
+
+Original key absent; user requested a new key and private Google Drive backup.
+Created a separate `nz.ridgeline.nativeapp.performance` app, labelled Ridgeline
+Native Performance, preserving the old installed app/data. Key plus restore
+instructions uploaded to an owner-only private Drive folder; never committed.
+New signer SHA-256 `03ef64214daee8c59cad6571ce5036579237d553c040837ce996f80efa898ae7`.
+
+User instructed stopping tests and pushing. Earlier host Rust run: 39 passed,
+6 ignored. Android run: 99 tests, 1 failure, 5 skipped; unresolved timeout in
+`TileTransportTest.actualHttpDiskHitFinishesWhileAllForegroundNetworkSlotsAreBlocked`.
+Stopped further tests/lint. Final `assembleDebug` succeeded in 19 seconds with
+no test/lint tasks. No device installation or phone performance claim.
+Evidence: `native-wgpu/validation/loading-checkpoint-2026-11-01/`.
+
+## 2026-11-01 — remove cache and DEM loading barriers
+
+Continued from `49d74fc` on `native-renderer-performance`. Foreground online
+requests now get a 40 ms disk-first window and a cache-free sibling HTTP path;
+`FORCE_NETWORK` alone still enters OkHttp's disk cache. The first valid result
+owns the source. Failed hedges preserve local fallback, offline/speculative
+requests never hedge, and existing download limits/cancellation remain. Local
+progress reopens the path; otherwise a monotonic 30-second cooldown applies.
+
+Nearby DEM operations now decode ready bodies and discover parent dependencies
+immediately, keeping at most eight raster references per operation and three
+focus operations. Pins are released on completion/cancellation/parking and under
+memory pressure. Final host fixtures: actual 400 ms cache lock 404.218 → 43.248 ms;
+complete parent-dependent mesh 375.235 → 197.203 ms, identical 66,564 bytes and
+five requests. Healthy disk hits 0.581 → 0.614 ms with no extra HTTP. All 60
+focused JVM tests and Kotlin/API 36 type-checking pass. No Rust/shader/route
+changes, new APK or phone performance claim.
+
+Continued review added atomic camera-demand publication and batched cancellation:
+a replay admits 8 rather than 72 backend operations when canceling eight active
+plus 64 obsolete queued sources. One on-demand deadline wake handles 200 stalled
+lookups. Prediction cancellation now clears ownership before callbacks can mutate
+its map, preventing an exception from aborting the view update.
+
+Audit: `native-wgpu/research/LATENCY-BARRIERS-2026-11-01.md`; raw measurements,
+input provenance and validation in `native-wgpu/validation/latency-barriers-2026-11-01/`.
+
+## 2026-10-31 — visible tile priority and native loading pipeline
+
+Started from native93be86c; refreshed mainc0b3941 and preview39431da/Capacitor018.
+Implemented end-to-end foreground priority, four nearby refinements before distant
+fallbacks, ranked local reads/uploads and pressure eviction, dependency-aware
+obsolete parking, protected speculative bytes, fresh decoded DEM admission,
+reused readiness/ownership/ancestry and generation-safe seam proofs. Added the
+website's independent seven-position imagery and terrain detail controls with
+unchanged defaults. Rejected slower finest-leaf hashing. Source only, no new APK.
+Host cache queue70.171→2.289ms (controlled2msservice), source owners28.886→15.047us,
+resident partition142.069→117.720us, repeated seam proof2.950→0.060us; these are
+independent subsystem results, not phone or end-to-end speedups. 39Rust tests,
+34focusedJVMtests, allKotlin/API36typechecking and softwareVulkanGPU smoke pass.
+Details/reproduction: native-wgpu/research/VIEWPORT-LOADING-AUDIT-2026-10-31.md;
+rawsamples: native-wgpu/validation/viewport-priority-2026-10-31/.
+
+
+## 2026-10-31 — final performance APK frozen for push
+
+Source150ad30e5db269a549769fb011667c31ec975178. Version0.1.1-performance-checkpoint,
+versionCode2,32,002,808bytes; SHA256
+5c41854d52fc08b6c5496c455593d5969834201c2205bb18d494bf0414358043.
+DatedPerformance-2026-10-31-Base APK plus latest Base alias. Optimized3ABIs,
+oldsignermatched(9384feb2...),ZIP16KiB/64bitELF16KiB verified;ARMv7ELF4KiB.
+37Rust and69Androidtests pass(2skipped),lint,sixGPUmodes pass. All67coarse
+images/catalog/gap bytes unchanged; no largepacks/sessionCA. Evidence in
+validation/performance-checkpoint-2026-10-31. User authorized pushing source
+and the new checkpoint to native-rust-wgpu; no physical A20 speedup claimed.
+
+
+## 2026-10-31 — geographic join breakthrough; final checkpoint rebuild
+
+User asked to keep searching for genuine breakthroughs while retaining the
+request to push a checkpoint APK. Found quadratic G×P scan in surface_cover;
+resident parent/fine sources can expand into thousands of cover regions. Exact
+Morton interval merge preserves every ordered patch and missing-photo skirt
+semantics. Release complete-cover host fixtures:0.237→0.087ms,2.124→0.302ms,
+9.398→0.705ms at17/65/161sources per pool (up to13.34×). This is source-arrival
+CPU work, not network/device FPS. Also kept exact power-of-two bounds
+(74.530→58.036us for both plans); removed slower support-plane experiment.
+Initial APK for a3021bc passed signing/alignment, but is intentionally replaced
+by a fresh3ABIbuild from the complete source checkpoint before publication.
+
+
+## 2026-10-31 — checkpoint build requested
+
+User explicitly authorized further measured work and a new pushed checkpoint APK.
+Added exact-normalization-table CPU mip fallback: release host genuine-image
+chain0.427→0.332ms,22.3%lessCPU,allbytespreserved. Vulkan/GLES/array forced-CPU
+render checks pass; startup driver validation unchanged. Version code2/name
+0.1.1-performance-checkpoint, same package/signing identity, all3optimizedABIs,
+Base packaging/no session CA. Source and publication commits will be separate
+so the APK metadata can pin its complete source commit.
+
+
+## 2026-10-31 — continued loading breakthrough search
+
+Added leading-edge planning (idle starts immediately; moving remains 20Hz),
+header-first validation of derived cache entries, and source/fingerprint sharing
+of overlapping CPU DEM PNG decode. Final recorded host fixtures: first-demand
+scheduler + local read/decode/mesh64.396→14.070ms; rejected stale RGBA cache
+read1.811→0.0225ms (fresh hits unchanged); duplicate PNG decodes120→60 but
+pair latency improves only1.2%. Raw samples and exact limits are in the audit.
+No network/first-present/device speedup claim. Producer sharing is CPU-only;
+parent-hole repair remains private. No extra retained decoded cache.
+
+## 2026-10-31 — measured native skirt/loading performance pass
+
+User identified native-rust-wgpu as the intended branch and requested tangible
+per-change loading/performance measurements. Work starts from remote 3cc6f903.
+Removed the unrelated initial MapLibre working changes. Implemented dense DEM
+halo/axis reuse, ordered seam intersection sweep (each shared join tested once),
+array-binding/index-pattern grouping, and exact-mesh fragment entry point without
+discard. Rounded-out sub-cell photo regions retain clipping. Heights, detail,
+photographs and skirt depth are preserved; no A20 or APK speedup is claimed.
+
+Final recorded host run: decoded-memory mesh 1.600→0.583ms; local genuine PNG files + decode
++ mesh 13.579→13.009ms; controlled 512-edge matching 4.550→0.593ms. Array fixture
+draws16→12, binds22→4. Separate shader/batching/combined GPU ablations retain
+raw samples; timing is mixed, including batching-only regressions. Small shader
+boundary pixel changes are recorded explicitly. Source audit and reproducible
+benchmarks: native-wgpu/research/PERFORMANCE-AUDIT-2026-10-31.md and
+native-wgpu/validation/skirt-performance/. Android tests/lint, both ARM Rust
+compile-checks and Vulkan/GLES/array GPU regressions pass. No publication.
+
+## 2026-10-29 — migration started
+
+User explicitly replaced the Capacitor optimisation task with a custom native
+Rust/wgpu Android migration. New branch native-rust-wgpu in /workspace/Ridgeline-native
+starts from authoritative 0.18.0 source d880143. Original source and APKs preserved.
+
+Initial findings: android/ is an older Compose + MapLibre Native 13.7.1 app. Its
+README explicitly says flat raster/hillshade, not the Capacitor draped 3D terrain,
+and excludes patches/grade. It is a source of reusable native planner/storage code,
+not an accepted renderer or visual reference. Capacitor owns the current behavior.
+
+Environment: JDK21/SDK36/Gradle8.13 present in /workspace/android-tools; Rust is not
+on PATH. Need inspect/install Rust and Android NDK before wgpu cross-build.
+Network policy restricted; inherit proxy and CA trust. No device execution yet.
+
+Commands: git worktree add -b native-rust-wgpu /workspace/Ridgeline-native d880143...
+Result: successful. No native implementation or APK yet.
+
+Exact next step: fetch official wgpu current Cargo/example/docs and Android surface
+lifecycle guidance; inspect Capacitor camera/terrain shaders/routing/native storage
+and existing Compose planner; write concrete parity audit and architecture decision;
+install Rust/NDK and implement the smallest terrain/imagery proof.
+
+## Toolchain and initial pure core
+
+Installed Rust stable 1.99.1 with CARGO_HOME=/workspace/android-tools/cargo and
+RUSTUP_HOME=/workspace/android-tools/rustup. Android aarch64 target install started.
+Official source snapshots fetched using raw.githubusercontent.com; GitHub REST API
+is proxy-denied. Read research/DECISIONS.md for source URLs and provisional choices.
+Rust workspace started: core geographic/height encoding primitives and renderer
+crate pinned to wgpu 30.0.1. NDK 29.0.14206865 install started via SDK manager with
+Java proxy/CA flags. No GPU implementation, Android native migration build or
+parity validation exists yet. Cargo dependency resolution initially caught an
+incorrect ndk feature name; corrected to rwh_06/nativewindow before compilation.
+
+Running commands/logs: /tmp/ridge-native-core-test.log, /tmp/ridge-native-ndk-install.log,
+/tmp/ridge-native-rust-target.log. Exact next step: finish these commands, run core
+tests (fix any failures), then implement SurfaceView/JNI wgpu surface and textured
+DEM mesh prototype. Do not confuse the stub renderer module with working rendering.
+
+## Native GPU and Android prototype checkpoint
+
+Host core: 3 tests pass. Real wgpu draw+readback passed using software Vulkan:
+VK_ICD_FILENAMES=/usr/lib/chromium/vk_swiftshader_icd.json cargo run ... --example gpu_smoke.
+Pixel center [36,113,74,255] from a synthetic flat 1000m field and uniform image.
+This proves native pipeline/depth/grade/readback execution, NOT real terrain parity.
+
+Rust ARM64 cdylib successfully cross-built against NDK29/API26. Android SurfaceView
+JNI integration and native widget Activity compile; assembleDebug and lintDebug pass.
+APK is native-wgpu/android/app/build/outputs/apk/debug/app-debug.apk. v2 signature
+and 16KiB ZIP alignment checked. No emulator/physical device execution yet.
+
+Prototype includes real-source LINZ loading, deduplicates per tile job, bounds
+HTTP persistence and decoded-ready tile count, uses native Android bitmap decode,
+and passes direct native buffers to Rust. Renderer work is scheduled on a dedicated
+GPU thread and only on changed camera/data (no continuous idle render loop).
+These are prototype paths: route UI, geographic gap selection, overview data,
+proper LOD/fallback, halo seams/mips and robust memory budgets remain open.
+
+External blocker: LINZ/S3/Esri and some official documentation hosts are denied by
+the runtime proxy. Saved configuration draft 2018dde912308198977079bf4a502b5f adds
+only needed hosts. Told user to review/save in environment settings and publish;
+not active yet. No bypass attempted. Live DEM fetch failed without printing key.
+Continue all independent work; do not claim a real-DEM or device parity test.
+
+Exact next step: add deterministic neighbor-halo mesh/seam tests and parent-cover
+selection, port genuine bundled overview routing/range reads and gap masks, then
+run the Android native surface on an emulator if feasible (no /dev/kvm currently).
+Native UI/route migration must wait for the critical renderer proof acceptance gate.
+
+## Geographic imagery and bounded native residency checkpoint
+
+Data-only native port now selects original LINZ, all 630 reviewed geographic gap
+entries, coarse gap overlays, z18 Esri parent crops, fine-survey alpha veto, and
+37 Cook reference coordinates. Six original binary overview payloads are verified
+by SHA-256/length before packaging, preserving 364,762,502 bytes plus coarse images.
+No JavaScript is packaged or executed by the native app. Build-time Node only
+extracts reference data and generates independent algorithm outputs.
+
+Validation: 2,520 native Kotlin routing cases and 360 masks exactly match executed
+0.18 JavaScript reference outputs; polygon-hole test also passes. Android unit
+suite (2 tests), assembleDebug and lintDebug passed before addition of Cook data.
+Need rerun packaging/build after that addition. No live data or phone claim.
+
+Tile loader now uses pipeline=terrain-rgb, deduplicated neighbor DEM downloads,
+real parent fallback on 404/nodata, global pixel-centre halo sampling, bounded
+memory caches based on Android memory class, three priority workers and removal
+of obsolete queued jobs. GPU renderer now bounds tile residency and uses cached
+non-overlapping ancestor/descendant coverage. Controlled GPU smoke still passes.
+These are not a finished viewport LOD system: frustum selection, LOD stitching,
+mips, fades, bounded upload scheduling and actual camera parity remain open.
+
+Android emulator system image and Rust x86_64 target installed. Software emulator
+started without KVM; boot is slow. x86_64 native library compiles. adb cannot create
+its default auth directory under read-only /home/agent; investigating an explicit
+writable config/transport. Logs in /tmp/ridge-native-{emulator,x86-build}.log.
+Network policy still has no additional approved hosts; real DEM validation blocked
+pending the previously requested environment draft publish.
+
+Exact next step: run GPU parent/fine coverage and memory-bound tests; rebuild both
+Android ABIs with the current library, package the verified imagery/reference data,
+run Android surface/lifecycle proof on the emulator, and audit reference camera.
+
+## Camera equivalence and bounded upload scheduling
+
+Generated camera fixtures directly from the authoritative bundled MapLibre engine:
+1,712 screen projections across NZ positions, zoom5/11.9/16/19, bearings, pitches
+and phone/landscape sizes. Native Rust passes with worst screen deviation
+0.00390625px. Near/far and horizon policy also match numerically (unpadded, zero
+roll, default minimum elevation). This exposed and fixed prototype camera-up sign
+and altitude scaling: MapLibre uses mean Earth circumference 40,030,228.88407185m,
+not the EPSG:3857 circumference. Rebase altitude as well as horizontal position
+before Float32 GPU transforms to keep close high-elevation views stable.
+
+This does NOT prove terrain collision, gesture anchor/inertia, padding/fitRoute,
+real DEM shape or visual parity. Those remain explicit acceptance items.
+
+Android GPU uploads now coalesce by tile identity, bound pending ownership and
+upload at most two complete tile payloads per frame. Device memory class sets
+GPU residency; paused apps stop frames. Added queue burst/dedup unit test (must
+rerun latest build). GPU smoke additionally verifies exact graded pixel, one fine
+child plus parent siblings without uncovered pixels and a 24-tile residency cap.
+
+Software Android emulator reached boot_completed=1 and package service is ready.
+Direct standard local ADB protocol tooling avoids changing read-only host HOME.
+First APK install before package service was ready failed with Broken pipe; retry
+with full x86_64 APK is running. System image had a system-server restart during
+slow software boot; these logs are not app crashes. Need actual app launch, GPU
+surface and lifecycle evidence before claiming emulator validation.
+
+## Viewport selection, filtering and actual Android integration attempts
+
+Repository audit now durable in native-wgpu/research/AUDIT-018.md, including
+route/profile contracts, original JSON trace limits, exact source chain and
+remaining acceptance gates. Latest preview branch independently remains39431dad.
+Additional current official-source snapshots/hashes recorded in research/.
+
+Replaced temporary3×3 loader requests with native conservative viewport quadtree,
+bounded96-target test plans, prioritized refinement heap, actual parent requests
+and retained ready data. Phone density is included in the native projection;
+initial camera now uses exact Aoraki coordinates/elevation3724m. Plan tests verify
+center coverage and no ancestor overlap at multiple pitches/zooms. Unknown DEM
+extrema are conservatively0..4000m for visibility only; actual terrain is never
+synthesized. Real per-tile extrema, stitching and movement policy remain open.
+
+GPU cover recomputes once per changed residency batch; duplicate JNI uploads touch
+resident content without rebuilding height arrays. Image resources now close on
+all success/error paths. Dedicated priority workers, bounded streams and HTTP
+cache cleanup are present; combined peak memory still needs measured budgets.
+Added GPU9-level imagery mips and supported anisotropy; GPU checkerboard
+minification readback passes while full-resolution level0 remains unchanged.
+
+Rust optimized libraries compile for ARM64, ARMv7 and x86_64. Added reproducible
+build script, pinned/checksummed Gradle wrapper, overview ZIP extractor and APK
+verifier. Full x86_64 packaging verifies6unchanged packs/364,762,502bytes,
+5,277unique packed photo ranges (plus67coarse) and no web assets/WebView/Capacitor
+DEX references. This is packaging evidence, not feature completion.
+
+Emulator first boot took≈397s without KVM. Full debug fixture APK installed and
+activity launched, but the host emulator segfaulted in SwiftShader after logging
+unsupported WGSL debug OpSource metadata. Disabled optional InstanceFlags::DEBUG,
+retaining validation. Second boot≈210s; optimized APK installs successfully and
+ProofActivity launches (am start statusok). Vulkan device creation and first
+sync export are logged. Screenshot initially black; inspecting warm UI/capture
+before claiming surface success. Debug fixture is explicitly labeled synthetic
+flat heights/genuine Cook imagery; it never appears as live-source fallback.
+
+Cloud selection benchmark:500 warmed calls, median33.42µs/p9583.024µs with95–96
+leaves/96budget. This is isolated optimized cloud CPU selection only, not a phone
+speed estimate, full frame time, or a comparison with the trace's nested timings.
+
+Exact next step: finish optimized emulator fixture capture and six-pack range-read
+check; test surface recreation/background. If emulator rendering fails, diagnose
+native/backend compatibility with actual logs. Rebuild ARM optimized device APK
+with latest source (mips/selection/JNI changes), run all tests/lint/package checks,
+commit. Live DEM/visual acceptance still needs the pending network draft publish;
+then complete parity before migrating the full planner/UI. Do not stop at a plan.
+
+## Successful controlled Android rendering and exact original ZIP packaging
+
+Optimized x86_64 retry renders genuine Cook imagery on the controlled flat height
+fixture. Captures now committed under native-wgpu/validation/ in portrait and
+landscape. Android ATD had debug.hwui.drawing_enabled=0, explaining missing native
+UI in initial screenshots. Set it to1 and restart app; native TextView and wgpu
+SurfaceView render together. Manual background/resume and rotation both render.
+This is actual Android integration evidence, NOT real-terrain or phone validation.
+
+Important packaging correction: six original overview ZIPs are ZIP_STORED inside,
+so can preserve the literal original ZIPs as requested without extraction or
+payload duplication. package-archives.py verifies original outer SHA/size plus
+inner payload SHA/size; generated catalog gives native absolute range offsets.
+All six exact ZIPs are now stored uncompressed in APK and read directly through
+AssetFileDescriptor/FileChannel. The wrappers add just1,404bytes over payloads.
+Verifier proves six originals,364,762,502payloadbytes/5277ranges +67coarseimages,
+and zero JS/HTML/WebView/Capacitor runtime assets/references. Updated build input
+is RIDGELINE_OVERVIEW_ZIPS pointing to original preview overview-packs directory.
+Older log entries describing .bin-only packaging are superseded by this change.
+
+Added frustum culling of retained GPU regions using their actual DEM extrema and
+coverage-aware eviction: preserve visible partial parents without real fallback;
+evict redundant or off-screen data first. GPU smoke passes after these changes.
+Native picking now retains a bounded CPU copy of the rendered height grid, uses
+2D cell traversal and exact triangle intersections clipped to the same ownership
+regions, avoiding GPU readback and full mesh scans. Eleven pure-core tests pass,
+including600rays compared with exhaustive triangle search, exact edge hits,
+missing-data rejection, clipped regions and triangle-vs-bilinear interpolation.
+GPU draw/readback + center terrain pick also passes. Picking is wired as an
+asynchronous native call; gesture anchoring/collision behavior still open.
+
+Reproducible build script passed for optimized ARM64+ARMv7 debug APK:
+395,702,587bytes,SHA269df0794365fa390af6b34ac41cb1d511df59576020e0768dbe8dc602cce6b6,
+v2signature and16KiB ZIP alignment pass. This earlier artifact predates the latest
+picking/visibility/original-ZIP changes; do not present it as the final build.
+
+Added debug-only platform Instrumentation checking native frames, exact flat-field
+terrain pick, all six ZIP reads, surface destroy/recreate, rotated activity and
+zero retained native surfaces after finish. Latest Full x86_64 instrumentation APK
+is installing from immutable /workspace/native-artifacts/Ridgeline-Native-Six-Zips-Proof-x86_64.apk.
+No automated lifecycle result yet. Logs /tmp/ridge-native-original-zips-install.log.
+
+User action: network status still revision1/allowedHosts[]. Sent a single async
+follow-up asking user to publish the saved network draft. Continue independent
+work; do not bypass policy or claim live LINZ validation. M1 audit marked complete;
+M2 remains open until real terrain/source parity is demonstrated.
+
+Exact next step: wait for current APK install while working independently, run
+`python3 native-wgpu/tools/emulator-adb.py 'am instrument -w nz.ridgeline.nativeapp/.ProofInstrumentation'`,
+inspect/fix failures; rebuild latest optimized ARM APK using new ZIP input and
+verify all tests/package/signature/alignment. Keep feature migration and M2 gates
+honest. Commit and push the separate native source branch for resumability.
+
+## Automated proof passed; independent route/profile backend migration
+
+Full x86_64 original-six-ZIP proof installed successfully. Platform Instrumentation
+passes native frame/pick, all6ZIPrange decodes, surface destroy/recreate, rotation,
+and remainingNativeSurfaces=0. Emulator log also shows VkDevice/VkInstance destruction.
+
+Replaced fixed16ms Handler scheduling with display Choreographer callbacks on the
+GPU owner Looper, retaining dirty-only rendering and two-upload budget. One immutable
+CameraPose snapshot now feeds a frame/selection; generation checks discard obsolete
+surface initialization, and resized surfaces request fresh viewport selection.
+The complete automated proof passed AGAIN after this scheduling change.
+
+Independent M4 backend work (not yet wired into app UI): NativeGeo matches100
+reference route/profile cases (lengths, distance locators, samples, missing-height
+statistics), including exact binary rounding boundaries. RouteEditor preserves
+append/insert limits,50undo snapshots, selected-point restoration and one snapshot
+per completed drag/cancel behavior. Native GPX handles current2MiB/2000point/NZ/
+single-track semantics, namespace alternatives, escaping and full coordinate precision.
+
+Added application-private SQLite route primitive: WAL/full-sync transactions,50
+records, stable IDs, original creation ordering, metadata-only list reads and one
+changed route write. Coordinates use lossless Float64 BLOBs (32,008bytes for2000
+points), avoiding whole-library JSON serialization and unused route decoding.
+Async autosave controller and native UI still need implementation; do not claim
+route feature migration complete based on these primitives.
+
+Host Android unit suite now12tests passes, including reference goldens, GPX,
+editor and binary storage tests; lint/build pass. Extended ACTUAL Android
+Instrumentation additionally passes exact Float64 SQLite save/load, edit/name
+ordering,50-record transaction rollback, close/reopen persistence and native GPX
+roundtrip. Saved result in validation/emulator-vsync-data-instrumentation.txt.
+Current installed test artifact is /workspace/native-artifacts/Ridgeline-Native-Vsync-Data-Proof-x86_64.apk.
+
+Native source branch was pushed successfully to origin/native-rust-wgpu atf3d828c
+before this backend checkpoint. Original preview branch/artifacts are unchanged.
+Network draft still pending user publication; async question remains open.
+
+Exact next step: implement/test the I/O autosave/session controller and native
+route overlay/UI against reference behavior while retaining explicit real-DEM/
+visual gates. Confirm network status when user replies, fetch actual LINZ DEM and
+same-camera reference captures, complete cross-LOD terrain/gesture parity. Rebuild
+latest ARM release-equivalent debug APK and verify literal6ZIPs/signature/alignment
+before final release. Current prototype remains feature-incomplete.
+
+## Autosave session controller and stalled environment publishing
+
+Added RouteStorage interface and serial background RouteController. Stable IDs
+prevent duplicate new records when editing overtakes a save;400ms name debounce,
+immediate geometry commits, no writes for drag previews, one undo per drag,
+save-failure navigation gating, explicit retry, route open/unload/delete/rename/
+combine and opened-route state are implemented as backend session operations.
+Native UI binding remains the exact next feature step. Four concurrent/controller
+regressions pass: editing during first save creates one latest row; failed save
+blocks navigation and retry preserves edits; drag preview avoids disk writes;
+deleting one route at the50-record limit retries the current unsaved route.
+All16Android host unit tests and lint pass. Controller is not yet included in an
+emulator integration run; preceding vsync/data proof remains the actual platform
+result, not a claim about unimplemented UI.
+
+Further current-Capacitor audit: build-web.mjs injects authoritative mobile route
+open/unload/delete/rename/combine APIs (not just public/app.js). mobile.css reserves
+map height for snapped native-equivalent sheets; mobile.js also includes page-size
+region selection, topo-only downloads, PDF options/magnetic declination and saved
+region sidebar. These are in full feature parity scope. Do not silently omit them.
+
+User reported environment publishing has been loading for hours. Checked current
+runtime and saved draft: running/current spec revision1, no failure, no custom
+allowed hosts; draftrevision3 is saved with required7hosts. Diagnostic metadata
+history_status=not_found/records=[], no publish job or restart control exposed.
+Explained this is an unapplied publish, with no evidence of root cause; advised
+reloading settings/retrying once and platform support if still hung. Continuing
+independent work. Preserve source checkpoint before any environment restart.
+
+Exact next step: push this tested checkpoint; bind RouteController to native
+planner/sidebar/sheet/profile UI and terrain overlay interactions. Continue
+remaining rendering/gesture/real-DEM parity gates when networking is available.
+Do not claim the whole application, speedup or physical phone validation complete.
+
+## Critical packaged-reference correction before UI migration
+
+Found and corrected an audit/port error: website public/ includes Cook reference
+substitutions, but Capacitor build-web.mjs deliberately removes their selector,
+import and assets. Actual0.18Full APK confirms zero Cook entries/selector and
+Direct=true. Native main imagery path and debug fixture now exclude Cook and use
+original bundled South Island overview images. Earlier committed screenshots are
+historical GPU mechanics evidence only, not accepted Android reference imagery.
+Need replace captures with corrected fixture images before reporting parity.
+
+Added audit-reference-apk.py against actual0.18Full APK (SHAb4d286f…): exact630
+atlas entries,58coarse coordinates/67photo files, every coarse overlay image and
+all6original payload hashes match. Native APK verifier now rejects Cook assets or
+reference selectors. Corrected full x86_64 APK installed and automated GPU/pick/
+sixZIP/lifecycle/SQLite/GPX proof PASSES again. Saved latest result and packaging
+record under validation/. Source masks/goldens and all16host tests/build/lint pass.
+
+Also narrowed fine-survey fallback to match packaged behavior: network transport
+failure retains original imagery; HTTP failure or invalid bitmap propagates tile
+failure so a ready parent remains visible. Previous catch-all was too permissive.
+
+Performance architecture finding: prototype couples129mesh and image tiles and
+selects from physical drawing pixels. Reference independently controls geometry
+(default tileSize round(512/2^.25)=431logicalpx) and imagery (256tile plus .25bias),
+with drawing ratio normally1.5, sharpening up to2 atzoom>=15. Native benchmark
+same-camera: physical basis96tiles vs logical63; these are prototype counts, not
+phone speedups. Reference terrain proxy without fetched DEM requests9z11 tiles at
+411×731 before applying detail policy. Must decouple geometry/image residency and
+source selection before accepting performance/LOD parity, rather than overbuild
+meshes for high-resolution photos. Native render remains full-resolution for now;
+no quality reduction is authorized as an assumed speed fix.
+
+Lyon current official release1.0.23/README researched for future native vector
+route overlays. No new dependency or route renderer committed yet. Preferred
+future tile-only overlay RTT preserves draping and avoids copying base imagery;
+prove it before entire UI migration. Route backend/controller is independent and
+tested, not a claim that UI migration is done.
+
+User publishing issue remains platform-side/unexplained: saved draft3 has not
+applied to running revision1. Already gave reload/retry/support guidance; do not
+repeat permission prompts or bypass policy. Continue independent work.
+
+Exact next step: checkpoint this correction, then separate terrain/image pools,
+plans and upload paths with GPU/readback/picking regression tests; keep legacy
+combined upload API for existing proof fixture. Adapt tile loader to logical-pixel
+independent plans and bound both budgets. Then native overlay/UI binding. Live DEM
+and visual parity gate remains open pending network or genuine source fixtures.
+
+### 2026-10-29 — Independent native geometry and image LOD checkpoint
+
+Separated geometry/heightfield and full-resolution photo pools, upload methods,
+source ownership and plans. Full original 256px imagery is unchanged; photo mips
+remain GPU-generated. Geometry uses the reference default431logicalpx target,
+photos256/2^.25logicalpx, independent ceilings22/19. Source selection no longer
+uses Android drawing-density zoom; the actual framebuffer stays full resolution.
+LOD error/frustum policy is still a prototype, not accepted terrain parity.
+
+Intersections of two disjoint source covers produce unique drawable regions.
+Subrectangle shared index ranges avoid drawing an entire128mesh for every photo.
+The controlled GPU readback test proves four child photos correctly cropped on
+one parent geometry with32768 triangles total; no terrain accuracy or phone FPS
+claim follows from this synthetic fixture. Picking uses this same visible source
+intersection and now rejects hits beyond the camera far plane.
+
+Android loader schedules geometry and photo jobs independently across the same
+3workers; DEM halos and HTTP dedup/cache remain. Native residency is mirrored to
+avoid decoding/uploading already-resident sources. CPU ready data is byte-bounded;
+queued uploads coalesce by source type and obey650KiB +4source/frame limits.
+Fallback ancestors now count inside each source budget; demand coarsening retains
+coverage under pressure. Replaced a cancel/reschedule debounce that could starve
+loading during a continuous drag with latest-camera100ms throttling. Off-screen
+retention and eviction transition behavior still require real-device movement
+validation; obsolete in-flight shared HTTP requests are not yet demand-refcounted.
+
+Commands/results: cargo fmt; cargo test --locked --workspace:17tests PASS;
+softwareVulkan gpu_smoke PASS; cross-release builds forARM64,ARMv7,x86_64 PASS;
+Gradle offline testDebugUnitTest/assembleDebug/lintDebug:19tests PASS,0lint errors,
+13existing/prototype localization warnings. Exact commands are in README/build
+script; this session uses android-tools toolchain directories from earlier log.
+Current full x86 APK packaging passes:6exact originalZIPs/364762502payload bytes,
+5277photo ranges, no web runtime and no website-only Cook substitutions. Packaging
+report and host/GPU/selection results are saved under native-wgpu/validation/.
+Raw leaf counts at411×731/defaultcamera:32geometry,79images, before ancestor
+budgeting; old coupled physical selection hit96meshes. These counts/host timing
+are architecture diagnostics only, not a measurement of faster phone behavior.
+
+Emulator fixture now uses geometryz11 and independent photosz12, verifying both
+source pools before accepting a frame. Installation/instrumentation result will
+be appended after it completes; do not infer device validation from host tests.
+
+Publishing issue rechecked: saved draftrevision3 remains unpublished against live
+runtime/spec1. Diagnostics exposes no retained records and tools expose no
+publish/restart operation. Cannot diagnose the platform failure or repair its
+publishing job from here. Required provider hosts remain unavailable; no bypass.
+The original app and committed native branch remain preserved.
+
+Exact next step: finish independent-source Android instrumentation, replace old
+Cook-fixture captures with corrected original-pack fixture captures, checkpoint
+and push. Real DEM/imagery proof remains a blockingM2 acceptance requirement before
+building the whole UI around this renderer. Once network publishing recovers,
+validate live terrain seams/LOD/picking/colour, then prove draped native overlays
+and bind the already-tested route controller to native UI. Later milestones stay
+open in GOAL.md.
+
+Independent-source emulator follow-up: frozen x86 APK32561d59… installed; Android
+platform instrumentation PASSES with geometryz11/photosz12, exact center pick,
+sixZIPreads, surface destruction/recreation, rotatedActivity, SQLite/GPX checks;
+remainingNativeSurfaces=0. Result saved as independent-sources-android-instrumentation.txt.
+Universal debug APK with ARM64/ARMv7/x86_64 also assembled; packaging audit,
+APK v2 signature verification and zipalign16KiB pass. ARM code cross-built only,
+not executed on a physical phone. Remote checkpointb959bae pushed successfully.
+
+Corrected portrait capture now replaced with original-pack independent-source
+fixture. It remains explicitly labelled synthetic flat terrain; no visual parity
+inference. Prior Cook fixture capture is superseded, retained only in Git history.
+Remaining pipeline tuning: drop obsolete queued uploads promptly on demand changes
+and measure eviction/re-admission during gestures; hard count/byte budgets alone
+do not prove stable memory or prevent all reloads. Do not callM5complete.
+Corrected landscape capture replaced too; both reviewed to confirm original-pack
+photos and explicit synthetic-fixture label. These demonstrate functioning drawing,
+not seamless real-terrain/imagery-source transition acceptance. All tests and
+native sources are checkpointed; awaiting usable provider access forM2realDEMproof.
+
+## 2026-10-29 — Published environment, genuine LINZ host proof
+
+Resumed exact ddee0d3 on native-rust-wgpu; refreshed authoritative download branch
+and confirmed it still advertises 0.18.0/source d880143. Capacitor remains untouched.
+New runtime has enforced unrestricted HTTP policy. Actual LINZ terrain-rgb PNG and
+aerial WebP requests now succeed (HTTP200,256x256). No new key was requested.
+
+Added reproducible fetch-live-proof.py (Pillow) and live_terrain Rust GPU example.
+Fetched12genuine halo DEMs and2original aerial tiles at Aoraki z11. No fallback or
+fabricated elevations. Source hashes/lengths are saved in validation/live-linz.
+129shared mesh-edge samples agree exactly; heights span450.8–3671.2m. Actual native
+softwareVulkan draw/readback passes and center terrain pick matches1087.000m.
+Full256px input imagery retained. Saved top-down host capture is evidence of real
+input execution only, not visual parity, Android loader parity or phone performance.
+
+Restored Rust1.99.1/Cargo and locked host tests (17pass), JDK21 plus pinned Android
+SDK/NDK under /workspace/android-tools. Extracted original6overview ZIPs from the
+refreshed download branch to /workspace/native-reference; native Android build and
+emulator toolchain restoration are in progress. No generated toolchain/APK committed.
+M2/M3 remain open: cross-LOD stitching, oblique same-camera reference captures,
+live Android loading and gesture/terrain collision acceptance must precede full UI.
+
+## Source-demand upload pruning and rebuilt native APK
+
+Queued uploads now adopt immutable geometry/image demand sets and release obsolete
+queued ownership immediately on viewport-plan changes. Late in-flight results
+cannot displace wanted uploads; re-admission remains allowed. This does not evict
+resident fallback tiles or reduce source/drawing resolution. Added regression for
+independent source kinds, late completion and re-admission. All20Android host
+unit tests pass (none skipped); assembleDebug/lintDebug pass. All3native ABIs
+cross-compiled optimized. APK signature/16KiB ZIP alignment and exact6originalZIP
+packaging audit pass. Frozen artifact is native-wgpu/artifacts/
+Ridgeline-Native-Live-Proof-Debug.apk (not committed); hashes in validation/live-linz.
+
+Restored actual0.18Full reference APK through GitLFS (the Git blob is only a pointer)
+and audited it: same b4d286f… SHA,630gap entries,67coarse photos,6original payloads,
+no Cook substitution. Original Capacitor/android/public sources remain untouched.
+System Java was a JRE without javac; replaced with full Temurin21.0.13, verified
+against official Adoptium API checksum. Managed Java CA trust retained. Earlier
+parallel Gradle clients were stopped; successful final run used writable caches,
+fullJDK and max-workers2. Recreated toolchain/build files stay outside Git.
+
+Added opt-in debug LiveProofInstrumentation exercising MainActivity/production
+TileLoader and genuine source residency/picking (no synthetic fallback). Compiles
+and lint passes; Android execution is still pending slow unaccelerated emulator
+boot. Host oblique real-terrain capture saved separately. Neither this capture
+nor packaging establishes same-camera reference parity or completedM2/M3.
+
+## Reference-scaled boundary skirts and current Android execution blocker
+
+Implemented lowered boundary skirts on selected native geometry subrectangles.
+Surface samples and128-cell triangle grids are unchanged; imagery remains original
+256px plus existing GPU mips. Skirt depth matches authoritative MapLibre6.14:
+meanEarthCircumference /2^max(logicalZoom,0) /5. Added separate logicalZoom to the
+Android render JNI call; framebuffer projection still uses full drawing density.
+Skirt vertices duplicate the surface buffer (399384GPU bytes/source vs199692).
+Existing source-count caps remain; combined device peak memory is not yet measured.
+Picking continues to use genuine surface heights, not lowered curtains.
+
+Host19Rust tests pass, including preserving every base index and exact boundary
+connectivity; all20Android tests pass,0lint errors/16warnings. Controlled GPU
+readback shows36092background pixels closed at an intentionally discontinuous
+parent/fine boundary. Existing exact-grade/source-crop/mip/residency checks and
+actual LINZ draw/1087mcenter pick still pass. This is a boundary-gap mechanism
+proof, not accepted real-terrain visual parity or morphing/fades. All3optimized
+ABIs rebuilt; frozen Skirt-Proof APK is signed/aligned with6unchanged originalZIPs.
+Hash/report: validation/skirts/universal-apk.json. No APK/toolchain committed.
+
+Esri imagery and S3Terrarium also returnHTTP200and decode256px (host requests).
+Full build script reproduced successfully; added early fullJDK/javac preflight
+and configurable default2Gradle workers. ADB helper now accepts a response timeout.
+
+Current emulator cannot provide valid app execution evidence: initial software
+boot showed system-level DeadSystemException events, and package/settings/activity
+services disappear before app installation. No Ridgeline process ran in those
+attempts. Rebooted retained AVD; unsupported ro.hw_timeout_multiplier boot override
+was rejected. Android supported watchdog_timeout_millis setting was confirmed at
+600000and boot_completed at1, but installer still lost package service. Failed
+attempts do not mean the APK failed. No /dev/kvm is available; root cause beyond
+these system-service observations remains unconfirmed. Do not retry unchanged
+install commands or claim this session's emulator validation passed.
+
+Exact next step: establish a stable Android runtime (or physical device), install
+frozen latest Skirt-Proof APK, run ProofInstrumentation then LiveProofInstrumentation,
+and compare genuine same-camera terrain/LOD/colour/fog/gesture captures to0.18Full.
+Continue source-independent parity work if the runtime remains unavailable; full
+native UI remains gated on critical renderer proof. Capacitor/android/public source
+and original overview ZIPs remain untouched. Overall completion estimated≈25%,
+withM1complete, M2partial, M3–M6open; never describe this as the finished app.
+
+Emulator diagnostic follow-up: focused crash buffer reports Android system process
+IllegalStateException "Lost network stack" during startup, plus unrelated Bluetooth
+SIGABRT and DeadSystemException cascades. Android's own message says lost network
+stack is a side effect and earlier logs are needed for root cause; do not claim
+watchdog, networking policy or Ridgeline caused it. Package/activity services were
+absent in subsequent checks despite stale boot_completed=1. No app process/install
+success or instrumentation pass exists for this current session. Toolchain/build,
+source hashes and hostGPU checks are independent successful evidence.
+
+## Quality-preserving CPU/GPU work removal
+
+Continued from7a3e659 on native-rust-wgpu. Removed repeated viewport selection on
+accepted-data callbacks by caching one immutable combined geometry/photo demand
+plan keyed by all camera fields and logical viewport dimensions. Residency and
+missing-source scheduling are still reconciled on every callback, so an evicted
+source or recreated surface can be refilled without changing camera. Failed plan
+builds cannot publish a stale value under a new key. No LOD/detail policy changed.
+
+DEM geometry now loads only source tiles touched by its exact pixel-centre mesh
+footprint. A representative interior z20 mesh uses1z18DEM instead of9; standard
+z18stilluses all9halo tiles, boundary z19uses4. Exact same-level integer samples
+avoid a redundant bilinear read; true parent fallback retains original sampling.
+Frozen checkpoint7a3e659 algorithm is the test oracle. All266256height samples in
+16full-buffer comparisons match byte-for-byte across source/overscaled zooms,
+world wrap/poles, parent fallback and signed zero. Initial test caught negative
+zero behavior; the zero path retains original arithmetic, assertions unchanged.
+These are source lookup/operation reductions, not measured device timing.
+
+Duplicate pending immutable payloads no longer call requestFrame again. New
+buffer ownership and re-admission after draining still work. GPU scene/instance
+buffers are transferred only when their contents change; rendering itself still
+occurs whenever requested. A data refinement still updates instance ownership;
+unchanged camera uniforms are reused. Full framebuffer,128-cell surface/skirt
+geometry,256px source imagery, grade/mips/filtering and budgets remain unchanged.
+The extra retained instance snapshot is bounded by existing visible source cover.
+
+Validation: all25Android tests pass, no skips/failures;19Rust host tests pass;
+lint0errors/16warnings; all3optimizedABIs rebuilt. Existing GPU exact-grade,
+parent/fine coverage, crop, mips,36092-pixel skirt-gap and residency regressions
+pass, including pixel-identical repeated frames with zero additional uniform/
+instance transfers. Genuine LINZ GPU draw/pick passes; oblique capture RGB bytes
+exactly equal previous skirt checkpoint. APK signature/16KiB alignment and all6
+originalZIP hashes pass. Report: validation/quality-work/checks.json. Frozen APK:
+artifacts/Ridgeline-Native-Quality-Work-Debug.apk (generated, not committed).
+No Capacitor/android/public source changes; no overview ZIP modifications.
+
+No phone FPS or live-Android/visual acceptance claim: previous emulator system
+service failure remains unresolved and this checkpoint does not change that
+runtime. Next critical gate remains stable Android execution of controlled/live
+instrumentation and genuine same-camera0.18reference comparisons before full UI.
+
+## Photographic skirt removal, exact index pressure and adapter compatibility
+
+Geometry cover now retains its ownership region across photographic subdivision.
+Full image coverage shares outer geometry skirts; missing photos conservatively
+keep all exposed walls. Independent full-resolution child photos no longer add
+internal curtains to the same mesh. Genuine LINZ test: same32768surface triangles,
+skirt triangles2048->1024. Topdown capture is byte-identical. Strict repeated
+oblique comparison differs at1of65536pixels: oldwhite/newterrain color beside
+internal boundaryv=.5; CPU terrain pick at that pixel givesv=.5000111955.
+This difference is recorded explicitly in strict-pixel-comparison.json; the full
+oblique equality assertion failed and was not relaxed into a passing parity claim.
+No source resolution, height samples, mips or filtering were reduced. No0.18
+visual parity claim follows from this native-before/after fixture.
+
+Bounded index atlas now compacts stale entries under pressure; a frame that still
+exceeds it uses exact transient index buffers, not the old broader-mesh fallback.
+GPU regression forces24-byte atlas and requires pixel- and triangle-identical
+mixed-LOD output. Existing36092-pixel boundary repair, exact grade/crop/filter/
+residency checks pass. All22Rust tests and25Android tests pass, lint0errors.
+All3optimized Android ABIs rebuilt; latest Compatible-Mips APK packaging audit,
+6originalZIPs, signature and16KiB alignment pass. Artifacts remain outside Git.
+
+A clean official Android30ATD image boots and installs the complete APK, avoiding
+the previous35image's failing system services. Actual platform route SQLite/GPX
+proof passes. Initial GPU proof times out: log confirms device creation requested
+compute-workgroup limit65535while this adapter allows0. Source loading also reports
+unavailable; it is not yet diagnosed as provider authorization or TLS failure.
+Added debug-only exception-class logging without provider URLs/key values.
+
+Renderer now requests the adapter's actual limits and selects render-pass mipmap
+generation when compute is unavailable. Both paths use the exact same4texel mean,
+retain original256pxlevel0and9levels, and hardware compute remains preferred where
+available. Forced-render and compute host GPU suites pass; genuine oblique RGB
+captures match between both mipmap backends. Latest APK rebuild/reinstall and
+controlled/live instrumentation reruns are in progress; do not infer AndroidGPU
+or live-source success yet. Results will be appended after commands finish.
+
+## Android30 native presentation, genuine loading and mip-content diagnosis
+
+Continued after7b35071. A clean API30ATD software emulator now supports installation
+and actual platform checks. Native surface ownership was the next blocker:
+initializing Vulkan and GLES together connected the same Android buffer queue
+more than once. Single-backend attempts, an explicit Android display handle and
+scoped surface-configuration validation now allow GLES presentation. Failed API
+state drops before fallback; the working API is preferred on surface recreation.
+No phone benchmark is implied by software-emulator results.
+
+Controlled instrumentation passes native imagery/geometry pools, terrain pick,
+six original ZIP reads, surface destruction/recreation and rotation, with zero
+remaining native surfaces. Platform SQLite/GPX integration passes. Genuine
+LiveProofInstrumentation passes production TileLoader source residency and actual
+terrain pick170.14190780126034,-43.595099224916105,3688.406470926.
+These tests do not require or establish cross-LOD/visual/gesture parity.
+
+Provider transport was TLS trust, not authorization: the managed proxy public CA
+verifies LINZ on the host, while the clean emulator lacked that anchor. Optional
+RIDGELINE_DEBUG_CA_PEM now generates debug-only network security resources for
+exactly LINZ basemaps, Esri imagery and S3, retaining TLS/hostname checks. No CA is
+committed. Normal build has system anchors only; separate local test APK includes
+the managed public CA. Audit confirms625assets/native-library entries identical
+between profiles and no session anchor in the normal APK. Release is unaffected.
+
+The first genuine Android capture had large grey gaps. Host GPU smoke alone did
+not catch the cause: an opt-in device mip readback found original level0correct,
+but all8derived levels fully transparent. Cached JPEG/WebP source bodies were all
+opaque. A failing GLES adapter now switches to CPU-generated complete mip chains
+only after an actual startup readback fails; the fallback must pass that same
+readback or initialization fails. Healthy GPU paths remain GPU-generated. Original
+256pxRGBA level0is untouched, all9levels/filtering/geometry retained. This is a
+compatibility correction, not a claim of reduced CPU work or phone speedup.
+Readback occurs on GLES initialization or explicit diagnostics, never each frame.
+
+Latest Android MipmapProofInstrumentation passes every pixel/all9levels with
+minimum alpha255. Controlled and live integration both pass again afterward.
+Host Vulkan/GLES CPU fallback suites pass exact checker, grade/crop/coverage,
+mixed-LOD skirts and forced24byteindexpressure. Genuine host CPU/GPU mip capture
+comparison differs in3RGBbytes by at most1step; do not call it pixel-identical.
+All22Rust tests and25Android tests pass; lint/build and all3optimizedABIs succeed.
+Normal frozen artifact: artifacts/Ridgeline-Native-Validated-Mips-Debug.apk,
+SHA2568ad58495bd9a40c4ba1c4decf714419a907f36e432963dc8c69e3fb20c7bdd7b.
+Evidence in native-wgpu/validation/android30, including the original mip failure.
+
+A fresh standalone real-view capture now shows continuous mountain imagery where
+large grey triangular gaps appeared before. Before/after PNGs and capture scope
+are saved in validation/android30. This is qualitative native-before/after evidence
+with unsynchronized residency, not reference pixel parity. The successful
+integration assertion is not a visual-hole regression test. Do not mark M2/M3
+complete until genuine settled terrain/LOD captures and same-camera0.18comparison
+are accepted. Full native UI remains incomplete and gated on renderer proof.
+Capacitor/android/public and all6originalZIPs remain unchanged. Overall estimate
+remains approximately25percent of the complete app. Next: finish real-view capture,
+check remaining gaps, then exact reference camera/terrain/fog/gesture comparison.
+
+
+Reference runtime follow-up: unchanged authoritative0.18FullAPK installed beside
+native app (SHA matches published b4d286f5...). Its first launch timed out; WebView
+inspection then confirmed complete document but no canvas or map engine. Exact
+reload emitted SyntaxError:Unexpected reserved word,line1783. This API30image has
+WebView83.0.4103.120. Splash/state/errors are recorded in validation/android30;
+this is a reference-runtime compatibility blocker, not a native parity failure.
+Do not patch the reference to silently bypass it. Next reference step is a modern
+supported WebView/runtime or the exact packaged assets on supported Chromium,
+then camera-matched captures with source/elevation settings recorded.
+
+User explicitly requested a repository APK checkpoint before usage limits.
+Normal complete-data/all3ABI debug build is now in native-wgpu/checkpoints using
+GitLFS, with checksum and scope README. It contains no session trust anchor.
+Do not replace it with the separately generated local managed-proxy test APK.
+
+
+## Reproducible exact-APK reference capture on supported Chromium
+
+Refreshed android-preview-download:still39431dad/0.18Full, source d880143.
+The API30reference syntax error is exactly the packaged module's top-level await,
+unsupported by WebView83. Used unchanged APK assets on Chromium154instead, with
+explicitly reproduced local provider/range transport, system/proxy TLS verification
+and genuine original inputs. New tools/capture-reference.py checks the full APK
+hash, records served-body hashes and rejects unsettled/error runs. Production
+reference source/shaders and all quality settings stay unchanged. No Android
+reference success or full parity is inferred from this host result.
+
+Settled320x640camera:170.14219572,-43.5955671,zoom11.9,bearing-24,pitch58,
+pixelRatio1; loaded/tilesReadytrue, no script or provider failures. Reference
+clamps center elevation to3648.731912109524m. Native prototype still held3724m,
+a concrete camera discrepancy to resolve before pixel comparison. Canvas/fullUI
+captures and182body hashes are in validation/reference-host. Ground-centering
+correction and stronger live frame assertions are being implemented separately;
+this checkpoint only establishes the supported-host authoritative reference.
+
+Removed8superseded generated local APK copies to recover3.2GB. Latest normal,
+local trust test, committed checkpoint, authoritative reference APK, all6literal
+originalZIPs, source data and evidence remain intact.
+
+
+## Native center grounding and exact reference DEM cover
+
+Native TileLoader now queries the original pixel-centre DEM at the camera center
+once the finest demanded center geometry is resident. Available decoded sources
+only; no new downloads or synthetic plane/zero fallback. Missing halo retains the
+previous camera height. Posted updates compare the entire immutable camera pose,
+so movement invalidates stale asynchronous results. Unchanged heights mark the
+grounding state without calling changed/requestFrame or rebuilding a plan. The
+center geometry is cached with the existing demand plan. Actual source pixels
+use direct reads; parent fallback preserves the original interpolation.
+
+TerrainView records the presented camera pose; strengthened live integration now
+requires a grounded frame before picking. Mesh/imagery resolution, all height
+buffers, nine mip levels, source ceilings and original ZIPs remain untouched.
+All28Android tests pass, including analytic four-tile seams, wrap/poles, missing
+halos, real parent fallback and four genuine LINZ source pixels matching the
+captured reference center within.001m(Float32quantization only). Lint/build,
+normal APK signature/16KiB alignment and all6originalZIP hashes pass. All3ABIs
+use the unchanged optimized native libraries. Normal/local-test625asset/library
+entries match; the normal APK contains no managed-session CA. Audit and sampler
+provenance are in validation/ground-camera. New Android live verification is
+pending: earlier emulator exited; cloud environment restart interrupted its boot.
+Previous checkpoint's Android passes remain valid only for that checkpoint.
+
+The reference capture now exports actual rendered terrain cover, not just source
+requests. Default view has12geometry tiles: center geometry12/3983/2600uses
+DEM11/1991/1300. Exact engine TerrainSourceCache has deltaZoom=1 and maps geometry
+zoom to source zoom minus1, capped at source maxzoom. Merely fetching z12DEM does
+not mean that tile is the active center source. Four z11pixels give reference
+3648.731912109524m; the available z12source gives3672.6977629647536m. Native source
+mapping/LOD still differs; do not force a captured height, lower a source ceiling,
+or claim full camera/terrain parity from the interpolation unit test. Next: finish
+new grounded Android proof, then port/verify exact geometry-to-DEM ownership and
+LOD policy with genuine multi-zoom captures before opening full UI migration.
+
+
+## User-requested smaller APK checkpoint
+
+Built normal Base APK from a585548 using existing RIDGELINE_BUNDLE_OVERVIEWS=0,
+without the six large overview packs. This changes bundled availability only:
+67coarse images remain; full256pxnetwork imagery, DEM detail, source ceilings,
+all3optimizednativeABIs and camera code match the latest normal Full build.
+Empty archive index makes NativeImagery use the existing network path. Signature,
+pack absence and native-library equality checked once; no unrelated test reruns.
+Normal trust only, no session CA. APK/checksum are in native-wgpu/checkpoints;
+previous Full checkpoint and all6original source ZIPs remain intact. User asked
+to focus on implementation with fewer repeated checks. Continuing terrain source
+ownership correction; latest Android grounding execution still pending.
+
+Base packaging follow-up: incremental Android packager retained deleted Full ZIP
+bodies as unreferenced bytes. Recreated only packageDebug state/output, producing
+a genuinely smaller Base archive; signature and actual file-size bound checked.
+Source/code/native libraries unchanged; no broad test rerun.
+
+
+## Reference geometry-to-DEM ownership correction
+
+Production terrain now implements exact0.18TerrainSourceCache deltaZoom=1:
+sourceZoom=clamp(geometryZoom-1,0,18). Geometry and camera ground queries use the
+same source mapping. Original256pxDEM inputs,129x129vertices, pixel-center halo,
+same-source nodata parents and source ceiling18 are retained. This removes the
+incorrect extra DEM source level relative to the reference; it does not globally
+cap terrain detail or change imagery. The generic old mesh sampler remains for
+unchanged bitwise compatibility regressions, separate from production ownership.
+
+Ran only6affected DemSampling tests and assembled the Base APK. Analytic full-buffer
+cases verify every vertex with parent source coordinates, adjacent geometry,
+source ceiling and overscaled geometry. Original frozen sampling regressions and
+captured genuine reference ground-pixel case still pass. No full Rust/emulator/
+lint cycle repeated for this data-policy correction. Android visual execution of
+the new policy remains pending; no new full-parity or phone-performance claim.
+
+Saved the existing selection diagnostic left uncommitted by the environment
+interruption. At320x640with explicit48/96budgets and reference camera height,
+heuristic native center geometry isz13versus referencez12. Ownership correction
+is complete, but exact LOD cover selection/transitions remain a separate blocker;
+do not tune down a target just to make one captured view match.
+
+
+## Native map navigation controls and attribution
+
+Added native Android zoom-in/out and north-up controls, plus LINZ imagery/elevation
+and Esri gap attribution links. These are minimal map controls for the renderer
+prototype, not the full planner UI. Pinch, double-tap and buttons share one bounded
+zoom update; unchanged zoom or an already-north bearing does not schedule a frame
+or source replan. Rendering resolution is unchanged behind native overlays.
+Compiled/assembled once; no new test suite for these reversible widget bindings.
+Build wrapper now recreates only APK packaging state to prevent stale Full payload
+bytes in future Base outputs, retaining compile/dependency caches. Next acceptance
+work remains exact LOD cover and camera/transition behavior, followed by full
+native feature UI. No new Android runtime/visual-parity claim.
+
+Latest normal Base download now includes source4c0b942(parent DEM fix plus native
+map controls). Stable path:native-wgpu/checkpoints/Ridgeline-Native-Base.apk;
+checksum/build-scopeJSON adjacent. Six original ZIPs remain separate and intact.
+
+
+## Priority change and native planner integration
+
+User now explicitly prioritizes performance/full visual and data quality over exact
+0.18pixel matching, authorizes continued implementation to completion, and wants
+fewer repeated checks. GOAL.md records this; exact reference matching no longer
+blocks feature UI. Existing Capacitor/olderAndroid/public and6originalZIPs remain
+untouched; Base APKs remain the requested normal checkpoint format.
+
+Connected existing native route controller/SQLite/GPX backend to native planner:
+create/open/rename/delete, autosave/status, undo, point deletion, insertion near
+segments, long-press waypoint dragging with coalesced terrain picks, multiple
+shown routes, combine, fit, SAF GPX import/export and elevation profile. Profile
+jobs are debounced/cancelled, use real DEMs, leave missing data incomplete, and
+cache the chart path; no chart redraw loop on camera movement. Metadata-only lists
+still avoid decoding unused routes. Close flushes queued route edits before DB
+close; file/storage/network work stays off UI thread.
+
+New Rust/wgpu route overlay follows crossed heightfield cells and actual triangle
+diagonals, depth tests lines/waypoints against terrain, and rebases around one
+route origin. Geometry is retained across idle/camera motion; only camera uniforms
+change. Geometry/source refinement or route changes rebuild it. No GPU depth
+readback or terrain/imagery resolution reduction. Active waypoint projection is
+CPU matrix math for picking UI; drag requests coalesce and preview never saves.
+
+Focused checks: route/controller/GPX tests and Kotlin assembly pass; exact draping
+invariant and route GPU fixture pass (1024affected pixels; no geometry uploads on
+idle/pan), plus existing GPU smoke on the changed pipeline. All3Android JNI ABIs
+are rebuilding; Android UI/runtime execution is still pending. No finished-app,
+phone-speedup or complete feature-acceptance claim at this source checkpoint.
+
+## Restored feature workspace checkpoint
+
+Preserved the interrupted native offline-region store/downloader, one-shot location,
+camera preferences/perspective pan and planner integration fixture. Kotlin assembly
+and focused camera checks passed before interruption; the final small profile/cache
+edits still need compilation. All three route-enabled JNI ABIs were built. Actual
+Android planner UI opened, but provider requests timed out and the grounded route
+fixture did not complete. No new Android terrain acceptance or phone-speed claim.
+Next user priority is MapLibre-like anchored gestures, stable view/loading and HLOD.
+
+## MapLibre-style anchored gestures and demand-owned HLOD
+
+Read current MapLibre GL JS/native gesture, terrain-anchor tests, inertia, raster
+fades and tile-pyramid sources, plus Cesium screen-space-error traversal. Exact
+revisions/links and applied/open behaviors: native-wgpu/research/MAPLIBRE-GESTURES-HLOD.md.
+Replaced incremental centre-plane pan with one geographic terrain anchor per
+pan/pinch/rotate/tilt gesture. Camera moves opposite finger; map content follows.
+A single rendered-terrain pick fixes anchor elevation, with fixed center-plane
+fallback when missing. Center elevation is held through gesture and eased after
+release. Pointer count changes rebase, async callbacks reject stale gestures.
+
+Separated GPU cache residency from requested render ownership. Ready ideal sources
+supersede cached descendants; missing ideals keep real loaded parent/children.
+This fixes history-dependent LOD ownership. Detail leaves no longer get collapsed
+merely to pay for full ancestor chains. DEM/image workers have independent bounded
+slots, queued priorities refresh, source failures get bounded retries, and demand
+updates run during dragging at most every50ms. Same source ceilings/full imagery,
+mesh resolution/filtering and upload budgets; original6ZIPs and Capacitor untouched.
+
+Focused evidence:3camera tests(including32pitch/bearing/density combinations and
+pinch),3source-demand tests,2newcoverownership tests pass. GPU readback proves
+repeated coarse/fine/coarse demand produces identical coarse pixels; missing
+siblings retain parent pixels, and settled frames repeat no scene/instance/route
+uploads. One actual Android30GLES controlled diagonal pitched drag passes with
+0.023479336975551036m anchor drift. Test is explicitly synthetic/offline and needs
+no imagery packs or provider CA. All3optimizedJNI ABIs compile. No new phone
+benchmark or real-terrain visual acceptance. HLOD geomorph/image fades, inertia,
+collision and full terrain-aware cover remain open; this addresses concrete input,
+height-snap, cache-ownership and loading-starvation problems without claiming all
+renderer behavior complete.
+
+
+User highlighted closest-zoom detail again. Reproduced geometry selection stuck at
+z16 at camera19 even with a level camera: identical projected depths gave distant
+conservative mountain bounds the same split priority as the focus. Read MapLibre
+Native's distanceLOD/minimum center-radius and JS variable-zoom cover. Replaced
+score with tile-bound distance/pitch-area metric; prioritize center branch and
+one-tile focus neighborhood. Camera still4..19 (same reference), sources still
+DEM18/photo19/geometry22. Zoom19 now requests centergeometry20/21(fullDEM18) and
+photo19 at0/45/58/75/80pitch within existing36/72leafbudgets. Closest detail download
+now precedes intermediate fallback chains. Selection regression covers maximum
+source detail plus bounded non-overlapping coverage. No new GPU shader or mesh/
+image downsampling. Actual provider availability and phone visuals remain separate.
+The native Android immediate-release drag case also passes(0.0951m drift), so a
+quick gesture cannot disappear while its asynchronous start pick is pending.
+
+Real provider check at default Aoraki focus also succeeds: LINZ aerial z19 and
+terrain-RGB DEM z18 both returnHTTP200, original256x256images; DEMalpha255throughout.
+Provider tile coordinates/body hashes are recorded without URLs/client key in
+validation/gestures-loading/providers.json. This establishes available real highest
+source inputs at this focus, not new Android live-terrain or visual acceptance.
+Fallback spare slots now favor broad coverage plus nearest parents rather than
+spending the pool on all intermediate levels; closest parent and fine leaf start
+promptly. Three focused source-demand tests pass after this ordering change.
+
+
+## MapLibre6.14camera and shared-grid checkpoint
+
+User confirms customRust/wgpu architecture and asks close0.18behavior, fewer broad
+checks, online/upstreamcode research and executive questions. User chose0.18camera
+feel and1GBadaptiveautomaticcache (separate savedregions/packs). Exact6.14.0
+handler_inertia.ts, camera.ts, two_fingers_touch.ts and terrain.ts read fromupstream;
+0.18bundledprovenance confirms6.14.0. Mainreference refreshed unchanged.
+
+Added bounded60ms/160msreleasevelocityhistory, referencepan/zoom/bearing/pitch
+speed/deceleration/linearity, interruptibleeasing, smooth300mszoom/north/doubletap,
+terrainanchorheldthroughmomentum. Corrected twofingerrotation/tiltsigns; deliberate
+parallelfingerpitch(-0.5degrees/logicalpixel),pinch0.1activation and25pxrotation
+threshold nowfollowreference. Threefocusedmotion/gesturetests andKotlincompilepass.
+Pinch-releasecoastacrosspointercountchanges still needsfinalintegration.
+
+Terrainnowsharesonefull129x129surface+skirtUVgrid, withoneR32Floatheighttexture
+pertile instead ofduplicatepositionbuffers. Alloriginalf32heightbits, diagonals,
+triangles,skirts,CPUterrainqueries,independentimagery/mips retained. RawGPUterrain
+payload per tile falls399384->66564bytes, plusone266256bytegrid perrenderer;
+this ispayload accounting, notphoneFPS. GPU fixturepasses Vulkan andGLES, including
+mixedLODskirts,detailownership,filtering andboundedcache. ExistingcontrolledAndroid
+inputfixture updated toholdbeforerelease so it stillisolatesanchoringfrommomentum;
+notrerunatthischeckpoint. MapLibreBSDnotice includedinsource andassetpackaging.
+
+
+## Cache retention, terrain camera safety and performance decisions
+
+User reaffirmed maximumperformance over copyingMapLibrestructure and chose immediate
+imageryreplacement (nofades). Directshader keepsoneimagerysample, nofadeframe-loop
+orintermediatedrape targets. Userchose1GBautomaticdiskcache, adaptivelylimitedby
+free space; explicitoffline regions andall6originalpacks excludedfromeviction.
+HTTPsourcebodyrequests nowdeduplicateacross imagery/DEM/profile/downloadworkers,
+retainingHTTPexpiration/conditionalrequests andseparateoffline-onlypolicy. Shared
+responses stilljoin eachsavedregion; originalproviderexceptiontypes preserved.
+CPUreadycacheevictsnonwantedentries first;GPUcacheLRUusesactualrendereduse instead
+ofuploadage. Viewselectionstopswhilebackgrounded andresumesfromlatestcamera.
+
+Camera safety follows exact6.14eye+3x3nearclip sampling againstresidentrealheight
+fields, withoutGPUreadback. It lifts a buriedcamera beforedraw andcorrects only
+currentcamera revisions. Centre grounding uses theactualrenderedtrianglefield
+only once finestrequestedcentresourceisready, soevicting decodedDEMcache cannot
+leaveheightstale. Safetyquerycacheinvalidates oncamera/viewport/demand/geometry
+changes; imageryarrival/routeupdates donotrecomputeunchangednearplanechecks.
+Pinch/rotate/tilt releasecoast now survivesquicktwo-to-one-to-zeropointerrelease,
+withoutaddingcentroidjumps toonefingerdrag. Normalzoom4..19,terrainceilings,
+originalmips/filtering/fullsurfacesamples retained. DedicatedGPUclearance/payload
+checks pass; Kotlinintegrationcompiles. No newAndroidruntimeorphonebenchmarkclaim.
+
+LatestnormalBaseAPKbuiltfrom40d2788withall3optimizedABIs, fullheight/imagequality,
+newsharedgrid/clearance/cache/camera code, packagedMapLibreBSDnotice andno6large
+packs/sessionCA. Signaturepasses. Size31559809bytes; SHA256
+301488d08668ea2375263598ce44fb95678e74f4e64e135c9c912bc545208d67.
+Scope/evidence in validation/maplibre-behavior andresearch/MAPLIBRE-614-ADAPTATION.md.
+No fullemulator/lint/testloops repeated; no phoneperformance claim. Preserve
+performance-first choices whencontinuing: matchbehavior, avoidunusedMapLibre
+infrastructure; improve actualterrain-awareselection/idlecamera re-solve only
+wherevisiblebenefit orprofilingjustifiescost. ExistingCapacitorapp untouched.
+
+
+## In-place overview ZIP attachments
+
+Userrequested Addimagery inthenextAPK, choseattach-existingfiles withoutcopies,
+anddelegatedadaptive/performancepolicy. NativeOffline/imagerymenu nowhas Addimagery
+ZIPs usingAndroidSAFmulti-select,persistedreadaccess,backgroundwholeZIPhash+size
+validationagainstthe6originalmanifest,payloadheadervalidation,anddirectpositional
+readsfromoneSTORED.binentry. Noextraction,resampling,duplicatepackstorage orfile
+modification. Attachedpacks surviveapprestartandbypassnetwork forcatalogtiles;
+unavailable/revokedattachments useexistingnetwork/bundledsourcefallback. Detach
+releasesaccess/handleswithoutdeletingphonefiles. Coarse67bundledimages andoriginal
+sixpacks preserved. Assetpackaging includesoriginalarchiveidentitymanifest and
+ignoresgeneratedlicense/manifestassets. Kotlincompilepasses; nativefilepicker/
+persistedURIexecution stillneedsAndroidruntimeacceptance. Nextbuildmustincludethis.
+
+## Adaptive terrain, GPU residency and submission reuse
+
+Read exact0.18adaptive source, MARTINI RTINcode andCDLODpaper/sourceoverview.
+Chose0.18bounded32/64/128indexpolicy onexisting sharedgrid: .6drawing-buffer-pixel
+entry/.9retention,10/13pixelcellbounds,350msstablecoarsening,immediaterefinement.
+Originalf32heights, fineboundaryvertices andskirts retained; invalid/unknown/near-
+plane metadata keepsfull128. Sourceworkercomputesresidualbounds once; readybuffers
+carry16bytesofmetadata. No perframeanalysis ornewDEMfetch. Indexvariants sharethe
+existing boundedatlas; oneidlewakeallowscoarsening without blockingimmediateinput.
+Route-bearing sourceskeepfull128for exactdepthwiththenativeroute/markerpass.
+
+AndroidGPUterrainretentionis3xprevioussourcecount, capped192, usinglessrawgeometry
+payloadthantheoldduplicatedvertexlayout. Warmrevisitsreuseheighttextures,CPUfields
+andadaptive metadata. Memory-pressurecallbacksreleaseoff-demand caches, preserve
+activecoverage anddo notdiscardcachemerelybecauseUIhidden. Sharedgrid/instance
+buffersbindonce/pass; texturebindingsskipduplicates, compatibleadjacentpatches
+batch; perframevisible/instance/adaptivescratchstorage reused. Nativegeometryupload
+movesitsheightvectorintotheretainedfieldinstead ofcloning it.
+
+Twofocusedcorechecks pass. GPUplanefixture32768->8952surfacetriangleswithidentical
+pixels; routegeometryrestoresfull128. VulkanandGLES executechangedterrainpath;
+cachepressurefixturekeepsdemandedterrain. No phoneFPSclaim. In-placeattachment
+pickercompiles andall6originalZIPheadersmatchnativeoffsetreader. NextnormalBase
+APKmustincludeAddimagery plus thesechanges; archivesremainexternal/user-owned.
+
+
+Further exactworkremoval: terrainindices nowUint16(all33282possibleverticesfit),
+halvingindexstorage/fetchbytes withunchangedtopology andsameboundedindexcapacity.
+Vulkan/GLES GPUfixtures passafterformat/instancing/scratchchanges. No terrainheight,
+imagefiltering,mips,sourceceilings ororiginalZIPdatareduced. Sourcevectorownership
+andbinding/scratchreuse are exactworkremoval; adaptivity remains the separately
+bounded0.18visualpolicy withroutegeometryprotected. Attachmentreaderdetach race
+nowrejectsstalepackhandles. Proceeding tobuildnormalBasewithAddimagery included.
+
+LatestnormalBaseAPKfrom22858d0includes Addimagery/in-placeZIPattachments plusadaptive,
+warmterraincache, pressurehandling, submission/scratchreuse and16bitindices.
+Size31614320bytes,SHA256
+0c96a6896546e6b5c588fa8f5bef361ac7a649b2ad48af009d5f2a0d17e3cac4.
+All3optimizedJNIABIs, Kotlin/assembly/signature pass. NativeZIPidentitymanifest
+included; no largepacks orsessionCA. Scope in validation/attach-adaptive;
+phoneSAFpersistedaccess andphysicalFPSstillneedexecution. Do notclaimprototype
+featurecomplete or inferdeviceFPSfromtrianglecounts. OriginalZIPs/Capacitorintact.
+
+## Samsung A20 terrain stability and recovery
+
+User clarified two-finger tilt. Removed automatic height-follow animation;
+terrain pivot recentering retains physical eye/pitch, render-only rest clearance
+avoids repeated state drift, and exclusive pitch pivots around map centre like
+MapLibre. Gesture elevation keeps a baseline with temporary collision lift.
+Planner uses the actual presented pose. Full upstream max-zoom recenter search
+is not yet ported; physical interaction acceptance remains open.
+
+Bounded background parent coverage now precedes most fine leaves so terrain
+behind a peak is not held behind foreground refinement. Same source ceilings.
+Uploads bounded to1/gesture or2/idle frame and paused during failed presentation.
+Temporary timeout/occlusion retries no longer stop after8failures; lost surfaces
+recreate, repeated hard/device errors rebuild renderer and reupload cached data.
+No A20 root-cause reproduction or measured FPS claim.
+
+Remove skirts only on proven continuous adjoining edges; retain exposed/mismatched
+joins to prevent cracks. Masks update on cover/geometry changes; unused fallback
+uploads/evictions no longer always retessellate routes. Vulkan/GLES fixtures pass,
+including 16->8 skirt edges in flat fixture and retained discontinuity protection.
+CameraMath5 and SourceDemand4 focused tests pass; Android native target compiles.
+See research/TERRAIN-STABILITY-AND-RECOVERY.md and validation/terrain-stability.
+Original six ZIPs, full source quality, Add imagery and Capacitor app preserved.
+
+Latest normal Base APK from c602395: 31684240 bytes, SHA256
+18e11cf44922da81a4dfa4b5aafff6bbb4af91e6113ff1f1bc7439e785d9dea1. All three optimized JNI ABIs, assembly and signature pass.
+No packs/session CA; Add imagery retained. A20 runtime acceptance remains open.
+
+## Prepared cache, coordinated residency and cost-aware scheduling
+
+Implemented all four requested improvements. Prepared terrain uses bounded,
+lossless versioned disk entries with full halo/parent/404provenance, validated
+through normal HTTP/offline source access. Fast gzip writes use one background
+worker with8queued entries; interrupted/corrupt writes recover. Allocates1/8of
+existing automatic disk budget, at most128MiB, subtracting from HTTP cache.
+
+GPU photographs may borrow unused terrain payload space, retaining up to25%extra
+photos under the previous combined target. Active coverage protected; explicit
+count caps bound temporary protected-coverage debt. GPU/CPU caches still release
+off-demand data under real memory pressure. No quality/source-policy changes.
+
+Obsolete tasks skip later image decoding/composition/RGBA work, halo work and
+terrain rows, without canceling shared source I/O or poisoning DEM futures.
+Aborted tasks have no failure backoff and reschedule if demand returns in flight.
+Uploads learn actual JNI cost by kind and available render CPU time, keep byte/
+count limits, and gate new uploads/frames at2outstanding GPU submissions using
+completion callbacks and nonblocking polling. Latest camera retries nextvsync.
+
+Real-input host measurements and reproducible fixtures in validation/pipeline-cache:
+prepared-hit1.138ms vs cold-read/decode/mesh12.485ms; warm decoded mesh1.116ms,
+so no gain over decoded RAM. Obsolete mesh0.109ms vs1.116ms full.36-photo revisit
+4->0reuploads (40->36total),10%less upload/mip work. Vulkan36.979->35.995ms;
+GLES40.113->36.826ms medians across6alternating trials. Timing noisy; work counts
+stronger evidence. Pressure fixture bounds queued submissions12->2Vulkan/6->2GLES,
+identical final per-backend pixels; GLES pressure throughput is slower, documented.
+Light upload-cost replay shows no CPU improvement; no A20/FPSclaim.16focusedtests
+pass; GPU coverage/quality fixture, all3optimizedABIs, assembly/signature pass.
+Full imagery/heights/filters/mips, Add imagery, original6ZIPs andCapacitor intact.
+
+Latest normal Base APK from 0e2d7ee: 31919402 bytes, SHA256
+474ed2be9fa8157d45132a0b3ff851b577504594b26725137e92f3975f687c55. All3optimizedABIs/signature/assembly pass; no packs orsessionCA.
+Measurement scope and reproducible original-data fixture in validation/pipeline-cache.
+
+## Published0.18cache/pipeline comparison audit
+
+Refreshed android-preview-download39431da andresolved d880143 usinglatestREADME,
+validation/checksum. FullAPKhashmatches. Readexactsource andgeneratedAPKmodules;
+app-onlyoptimise-web transforms matter. Detailed gaps/recommendations andasset
+provenance in research/CACHE-018-COMPARISON.md andCACHE-018-ASSETS.json.
+
+Highestpriority: local/prepared/disk hits mustnotqueuebehindtwo blockingHTTP
+workers; metadatafreshness shouldavoidbodyfetch/hash on everypreparedhit;
+subscriber-awaretransfercancel/promotion plusboundedquick-returngrace; restore
+residentcoverage/sharperchildren/coarsereserve beforemorefallbackrequests;
+boundedencodedRAM/compositionreuse; epoch-invalidatedsaveddatamissmemo;
+smallpressure-awareprediction; exactmembership/planindexreuse; per-tilephone
+traces.0.18alreadyimplements manyofthese. Nativecurrentlyhaspartialdedup,
+parentfallback,residency andcostadmission, notfull0.18cachearchitecture.
+
+Do notcopyremovedSHAdecoded-imagepool, duplicateWebViewelevationdiskcache,
+bridge/RTT-specificwrappers oroldmemoryvalues. OptionalexpandedGPUpreparation
+wasoffbydefault. No production code/APKchanged; no newperformanceclaim.
+
+## Full six-row0.18cache adaptation and no skirts
+
+User explicitly requested removal of ALL skirts, overriding earlier retention
+requirements. Runtime nowhaszero skirt indices/duplicatevertices/lowering shader
+orCPUjoinanalysis. Sharedgrid266256->133128bytes; originalsurface/boundarysamples
+remain. Gaps atdiscontinuous/missingterrainmay bevisible; nofakefill.
+
+Sixrequestedbehaviorsimplemented: separate localcache-onlylookup lane andasync
+network withresumableCPUjobs; boundedfreshencodedRAM andabsoluteexpiry metadata;
+subscriber-ownedfutures/refcountcancel/promotion/600msquickreturngrace; exact/sharper
+residentcoveradoption andcoarsereserve; losslessfinishedRGBAcompositioncache plus
+provider/native mappingplanreuse; tinyrealprovider-input predictions withstrict
+rate/backpressurelimits andoptionalexpandedGPUidleprep(defaultoff, Offline/imagery).
+Preparedhits no longer fetch/hash original bodies while dependencyfreshness valid.
+Compression/diskI/O no longer holdsLRUreadlock. Map/profile/download sharing safe;
+lastreaderabort cancelsactualHTTP, oneconsumerabort doesnotpoisonothers.
+
+18focusedtests +26Rustcoretests pass. ActualOkHTTPdiskhit returns1.529095ms with
+8foregroundHTTPrequests stillblocked; RAMdisabledinfixture. Vulkan/GLES pass
+includingzero-skirtgeometry. All3optimizedABIs/assembly pass. Evidence andexact
+bounds in validation/cache-revisit. No A20/emulatorruntimeclaim. Original6ZIPs,
+Addimagery/fullsourcequality/Capacitorpreserved; automaticdiskbudget still1GBadaptive.
+
+Latest normal Base APK from a7cb004: 31716248bytes, SHA256
+c804a18f038bb8b704c014048a09efbfda8eca66fe74954d461f57c5e5ae610b. All3optimizedABIs/assembly/signature pass. No largepacks/sessionCA;
+Addimagery retained. Source/dataquality preserved, allskirtsremovedbyrequest.
+
+Idle-preparationcompletionchecks nowpoll actualGPUcompletion ontheGPUownerthread
+withoutdrawinganotheridleframe. Avoidsastale last-framebacklogpreventingoptional
+preparationaftertheGPUhasalreadydrained. Kotlin/assembly/signaturepass; native
+librariesandearlierfocusedchecksunchanged.
+
+RefreshednormalBasefrom3e9811b: 31964120bytes,SHA256
+c655779bc85bd7a5fe5a628f35b08144fc7bf02675ae088f9d1e664d56e342a4. IncludesactualidleGPUcompletionpoll; no largepacks/sessionCA.
+
+Cleanfinalpackaging(same3e9811bproductioncode): 31716248bytes,SHA256
+9c9405eb6c91bcd318bc2eead7fba102f1e7c8d5441f9c952db7deb54a307393; incrementalZIPslackremoved.
+
+## Comprehensive audit implementation underway
+
+Fast-forwarded user audit commit5c29ea8 (audits6a84dab). Readaudit/GOAL/progress/
+0.18performance/nativeREADME. FrozenbaselineAPK9c9405... source6a84dab.
+Selected bulkpixelpacking(NAT11), stableindexatlas(NAT09), GLES mipscratchreuse
+(NAT10). User additionallyexplicitlyrequiresGPUtexturearrays(NAT04): implement
+boundedlazypages+layerleases+layerawaremips+batching withseparatetexturefallback.
+No worker/network/resolutionincreases. Preservequality/no-skirts/Capacitor/6ZIPs.
+Pixelpacking tests passallalphas+randomopaque+cancellation. Realinputhostpacking
+median.576->.305ms across60samples; p951.087->.715ms. No phoneFPSclaim.
+Source/evidence in research/COMPREHENSIVE-AUDIT-IMPLEMENTATION.md and
+validation/comprehensive-audit. Index/mipschanges arecurrentlyinprogress.
+
+
+## Comprehensive audit: GPU texture arrays and exact-work reductions
+
+Implemented lazy eight-layer GPU texture arrays for imagery/all nine mips and
+R32Float terrain, bounded generation-owned slots, shared bindings and compatible
+instanced draws. Automatic Vulkan arrays; automatic GLES pooled separate textures
+because host GLES arrays were slower. Offline / imagery > GPU textures allows
+explicit comparison and compatibility mode. Layer-aware GLES base staging fixes
+emulated-view mip corruption; startup layer/mip probes and safe fallback retained.
+Stable/coalescing index atlas prevents whole-cache resets. GLES mip scratch and
+bindings are reused. Bulk exact pixel packing is included. Full quality/no skirts/
+Capacitor/six original ZIPs remain. Optional expanded preparation remains off.
+
+Host fixture: 32 -> 4 image/height texture allocations, 16 -> 2 draws; all RGBA
+pixels identical. GLES median former139.671ms, pooled128.088ms, arrays148.593ms;
+Vulkan334.076/330.903/329.711ms, not a meaningful phone-speed claim. Index trace
+45 -> 31 pattern uploads. See research/COMPREHENSIVE-AUDIT-IMPLEMENTATION.md and
+validation/comprehensive-audit for raw data, warmup/memory costs and limitations.
+
+Requested 0–1000MiB automatic disk-cache slider added under Offline / imagery,
+sharing one allowance across HTTP/prepared terrain/completed imagery. Persists;
+changes apply after app restart, current active limit shown. Zero disables and
+clears these disposable disk caches on next launch. Saved regions, attached ZIPs
+and independent RAM/GPU working sets are separate. Default1000MiB, free-space cap
+retained. API33+ back callback already present; lint annotation documents legacy
+back override. No physical A20 run/performance acceptance is claimed.
+
+Validation: 26 core, 4 renderer and 1 CLI Rust tests pass; 58 JVM tests report
+zero failures. Vulkan/GLES smoke and five-trial three-mode pixel/recycle fixture
+pass. All three optimized JNI ABIs, assembly, lint, signature and alignment pass.
+Normal Base APK: 31,866,304 bytes; no large overview packs or session CA.
+
+Published Base source `033bec6`: 31,866,304 bytes, SHA256
+`e329eb1f39198424931b4a18e18e3617672d0d11a9a48ab17b3487c14f2b972c`. All three optimized ABIs; no large packs/session CA.
+
+
+## Combined RAM cache control
+
+Added Offline / imagery > Combined RAM tile cache slider, 0–1000 MiB in 1 MiB
+steps, separate from automatic disk cache. Persists and applies live; shrinking
+trims all three stores immediately. One retained payload allowance is partitioned
+25% fresh encoded tile bytes, 25% decoded DEM FloatArrays, 50% prepared terrain/
+RGBA direct buffers. Those partition limits sum exactly to the selected total;
+LRU eviction keeps each below its share. No large allocation occurs when raising
+the slider. Zero retains no payloads in those stores; in-flight/shared responses,
+mesh-building halo references and queued uploads remain necessary working memory.
+Metadata/object overhead, active renderer CPU working sets and GPU memory are
+separate; this is not an app-wide memory ceiling. No quality/concurrency changes.
+Defaults: 32 MiB on low-RAM devices; otherwise one quarter of Android memoryClass,
+clamped32–96 MiB. UI shows recommended value and warns above it, specifically
+including A20 risk. Memory-pressure handling still clears disposable payloads.
+Focused budget/transport tests and lint pass; all slider values, immediate encoded
+shrink/zero/live response delivery/re-enable are covered. Native libraries unchanged.
+
+RAM-slider Base APK source `eef2ba7`: 31,866,304 bytes, SHA256
+`1fc293176f5180d4445e78a9ce4143af55bf93e7d6225dd6298b9877a20672c9`. All three optimized native libraries byte-identical to 033bec6;
+8 focused JVM checks, lint, assembly, signing and 16KiB alignment pass. No new
+GPU/phone run, large packs or session CA.
+
+
+## MapLibre-style seam protection restored by request
+
+User now requests all four seam protections, superseding earlier remove-all-skirts
+instruction. Restored selective lowered skirts using unchanged source UV/heights,
+MapLibre logical-zoom depth and uint16 shared-grid indices. Omits photography-only
+internal walls and entire proven continuous shared terrain joins; missing,
+discontinuous/off-grid/unknown joins retain skirts. Cached seam masks recompute
+on cover/height arrival changes, not each camera frame. Global extraUVgrid133128B,
+no per-tile duplicate heights. Current adaptive detail/index atlas/texture arrays
+and RAM/disk sliders retained.
+
+Neighbour DEM halo sampling was already present and remains exact; new bitwise
+checks cover all129shared east/south samples across DEM boundaries/overscaling.
+Parent fallback/sharper complete cover already present and retained. Explicit
+ClampToEdge addressing with original full-resolution UVs/all nine trilinear mips
+and anisotropy retained; no invented imagery or blending of source colour seams.
+
+Controlled Vulkan/GLES mixed-LOD fixture closes36092/36093background pixels.
+Continuous shared edges omit internal skirts; photo subdivisions keep only original
+terrain perimeter. Overflow/coverage/picking/settled-transfer checks pass. Rust
+26core+4renderer+1CLI and7focusedDEM JVM tests pass; all3optimizedABIs build.
+See validation/seam-protection. No A20 FPS/real-terrain acceptance claim.
+
+Forced GLES texture-array seam fixture also passes (36093background pixels repaired);
+normal three-ABI Base signing and16KiB alignment pass.
+
+Seam-protected Base source`f104946`: 31,916,688bytes, SHA256
+`a1a21c2dfd36ec7bc35262f9f2d903235478b25502ab1a6d43c4b295a68e4f3d`; all3optimizedABIs, no largepacks/sessionCA.
+
+
+## Parent fallback gaps during zoom/pan
+
+Fixed ready-child ownership dropping its resident parent background while camera
+motion precedes next demand selection. Rendering now includes nearest cached
+ancestors without overlapping finer surfaces. Complete fine cover still removes
+all parent draws; coarse demand remains independent of stale cached detail.
+Loader restores nearest already-prepared RAM parents before fine preparation,
+including multi-level zoom jumps; terrain/photo independent. Upload queue admits
+ancestors outside exact requested IDs, prioritizes coverage, prunes unrelated work.
+Count eviction no longer selects newest non-explicit sources that still provide
+coverage: protects owners/backgrounds, oldest nonowners first, or detail with a
+real resident ancestor. Preserves coverage debt rather than deleting sole sources;
+soft count targets may be exceeded transiently, fixed array bounds/admission remain.
+No worker/network/detail increases; RAM/disk sliders, arrays, skirts/6ZIPs preserved.
+
+Regression: GPU complete parent/child frame stays byte-identical under fine-only
+new demand on Vulkan and GLES arrays; sibling holes no longer appear in that case.
+27core+4renderer+1CLI Rust,11focusedJVM+lint pass; all3optimizedABIs build.
+Evidence/scope in validation/parent-fallback; no A20 runtime or speedup claim.
+
+Physical residency remains bounded on both texture backends:192sources per terrain/
+photo pool. If all owners are protected at that hard ceiling, unrelated uploads
+wait for capacity; related replacements may use one transient slot and then evict
+a safely covered source. This bounds soft coverage debt on GLES as well as arrays.
+
+Parent-fallback Base source`1fd7000`: 31,930,328bytes, SHA256
+`d46046b0bb5271c49cf46e7390abe0da2f830186c4082a260c7f180f74865431`; all3optimizedABIs, no largepacks/sessionCA.
+
+Prepared-RAM background restoration also runs for ready GPU fine tiles: exact fine
+coverage cannot stand in for siblings of its parent. Only ideal leaves trigger
+restoration, avoiding recursive background requests for fallback entries. One
+bounded ancestor walk replaces repeated quadratic fallback classification.
+
+Final parent-fallback Base source`da2579c`: 31,930,328bytes, SHA256
+`c5c0b9654998a663d560bc644eb2f2666f175b09dd8ebabc4fe24d505c59c8aa`. Includes RAM-only parent restoration for ready GPU fine tiles;
+11targetedJVM checks/lint/assembly/signature/alignment pass. Native3ABIs unchanged
+from1fd7000. No largepacks/sessionCA.
+
+
+### 2026-11-05 — additional native audit and overlay alignment
+
+Implemented post-acquire camera latching, optional Vulkan actual-presentation feedback,
+strict active-refresh optional budgets, immediate first-qualified adaptive density,
+completion-triggered cartography/route workers, and acknowledged incremental GPU
+overlay updates with coherent bounded staging. Matched Capacitor route colour/width
+semantics, perspective screen-space antialiasing, layer ordering and Open Sans.
+See `native-wgpu/research/ADDITIONAL-AUDIT-2026-11-05.md`. Native 0.1.12 code13
+uses the existing Performance package and signing identity. No handset speed claim.
+
+Published-build artifact: `Ridgeline-Native-Additional-Audit-0.1.12-Base.apk`, 33,192,122 bytes, SHA256
+`085fff49995826f07da20d451c63a968c3afc15b8a4ce3390f7bf486f57f61ce`. Source `60520651aed447bd862b6e47b2ab8948875eb2e9`; package/code/signer,
+43 JNI exports in all3 rebuilt optimized ABIs, 16KiB ELF/APK alignment and621
+original assets verified. Four focused JVM checks and16renderer checks pass.

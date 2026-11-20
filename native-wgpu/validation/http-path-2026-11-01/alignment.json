@@ -1,0 +1,5 @@
+{
+  "command": "zipalign -c -P 16 4 Ridgeline-Native-HTTP-Latency-0.1.8-Base.apk",
+  "exitCode": 0,
+  "scope": "ZIP entries, native ELF alignment recorded separately in release.json"
+}

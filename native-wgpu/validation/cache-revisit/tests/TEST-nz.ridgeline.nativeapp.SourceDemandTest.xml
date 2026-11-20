@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="nz.ridgeline.nativeapp.SourceDemandTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-30T04:01:02.222Z" hostname="5085ef76c66b" time="0.013">
+  <properties/>
+  <testcase name="backgroundCoverageStartsBeforeBackgroundFineDetail" classname="nz.ridgeline.nativeapp.SourceDemandTest" time="0.001"/>
+  <testcase name="visibleDetailIsNeverEvictedToMakeRoomForAncestors" classname="nz.ridgeline.nativeapp.SourceDemandTest" time="0.0"/>
+  <testcase name="ancestorsConsumeBudgetWithoutRemovingVisibleCoverage" classname="nz.ridgeline.nativeapp.SourceDemandTest" time="0.011"/>
+  <testcase name="affordableSourcesKeepFullDetail" classname="nz.ridgeline.nativeapp.SourceDemandTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

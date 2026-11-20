@@ -51,12 +51,26 @@ final class TileHttpClient implements AutoCloseable {
   }
 
   private final OkHttpClient client, sampling;
+  private final long cacheLimitBytes;
   private final Validator validator;
   private final TileDispatcher<Resource> dispatcher = new TileDispatcher<>(2);
+  private final java.util.concurrent.atomic.AtomicLong warmed = new java.util.concurrent.atomic.AtomicLong(),
+      evictionScans = new java.util.concurrent.atomic.AtomicLong();
 
   static OkHttpClient create(File directory) {
+    return create(directory, CACHE_BYTES);
+  }
+
+  static OkHttpClient create(File directory, long bytes) {
+    if (bytes < 0) throw new IllegalArgumentException("Negative disk cache budget");
+    if (bytes == 0 && directory.isDirectory()) {
+      // Only on process startup, before a client owns this journal. Saved maps
+      // use a different store. No concurrent cache reopen or request teardown.
+      try (Cache old = new Cache(directory, 1)) { old.delete(); }
+      catch (IOException ignored) { /* Remain cache-free if cleanup fails. */ }
+    }
     return new OkHttpClient.Builder()
-        .cache(new Cache(directory, CACHE_BYTES))
+        .cache(bytes == 0 ? null : new Cache(directory, bytes))
         .connectTimeout(12, TimeUnit.SECONDS)
         .readTimeout(15, TimeUnit.SECONDS)
         .followRedirects(false)
@@ -65,6 +79,7 @@ final class TileHttpClient implements AutoCloseable {
   }
 
   TileHttpClient(OkHttpClient client, Validator validator) {
+    cacheLimitBytes = client.cache() == null ? 0 : client.cache().maxSize();
     this.client =
         client
             .newBuilder()
@@ -129,12 +144,17 @@ final class TileHttpClient implements AutoCloseable {
     Call call = (sample ? sampling : client).newCall(request);
     output.onCancel(call::cancel);
     SharedTileBody body = null;
-    boolean evictInvalid = false;
+    boolean evictInvalid = false, mayBeCached = false;
     try (Response response = call.execute()) {
       int status = response.code();
       if (status != 200 && !(status == 204 && !tile.raster()))
         throw new TileNetwork.HttpFailure(status, response.header("Retry-After"));
       evictInvalid = true;
+      // A body read from the disk cache was committed earlier. A network body
+      // only becomes a cache entry once it is fully read (OkHttp aborts the
+      // cache write on a mid-body failure), so interrupted transfers leave
+      // nothing to evict and must not scan the whole cache journal.
+      mayBeCached = response.networkResponse() == null;
       ResponseBody input = response.body();
       if (input == null) throw new IOException("Map provider returned an empty response.");
       if (input.contentLength() > TileNetwork.MAX) throw new SharedTileBody.TooLarge();
@@ -148,6 +168,7 @@ final class TileHttpClient implements AutoCloseable {
           if (output.cancelled()) throw TileDispatcher.abort();
           body.append(chunk, n);
         }
+        mayBeCached = true;
       }
       byte[] exact = body.snapshot();
       try {
@@ -162,8 +183,9 @@ final class TileHttpClient implements AutoCloseable {
       output.complete();
       body.finish(exact);
     } catch (IOException error) {
-      if (evictInvalid && (!call.isCanceled() || error instanceof SharedTileBody.TooLarge))
-        evict(url);
+      // An oversized body may still be committed while its stream is drained on close.
+      if (error instanceof SharedTileBody.TooLarge
+          || evictInvalid && mayBeCached && !call.isCanceled()) evict(url);
       if (body != null) body.fail(error);
       throw error;
     } catch (RuntimeException error) {
@@ -173,7 +195,44 @@ final class TileHttpClient implements AutoCloseable {
     }
   }
 
+  /**
+   * Read the disk-cache journal and open pooled TLS connections to the given
+   * provider origins before the first tile needs them. The HEAD responses are
+   * discarded, bypass the dispatcher and are never cached; failures are ignored.
+   */
+  void warm(String... origins) {
+    if (client.cache() != null)
+      try {
+        client.cache().initialize();
+      } catch (IOException ignored) {
+        // The first real request retries cache initialisation.
+      }
+    for (String origin : origins) {
+      Request request =
+          new Request.Builder()
+              .url(origin)
+              .head()
+              .header("User-Agent", "Ridgeline-Android/0.16.0")
+              .cacheControl(CacheControl.FORCE_NETWORK)
+              .build();
+      sampling
+          .newCall(request)
+          .enqueue(
+              new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {}
+
+                @Override
+                public void onResponse(Call call, Response response) {
+                  response.close();
+                  warmed.incrementAndGet();
+                }
+              });
+    }
+  }
+
   private void evict(String url) {
+    evictionScans.incrementAndGet();
     if (client.cache() != null)
       try {
         var urls = client.cache().urls();
@@ -184,7 +243,10 @@ final class TileHttpClient implements AutoCloseable {
 
   Map<String, Long> stats() {
     Map<String, Long> values = new java.util.HashMap<>(dispatcher.stats());
+    values.put("warmedConnections", warmed.get());
+    values.put("httpCacheEvictionScans", evictionScans.get());
     if (client.cache() != null) {
+      values.put("httpCacheLimitBytes", cacheLimitBytes);
       values.put("httpCacheHits", (long) client.cache().hitCount());
       values.put("httpCacheRequests", (long) client.cache().requestCount());
       values.put("httpNetworkRequests", (long) client.cache().networkCount());

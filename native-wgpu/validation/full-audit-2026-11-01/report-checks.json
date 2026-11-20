@@ -1,0 +1,12 @@
+{
+  "applicationSourceUnchanged": true,
+  "findingsWithPinnedSourceAnchors": 23,
+  "inventoriedSourceFiles": 63,
+  "primaryReferenceGroups": 16,
+  "primaryResearchUrls": 22,
+  "reportRelativeLinksExist": true,
+  "newAppTestsRun": 0,
+  "physicalDeviceMeasurements": false,
+  "reportSha256": "4be906abf69ec4e7233d4cb5fbcd2daaf68f43671960b696e46c352983f08d6a",
+  "allInventoriedSourcesMatchPinnedPublication": true
+}

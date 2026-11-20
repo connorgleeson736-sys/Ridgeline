@@ -1,0 +1,7 @@
+   Compiling ridgeline-renderer v0.1.0 (/workspace/Ridgeline/native-wgpu/renderer)
+    Finished `release` profile [optimized] target(s) in 15.44s
+     Running `native-wgpu/target/release/examples/gpu_smoke`
+Adaptive plane: 8952 surface triangles, full boundaries, selective skirts, identical pixels
+Cached parent backdrop: fine-only demand preserves every pixel of the complete cached frame
+Mixed-LOD discontinuity: skirts close 36092 exposed background pixels
+PASS GPU: exact grade, fine-child/coarse-parent ownership, no fallback holes, independent image/geometry LOD and exact crop UV, trilinear mipmap average, bounded 24-tile residency. Synthetic geometry; no phone benchmark or real-terrain parity claim.

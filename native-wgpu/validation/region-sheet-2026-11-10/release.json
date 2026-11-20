@@ -1,0 +1,34 @@
+{
+  "artifact": "Ridgeline-Native-Region-Sheet-0.1.35-Base.apk",
+  "bytes": 33772762,
+  "sha256": "7bf6c92bd6002fbeeb087b01c6c195a7a208e26f0033e4b3ea87e39324568b2f",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.35-region-sheet",
+  "versionCode": 36,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.34 Full Audit (same package and signer)",
+  "changes": [
+    "NZ Topo switches to finer tiles one zoom level later: tile zoom = round(camera zoom + 1), was + 2 (TOPO_TARGET_PX 256, was 128). Camera zoom 16 still reaches z17.",
+    "Hut and other new names appear while moving: a grown label atlas (up to 4 MiB) uploads during gestures, and any atlas waits at most 200 ms while moving (previously its predicted cost never fitted a gesture frame, so it waited until the map was still). The atlas starts at 2048x256, so it grows less often.",
+    "Names no longer vanish when the atlas grows: the renderer keeps drawing the placed names from the previous atlas until the new placement is built.",
+    "Names from a finer or coarser source tile are the same label: label keys use layer, text and a ~10 m grid (were feature id and exact point), and renderer fade-in/height continuity matches points within ~10 m, so names keep their place and do not fade in again while zooming.",
+    "Compact route bar 116 dp (was 136): tighter grip, stats and tool buttons.",
+    "Choose region: 'Custom' page size; corners then resize the frame freely. Live area readout in km.",
+    "Download region is a bottom panel like the route bar (was a dialog), with the area size. 'Included imagery' moved under Advanced with the region coordinates."
+  ],
+  "tests": {
+    "kotlinJvm": "197 tests, 0 failures (new: NZ Topo switch-point test)",
+    "rust": "51 tests pass",
+    "gpu": "overlay_drape (Vulkan and GLES)"
+  },
+  "lintErrors": 0,
+  "assetsIdenticalTo0134": "626 of 628; only the generated dexopt baseline profiles differ",
+  "jniExportsPerAbi": 49,
+  "loadAlignment": "0x4000",
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

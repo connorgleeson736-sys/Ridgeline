@@ -1,0 +1,153 @@
+{
+ "guid": "e52dc366-4cd0-4636-90f0-b132ec7a5c18",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Hope Kiwi Track from Hurunui swing bridge via Kiwi Saddle and Hope Kiwi Lodge to Windy Point car park",
+   "shape": "one_way",
+   "start": {
+    "name": "Hurunui swing bridge",
+    "quote": "Hurunui swing bridge - Hope Kiwi Lodge (via Kiwi Saddle)",
+    "ref": null
+   },
+   "end": {
+    "name": "Windy Point car park (SH7)",
+    "quote": "Five minutes down a shingle road is the shelter and car park at Windy Point, beside SH 7",
+    "ref": "F1"
+   },
+   "via": [
+    {
+     "name": "Three Mile Stream",
+     "quote": "Cross the stream, then climb steadily to Kiwi Saddle through red beech forest",
+     "ref": "T12",
+     "how": "ford"
+    },
+    {
+     "name": "Kiwi Saddle",
+     "quote": "then climb steadily to Kiwi Saddle through red beech forest",
+     "ref": "T8"
+    },
+    {
+     "name": "Kiwi River",
+     "quote": "Pick up a 4WD track on the true right of Kiwi River",
+     "ref": "T7"
+    },
+    {
+     "name": "Hope Kiwi Lodge",
+     "quote": "across open grasslands to Hope Kiwi Lodge",
+     "ref": "T6"
+    },
+    {
+     "name": "Hope River swingbridge",
+     "quote": "to the Hope River swingbridge about 30 minutes from the hut",
+     "ref": null
+    },
+    {
+     "name": "Hope Halfway Hut",
+     "quote": "The track leaves the river and climbs the bank to Hope Halfway Hut",
+     "ref": "T5"
+    },
+    {
+     "name": "Boyle River swingbridge",
+     "quote": "to the swingbridge over the Boyle River gorge",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "18 hr 30 min",
+   "distance": "33 km one way",
+   "evidence": [
+    "From the swing bridge, follow the 4WD track to the forest edge where it climbs easily to Three Mile Stream.",
+    "Follow the poled route from Hope Kiwi Lodge along the forest edge to the Hope River swingbridge about 30 minutes from the hut.",
+    "Five minutes down a shingle road is the shelter and car park at Windy Point, beside SH 7."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Windy Point car park to Hope Kiwi Lodge via Hope Halfway Hut",
+   "shape": "one_way",
+   "start": {
+    "name": "Windy Point car park",
+    "quote": "Windy Point car park to Hope Halfway Hut",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Hope Kiwi Lodge",
+    "quote": "via a poled route across open terraces and through sections of forest to Hope Kiwi Lodge",
+    "ref": "T6"
+   },
+   "via": [
+    {
+     "name": "Boyle River swingbridge",
+     "quote": "After crossing the swingbridge over Boyle River",
+     "ref": null
+    },
+    {
+     "name": "Hope Halfway Hut",
+     "quote": "It eventually drops to the Hope Halfway Hut",
+     "ref": "T5"
+    },
+    {
+     "name": "Hope River swingbridge",
+     "quote": "Follow the poled track up the valley floor to Hope River swingbridge",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "After crossing the swingbridge over Boyle River, follow a vehicle track that climbs through mānuka and tussock.",
+    "It eventually drops to the Hope Halfway Hut.",
+    "From here the hut is 30 minutes away, via a poled route across open terraces and through sections of forest to Hope Kiwi Lodge."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Loch Katrine",
+   "quote": "It is around 9 km (2–3 hours walk) from Loch Katrine to the Hurunui swingbridge.",
+   "ref": "T10",
+   "onto": "Hurunui swing bridge"
+  }
+ ],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Lookout across the lake",
+   "quote": "Just before the saddle there is a two-minute side track to a lookout across the lake",
+   "ref": null,
+   "from": "Kiwi Saddle"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Hope Kiwi Lodge",
+   "quote": "Hope Kiwi Lodge",
+   "ref": "T6"
+  },
+  {
+   "name": "Hope Halfway Hut",
+   "quote": "Hope Halfway Hut",
+   "ref": "T5"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Hope Pass Track",
+   "quote": "From Hope Kiwi Lodge, you can access the Hope Pass Track",
+   "ref": "L1",
+   "why": "other walk"
+  },
+  {
+   "name": "Te Araroa Trail",
+   "quote": "This track is part of Te Araroa Trail.",
+   "ref": null,
+   "why": "other walk"
+  }
+ ],
+ "doubts": "The Hurunui swing bridge start has no feature or name entry, so its ref is null. Windy Point car park is F1 (an unnamed track meeting Lewis Pass Road); the text places the car park beside SH 7 at the end of a shingle road, so the match is probable but not certain. Loch Katrine is an access point only: the text says walkers may use the 4WD track from it (the locked gate has no foot restriction), but it is not described as a way start. The main way's DOC time (18 hr 30 min) is given as is, although the three leg times add to 11 hr 30 min. The Windy Point to Hope Kiwi Lodge way (W2) is a reverse-direction description with its own headings, so it is a separate way; it has no whole-way time (legs 4 hr and 3 hr only), so time is null. Cross the stream is marked ford for Three Mile Stream because no bridge is mentioned. Which lake the Kiwi Saddle lookout views is not named."
+}

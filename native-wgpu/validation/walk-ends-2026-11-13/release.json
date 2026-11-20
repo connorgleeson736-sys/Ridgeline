@@ -1,0 +1,27 @@
+{
+  "artifact": "Ridgeline-Native-Walk-Ends-0.1.50-Base.apk",
+  "bytes": 34001698,
+  "sha256": "c6d78e7bdd96812b6880b8cee709fccf0b3ea0548bdb5f75ed7467b3b8825efa",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.50-walk-ends",
+  "versionCode": 51,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.49 Full Audit (same package and signer)",
+  "changes": [
+    "Walk ends: a walk start or end that is a point on DOC's line (a hut, bivouac, shelter, lodge or campsite within 300 m) is taken as it is; DOC's leg distances only choose between line ends for places known roughly (a locality, a pass) or not placed. The Liverpool Track ended at the foot of the climb (DOC gives 'Pearl Flat to Liverpool Hut' as 1 km; the climb is 1.5 km and a separate piece of DOC's line) and now reaches Liverpool Hut (14.6 km).",
+    "A start or end chosen by distance is never the walk's other end (unless the walk is a loop between same-named places).",
+    "Found with this: the Wharfedale/Townshend Track ends at Wharfedale Hut, as DOC describes it, not 1.4 km past it."
+  ],
+  "dataChecks": "Extent survey (232 DOC walks, extent-survey.txt): no walk where a line nearer DOC's stated distance was available and not chosen; compared with 0.1.49, four walks changed slightly (Greenstone and Caples 60.3 -> 58.4 km of DOC's 58.3 km loop line, Te Pua-a-Tāne 75.5 -> 74.8, two more walks now follow DOC's legs), none worse; 57 of 101 large walks with legs follow them, 108 of 117 leg spans within 25% of DOC's distances. Label survey (label-survey.txt): Liverpool Track 14.6 km by DOC's legs to the hut; Gillespie Pass, Greenstone and Caples unchanged.",
+  "tests": {
+    "kotlinJvm": "258 tests, 0 failures (new: WalkRoutesTest hut end against a short leg distance, with the start at the car park end)",
+    "rust": "unchanged (native libraries byte-identical to 0.1.49)"
+  },
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

@@ -1,0 +1,208 @@
+{
+ "guid": "f1485c5a-2d8c-4d2b-9f01-7a449a1adb92",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Ohakune Railway Station to Horopito",
+   "shape": "one_way",
+   "start": {
+    "name": "Ohakune Railway Station",
+    "quote": "Ohakune Railway Station to Marshalls Road carpark",
+    "ref": "T3"
+   },
+   "end": {
+    "name": "Horopito",
+    "quote": "From here the trail crosses the stream and follows the Old Coach Road through to Horopito.",
+    "ref": "T2"
+   },
+   "via": [
+    {
+     "name": "Mangawhero River Bridge",
+     "quote": "follow the footpath to the Mangawhero River Bridge",
+     "ref": null
+    },
+    {
+     "name": "Old Station Road",
+     "quote": "cross over onto Old Station Road",
+     "ref": null,
+     "how": "road"
+    },
+    {
+     "name": "Marshalls Road",
+     "quote": "turn right onto Marshalls Road",
+     "ref": null,
+     "how": "road"
+    },
+    {
+     "name": "Rongokaupo Wetland",
+     "quote": "Rongokaupo Wetland and picnic area",
+     "ref": null
+    },
+    {
+     "name": "Marshalls Road carpark",
+     "quote": "Marshalls Road carpark",
+     "ref": "F4"
+    },
+    {
+     "name": "Ohakune Old Coach Road",
+     "quote": "From the car park the track follows the Ohakune Old Coach Road",
+     "ref": null
+    },
+    {
+     "name": "Hapuawhenua Tunnel",
+     "quote": "Explore the Hapuawhenua Tunnel",
+     "ref": null
+    },
+    {
+     "name": "Hapuawhenua Valley",
+     "quote": "dropping into the Hapuawhenua Valley",
+     "ref": null
+    },
+    {
+     "name": "Hapuawhenua Viaduct",
+     "quote": "Walk the historic Hapuawhenua Viaduct",
+     "ref": null
+    },
+    {
+     "name": "Skyline section",
+     "quote": "This is known as the Skyline section",
+     "ref": null
+    },
+    {
+     "name": "old quarry",
+     "quote": "the trail passes the old quarry",
+     "ref": null
+    },
+    {
+     "name": "grassed picnic area",
+     "quote": "there is a grassed picnic area surrounded by rimu and tawa trees",
+     "ref": null
+    },
+    {
+     "name": "Taonui Stream",
+     "quote": "down the hill to Taonui Stream",
+     "ref": "T7"
+    },
+    {
+     "name": "Taonui Rail Bridge",
+     "quote": "under the new Taonui Rail Bridge",
+     "ref": null
+    },
+    {
+     "name": "Taonui Viaduct",
+     "quote": "The trail follows the stream down to the historic Taonui Viaduct.",
+     "ref": null
+    },
+    {
+     "name": "railway line (designated crossing point)",
+     "quote": "The railway line must be crossed at the designated crossing point.",
+     "ref": null
+    },
+    {
+     "name": "Haeremaere Stream",
+     "quote": "across Haeremaere Stream",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "4 hr 30 min walk",
+   "distance": "15 km one way",
+   "evidence": [
+    "Access the Ohakune Old Coach Road from Ohakune or Horopito. It's a one way walk or ride so you'll need to return the same way or arrange transport back.",
+    "From the station follow the footpath to the Mangawhero River Bridge and cross over onto Old Station Road.",
+    "From here the trail crosses the stream and follows the Old Coach Road through to Horopito."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Ohakune Railway Station to Hapuawhenua Viaduct and return to Ohakune",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Ohakune Railway Station",
+    "quote": "Ohakune Railway Station to Marshalls Road carpark",
+    "ref": "T3"
+   },
+   "end": {
+    "name": "Hapuawhenua Viaduct",
+    "quote": "Walk the historic Hapuawhenua Viaduct",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Mangawhero River Bridge",
+     "quote": "follow the footpath to the Mangawhero River Bridge",
+     "ref": null
+    },
+    {
+     "name": "Old Station Road",
+     "quote": "cross over onto Old Station Road",
+     "ref": null,
+     "how": "road"
+    },
+    {
+     "name": "Marshalls Road",
+     "quote": "turn right onto Marshalls Road",
+     "ref": null,
+     "how": "road"
+    },
+    {
+     "name": "Marshalls Road carpark",
+     "quote": "Marshalls Road carpark",
+     "ref": "F4"
+    },
+    {
+     "name": "Hapuawhenua Tunnel",
+     "quote": "Explore the Hapuawhenua Tunnel",
+     "ref": null
+    },
+    {
+     "name": "Hapuawhenua Valley",
+     "quote": "dropping into the Hapuawhenua Valley",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": null,
+   "distance": null,
+   "evidence": [
+    "From here you can return to Ohakune or carry on to Horopito.",
+    "It's a one way walk or ride so you'll need to return the same way or arrange transport back."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Marshalls Road car park",
+   "quote": "drive to the Marshalls Road car park (5 minutes drive from Ohakune) and begin the ride there",
+   "ref": "F4",
+   "onto": "Ohakune Old Coach Road"
+  },
+  {
+   "name": "Matapuna Road parking area",
+   "quote": "Turn onto Matapuna Road from SH4. There is a parking area just across the railway line.",
+   "ref": null,
+   "onto": null
+  }
+ ],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Ohakune Basin",
+   "quote": "views over the spectacular Ohakune Basin",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Raetihi Hill",
+   "quote": "top of Raetihi Hill",
+   "ref": null,
+   "why": "view"
+  }
+ ],
+ "doubts": "Start: the text starts the walk at the Ohakune railway station, which has no feature of its own; T3 is the Ohakune town place it lies in, so the ref is a judgement. End: Horopito is the place T2, which the text names as the end. Shape: the page says it is a one way walk and that you return the same way or arrange transport, so W1 is one_way; W2 is the page's 'return to Ohakune' option from the viaduct, which the same statement supports as an out and back, but the page does not give it its own heading, time or distance. Marshalls Road is walked from the station to the carpark (about 1.5 km and a turn), recorded as a road; the carpark F4 is taken from the feature where Ohakune Coach Road meets Marshalls Road. The Heritage section says the Taonui Viaduct will not be restored for visitor use and that access to view it is being restored as a side track, which conflicts with the description that the trail goes down to it; it is kept in via on the main description. The text says the trail crosses Haeremaere Stream but does not say whether there is a bridge, so no ford is recorded. The Matapuna Road parking area is not matched to a feature and does not say which end of the walk it joins. Time and distance for W1 are DOC's header values; W2 has none on the page."
+}

@@ -3,12 +3,13 @@ apply plugin: 'com.android.application'
 android {
     namespace = "nz.ridgeline.mobile"
     compileSdk = rootProject.ext.compileSdkVersion
+    testBuildType "performance"
     defaultConfig {
         applicationId "nz.ridgeline.mobile"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 19
-        versionName "0.16.0"
+        versionCode 27
+        versionName "0.21.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
             noCompress 'bin'
@@ -22,10 +23,42 @@ android {
         targetCompatibility JavaVersion.VERSION_21
         coreLibraryDesugaringEnabled true
     }
+    signingConfigs {
+        debug {
+            def externalKey = System.getenv("RIDGELINE_SIGNING_KEYSTORE")
+            if (externalKey) storeFile file(externalKey)
+        }
+    }
     buildTypes {
         preview {
             initWith release
             signingConfig signingConfigs.debug
+            matchingFallbacks = ['release']
+        }
+        performance {
+            initWith preview
+            applicationIdSuffix ".performance"
+            versionNameSuffix "-performance"
+            resValue "string", "app_name", "Ridgeline 3D Performance"
+            resValue "string", "title_activity_main", "Ridgeline 3D Performance"
+            matchingFallbacks = ['release']
+        }
+        latencyAudit {
+            initWith performance
+            applicationIdSuffix ".performance.latencyaudit"
+            versionNameSuffix "-latency-audit"
+            resValue "string", "app_name", "Ridgeline Capacitor Audit"
+            resValue "string", "title_activity_main", "Ridgeline Capacitor Audit"
+            matchingFallbacks = ['release']
+        }
+        // Separately installable app signed with its own key (RIDGELINE_SIGNING_KEYSTORE).
+        // It cannot update the Audit app, whose original signing key is unavailable.
+        fullAudit {
+            initWith performance
+            applicationIdSuffix ".performance.fullaudit"
+            versionNameSuffix "-full-audit"
+            resValue "string", "app_name", "Ridgeline Full Audit"
+            resValue "string", "title_activity_main", "Ridgeline Full Audit"
             matchingFallbacks = ['release']
         }
         release {

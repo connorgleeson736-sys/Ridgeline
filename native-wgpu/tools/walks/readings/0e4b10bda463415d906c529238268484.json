@@ -1,0 +1,131 @@
+{
+ "guid": "0e4b10bd-a463-415d-906c-529238268484",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Pisa Range Ridge Track from Queensberry car park",
+   "shape": "one_way",
+   "start": {
+    "name": "Queensberry car park",
+    "quote": "Queensberry car park",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Pisa Range Conservation Area boundary just before Mitre Rocks",
+    "quote": "terminates at the Pisa Range Conservation Area boundary just before Mitre Rocks",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Lake McKay",
+     "quote": "Lake McKay",
+     "ref": "T8"
+    },
+    {
+     "name": "Mt Pisa",
+     "quote": "Mt Pisa",
+     "ref": "T11"
+    },
+    {
+     "name": "The Column Rocks",
+     "quote": "The Column Rocks",
+     "ref": "T7"
+    },
+    {
+     "name": "Mt Dottrel",
+     "quote": "Mt Dottrel",
+     "ref": "T10"
+    }
+   ],
+   "direction": null,
+   "time": "10 hr one way",
+   "distance": "29.24 km one way",
+   "evidence": [
+    "Start at Queensberry car park and climb the Pisa Range Ridge Track.",
+    "The track continues past Mt Dottrel at 1690 metres, and terminates at the Pisa Range Conservation Area boundary just before Mitre Rocks.",
+    "Note: There is no exit on the Mitre Rocks/Lowburn side, trampers must return same way or use alternate exits described here."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Tinwald Burn Ridge Track",
+   "quote": "Tinwald Burn Ridge Track",
+   "ref": "T5",
+   "onto": "Pisa Range Ridge Track"
+  },
+  {
+   "name": "Locharburn Track",
+   "quote": "Locharburn Track",
+   "ref": "T3",
+   "onto": "Pisa Range Ridge Track"
+  },
+  {
+   "name": "Kirtle Burn Track",
+   "quote": "Kirtle Burn Track via Snow Farm",
+   "ref": "T2",
+   "onto": "Pisa Range Ridge Track"
+  },
+  {
+   "name": "Cardrona-Cromwell Pack Track",
+   "quote": "Cardrona-Cromwell Pack Track",
+   "ref": "T1",
+   "onto": "Pisa Range Ridge Track"
+  }
+ ],
+ "exits": [
+  {
+   "name": "Tinwald Burn Ridge Track",
+   "quote": "Tinwald Burn Ridge Track",
+   "ref": "T5",
+   "from": null,
+   "how": "track"
+  },
+  {
+   "name": "Locharburn Track",
+   "quote": "Locharburn Track",
+   "ref": "T3",
+   "from": null,
+   "how": "track"
+  },
+  {
+   "name": "Kirtle Burn Track",
+   "quote": "Kirtle Burn Track via Snow Farm",
+   "ref": "T2",
+   "from": null,
+   "how": "track"
+  },
+  {
+   "name": "Cardrona-Cromwell Pack Track",
+   "quote": "Cardrona-Cromwell Pack Track",
+   "ref": "T1",
+   "from": null,
+   "how": "track"
+  }
+ ],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Mitre Rocks",
+   "quote": "Mitre Rocks",
+   "ref": "T9",
+   "why": "nearby"
+  },
+  {
+   "name": "Deep Creek Hut",
+   "quote": "Deep Creek Hut",
+   "ref": null,
+   "why": "other"
+  },
+  {
+   "name": "Rock Peak Track",
+   "quote": "Rock Peak Track",
+   "ref": "L3",
+   "why": "other walk"
+  }
+ ],
+ "doubts": "Start ref F1 is the road end where the track meets Wailana Heights Drive, where the page says the Queensberry car park is. The end is the conservation boundary, not a named place. The alternative entry/exit tracks are listed together as entry/exit points; the leave points along the ridge are not stated precisely."
+}

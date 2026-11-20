@@ -1,0 +1,56 @@
+{
+  "retention": {
+    "configuredPendingLimit": 0,
+    "pendingOffscreen": 12,
+    "aborted": 0,
+    "originalTexturesRetained": true
+  },
+  "queueReplay": {
+    "fixture": "Actual shipped admission queue, default limits 12 stationary / 8 moving; 12 obsolete transfers with injected 1000 ms delivery, then movement and 4 visible transfers with injected 200 ms delivery; decoding/GPU/network mocked",
+    "baseline": {
+      "elapsedMs": 1200.372589,
+      "firstVisibleStartMs": 999.419613,
+      "blockedBeforePreemption": {
+        "active": 12,
+        "stagedItems": 0,
+        "stagedBytes": 0,
+        "stagingItemLimit": 16,
+        "stagingByteLimit": 16777216,
+        "cachedActive": 0,
+        "queued": 4,
+        "moving": true,
+        "limit": 8,
+        "cachedReserve": 0,
+        "policyEvaluations": 28,
+        "queueRebuilds": 0,
+        "activeDecodes": 0,
+        "queuedDecodes": 0,
+        "decodeLimit": 8
+      }
+    },
+    "pressurePreemption": {
+      "elapsedMs": 202.474336,
+      "firstVisibleStartMs": 1.409420000000182,
+      "blockedBeforePreemption": {
+        "active": 12,
+        "stagedItems": 0,
+        "stagedBytes": 0,
+        "stagingItemLimit": 16,
+        "stagingByteLimit": 16777216,
+        "cachedActive": 0,
+        "queued": 4,
+        "moving": true,
+        "limit": 8,
+        "cachedReserve": 0,
+        "policyEvaluations": 28,
+        "queueRebuilds": 0,
+        "activeDecodes": 0,
+        "queuedDecodes": 0,
+        "decodeLimit": 8
+      }
+    },
+    "visibleReadySavingMs": 997.8982530000001
+  },
+  "productionFixImplemented": false,
+  "requiredIntegration": "Cancel obsolete transfer subscribers under foreground pressure while preserving valid old textures/DEMs and retry-on-return; real raster-source cancellation state still needs integration checks"
+}

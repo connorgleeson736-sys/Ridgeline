@@ -1,0 +1,272 @@
+{
+ "guid": "9943e482-ca33-4736-8b7a-a0199a2a4a0c",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Brown Hut to Kohaihai carpark",
+   "shape": "one_way",
+   "start": {
+    "name": "Brown Hut",
+    "quote": "Brown Hut in Golden Bay – 156 km from Nelson – at the end of Aorere Valley Rd",
+    "ref": "L2"
+   },
+   "end": {
+    "name": "Kohaihai carpark",
+    "quote": "The track follows the riverbank for 400 m to Kohaihai carpark",
+    "ref": "F1"
+   },
+   "via": [
+    {
+     "name": "Brown River",
+     "quote": "cross the bridge over the Brown River",
+     "ref": "T7"
+    },
+    {
+     "name": "Aorere Shelter",
+     "quote": "After 4 hours, you'll reach Aorere Shelter.",
+     "ref": "L3"
+    },
+    {
+     "name": "Flanagans Corner",
+     "quote": "a short track leads to a viewpoint at Flanagans Corner",
+     "ref": null
+    },
+    {
+     "name": "Perry Saddle Campsite",
+     "quote": "Perry Saddle Campsite",
+     "ref": "L4"
+    },
+    {
+     "name": "Perry Saddle Hut",
+     "quote": "Perry Saddle Hut is 880 m above sea level.",
+     "ref": "L5"
+    },
+    {
+     "name": "Perry Saddle",
+     "quote": "Cross Perry Saddle and sidle above Perry Creek",
+     "ref": "T25"
+    },
+    {
+     "name": "Perry Creek",
+     "quote": "Cross Perry Saddle and sidle above Perry Creek",
+     "ref": "T24"
+    },
+    {
+     "name": "Gouland Downs",
+     "quote": "the track climbs a small rise to where the Gouland Downs, an open tussock area, is revealed",
+     "ref": "T11"
+    },
+    {
+     "name": "Cave Brook",
+     "quote": "The track meanders easily down to Cave Brook",
+     "ref": "T8"
+    },
+    {
+     "name": "Gouland Downs Campsite",
+     "quote": "Gouland Downs Campsite",
+     "ref": "L6"
+    },
+    {
+     "name": "Gouland Downs Hut",
+     "quote": "Just beyond the brook is Gouland Downs Hut.",
+     "ref": "L7"
+    },
+    {
+     "name": "Saxon Campsite",
+     "quote": "Saxon Campsite",
+     "ref": "L8"
+    },
+    {
+     "name": "Saxon Hut",
+     "quote": "Saxon Hut, nestled near the end of the downs",
+     "ref": "L9"
+    },
+    {
+     "name": "Saxon River",
+     "quote": "drops slightly to grassy flats beside the Saxon River",
+     "ref": "T30"
+    },
+    {
+     "name": "Mackay Downs",
+     "quote": "The track now skirts the edge of Mackay Downs to James Mackay Hut",
+     "ref": "T23"
+    },
+    {
+     "name": "James Mackay Campsite",
+     "quote": "James Mackay Campsite",
+     "ref": "L10"
+    },
+    {
+     "name": "James Mackay Hut",
+     "quote": "James Mackay Hut is situated just above the track on an open terrace.",
+     "ref": "L11"
+    },
+    {
+     "name": "Lewis Shelter",
+     "quote": "Lewis Shelter appears at the junction of the Heaphy River with the smaller Lewis River",
+     "ref": null
+    },
+    {
+     "name": "Lewis River",
+     "quote": "continue to the 101m long Lewis River swing bridge",
+     "ref": "T22"
+    },
+    {
+     "name": "Heaphy River",
+     "quote": "you cross the Heaphy River swing bridge",
+     "ref": "T16"
+    },
+    {
+     "name": "Heaphy River mouth",
+     "quote": "The track continues along the left bank to the river mouth",
+     "ref": null
+    },
+    {
+     "name": "Heaphy Campsite",
+     "quote": "Heaphy Campsite",
+     "ref": "L12"
+    },
+    {
+     "name": "Heaphy Hut",
+     "quote": "Heaphy Hut is situated far enough back from the sea to be spared the worst of the winds.",
+     "ref": "L13"
+    },
+    {
+     "name": "Katipo Creek",
+     "quote": "Just beyond Katipo Creek is Crayfish (Koura) Point.",
+     "ref": "T20"
+    },
+    {
+     "name": "Katipo Creek Shelter Campsite",
+     "quote": "Katipo Creek Shelter Campsite",
+     "ref": "L14"
+    },
+    {
+     "name": "Crayfish Point",
+     "quote": "Just beyond Katipo Creek is Crayfish (Koura) Point.",
+     "ref": "T9"
+    },
+    {
+     "name": "Crayfish Stream",
+     "quote": "take care crossing Crayfish Stream",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Scotts Beach",
+     "quote": "Soon Scotts Beach is reached",
+     "ref": "T31"
+    },
+    {
+     "name": "Scotts Beach Campsite",
+     "quote": "Scotts Beach Campsite",
+     "ref": "L15"
+    },
+    {
+     "name": "Kohaihai Saddle",
+     "quote": "before climbing over Kohaihai Saddle",
+     "ref": null
+    },
+    {
+     "name": "Kohaihai River",
+     "quote": "to a bridge across the Kohaihai River",
+     "ref": null
+    },
+    {
+     "name": "Kohaihai Campsite",
+     "quote": "Kohaihai Campsite",
+     "ref": "L16"
+    }
+   ],
+   "direction": null,
+   "time": "4-6 days",
+   "distance": "78.4 km one way",
+   "evidence": [
+    "The Heaphy Track is not a circuit track.",
+    "You can start the track either from",
+    "Brown Hut in Golden Bay – 156 km from Nelson – at the end of Aorere Valley Rd, or",
+    "The track follows the riverbank for 400 m to Kohaihai carpark where there is a shelter and phone."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Kohaihai",
+   "quote": "Kohaihai on the West Coast – 110 km from Westport – at the end of Kohaihai Rd",
+   "ref": "F1",
+   "onto": "Heaphy Track"
+  }
+ ],
+ "exits": [
+  {
+   "name": "Air services",
+   "quote": "Air services make it possible to walk the track one way and return by air to near your starting point.",
+   "ref": null,
+   "from": null,
+   "how": "fly"
+  }
+ ],
+ "side_trips": [
+  {
+   "name": "Ōparara Arch",
+   "quote": "On the road from Kohaihai to Karamea you'll pass the entrance to Ōparara Arch",
+   "ref": "L17",
+   "from": null
+  }
+ ],
+ "huts": [
+  {
+   "name": "Brown Hut",
+   "quote": "Brown Hut to Perry Saddle Hut",
+   "ref": "L2"
+  },
+  {
+   "name": "Perry Saddle Hut",
+   "quote": "Perry Saddle Hut is 880 m above sea level.",
+   "ref": "L5"
+  },
+  {
+   "name": "Gouland Downs Hut",
+   "quote": "Just beyond the brook is Gouland Downs Hut.",
+   "ref": "L7"
+  },
+  {
+   "name": "Saxon Hut",
+   "quote": "Saxon Hut, nestled near the end of the downs",
+   "ref": "L9"
+  },
+  {
+   "name": "James Mackay Hut",
+   "quote": "James Mackay Hut is situated just above the track on an open terrace.",
+   "ref": "L11"
+  },
+  {
+   "name": "Heaphy Hut",
+   "quote": "Heaphy Hut is situated far enough back from the sea to be spared the worst of the winds.",
+   "ref": "L13"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Gorge Creek pool",
+   "quote": "Near the hut in Gorge Creek is a deep but cold pool, popular for swimming.",
+   "ref": "T10",
+   "why": "nearby"
+  },
+  {
+   "name": "Mt Taranaki/Egmont",
+   "quote": "on clear days it is possible to see Mt Taranaki/Egmont",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Karamea",
+   "quote": "take SH 67 from Westport to Karamea (95 km)",
+   "ref": null,
+   "why": "other"
+  }
+ ],
+ "doubts": "The page says the track can be started either from Brown Hut or from Kohaihai. This is one way, recorded from Brown Hut as the page presents it (east to west), with Kohaihai as an access point; walking it the other way is not a separate way. Kohaihai (F1, the road end where the track meets Kohaihai Rd) is also the main way's end, so it is both the access point and the end. Brown Campsite is listed at the start hut and is not in the via list. Flanagans Corner is a viewpoint reached by a short track 30 min before Perry Saddle Hut, but the page also calls 915 m 'the highest point on the track', so I put it in via with a null ref; this may be a side trip rather than a point the main way passes. The via list includes campsites on the way (Aorere Shelter, Perry Saddle, Gouland Downs, Saxon, James Mackay, Heaphy, Katipo Creek, Scotts Beach and Kohaihai). The Lewis Shelter is an emergency shelter with no overnight stays, so it is a via and not a hut. Crayfish Stream is recorded as a ford because the text says to take care crossing it and does not mention a bridge; this is a judgement. The distance comes from DOC's summary (78.4 km one way) and the time is DOC's (4-6 days). The air service exit is recorded with from null because the page does not say where the return flight leaves."
+}

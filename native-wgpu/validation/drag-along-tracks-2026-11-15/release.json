@@ -1,0 +1,24 @@
+{
+  "artifact": "Ridgeline-Native-Drag-Along-Tracks-0.1.70-Base.apk",
+  "bytes": 36315113,
+  "sha256": "1b3175dcc859a3d463ad0c371a7cd2913ea4bf9d13ff5a6e80763afe23e54d47",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.70-drag-along-tracks",
+  "versionCode": 71,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.69 Full Audit (same package and signer)",
+  "changes": [
+    "Dragging a route point slides it along tracks and walkable roads: within a finger's width (22 dp, 10-150 m) of one, the point sits on it and the pieces to the waypoints either side are re-routed along the tracks as it moves (each straight where they do not join); dragged further, it comes off and both pieces are straight. The tracks around the point and its neighbours are read once when the drag starts (TrackFollow.Graph); each move is worked out on a background thread, latest only; the final place is worked out when the finger lifts. One undo for the whole drag; a cancelled drag restores the route."
+  ],
+  "tests": {
+    "kotlinJvm": "all pass (new: drag slides along the track and comes off; editor replaces the pieces either side, one undo, cancel restores); PlaceSearchLoadTimeTest timing flaky under full-suite load, passes alone",
+    "rust": "unchanged since 0.1.67"
+  },
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

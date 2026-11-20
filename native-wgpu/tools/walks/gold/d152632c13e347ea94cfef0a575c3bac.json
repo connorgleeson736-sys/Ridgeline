@@ -1,0 +1,72 @@
+{
+ "guid": "d152632c-13e3-47ea-94cf-ef0a575c3bac",
+ "kind": "out_and_back",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Visitor Centre to Sealy Tarns",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Aoraki/Mount Cook National Park Visitor Centre",
+    "quote": "outside the Aoraki/ Mount Cook National Park Visitor Centre",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "Sealy Tarns",
+    "quote": "The track zigzags steeply up to Sealy Tarns",
+    "ref": "T8"
+   },
+   "via": [
+    {
+     "name": "Kea Point Track",
+     "quote": "Follow the Kea Point Track to the Sealy Tarns turnoff",
+     "ref": "T2"
+    },
+    {
+     "name": "Sealy Tarns Track",
+     "quote": "The Sealy Tarns Track begins gently",
+     "ref": "T3"
+    }
+   ],
+   "direction": null,
+   "evidence": [
+    "Start on the Kea Point Track either outside the Aoraki/ Mount Cook National Park Visitor Centre or at White Horse Hill car park, at the end of the Hooker Valley Road.",
+    "Follow the Kea Point Track to the Sealy Tarns turnoff.",
+    "The track zigzags steeply up to Sealy Tarns."
+   ],
+   "time": "3 - 4 hr return"
+  }
+ ],
+ "access_points": [
+  {
+   "name": "White Horse Hill car park",
+   "quote": "White Horse Hill car park, at the end of the Hooker Valley Road",
+   "ref": "F2",
+   "onto": "Kea Point Track"
+  }
+ ],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Mueller Hut Route",
+   "quote": "Mueller Hut Route",
+   "ref": "L1",
+   "why": "other walk"
+  },
+  {
+   "name": "Mueller Hut",
+   "quote": "Mueller Hut",
+   "ref": "L2",
+   "why": "other walk"
+  },
+  {
+   "name": "Aoraki/Mount Cook",
+   "quote": "including Aoraki/Mount Cook",
+   "ref": null,
+   "why": "view"
+  }
+ ],
+ "doubts": "Shape taken from DOC's time '3 - 4 hr return'; the text describes only the way up."
+}

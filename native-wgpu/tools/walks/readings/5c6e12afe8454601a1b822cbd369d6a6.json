@@ -1,0 +1,117 @@
+{
+ "guid": "5c6e12af-e845-4601-a1b8-22cbd369d6a6",
+ "kind": "unclear",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Main Road car park to Harman Pass via Dillon, Mid Taipo and Julia Huts",
+   "shape": null,
+   "start": {
+    "name": "car park at SH73",
+    "quote": "car park at SH73",
+    "ref": null
+   },
+   "end": {
+    "name": "Harman Pass",
+    "quote": "Harman Pass",
+    "ref": "T4"
+   },
+   "via": [
+    {
+     "name": "4WD road",
+     "quote": "the 4WD road",
+     "ref": null,
+     "how": "road"
+    },
+    {
+     "name": "Seven Mile Creek",
+     "quote": "you cross Seven Mile Creek",
+     "ref": "T9",
+     "how": "ford"
+    },
+    {
+     "name": "Dillon Hut",
+     "quote": "Dillon Hut",
+     "ref": "T2"
+    },
+    {
+     "name": "Scotties 3 Wire",
+     "quote": "Scotties 3 Wire",
+     "ref": null
+    },
+    {
+     "name": "Dunns Creek",
+     "quote": "Dunns Creek",
+     "ref": "T3"
+    },
+    {
+     "name": "Hura Creek",
+     "quote": "After crossing Hura Creek",
+     "ref": "T5",
+     "how": "ford"
+    },
+    {
+     "name": "Mid Taipo Hut",
+     "quote": "Mid Taipo Hut",
+     "ref": "T8"
+    },
+    {
+     "name": "Mid Taipo Swing Bridge",
+     "quote": "Mid Taipo Swing Bridge",
+     "ref": null
+    },
+    {
+     "name": "Tumbledown Creek",
+     "quote": "Tumbledown Creek",
+     "ref": "T11"
+    },
+    {
+     "name": "Julia Hut",
+     "quote": "Julia Hut",
+     "ref": "T6"
+    },
+    {
+     "name": "Mary Creek Swing Bridge",
+     "quote": "Mary Creek Swing Bridge",
+     "ref": null
+    },
+    {
+     "name": "Mary Creek",
+     "quote": "Cross the creek below the gorge",
+     "ref": "T7",
+     "how": "ford"
+    }
+   ],
+   "direction": null,
+   "time": "2 days",
+   "distance": null,
+   "evidence": [
+    "Walking from the car park at SH73 to Dillon Hut will take you 2-3 hours following the 4WD road.",
+    "Keep following the marker poles, dropping into and crossing Mary Creek above the gorge and climbing through easy bluffs to Harman Pass."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Dillon Hut",
+   "quote": "Dillon Hut",
+   "ref": "T2"
+  },
+  {
+   "name": "Mid Taipo Hut",
+   "quote": "Mid Taipo Hut",
+   "ref": "T8"
+  },
+  {
+   "name": "Julia Hut",
+   "quote": "Julia Hut",
+   "ref": "T6"
+  }
+ ],
+ "not_on_route": [],
+ "doubts": "Page does not say whether the trip returns or continues beyond Harman Pass, so shape is null. The 'car park at SH73' has no matching feature. Mary Creek is crossed twice (below the gorge, above the gorge); listed once. Dunns Creek is passed (track goes 600 m beyond it), no crossing stated. Scotties 3 Wire and swing bridges have no ref. The old Julia Hut and newer hut are both called Julia Hut."
+}

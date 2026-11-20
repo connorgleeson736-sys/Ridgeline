@@ -1,0 +1,1309 @@
+walks 1308, followed 231 (nearer DOC's length 35, further 11)
+-- Sentinel Rock Lookout Track [5.4 km return via same track] line 2.4 km: names nothing on the map ([])
+== Piwakawaka Track [] line 2.2 km -> 2.2 km; via [Elaine Bay]; ends 1111 m apart
+-- Cameron Hut via Mt Kuripapango and Smith-Russell Track [] line 7.5 km: 14210 m for DOC's 7501 m line ([Smith - Russell Track, Kiwi Saddle, Cameron Hut])
+-- Shek Harn Historic Reserve Track [4 km return via same track] line 1.4 km: 5672 m in 1 hr 30 min return ([Fraser Dam])
+-- Māhinapua short walks [] line 2.7 km: names nothing on the map ([Lake Mahinapua])
+-- Glen Dene Ridge Track [30 km return via same track] line 11.5 km: names nothing on the map ([])
+-- Mount Somers Nature Walk [] line 0.8 km: names nothing on the map ([])
+-- Lake Matiri Hut Track [] line 7.6 km: covers 11% of DOC's line ([Lake Matiri Hut])
+-- Waimama Bay Walk [2 km return via same track] line 0.9 km: names nothing on the map ([])
+-- Whangaruru North Head walking tracks [6 km loop] line 7.5 km: a long way round: 4124 m for 543 m ([Puriri Bay, Admirals Bay])
+-- Ngahere Loop Track [] line 1.5 km: 12635 m in 1 hr ([Ngahere Hill, Kaweka])
+-- Munro’s Gully Track [2.6 km return via same track] line 1.8 km: 4714 m, DOC 1300 m ([Gabriels Gully])
+-- Helena Falls Track [1.9 km return via same track] line 1.0 km: names nothing on the map ([Deep Cove, Helena Falls])
+-- Lighthouse Walk [] line 0.5 km: covers 76% of DOC's line ([Castlepoint])
+-- Smugglers Bay Loop Track [3 km loop] line 1.9 km: 5496 m, DOC 3000 m ([Busby Head, Smugglers Bay])
+-- Forks/Riverside Walk [4 - 5 km return via same track] line 5.4 km: names nothing on the map ([])
+== Tahuanui Track [7.2 km one way] line 6.8 km -> 6.7 km; via [Nikau Walk, Kaniwhaniwha Campsite, Tirohanga Track]; ends 6143 m apart
+== Jacks Pass Track to Mt Isobel [6.4 km return return via same track] line 1.8 km -> 3.7 km; via [Mt Isobel Track, Jacks Pass]; ends 58 m apart
+-- Punakaiki – Pororari Loop [11 km loop] line 7.2 km: 13924 m for DOC's 7102 m line ([Punakaiki, Pororari River Track])
+-- Waterfall Track [1 km return via same track] line 0.6 km: further from DOC's length than before ([Beverley Price Loop Track])
+== Cameron Track [7 km one way] line 6.6 km -> 6.7 km; via [Cameron Hut]; ends 4920 m apart
+== Ohinetonga Track [3.8 km loop] line 4.2 km -> 4.2 km loop; via [Ohinetonga Lagoon]; ends 0 m apart
+-- Dome Forest car park to Govan Wilson Rd, Matakana [14 km to Govan Wilson Road one way] line 11.8 km: covers 55% of DOC's line ([The Dome, Waiwhiu])
+-- Allans Beach Walking Track [500 m return via same track] line 0.3 km: names nothing on the map ([Mount Charles/Poatiri])
+-- Motuara Island Lookout Track [1.6 km return via same track] line 0.7 km: names nothing on the map ([])
+-- Slapjack Saddle Track [24.5 km one way one way] line 16.0 km: covers 56% of DOC's line ([Slapjack Saddle, Mount Difficulty, Long Gully Loop Track])
+-- Jolliffe Saddle Track [850 m one way] line 0.8 km: covers 29% of DOC's line ([Waterfall Track, Dog Stream Track])
+-- Rotary Centennial Loop Track [] line 1.2 km: no route
+-- Wairakau Stream Track [5.6 km one way] line 5.3 km: covers 3% of DOC's line ([Lane Cove Hut, Duke's Nose (Kaiaraara Rocks) Track])
+-- Okitu Bush Scenic Reserve Walk [] line 0.7 km: names nothing on the map ([])
+== Five Mile Loop Track [3.8 km loop] line 2.0 km -> 3.3 km loop; via [Clay Forks]; ends 0 m apart
+-- Craigieburn Edge Track [4.5 km one way] line 4.4 km: names nothing on the map ([])
+-- Opera Point Walk [500 m beach access | 1.5 km for the loop] line 1.4 km: covers 39% of DOC's line ([Raukawa])
+-- Huxley valley tracks [23 km return via same track] line 14.0 km: covers 75% of DOC's line ([Monument Hut, Huxley Forks Hut, Officers Hut, Brodrick Hut])
+-- Tama Lakes Track [17. 6 km return via same track] line 5.7 km: 6069 m, DOC 3000 m ([Taranaki Falls])
+-- Constant Bay Loop [850 m loop] line 0.6 km: no route
+== Curtis Falls Track [] line 4.5 km -> 4.9 km; via [Maketawa Hut]; ends 3339 m apart
+-- Nīkau Bush Conservation Area Walk [] line 1.2 km: no line or map
+-- Pinchgut Track [] line 5.7 km: 10301 m for DOC's 5699 m line ([Pinchgut Hut, Cattle Peak Route, Bob’s Camp Bivouac Route])
+-- Roaring Meg Pack Track [18 km one way] line 13.2 km: names nothing on the map ([])
+-- Te Aroha Summit Track [3.9 km one way] line 1.4 km: covers 13% of DOC's line ([Te Aroha, Whakapipi])
+-- Kaipawa Trig Track [] line 5.3 km: names nothing on the map ([])
+-- Mangaweka Scenic Reserve Track [] line 1.7 km: names nothing on the map ([])
+-- Karamū Walkway South [8.1 km one way] line 7.9 km: 13778 m, DOC 8100 m ([Karamū Walkway North, Four Brothers Track])
+-- Cape Kidnappers/Te Kauwae-a-Māui Route [19 km return via same track] line 8.7 km: names nothing on the map ([Clifton, Cape Kidnappers / Te Kauwae-a-Māui])
+-- Willberg Walk [] line 0.8 km: names nothing on the map ([])
+== Spa Park to Huka Falls Walk [3 km one way] line 2.7 km -> 2.8 km; via [Huka Falls]; ends 2237 m apart
+-- Conroys Creek Historic Sites [4 km loop] line 3.0 km: covers 4% of DOC's line ([Conroys Gully])
+-- Fox Glacier South Side Walkway/Cycleway [6.4 km return via same track] line 3.0 km: names nothing on the map ([])
+-- Jasper Creek Walk [500 m return loop] line 0.5 km: 868 m for DOC's 496 m line ([Hotoritori Campsite])
+== Whakamaharatanga Walkway [] line 1.2 km -> 1.3 km; via [Rorookuri]; ends 899 m apart
+-- Mākara Walkway [7 km loop] line 4.1 km: no route
+-- Omaru Falls Walk [1.7 km return via same track] line 1.7 km: names nothing on the map ([])
+-- Mount Messenger to White Cliffs Walkway Track [] line 5.4 km: 12157 m for DOC's 5448 m line ([Mount Messenger, Waipingau, White Cliffs Walkway Track])
+== Mahoenui Track [24 km return return via same track] line 11.4 km -> 11.8 km; via [Leitch's Hut]; ends 8462 m apart
+-- Red Tarns Track [4 km return via same track] line 0.6 km: covers 41% of DOC's line ([Aoraki/Mount Cook])
+-- Maunganui Bluff Track [2.6 km to Maunganui Bluff | 5.3 km to Waikara Beach one way] line 8.1 km: 8202 m in 1 hr 30 min to Maunganui Bluff | 5 hr to Waikara Beach one way ([Aranga Beach, Maunganui])
+-- Kakahu Bush tracks [1- 8 km return via same track] line 3.9 km: names nothing on the map ([])
+== Camp Creek Route [3 km | 6.1 km one way] line 6.0 km -> 6.1 km; via [Camp Creek Hut]; ends 4792 m apart
+-- Rimu Walk [1.7 km loop] line 1.5 km: no route
+-- Pavilion Peak Track [32 km one way] line 32.4 km: covers 71% of DOC's line ([Pavilion Peak])
+-- Fossil Point Track [2 km one way] line 1.3 km: names nothing on the map ([Fossil Point])
+-- Goldsborough short walks [] line 3.4 km: no route
+-- Minnehaha Walk [1.2 km loop] line 0.4 km: no route
+-- Bruce Park Loop Track [1.4 km loop] line 1.9 km: no route
+-- Third Branch Track [1.3 km loop] line 0.7 km: covers 10% of DOC's line ([Puketui Walk])
+-- Te Henga Walkway [1.2 km to cliff viewpoint, 1.8 km to Tirikohua Point one way] line 9.6 km: 9911 m in 45 min to cliff viewpoint, 65 min to Tirikohua Point ([Tirikohua Point])
+-- Matatā Lagoon Track [1 km loop] line 1.0 km: no route
+-- A-Frame Hut and Takapari Road Track [] line 2.7 km: names nothing on the map ([])
+-- Wairere Falls Track [5 km return via same track] line 2.8 km: names nothing on the map ([])
+-- Ngamarama/Te Tuhi Track [11.7 km one way] line 11.1 km: a long way round: 15421 m for 4249 m ([North South Track, Ngamarama Track, Te Whare Okioki])
+-- Pearse Valley Route to Pearse River Resurgence [] line 5.0 km: names nothing on the map ([])
+== Matarangi Bluff Track [] line 0.7 km -> 0.9 km; via [Rings Beach]; ends 705 m apart
+-- Lake Hauroko Track [1.1 km loop] line 0.9 km: no route
+== Archer Track [9 km one way] line 7.8 km -> 9.6 km; via [Deep Bay, Elaine Bay]; ends 3863 m apart
+-- Ngarunui Track [800 m one way] line 0.6 km: names nothing on the map ([Manu Bay, Ngarunui Beach])
+-- Tauranga Loop Track [] line 4.7 km: no route
+-- Long Hilly (Round Hill) Walking Track [2.7 km loop] line 2.0 km: no route
+-- Thomas Bush Track [5.4 km loop] line 6.1 km: 8676 m, DOC 5400 m ([Opouahi Walkway])
+-- Colenso Spur Track [] line 1.1 km: names nothing on the map ([])
+-- Seven Mile Point Track [] line 2.8 km: names nothing on the map ([Lake Wakatipu])
+-- Mohi Bush Track [] line 3.2 km: names nothing on the map ([])
+-- Boars Head Mine Track [1.9 km return via same track] line 1.9 km: names nothing on the map ([])
+-- Mount Tutamoe Track [4 km return via same track] line 3.0 km: 3096 m, DOC 2000 m ([Tutamoe])
+== Opouri Bridle Track [3 km one way] line 4.2 km -> 4.4 km; via [Ōpōuri Saddle]; ends 3113 m apart
+== Soda Springs Walk [] line 4.3 km -> 4.6 km; via [Tongariro Alpine Crossing]; ends 4041 m apart
+-- Gold Creek Ridge Track [] line 5.0 km: names nothing on the map ([])
+== Hihikiwi Track [4.8 km to the lookout | 6.4 km one way to the summit return via same track] line 5.1 km -> 7.7 km; via [Pirongia, Hihikiwi, Pāhautea Hut]; ends 4150 m apart
+-- Titan Rocks Track [5.5 km return via same track] line 5.5 km: names nothing on the map ([])
+-- Tōtaranui to Anapai Bay [4.2 km return via same track] line 5.3 km: covers 79% of DOC's line ([Tōtaranui, Anapai Bay])
+-- Moke Lake Loop Track [6 km loop] line 4.9 km: no route
+-- Nancy Fladgate Track [500 m one way] line 0.5 km: 2103 m in 15 min ([Waihihi Bay, Russell])
+-- Pukaki Kettle Hole Track [4 km return via same track] line 1.2 km: names nothing on the map ([])
+-- Gordon Park Loop Track [550 m loop] line 0.6 km: no route
+-- Basin View Tramping Track [7.5 km loop] line 6.0 km: no route
+-- Fantail Falls Walk [200 m return via same track] line 0.1 km: names nothing on the map ([])
+-- Mangōraukawa / Lake Dive tracks [Upper track 4.2 km, Lower track 6.2 km one way] line 13.0 km: 22251 m for DOC's 12878 m line ([Mangōraukawa / Lake Dive, Dawson Falls, Panitahi and Syme Hut Track])
+-- Cave Stream Loop Walk [] line 0.7 km: no route
+-- Mount Robert Circuit [9 km loop] line 7.5 km: covers 52% of DOC's line ([Pourangahau / Mount Robert, Bushline Hut, Mount Robert, Pinchgut Track])
+-- Motukiore Island Walk [] line 2.6 km: names nothing on the map ([Whangārei Harbour, Motukiore Island, Parua Bay, Manganese Point])
+== Golden Hills Battery Walk [800 m return via same track] line 0.4 km -> 0.4 km; via [Broken Hills]; ends 388 m apart
+-- Ridge Track [7 km one way] line 7.0 km: covers 31% of DOC's line ([Bob’s Camp Bivouac Route, Mount Thomas])
+-- Tui Mine Track (from Te Aroha Summit to town) [8.4 km from summit one way] line 3.6 km: 16809 m, DOC 8400 m ([Te Aroha, Te Aroha Summit Track, Tui Domain Track])
+-- Woods Creek Track [1.1 km loop] line 0.9 km: no route
+-- Clay Ridge Track [] line 4.0 km: 10958 m for DOC's 4021 m line ([Clay Forks, Five Mile Loop Track, McKerrow, McKerrow Track, Ōrongorongo Track])
+-- Ōkura Bush Walkway [] line 4.1 km: names nothing on the map ([])
+-- Waipapa Point Coastal walk [700 m return via same track] line 0.3 km: names nothing on the map ([])
+-- Old Blyth Track [5.3 km one way] line 5.3 km: names nothing on the map ([Round the Mountain Track])
+-- Craig Burn Track [] line 1.5 km: names nothing on the map ([])
+-- Turnbulls Tramping Track [12 km one way] line 11.4 km: names nothing on the map ([])
+-- Elvy Waterfalls Track [1.5 km return via same track] line 1.6 km: 2738 m, DOC 750 m ([Trig K Track, Tawa Walk and Weta Walk, Tawa Walk])
+-- Murrays Walk [] line 0.6 km: names nothing on the map ([])
+-- Stony Batter Historic Reserve walks [] line 4.2 km: names nothing on the map ([Man o'War Bay])
+-- Highcliff Track [4 km return loop] line 2.1 km: no route
+-- Kelly Knight Hut Track [] line 2.1 km: 9588 m for DOC's 2082 m line ([Pourangaki, Kelly Knight Hut])
+-- Routeburn Track: Earland Falls Track [7.5 km return via same track] line 11.1 km: 12212 m, DOC 3750 m ([The Divide, Routeburn Track, Lake Howden, Earland Falls])
+-- Waitaanga South Road to Te Rerepahupahu Falls Track [] line 11.1 km: 18147 m for DOC's 11109 m line ([Te Rerepahupahu Falls, Mount Damper])
+-- Catlins River Track [12 km one way] line 12.1 km: names nothing on the map ([])
+== Waitewaewae Hut Track [] line 9.8 km -> 13.9 km; via [Ōtaki Forks, Plateau]; ends 7706 m apart
+-- No.1 Line tracks [4.3 km return return via same track] line 1.6 km: names nothing on the map ([])
+-- Yeoman's Track [] line 5.7 km: names nothing on the map ([])
+-- Skyline Track [23 km one way] line 21.9 km: further from DOC's length than before ([Roys Peak, Mount Alpha])
+-- Angelus Hut via Pinchgut Track and Robert Ridge Route [12.2 km one way] line 12.1 km: further from DOC's length than before ([Mount Robert, Bushline Hut, Julius Summit, Angelus Hut])
+== Teal Bay to Lake Poteriteri Hut Route [14.5 km one way] line 15.8 km -> 15.9 km; via [Teal Bay Hut, Lake Poteriteri Hut]; ends 12009 m apart
+-- Berwen Track [5 km one way] line 5.4 km: names nothing on the map ([])
+-- Lake Hayes Walkway [8 km loop] line 7.2 km: no route
+-- Waterworks Walk [1 km return via same track] line 0.0 km: names nothing on the map ([])
+-- Manganui Gorge Track [] line 1.5 km: 11467 m in 20 min one way to bridge and further 5-10 min to ski field ([Taranaki Maunga, Around the Mountain Circuit])
+-- Waiomu Valley Track [] line 2.9 km: 13910 m for DOC's 2930 m line ([Tapu Summit to Crosbies Hut Track, Crosbies Hut, Waiomu Kauri Grove Walk])
+== Dome Forest car park to Waiwhiu Grove [] line 4.0 km -> 4.1 km; via [The Dome]; ends 2931 m apart
+-- Rainbow Falls Walk [400 m one way return via same track] line 0.2 km: 529 m for DOC's 246 m line ([Rainbow Falls, Kerikeri River Track])
+== Crystal Battery Track [] line 2.1 km -> 2.1 km; via [Skippers, Crystal Hut]; ends 1793 m apart
+-- Doubtful Valley Track [17 km one way] line 17.2 km: 37883 m in 5 hr 30 min ([Doubtful Hut, Devilskin Saddle Route, Doubtless Hut, Lake Man Route, Amuri Pass])
+-- Come in Time Battery Walk [] line 0.3 km: names nothing on the map ([])
+-- Sandymount Track [1.7 km return return via same track] line 0.8 km: covers 9% of DOC's line ([Sandymount])
+-- Cameron Carpark to Mt Kuripapango Track [7.4 km return via same track] line 3.6 km: 7636 m, DOC 3700 m ([The Lakes])
+== Lower Ruamahanga Track to Cow Creek Hut, via Cow Saddle [] line 12.4 km -> 15.7 km; via [Cow Saddle, Cow Creek Hut]; ends 9750 m apart
+== Waihāhā Hut Track [9.4 km one way] line 9.3 km -> 9.5 km; via [Waihāhā Hut]; ends 7145 m apart
+-- Tuhoto Ariki Trail [5 km one way] line 3.5 km: names nothing on the map ([])
+== Luggate Creek Track [1.5 km one way] line 0.9 km -> 1.0 km; via [Upper Clutha River Track]; ends 725 m apart
+-- Avalanche Peak Route [2.5 km, 1,100 m vertical climb one way] line 5.7 km: 13248 m, DOC 2500 m ([Avalanche Peak, Arthur's Pass, Scotts Track, Devils Punchbowl Falls])
+-- Te Au Track [3.5 km one way] line 4.1 km: names nothing on the map ([Waikanae])
+== South Ohau Hut via Waiopehu and Dora Ridge [] line 6.6 km -> 11.4 km; via [Waiopehu Track, Waiopehu Hut, Waiopehu, Twin Peak, Richards Knob, Butcher Saddle, Yeates Track, South Ohau Hut]; ends 4149 m apart
+-- Otanewainuku Rimu Loop Walk [3.8 km loop] line 4.2 km: no route
+-- Sandfly Bay Track [560 m return via same track] line 0.6 km: names nothing on the map ([])
+-- Punakaiki Pancake Rocks and Blowholes Walk [1.1 km loop] line 1.0 km: no route
+-- Pukatea Walk [600 m one way] line 0.4 km: a long way round: 10764 m for 455 m ([Pukatea / Whites Bay])
+== Tekapo Mt John Walkway [8.9 km loop] line 3.3 km -> 4.8 km loop; via [Mount John]; ends 0 m apart
+-- Tunnel Beach Walk [2.6 km return via same track] line 1.3 km: covers 74% of DOC's line ([Tunnel Beach])
+-- Mount Haast Route [] line 2.1 km: 2070 m in 6 hr return ([Mount Haast])
+-- Waikiti Route [8.2 km one way] line 3.2 km: names nothing on the map ([])
+-- Waiotemarama Waterfall Walk [546 m to waterfall return via same track] line 0.5 km: names nothing on the map ([Waiotemarama])
+-- Hook Bush Route [] line 2.1 km: names nothing on the map ([])
+-- Waipawa Forks Hut Track [1.5 km one way] line 1.4 km: further from DOC's length than before ([Waipawa Forks Hut, Sunrise Track])
+== Tarawera Outlet to Falls Track [5 km one way] line 5.1 km -> 5.1 km; via [Tarawera Falls, Northern Tarawera Track]; ends 3385 m apart
+-- Whakapapaiti Valley Track [16 km loop] line 10.4 km: a long way round: 11064 m for 1547 m ([Silica Rapids, Whakapapaiti Hut, Whakapapa Village])
+-- Mica Mine Tops Route [] line 7.6 km: 30107 m for DOC's 7610 m line ([Historic Haast to Paringa Cattle Track, Blowfly Hut, Mataketake Hut, Māori Saddle Route])
+-- Big Rimu Walk [2.2 km return via same track] line 0.7 km: names nothing on the map ([])
+-- Lake Gault Track [8 km return via same track] line 2.9 km: 6027 m, DOC 4000 m ([Lake Matheson, Lake Matheson / Te Ara Kairaumati Walk, Lake Gault])
+-- Mangawhai Cliffs Walkway [8.4 km return via same track] line 4.1 km: names nothing on the map ([Mangawhai Heads])
+-- Washbourn Scenic Reserve Walk [] line 0.8 km: names nothing on the map ([])
+-- Mount Damper to Te Rerepahupahu Falls track [14 km to the falls one way] line 12.0 km: 28070 m, DOC 14000 m ([Mount Damper, Te Rerepahupahu Falls, Mount Damper Falls])
+-- Everett Park Scenic Reserve walk [] line 0.5 km: names nothing on the map ([])
+-- Wooded Gully Track [] line 4.0 km: names nothing on the map ([])
+-- Truman Track [1.4 km return via same track] line 0.6 km: names nothing on the map ([Punakaiki])
+-- Velenski Walk [600 m one way] line 0.7 km: names nothing on the map ([Moana, Te Kinga])
+-- Kaitoke Hot Springs Track [] line 2.5 km: 8167 m for DOC's 2451 m line ([Whangaparapara])
+-- Governors Bush Walk [1.2 km loop] line 1.1 km: covers 18% of DOC's line ([Aoraki/Mount Cook])
+-- Lakes car park to Mt Kuripapango Track [] line 2.5 km: 4973 m for DOC's 2463 m line ([The Lakes, Kuripapango])
+-- Lake Marian Track [3.1 km one way] line 2.7 km: names nothing on the map ([Lake Marian])
+-- Grey River Nature Trail [1.7 km loop] line 1.4 km: no route
+-- Mangorewa Track [] line 7.9 km: names nothing on the map ([])
+-- Aorangi Crossing [30 km one way] line 24.6 km: 53335 m, DOC 30000 m ([Pinnacles Ridge Track, Washpool Hut, Pararaki Hut, Kawakawa, Kawakawa Hut])
+-- Carrington Hut Route [12.3 km to Carrington Hut one way] line 15.3 km: covers 69% of DOC's line ([Carrington Hut, Anti Crow Hut])
+-- Woodlands Walk [] line 2.2 km: covers 65% of DOC's line ([Hanmer, Conical Hill])
+-- Pass Creek Track [6 km return via same track] line 2.6 km: covers 2% of DOC's line ([Lake Howden])
+-- Lindemann Loop Track [11 km loop] line 12.1 km: 23474 m, DOC 11000 m ([Waitawheta Hut])
+-- Dry Creek Track [17 km return via same track] line 8.4 km: names nothing on the map ([])
+-- Kiriwhakapapa Loop Track [2 km loop] line 2.0 km: covers 25% of DOC's line ([Kiriwhakapapa to Blue Range Hut, Blue Range Hut])
+-- Langsview Track [6.5 km one way] line 6.6 km: names nothing on the map ([])
+-- Flagstaff Hill Track [2.5 km loop] line 1.7 km: no route
+-- Studholme Bush Scenic Reserve tracks [] line 4.7 km: covers 48% of DOC's line ([Bellbird Track])
+== Devils Punchbowl Walking Track [2 km return via same track] line 0.7 km -> 0.7 km; via [Devils Punchbowl Falls]; ends 481 m apart
+-- Eves Valley Walk [1.3 km one way] line 1.3 km: names nothing on the map ([])
+== Waitonga Falls Track [4 km return via same track] line 2.2 km -> 2.3 km; via [Waitonga Falls]; ends 1525 m apart
+-- Pororari River - Bullock Creek Road Track [15 km loop] line 9.6 km: no route
+-- Oromahoe Traverse [] line 3.9 km: names nothing on the map ([Paihia])
+== Puniho Track to Kahui Hut [7 km one way] line 6.2 km -> 7.3 km; via [Kahui Hut]; ends 5879 m apart
+-- Southern Access Corridor [] line 21.0 km: names nothing on the map ([])
+== Allans Track [] line 2.3 km -> 2.4 km; via [Acland Falls Track]; ends 1493 m apart
+-- Carew Falls Track [2 km return via same track] line 0.8 km: names nothing on the map ([Castle Hill, Mitchells])
+-- River Ridge Track [] line 1.7 km: a long way round: 6781 m for 1434 m ([Gentle Annie Track, Atiwhakatu Track, Holdsworth road end to Powell Hut/Mount Holdsworth])
+-- Zekes Hut Track [] line 9.2 km: names nothing on the map ([Hihitahi])
+-- Canyon Creek Track [] line 4.2 km: names nothing on the map ([])
+== Ōtepatotu Scenic Reserve walk [1.7 km loop] line 1.5 km -> 1.6 km loop; via [Lavericks]; ends 0 m apart
+-- Lake Rotoiti Circuit [23 km (with river crossing) or 31 km (via swingbridge) loop] line 19.4 km: covers 47% of DOC's line ([Lakehead Hut, Coldwater Hut, Lakehead Track, Whisky Falls, Mount Robert])
+-- Aramoana Saltmarsh Walking Track [1 km return via same track] line 0.5 km: names nothing on the map ([Aramoana])
+== South Temple Track [15 km return via same track] line 7.0 km -> 7.0 km; via [South Temple Hut]; ends 5862 m apart
+-- Judah Track [13.4 km return via same track] line 7.2 km: 12865 m, DOC 6700 m ([Mount Judah])
+== Comet Road end to Shutes Hut [6.5 km one way] line 5.9 km -> 6.4 km; via [Komata]; ends 4658 m apart
+-- Bridle Track [3.5 km one way] line 3.5 km: names nothing on the map ([])
+-- Aparima Hut to Princhester Saddle Track [11.5 km one way] line 11.7 km: covers 62% of DOC's line ([Becketts Hut])
+== Elizabeth Hut Route [12 km one way] line 9.7 km -> 9.5 km; via [Elizabeth Hut, Trent Saddle]; ends 6813 m apart
+-- Mokaihaha Track [4 km return via same track] line 3.7 km: names nothing on the map ([])
+-- Mount Bealey Track [3.2 km (610 m vertical climb) to the bushline return via same track] line 1.4 km: names nothing on the map ([Mount Bealey, Arthur's Pass])
+-- Kopuwai Track to Sisters Track [8 km one way] line 7.7 km: names nothing on the map ([])
+-- Bell Track [15.2 km one way] line 14.6 km: covers 12% of DOC's line ([Nikau Walk, The Cone, Pāhautea Hut, Pirongia])
+-- Mt Crichton Loop Track [6.4 km loop] line 6.4 km: no route
+-- Tasman Lake and River Track [2.6 km return via same track] line 1.4 km: 2462 m, DOC 1300 m ([Blue Lakes])
+-- Makahu Road Circuit (via Makino Hut and Te Puia Lodge) [] line 14.2 km: a long way round: 14123 m for 1027 m
+-- Manganuku Track [] line 7.7 km: names nothing on the map ([])
+-- Aotea Track [] line 40.4 km: covers 65% of DOC's line ([Whangaparapara, Tramline Track North, Mt Heale Hut, South Fork Track, Kaiaraara Track, Forest Road, Tramline Track, The Green Campsite])
+-- Lower Wye Creek Track [6.66 km return via same track] line 3.3 km: names nothing on the map ([])
+-- Whitianga Rock Walk and Maramaratotara Track [] line 0.9 km: 2992 m for DOC's 1094 m line ([Whitianga Rock Walk, Ferry Landing, Maramaratotara Bay, Back Bay])
+-- Paparahi Reserve Access Track [] line 0.4 km: 663 m for DOC's 383 m line ([Ngahau Bay])
+-- Iron Gate Hut Track [] line 7.2 km: covers 76% of DOC's line ([Alice Nash Memorial Heritage Lodge, Iron Gate Hut])
+-- Birch Creek access route [] line 2.3 km: names nothing on the map ([Puke Makariri])
+-- Dobson Nature Walk [750 m return via same track] line 0.5 km: names nothing on the map ([Arthur's Pass])
+-- Whakapono and Tumanako tracks [] line 1.4 km: covers 53% of DOC's line ([Horokaka Track])
+-- Tarnbrae Track A2O [16 km one way] line 18.7 km: names nothing on the map ([])
+-- Puhoi to Remiger Road Track [5 km one way] line 1.2 km: names nothing on the map ([Puhoi])
+== Buicks Bridge to Potts Bridge Track [] line 20.4 km -> 29.3 km; via [Mount Guy]; ends 16719 m apart
+-- Eastern Ōkataina Walkway [10.5 km one way] line 9.0 km: 15720 m for DOC's 8970 m line ([Tauranganui Bay, Ōtangimoana Bay, Northern Tarawera Track, Kaiwaka Bay])
+== Nina Valley Track [13 km one way] line 13.1 km -> 12.8 km; via [Nina Hut]; ends 10198 m apart
+-- Mount Shrimpton Track [6 km return via same track] line 3.1 km: names nothing on the map ([])
+== Diamond Creek Walk [2.7 km one way] line 2.7 km -> 2.6 km; via [Lake Reid]; ends 2358 m apart
+-- Mangamuka Track [19 km one way] line 15.5 km: covers 52% of DOC's line ([Raetea, Kumetewhiwhia, Umaumakaroro])
+== Pukeatua Track [14 km one way] line 12.1 km -> 14.9 km; via [Pukeatua, Ōtaki Forks]; ends 8534 m apart
+-- Ōrongorongo Track [5.2 km one way] line 4.8 km: names nothing on the map ([])
+-- Karioi Track [] line 3.9 km: names nothing on the map ([])
+-- Mount Ida Water Race Track [18 km one way] line 18.4 km: names nothing on the map ([])
+-- Falls Creek Route [21 km return via same track] line 3.6 km: names nothing on the map ([])
+-- Glenorchy Walkway [] line 4.7 km: names nothing on the map ([])
+-- Pauanui Beach Loop Short Walk [500 m return loop] line 0.4 km: no route
+-- William Hartree Memorial Reserve walks [] line 1.1 km: names nothing on the map ([])
+-- Deliverance Cove Track [] line 1.5 km: names nothing on the map ([])
+== Quartz Creek/Mount Royal Route [] line 8.0 km -> 8.2 km; via [Mount Royal]; ends 5672 m apart
+-- Saddle Hill Summit Track [1.6 km return via same track] line 1.5 km: DOC's line is off the map's tracks
+-- Waingawa River Track (Mitre Flats to Cow Creek) [] line 7.3 km: 17423 m for DOC's 7298 m line ([Mitre Flats Hut, Mitre, Cow Creek Hut])
+-- Cape Brett Track [16.3 km one way] line 4.4 km: 4977 m in 8 hr ([Cape Brett, Deep Water Cove])
+-- Monument Track [1 km return via same track] line 0.8 km: 880 m, DOC 500 m ([Monument])
+-- Morepork Track [4.2 km one way] line 4.0 km: names nothing on the map ([])
+-- Atleys Track [] line 3.5 km: names nothing on the map ([])
+== Rangiwahia Hut Track [] line 4.0 km -> 4.2 km; via [Rangiwahia Hut]; ends 1924 m apart
+-- Leith Saddle Track [] line 2.7 km: names nothing on the map ([Swampy Summit])
+== Jollies Pass Track to Mt Isobel [6 km return return via same track] line 2.7 km -> 2.8 km; via [Mount Isobel]; ends 2471 m apart
+-- Brian O’Lyn Route [8.4 km one way] line 2.4 km: names nothing on the map ([])
+== Rock Peak Track [] line 3.9 km -> 3.9 km; via [Rock Peak]; ends 2330 m apart
+-- Hinehopu/Hongi's Track [2.2 km one way] line 2.4 km: further from DOC's length than before ([Korokitewao Bay, Te Pōhue Bay])
+-- Chatterton River Track [] line 2.9 km: names nothing on the map ([])
+-- Martin's Hut/Merrivale Tramping Track [19.8 km one way] line 19.2 km: covers 18% of DOC's line ([Longwood, Martin's Hut])
+-- Forest Track [1.1 km one way] line 4.0 km: 5362 m, DOC 1100 m ([Wooded Gully Track, Summit Track])
+-- Whinray Scenic Reserve Track [6.3 km one way] line 5.6 km: no description
+-- Mt Ngongotaha Jubilee Track [2.4 km return via same track] line 1.7 km: 2108 m, DOC 1200 m ([Mt Ngongotaha Nature Loop Track])
+-- Bypass Track [2.8 km one way] line 2.8 km: covers 7% of DOC's line ([Richardson Track])
+-- Glenroy Water Race Track [] line 4.9 km: covers 5% of DOC's line ([Mount Salmond])
+-- Trains Track [15 km one way] line 12.3 km: 37833 m in 4–5 hr ([Trains Hut, Kapara, Terereohaupa Falls])
+-- Moanataiari Link Track [1.5 km one way] line 1.2 km: a long way round: 10860 m for 894 m ([Karaka])
+-- Chummies Track [8 km one way] line 7.4 km: no route
+== Watkin Powell Track [400 m return via same track] line 0.2 km -> 0.2 km; via [Tauwhara Bay]; ends 143 m apart
+-- Deans Bank Track [11.5 km loop] line 12.0 km: no route
+-- Waitanguru Falls Walk [] line 0.2 km: names nothing on the map ([Mangaotaki])
+-- Wainui Falls Track [3.4 km return via same track] line 1.7 km: names nothing on the map ([])
+-- Tawhai Falls Track [800 m return via same track] line 0.3 km: names nothing on the map ([])
+-- Kauri Dam Walk [] line 0.3 km: names nothing on the map ([Pikiwahine])
+-- Ross Goldfield Water Race Walkway [2.5 km loop] line 1.1 km: no route
+-- Mangakawa Track [] line 3.0 km: covers 8% of DOC's line ([Nikau Loop Track])
+-- Crooked Route [7.8 km | 13.2 km one way] line 13.9 km: 24051 m for DOC's 13880 m line ([Jacko Flat Hut, Top Crooked Hut])
+-- Te Haua Uru Track [] line 3.3 km: 20258 m in 3 hr 45 min to junction one way from car park ([Horokaka, Tangihua Hut])
+-- Waiwhakaiho Route [5 km one way] line 5.4 km: 8629 m, DOC 5000 m ([Ram Track, North Egmont])
+-- Whakapapa Nature Walk [300 m loop] line 0.2 km: no route
+-- Mt Nimrod Track [3 km loop] line 2.8 km: no route
+-- Blue Pools Track [3.2 km return via same track] line 1.6 km: names nothing on the map ([])
+-- Flora Circuit (via Mt Arthur Hut and Flora Hut) [] line 4.0 km: no route
+-- Cathedral Caves Walk [] line 0.4 km: names nothing on the map ([Waipati Beach])
+-- Taheke Waterfall Track [3 km loop] line 2.4 km: no route
+-- Pakotai Track [91 m return via same track] line 0.1 km: names nothing on the map ([])
+-- Kaituna Valley Scenic Reserve walk [] line 0.5 km: names nothing on the map ([])
+-- Kepler Track: Rainbow Reach to Shallow Bay or Moturau Hut [12 km return via same track] line 15.3 km: names nothing on the map ([Manapōuri, Shallow Bay])
+-- Government Track [17 km return via same track] line 8.2 km: names nothing on the map ([])
+-- Port FitzRoy: Cooper's Castle Track [] line 4.0 km: names nothing on the map ([Ōkiwi, Port Fitzroy])
+-- Ngutuoha Nature Trail [2 km loop] line 1.8 km: no route
+-- Opouahi Walkway [1.4 km loop] line 1.3 km: no route
+-- Black Jack Track [3.8 km loop] line 4.4 km: a long way round: 8332 m for 1326 m ([Whites Bay])
+-- Motutapu Walkway [] line 5.0 km: covers 65% of DOC's line ([Emu Point, Emu Bay])
+-- Dromedary Hill Track [10 km, 1000 m vertical return via same track] line 4.7 km: names nothing on the map ([])
+-- Trotters Cave Walk [700 m one way] line 0.6 km: names nothing on the map ([])
+-- Kura Tāwhiti Access Track [1.7 km loop] line 1.1 km: covers 68% of DOC's line ([Kura Tawhiti, Castle Hill])
+-- Boyd Creek Track [6.5 km one way] line 4.9 km: names nothing on the map ([])
+-- Ball Hut Track [9 km return via same track] line 8.7 km: 8733 m, DOC 4500 m ([Ball Hut])
+-- George Sound Route [17.8 km one way] line 0.6 km: names nothing on the map ([Lake Hankinson, Lake Thomson, Lake Katherine, Henry Pass, Deadwood Lagoon, George Sound Hut])
+-- Lake Ōkataina walking tracks [] line 8.7 km: covers 50% of DOC's line ([Rotoatua])
+-- Duffy Creek Route [] line 1.9 km: names nothing on the map ([])
+-- McKinnon Hut Track [] line 6.2 km: names nothing on the map ([Mckinnon Hut, Hikurangi, Crow Hut])
+-- Rimu Walk [] line 0.6 km: names nothing on the map ([])
+== Umukarikari Track (to Waipakihi Hut) [14 km one way] line 12.9 km -> 15.5 km; via [Umukarikari, Sharp Cone, Waipakihi Hut]; ends 10744 m apart
+-- Pourakino Picnic Area Loop Track [1.7 km loop] line 1.6 km: no route
+-- Peak Hill Route [] line 3.0 km: names nothing on the map ([])
+== Mount Herbert Walkway/Te Ahu Pātiki [14 km return via same track] line 6.5 km -> 6.6 km; via [Mount Herbert/Te Ahu Patiki]; ends 6068 m apart
+-- Peters Pool Walk [1.1 km return via same track] line 0.5 km: names nothing on the map ([])
+-- Glacier Burn Track [] line 1.3 km: 1346 m in 4–6 hr ([East Matukituki Track])
+-- Kapuni Loop Track [1.4 km loop] line 1.3 km: covers 32% of DOC's line ([Dawson Falls])
+== Mistletoe Track [] line 2.1 km -> 2.5 km; via [Helicopter Hill]; ends 1144 m apart
+-- Rockvale Track [4.5 km one way] line 4.7 km: names nothing on the map ([])
+-- St Paul's Rock Track [] line 0.7 km: names nothing on the map ([])
+-- Kōhaihai area short walks [] line 3.3 km: names nothing on the map ([])
+-- Wentworth Falls Walk [6 km return return via same track] line 3.2 km: 5569 m, DOC 3000 m ([Maratoto - Wentworth Crossing])
+-- Manginangina Kauri Walk [350 m return via same track] line 0.3 km: names nothing on the map ([])
+-- Brunner Mine Site Walk [2 km loop] line 0.7 km: covers 32% of DOC's line ([Brunner])
+-- Scotts Saddle Track [4.5 km one way] line 4.3 km: names nothing on the map ([])
+== Kaituna Track [] line 17.3 km -> 17.9 km; via [Knuckle Hill]; ends 10703 m apart
+== Maharahara Peak Track [] line 5.2 km -> 5.3 km; via [Maharahara]; ends 4574 m apart
+-- Rakiura Track [32 km loop] line 29.0 km: covers 77% of DOC's line ([Port William Hut, North Arm Hut, Māori Beach Campsite, Port William Campsite, North Arm Campsite, Lee Bay, Maori Beach, Magnetic Beach, Kidney Fern Arm])
+-- Woodside Glen Walk [700 m return via same track] line 0.7 km: names nothing on the map ([])
+-- Bridle Track [8.4 km return via same track] line 4.5 km: names nothing on the map ([])
+-- Peninsula Loop Walk [4.5 km loop] line 4.9 km: no route
+-- Ship Creek Tauparikākā walks [] line 1.7 km: names nothing on the map ([])
+-- Duke's Nose (Kaiaraara Rocks) Track [] line 0.6 km: names nothing on the map ([Pekapeka Bay])
+-- Pudding Hill Stream Route [8.3 km one way] line 7.7 km: names nothing on the map ([Pudding Hill])
+-- Ruakuri Walk [1 km loop] line 1.2 km: no route
+-- Borland Road to Monowai Hut Track [] line 12.1 km: covers 51% of DOC's line ([Clark Hut, Monowai Hut])
+-- Dawson Falls Power Station Track [100 m return via same track] line 0.1 km: names nothing on the map ([])
+-- Te Kauri Park Circuit Walk [2.5 km loop] line 1.0 km: covers 70% of DOC's line ([Waikuku Track, Sheep Track])
+-- Whakapapanui Walk [6 km return via same track] line 2.9 km: further from DOC's length than before ([Whakapapa Village])
+-- Cullen Point tracks [] line 3.1 km: names nothing on the map ([Havelock])
+-- Cockayne Nature Walk [850 m loop] line 1.0 km: no route
+-- South Borland Track [] line 5.9 km: 9978 m for DOC's 5866 m line ([Eldrig Peak Route, Borland Nature Walk])
+-- Eldrig Peak Route [4 km return via same track] line 3.8 km: names nothing on the map ([Eldrig Peak])
+-- Crown Track to Dickey's Flat [3 km one way] line 3.9 km: further from DOC's length than before ([Dickey Flat Campsite])
+-- Purity - Kelly Knight Hut Loop Track [] line 7.0 km: covers 80% of DOC's line ([Purity Hut Track, Purity Hut, Wooden Peg, Kelly Knight Hut, Pourangaki])
+-- Pearl Harbour to Back Valley Hut Track [] line 23.2 km: covers 55% of DOC's line ([Hope Arm Hut, Back Valley Hut])
+-- Flanagan Pass Trail [] line 11.5 km: 24898 m for DOC's 11487 m line ([Flanagan Pass, Ben Ohau])
+-- Ambury Monument Walk [380 m one way] line 0.1 km: covers 40% of DOC's line ([Nature Walk])
+-- Butchers Dam Loop Track [2.5 km loop] line 1.7 km: no route
+-- Taraire Ridge Track [8.9 km loop] line 5.1 km: no route
+-- Water Race Tunnel Track [1.6 km one way] line 0.8 km: covers 69% of DOC's line ([Puketui Walk, Water Race Tunnels Track, Broken Hills])
+== Bealey Spur Track [] line 5.5 km -> 5.6 km; via [Bealey Spur Hut]; ends 4828 m apart
+-- Red Beech Track [] line 6.4 km: 12194 m for DOC's 6382 m line ([Mount Grey, Mt Grey/Maukatere Track, Mount Grey/Maukatere])
+-- Hideaway Hut Route [6 km return via same track] line 2.0 km: names nothing on the map ([])
+-- Homestead Run [15 km loop] line 7.1 km: covers 75% of DOC's line ([Peters Pass])
+-- Veronica Loop Track [3 km loop] line 2.6 km: no route
+-- Big River – Golden Lead Battery [7 km one way] line 21.3 km: 22340 m, DOC 7000 m ([Big River Hut, Big River])
+-- Trig K Track [4.6 km return via same track] line 4.0 km: names nothing on the map ([])
+-- Opapaka Pā Walk [] line 0.8 km: names nothing on the map ([])
+-- Visitor Centre to Kepler Track Carpark Walk [3.5 km one way] line 2.7 km: names nothing on the map ([Te Anau, Dock Bay, Kepler Track: Carpark to Dock Bay and Brod Bay, Kepler Track: Carpark to Rainbow Reach])
+-- Saddle Ridge Track [7 km one way] line 10.5 km: names nothing on the map ([])
+-- Waiotapu Boardwalk [] line 0.1 km: DOC's line is off the map's tracks
+-- Shirt Tail Track [] line 0.9 km: names nothing on the map ([])
+-- Waiatiu Falls Track [3.2 km return via same track] line 1.6 km: names nothing on the map ([])
+-- Hooker Valley Track [10 km return via same track] line 4.9 km: 12592 m in 3 hr return ([White Horse Hill, Aoraki/Mount Cook])
+== Knuckle Hill Track [] line 4.6 km -> 4.6 km; via [Knuckle Hill]; ends 2395 m apart
+== Historic Waihohonu Hut Track [6.3 km one way] line 5.7 km -> 5.9 km; via [Waihohonu Hut]; ends 5145 m apart
+== Tarawera Trail [15 km one way] line 13.8 km -> 14.2 km; via [Hawaiki Bay, Te Hīnau Bay, Te Rātā Bay]; ends 7530 m apart
+-- Cons Track [2 km (475 m vertical climb) to the bushline return via same track] line 0.9 km: names nothing on the map ([Mount Cassidy])
+-- Six Foot Track [] line 3.2 km: names nothing on the map ([])
+== Mackintosh car park to Lawrence Road end via Mackintosh Hut and Donald River [] line 12.9 km -> 16.0 km; via [Mackintosh Hut, Lawrence Campsite]; ends 5788 m apart
+== Ashley Gorge Waterfall Track [3.5 km return via same track] line 0.9 km -> 2.2 km; via [Ashley Gorge]; ends 755 m apart
+== Sylvester Hut Track [5 km one way return via same track] line 6.8 km -> 7.0 km; via [Sylvester Hut]; ends 4689 m apart
+== Potters No. 2 Tramping Track, Huts to Grave [3 km return via same track] line 1.3 km -> 1.3 km; via [Potters]; ends 1008 m apart
+-- Old Doubtful Sound Track [2.7 km return via same track] line 1.1 km: names nothing on the map ([])
+-- Mount Te Kinga Track/Ara O Te Kinga [5.4 km | 12.4 km return via same track] line 5.3 km: names nothing on the map ([Iveagh Bay, Pah Point])
+-- Blue Lake Track [5.5 km loop] line 5.6 km: no route
+-- Te Puna Wai o Riuwaka/Riuwaka Resurgence [] line 0.5 km: names nothing on the map ([])
+-- Lake Waikareiti Walk [3.3 km return via same track] line 3.2 km: 5714 m, DOC 1650 m ([Ruapani Circuit Track])
+-- Piraunui Track [6 km one way] line 5.8 km: names nothing on the map ([])
+-- Grants Knob Track [2.7 km one way] line 2.7 km: covers 6% of DOC's line ([East Peak])
+-- Trotters Gorge Track [2.5 km from campsite return via same track] line 2.0 km: covers 29% of DOC's line ([Trotters Cave Walk])
+== Mt Grey/Maukatere Track [] line 6.1 km -> 5.9 km; via [Mount Grey/Maukatere]; ends 3284 m apart
+== Davies Track [4.2 km one way] line 3.6 km -> 5.1 km; via [Patuhā, Kaitake]; ends 2599 m apart
+-- Upper Clutha River Track [] line 18.2 km: covers 74% of DOC's line ([Albert Town])
+-- Cave Walk [600 m return via same track] line 0.2 km: names nothing on the map ([])
+== Angelus Hut via Mt Cedric Track/Route [6.8 km one way] line 6.7 km -> 7.3 km; via [Mount Cedric, Rotomaninitua / Lake Angelus]; ends 5702 m apart
+-- Big Tōtara Walk [] line 0.3 km: names nothing on the map ([])
+== Waiuta to Big River Track [10.7 km one way] line 10.2 km -> 10.8 km; via [Big River, Big River Hut]; ends 6564 m apart
+-- Three Mile Pack Track - Ōkārito Coastal Walk [9.8 km return via same track] line 4.1 km: 11594 m, DOC 4900 m ([Ōkārito Wetland Walk, Kohuamarua, Okarito])
+-- Gibbs Hill to Whariwharangi Bay Loop Track [18.3 km loop] line 17.3 km: 30885 m in 5 hr 30 min loop ([Tōtaranui, Gibbs Hill, Whariwharangi Bay, Mutton Cove, Anapai Bay, Pigeon Saddle])
+== Patutu Route [] line 4.8 km -> 5.0 km; via [Patutu]; ends 2838 m apart
+== Stour Track [15 km one way] line 14.2 km -> 14.7 km; via [Lake Emily]; ends 10723 m apart
+-- Twelve Mile Delta to Bob’s Cove Track [6 km one way return via same track] line 7.8 km: names nothing on the map ([Lake Wakatipu])
+-- Braeburn Walk [2.5 km loop] line 2.5 km: no route
+-- Lake Rototuna and Lake Rotoroa (Kaweka Lakes) Track [2.3 km from Lakes carpark to Kuripapango Road one way] line 2.3 km: 4846 m in 30 mins from Lakes carpark to Lake Rototuna and Lake Rotoroa (one way) ([Rototuna, The Lakes, Kuripapango])
+== Waiotahi Track [6.6 km to track junction one way] line 6.4 km -> 6.8 km; via [Karaka Track]; ends 5110 m apart
+-- Tasman River tracks [] line 11.3 km: names nothing on the map ([Tasman Point])
+-- Opua Kauri Walk [370 m return via same track] line 0.4 km: names nothing on the map ([Oromahoe Traverse])
+-- Shotover Saddle Route [4 km return via same track] line 2.5 km: covers 40% of DOC's line ([Brides Veil Waterfall])
+-- Alborns Walk [2.7 km loop] line 2.1 km: no route
+-- Cowans Hill Track [3.2 km one way] line 1.8 km: DOC's line is off the map's tracks
+-- Kashmir Road tramping tracks [] line 5.3 km: no route
+== Whangamumu Track [4.2 km one way] line 3.4 km -> 3.4 km; via [Whangamumu]; ends 2752 m apart
+-- Ruahine Corner to Rangitane Road [] line 16.0 km: covers 14% of DOC's line ([Ruahine Corner Hut, Pōtae])
+-- Mount Damper Falls Walk [1 km to the falls return via same track] line 0.7 km: 948 m, DOC 500 m ([Mount Damper Falls])
+-- Tōtara Walk [] line 0.4 km: names nothing on the map ([])
+== Roberts Point Track [12.3 km return via same track] line 3.7 km -> 3.9 km; via [Douglas Walk]; ends 3054 m apart
+-- Forks Flat Track [3.6 km loop] line 3.6 km: no route
+-- Nīkau Palm Gully Scenic Reserve walk [10 km return via same track] line 5.1 km: names nothing on the map ([])
+-- Humboldt Falls Track [1.2 km return via same track] line 0.6 km: names nothing on the map ([Humboldt Falls])
+-- Pūponga Hilltop Walk [8 km one way] line 10.0 km: 24530 m, DOC 8000 m ([Wharariki Beach, Pillar Point, Cape Farewell, Pillar Point Lighthouse Track, Wharariki Beach Track])
+-- Manuoha to Waikareiti Track [32 km one way] line 27.1 km: covers 54% of DOC's line ([Manuoha, Sandy Bay Hut, Pukepuke, Kaipō Lagoon, Sandy Bay])
+== Ōpārara Valley Track [14 km one way one way] line 11.9 km -> 14.7 km; via [Mirror Tarn]; ends 7290 m apart
+== Pillar Point Lighthouse Track [1.5 km one way] line 1.1 km -> 1.1 km; via [Pūponga Hilltop Walk]; ends 659 m apart
+-- Lake Waikaremoana Track [46 km one way] line 45.4 km: covers 72% of DOC's line ([Korokoro Falls, Onepoto, Puketapu, Panekire Hut, Waiopaoa Hut, Waiopaoa Campsite, Korokoro Campsite, Maraunui Campsite, Marauiti Hut, Marauiti Bay, Te Tōtara Bay, Waiharuru Hut, Waiharuru Campsite])
+-- Lake Marian Falls Track [720 m return via same track] line 0.3 km: names nothing on the map ([Lake Marian])
+-- Main Ridge Track [] line 4.7 km: covers 44% of DOC's line ([Te Haua Uru Track, Horokaka])
+-- Tauwhare Pā short walk [1 km return return via same track] line 0.5 km: names nothing on the map ([Ōhiwa Harbour, Ohakana Island])
+-- Braemar Road to Landslip Creek [] line 15.7 km: names nothing on the map ([])
+-- Maryburn Stream Track [7 km return via same track] line 6.8 km: names nothing on the map ([])
+-- Earnslaw Burn Track [8.3 km one way] line 8.0 km: names nothing on the map ([])
+-- Temple Viewpoint Track [2 km loop] line 1.7 km: covers 11% of DOC's line ([Temple Campsite])
+-- Rangihau Track [10.3 km one way] line 10.1 km: names nothing on the map ([])
+-- Te Kuri Farm Walkway [5.6 km loop] line 4.9 km: no route
+-- Mount Tuhua Track [7.6 km return via same track] line 3.5 km: 3576 m in 7 hr ([Tūhua])
+-- Major Hornbrook Track [1 km return via same track] line 1.2 km: names nothing on the map ([Lyttelton, Mount Pleasant])
+-- Atiwhakatu Track [7.2 km one way] line 5.0 km: covers 39% of DOC's line ([Mount Holdsworth])
+-- Kaituna Goldfield and Forks Track [3.6 km return to gold workings, 8 km return to Kaituna Forks return via same track] line 3.5 km: names nothing on the map ([])
+-- Mount Aicken Track [2.8 km (540 vertical climb) to the bushline return via same track] line 1.2 km: names nothing on the map ([Mount Aicken])
+-- Ocean Beach Track [3.4 km one way] line 3.3 km: further from DOC's length than before ([Lookout Point, Foveaux Walkway])
+-- Crown Range Road summit to Tuohys Gully [21 km one way] line 21.3 km: 47869 m in 7 hr one way ([Roaring Meg Pack Track, Rock Peak, Mount Allen, Quartz Knoll, Queensberry Hill])
+-- Te Matua Ngahere Walk [] line 1.3 km: names nothing on the map ([])
+== Tupapakurua Falls Track [11 km return return via same track] line 3.0 km -> 3.3 km; via [Tupapakurua Falls]; ends 1996 m apart
+== Deerford Loop Track [4.3 km loop] line 4.8 km -> 5.2 km loop; via [Knights Track, Shorts Track]; ends 0 m apart
+== Brewster Track [5 km return via same track] line 2.8 km -> 2.8 km; via [Fantail Falls]; ends 2381 m apart
+-- Dons Stream Walk [] line 1.0 km: names nothing on the map ([])
+-- Richardson Track [3.2 km one way] line 3.2 km: 6617 m, DOC 3200 m ([Mount Richardson, Bypass Track, Blowhard Track])
+-- Kauri Bushman's Walk [300 m loop] line 0.3 km: no description
+== Harataonga Coastal Walkway [11.17 km one way] line 11.2 km -> 11.4 km; via [Harataonga Campsite]; ends 5128 m apart
+-- Pukaki Boulders Track [200 m one way] line 0.2 km: names nothing on the map ([])
+-- Mangleton Road to Parks Peak Ridge [] line 7.1 km: no length or time to check
+-- Red Pine Track [] line 1.8 km: covers 19% of DOC's line ([Wooded Gully Track])
+-- McLean Falls Walk [2.1 km return via same track] line 1.0 km: names nothing on the map ([])
+== Waipapa Track to Waitawheta Hut [] line 8.9 km -> 11.4 km; via [Waipapa Track, Pukekohatu, Waitawheta Hut, Waitawheta Tramway]; ends 5152 m apart
+-- Tumanako Loop Track [1.4 km loop] line 1.2 km: no route
+-- Kumutoto Bay Track [] line 1.0 km: no description
+-- Stratford Plateau Lookout [] line 0.1 km: names nothing on the map ([])
+-- Aratiatia Rapids Lookout Walk [620 m return via same track] line 0.4 km: names nothing on the map ([Aratiatia])
+== Karaka Track [12.9 km one way] line 12.7 km -> 13.0 km; via [Karaka, Crosbies Hut]; ends 10650 m apart
+-- Ōruawairua Track [2.4 km one way] line 2.2 km: names nothing on the map ([Blumine Island, Blumine Island / Ōruawairua])
+-- Coppermine Loop Track [4.1 km loop] line 4.1 km: no route
+-- Pukaki Flats walk [6 km one way] line 8.4 km: names nothing on the map ([Twizel])
+-- Sentinel Rock Walk [900 m return via same track] line 0.2 km: 235 m in 20 min ([Sentinel Rock])
+-- Arcus Loop Track [3.5 km loop] line 3.0 km: covers 3% of DOC's line ([Ōtaki Forks])
+-- Te Paki Coastal Track [48 km total one way] line 37.4 km: covers 18% of DOC's line ([Cape Reinga, Tapotupotu Bay, Sandy Bay, Cape Reinga/Te Rerenga Wairua Lighthouse Walk, Te Werahi Beach])
+== Bushy Beach Track [340 m return via same track] line 0.2 km -> 0.2 km; via [Cape Wanbrow]; ends 179 m apart
+-- Green Lake Track [] line 18.2 km: 32510 m for DOC's 18241 m line ([Green Lake Hut, Borland Bivvy])
+-- Ōpārara Basin: Moria Gate and Mirror Tarn Loop [] line 3.6 km: 11908 m in 1 hr 30 min loop ([Ōparara Valley Track, Mirror Tarn])
+-- Glacier Burn Track [] line 3.1 km: names nothing on the map ([])
+-- Taipo River Track to Harman Pass [] line 26.0 km: covers 71% of DOC's line ([Dillon Hut, Mid Taipo Hut, Julia Hut, Harman Pass])
+-- Hereheretaura Pā Short Walk [550 m one way] line 0.5 km: 874 m for DOC's 500 m line ([Te Pare])
+== Tongariro Alpine Crossing [20.2 km one way] line 0.3 km -> 19.6 km; via [Soda Springs Walk, Emerald Lakes, Blue Lake]; ends 10625 m apart
+-- Alice Nash Memorial Heritage Lodge Track [2.4 km one way] line 2.5 km: 15710 m in 30 min one way ([Iron Gate Hut])
+-- Putanui Point Track [2 km one way] line 2.1 km: names nothing on the map ([])
+-- Waro Limestone Scenic Reserve Walk [] line 0.9 km: names nothing on the map ([])
+-- Panitahi and Syme Hut Track [] line 3.6 km: 8977 m for DOC's 4259 m line ([Dawson Falls, Panitahi, Syme Hut])
+-- Tinwald Burn Ridge Track [20.36 km return via same track] line 10.2 km: names nothing on the map ([])
+-- Rocky Mountain Track [7 km loop] line 1.5 km: covers 12% of DOC's line ([Diamond Lake])
+-- Heyward Point Track [5 km return via same track] line 3.3 km: covers 80% of DOC's line ([Heyward Point])
+-- Whangamarino Historic Walk [900 m one way] line 0.9 km: names nothing on the map ([])
+-- Cave Creek Memorial Track/Kotihotiho [4 km return via same track] line 1.8 km: names nothing on the map ([])
+-- Pauanui Trig Track [2.9 km one way] line 3.8 km: names nothing on the map ([])
+-- Coromandel Walkway and mountain bike track [] line 8.3 km: 36584 m in 7 hr return ([Poley Bay, Stony Bay Campsite, Fletcher Bay, Stony Bay])
+-- Wentworth Mines Walk [1 km one way] line 0.8 km: names nothing on the map ([])
+-- Tirohanga Dunes Trail [20 km return via same track] line 4.5 km: names nothing on the map ([])
+== Pakihi Track [20.7 km one way] line 18.3 km -> 19.8 km; via [Pakihi Hut]; ends 9141 m apart
+-- Edwards Lookout [] line 0.6 km: names nothing on the map ([])
+-- Oxenbridge Tunnel Track [] line 0.6 km: names nothing on the map ([])
+-- East Holdsworth Track [] line 3.5 km: 12923 m for DOC's 3510 m line ([Atiwhakatu Track, Mount Holdsworth, Jumbo, Mt Holdsworth - Jumbo Circuit])
+-- Kiwi Saddle Hut via Mt Kuripapango [] line 3.9 km: covers 79% of DOC's line ([Kuripapango, Smith - Russell Track, Cameron Hut, Kiwi Saddle Hut, Kiwi Saddle])
+-- Kepler Track: Carpark to Dock Bay and Brod Bay [5.6 km return via same track] line 4.7 km: 4740 m, DOC 2800 m ([Dock Bay])
+-- Grahams Bush Walkway [6.8 km return return via same track] line 2.1 km: names nothing on the map ([Sawyers Bay, Mount Cargill])
+-- Middle Ridge Track [3.2 km return via same track] line 1.4 km: names nothing on the map ([])
+-- Te Tapui Loop Track [4 km loop] line 5.9 km: no route
+== Atene Skyline Track [12.5 km one way] line 12.3 km -> 12.3 km; via [Taupiri]; ends 1308 m apart
+-- Meeting of the Waters Scenic Reserve walks [] line 0.9 km: names nothing on the map ([])
+-- Kaitaia Walkway [4 km return via same track] line 7.0 km: names nothing on the map ([])
+-- Knights-Shorts Loop Track [] line 12.1 km: covers 36% of DOC's line ([Knights Track, Shorts Track])
+== Nicholsons Track [6 km return via same track] line 2.7 km -> 3.0 km; via [Nicholsons Hut]; ends 2231 m apart
+-- Karangarua and Douglas valleys routes [] line 24.1 km: covers 69% of DOC's line ([Lame Duck Hut, Christmas Flat Hut, Cassel Flat Hut])
+-- Ōpārara Basin: Box Canyon and Crazy Paving Caves [200 m return via same track] line 0.1 km: names nothing on the map ([])
+-- Kaniere Water Race Walkway [9.9 km one way] line 9.3 km: names nothing on the map ([])
+== Kaitarakihi Summit Track [7.2 km return via same track] line 3.6 km -> 3.6 km; via [Kaitarakihi]; ends 3074 m apart
+-- Mangaone Walkway [6 km one way] line 7.2 km: names nothing on the map ([])
+== Albert Burn Hut Track [] line 19.4 km -> 19.4 km; via [Albert Burn Hut]; ends 15190 m apart
+-- Kapakapanui Track [] line 10.6 km: covers 45% of DOC's line ([Kapakapanui])
+-- Lake Rotoiti (West Bay) walks [] line 4.4 km: 12875 m in 1 hr | 1 hr 30 min ([Black Hill, St. Arnaud, Brunner Peninsula, Moraine Walk])
+-- Kepler Track: Carpark to Rainbow Reach [9.5 km one way] line 9.6 km: no route
+-- Historic Railway Tunnel Walk [360 m return via same track] line 0.2 km: names nothing on the map ([])
+== Mt Sunday/Mt Riley Track [15 km loop] line 11.3 km -> 11.5 km loop; via [Mount Riley, Mount Sunday, Mt Sunday Bivvy]; ends 0 m apart
+-- Mount Pureora via Toitoi Track [5.8 km return via same track] line 1.8 km: names nothing on the map ([])
+-- Stonehurst Track [13.5 km one way] line 13.4 km: names nothing on the map ([])
+-- Puketī Nature Trail [1.6 km loop] line 1.5 km: no route
+== North Borland Track [12 km one way, return via same track] line 9.0 km -> 9.1 km; via [North Borland Hut]; ends 7333 m apart
+== Toretore Island Walk [] line 0.3 km -> 0.4 km; via [Toretore Island]; ends 340 m apart
+== Waiopehu Track (Poads Road to Waiopehu Hut) [] line 8.6 km -> 9.7 km; via [Waiopehu Hut]; ends 7333 m apart
+-- Rings Beach Loop Track [4.7 km loop] line 4.7 km: a long way round: 5382 m for 733 m ([Rings Beach, Matarangi Bluff Track])
+-- Martins Bay Track [] line 0.3 km: names nothing on the map ([])
+-- Tailrace Walk [20 min return via same track] line 0.9 km: covers 67% of DOC's line ([Nelson Creek])
+-- Mitre Flats Track [8.2 km return via same track] line 8.1 km: names nothing on the map ([Mitre])
+-- Kahikatea Walk [1 km loop] line 1.1 km: no route
+-- Hogs Back Track (Easy Up Track and Descent Track) [7.4 km one way] line 10.4 km: covers 73% of DOC's line ([Hogs Back, Castle Hill Village])
+== Maude Track to Mangakotukutuku Falls [2.8 km one way] line 2.8 km -> 2.8 km; via [Mangakotukutuku Falls]; ends 2525 m apart
+-- Mahinepua Peninsula Track [] line 2.1 km: names nothing on the map ([Mahinepua])
+-- Tīmaru River Tracks [10.3 km one way] line 10.2 km: no route
+-- Dobson Loop Track [] line 6.6 km: covers 21% of DOC's line ([Puffer Saddle])
+-- Wairau Lagoons Walkway [] line 4.6 km: names nothing on the map ([Upper Lagoon])
+== Adams Flat Track [14 km return | 16 km return return via same track] line 6.4 km -> 6.6 km; via [Fenian Track]; ends 5053 m apart
+-- Taurewa Track [4.5 km loop] line 3.4 km: no route
+== Lindis Peak Track [13 km return return via same track] line 5.6 km -> 5.7 km; via [Lindis Peak]; ends 3653 m apart
+-- Routeburn Track: Key Summit Track [3.4 km one way, return via same track] line 5.7 km: covers 76% of DOC's line ([The Divide, Routeburn Track, Key Summit])
+== Lake Peel Track [12 km one way] line 10.5 km -> 12.1 km; via [Myttons Hut, Lake Peel, Balloon Hut, Tableland, Salisbury Lodge]; ends 6683 m apart
+-- Water Intake Track [500 m one way] line 0.8 km: names nothing on the map ([Hogs Back])
+-- Cape Reinga/Te Rerenga Wairua Lighthouse Walk [800 m one way] line 0.8 km: names nothing on the map ([])
+== Tahurangi Translator Tower round trip [7.5 km loop] line 3.6 km -> 7.6 km loop; via [Tahurangi, Humphries Castle]; ends 0 m apart
+-- Glentui Loop Track [2 km loop] line 2.5 km: covers 26% of DOC's line ([Richardson Track])
+-- Rawhiti Cave Track [] line 1.6 km: names nothing on the map ([])
+-- Monro Beach Track [] line 2.3 km: names nothing on the map ([])
+-- Ngamoko Track [] line 7.1 km: 15464 m for DOC's 7342 m line ([Ngamoko, Waikaremoana, Lake Kaitawa])
+-- Te Puia Hut Track  and Mangatainoka Hot Springs [] line 8.8 km: 15051 m for DOC's 8814 m line ([Makino Hut])
+-- Progress Water Race Track [5 km return via same track] line 2.2 km: names nothing on the map ([])
+-- Pūponga Farm Track / Green Hills Route [10 km return via same track] line 4.5 km: covers 75% of DOC's line ([Wharariki Beach])
+== Routeburn Track [33 km one way] line 33.3 km -> 35.3 km; via [Routeburn Flats Hut, Routeburn Falls Hut, Routeburn Falls, Lake Harris, Harris Saddle/Tarahaka Whakatipu, Harris Saddle, Lake Mackenzie Hut, Lake Mackenzie, The Orchard, Earland Falls, Lake Howden, Key Summit, The Divide]; ends 17346 m apart
+-- Historic Haast to Paringa Cattle Track [] line 33.2 km: no length or time to check
+-- Beverley Price Loop Track [6 km loop] line 2.7 km: covers 8% of DOC's line ([Waterfall Track])
+-- Cloustons Mine Track [] line 4.6 km: covers 3% of DOC's line ([Gordons Pyramid, Tableland Circuit, Mt Arthur Hut, Mt Arthur Hut Walk])
+== Shine Falls Track [4.4 km return via same track] line 2.0 km -> 2.0 km; via [Shine Falls]; ends 1626 m apart
+-- Mautohe Cathedral Cove Track [5 km return via same track] line 2.2 km: 6660 m in 1 hr 30 min return ([Cathedral Cove, Hahei, Stingray Bay, Mares Leg Cove])
+-- Rangitoto Island shorter walks [] line 1.7 km: names nothing on the map ([Flax Point])
+-- Lake Dispute to Moke Lake Track [5.8 km one way return via same track] line 7.4 km: names nothing on the map ([Lake Dispute, Moke Lake])
+-- Youngman Stream Track [] line 13.1 km: 24997 m for DOC's 13141 m line ([Youngman Stream Hut, Tarn Hut tracks])
+-- Kingswood Bush Scenic Reserve [670 m loop] line 0.6 km: no route
+-- Lake Roxburgh Walkway [10 km | 20 km return via same track] line 9.4 km: a long way round: 19594 m for 686 m ([Alexandra, Doctors Point])
+-- Diamond Lake Loop Track [1.5 km loop] line 1.5 km: covers 47% of DOC's line ([Diamond Lake, Lake Wānaka Lookout Track])
+-- Koranga Tawa Loop Track [] line 24.5 km: a long way round: 18601 m for 4876 m ([Koranga Forks Hut, Tawa Hut])
+-- Northern Tarawera Track [6 km one way] line 7.4 km: names nothing on the map ([Lake Tarawera])
+-- Pakihi Walk [1 km return via same track] line 0.5 km: names nothing on the map ([])
+== Mystery Lake Track [] line 11.4 km -> 11.6 km; via [Mystery Lake]; ends 5419 m apart
+-- Ōtūkaikino Walk [1.2 km loop] line 1.2 km: no route
+-- Māori Saddle Route [] line 1.9 km: 15406 m for DOC's 1887 m line ([Historic Haast to Paringa Cattle Track, Maori Saddle Hut, Mataketake Hut, Mica Mine Tops Route])
+== Ocean Beach tracks [] line 2.0 km -> 1.3 km; via [Ocean Beach]; ends 496 m apart
+-- Roxburgh Faces Tramping Track [2.5 km one way] line 2.5 km: names nothing on the map ([])
+-- Hokitika Gorge Walk [1.6 km loop] line 1.9 km: no route
+-- Lower Circuit Track [4 km loop] line 1.4 km: covers 8% of DOC's line ([Diamond Lake])
+-- Pororari River Track [7 km return via same track] line 3.3 km: names nothing on the map ([Pororari])
+-- Moraine Creek Route [5.5 km one way] line 4.3 km: names nothing on the map ([])
+-- Newcastle Track [12 km one way] line 12.5 km: names nothing on the map ([])
+-- Bealey Valley Track [1.2 km one way] line 1.3 km: names nothing on the map ([])
+== Cobb Ridge Route [] line 8.9 km -> 11.9 km; via [Lake Peel Track, Myttons Hut]; ends 6874 m apart
+-- Tokatea Lookout Walking Track [600 m return via same track] line 0.3 km: names nothing on the map ([])
+== Trig Lookout Track / Mount Chisolm Track [Trig Lookout - 1.3 km / Mount Chisolm - 3.5 km return via same track] line 3.3 km -> 3.4 km; via [Mount Chisholm]; ends 2933 m apart
+-- Tarawaere Track [] line 2.0 km: names nothing on the map ([])
+-- Angelus Hut via Speargrass Track and Speargrass Creek Route [11.2 km one way] line 10.4 km: a long way round: 18910 m for 1257 m ([Mount Robert, Speargrass Track, Speargrass Hut])
+-- Ngapuketurua Track [] line 6.3 km: names nothing on the map ([Ngapuketurua])
+-- Lake Alta Track [2.4 km return via same track] line 1.2 km: further from DOC's length than before ([Lake Alta])
+-- Government Battery Walk [50 m return via same track] line 0.0 km: names nothing on the map ([])
+== Mount Sunday Track [] line 1.5 km -> 1.6 km; via [Mount Sunday]; ends 1120 m apart
+-- Kaimanawa Forest Loop Walk [1.1 km loop] line 0.9 km: no route
+-- King Hill Reserve Walking Track [300 m one way] line 0.4 km: names nothing on the map ([])
+== Wairake Track [] line 3.3 km -> 3.3 km; via [Mount Karioi]; ends 2593 m apart
+-- Lake Monowai Peninsula Lookout Track [1 km loop] line 1.2 km: no route
+-- Aongatete Long Loop Walk [6.7 km (via the Short Loop Track) loop] line 6.9 km: no route
+-- Waipohatu Waterfalls Track [6.5 km loop] line 4.6 km: no route
+-- Otago Dam Track [4 km return via same track] line 2.1 km: 5013 m, DOC 2000 m ([Gabriels Gully])
+-- Hay Scenic Reserve walk [900 m loop] line 0.8 km: no route
+-- Waikakaho/Cullen Creek Track [15 km one way] line 13.7 km: names nothing on the map ([])
+-- Akaroa Head Scenic Reserve walk [1 km return via same track] line 0.9 km: covers 55% of DOC's line ([Haylocks Bay])
+-- Peach Tree Track to Mt Hobson (Hirakimata) [] line 3.3 km: 10285 m for DOC's 3311 m line ([Kaitoke Hot Springs Track, Tramline Track, Mount Heale, Mt Heale Hut])
+-- Te Kiekie Route [] line 2.4 km: covers 3% of DOC's line ([Mount Somers Track, Pinnacles Hut, Woolshed Creek Hut])
+-- Alex Knob Track [17.2 km return via same track] line 7.9 km: further from DOC's length than before ([Alex Knob, Lake Wombat])
+-- Surat Bay Beach Walk [500 m return via same track] line 0.5 km: names nothing on the map ([Surat Bay])
+-- Twizel River Trail [12 km one way] line 3.6 km: names nothing on the map ([])
+-- Forest Road (Port FitzRoy - Whangaparapara) [13 km one way] line 13.6 km: names nothing on the map ([])
+-- Around Blue Lake Track [2.9 km return via same track] line 2.8 km: 3029 m, DOC 1450 m ([Saint Bathans])
+-- Hacket Track [11.4 km return via same track] line 5.5 km: covers 78% of DOC's line ([Hacket Hut])
+-- H Tree Track [2.2 km loop] line 2.0 km: no route
+-- Owharoa Falls Track [200 m one way] line 0.2 km: 293 m for DOC's 180 m line ([Owharoa Falls])
+-- Track to Dawson Falls [] line 0.6 km: covers 68% of DOC's line ([Kapuni Loop Track])
+== Tuahu Track [11.9 km one way] line 12.8 km -> 11.7 km; via [North-South Track]; ends 5766 m apart
+-- Opepe walks [1.5 km | 3 km loop] line 4.4 km: no route
+-- Kirtle Burn Track [12.38 km loop] line 12.2 km: covers 22% of DOC's line ([Mount Pisa, Kirtle Burn Hut])
+-- Bowen Bush Walk [250 m loop] line 0.1 km: no route
+-- Arnold River Dam Walk [2.1 km loop] line 1.7 km: no route
+-- Karikari Bay Walk [400 m one way] line 0.5 km: names nothing on the map ([])
+-- Brookdale Track [4 km one way] line 3.7 km: names nothing on the map ([])
+-- Tuatapere Scenic Reserve Loop Track [] line 1.8 km: no route
+-- Milford Sound Lookout Track [400 m return via same track] line 0.1 km: covers 0% of DOC's line ([Milford Sound])
+-- Marker Bay Track [1 km return via same track] line 0.6 km: names nothing on the map ([])
+-- Rapurapu Kauri Track [5 km return via same track] line 2.8 km: names nothing on the map ([])
+-- Benmore Peninsula Walk [4 km loop] line 4.1 km: no route
+-- Kiriwhakapapa to Blue Range Hut [] line 3.4 km: 16119 m for DOC's 3371 m line ([Blue Range Hut, Kiriwhakapapa Campsite, Kiriwhakapapa Loop Track, Cow Creek Hut])
+-- Titri Creek Walking Track [1.5 km return via same track] line 0.7 km: names nothing on the map ([Titri])
+-- Otawa Trig Track [] line 12.0 km: covers 70% of DOC's line ([Otawa, Otawa Reservoir Track])
+-- Dingle Burn Peninsula Track [12 km one way] line 12.0 km: covers 18% of DOC's line ([The Peninsula])
+-- Waipapa Loop Track [2.3 km loop] line 2.1 km: no route
+-- Blowhard Track [9. 5 km one way] line 9.2 km: covers 65% of DOC's line ([Richardson Track, Mount Richardson])
+-- Bennetts Bluff Viewpoint Walk [800 m return via same track] line 0.3 km: names nothing on the map ([])
+-- Farewell Spit Walk [12 km loop] line 12.3 km: no route
+-- Port FitzRoy: Kaiaraara Hut side tracks [] line 10.0 km: covers 19% of DOC's line ([Kaiaraara Hut, Bush's Beach Track, Maungapiko, Forest Road, Mt Heale Hut, Mount Heale])
+-- Anaura Bay Walkway [4.5 km loop] line 4.0 km: no route
+== Ketemaringi Route [10.7 km one way] line 10.7 km -> 10.8 km; via [Ketemaringi]; ends 2899 m apart
+-- Orari Gorge Track [3.3 km loop] line 2.9 km: no route
+-- Kiko Loop Track [3.9 km loop] line 3.4 km: no route
+-- Lake Waikaremoana: Panekire Bluffs [] line 8.5 km: no length or time to check
+-- Deep Stream Track [2 km one way] line 1.2 km: names nothing on the map ([])
+-- Bannockburn Sluicings [3.5 km loop] line 3.4 km: no description
+-- Kaituna Valley Packhorse Hut Track [4 km one way] line 3.7 km: a long way round: 13889 m for 3232 m ([Packhorse Hut])
+-- Roaring Billy Falls Walk [1 km return via same track] line 0.5 km: names nothing on the map ([])
+== Ferndale tracks [] line 0.4 km -> 0.4 km; via [Ferndale Campsite]; ends 357 m apart
+-- Moonlight Pack Track [] line 8.4 km: names nothing on the map ([])
+-- Hut Creek Track [1.3 km one way] line 1.1 km: 2591 m, DOC 1300 m ([Bridge Hill])
+== Sawyers and Parsons Creek to Freehold Creek Track [12 km one way] line 6.1 km -> 7.0 km; via [Freehold Creek Track]; ends 4858 m apart
+-- Cattle Ridge Track [] line 10.8 km: covers 48% of DOC's line ([Ōrongorongo Track])
+-- Eliza Mine Loop Track [7 km loop] line 4.9 km: covers 73% of DOC's line ([Mount Eliza, Thompsons Track])
+== Kepler Track: Carpark to Luxmore Hut [13.8 km one way return via same track] line 12.9 km -> 13.1 km; via [Dock Bay, Luxmore Hut]; ends 7965 m apart
+-- Mapara Track [2.5 km loop] line 2.4 km: no route
+== Cockayne Alley Track [4 km one way] line 3.2 km -> 3.3 km; via [Dracophyllum Flat Track]; ends 2446 m apart
+== Kiwi Track [8.3 km one way] line 10.0 km -> 9.8 km; via [Kiwi Saddle Hut, Wangapeka Track]; ends 4751 m apart
+-- Mokai Road End to Otukota Hut [] line 8.7 km: covers 75% of DOC's line ([Otukota Hut])
+== Whangaparapara: Old Mill Track [] line 1.4 km -> 1.4 km; via [The Green Campsite]; ends 1019 m apart
+-- Four Brothers Track [630 m one way] line 0.6 km: names nothing on the map ([])
+-- Haast Pass Lookout Track [1.5 km return via same track] line 0.7 km: names nothing on the map ([])
+-- Te Kere Haka Track [] line 3.1 km: names nothing on the map ([Kingston])
+-- Huka Falls to Aratiatia Rapids Track [] line 6.2 km: 6846 m in 10 min | 2 hr ([Huka Falls])
+== Mueller Hut Route [5.2 km one way] line 5.2 km -> 5.4 km; via [Sealy Tarns Track, Sealy Tarns, Mueller Hut]; ends 2638 m apart
+-- Maukaatua Route [2.7 km return via same track] line 2.0 km: 2586 m, DOC 1350 m ([Woodside Glen Walk])
+-- Mackenzie Stream Route [8 km one way] line 8.0 km: names nothing on the map ([])
+-- Purakaunui Falls Walk [] line 0.5 km: covers 44% of DOC's line ([Purakaunui Falls])
+-- Rocky's to Waiotahi Track [3.3 km one way] line 3.3 km: names nothing on the map ([Waiotahi Track])
+-- Cameron Lookout Walk [1 km return via same track] line 0.5 km: 3083 m in 20 min return ([Cameron Valley Track])
+== Teal Bay to South Coast Track [17 km one way] line 15.1 km -> 17.4 km; via [Teal Bay Hut]; ends 12346 m apart
+-- Penguin Walk [500 m return via same track] line 0.2 km: names nothing on the map ([])
+-- Obelisk Loop Track [10 km loop] line 9.8 km: covers 1% of DOC's line ([Obelisk])
+-- Baldy Knob Route [11.5 km one way] line 11.5 km: names nothing on the map ([Baldy Knob])
+-- Waikōpiro Loop Track [1.1 km loop] line 4.4 km: covers 21% of DOC's line ([Lake Waikōpiro])
+-- Catchpool Loop Walk [1.6 km loop] line 0.7 km: 5110 m in 30 min ([Ōrongorongo Track])
+-- Sutton Salt Lake walk [3.5 km loop] line 3.3 km: no route
+-- Momorangi Forest Experience Walk [] line 0.4 km: names nothing on the map ([])
+-- Ōpārara Arch [2 km return via same track] line 1.1 km: names nothing on the map ([])
+-- Port FitzRoy: Warren's and Bridle Tracks [] line 2.9 km: names nothing on the map ([])
+-- Papatowai walks [] line 2.5 km: names nothing on the map ([Tahakopa Bay, Papatowai, Picnic Point])
+-- Omeo Gully Track [19 km return via same track] line 9.3 km: names nothing on the map ([])
+-- Ashley Gorge Loop Track [1.5 km return via same track] line 1.0 km: no route
+-- Rangitoto Island longer walks [] line 6.8 km: names nothing on the map ([Rangitoto, Islington Bay, Motutapu Island, Boulder Bay])
+-- Burnt Ridge Track [3.8 km one way] line 4.4 km: names nothing on the map ([])
+-- Long Gully Loop Track [11 km loop] line 11.2 km: no route
+-- St Arnaud Range Track [10 km return return via same track] line 4.2 km: names nothing on the map ([])
+-- Mounds Walk [360 m return via same track] line 0.2 km: names nothing on the map ([])
+== Lake Wānaka Lookout Track [3.5 km return via same track] line 1.3 km -> 1.5 km; via [Diamond Lake]; ends 832 m apart
+-- Fantail Bay Track [] line 1.4 km: names nothing on the map ([])
+-- Kauaeranga Nature Walk – Hoffman's Pool [] line 0.4 km: names nothing on the map ([])
+-- Peach Cove Track [5.7 km return return via same track] line 3.0 km: covers 16% of DOC's line ([Peach Cove])
+-- Glencreag Track [5 km one way] line 4.5 km: covers 63% of DOC's line ([Big Hut])
+-- Huriawa Pā Walk [2.4 km loop] line 1.0 km: no route
+-- Tūtoko Valley Route [4 km return via same track] line 6.5 km: names nothing on the map ([])
+-- Pukenui Forest Loop [8.2 km loop] line 7.7 km: no route
+== Ridge Loop Track [1.9 km loop] line 0.9 km -> 1.9 km loop; via [Wilkies Pools Loop Track]; ends 0 m apart
+-- Lake Ngatu Track [4 km loop] line 3.4 km: no route
+-- Inland Pack Track [25 km one way] line 21.8 km: covers 20% of DOC's line ([Paparoa Track])
+-- Leith Hill Loop Track [5 km loop] line 4.2 km: covers 20% of DOC's line ([Thomas River Track])
+-- Globe Hill Track [11 km to Globe Progress Mine Site one way] line 9.2 km: names nothing on the map ([])
+-- Trials Spur Track [] line 1.0 km: covers 70% of DOC's line ([Makahu Saddle Hut])
+-- Billygoat Circuit [10.5 km loop] line 9.9 km: covers 29% of DOC's line ([Billygoat Basin Campsite, Hihi])
+-- Klondyke Valley Track [4.5 km one way] line 3.7 km: names nothing on the map ([])
+-- Headlands Track [1.6 km loop] line 0.8 km: 2895 m, DOC 1600 m ([Tōtaranui])
+== Mangahao Track [] line 9.5 km -> 9.9 km; via [Mangahao Upper No. 1 Reservoir, Mangahao Flats Hut]; ends 8073 m apart
+-- Heather Jock Loop Track [3.3 km loop] line 3.3 km: a long way round: 7349 m for 1786 m ([Mount Judah, Heather Jock Hut])
+== Princhester Saddle Route [16 km one way] line 16.0 km -> 16.0 km; via [Lower Princhester Hut, Aparima Hut]; ends 13328 m apart
+-- Parks Peak Track to Yeoman's Track [7.3 km one way] line 7.3 km: covers 73% of DOC's line ([Yeoman's Track, Upper Makaroro Hut])
+== Paparoa Track: Pororari Hut Track [16 km one way | 17.1 km one way return via same track] line 15.2 km -> 15.3 km; via [Pororari Hut]; ends 9974 m apart
+-- A’Deanes Bush Walk [1 km loop] line 1.1 km: no route
+-- Glencoe Walking Track [] line 0.2 km: names nothing on the map ([])
+-- Hakarimata Summit Track [2 km return via same track] line 1.8 km: 1756 m in 3 hr ([Waterworks Walk])
+-- Kirwans Track [20.7 km one way return via same track] line 9.1 km: 10132 m, DOC 20700 m ([Kirwans Hut, Montgomerie Hut])
+-- Moki Track [18 km one way] line 18.0 km: names nothing on the map ([Moki])
+== Dome Forest car park to lookout [] line 1.0 km -> 1.6 km; via [The Dome]; ends 1115 m apart
+== Rerekapa Track [] line 9.4 km -> 9.7 km; via [Rerekapa Hut, Rerekapa Falls]; ends 7040 m apart
+-- Northern Tangihua Track [] line 7.8 km: covers 38% of DOC's line ([Tangihua Hut])
+-- Londonderry Rock Walk [] line 0.2 km: names nothing on the map ([])
+-- Arataki Track [4.85 km return via same track] line 4.8 km: names nothing on the map ([Arataki])
+== Te Hapua Bay Track [2.5 km one way return via same track] line 0.5 km -> 1.9 km; via [Te Hāpua Bay]; ends 1592 m apart
+== Roaring Stag Track [] line 3.9 km -> 5.7 km; via [Roaring Stag Hut, Herepai Hut]; ends 4313 m apart
+== Canavans Knob Walk [3.2 km - 6.3 km return via same track] line 1.5 km -> 1.6 km; via [Canavans Knob]; ends 929 m apart
+-- Makarora Bush Walk [700 m loop] line 0.7 km: no route
+-- Rarawa Beach Walk [] line 0.5 km: names nothing on the map ([])
+-- Little Manganuku Track [] line 2.9 km: names nothing on the map ([])
+-- Waitahu - Murray Connecting Track [3 km loop] line 2.5 km: no route
+== Wharauroa Track [] line 3.1 km -> 3.6 km; via [Wharauroa, Mahaukura Track, Mahaukura]; ends 3218 m apart
+== Bain Bay Walk [7.2 km return via same track] line 3.4 km -> 3.5 km; via [Drake Point, Bain Bay]; ends 2349 m apart
+-- Remutaka Rail Trail [18 km (Kaitoke to Cross Creek carpark) one way] line 3.3 km: 6804 m, DOC 18000 m ([Summit])
+-- Ridge Track [1.2 km return via same track] line 0.7 km: names nothing on the map ([])
+-- Caving at Cave Stream [] line 0.7 km: names nothing on the map ([])
+-- Ballroom Overhang Track [12 km return via same track] line 1.0 km: names nothing on the map ([])
+== Middle Hill Track (Makahu Road to Middle Hill Hut) [] line 5.3 km -> 5.6 km; via [Middle Hill Hut]; ends 4764 m apart
+-- Swamp Track [1.9 km loop] line 2.1 km: covers 13% of DOC's line ([Triplex Hut, Armstrong Saddle])
+-- Nga Taonga Nature Walk [] line 1.2 km: names nothing on the map ([])
+-- Ruapani Circuit Track [] line 13.2 km: a long way round: 10927 m for 2700 m
+-- Mapoutahi Track [3 km return via same track] line 0.2 km: names nothing on the map ([Osborne, Purakaunui Bay])
+== Careys Creek Track [9.5 km one way] line 9.7 km -> 9.6 km; via [Double Hill]; ends 5513 m apart
+-- Gray's Bush Scenic Reserve walks [] line 1.0 km: names nothing on the map ([])
+-- Woolshed Hill Track [4.1 km return via same track] line 2.1 km: names nothing on the map ([Hawdon Shelter Campsite, Woolshed Hill])
+== Lake Kaniere Walkway [10.1 km one way] line 10.1 km -> 10.4 km; via [Sunny Bight]; ends 8196 m apart
+-- Okuti Valley Scenic Reserve walk [600 m return via same track] line 0.4 km: names nothing on the map ([Okuti Valley])
+-- Mt Holdsworth - Jumbo Circuit [24 km loop] line 18.7 km: covers 78% of DOC's line ([Holdsworth road end to Powell Hut/Mount Holdsworth, Jumbo Hut, Atiwhakatu Track, Gentle Annie Track, Powell Hut, Mount Holdsworth, Jumbo, Atiwhakatu Hut])
+-- Forest Walk [1.3 km one way] line 0.7 km: names nothing on the map ([])
+-- Tawarau Forest tramping tracks [] line 16.3 km: covers 75% of DOC's line ([Tawarau Falls, Double Falls, Mangaohae])
+-- Whangaparapara: Te Ahumata Track [] line 2.4 km: covers 22% of DOC's line ([Whangaparapara])
+-- Whakanui Track [] line 8.5 km: names nothing on the map ([Wainuiomata])
+== Signal Station Track [] line 0.4 km -> 0.4 km; via [Martins Bay Track]; ends 351 m apart
+-- Hahei Beach Short Walk [700 m one way] line 0.6 km: no description
+-- Te Weheka Walkway/Cycleway [5 km return via same track] line 3.4 km: covers 2% of DOC's line ([Fox Glacier])
+-- Maratoto - Wentworth Crossing [] line 11.7 km: names nothing on the map ([Maratoto])
+== Makino Track (Makahu Road to Makino Hut) [] line 5.5 km -> 5.8 km; via [Makino Hut]; ends 4664 m apart
+-- Fossickers Lake Track [8 km return via same track] line 5.8 km: DOC's line is off the map's tracks
+-- Upper Matiri Valley and 1000 Acre Plateau tramping tracks [] line 31.6 km: covers 55% of DOC's line ([Lake Matiri Hut, Mcconchies Hut, Lake Jeanette, Hurricane Hut])
+-- Brasell Point Nature Walk [] line 0.3 km: names nothing on the map ([Deep Cove, Helena Falls])
+-- Patea Track [] line 2.4 km: names nothing on the map ([])
+-- Old Coach Road [1.1 km loop] line 1.1 km: no route
+-- Okiwi Bay Seaward Valley Track [] line 12.3 km: names nothing on the map ([Half Moon Bay])
+-- Waihora Lagoon Walk [730 m return via same track] line 0.7 km: names nothing on the map ([])
+-- Governors Bay Track [] line 0.3 km: no description
+== Waikawau Track [28 km return via same track] line 10.7 km -> 13.5 km; via [Leitch's Hut]; ends 9345 m apart
+-- Windy Canyon and Palmer's Track to Mt Hobson (Hirakimata) [] line 3.0 km: 3181 m in 15 min | 3 hr return ([Mount Hobson])
+-- Lake Rotoiti (Kerr Bay) walks [] line 9.7 km: covers 63% of DOC's line ([St. Arnaud, Bellbird Walk, Lakehead Track, Kerr Bay Campsite])
+-- Rotopounamu Track [5 km loop] line 4.8 km: no route
+-- Waipakihi Valley (Waipakihi Road end to Waipakihi Hut) [] line 6.3 km: names nothing on the map ([])
+== Dog Gully Route [5 km one way] line 5.4 km -> 5.4 km; via [Dog Gully Easement]; ends 3493 m apart
+== Flora Hut Walk [] line 1.9 km -> 2.1 km; via [Flora Saddle, Flora Hut]; ends 1642 m apart
+== Mt Tamahunga Walkway [] line 2.5 km -> 2.5 km; via [Tamahunga]; ends 1981 m apart
+-- Waoku Coach Road Track [] line 23.0 km: names nothing on the map ([Waimā])
+-- Papa Aroha Walk [400 m return via same track] line 0.5 km: names nothing on the map ([])
+-- Lake Emma to Lake Camp Track [] line 5.6 km: a long way round: 9825 m for 2708 m ([Lake Roundabout])
+== Freshwater Landing to Mason Bay [15.5 km one way] line 14.9 km -> 15.0 km; via [Freshwater Hut, Island Hill, Mason Bay Hut]; ends 12828 m apart
+-- Richmond Trail [13 km one way] line 15.9 km: DOC's line is off the map's tracks
+-- Waikanae Link Track [1.8 km one way] line 1.8 km: names nothing on the map ([Waikanae Beach])
+-- Routeburn Track: Lake Howden Track [3.4 km return via same track] line 3.2 km: 3698 m, DOC 1700 m ([The Divide, Routeburn Track, Lake Howden])
+-- Urchin Campsite to Pillars of Hercules [1.5 km one way] line 1.3 km: names nothing on the map ([])
+-- Tohumoana Lookout Track [] line 5.0 km: 3756 m in 1 hr 30 min - 2 hr return ([Waikahoa Bay])
+-- Rob Roy Track [10 km return via same track] line 5.3 km: names nothing on the map ([])
+-- Chalkies Track [6 km loop] line 4.7 km: no route
+-- Mount Augarde Track [2 km return via same track] line 1.6 km: 1571 m, DOC 1000 m ([Mount Augarde])
+== Waitomo Walkway [] line 3.1 km -> 3.4 km; via [Waitomo Caves]; ends 2302 m apart
+-- Mangawhero Forest Walk [3.4 km loop] line 2.9 km: covers 54% of DOC's line ([Rimu Walk])
+-- Otanewainuku Lookout Track [] line 3.2 km: names nothing on the map ([])
+-- Waterfall Track [2.1 km one way] line 2.0 km: 6189 m in 1 hr 30 min one way ([Dog Stream Waterfall, Mount Isobel, Spur Track])
+== Sawyer Burn Track [8 km return via same track] line 4.0 km -> 4.3 km; via [Kidds Bush Nature Walk]; ends 2647 m apart
+-- Lake Heron tracks [] line 9.7 km: names nothing on the map ([Lake Heron, Lake Hill, Double Hut])
+-- Tapeka Point Track [] line 0.4 km: names nothing on the map ([])
+-- Routeburn Nature Walk [] line 2.3 km: covers 64% of DOC's line ([Routeburn Track])
+-- Ihaia Track to Waiaua Gorge Hut [5.9 km one way] line 5.6 km: names nothing on the map ([])
+-- Renfrew Road end to Table Flat Road end [] line 20.8 km: covers 54% of DOC's line ([Rangiwahia Hut, Triangle Hut])
+-- Harper Valley Track [18 km one way] line 18.0 km: further from DOC's length than before ([Hamilton Hut])
+-- Long Beach (South) Walking Track [600 m loop] line 0.4 km: covers 17% of DOC's line ([Long Beach])
+-- View Hill to Mt Oxford Track [5.7 km one way] line 5.7 km: names nothing on the map ([])
+-- Wanganui valley tracks [] line 22.9 km: names nothing on the map ([Hunters Hut, Blue Lookout, Smyth Hut])
+-- Kahikatea Walk [900 m return loop] line 0.7 km: no route
+-- Lake Man Route [8.1 km one way] line 8.1 km: further from DOC's length than before ([Doubtful Valley Track])
+-- Hāpūpū/J.M. Barker Historic Reserve Walk [] line 1.5 km: names nothing on the map ([])
+-- Karamū Walkway North [2.7 km one way] line 2.5 km: 9688 m in 1 hr 30 min ([Four Brothers Track, Karamū Walkway South])
+-- Trig M Route [3.1 km one way] line 3.1 km: names nothing on the map ([Porters Pass, Lake Lyndon])
+-- Minaret Burn Track [45 km return via same track] line 22.0 km: names nothing on the map ([])
+-- Pukatea Walk [0.8 km return via same track] line 0.6 km: covers 27% of DOC's line ([Tōtaranui])
+-- Dolamore Track [2 km loop] line 2.4 km: no route
+-- Trotters Creek Track [1.5 km one way] line 1.4 km: further from DOC's length than before ([Trotters Gorge])
+-- White Pine Bush Scenic Reserve walks [800 m /1.6 km loop] line 1.2 km: no route
+== Bob’s Camp Bivouac Route [] line 8.8 km -> 9.4 km; via [Wooded Gully Track, Ridge Track]; ends 6084 m apart
+-- Sparrowhawk Track [4.9 km one way] line 4.9 km: further from DOC's length than before ([Maropea])
+== Mount Pureora from Link Road [2.6 km one way return via same track] line 2.6 km -> 2.7 km; via [Pureora]; ends 2204 m apart
+-- Lankey Creek Tram Track [4 km loop] line 2.8 km: 9591 m, DOC 4000 m ([Tram Track, Blacks Point])
+== Kerikeri River Track [3.5 km one way] line 4.0 km -> 3.9 km; via [Wharepoke Falls, Rainbow Falls]; ends 1838 m apart
+== Stockyard Cove Track [1.5 km return via same track] line 1.1 km -> 1.1 km; via [Stockyard Cove]; ends 862 m apart
+-- Ōkere Falls Track [] line 1.1 km: names nothing on the map ([])
+-- Tiropahi Track [10 km return via same track] line 5.2 km: names nothing on the map ([])
+-- Huka Falls Lookout Walk [167 m one way] line 0.2 km: 499 m for DOC's 188 m line ([Huka Falls])
+-- Holly Hut Track [] line 6.6 km: a long way round: 14944 m for 3788 m ([Holly Hut, Veronica Loop Track, North Egmont])
+-- Motukawanui Island Track [3.5 km one way] line 3.3 km: names nothing on the map ([])
+-- Waitaia Track [2 km loop] line 2.4 km: no route
+-- Skyline Walk [] line 0.7 km: names nothing on the map ([Murchison])
+-- Square Kauri Tree [150 m return via same track] line 0.1 km: names nothing on the map ([])
+== Lower Wairaki Hut to Upper Wairaki Hut Route [8.5 km one way] line 5.4 km -> 10.0 km; via [Lower Wairaki Hut]; ends 4554 m apart
+-- Gunns Bush Track [4.1 km return via same track] line 1.2 km: names nothing on the map ([])
+-- Golden Fleece Walk [550 m return via same track] line 0.3 km: 661 m for DOC's 293 m line ([Murray Creek Track, Blacks Point])
+== Emily Falls Track [] line 1.4 km -> 1.4 km; via [Blandswood]; ends 764 m apart
+== Mt Fishtail Route [] line 7.9 km -> 8.1 km; via [Pine Valley Track, Mill Flat Campsite, Fishtail Hut]; ends 6999 m apart
+-- Mount Fox Route [7.4 km return via same track] line 3.4 km: names nothing on the map ([Fox Glacier])
+-- Ōtara Bay Track [5.5 km return via same track] line 1.0 km: 973 m in 2 hours ([Ōtara Bay])
+-- The Chasm Walk [400 m return via same track] line 0.5 km: no length or time to check
+-- Kohekohe Walk [] line 1.0 km: names nothing on the map ([])
+-- Blue Lake Loop Track [2 km loop] line 1.8 km: no route
+-- Cooks Cove Walkway [5.8 km return via same track] line 2.4 km: names nothing on the map ([Mitre Rocks, Pourewa Island, Hauiti])
+== Steele Creek Track [15 km one way] line 14.7 km -> 14.6 km; via [Steele Creek Hut, Caples Track]; ends 12896 m apart
+-- Karakariki Track [] line 1.8 km: names nothing on the map ([Karakariki])
+-- Millennium Walk [350 m loop] line 0.0 km: no route
+-- Tarawaere to Billygoat Link Track [] line 2.3 km: covers 6% of DOC's line ([Billygoat Walk])
+-- Waimamaku Coastal Track [10.1 km one way] line 9.5 km: names nothing on the map ([])
+-- Nikau Flat and Kotepato Tracks [] line 5.5 km: no length or time to check
+-- French Pass Lookout Track [] line 0.7 km: no description
+-- Double Hill access tracks [] line 7.7 km: names nothing on the map ([Double Hill])
+-- Pounawea nature walks [1 km loop loop] line 0.3 km: covers 30% of DOC's line ([Pounawea])
+-- Molesworth Homestead Lookout Track [1 km return via same track] line 0.5 km: names nothing on the map ([])
+-- Deadmans Track [3 km one way] line 4.2 km: 5308 m, DOC 3000 m ([Harris Saddle, Routeburn Track])
+-- Motuora Island walks [] line 1.9 km: names nothing on the map ([])
+-- Dundas Circuit [] line 14.1 km: 33782 m for DOC's 16581 m line ([Herepai, Herepai Hut, Dundas Hut, Cattle Ridge Hut, Roaring Stag Hut, Roaring Stag Track])
+-- No Man's Road area tramping tracks [] line 15.5 km: no route
+-- Ballance Loop Track [] line 0.8 km: 8576 m in 15-30 min ([Manawatu Gorge Track])
+-- Waitengaue Track [] line 8.9 km: names nothing on the map ([])
+== Mt Urchin Trig Track [6.6 km return via same track] line 3.2 km -> 3.3 km; via [Urchin]; ends 2499 m apart
+== Matiu/Somes Island gun emplacements track [] line 0.4 km -> 0.4 km; via [Matiu / Somes Island]; ends 322 m apart
+-- Kelceys Bush tracks [] line 1.0 km: names nothing on the map ([])
+-- Tongariro Northern Circuit [35.5 km one way] line 32.7 km: a long way round: 33438 m for 5731 m ([Blue Lake, Emerald Lakes, Tongariro Alpine Crossing, Oturere Hut, Waihohonu Hut, Taranaki Falls])
+== Gentle Annie Track [4.5 km one way] line 4.5 km -> 4.5 km; via [Rocky Lookout]; ends 3030 m apart
+-- Ngahere Ara Track [1.1 km loop] line 1.1 km: no route
+== Kea Basin Track [] line 3.1 km -> 3.1 km; via [Earnslaw Hut]; ends 1020 m apart
+-- Rangitoto Summit Track [7 km return via same track] line 2.8 km: covers 48% of DOC's line ([Rangitoto])
+-- Kauri Stump Walk [140 m return via same track] line 0.1 km: names nothing on the map ([])
+-- Sefton Ridge Track [4.3 km loop] line 2.3 km: 8749 m, DOC 4300 m ([Kaitake])
+-- Wharariki Beach Track (Archway Islands) [1 km one way] line 1.0 km: names nothing on the map ([])
+-- Urupukapuka Island Walk [] line 14.9 km: covers 33% of DOC's line ([Whangapau Point])
+-- Dore Pass Route [13.5 km one way] line 10.3 km: names nothing on the map ([])
+-- Tawhai Walk [250 m loop] line 0.2 km: 2668 m for DOC's 200 m line ([Reefton Saddle])
+-- Three Mile Stream Track and Route [] line 17.9 km: covers 26% of DOC's line ([Three Mile Stream Hut, Hope Kiwi Lodge, Hope Kiwi Track])
+== Lake Hauroko to Teal Bay Hut Track [18 km one way, return via same track] line 15.8 km -> 16.2 km; via [Teal Bay Hut]; ends 11070 m apart
+-- Paihia School Road Track [1.5 km return via same track] line 1.3 km: names nothing on the map ([Paihia])
+== Opito Point Pā Walk [1 km return via same track] line 0.3 km -> 0.4 km; via [Opito Point]; ends 259 m apart
+== Waingongoro Hut tracks [Various: 2.3 km one way | 2.9 km one way one way] line 2.4 km -> 4.1 km; via [Ridge Track, Waingongoro Hut]; ends 1298 m apart
+-- Te Waikoropupū Springs Walk [1 km loop] line 1.1 km: no route
+-- Mangapumarumaru Track [] line 5.6 km: names nothing on the map ([])
+-- Tikitapu Nature Walk [] line 0.7 km: names nothing on the map ([])
+-- Kororipo Pā Historic Walk [800 m one way] line 0.5 km: names nothing on the map ([Kerikeri])
+-- Ōtātara Pā Historic Reserve Walk [] line 1.8 km: names nothing on the map ([])
+== Hongi Hika Walk [1 km one way] line 0.9 km -> 1.2 km; via [Kororipo Pā Historic Walk]; ends 887 m apart
+-- Mt Potts Easement Track to Mt Potts Conservation Area boundary [] line 1.5 km: names nothing on the map ([Mount Potts])
+-- Ruapekapeka Pā Track [1.5 km loop] line 1.7 km: covers 22% of DOC's line ([Ruapekapeka])
+-- Avoca Valley Track [23.4 km one way] line 23.5 km: a long way round: 12086 m for 1985 m ([Lake Lilian, Basins Hut, Old Basins Hut, Avoca Hut])
+-- Kakepuku Track [7.2 km return via same track] line 3.5 km: names nothing on the map ([])
+-- Ulva Island/Te Wharawhara walking tracks [] line 5.5 km: covers 66% of DOC's line ([Te Wharawhara, Boulder Beach, West End Beach])
+-- Harataonga Loop Track [1.42 km one way] line 1.5 km: no route
+== Copland Track to Welcome Flat Hut [18 km one way] line 15.7 km -> 15.8 km; via [Copland Track, Architect Creek Hut, Welcome Flat Hut]; ends 12416 m apart
+-- Tawa Walk and Weta Walk [1 km loop] line 1.7 km: no route
+== Ellis Basin Route [22 km one way] line 18.9 km -> 19.4 km; via [Ellis Hut, Mount Arthur, Winter Peak]; ends 11839 m apart
+-- Waiuta Town Walk [2 km loop] line 3.4 km: no route
+-- Rotoma Bridle Track [] line 1.0 km: names nothing on the map ([Whangaroa Bay, Lake Rotomā])
+-- Tikitiki Scenic Stroll [] line 0.1 km: DOC's line is off the map's tracks
+-- Motutapu Outdoor Education Camp  Access Track [4 km one way] line 4.2 km: 6801 m in 1 hr 30 min ([Administration Bay, Sandy Bay, Pōhutukawa Track])
+-- White Pine Bush Track [250 m loop] line 0.2 km: no route
+-- Circle Walk and Circle Loop Track [1.7 km loop] line 1.2 km: no route
+-- Waiau Falls and Kauri Grove Lookout Walk [] line 0.1 km: 53 m in 30 min return ([Waiau Falls])
+-- Booms Tramping Track [] line 7.8 km: covers 1% of DOC's line ([Karaka Track, Crosbies Hut])
+-- Pukaka Valley Track [3.6 km one way] line 3.5 km: 16187 m, DOC 3600 m ([Mt Robertson Loop Track, Whites Bay, Mount Robertson])
+-- Kaihoka Lakes Walk [1.3 km return via same track] line 0.6 km: names nothing on the map ([])
+-- Aongatete Nature Trail [640 m loop] line 0.4 km: no route
+-- Mount Hutt Forest walking tracks [] line 3.8 km: names nothing on the map ([Pudding Hill])
+-- Otira Valley Track [1.7 km one way] line 1.6 km: names nothing on the map ([Mount Rolleston])
+== Antimony Mines Track [] line 4.3 km -> 4.5 km; via [Endeavour Inlet]; ends 2767 m apart
+-- Donnelly Flat Loop Walk [2.5 km loop] line 2.8 km: further from DOC's length than before ([Atiwhakatu Track])
+-- Ewe Range Track [] line 6.4 km: names nothing on the map ([])
+-- Richardson's Track [2.5 km one way] line 2.5 km: covers 14% of DOC's line ([East Peak])
+== Roaring Stag Hut to Cattle Ridge Track [] line 2.2 km -> 2.2 km; via [Roaring Stag Hut, Cattle Ridge Hut]; ends 1779 m apart
+== Te Waiti Hut Walk [] line 6.2 km -> 6.2 km; via [Te Waiti Hut]; ends 4245 m apart
+== Moss Creek Track [3.2 km one way] line 3.2 km -> 3.2 km; via [Moss Creek Campsite]; ends 2723 m apart
+-- Lake Rotoroa Nature Walk [1 km loop] line 0.9 km: no route
+-- Alpine Nature Walk [800 m loop] line 0.7 km: no route
+-- Larrys Creek Track [4.8 km return via same track] line 2.4 km: names nothing on the map ([])
+-- Awaroa/Godley Head Loop Track [9.3 km loop] line 7.9 km: 22524 m in 3 hr loop ([Te Onepoto / Taylors Mistake, Awaroa / Godley Head, Pilgrims Way Coastal Track, Taylors Mistake, Boulder Bay, Godley Head, Black Rock])
+-- Old Man Hut Circuit [30 km loop] line 24.8 km: covers 76% of DOC's line ([Lake Chalice Hut, Old Man, Old Man Hut, Lake Chalice])
+== Mutton Creek Track [] line 5.5 km -> 7.0 km; via [Boundary Creek Hut]; ends 3137 m apart
+-- Neill Forks to Maungahuka Track [] line 3.6 km: 22138 m for DOC's 3551 m line ([Maungahuka Hut, Neill Forks Hut, Neill, Concertina Knob, Maungahuka])
+-- Taita Bridle Track [] line 4.0 km: 6916 m for DOC's 4006 m line ([Oraora, Waimā Main Range Track])
+-- Ahuriri Estuary Walking Track [2.8 km one way] line 3.0 km: names nothing on the map ([])
+-- Marokopa Falls Walk [600-700 m return via same track] line 0.4 km: names nothing on the map ([])
+-- Balls Clearing Walks [] line 1.0 km: names nothing on the map ([])
+-- Rangiwahia Hut - Deadmans Track [] line 13.1 km: covers 59% of DOC's line ([Rangiwahia Hut Track, Rangiwahia Hut, Mangahuia])
+-- Taronui Bay Recreation Reserve Track [3.7 km one way] line 3.5 km: names nothing on the map ([Taronui Bay])
+-- North Temple Track [10 km return via same track] line 4.9 km: names nothing on the map ([Gunsight Pass])
+-- Potaema Track [] line 0.4 km: names nothing on the map ([])
+-- Tasman Glacier View Track [1.5 km return via same track] line 0.4 km: 1742 m in 30 min return ([Tasman Lake and River Track])
+-- Last Creek Track [4 km one way] line 4.1 km: names nothing on the map ([])
+-- Mangapohue Natural Bridge Walk [700 m return via same track] line 0.9 km: covers 29% of DOC's line ([Piripiri Cave Walk])
+== Tapu Summit to Crosbies Hut Track [9.2 km one way] line 9.1 km -> 9.4 km; via [Crosbies Hut]; ends 6642 m apart
+-- Te Rereatukahia Hut Track [9.5–15 km one way] line 4.3 km: 6485 m, DOC 15000 m ([Te Rereatukahia Hut, North-South Track])
+== Mt Titiraupenga Track [6.4 km return via same track] line 3.4 km -> 3.4 km; via [Titiraupenga]; ends 2396 m apart
+-- Kōkako Track [11 km return via same track] line 5.1 km: DOC's line is off the map's tracks
+-- Otawa Reservoir Track [] line 12.0 km: covers 70% of DOC's line ([Otawa, Trig Track])
+-- Akeake Historic Reserve Track [1.4 km return via same track] line 0.7 km: covers 47% of DOC's line ([Opito Bay])
+-- Bellbird Bush Track [1.9 km one way] line 1.9 km: names nothing on the map ([])
+-- Pā Road Walk [185 m one way] line 0.5 km: names nothing on the map ([Kerikeri])
+-- Awakiki Bush Track [2.7 km loop] line 1.2 km: no route
+-- Otaika Valley Walkway [4.8 km one way] line 4.6 km: names nothing on the map ([Otaika Valley])
+-- Pearl Harbour return via Circle Track [] line 6.8 km: covers 28% of DOC's line ([Pearl Harbour])
+-- Tarawera Falls Track [700 m return via same track] line 0.8 km: names nothing on the map ([])
+-- Camp Stream Hut Track [9 km one way] line 15.1 km: names nothing on the map ([Round Hill])
+-- Mt Matthews [] line 11.8 km: covers 22% of DOC's line ([Ōrongorongo Track])
+== Klondyke Spur Track [2 km one way] line 1.7 km -> 1.7 km; via [Klondyke Valley Track]; ends 1558 m apart
+-- Lake Ellery Track [3 km return via same track] line 1.3 km: names nothing on the map ([])
+-- Acheron Lookout Loop Walk [1 km loop] line 1.4 km: no route
+-- Bridge to Nowhere Walk [3 km return via same track] line 2.5 km: 2397 m, DOC 1500 m ([Mangapurua Landing])
+-- Arrowtown Chinese Settlement [] line 0.3 km: names nothing on the map ([])
+== Prospect Hill Track [20 km return via same track] line 10.1 km -> 10.1 km; via [Obelisk Loop Track]; ends 6943 m apart
+-- Pike29 Memorial Track [11.6 km one way] line 10.6 km: names nothing on the map ([])
+-- Bullendale & Dynamo Hut Tracks [] line 8.0 km: no route
+-- Mount French Track [7 km return return via same track] line 3.0 km: names nothing on the map ([Mount French])
+-- Smoothwater Bay Track [9.4 km return via same track] line 4.0 km: 9281 m, DOC 4700 m ([Smoothwater Bay, Stafford Bay Route])
+-- Ratapihipihi Scenic Reserve walk [2 km loop] line 1.9 km: no route
+== Mananui Tramline (Māhinapua Walkway) [] line 6.0 km -> 7.3 km; via [Picnic Point, Mananui]; ends 4950 m apart
+-- Cape Wanbrow Walking Track [185 m return via same track] line 0.3 km: names nothing on the map ([Makotukutuku, Cape Wanbrow])
+-- Centre of the North Island Walk [500 m return via same track] line 0.2 km: no description
+-- Nevis Valley tracks [] line 17.1 km: covers 27% of DOC's line ([Nevis Crossing, Doolans Saddle])
+== Little Kyeburn Track [5 km one way] line 4.1 km -> 4.3 km; via [Buster Hut]; ends 3249 m apart
+-- Flower Brothers Walk [] line 0.2 km: 507 m for DOC's 176 m line ([Rotoroa])
+-- Bob’s Cove Track and Nature Walk [] line 4.5 km: covers 67% of DOC's line ([Picnic Point])
+== Sugarloaf/Rockburn Track [] line 12.5 km -> 16.7 km; via [Lake Sylvan]; ends 5725 m apart
+-- Kauri Loop Track [3 km loop] line 2.7 km: no route
+-- Red Bridge Walk [2 km one way] line 1.9 km: names nothing on the map ([])
+-- Mangaotaki Walk [800 m loop] line 1.2 km: no route
+-- Boundary Creek Track [12 km return via same track] line 2.3 km: names nothing on the map ([])
+== Douglas Walk [3.9 km return via same track] line 1.7 km -> 1.6 km; via [Peters Pool]; ends 868 m apart
+== Tōtaranui to Awaroa Bay [7 km (tidal) one way] line 6.5 km -> 7.1 km; via [Skinner Point, Goat Bay, Awaroa Hut, Awaroa Inlet]; ends 3948 m apart
+-- Motuarohia (Roberton) Island Track [] line 0.3 km: names nothing on the map ([])
+-- Henga Scenic Reserve Walk [] line 2.9 km: names nothing on the map ([])
+-- Muriwai Walk [6 km loop] line 5.6 km: covers 4% of DOC's line ([Port Jackson Campsite])
+-- Marsden Cross Track [1.1 km one way] line 1.2 km: further from DOC's length than before ([Oihi Bay])
+-- Otamatapaio River easement [] line 10.5 km: names nothing on the map ([])
+-- Wilderness Lookout Walk [300 m return via same track] line 0.2 km: names nothing on the map ([])
+== Thomas River Track [2 km one way] line 1.4 km -> 1.4 km; via [Castle Hill Village]; ends 1178 m apart
+-- Papaitonga Track [] line 0.7 km: names nothing on the map ([])
+-- Wills Valley Track [7.5 km one way] line 7.3 km: names nothing on the map ([Wills Hut])
+== Homestead Track [1.7 km one way] line 1.7 km -> 1.7 km; via [Homestead Campsite]; ends 1467 m apart
+-- Kea Point Track [] line 2.7 km: covers 46% of DOC's line ([Aoraki/Mount Cook])
+-- Kawatiri Historic Railway Walk [] line 1.0 km: covers 62% of DOC's line ([Kawatiri])
+-- Angelus Hut via Travers and Cascade Track/Route [9.4 km one way] line 5.4 km: a long way round: 9966 m for 714 m ([Coldwater Hut, Lakehead Hut, Angelus Hut])
+-- Rakaia Gorge Walkway [10.4 km return via same track] line 5.6 km: names nothing on the map ([])
+-- Jacks Blowhole Track [3 km return via same track] line 1.5 km: names nothing on the map ([])
+== Point Elizabeth Walkway [5.5km one way] line 5.3 km -> 5.3 km; via [Point Elizabeth]; ends 2991 m apart
+-- Tangoio Falls Scenic Reserve tracks [] line 4.0 km: 3932 m in Various: 30 min - 2 hr ([Tangoio Falls])
+-- Mt Ngongotaha Nature Loop Track [2.5 km loop] line 3.0 km: covers 36% of DOC's line ([Ngongotahā])
+-- Leyland O'Brien Tramline Track [] line 6.0 km: 17326 m in 2 hr 30 min one way ([North South Track, Te Whare Okioki, Hurunui Hut])
+-- Pyramid Track [] line 7.2 km: names nothing on the map ([The Pyramid])
+== Hapuakohe Walkway [23 km one way] line 22.3 km -> 22.8 km; via [Pukeitionga]; ends 14569 m apart
+-- Mt Difficulty tracks [30 km | 33 km | 38 km one way] line 46.5 km: covers 44% of DOC's line ([Mount Difficulty])
+-- Matietie Walk [] line 3.1 km: names nothing on the map ([])
+-- Tatare Tunnels Walk [3.6 km return via same track] line 1.8 km: names nothing on the map ([Tatare])
+-- Edwards - Hawdon Route [] line 29.9 km: 51291 m for DOC's 29892 m line ([Walker Pass, Taruahuna Pass, Tarn Col, Edwards Hut, Hawdon Hut, Hawdon Hut Track])
+-- Matiu/Somes Island Loop Track [] line 2.1 km: covers 32% of DOC's line ([Matiu / Somes Island])
+-- Silica Rapids Walk [6 km return from Whakapapa Village or 3 km return from Bruce Road car park return via same track] line 4.2 km: 7420 m in 2 hr 30 min return from Whakapapa Village or 1 hr 30 min return from Bruce Road car park ([Whakapapa Holiday Park, Punaruku Falls, Silica Rapids])
+-- Manuka Hut Track [4.5 km one way] line 9.6 km: 19514 m in 1 hr 30 min one way ([Lake Emily, Manuka Hut, Stour Track, Manuka Hut Mountain Bike Link])
+-- Daly's Clearing Loop Track [7.5 km loop] line 7.9 km: covers 10% of DOC's line ([Dean Track, Daly's Clearing Hut])
+-- Goat Island Walkway [1.5 km one way return via same track] line 1.4 km: names nothing on the map ([Cape Rodney])
+-- Taumarumaru Scenic Reserve Walk [] line 2.7 km: names nothing on the map ([Rangikapiti])
+-- Tutakakahikura Scenic Reserve Track [1.6 km return via same track] line 1.2 km: names nothing on the map ([Flea Bay])
+== Waipū Caves Track [] line 1.7 km -> 2.0 km; via [Waipu Caves]; ends 1169 m apart
+-- Kaituna Wetland Loop Track [4.4 km loop] line 2.3 km: no route
+-- Ellangowan Scenic Reserve Track [2.4 km return return via same track] line 2.1 km: names nothing on the map ([])
+-- Whisky Creek Track [] line 2.8 km: names nothing on the map ([])
+-- Hawkes Lookout Walk [800 m return via same track] line 0.4 km: names nothing on the map ([])
+-- Jollie Brook Circuit [24 km loop] line 20.2 km: 45031 m, DOC 24000 m ([Gabriel Hut, Lake Marion])
+== Callaghans Track [2.6 km to lookout, 4 km to Prices Creek Road return via same track] line 1.8 km -> 2.2 km; via [Nelson Creek]; ends 1544 m apart
+-- Sanctuary Track [2.16 km loop] line 2.2 km: no route
+-- Table Flat - Kashmir Roadend West-East crossing [] line 17.6 km: covers 35% of DOC's line ([Iron Gate Hut Track, Alice Nash Memorial Heritage Lodge, Iron Gate Hut])
+-- Kamahi Loop Track [600 m loop] line 0.4 km: no route
+-- Rokaiwhana Stream Walk [] line 2.1 km: names nothing on the map ([])
+-- Manuka Bay Lookout Track [3 km return via same track] line 1.9 km: names nothing on the map ([])
+-- Mount Stokes Track [] line 3.3 km: names nothing on the map ([])
+== Poutaki Track [2 km one way] line 2.0 km -> 2.1 km; via [Poutaki Hut]; ends 1596 m apart
+== Whisky Falls [10.8 km return return via same track] line 8.0 km -> 8.0 km; via [Lakeside Track]; ends 6505 m apart
+-- Mt Bovis Route [8 km from track head return via same track] line 8.0 km: names nothing on the map ([])
+-- Bell Rock Loop Track [5. 3 km loop] line 2.5 km: no route
+-- Mount Robertson tracks [6.4 or 7.1 km loop] line 7.2 km: 25494 m, DOC 7100 m ([Rārangi, Whites Bay, Mount Robertson])
+-- Water-race Track [1 km one way] line 0.8 km: names nothing on the map ([])
+-- Cloudy Peak Track [] line 7.2 km: 14849 m for DOC's 7223 m line ([Cloudy Peak])
+-- Motutara Recreation Reserve Walk [3.4 km return via same track] line 1.7 km: names nothing on the map ([])
+-- Franz Josef Glacier/Kā Roimata o Hine Hukatere Walk [1.7 km return via same track] line 2.6 km: names nothing on the map ([])
+-- Matauria Ridge Track (Makahu Saddle to Mackintosh Track Junction) [] line 5.1 km: a long way round: 8946 m for 2053 m ([Lakes carpark to Mackintosh carpark via Mackintosh Hut, Mackintosh Hut])
+== Roys Peak Track [16 km return via same track] line 6.9 km -> 7.6 km; via [Roys Peak]; ends 2970 m apart
+-- Salisbury Track [14 km one way] line 14.5 km: 32755 m in 4 hr one way ([Flora Hut, Tableland, Upper Gridiron Hut, Upper Junction, Salisbury Lodge])
+-- Kānuka Track [10 km loop] line 9.7 km: covers 1% of DOC's line ([Logantown])
+== Goldsborough (Shamrock) Track [8 km one way] line 6.6 km -> 6.8 km; via [Callaghans]; ends 2833 m apart
+-- Nugget Point/Tokata walks [] line 1.3 km: no route
+-- Matai Falls Walk [1.2 km return via same track return via same track] line 0.6 km: names nothing on the map ([])
+-- Moraine Walk [4 km return via same track] line 0.6 km: names nothing on the map ([Fox Glacier])
+-- Leitch's Track [17 km return via same track] line 9.0 km: names nothing on the map ([])
+== Kaiaraara Track to Mt Hobson (Hirakimata) [] line 4.5 km -> 4.2 km; via [Kaiaraara Hut]; ends 3197 m apart
+-- Maratoto - Golden Cross Track [4.3 km one way] line 3.4 km: names nothing on the map ([])
+-- Nikau Loop Track [] line 1.3 km: 3889 m in 20 min ([Mōrere, Ridge Track])
+-- Kahikatea Walk [1.9 km return via same track] line 0.9 km: names nothing on the map ([])
+-- Murray Creek Track [9.7 km loop] line 9.8 km: further from DOC's length than before ([Inglewood, Cementown])
+== Parata Track [3.6 km return via same track] line 1.5 km -> 1.8 km; via [Te Au Track]; ends 975 m apart
+-- Godley River Route [25 km | 32 km one way] line 23.6 km: no route
+-- Mangaone Caves Track [582 m one way] line 0.6 km: names nothing on the map ([])
+-- Lake Ohia Gumholes Reserve Walk [] line 0.2 km: names nothing on the map ([])
+-- Carroll Hut Track [5 km return via same track] line 2.5 km: 2494 m in 6 hr ([Carroll Hut])
+-- Terrace Walk [1.8 km return via same track] line 0.8 km: names nothing on the map ([])
+-- Okupata Caves [] line 0.1 km: names nothing on the map ([])
+-- Mirror Lakes Walk [400 m return via same track] line 0.2 km: names nothing on the map ([])
+-- Hāwea River Track [14 km one way] line 5.3 km: names nothing on the map ([])
+-- Tūtira Walkway [5 km or 7.1 km loop] line 7.1 km: no route
+-- Pouākai Crossing [19 km one way] line 15.5 km: 30749 m, DOC 19000 m ([Veronica Loop Track, North Egmont, Holly Hut, Hump, Pouakai])
+-- Mt McIntosh Loop Track [18 km loop] line 13.1 km: a long way round: 14708 m for 2575 m ([Mount Judah, Mcintyre Hut, Mcintosh Hut])
+-- Lewis Tops Track [2.6 km one way] line 2.6 km: names nothing on the map ([])
+-- Locharburn Track [13.36 km return via same track] line 6.7 km: names nothing on the map ([])
+== Mangatoa Track [16 km return via same track] line 7.4 km -> 7.6 km; via [Waikawau Track, Leitch's Hut]; ends 5161 m apart
+-- Te U Route [] line 15.2 km: names nothing on the map ([])
+== Mt Burns Tarns Track [1 km return via same track] line 0.4 km -> 0.4 km; via [Borland Saddle]; ends 329 m apart
+-- Coal Creek Track [3.6 km return via same track] line 1.7 km: names nothing on the map ([])
+-- Quartz Reef Point Walk [] line 1.1 km: names nothing on the map ([Lake Dunstan])
+-- Milford Foreshore Walk [400 m loop] line 0.6 km: covers 38% of DOC's line ([Milford Sound])
+-- Kidds Bush Nature Walk [1 km loop] line 0.9 km: no route
+-- Tableland Circuit [28 km loop] line 29.7 km: a long way round: 11146 m for 3110 m ([Salisbury Lodge, Salisbury Track, Gordons Pyramid, Mt Arthur Hut, Lake Peel])
+-- Angelus Hut tracks and routes [] line 19.7 km: names nothing on the map ([])
+-- Wharite Peak Track [] line 3.8 km: names nothing on the map ([])
+== Thisbe Valley Track [8.8 km one way] line 8.5 km -> 8.7 km; via [Calliope Saddle]; ends 6145 m apart
+-- Ben Avon access route [] line 0.5 km: names nothing on the map ([Ben Avon])
+-- Moturua Island Track [4.6 km loop] line 4.1 km: no route
+-- Christchurch to Little River Rail Trail [20 km one way] line 22.1 km: 44958 m, DOC 20000 m ([Motukarara, Little River, Little River Rail Trail])
+-- Mackintosh carpark to Mackintosh Hut [] line 3.4 km: names nothing on the map ([])
+-- Connett Loop Track [700 m loop] line 0.6 km: no route
+-- Wairēinga/Bridal Veil Falls [] line 0.5 km: names nothing on the map ([])
+-- Homes Ridge Track [5 km one way] line 3.3 km: 8062 m, DOC 5000 m ([Stanfield Hut])
+-- Lakes carpark to Mackintosh carpark via Mackintosh Hut [] line 8.7 km: covers 64% of DOC's line ([Mackintosh Hut])
+-- Ōtamahua/Quail Island tracks [] line 5.0 km: covers 33% of DOC's line ([Ōtamahua Hut, Walkers Beach])
+-- Nikau Walk [] line 2.6 km: names nothing on the map ([Kaniwhaniwha])
+-- Mangahao Makahika Track [13 km one way] line 12.8 km: names nothing on the map ([Makahika])
+-- Croesus Battery [2 km one way] line 0.8 km: names nothing on the map ([])
+-- Sunrise Track [6.4 km one way] line 5.4 km: 8619 m for DOC's 5355 m line ([Sunrise Hut, Waipawa Forks Hut Track])
+-- Te Kopia Walk [] line 0.2 km: DOC's line is off the map's tracks
+-- Aparima Huts/Spence Burn Junction Route [5 km one way] line 2.1 km: names nothing on the map ([])
+== Lake Rotokura Walk [] line 1.0 km -> 1.0 km; via [Lake Rotokura]; ends 920 m apart
+-- Rarangi–Whites Bay Track [2.5 km one way] line 2.4 km: 7331 m in 1 hr ([Whites Bay, Rārangi])
+-- Aorere Goldfields Track [] line 6.2 km: names nothing on the map ([])
+== Lake Daniell Track [8.4 km one way] line 8.0 km -> 7.9 km; via [Marble Hill Campsite, Kōhanga Atawhai – Manson Nicholls Hut]; ends 7111 m apart
+== Cardrona-Cromwell Pack Track [25 km one way] line 15.8 km -> 15.9 km; via [Meg Hut]; ends 13309 m apart
+== Hauturu Highpoint Track [5.7 km one way] line 5.4 km -> 5.2 km; via [Waiotemarama Waterfall Walk]; ends 3885 m apart
+-- Devils Creek Track [13 km return via same track] line 6.6 km: names nothing on the map ([Mount Kinaki])
+-- Borland Nature Walk [2.2km loop] line 1.6 km: no route
+-- Rangituhi/Colonial Knob Walk [] line 6.0 km: covers 37% of DOC's line ([Rangituhi/Colonial Knob, Porirua])
+-- Kowhai-Hapuku Circuit [] line 21.5 km: no route
+-- Western Ōkataina Walkway [22.5 km one way] line 19.6 km: 35086 m, DOC 22500 m ([Rongomai Track, Whakapoungakau])
+== Hollyford Track: Hidden Falls Track [18 km return via same track] line 8.6 km -> 9.3 km; via [Hidden Falls, Hidden Falls Hut]; ends 7798 m apart
+-- Coal Pit Spur Track [4.3 km one way] line 4.1 km: names nothing on the map ([])
+-- Dracophyllum Flat Track [] line 5.8 km: names nothing on the map ([])
+== Ngatoro – Waiwhakaiho Loop Track [10 km loop] line 8.4 km -> 11.3 km loop; via [Connett Loop Track, Mangaoraka Loop Track]; ends 0 m apart
+-- Kaharoa Kōkako Track [1.2 km return via same track] line 1.1 km: names nothing on the map ([])
+-- Tāne Mahuta Walk [] line 0.1 km: names nothing on the map ([])
+-- Horokaka Track [] line 4.3 km: covers 40% of DOC's line ([Horokaka, Main Ridge Track, Te Haua Uru Track])
+-- Tawa Grove Walk [] line 0.4 km: names nothing on the map ([])
+== Dover Route [4.8 km one way] line 4.7 km -> 4.8 km; via [Pouakai]; ends 4311 m apart
+-- Tautuku walks [] line 2.7 km: names nothing on the map ([])
+-- Ngamuwahine Track [3.5 km return via same track] line 3.8 km: 4527 m, DOC 1750 m ([Leyland O'Brien Tramline Track])
+== Middle Ridge Track [2.4 km one way] line 2.4 km -> 2.6 km; via [East Peak]; ends 1913 m apart
+-- The Grove Scenic Reserve Walk [] line 0.3 km: names nothing on the map ([])
+-- Mt Patriarch Route [14 km return via same track] line 7.7 km: names nothing on the map ([])
+-- Masters Shelter to Golden Crown Ridge [] line 4.0 km: covers 71% of DOC's line ([Aranga Hut])
+-- York Road Loop Track [5.3 km loop] line 6.8 km: no route
+-- Urchin to Umukarikari (U2U) track [] line 5.7 km: 11791 m for DOC's 5736 m line ([Urchin, Umukarikari, Sharp Cone])
+-- Baikie Hut Track [] line 4.1 km: 8968 m for DOC's 4118 m line ([Baikie Hut])
+-- The Sisters Track [4 km one way one way] line 4.1 km: 6286 m in 1 hr 30 min one way ([Prospect Hill Track, Kopuwai Track])
+-- Lake Rotorangi Hydro Walkway [1.5 km loop] line 1.3 km: no route
+-- Limestone Road to Pohangina Valley East Road [] line 9.4 km: covers 16% of DOC's line ([Shorts Track, Leon Kinvig Hut])
+-- Taranaki Falls Walk [6 km loop] line 5.9 km: covers 54% of DOC's line ([Taranaki Falls, Tama Lakes Track])
+-- Denniston Brakehead walks [2 km loop] line 1.5 km: covers 32% of DOC's line ([Denniston])
+-- Waitaha Pā Track [500 m return return via same track] line 0.1 km: names nothing on the map ([])
+-- Petrified Forest Walk [150 m return via same track] line 0.1 km: names nothing on the map ([])
+-- Maruia Falls Track [250 m return via same track] line 0.1 km: names nothing on the map ([])
+-- Monckton Walkway [] line 0.4 km: names nothing on the map ([])
+-- Te Ara a Waiau Walkway/Cycleway [8.7 km return via same track] line 3.7 km: names nothing on the map ([Lake Wombat Walk])
+-- Chalice–Goulter Track [] line 22.5 km: covers 78% of DOC's line ([Lake Chalice, Mid Goulter Hut])
+-- Hinau Track [808 m loop] line 0.8 km: no route
+== Maitai Bay Headland Track [3.45 km return via same track] line 1.7 km -> 1.8 km; via [Maitai Bay]; ends 920 m apart
+-- Te Arapiki o Tawhaki [4 km loop] line 2.4 km: covers 44% of DOC's line ([Pukaha / Mount Bruce])
+-- Nature Walk [800 m loop] line 0.3 km: no route
+-- Te Puru Track [5.6 km to track junction one way] line 5.5 km: 12691 m, DOC 5600 m ([Tapu Summit to Crosbies Hut Track, Crosbies Hut])
+== Mount Barrosa Track [] line 3.2 km -> 3.2 km; via [Mount Barrosa]; ends 2801 m apart
+-- Mt Fyffe Forest Walk [2.5 km return via same track] line 2.5 km: names nothing on the map ([Mount Fyffe])
+-- Matamataharakeke Track [6.5 km loop] line 6.4 km: no route
+-- Opoutere Beach Track [1.4 km return return via same track] line 0.7 km: names nothing on the map ([Opoutere Beach, Wharekawa Harbour])
+-- Dusky Trail [] line 22.0 km: names nothing on the map ([])
+-- Hut Creek Track [2.7 km one way] line 2.3 km: names nothing on the map ([])
+-- Ruapane Track [3.4 km one way] line 3.2 km: covers 2% of DOC's line ([Ruapane])
+== Orokonui Creek Walking Track [2.4 km return via same track] line 1.1 km -> 1.3 km; via [Orokonui, Orokonui lagoon walk]; ends 827 m apart
+== Lucretia Hut Route [5.7 km from Nina swing bridge one way] line 5.7 km -> 5.8 km; via [Nina Valley Track]; ends 3905 m apart
+-- Piripiri Cave Walk [300 m return return via same track] line 0.2 km: names nothing on the map ([Piripiri, Mangapohue Natural Bridge Walk, Marokopa Falls Walk])
+-- Te Awa Awa Walk [430 m one way] line 0.4 km: names nothing on the map ([])
+-- Ruakaka Pipeline Road Track [3 km one way] line 3.5 km: names nothing on the map ([])
+== Kererū Track [1.8 km one way] line 2.2 km -> 2.2 km; via [Wooded Gully Track, Red Pine Track]; ends 85 m apart
+-- Young River Link Track [14 km return via same track] line 6.6 km: names nothing on the map ([])
+== Burrill Route [] line 8.1 km -> 7.8 km; via [Tataweka]; ends 5603 m apart
+-- Little Mt Peel/Huatekerekere tracks [] line 8.3 km: covers 51% of DOC's line ([Blandswood, Little Mount Peel/Huatekerekere])
+-- Taranaki Maunga Summit Climb [6.3 km one way return via same track] line 5.6 km: no description
+-- Outram Glen to Lee Stream Walk [8.5 km return return via same track] line 1.5 km: names nothing on the map ([Outram])
+-- Mitre Peak Track [] line 2.7 km: 5175 m for DOC's 2658 m line ([Mitre Flats Hut, Pukeamoamo / Mitre, Mitre, Peggys Peak])
+-- Dry Acheron Track [8 km one way] line 7.8 km: 13222 m, DOC 8000 m ([Big Ben])
+== Purity Hut Track [] line 4.4 km -> 4.3 km; via [Purity Hut]; ends 3670 m apart
+-- Big Tree Walk [870 m one way] line 0.4 km: names nothing on the map ([])
+-- Hapuka Estuary Walk [1 km loop] line 0.8 km: no route
+== Waimā Main Range Track [] line 14.1 km -> 14.2 km; via [Te Raupua]; ends 11258 m apart
+-- Homunga Bay Track [5 km one way] line 5.1 km: covers 1% of DOC's line ([Orokawa Bay])
+-- Dennistoun Bush Walk [1.8 km loop] line 1.7 km: no route
+== Hawdon Hut Track [18 km return via same track] line 9.4 km -> 9.4 km; via [Hawdon Shelter Campsite]; ends 8616 m apart
+-- Kauri Block Track [] line 1.1 km: names nothing on the map ([])
+-- Trounson Kauri Park Loop Track [1.6 km loop] line 1.7 km: no route
+-- Craigieburn Sidle 73 Track [1 km one way] line 1.0 km: names nothing on the map ([Craigieburn Edge Track, The Luge Track])
+-- Kaimai Summit Loop Track [500 m loop] line 0.4 km: no route
+== Urchin Track (to Waipakihi Valley) [7 km one way] line 6.3 km -> 6.5 km; via [Urchin]; ends 4291 m apart
+-- Gem of the Boom Walk [400 m loop] line 0.3 km: no route
+== Stanfield Hut to Cattle Creek Hut Track [4 km one way] line 3.3 km -> 3.4 km; via [Stanfield Hut]; ends 2884 m apart
+-- Pudding Hill Track [4 km return via same track] line 4.8 km: 4287 m, DOC 2000 m ([Pudding Hill])
+-- Tramline Track [8 km one way] line 10.9 km: names nothing on the map ([Awana])
+-- Tui Track [11 km one way] line 11.2 km: covers 0% of DOC's line ([Boyle Village])
+-- Te Maire Loop Track [] line 3.6 km: no route
+-- Pukatea Ridge Track [] line 11.7 km: names nothing on the map ([])
+== Blue Range to Cow Creek Hut Track [] line 4.6 km -> 5.9 km; via [Blue Range Hut, Cow Creek Hut]; ends 3315 m apart
+-- Aurora Track [4.5 km loop] line 5.0 km: a long way round: 4240 m for 459 m ([Logantown, Ridge Dray Track])
+-- Greta Track [16 km loop] line 15.6 km: a long way round: 10478 m for 2948 m ([Ben Ohau])
+-- Hunter Valley tracks [] line 12.5 km: no route
+-- Tamatahia Te Whenua Track [600 m loop] line 0.5 km: DOC's line is off the map's tracks
+-- Mikonui Catchment - Dickie Ridge/Upper Tuke River Route [] line 13.7 km: covers 76% of DOC's line ([Truran Pass, Dickie Spur Hut, Top Tuke Hut])
+-- Piroa Falls Track [200 m return via same track] line 0.1 km: names nothing on the map ([])
+-- Mangorei Track to Pouākai tarns [5 km one way] line 4.8 km: 7557 m, DOC 5000 m ([Pouakai, Pouakai Track])
+-- Taieri River Track [8 km return via same track] line 4.3 km: names nothing on the map ([Taieri Island])
+-- Piano Flat Creek Loop Track [2.3 km loop] line 2.4 km: no route
+== Rod Donald Hut to The Hilltop [14.3 km one way] line 13.3 km -> 15.1 km; via [Te Ara Pātaka/Summit Walkway, Rod Donald Hut, Waipuna Saddle, Mount Fitzgerald]; ends 7818 m apart
+-- Ngatoro Loop Track [1.2 km loop] line 0.8 km: no route
+-- Paengaroa Scenic Reserve Walk [] line 0.1 km: names nothing on the map ([])
+-- Nydia Track [27 km one way] line 24.6 km: names nothing on the map ([Ngāwhakawhiti Bay, Nydia Saddle, Nydia Bay, Kaiuma Saddle, Kaiuma Bay])
+-- Kātiki Point Walking Track [800 m return via same track] line 0.4 km: names nothing on the map ([])
+-- Tokatoka Scenic Reserve Track [] line 0.3 km: names nothing on the map ([Tokatoka])
+-- Stony River (Hangatahua) Walkway [3 km return via same track] line 0.5 km: names nothing on the map ([Ōkato])
+-- Okiwi Bay Lookout Walk [] line 0.6 km: names nothing on the map ([])
+-- Summit Track [3.1 km one way] line 3.1 km: covers 6% of DOC's line ([Mount Thomas, Ridge Track])
+-- Lakes Carpark Loop – Rogue Ridge/Cooks Horn [] line 5.7 km: covers 8% of DOC's line ([The Tits])
+-- Harts Creek Track [2.7 km return via same track] line 1.4 km: names nothing on the map ([])
+-- Pataua Island Track [] line 0.5 km: DOC's line is off the map's tracks
+-- Toaroha/Zit Saddle/Kokatahi/Lathrop Saddle/Styx River  Route [] line 31.3 km: no length or time to check
+-- Isthmus Peak Track [16 km return via same track] line 7.6 km: covers 17% of DOC's line ([Glen Dene Ridge Track])
+-- Awa Nohoaka Conservation Area access tracks [Various from 11 - 21 km one way] line 12.4 km: covers 9% of DOC's line ([Grandview Ridge Track, South Awa Nohoaka Track])
+-- Lake Sylvan Track [] line 3.2 km: covers 41% of DOC's line ([Lake Sylvan])
+-- Fenceline Walk [] line 2.7 km: covers 6% of DOC's line ([Ōtaki Forks Campsite])
+== Spur Track [] line 2.5 km -> 3.1 km; via [Waterfall Track]; ends 1164 m apart
+-- Colls Dam Walk [1.1 km loop] line 0.9 km: no route
+-- Waihāhā and Waihora tracks [] line 24.4 km: 28982 m in 3 hr 30 min | 4 hr ([Waihāhā])
+== Mt Isobel Track [] line 3.7 km -> 4.3 km; via [Mount Isobel]; ends 3205 m apart
+-- Wairepo Kettleholes Track [3 km return via same track] line 2.7 km: names nothing on the map ([])
+-- Otamatakou Track [5.5 km one way one way] line 5.5 km: names nothing on the map ([])
+-- Big Bend Track [] line 3.1 km: 7817 m in 1 hr 30 min one way from Turere Bridge ([Ōrongorongo Track, Tūrere Lodge])
+-- Gabriels Gully interpretation walk [2.8 km loop] line 2.9 km: covers 6% of DOC's line ([Gabriels Gully])
+-- Cuckoo Creek Track [2 km one way] line 1.5 km: names nothing on the map ([])
+== Outlook 76 Walk [] line 0.6 km -> 0.8 km; via [Whangaiterenga Campsite]; ends 301 m apart
+-- Pylon Peak Summit Loop [4.4 km to the summit, 13.7 km loop] line 3.9 km: covers 3% of DOC's line ([Waiorongomai])
+== Tutukaka Head tracks [] line 1.1 km -> 1.1 km; via [Kukutauwhao Island]; ends 927 m apart
+-- Barrs Falls (Barrs Falls Scenic Reserve) [320 m return via same track] line 0.2 km: DOC's line is off the map's tracks
+-- Hawksbury lagoon and beach walk [4 km loop] line 1.6 km: covers 42% of DOC's line ([Hawksbury Lagoon])
+-- High-Level Pack Track [4.3 km one way] line 3.3 km: covers 62% of DOC's line ([Low-Level Loop, Te Aroha Link Track, Waiorongomai])
+-- Rhoboro Track [] line 4.6 km: names nothing on the map ([])
+== Hump Ridge Track [61.5 km loop] line 44.1 km -> 55.8 km loop; via [Port Craig, South Coast Track]; ends 0 m apart
+-- Ōkārito Trig Walk [4.2 km return via same track] line 0.9 km: 3369 m, DOC 2100 m ([Ōkārito Wetland Walk, Three Mile Pack Track, Okarito])
+== Nardoo Creek Route [19 km one way] line 14.6 km -> 21.2 km; via [Watson Creek Route, Nardoo Hut]; ends 11632 m apart
+-- Carrick Range access tracks [] line 12.1 km: a long way round: 11958 m for 2051 m ([Duffers Saddle, Slapjack Saddle Track, Upper Potters Creek Track])
+-- Wilkies Pools Loop Track [1.9 km loop] line 2.5 km: no route
+== Gertrude Saddle Route [7 km return via same track] line 4.3 km -> 4.2 km; via [Black Lake]; ends 3126 m apart
+-- White Cliffs Track Walkway [22 km return via same track] line 6.7 km: covers 32% of DOC's line ([Parininihi, Mount Messenger])
+-- Foveaux Walkway [7.8 km return via same track] line 3.9 km: 10866 m in 2 hr return ([Lookout Point, Stirling Point, Glory Track])
+-- Renata-Alpha Crossing [] line 14.4 km: 99866 m for DOC's 19485 m line ([Maymorn Junction, Renata Hut, Renata Ridge Track, Renata, Elder, Elder Hut, Aston, Alpha, Alpha Hut, Hells Gate, Marchant, Bull Mound, Omega, Dobson Loop Track])
+-- Ōkareka Mistletoe Walk [] line 0.1 km: names nothing on the map ([])
+-- Inland Track [41.1 km one way] line 28.1 km: 123793 m, DOC 41100 m ([Pigeon Saddle, Tōtaranui, Coast Track, Tinline Bay, Castle Rock Hut, Awapoto Hut, Gibbs Hill])
+-- Waipakihi Middle Range Route [] line 1.9 km: covers 68% of DOC's line ([Waipakihi Hut])
+== Lake Wombat Walk [3.8 km return via same track] line 1.8 km -> 1.8 km; via [Lake Wombat]; ends 1195 m apart
+-- Pinnacles Ridge Track [1.5 km one way] line 1.2 km: names nothing on the map ([])
+-- Lake Chalice Hut tracks [] line 8.4 km: covers 31% of DOC's line ([Lake Chalice Hut])
+-- Mangakara Nature Walk [1.5 km loop] line 1.3 km: no route
+-- Charming Creek North Walkway [5.5 km one way] line 9.3 km: names nothing on the map ([Ngakawau])
+-- Wilkin Valley tracks [] line 32.8 km: names nothing on the map ([Kerin Forks Hut, Jumboland, Top Forks Hut, Lake Diana, Lake Castalia])
+-- Old Māori Trail [] line 5.0 km: 10701 m for DOC's 4958 m line ([Lake Kaitawa, Ngamoko])
+-- Mt Owen tracks and routes [Courthouse Flat to Granity Pass Hut - 8.3 km return via same track] line 5.7 km: no route
+== Mount Manaia Track [4 km return via same track] line 1.8 km -> 1.9 km; via [Manaia]; ends 736 m apart
+-- Mount Hikurangi - Te Ara ki Hikurangi [] line 2.4 km: 2325 m in 7 hr one way ([Hikurangi])
+-- Outlet Track [3 km one way] line 3.1 km: 11027 m in 45 min one way ([Beacon Point, Albert Town, Newcastle])
+== Leatham Molesworth Route [56 km loop] line 23.6 km -> 49.1 km loop; via [Bottom Gordon Hut, Top Gordon Hut, Top Leatham Hut, Severn Saddle, Saxton Saddle]; ends 0 m apart
+-- Wakamarina Track [] line 20.0 km: covers 70% of DOC's line ([Devils Creek Hut])
+-- Ōmahuta and Puketī Forests Te Araroa Trail [] line 11.1 km: no route
+-- South Face Track [11.6 km one way] line 11.9 km: a long way round: 16231 m for 3782 m ([Mount Somers, Mount Somers summit hike, Mount Somers Track])
+-- Ōkārito Wetland Walk [1 km return via same track] line 0.7 km: 826 m, DOC 500 m ([Okarito])
+== Six Mile Walk [] line 1.2 km -> 2.8 km; via [Six Mile]; ends 1042 m apart
+-- Motuihe Island tracks [1 to 6.5 km return via same track] line 2.0 km: names nothing on the map ([Ocean Beach])
+-- Lower Waiohine Track [] line 8.7 km: covers 19% of DOC's line ([Cone Saddle, Sayer Hut, Totara Flats Hut])
+-- Mistake Creek Track [5 km one way] line 5.9 km: names nothing on the map ([])
+-- Helicopter Hill Track [500 m one way] line 0.5 km: no route
+-- Corner Peak Route [] line 5.1 km: names nothing on the map ([])
+== Broken Hills Battery Walk [550 m one way] line 0.4 km -> 0.4 km; via [Broken Hills]; ends 388 m apart
+-- Elsthorpe Scenic Reserve Loop Track [600 m loop] line 1.5 km: covers 17% of DOC's line ([Elsthorpe])
+-- Pōhutukawa Track [1.1 km to 6.6 km one way] line 2.8 km: 3707 m in 35 min to 3 hr 30 min ([Sandy Bay, Billy Goat Point])
+-- Earnscleugh Tailings Track [] line 5.1 km: covers 10% of DOC's line ([Alexandra])
+-- Te Whara Track [7.5 km one way] line 6.9 km: further from DOC's length than before ([Peach Cove Hut, Mount Lion, Smugglers Bay])
+-- Arawata Bridle Track [1.4 km one way] line 1.5 km: names nothing on the map ([Queenstown])
+-- Lake Mistletoe Track [1.3 km return via same track] line 1.5 km: names nothing on the map ([])
+-- Flat Top Hill Tramping Track [6 km loop] line 5.7 km: covers 4% of DOC's line ([Butchers Dam Loop Track])
+-- Wharekirauponga Track [10 km return via same track] line 5.5 km: names nothing on the map ([])
+-- Tawa Loop Walk [4.2 km loop] line 3.3 km: 11460 m in 1 hr 40 min ([Manawatu Gorge Track])
+== Lake Stream Route [] line 6.7 km -> 6.8 km; via [Lake Stream Hut]; ends 5933 m apart
+-- Mistletoe Bay tracks [] line 1.8 km: covers 62% of DOC's line ([Mistletoe Bay Campsite])
+-- Temple Basin Track [2.1 km one way] line 2.1 km: names nothing on the map ([Arthur's Pass])
+-- Kaikōura Peninsula Walkway [Various: 200 m – 11.7 km one way] line 5.0 km: no route
+-- Rough Creek Track [] line 9.0 km: names nothing on the map ([Lake Christabel])
+-- Mangawhero Falls Walk [] line 0.1 km: names nothing on the map ([])
+-- Waikaia River Track [7 km return via same track] line 7.0 km: names nothing on the map ([])
+-- East Eglinton Track [] line 3.3 km: names nothing on the map ([])
+-- Thunder Creek Falls [200 m return via same track] line 0.1 km: names nothing on the map ([])
+-- Scott Creek Track [] line 3.6 km: names nothing on the map ([])
+-- Lake Gunn Nature Walk [1.4 km loop] line 1.3 km: covers 44% of DOC's line ([Cascade Creek Campsite])
+-- Macaulay Hut Track [] line 24.1 km: names nothing on the map ([Macaulay Hut])
+-- Te Ara Pātaka/Summit Walkway [35 km one way] line 27.7 km: a long way round: 11010 m for 1584 m ([Kaituna Valley, Mount Herbert/Te Ahu Patiki, Packhorse Hut, Mount Bradley, Mount Herbert, Rod Donald Hut, Waipuna Saddle, Mount Fitzgerald])
+-- Otoko Walkway [5 km one way] line 6.9 km: names nothing on the map ([Otoko])
+-- Union Creek Track [3 km loop] line 1.8 km: DOC's line is off the map's tracks
+-- Ridge Track [] line 2.9 km: names nothing on the map ([])
+-- Hikuwai Link Track [600 m one way] line 0.6 km: names nothing on the map ([])
+-- Visitor Centre to Te Anau Bird Sanctuary Walk [1 km return via same track] line 0.7 km: names nothing on the map ([Te Anau])
+-- Lake Kaurapataka Route [] line 4.8 km: names nothing on the map ([])
+== Wharekai-Te Kou Walk [] line 0.8 km -> 0.8 km; via [Jackson Bay]; ends 752 m apart
+-- Thunderbolt Track [] line 1.3 km: names nothing on the map ([])
+-- Seaward Downs Loop Track [1.3 km loop] line 1.2 km: no route
+== Mt Alford Track [4.6 km one way] line 4.3 km -> 4.3 km; via [Mount Alford]; ends 3105 m apart
+== Mt Oxford Track [4.9 km one way] line 4.9 km -> 5.1 km; via [Mount Oxford]; ends 4167 m apart
+-- Pupu Hydro Walkway [] line 5.4 km: names nothing on the map ([])
+== Longview Hut to Mākāretu Hut Track [8.7 km one way] line 7.4 km -> 7.6 km; via [Longview Hut, Mākāretu Hut]; ends 5831 m apart
+-- Callery Gorge Walk [5.2 km return via same track] line 2.5 km: 4378 m, DOC 2600 m ([Tatare Tunnels Walk])
+== Reefton - Big River 4WD road [] line 20.4 km -> 22.0 km; via [Big River, Big River Hut]; ends 12458 m apart
+-- Kāmahi Loop Track [4.5 km loop] line 3.6 km: no route
+-- Low-Level Loop [5.5 km loop] line 5.1 km: covers 6% of DOC's line ([Waiorongomai])
+-- Mount Somers summit hike [5.7 km one way one way] line 5.1 km: further from DOC's length than before ([Mount Somers, South Face Track])
+-- Puketui Walk [900 m one way] line 0.9 km: names nothing on the map ([Puketui])
+-- Puriri Track [] line 4.7 km: names nothing on the map ([])
+== Maratoto: Wires Track [] line 4.9 km -> 6.4 km; via [Maratoto Track, Maratoto - Wentworth Crossing]; ends 5379 m apart
+-- Butterfields Wetland Walk [2.5km loop] line 1.1 km: no route
+-- Rakaitane Track [1.2 km return via same track] line 0.5 km: names nothing on the map ([Moana, Kotuku])
+-- Glencoe Walk [600 m return via same track] line 0.3 km: 1892 m in 30 min return ([Aoraki/Mount Cook])
+-- Horopito Track [12 km one way] line 7.5 km: names nothing on the map ([])
+== Ohakune Old Coach Road [15 km one way] line 11.2 km -> 10.4 km; via [Rongokaupo]; ends 4322 m apart
+-- Viewing Platform Walk [180 m one way] line 0.1 km: names nothing on the map ([])
+== Mt Arthur Hut Walk [] line 3.4 km -> 3.5 km; via [Flora Saddle, Mt Arthur Hut]; ends 2300 m apart
+-- Hakarimata Rail Trail [] line 1.2 km: names nothing on the map ([Ngāruawāhia])
+-- Waituna Lagoon Loop Track [] line 4.3 km: no route
+-- Lotkow Road to Little's Clearing [] line 6.4 km: names nothing on the map ([])
+-- Isthmus Track [1.2 km one way] line 1.2 km: names nothing on the map ([])
+-- Coppermine Track [6.2 km return via same track] line 3.0 km: names nothing on the map ([])
+== Arohaki Lagoon Track [6 km return via same track] line 2.5 km -> 2.4 km; via [Arohaki Lagoon]; ends 2037 m apart
+-- Harihari Coastal Walkway [8.3 km return via same track] line 3.9 km: names nothing on the map ([])
+-- Whirinaki Waterfall Loop Track [11 km loop] line 8.6 km: no route
+-- Port FitzRoy: Old Lady Track [] line 1.5 km: names nothing on the map ([Port Fitzroy])
+-- Lake Kaniere short walks [] line 2.1 km: no route
+-- Cairnmuir Hill Track [21 km one way] line 20.6 km: 64002 m in 6–8 hr one way ([Cairnmuir Hill, Cornish Point])
+-- Kākā Point Bush Walk [1.6 km loop] line 1.5 km: no route
+-- Te Rēinga Scenic Reserve Walk [] line 0.2 km: names nothing on the map ([])
+-- Cape Foulwind Walkway [3.4 km one way] line 3.2 km: covers 70% of DOC's line ([Wall Island, Cape Foulwind])
+-- Billygoat Landing Walk [] line 0.1 km: names nothing on the map ([])
+== Speargrass Track [] line 6.5 km -> 6.6 km; via [Speargrass Hut]; ends 5882 m apart
+-- Lake Hauroko Lookout Track [2.9 km return via same track] line 3.1 km: names nothing on the map ([])
+-- Mount Pleasant Track [1.1 km one way] line 1.8 km: 1807 m, DOC 1100 m ([Tapuwaeharuru / Evans Pass, Crater Rim Walkway])
+-- Moeraki Boulders/Kaihinaki Walk [300 m one way] line 0.7 km: names nothing on the map ([Moeraki])
+-- Holdsworth road end to Powell Hut/Mount Holdsworth [] line 7.8 km: covers 46% of DOC's line ([Gentle Annie Track, Mount Holdsworth Track, Powell Hut, Mount Holdsworth, Mt Holdsworth - Jumbo Circuit])
+-- Tenahaun Conservation Area tramping tracks [] line 10.9 km: names nothing on the map ([])
+-- Parapara Peak [9 km return via same track] line 7.9 km: names nothing on the map ([])
+== Cookson Kauri Walk [6 km return via same track] line 2.1 km -> 2.2 km; via [Wainora Campsite]; ends 1735 m apart
+== Coach Stream Route [4.2 km one way] line 4.2 km -> 4.3 km; via [Trig M Route]; ends 3001 m apart
+-- Waitawheta Tramway [19 km return via same track] line 9.2 km: covers 68% of DOC's line ([Waitawheta Hut])
+-- Peregrine Loop Track [2.7 km loop] line 8.2 km: no route
+-- Monkey Bay Walk [300 m return via same track] line 0.1 km: 991 m for DOC's 146 m line ([Rārangi])
+-- Invincible Mine Track [4.5 km return via same track] line 2.3 km: names nothing on the map ([])
+-- Karangahake Windows Walk [2.5 km return via same track] line 1.4 km: a long way round: 8799 m for 1432 m ([Karangahake])
+-- Burtton's Track [17 km one way] line 13.2 km: names nothing on the map ([])
+-- Tongariro River Trail [13.2 km loop] line 14.5 km: no route
+-- Tangihua Forest Nature Walk [] line 0.6 km: names nothing on the map ([])
+-- The Fern Walk [3.3 km one way] line 2.8 km: names nothing on the map ([Peel Forest])
+== Kōkōwai Track round trip [12 km loop] line 6.3 km -> 11.9 km loop; via [Holly Hut Track, Kaiauai Track, Ram Track]; ends 0 m apart
+-- Waipapa River Track [] line 11.7 km: covers 33% of DOC's line ([Lower Waipapa River Track])
+-- Pearl Harbour to Hope Arm Track [] line 23.2 km: covers 29% of DOC's line ([Hope Arm Hut])
+-- Purity to Kawhatau Base Track [] line 7.0 km: covers 51% of DOC's line ([Purity Hut Track, Purity Hut, Wooden Peg])
+-- Silverpeaks Circuit Track [24 km loop] line 0.5 km: covers 16% of DOC's line ([Pulpit Rock])
+-- Waitangitāhuna Wetland Walk [] line 0.3 km: names nothing on the map ([])
+-- Tōtaranui to Waiharakeke Bay [6.8 km return via same track] line 6.2 km: 6514 m in 1 hr 40 min return via the same track ([Skinner Point, Goat Bay])
+-- Honeycomb Rock Walkway [] line 8.3 km: covers 55% of DOC's line ([Honeycomb])
+-- Talbot Forest Scenic Reserve tracks [] line 1.8 km: names nothing on the map ([Geraldine])
+-- Field Hut and Table Top [] line 5.1 km: 16208 m for DOC's 5055 m line ([Table Top, Ōtaki Forks, Field Hut])
+-- Lake Dispute Walkway [] line 2.8 km: names nothing on the map ([Lake Dispute])
+-- Aparima River Track [6 km one way] line 5.7 km: covers 23% of DOC's line ([Aparima Hut])
+-- Kahikatea Walk [] line 0.8 km: names nothing on the map ([])
+-- Whenuakite Kauri Loop Walk [1.5 km return loop] line 0.8 km: no route
+-- Snowdens Bush Walk [] line 0.8 km: names nothing on the map ([])
+-- Whangaparapara: Tramline and Withey Tracks [] line 3.6 km: 12091 m for DOC's 5469 m line ([Tramline Track, Whangaparapara, Forest Road])
+-- Paines Ford Tramline Track [] line 1.9 km: names nothing on the map ([])
+== Makarora Track [10.5 km from the road bridge one way] line 10.6 km -> 10.7 km; via [Stewart Falls, Makarora Hut]; ends 8977 m apart
+== Smith Creek - Tauwharenīkau River [13 km return via same track] line 6.6 km -> 6.8 km; via [Puffer Saddle]; ends 4787 m apart
+== Stanley River Route [] line 16.1 km -> 21.2 km; via [Charlies Saddle, Stanley Vale, Fowlers Pass Track]; ends 16266 m apart
+-- Smiths Stream Hut track [6 km one way] line 4.4 km: names nothing on the map ([])
+-- Waiomu Kauri Grove Walk [] line 2.1 km: names nothing on the map ([])
+-- Beehive Creek Walkway [4 km return via same track] line 2.6 km: names nothing on the map ([])
+-- Henderson Tramline Loop Track [9 km loop] line 9.3 km: no route
+== Lake Rere Walk [14 km loop] line 8.9 km -> 14.3 km loop; via [Elfin Bay, Lake Rere, Greenstone Track]; ends 0 m apart
+== Lake Matheson/Te Ara Kairaumati Walk [4.4 km loop] line 3.6 km -> 4.1 km loop; via [Lake Matheson]; ends 0 m apart
+-- Gillespies Beach walking tracks [] line 7.1 km: covers 3% of DOC's line ([Gillespies Beach])
+-- The Hihi Trig Track [8.8 km one way] line 8.6 km: further from DOC's length than before ([Broken Hills])
+-- Mt Fyffe Hut/Kowhai Saddle Route [14 km return via same track] line 9.2 km: covers 77% of DOC's line ([Mount Fyffe, Mt Fyffe Hut])
+-- March Creek Track [4 km one way] line 4.2 km: names nothing on the map ([])
+-- Lake Hanlon Track [1.5 km return via same track] line 0.7 km: names nothing on the map ([])
+-- Wekaweka Track [] line 3.3 km: 9103 m for DOC's 3300 m line ([Waoku Coach Road Track])
+-- Cable Bay Walkway [] line 9.1 km: names nothing on the map ([Rotokura / Cable Bay])
+-- Mahia Peninsula Scenic Reserve Track [4.5 km loop] line 3.7 km: no route
+-- Fenian Caves Track [8.6 km return via same track] line 4.9 km: covers 68% of DOC's line ([Fenian Track])
+-- Mt Miserable Conical Peak Route [] line 15.1 km: no route
+-- Butcher Track [] line 1.4 km: 5474 m for DOC's 1423 m line ([Ōrongorongo Track, Cattle Ridge Track])
+-- Waimoku Track [3.5 km one way] line 3.5 km: 6666 m, DOC 3500 m ([Patuhā, Sefton Ridge Track, Kaitake])
+-- Potts Hut Track [] line 14.5 km: no description
+-- Okahukura Loop [14 km loop] line 15.3 km: no route
+-- Lake Kaitawa Fairy Springs Track [] line 1.6 km: names nothing on the map ([])
+-- Johnson Creek Track [4.6 km return via same track] line 2.1 km: names nothing on the map ([])

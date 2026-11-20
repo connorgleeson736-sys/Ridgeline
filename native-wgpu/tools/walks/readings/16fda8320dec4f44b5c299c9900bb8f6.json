@@ -1,0 +1,75 @@
+{
+ "guid": "16fda832-0dec-4f44-b5c2-99c9900bb8f6",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Angelus Hut via Pinchgut Track and Robert Ridge Route",
+   "shape": "one_way",
+   "start": {
+    "name": "Mt Robert car park",
+    "quote": "From the Mt Robert car park, a steep zigzag track (the Pinchgut Track) climbs up",
+    "ref": "F2"
+   },
+   "end": {
+    "name": "Angelus Hut",
+    "quote": "Follow the poles down to the lake and hut.",
+    "ref": "T10"
+   },
+   "via": [
+    {
+     "name": "Pinchgut Track",
+     "quote": "the Pinchgut Track",
+     "ref": "T6"
+    },
+    {
+     "name": "junction with Paddys Track",
+     "quote": "the junction with Paddys Track",
+     "ref": "T5"
+    },
+    {
+     "name": "Robert Ridge Route",
+     "quote": "the route along the ridge is marked with poles",
+     "ref": "T7"
+    },
+    {
+     "name": "Julius Summit",
+     "quote": "Julius Summit (1794 m)",
+     "ref": null
+    },
+    {
+     "name": "junction with Speargrass Creek Route",
+     "quote": "the junction with the Speargrass Creek Route",
+     "ref": "T8"
+    }
+   ],
+   "direction": null,
+   "time": "6 hr",
+   "distance": "12.2 km one way",
+   "evidence": [
+    "From the Mt Robert car park, a steep zigzag track (the Pinchgut Track) climbs up to the junction with Paddys Track (Bushline Hut is 30 min from junction).",
+    "Continue past the junction with the Speargrass Creek Route (30 min from Angelus Hut) onto the ridge overlooking the Angelus basin. Follow the poles down to the lake and hut."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Angelus Hut",
+   "quote": "Angelus Hut",
+   "ref": "T10"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Bushline Hut",
+   "quote": "Bushline Hut is 30 min from junction",
+   "ref": "L1",
+   "why": "nearby"
+  }
+ ],
+ "doubts": "End 'Angelus Hut' named in the title/last sentence; quote 'lake and hut' used. Julius Summit has no ref."
+}

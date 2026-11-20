@@ -1,0 +1,33 @@
+{
+  "artifact": "Ridgeline-Native-Fast-Coverage-0.1.15-Base.apk",
+  "bytes": 32632718,
+  "sha256": "23b2fcdcdcc4fb15b8305be5a84f6724b25b491185f4f9bd7853d440fc8289e0",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.15-fast-coverage",
+  "versionCode": 16,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13/0.1.14 Full Audit (same package and signer)",
+  "changes": [
+    "coarse terrain+imagery backdrop (zoom 5-10, at most 6 tiles per kind) planned under every view",
+    "arrived imagery drapes on the backdrop or any resident ancestor terrain while fine terrain loads",
+    "progressive terrain generalised to up to 16 disjoint tiles (focus + 12 nearest leaves) and on by default",
+    "parked started work may finish for 1.5 s in background transfer slots (was 0.6 s, up to background cap)"
+  ],
+  "originalAssetsIdentical": 623,
+  "jniExportsPerAbi": 43,
+  "elfLoadAlignment": 16384,
+  "zip16KiBAlignmentVerified": true,
+  "signatureVerified": true,
+  "debuggable": false,
+  "lintErrors": 0,
+  "tests": {
+    "rustWorkspace": "all pass (lavapipe Vulkan + Mesa GLES)",
+    "progressiveMultiExample": "Vulkan and GLES pass: 4 concurrent interiors, measured parent rims, overlap refused, pixel-identical promotion; fails on the previous renderer",
+    "overlayParityExample": "Vulkan and GLES pass",
+    "preExistingExampleFailures": "layer_smoke (line 128) and gpu_smoke (line 147) fail identically on untouched 0.1.12 with lavapipe and SwiftShader",
+    "kotlinJvm": "152 tests incl. 4 new backdrop/progressive tests; only the known intermittent PipelineWaitTest case can fail"
+  },
+  "physicalDeviceRun": false
+}

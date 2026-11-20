@@ -1,0 +1,173 @@
+{
+ "guid": "373d14ae-c24a-485f-a98f-849707d14e8d",
+ "kind": "out_and_back",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Webb Creek Track to Pinnacles Hut",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Kauaeranga road end car park",
+    "quote": "From the road end car park, walk to the swing bridge to cross the Kauaeranga River.",
+    "ref": null
+   },
+   "end": {
+    "name": "Pinnacles Hut",
+    "quote": "Pinnacles Hut and Dancing Camp Campsite are a short walk down signposted side tracks.",
+    "ref": "T7"
+   },
+   "via": [
+    {
+     "name": "Kauaeranga River swing bridge",
+     "quote": "walk to the swing bridge to cross the Kauaeranga River",
+     "ref": "T6"
+    },
+    {
+     "name": "Webb Creek Track",
+     "quote": "you keep follow the Webb Creek Track to Hydro Camp",
+     "ref": null
+    },
+    {
+     "name": "Hydro Camp",
+     "quote": "At the top of the climb to the Hydro Camp clearing",
+     "ref": null
+    },
+    {
+     "name": "Pinnacles Track",
+     "quote": "take the Pinnacles Track which climbs and sidles around a hill",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "2 hr 30 min – 3 hr one way",
+   "distance": "6 km",
+   "evidence": [
+    "Walk there and back on the Webb Creek Track (6 – 7 hr 30 min)",
+    "Return the same way, or return to the Hydro Camp and take the Billygoat Track back to the road end."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Circuit using the Webb Creek Track and the Billygoat Track",
+   "shape": "loop",
+   "start": {
+    "name": "Kauaeranga road end car park",
+    "quote": "From the road end car park, walk to the swing bridge to cross the Kauaeranga River.",
+    "ref": null
+   },
+   "end": {
+    "name": "Kauaeranga road end car park",
+    "quote": "Walk 300 m north along the road to get back to the road end car park.",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Kauaeranga River swing bridge",
+     "quote": "walk to the swing bridge to cross the Kauaeranga River",
+     "ref": "T6"
+    },
+    {
+     "name": "Webb Creek Track",
+     "quote": "you keep follow the Webb Creek Track to Hydro Camp",
+     "ref": null
+    },
+    {
+     "name": "Hydro Camp",
+     "quote": "At the top of the climb to the Hydro Camp clearing",
+     "ref": null
+    },
+    {
+     "name": "Pinnacles Hut",
+     "quote": "Pinnacles Hut and Dancing Camp Campsite are a short walk down signposted side tracks.",
+     "ref": "T7"
+    },
+    {
+     "name": "Hydro Camp",
+     "quote": "return to the Hydro Camp and take the Billygoat Track back to the road end",
+     "ref": null
+    },
+    {
+     "name": "Billygoat Track",
+     "quote": "### Hydro Camp – Kauaeranga Road end via Billygoat Track",
+     "ref": null
+    },
+    {
+     "name": "Billygoat Stream",
+     "quote": "cross Billygoat Stream",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Kauaeranga River",
+     "quote": "You must walk across the river.",
+     "ref": "T6",
+     "how": "ford"
+    },
+    {
+     "name": "Tarawaere car park",
+     "quote": "crossing the Kauaeranga River to the Tarawaere car park",
+     "ref": null
+    },
+    {
+     "name": "Kauaeranga Valley Road",
+     "quote": "Walk 300 m north along the road",
+     "ref": null,
+     "how": "road"
+    }
+   ],
+   "direction": null,
+   "time": "7 – 8 hr 30 min",
+   "distance": null,
+   "evidence": [
+    "Complete a circuit using the Webb Creek Track and the Billygoat Track ( 7 – 8 hr 30 min)",
+    "Walk 300 m north along the road to get back to the road end car park."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "Billygoat Landing",
+   "quote": "Take the first track on your right which leads you for 5 minutes to Billygoat Landing.",
+   "ref": null,
+   "from": "Kauaeranga River swing bridge"
+  },
+  {
+   "name": "Pinnacles",
+   "quote": "### Side trip: Pinnacles Hut – Pinnacles",
+   "ref": "T9",
+   "from": "Pinnacles Hut"
+  },
+  {
+   "name": "Dancing Camp Campsite",
+   "quote": "Pinnacles Hut and Dancing Camp Campsite are a short walk down signposted side tracks.",
+   "ref": "T4",
+   "from": "Pinnacles Track"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Pinnacles Hut",
+   "quote": "Pinnacles Hut",
+   "ref": "T7"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Billygoat Circuit",
+   "quote": "walk the shorter Billygoat Circuit",
+   "ref": "L1",
+   "why": "other walk"
+  },
+  {
+   "name": "Cookson Kauri Walk",
+   "quote": "Cookson Kauri Walk is a good wet weather alternative.",
+   "ref": "T3",
+   "why": "other walk"
+  }
+ ],
+ "doubts": "Page lists walking options: there and back on Webb Creek Track (main), circuit with Billygoat Track, and the shorter Billygoat Circuit (a separate linked walk, no start or end given, so not a way). DOC's time/distance are one way to the hut; the main way uses the section's 2 hr 30 min – 3 hr one way and 6 km. Road end start has no clear feature (F1-F3 are different tracks at Kauaeranga Valley Road), so null. Whether the circuit visits Pinnacles Hut is not explicit; included because the option's time (7 – 8 hr 30 min) and the Hydro Camp return wording suggest it. The Billygoat leg crosses the Kauaeranga River with no bridge, then walks the road 300 m north to the road end car park."
+}

@@ -1,0 +1,68 @@
+{
+  "sourceCommit": "36f94778587447c5519623bea318f2d0e0b5e072",
+  "nativeBuildSourceCommit": "3681a4ac86d955837c893ef42285b2ec9c0f3c32",
+  "nativeSourceTreesIdenticalAtFinalSource": true,
+  "artifact": "Ridgeline-Native-Latency-0.1.7-Base.apk",
+  "bytes": 32092956,
+  "sha256": "9432908850999d937293a6efc85c5b40ef7aedfa10683f67d3cf2ae111330dbb",
+  "versionName": "0.1.7-async-pipeline",
+  "versionCode": 8,
+  "applicationId": "nz.ridgeline.nativeapp.performance",
+  "signerSha256": "03ef64214daee8c59cad6571ce5036579237d553c040837ce996f80efa898ae7",
+  "updates016InPlace": true,
+  "originalAssetsByteIdenticalTo016": 618,
+  "noSessionCa": true,
+  "signatureV2Verified": true,
+  "zip16KiBAlignmentVerified": true,
+  "nativeLibraries": [
+    {
+      "path": "lib/arm64-v8a/libridgeline_renderer.so",
+      "bytes": 4582096,
+      "sha256": "d51b0d7b21314f45db8ab273a406e0f217c0e378f4b910b6603cb5c76a9d4fd8",
+      "loadSegmentAlignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "typedUploadAndFocusedPlanExportsVerified": true,
+      "profile": "release optimized, stripped"
+    },
+    {
+      "path": "lib/armeabi-v7a/libridgeline_renderer.so",
+      "bytes": 3145960,
+      "sha256": "f35f3d687b7cdd46803b2973a51ec214b95db6f41ee7205627bc72992a1c090e",
+      "loadSegmentAlignments": [
+        4096,
+        4096,
+        4096
+      ],
+      "typedUploadAndFocusedPlanExportsVerified": true,
+      "profile": "release optimized, stripped"
+    },
+    {
+      "path": "lib/x86_64/libridgeline_renderer.so",
+      "bytes": 5198168,
+      "sha256": "03c35447cda780664da7de84aa483628d056350a89d18b00a1df8148d1d9c601",
+      "loadSegmentAlignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "typedUploadAndFocusedPlanExportsVerified": true,
+      "profile": "release optimized, stripped"
+    }
+  ],
+  "targetedJVMChecksPassed": 11,
+  "gpuConfigurationsVerified": [
+    "Vulkan arrays",
+    "Vulkan separate textures",
+    "GLES separate textures"
+  ],
+  "graphicsModesCompared": 3,
+  "vulkanMipBatchingEnabled": true,
+  "glesMipBatchingEnabled": false,
+  "fullSuiteOrLintRun": false,
+  "physicalDeviceRun": false,
+  "phoneSpeedupMeasured": false,
+  "packagingRecreatedWithoutIncrementalUnusedBodies": true
+}

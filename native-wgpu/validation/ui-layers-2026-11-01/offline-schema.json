@@ -1,0 +1,10 @@
+{
+  "scope": "Host SQLite statement compatibility, not Android lifecycle execution",
+  "oldSchemaVersion": 1,
+  "newSchemaVersion": 2,
+  "operation": "ALTER TABLE regions ADD COLUMN metadata TEXT",
+  "originalResourceBytesPreserved": true,
+  "membershipPreserved": true,
+  "legacyMetadataRemainsNull": true,
+  "routeDatabaseSchemaUnchanged": true
+}

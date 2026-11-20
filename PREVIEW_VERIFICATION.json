@@ -1,0 +1,61 @@
+{
+  "referenceBranch": "android-preview-download",
+  "referenceCommit": "a3f9046add3680f275733188a12aa0c014e50b5a",
+  "sourceCommit": "c0b394125bc35f6236c645c68a4a3bb94d88ce55",
+  "previewVersion": "0.16.0",
+  "versionCode": 19,
+  "baseApkSha256": "8176289ff233702777205bd8f94f3737620fc256c8bb7debeea003806d1c0522",
+  "profilingApkSha256": "cef449bc6cc35c2741ef68f1a644124af413923da410354aecbf83fdfd35d404",
+  "profilingOnlyChangedZipEntry": "assets/capacitor.config.json",
+  "preparedWebFingerprint": "880f46219934d94699e288181ffda4480a62903a41c88ef59542de4dcd18c5d6",
+  "baselineMobileTests": {
+    "tests": 55,
+    "failures": 0
+  },
+  "patchedMobileTests": {
+    "tests": 55,
+    "failures": 0
+  },
+  "focusedSourceTests": {
+    "tests": 15,
+    "failures": 0
+  },
+  "focusedGeneratedAppTests": {
+    "tests": 15,
+    "failures": 0
+  },
+  "affectedJavaTests": {
+    "tests": 9,
+    "failures": 0
+  },
+  "browserWorkflow": {
+    "passed": true,
+    "softwareWebGL": true,
+    "providerFixtureRequests": 305,
+    "actualPrecomputedReads": 0,
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  "workerBrowserTransport": {
+    "passed": true,
+    "pageErrors": []
+  },
+  "responsePrecopyFix": "Already shipped in 0.16.0 app build; excluded as a new Android fix",
+  "preservedPreviewOptimisations": [
+    "coordinate index cache",
+    "temporary release hook reuse",
+    "stable transition fast path",
+    "ready coverage reuse",
+    "geographic invalidation filtering",
+    "native elevation persistence instead of duplicate WebView disk caching",
+    "inclusive main-thread profiling",
+    "waypoint visibility integration"
+  ],
+  "notPerformed": [
+    "full Android Gradle build/lint",
+    "full original 85-test native suite",
+    "Android-device execution",
+    "phone FPS measurement",
+    "APK publication or installation"
+  ]
+}

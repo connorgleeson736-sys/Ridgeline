@@ -1,0 +1,108 @@
+{
+ "guid": "ae6ce4ad-9a31-4fa1-967e-fadd7b53e03c",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Kitchener Track to Aspiring Flats",
+   "shape": "one_way",
+   "start": {
+    "name": "Camerons Flat car park",
+    "quote": "Walk upstream from the car park to find a suitable crossing point.",
+    "ref": null
+   },
+   "end": {
+    "name": "Aspiring Flats",
+    "quote": "ends at Aspiring Flats",
+    "ref": "T4"
+   },
+   "via": [
+    {
+     "name": "Matukituki River",
+     "quote": "Ford the Matukituki River at Camerons Flat.",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Glacier Burn",
+     "quote": "After reaching and crossing the Glacier Burn",
+     "ref": "T5"
+    },
+    {
+     "name": "East Matukituki River",
+     "quote": "the track undulates alongside the East Matukituki River",
+     "ref": null
+    },
+    {
+     "name": "Junction Flat",
+     "quote": "until it reaches Junction Flat and the Kitchener River.",
+     "ref": "T6"
+    },
+    {
+     "name": "Kitchener River",
+     "quote": "until it reaches Junction Flat and the Kitchener River.",
+     "ref": "T7"
+    },
+    {
+     "name": "top of the gorge",
+     "quote": "The track passes through beech forest to the top of the gorge",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "8–10 hr",
+   "distance": null,
+   "evidence": [
+    "Ford the Matukituki River at Camerons Flat. Walk upstream from the car park to find a suitable crossing point.",
+    "This track starts on the opposite side of the Matukituki River from Camerons Flat.",
+    "After reaching and crossing the Glacier Burn the track undulates alongside the East Matukituki River until it reaches Junction Flat and the Kitchener River.",
+    "The track passes through beech forest to the top of the gorge and ends at Aspiring Flats."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Otago Boys' High Bridge at MacPherson Creek",
+   "quote": "park by the Otago Boys' High Bridge at MacPherson Creek",
+   "ref": null,
+   "onto": "East Matukituki track"
+  }
+ ],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Rock of Ages Biv",
+   "quote": "The rock biv is 30 minutes further on from where the track reaches the flats.",
+   "ref": null,
+   "why": "other"
+  },
+  {
+   "name": "Glacier Burn Track",
+   "quote": "at the turn off for the Glacier Burn Track",
+   "ref": "L1",
+   "why": "other walk"
+  },
+  {
+   "name": "Kitchener Cirque",
+   "quote": "spectacular views of the Kitchener Cirque from Aspiring Flats",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Raspberry Creek",
+   "quote": "drive 2.5 km further along the road towards Raspberry Creek",
+   "ref": null,
+   "why": "nearby"
+  },
+  {
+   "name": "Wānaka",
+   "quote": "a one-hour drive from Wānaka",
+   "ref": null,
+   "why": "nearby"
+  }
+ ],
+ "doubts": "Shape is one_way: the page describes a walk from Camerons Flat to Aspiring Flats in two legs ('Camerons Flat to Junction Flat', 'Junction Flat to Aspiring Flats') and does not say it returns the same way; DOC's '8–10 hr' has no 'return'. The start is the Camerons Flat car park (the text says walk upstream from the car park after the ford), although the Getting there section says the track starts on the opposite side of the river. No road-end feature or name entry is in the packet, so the start has no ref. The ford point is not stated ('find a suitable crossing point'). Whether the Glacier Burn is bridged is not stated, so it has no how. The high-river alternative (Otago Boys' High Bridge at MacPherson Creek, then about an hour to join the East Matukituki track) is recorded as an access point, not a way. The Rock of Ages Biv is 30 minutes further on than the flats, so it is beyond the end and not on the route. DOC gives no whole-walk distance, and the section distances (9.5 km and 2.55 km) are not summed. The via 'top of the gorge' is a place the text names but has no entry."
+}

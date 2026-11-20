@@ -1,0 +1,100 @@
+{
+ "guid": "c832a31e-b1ec-48d9-a46b-b760d9859c92",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Mangahao Road parking area to Poulton Drive car park",
+   "shape": "one_way",
+   "start": {
+    "name": "parking area on Mangahao Road",
+    "quote": "400 m past the Tararua Forest Park sign is a small parking area. This is the start of the track.",
+    "ref": null
+   },
+   "end": {
+    "name": "Poulton Drive car park",
+    "quote": "The track ends at the Poulton Drive car park.",
+    "ref": "F1"
+   },
+   "via": [
+    {
+     "name": "tributaries of Blackwood Stream",
+     "quote": "crossing three tributaries of Blackwood Stream",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Makahika Ridge",
+     "quote": "turning south and following Makahika Ridge",
+     "ref": null
+    },
+    {
+     "name": "Horowhenua Lookout",
+     "quote": "Horowhenua Lookout, a small clearing with seating",
+     "ref": null
+    },
+    {
+     "name": "Kāpiti Viewpoint",
+     "quote": "Kāpiti Viewpoint",
+     "ref": null
+    },
+    {
+     "name": "historic Makahika tramline",
+     "quote": "reaches the end of the historic Makahika tramline",
+     "ref": null
+    },
+    {
+     "name": "Makahika Stream",
+     "quote": "The track crosses the Makahika stream several times",
+     "ref": "T4"
+    }
+   ],
+   "direction": null,
+   "time": "6 - 7 hrs going south, 7- 8 hrs going north",
+   "distance": "13 km one way",
+   "evidence": [
+    "From the parking area on Mangahao Road, the track enters the bush and climbs to a low spur, where an orientation sign is located.",
+    "The track ends at the Poulton Drive car park.",
+    "400 m past the Tararua Forest Park sign is a small parking area. This is the start of the track."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [],
+ "not_on_route": [
+  {
+   "name": "Mangaore Stream",
+   "quote": "good views of Mangaore Stream",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Kāpiti Island",
+   "quote": "Kāpiti Island, the South Island",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Shannon",
+   "quote": "an excellent view of Shannon",
+   "ref": null,
+   "why": "view"
+  },
+  {
+   "name": "Mangaore village",
+   "quote": "past Mangaore village",
+   "ref": "T5",
+   "why": "nearby"
+  },
+  {
+   "name": "Arapaepae Lookout Trail",
+   "quote": "eastern entrance to the Arapaepae Lookout Trail",
+   "ref": null,
+   "why": "other walk"
+  }
+ ],
+ "doubts": "The start is the small parking area on Mangahao Road, 400 m past the Tararua Forest Park sign; no road end feature or name matches it, so the ref is null. The end is the Poulton Drive car park, ref F1 (where an unnamed track meets Poulton Drive). The page describes the track going south from Mangahao Road; the Levin approach ends at the same Poulton Drive carpark, which is the track's other end, so it is not a separate way (the page does not give a start-from-Levin direction as a second way). Time is DOC's text for both directions and is copied as given. The stream crossings are described as unbridged for the three tributaries of Blackwood Stream (recorded as ford, ref null, since the tributaries are not named); the Makahika stream crossings are not described as unbridged, so no how is given. Makahika Ridge is not matched to the Makahika peak or place entries, so its ref is null. No direction (clockwise or anticlockwise) applies."
+}

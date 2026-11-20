@@ -1,0 +1,77 @@
+{
+  "scope": "Single cloud fetch of real LINZ DEMs for default focus. Byte-volume comparison only; no phone/network latency benchmark.",
+  "sources": [
+    {
+      "kind": "coarse",
+      "z": 7,
+      "x": 123,
+      "y": 80,
+      "httpStatus": 200,
+      "bytes": 1831,
+      "sha256": "6b0dd9489faf55d140d579f933ca259cfb7b9be7a5931fdb75b825e4c2a6227e"
+    },
+    {
+      "kind": "coarse",
+      "z": 7,
+      "x": 124,
+      "y": 80,
+      "httpStatus": 200,
+      "bytes": 10404,
+      "sha256": "cf16946be65bcee8d8aea7cfe49099d881c6b2df8f8f9aa8872ecea6eb9a957a"
+    },
+    {
+      "kind": "coarse",
+      "z": 7,
+      "x": 123,
+      "y": 81,
+      "httpStatus": 200,
+      "bytes": 20057,
+      "sha256": "afad3522455db0850d875bedd3e680c7713128a9ac36ac0f9283cd8defc89560"
+    },
+    {
+      "kind": "coarse",
+      "z": 7,
+      "x": 124,
+      "y": 81,
+      "httpStatus": 200,
+      "bytes": 59403,
+      "sha256": "4c18f1eaa9b25be27b3785b685d15578e9ab49cb2a082f9a2dcd3f65465aa4d9"
+    },
+    {
+      "kind": "nearParent",
+      "z": 10,
+      "x": 995,
+      "y": 649,
+      "httpStatus": 200,
+      "bytes": 77938,
+      "sha256": "564d0154f84e0f2e4a0a1cf32162225c294f7244da838bfa27359186a4a38a39"
+    },
+    {
+      "kind": "nearParent",
+      "z": 10,
+      "x": 996,
+      "y": 649,
+      "httpStatus": 200,
+      "bytes": 106410,
+      "sha256": "82278f864d30618a7f8f6cc66d70b21137295afa5d344e7512ba4d95b8ace067"
+    },
+    {
+      "kind": "nearParent",
+      "z": 10,
+      "x": 995,
+      "y": 650,
+      "httpStatus": 200,
+      "bytes": 107744,
+      "sha256": "23f0e2573739fde9837900ca2485cb204e4b040f4260626646b42119a97fae91"
+    },
+    {
+      "kind": "nearParent",
+      "z": 10,
+      "x": 996,
+      "y": 650,
+      "httpStatus": 200,
+      "bytes": 102296,
+      "sha256": "2601d01a542b95bd5bee13b12bf43aa67b9efeb51c9101f3a639304da9cc580d"
+    }
+  ]
+}

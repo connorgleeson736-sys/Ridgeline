@@ -1,0 +1,18 @@
+{
+  "mode": "implemented",
+  "first": {
+    "allocations": 0,
+    "mips": 0,
+    "directDraws": 24,
+    "actualRouteDraws": 0
+  },
+  "afterLineArrival": {
+    "allocations": 1,
+    "mips": 1,
+    "actualRouteDraws": 1
+  },
+  "retainedExistingOverlayWhenCoordinatesMissing": true,
+  "removedConfirmedEmptyOverlay": true,
+  "textureBytesPerPatch": 5600600
+}
+{"multipleStacksRetainNativeComposition":true}

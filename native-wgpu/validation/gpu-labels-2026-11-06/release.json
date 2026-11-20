@@ -1,0 +1,33 @@
+{
+  "artifact": "Ridgeline-Native-GPU-Labels-0.1.21-Base.apk",
+  "bytes": 32774595,
+  "sha256": "948d91ecac2f413fd790b2ca540b4cbcaf058591766311ca629bffed9d1177d8",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.21-gpu-labels",
+  "versionCode": 22,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.20 Full Audit (same package and signer)",
+  "changes": [
+    "label occlusion on the GPU: label pass after terrain samples terrain depth at each anchor by comparison sampling (4 levels between 20 m + 1.5 px and twice that); CPU line-of-sight removed",
+    "shown labels kept until their new placement arrives; last height kept during terrain refinement; 0.2 s fade-in",
+    "placement hysteresis (shown labels first, previous anchor first); 100 ms placement interval while moving plus a final placement",
+    "river names minzoom 15.5, river polygons 14.5, major track names 13.5, other track names 15.5; one label per name per tile",
+    "NZ Topo: fixed 128 px target, rounded tile zoom, full image budget; 2D aerial uses rounded tile zoom"
+  ],
+  "tests": {
+    "kotlinJvm": "174 tests, 0 failures",
+    "rust": "cargo test --workspace: all pass",
+    "gpu": "label_occlusion (new; Vulkan and GLES), overlay_parity (Vulkan and GLES), overlay_drape, waypoint_occlusion, route_smoke, progressive_multi pass"
+  },
+  "lintErrors": 0,
+  "originalAssetsIdentical": 623,
+  "jniExportsPerAbi": 43,
+  "loadAlignment": "0x4000",
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false,
+  "uiSeenOnDevice": false
+}

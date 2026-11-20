@@ -1,0 +1,150 @@
+{
+ "guid": "4fc6ffc6-04c8-418f-bc7a-98576d543020",
+ "kind": "one_way",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Manuoha to Waikareiti Track, Waiotukupuna Bridge (SH38) to Āniwaniwa",
+   "shape": "one_way",
+   "start": {
+    "name": "Waiotukupuna Bridge on SH38",
+    "quote": "The directions in this guide take you from the true right of the Waiotukupuna Bridge (SH38)",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "end of the track 200 m west of the Visitor Centre",
+    "quote": "From the shelter there is an easy downhill walk to the end of the track, 200 m west of the Visitor Centre.",
+    "ref": "T6"
+   },
+   "via": [
+    {
+     "name": "Waiotukupuna Stream",
+     "quote": "the true right of the Waiotukupuna Stream",
+     "ref": "T18"
+    },
+    {
+     "name": "Mt Manuoha",
+     "quote": "Mt Manuoha",
+     "ref": "T11"
+    },
+    {
+     "name": "Manuoha Hut",
+     "quote": "Manuoha Hut",
+     "ref": null
+    },
+    {
+     "name": "Pukepuke Range",
+     "quote": "the Pukepuke Range",
+     "ref": null
+    },
+    {
+     "name": "Kaipo Lagoon",
+     "quote": "the Kaipo Lagoon",
+     "ref": "T7"
+    },
+    {
+     "name": "Waikareiti Track junction",
+     "quote": "the Waikareiti Track junction",
+     "ref": null
+    },
+    {
+     "name": "Sandy Bay Hut",
+     "quote": "Sandy Bay Hut",
+     "ref": "T16"
+    },
+    {
+     "name": "Lake Waikareiti",
+     "quote": "along the shores of Lake Waikareiti",
+     "ref": "T9"
+    },
+    {
+     "name": "Waikareiti Shelter",
+     "quote": "the Waikareiti Shelter",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "3 days",
+   "distance": "32 km one way",
+   "evidence": [
+    "It takes a minimum of three days to complete and can be walked in either direction.",
+    "The directions in this guide take you from the true right of the Waiotukupuna Bridge (SH38), 16 km west of the Aniwaniwa Visitor Centre.",
+    "From the shelter there is an easy downhill walk to the end of the track, 200 m west of the Visitor Centre."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Alternative route via Lake Ruapani",
+   "shape": "one_way",
+   "start": {
+    "name": "Waiotukupuna Bridge on SH38",
+    "quote": "The directions in this guide take you from the true right of the Waiotukupuna Bridge (SH38)",
+    "ref": "F1"
+   },
+   "end": {
+    "name": "end of the Ruapani track on SH38",
+    "quote": "At the end of the track turn right to reach the start of the Waikareiti Track on SH38.",
+    "ref": "F3"
+   },
+   "via": [
+    {
+     "name": "Mt Manuoha",
+     "quote": "Mt Manuoha",
+     "ref": "T11"
+    },
+    {
+     "name": "Manuoha Hut",
+     "quote": "Manuoha Hut",
+     "ref": null
+    },
+    {
+     "name": "Kaipo Lagoon",
+     "quote": "the Kaipo Lagoon",
+     "ref": "T7"
+    },
+    {
+     "name": "Sandy Bay Hut",
+     "quote": "Sandy Bay Hut",
+     "ref": "T16"
+    },
+    {
+     "name": "Lake Ruapani",
+     "quote": "Lake Ruapani",
+     "ref": "T8"
+    },
+    {
+     "name": "Ruapani Wetland",
+     "quote": "the Ruapani Wetland",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "7 hr",
+   "distance": null,
+   "evidence": [
+    "If you wish to see more of the area, there is a detour you can take through the Ruapani wetlands.",
+    "Instead of taking the track to Waikareiti Shelter, take a fork to the right, approximately 2 hours 30 minutes to the south of the Sandy Bay Hut.",
+    "At the end of the track turn right to reach the start of the Waikareiti Track on SH38."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Manuoha Hut",
+   "quote": "Manuoha Hut",
+   "ref": null
+  },
+  {
+   "name": "Sandy Bay Hut",
+   "quote": "Sandy Bay Hut",
+   "ref": "T16"
+  }
+ ],
+ "not_on_route": [],
+ "doubts": "Start: the text starts from the Waiotukupuna Bridge on SH38, taken as F1 (Manuoha Track meets Waikaremoana Road; SH38 not named as that road in the text). W2 time 7 hr is the heading time for the Sandy Bay to Aniwaniwa alternative section only; W2 end F3 (Ruapani Track meets road) is my inference for 'the end of the track', after which one turns right to reach the Waikareiti Track start on SH38. Manuoha Hut is being removed. Waikareiti Shelter has no bunks, not listed as hut. Walkable in either direction (not a separate way)."
+}

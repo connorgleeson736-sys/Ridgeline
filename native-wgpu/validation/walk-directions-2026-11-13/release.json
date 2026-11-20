@@ -1,0 +1,28 @@
+{
+  "artifact": "Ridgeline-Native-Walk-Directions-0.1.53-Base.apk",
+  "bytes": 34050854,
+  "sha256": "dc9844989f9bf4d7d8ee84cd9d4261b975d581f01dbe64a5f083544b6041cd46",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.53-walk-directions",
+  "versionCode": 54,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.52 Full Audit (same package and signer)",
+  "changes": [
+    "Walks follow DOC's description: the map's tracks the text says to walk ('join the Greenstone Track', 'continue on …') and the places it names (huts, lakes, bays, peaks, saddles, localities), in the order named, over the map's tracks from the walk's road end. Side trips, alternatives, options, 'you can …' sentences, things seen ('views of …') and the walk's own name are not followed; each place once. Loops come back to their start without retracing and go the way DOC says (clockwise/anticlockwise); out-and-back walks go on to the far end of DOC's line. Pages for several tracks are not followed as one walk.",
+    "Checks do not rely on DOC's stated length (it can be well out): the route must cover 80% of DOC's line, take no long way round between consecutive named places (at most 3x their distance plus 1.5 km), fit DOC's time at 0.75-6 km/h, and be mostly along DOC's line and at most 1.6x its length unless DOC's stated length agrees within 25%; DOC's length is otherwise a loose bound (50%), and a line already nearer DOC's length is kept.",
+    "Loops whose description is not followed are closed over the map's tracks when that fits DOC's loop length; start/end options with both ends found by name accept DOC's leg distance within 50%.",
+    "The Lake Rere Walk is a 14.3 km clockwise loop via Elfin Bay, Lake Rere and the Greenstone Track (DOC: 14 km loop)."
+  ],
+  "dataChecks": "Directions survey over 1,308 DOC walks with a DOC line (directions-survey.txt): the description is followed for 231; the rest keep the 0.1.52 line (names nothing on the map, covers too little of DOC's line, a long way round, and so on). Of those followed, 35 are nearer DOC's stated length and 11 further (within the loose bound).",
+  "tests": {
+    "kotlinJvm": "274 tests, 0 failures (new: Lake Rere loop from its description, out-and-back to the far end, mentions in order without views or passing tracks, side trips not followed, clockwise from text)",
+    "rust": "unchanged (native libraries byte-identical to 0.1.52)"
+  },
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

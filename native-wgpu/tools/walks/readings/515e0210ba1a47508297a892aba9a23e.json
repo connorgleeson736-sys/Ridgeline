@@ -1,0 +1,245 @@
+{
+ "guid": "515e0210-ba1a-4750-8297-a892aba9a23e",
+ "kind": "loop",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Gillespie Pass Circuit from Makarora",
+   "shape": "loop",
+   "start": {
+    "name": "Makarora",
+    "quote": "Makarora",
+    "ref": "T11"
+   },
+   "end": {
+    "name": "Makarora",
+    "quote": "Makarora",
+    "ref": "T11"
+   },
+   "via": [
+    {
+     "name": "Makarora River",
+     "quote": "Once across the Makarora",
+     "ref": "T12",
+     "how": "ford"
+    },
+    {
+     "name": "Young River",
+     "quote": "follow Young River on the true left",
+     "ref": "T23"
+    },
+    {
+     "name": "swing bridge at the junction of the North and South branches",
+     "quote": "a swing bridge at the junction of the North and South branches",
+     "ref": null
+    },
+    {
+     "name": "Stag Creek",
+     "quote": "Stag Creek",
+     "ref": "T19"
+    },
+    {
+     "name": "Young Hut",
+     "quote": "Young Hut",
+     "ref": "T22"
+    },
+    {
+     "name": "Gillespie Pass",
+     "quote": "Gillespie Pass",
+     "ref": "T7"
+    },
+    {
+     "name": "Siberia Stream",
+     "quote": "Siberia Stream",
+     "ref": "T17"
+    },
+    {
+     "name": "Siberia Hut",
+     "quote": "Siberia Hut",
+     "ref": "T16"
+    },
+    {
+     "name": "Wilkin River",
+     "quote": "Wilkin River",
+     "ref": "T20"
+    },
+    {
+     "name": "Kerin Forks Hut",
+     "quote": "Kerin Forks Hut",
+     "ref": "T10"
+    },
+    {
+     "name": "Dans Flat",
+     "quote": "Dans Flat",
+     "ref": "T6"
+    },
+    {
+     "name": "Makarora River",
+     "quote": "When you reach the Makarora River, cross with care if it is safe to do so",
+     "ref": "T12",
+     "how": "ford"
+    },
+    {
+     "name": "Wilkin Road",
+     "quote": "Wilkin Road",
+     "ref": null,
+     "how": "road"
+    }
+   ],
+   "direction": null,
+   "time": "3 - 4 days",
+   "distance": "56 km loop",
+   "evidence": [
+    "Makarora to Young Hut",
+    "Once across the Makarora, follow Young River on the true left to a swing bridge at the junction of the North and South branches (3 to 4 hours).",
+    "Siberia Hut to Makarora",
+    "The Gillespie Pass Circuit can begin from either confluence:",
+    "The circuit can be walked in a clockwise or anti-clockwise direction. This description begins from the Young/Makarora confluence."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Gillespie Pass Circuit from the Wilkin/Makarora confluence",
+   "shape": "loop",
+   "start": {
+    "name": "Wilkin/Makarora confluence",
+    "quote": "the Wilkin/Makarora River",
+    "ref": null
+   },
+   "end": {
+    "name": "Wilkin/Makarora confluence",
+    "quote": "the Wilkin/Makarora River",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Makarora River",
+     "quote": "Makarora River",
+     "ref": "T12",
+     "how": "ford"
+    },
+    {
+     "name": "Wilkin Road",
+     "quote": "Wilkin Road",
+     "ref": null,
+     "how": "road"
+    },
+    {
+     "name": "Young/Makarora confluence",
+     "quote": "Young/Makarora",
+     "ref": null
+    },
+    {
+     "name": "Young River",
+     "quote": "Young River",
+     "ref": "T23"
+    },
+    {
+     "name": "Young Hut",
+     "quote": "Young Hut",
+     "ref": "T22"
+    },
+    {
+     "name": "Gillespie Pass",
+     "quote": "Gillespie Pass",
+     "ref": "T7"
+    },
+    {
+     "name": "Siberia Hut",
+     "quote": "Siberia Hut",
+     "ref": "T16"
+    },
+    {
+     "name": "Kerin Forks Hut",
+     "quote": "Kerin Forks Hut",
+     "ref": "T10"
+    },
+    {
+     "name": "Dans Flat",
+     "quote": "Dans Flat",
+     "ref": "T6"
+    }
+   ],
+   "direction": null,
+   "time": "3 - 4 days",
+   "distance": "56 km loop",
+   "evidence": [
+    "The Gillespie Pass Circuit can begin from either confluence:",
+    "the Wilkin/Makarora River, or",
+    "Young/Makarora."
+   ]
+  }
+ ],
+ "access_points": [
+  {
+   "name": "Young valley access",
+   "quote": "Access to the Young valley is signposted on the left, 2.5 km north of Makarora.",
+   "ref": null,
+   "onto": "track to the Young/Makarora confluence"
+  },
+  {
+   "name": "Young River Link Track",
+   "quote": "Young River Link Track",
+   "ref": "L1",
+   "onto": "Young valley"
+  }
+ ],
+ "exits": [
+  {
+   "name": "fly out of Siberia Valley",
+   "quote": "fly by plane or helicopter out of Siberia Valley",
+   "ref": "T18",
+   "from": "Siberia Hut",
+   "how": "fly"
+  },
+  {
+   "name": "jet boat from Kerin Forks",
+   "quote": "catch a jet boat from Kerin Forks",
+   "ref": "T9",
+   "from": "Kerin Forks",
+   "how": "boat"
+  }
+ ],
+ "side_trips": [
+  {
+   "name": "Lake Crucible",
+   "quote": "Lake Crucible",
+   "ref": null,
+   "from": "Siberia Hut"
+  },
+  {
+   "name": "Young Forks Campsite",
+   "quote": "Young Forks campsite",
+   "ref": "T21",
+   "from": "swing bridge at the junction of the North and South branches"
+  }
+ ],
+ "huts": [
+  {
+   "name": "Young Hut",
+   "quote": "Young Hut",
+   "ref": "T22"
+  },
+  {
+   "name": "Siberia Hut",
+   "quote": "Siberia Hut",
+   "ref": "T16"
+  },
+  {
+   "name": "Kerin Forks Hut",
+   "quote": "Kerin Forks Hut",
+   "ref": "T10"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Young River Link Track",
+   "quote": "Young River Link Track",
+   "ref": "L1",
+   "why": "other walk"
+  }
+ ],
+ "doubts": "The text does not say which direction the circuit is walked beyond 'clockwise or anti-clockwise'; the description runs Young confluence, Young Hut, Siberia Hut, Kerin Forks, out to Makarora. How the walker returns from Makarora to the start is not stated, so the loop closes at the start by inference. W2's via order is my inference of going round the same way from the Wilkin confluence. The page says to cross the Wilkin River to reach Kerin Forks Hut but does not place that crossing on the circuit, so no Wilkin ford is recorded. The first Makarora crossing is implied by 'Once across the Makarora'. Via refs for Gillespie Pass and the Wilkin River are inferred from the track's name and route. Main way start and end set to Makarora, as the page's section headings run (\"Makarora to Young Hut\", \"Siberia Hut to Makarora\"); the Young/Makarora confluence it begins from has no place on the map."
+}

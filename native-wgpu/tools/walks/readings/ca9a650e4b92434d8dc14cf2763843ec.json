@@ -1,0 +1,243 @@
+{
+ "guid": "ca9a650e-4b92-434d-8dc1-4cf2763843ec",
+ "kind": "loop",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "Neill Winchcombe Circuit from Waiohine Road End",
+   "shape": "loop",
+   "start": {
+    "name": "Waiohine Road End and Campsite",
+    "quote": "The track starts from Waiohine Road End and Campsite.",
+    "ref": null
+   },
+   "end": {
+    "name": "Waiohine Road End and Campsite",
+    "quote": "Again, take the right hand track towards Waiohine Road End",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "Waiohine River suspension bridge",
+     "quote": "cross the high suspension bridge over the Waiohine River",
+     "ref": null
+    },
+    {
+     "name": "Cone Saddle",
+     "quote": "From Cone Saddle, the track climbs to the Cone summit.",
+     "ref": "T12"
+    },
+    {
+     "name": "Cone",
+     "quote": "the track climbs to the Cone summit",
+     "ref": "T10"
+    },
+    {
+     "name": "Neill Ridge",
+     "quote": "Follow the track along Neill Ridge.",
+     "ref": "T21"
+    },
+    {
+     "name": "Neill Saddle",
+     "quote": "The track descends to Neill Saddle",
+     "ref": "T22"
+    },
+    {
+     "name": "Neill",
+     "quote": "the Neill high point (1158 m)",
+     "ref": "T20"
+    },
+    {
+     "name": "Winchcombe Bivouac",
+     "quote": "Shortly before the bush line you will reach Winchcombe Bivouac.",
+     "ref": null
+    },
+    {
+     "name": "Winchcombe Peak",
+     "quote": "passing Winchcombe Peak",
+     "ref": "T24"
+    },
+    {
+     "name": "Mount Hector",
+     "quote": "At the Mt Hector summit, you join the Southern Crossing track.",
+     "ref": "T19"
+    },
+    {
+     "name": "Southern Crossing",
+     "quote": "continue south along the Southern Crossing",
+     "ref": "L1"
+    },
+    {
+     "name": "Dress Circle",
+     "quote": "The exposed ridge of the Dress Circle takes you to the top of Aston",
+     "ref": null
+    },
+    {
+     "name": "Aston",
+     "quote": "the top of Aston",
+     "ref": "T8"
+    },
+    {
+     "name": "Alpha",
+     "quote": "over Alpha (1361 m)",
+     "ref": "T6"
+    },
+    {
+     "name": "Alpha Hut",
+     "quote": "descend to Alpha Hut, just below the bush line.",
+     "ref": "T7"
+    },
+    {
+     "name": "Hells Gate",
+     "quote": "the saddle at Hells Gate",
+     "ref": "T17"
+    },
+    {
+     "name": "Marchant Ridge",
+     "quote": "The track climbs from the saddle to Marchant Ridge.",
+     "ref": null
+    },
+    {
+     "name": "Bull Mound Track",
+     "quote": "the Bull Mound Track",
+     "ref": "T1"
+    },
+    {
+     "name": "Bull Mound",
+     "quote": "follows the ridge to Bull Mound (1060 m)",
+     "ref": "T9"
+    },
+    {
+     "name": "Tauwharenīkau River",
+     "quote": "Cross the river to the true left",
+     "ref": null,
+     "how": "ford"
+    },
+    {
+     "name": "Tauwharenīkau Track",
+     "quote": "where you will meet the Tauwharenīkau Track",
+     "ref": "T5"
+    },
+    {
+     "name": "Cone Hut",
+     "quote": "until you come to Cone Hut.",
+     "ref": "T11"
+    },
+    {
+     "name": "Waiohine Valley",
+     "quote": "descends all the way into the Waiohine Valley",
+     "ref": null
+    },
+    {
+     "name": "Waiohine River bridge",
+     "quote": "Cross the bridge over the river, then you will reach the road end.",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "3 days",
+   "distance": null,
+   "evidence": [
+    "The track starts from Waiohine Road End and Campsite.",
+    "From Waiohine Road End and Campsite, cross the high suspension bridge over the Waiohine River and follow the track signposted towards Cone Hut.",
+    "Cone Hut to Waiohine Road End",
+    "Again, take the right hand track towards Waiohine Road End (the track you came up on), rather than going towards Cone Saddle.",
+    "The track follows the ridge, then descends all the way into the Waiohine Valley. Cross the bridge over the river, then you will reach the road end."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "Kime Hut to Alpha Hut over Field Peak and Mt Hector",
+   "shape": "one_way",
+   "start": {
+    "name": "Kime Hut",
+    "quote": "If you are starting from Kime Hut",
+    "ref": "T18"
+   },
+   "end": {
+    "name": "Alpha Hut",
+    "quote": "descend to Alpha Hut, just below the bush line.",
+    "ref": "T7"
+   },
+   "via": [
+    {
+     "name": "Field Peak",
+     "quote": "follow the ridge over Field Peak",
+     "ref": "T16"
+    },
+    {
+     "name": "Mount Hector",
+     "quote": "to Mount Hector (1,529 m)",
+     "ref": "T19"
+    },
+    {
+     "name": "Southern Crossing",
+     "quote": "continue south along the Southern Crossing",
+     "ref": "L1"
+    },
+    {
+     "name": "Dress Circle",
+     "quote": "The exposed ridge of the Dress Circle takes you to the top of Aston",
+     "ref": null
+    },
+    {
+     "name": "Aston",
+     "quote": "the top of Aston",
+     "ref": "T8"
+    },
+    {
+     "name": "Alpha",
+     "quote": "over Alpha (1361 m)",
+     "ref": "T6"
+    }
+   ],
+   "direction": null,
+   "time": "5-6 hr from Kime Hut",
+   "distance": null,
+   "evidence": [
+    "If you are starting from Kime Hut, follow the ridge over Field Peak to Mount Hector (1,529 m).",
+    "Time: 5-6 hr from Kime Hut",
+    "Continue along the ridge route over Alpha (1361 m) and descend to Alpha Hut, just below the bush line."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [
+  {
+   "name": "Marchant Ridge down the Southern Crossing Track",
+   "quote": "exiting via Marchant Ridge down the Southern Crossing Track",
+   "ref": null,
+   "from": "Alpha Hut",
+   "how": "track"
+  }
+ ],
+ "side_trips": [],
+ "huts": [
+  {
+   "name": "Winchcombe Bivouac",
+   "quote": "Winchcombe Bivouac",
+   "ref": null
+  },
+  {
+   "name": "Alpha Hut",
+   "quote": "Alpha Hut",
+   "ref": "T7"
+  },
+  {
+   "name": "Cone Hut",
+   "quote": "Cone Hut",
+   "ref": "T11"
+  }
+ ],
+ "not_on_route": [
+  {
+   "name": "Elder Hut",
+   "quote": "signposted junction to Elder Hut",
+   "ref": "L2",
+   "why": "nearby"
+  }
+ ],
+ "doubts": "The start and end (Waiohine Road End and Campsite) have no road-end feature in the packet, so the ref is null. Kime Hut is a start of W2 (its own time, 5-6 hr from Kime Hut), so it is not recorded as a side trip; the text's Mt Hector descent to Kime Hut is the same choice. The Dress Circle ref is null: the text names the ridge, and T13 (Dress Circle peak) was not certain. Marchant Ridge is left without a ref (T4 is a track of that name, not certain). No direction is named. The page's alternative exit via Marchant Ridge is recorded under exits; the return up the Bull Mound Track to Alpha Hut is a retreat and not recorded. The order of Neill Ridge, Neill Saddle and Neill follows the text's ridge description."
+}

@@ -1,0 +1,1 @@
+PASS native route GPU: 1536 affected pixels, visible draped line/waypoints, unchanged geometry uploads on idle/pan. Synthetic height fixture; not phone performance.

@@ -1,0 +1,119 @@
+{
+ "guid": "6db41893-784a-488a-808f-3d7f0560f04e",
+ "kind": "loop",
+ "ways": [
+  {
+   "id": "W1",
+   "main": true,
+   "label": "full loop via the upper suspension bridge",
+   "shape": "loop",
+   "start": {
+    "name": "Hokitika Gorge car park",
+    "quote": "Hokitika Gorge car park",
+    "ref": null
+   },
+   "end": {
+    "name": "Hokitika Gorge car park",
+    "quote": "Hokitika Gorge car park",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "viewing platform",
+     "quote": "viewing platform",
+     "ref": null
+    },
+    {
+     "name": "swing bridge",
+     "quote": "swing bridge across the Hokitika River",
+     "ref": null
+    },
+    {
+     "name": "junction before the second viewing platform",
+     "quote": "junction just before the second viewing platform",
+     "ref": null
+    },
+    {
+     "name": "upper Hokitika Gorge suspension bridge",
+     "quote": "upper Hokitika Gorge suspension bridge",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "1 hr 30 min",
+   "distance": "1.6 km loop",
+   "evidence": [
+    "From Hokitika Gorge car park, you can:",
+    "complete the full loop via the upper suspension bridge.",
+    "After crossing the bridge, it’s a 30 min walk back to the car park through rainforest, with some ups and downs."
+   ]
+  },
+  {
+   "id": "W2",
+   "main": false,
+   "label": "car park to viewing platform and return",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Hokitika Gorge car park",
+    "quote": "Hokitika Gorge car park",
+    "ref": null
+   },
+   "end": {
+    "name": "viewing platform",
+    "quote": "viewing platform",
+    "ref": null
+   },
+   "via": [],
+   "direction": null,
+   "time": "4 min / 150 m (one way)",
+   "distance": null,
+   "evidence": [
+    "walk to the first viewing platform or lower swing bridge and return",
+    "From the car park, follow the signposted track through pristine West Coast rainforest to the viewing platform."
+   ]
+  },
+  {
+   "id": "W3",
+   "main": false,
+   "label": "car park to lower swing bridge and return",
+   "shape": "out_and_back",
+   "start": {
+    "name": "Hokitika Gorge car park",
+    "quote": "Hokitika Gorge car park",
+    "ref": null
+   },
+   "end": {
+    "name": "swing bridge",
+    "quote": "swing bridge across the Hokitika River",
+    "ref": null
+   },
+   "via": [
+    {
+     "name": "viewing platform",
+     "quote": "viewing platform",
+     "ref": null
+    }
+   ],
+   "direction": null,
+   "time": "6 min / 300 m (one way)",
+   "distance": null,
+   "evidence": [
+    "walk to the first viewing platform or lower swing bridge and return",
+    "Continue along the track and boardwalks to reach the swing bridge across the Hokitika River."
+   ]
+  }
+ ],
+ "access_points": [],
+ "exits": [],
+ "side_trips": [
+  {
+   "name": "second viewing platform",
+   "quote": "second viewing platform",
+   "ref": null,
+   "from": "junction before the second viewing platform"
+  }
+ ],
+ "huts": [],
+ "not_on_route": [],
+ "doubts": "Car park start ref null: two unnamed road-end features (F1, F2) on Whitcombe Valley Road and the text does not say which. W2 and W3 times are the one-way figures under their section headings (W3's is from the viewing platform, not the car park). Swing bridge is crossed on the full loop, not forded."
+}

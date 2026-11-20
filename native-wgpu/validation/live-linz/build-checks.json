@@ -1,0 +1,25 @@
+{
+  "androidUnitTests": {
+    "tests": 20,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "lintIssues": {
+    "Error": 0,
+    "Warning": 16
+  },
+  "rustHostTests": 17,
+  "sourceRoutingCases": 2520,
+  "sourceMasks": 360,
+  "cameraProjections": 1712,
+  "abisCrossBuilt": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86_64"
+  ],
+  "signatureVerified": true,
+  "zipalign16KiB": true,
+  "androidLiveInstrumentation": "not yet run",
+  "phonePerformance": "unverified"
+}

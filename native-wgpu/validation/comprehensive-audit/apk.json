@@ -1,0 +1,38 @@
+{
+  "sourceCheckpoint": "033bec62c340fd05ba95a316b01604e6ce8c9062",
+  "bytes": 31866304,
+  "sha256": "e329eb1f39198424931b4a18e18e3617672d0d11a9a48ab17b3487c14f2b972c",
+  "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86_64"
+  ],
+  "terrainSkirts": false,
+  "managedSessionCa": false,
+  "largeOverviewPacks": 0,
+  "signatureVerified": true,
+  "alignment16KiBVerified": true,
+  "phoneTested": false,
+  "jvmTests": 58,
+  "coreTests": 26,
+  "rendererTests": 4,
+  "cliTests": 1,
+  "textureBackend": {
+    "automaticVulkan": "arrays",
+    "automaticGles": "pooled separate textures",
+    "override": "Offline / imagery > GPU textures",
+    "layersPerPage": 8,
+    "maxPagesPerPool": 25
+  },
+  "automaticDiskCache": {
+    "defaultMiB": 1000,
+    "rangeMiB": [
+      0,
+      1000
+    ],
+    "applies": "after app restart",
+    "zero": "disable and clear disposable disk caches at next launch",
+    "savedRegionsAndAttachedZipsSeparate": true,
+    "ramAndGpuSeparate": true
+  }
+}

@@ -1,0 +1,158 @@
+[
+  {
+    "tile": [
+      13,
+      7935,
+      5224
+    ],
+    "source": "aerial",
+    "status": 200,
+    "bytes": 15846,
+    "alphaPixels": 65536,
+    "seconds": 1.72
+  },
+  {
+    "tile": [
+      13,
+      7935,
+      5224
+    ],
+    "source": "otago-2017-2019-0.3m",
+    "status": 200,
+    "bytes": 133799,
+    "alphaPixels": 65249,
+    "seconds": 2.013
+  },
+  {
+    "tile": [
+      16,
+      63480,
+      41798
+    ],
+    "source": "aerial",
+    "status": 200,
+    "bytes": 10662,
+    "alphaPixels": 65536,
+    "seconds": 1.491
+  },
+  {
+    "tile": [
+      16,
+      63480,
+      41798
+    ],
+    "source": "otago-2017-2019-0.3m",
+    "status": 200,
+    "bytes": 92069,
+    "alphaPixels": 61589,
+    "seconds": 1.484
+  },
+  {
+    "tile": [
+      17,
+      126961,
+      83596
+    ],
+    "source": "aerial",
+    "status": 200,
+    "bytes": 5618,
+    "alphaPixels": 65536,
+    "seconds": 1.122
+  },
+  {
+    "tile": [
+      17,
+      126961,
+      83596
+    ],
+    "source": "otago-2017-2019-0.3m",
+    "status": 200,
+    "bytes": 60722,
+    "alphaPixels": 65536,
+    "seconds": 1.679
+  },
+  {
+    "tile": [
+      17,
+      126960,
+      83596
+    ],
+    "source": "aerial",
+    "status": 200,
+    "bytes": 12288,
+    "alphaPixels": 65536,
+    "seconds": 0.786
+  },
+  {
+    "tile": [
+      17,
+      126960,
+      83596
+    ],
+    "source": "otago-2017-2019-0.3m",
+    "status": 200,
+    "bytes": 113912,
+    "alphaPixels": 65536,
+    "seconds": 1.447
+  },
+  {
+    "tile": [
+      18,
+      253922,
+      167192
+    ],
+    "source": "aerial",
+    "status": 200,
+    "bytes": 10690,
+    "alphaPixels": 65536,
+    "seconds": 0.747
+  },
+  {
+    "tile": [
+      18,
+      253922,
+      167192
+    ],
+    "source": "otago-2017-2019-0.3m",
+    "status": 200,
+    "bytes": 102374,
+    "alphaPixels": 65536,
+    "seconds": 1.178
+  },
+  {
+    "tile": [
+      19,
+      507844,
+      334385
+    ],
+    "source": "aerial",
+    "status": 200,
+    "bytes": 8902,
+    "alphaPixels": 65536,
+    "seconds": 1.051
+  },
+  {
+    "tile": [
+      19,
+      507844,
+      334385
+    ],
+    "source": "otago-2017-2019-0.3m",
+    "status": 200,
+    "bytes": 108476,
+    "alphaPixels": 65536,
+    "seconds": 1.169
+  },
+  {
+    "tile": [
+      17,
+      126961,
+      83596
+    ],
+    "source": "esri",
+    "status": 200,
+    "bytes": 8222,
+    "alphaPixels": 65536,
+    "seconds": 0.604
+  }
+]

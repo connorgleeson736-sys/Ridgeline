@@ -1,0 +1,17 @@
+Verifies
+Verified using v1 scheme (JAR signing): false
+Verified using v2 scheme (APK Signature Scheme v2): true
+Verified using v3 scheme (APK Signature Scheme v3): false
+Verified using v3.1 scheme (APK Signature Scheme v3.1): false
+Verified using v4 scheme (APK Signature Scheme v4): false
+Verified for SourceStamp: false
+Number of signers: 1
+Signer #1 certificate DN: CN=Ridgeline Native Performance, O=Ridgeline, C=NZ
+Signer #1 certificate SHA-256 digest: 03ef64214daee8c59cad6571ce5036579237d553c040837ce996f80efa898ae7
+Signer #1 certificate SHA-1 digest: 6506aa88a1b5263c3588bb05aaf9439ac0052856
+Signer #1 certificate MD5 digest: a4809f0cf5319ae8fba1a0544cf06042
+Signer #1 key algorithm: RSA
+Signer #1 key size (bits): 3072
+Signer #1 public key SHA-256 digest: 572865d552ae5ea1dea44183129ec2994710d23c4e8f144beb68102c8fe4ea83
+Signer #1 public key SHA-1 digest: 50040c72f499c1774d45d371d174c8c5d3c3c57f
+Signer #1 public key MD5 digest: 31967b5e9aa8b199a3c7d760f2eb504c

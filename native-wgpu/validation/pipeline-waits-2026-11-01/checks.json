@@ -1,0 +1,14 @@
+{
+  "scope": "Only targeted loading checks, no full suite or lint. No physical device execution.",
+  "targetedChecksPassed": 7,
+  "targetedChecksFailed": 0,
+  "checks": [
+    "PipelineWaitTest: 3 original disk/decode checks including six alternating cache-stall trials",
+    "PipelineWaitTest: real uncached HTTP persistence, expiry/no-store, restart and local original bootstrap budget checks (2)",
+    "PipelineWaitTest: imagery reservation replay (1), six alternating trials",
+    "TileTransportTest.actualHttpDiskHitFinishesWhileAllForegroundNetworkSlotsAreBlocked: isolated replay passes; historical full-suite timeout not reproduced"
+  ],
+  "productionKotlinCompilation": "Passed with targeted tasks",
+  "nativeRustChanged": false,
+  "phoneWifiDiagnosis": "Not established; app-side admission/worker delays independently reproduced."
+}

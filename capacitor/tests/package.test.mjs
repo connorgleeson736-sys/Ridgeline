@@ -13,8 +13,12 @@ test('overview catalogue contains only verified local ranges and no server depen
 
 test('overview packaging matches the selected full or base build',async()=>{const {createReadStream}=await import('node:fs');const {createHash}=await import('node:crypto');const manifest=JSON.parse(await read('overview-manifest.json'));const {document}=parseHTML(await read('index.html'));assert.equal(document.documentElement.dataset.overviewsBundled,String(manifest.bundled));if(!manifest.bundled){await assert.rejects(access(new URL('../www/overview-packs',import.meta.url)));return;}for(const pack of manifest.files){let size=0;const digest=createHash('sha256');for await(const bytes of createReadStream(new URL('../www/overview-packs/'+pack.sha256+'.bin',import.meta.url))){size+=bytes.length;digest.update(bytes);}assert.equal(size,pack.bytes);assert.equal(digest.digest('hex'),pack.sha256);}});
 
+test('motion detail matches the website apart from restoring full detail at moveend',async()=>{
+ const web=await readFile(new URL('../../public/motion-detail.js',import.meta.url),'utf8'),app=await read('motion-detail.js');
+ assert.equal(app.replace("function end(){moving=false;previous=null;clear();if(dead)return;smoothed=0;apply(0);}","function end(){moving=false;previous=null;clear();timer=root.setTimeout(()=>{timer=null;if(dead||moving)return;smoothed=0;apply(0);},350);}"),web);
+});
 test('rendering engine and quality policies are identical to website source',async()=>{
- for(const file of ['maplibre-direct-sampling.js','adaptive-terrain.js','motion-detail.js','surface-focus.js','assets/maplibre-gl.mjs','assets/maplibre-gl-worker.mjs']){
+ for(const file of ['maplibre-direct-sampling.js','adaptive-terrain.js','surface-focus.js','assets/maplibre-gl.mjs','assets/maplibre-gl-worker.mjs']){
   assert.equal(await read(file),await readFile(new URL('../../public/'+file,import.meta.url),'utf8'),file);
  }
 });

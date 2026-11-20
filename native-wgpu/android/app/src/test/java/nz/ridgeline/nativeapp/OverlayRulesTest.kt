@@ -1,0 +1,67 @@
+package nz.ridgeline.nativeapp
+
+import org.junit.Assert.*
+import org.junit.Test
+import java.io.File
+
+/** Capacitor/MapLibre overlay rules: layer ranges use the camera zoom, while
+ * ["zoom"] in filters uses each source tile's own zoom. */
+class OverlayRulesTest {
+    private val fixtures get()=File(requireNotNull(System.getProperty("ridgeline.fixtures")))
+    private val style get()=TopographyStyle(File(fixtures,"../../main/assets/topography-style.json").readText())
+    private fun peak(name:String,rank:Int)=VectorTile.Feature("place_labels",name.hashCode().toLong(),1,
+        mapOf("natural" to "peak","label" to name,"admin_level" to rank),listOf(listOf(VectorTile.Point(.5,.5))))
+    private fun names(out:TopographyStyle.Output)=out.labels.map{it.text}.toSet()
+
+    @Test fun minorPeaksFollowTheTileZoomLikeMapLibre(){
+        val features=listOf(peak("Major",3),peak("Mid",8),peak("Minor",10))
+        val s=MapSettings.State()
+        // Camera z15 over a z15-equivalent near tile: every tier is shown.
+        assertEquals(setOf("Major","Mid","Minor"),names(style.build(features,s,15.0,15.0)))
+        // Same camera, distant z12 tile in a pitched view: minor peaks wait for
+        // tile zoom 14 (as in Capacitor); rank<=8 secondary peaks show from 12.
+        assertEquals(setOf("Major","Mid"),names(style.build(features,s,15.0,12.0)))
+        // Below the secondary layer's minzoom (camera 11.5) only major peaks remain.
+        assertEquals(setOf("Major"),names(style.build(features,s,11.5,11.0)))
+    }
+    @Test fun peaksFollowThePeakLabelsSwitchAndTopoHidesOverlays(){
+        val features=listOf(peak("Major",3))
+        assertTrue(names(style.build(features,MapSettings.State(peaks=false),15.0,15.0)).isEmpty())
+        assertFalse(MapSettings.State(base=MapSettings.Base.TOPO).overlays())
+    }
+    private fun river(name:String,id:Long)=VectorTile.Feature("water_lines",id,2,mapOf("kind" to "river","name" to name),listOf(listOf(VectorTile.Point(.1,.1+id*.01),VectorTile.Point(.4,.1+id*.01))))
+    private fun track(name:String,id:Long)=VectorTile.Feature("streets",id,2,mapOf("kind" to "track","track_use" to "foot","name" to name),listOf(listOf(VectorTile.Point(.2,.5+id*.01),VectorTile.Point(.6,.5+id*.01))))
+    @Test fun riverNamesComeLaterAndOncePerTileTrackNamesFromZoom13(){
+        val s=MapSettings.State()
+        val rivers=listOf(river("Hooker River",1),river("Hooker River",2),river("Tasman River",3))
+        assertTrue("rivers wait for 15.5",names(style.build(rivers,s,15.0,14.0)).isEmpty())
+        val shown=style.build(rivers,s,15.6,14.0).labels.map{it.text}
+        assertEquals(listOf("Hooker River","Tasman River"),shown.sorted())
+        val tracks=listOf(track("Hooker Valley Track",1),track("Local Spur Track",2))
+        // Listed Great Walks from tile zoom 12 (as Capacitor), other named tracks
+        // one zoom earlier than Capacitor's 14: from 13.
+        assertEquals(setOf("Hooker Valley Track"),names(style.build(tracks,s,12.2,12.0)))
+        assertEquals(setOf("Hooker Valley Track","Local Spur Track"),names(style.build(tracks,s,13.2,13.0)))
+        assertEquals(setOf("Hooker Valley Track","Local Spur Track"),names(style.build(tracks,s,14.0,14.0)))
+    }
+    @Test fun aRoadSplitIntoPiecesGetsOneNamePerTile(){
+        val piece={i:Int->VectorTile.Feature("streets",i.toLong(),2,mapOf("kind" to "primary","hway_num" to 80L,"name" to "Mount Cook Road"),listOf(listOf(VectorTile.Point(.1+i*.1,.5),VectorTile.Point(.15+i*.1,.5))))}
+        val out=style.build((0 until 6).map(piece),MapSettings.State(),13.0,13.0)
+        val names=out.labels.filter{it.text=="SH 80"}
+        assertEquals(1,names.size)
+        assertEquals(850f,names[0].spacing)
+    }
+    /** MapLayers caches a tile's lines apart from its names: DOC's walk data
+     * (marked tracks) changes names only, so lines are never rebuilt or re-sent for it. */
+    @Test fun walkMarksChangeNamesNotLines(){
+        val s=MapSettings.State()
+        val plain=listOf(track("Siberia Track",1),track("Local Spur Track",2))
+        val marked=plain.map{f->if(f.properties["name"]=="Siberia Track")f.copy(properties=f.properties+mapOf(DocWalks.WALK to "Gillespie Pass Circuit",DocWalks.WALK_ID to "abc"))else f}
+        val a=style.build(plain,s,13.0,13.0);val b=style.build(marked,s,13.0,13.0)
+        assertEquals(a.lines,b.lines)
+        assertNotEquals(names(a),names(b))
+        // Names only: no lines, the same names as a full build.
+        val only=style.build(marked,s,13.0,13.0,withLines=false)
+        assertTrue(only.lines.isEmpty());assertEquals(b.labels,only.labels)
+    }
+}

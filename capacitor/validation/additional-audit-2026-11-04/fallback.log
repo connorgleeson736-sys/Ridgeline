@@ -1,0 +1,13 @@
+{
+  "parentProvenance": true,
+  "initialFallbackVisible": true,
+  "compressedFallbackEntries": 0,
+  "visibleStationaryRecovery": true,
+  "uploads": 2,
+  "transfers": 2,
+  "sharpSuccessClearsRecord": true,
+  "retryAfterRespected": true,
+  "offlineOnlyDoesNotPoll": true,
+  "restoredFallbackRescanned": true,
+  "retiredSourceDoesNotReload": true
+}

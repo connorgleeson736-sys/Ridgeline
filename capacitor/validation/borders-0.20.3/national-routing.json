@@ -1,0 +1,8 @@
+{
+  "cases": 40320,
+  "formerlyBlockedPureLinzTiles": 1045,
+  "allChangedTilesIndependentlyHaveZeroReplacementArea": true,
+  "otherRoutingChanges": 0,
+  "imageryMasksChanged": false,
+  "fineAlphaProtectionRetained": true
+}

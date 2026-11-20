@@ -1,0 +1,12 @@
+✔ combines selected order/direction, removing only identical join points (5.634363ms)
+✔ combination keeps originals and enforces the existing route point limit (5.159536ms)
+✔ route summaries measure distance and previews fit horizontal, vertical and single-point routes (0.824109ms)
+✔ route cards reuse nodes and geometry, defer hidden work, and skip unchanged overlay updates (42.824733ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 420.535202

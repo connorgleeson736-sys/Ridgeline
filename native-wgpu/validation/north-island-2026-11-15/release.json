@@ -1,0 +1,29 @@
+{
+  "artifact": "Ridgeline-Native-North-Island-0.1.62-Base.apk",
+  "bytes": 36283845,
+  "sha256": "0c64300d65fa92825476080779288423be3f4b1c9af5982ffb7c9b8ba9df802d",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.62-north-island",
+  "versionCode": 63,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.61 Full Audit (same package and signer)",
+  "changes": [
+    "North Island overview imagery (zooms 0-12), made as the South Island's: averaged from LINZ's zoom-13 aerial photography with the same coastal blend (tools/overviews/north_island.py, README.md). 3,838 coordinates: zooms 0-8 bundled (52), zooms 9-12 streamed from the overview host or kept offline as four packs Ridgeline-Overviews-NI-1.0-N-of-4.zip (244 MB). 103 coordinates shared with the South Island (Cook Strait, the whole country) are the North Island laid over the South Island's finished tiles.",
+    "Offline: 'Download all' and the attached-pack count cover all ten packs (six South Island, four North Island).",
+    "Route tools (Edit, Undo, Export GPX, Delete point): smaller (11 sp, 9.5 sp when a label wraps to two lines, 30 dp tall) and kept at the bottom of the route sheet.",
+    "Hunting permit hatching fainter (30% instead of 45% opacity).",
+    "Closing a hut opened from a track returns to the track without moving the map."
+  ],
+  "imageryHost": "https://pub-b39506879e9740798b22fa3186e4206d.r2.dev (Cloudflare R2)",
+  "tests": {
+    "kotlinJvm": "all pass (overview index: every tile in a known pack)",
+    "rust": "unchanged"
+  },
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}

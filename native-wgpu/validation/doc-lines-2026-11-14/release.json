@@ -1,0 +1,24 @@
+{
+  "artifact": "Ridgeline-Native-DOC-Lines-0.1.59-Base.apk",
+  "bytes": 34613147,
+  "sha256": "85b4deb429cf8a02540c61dbba8a64c4d644e051f836716d0e6510c48c76bbf1",
+  "applicationId": "nz.ridgeline.nativeapp.fullaudit",
+  "label": "Ridgeline Native Full Audit",
+  "versionName": "0.1.59-doc-lines",
+  "versionCode": 60,
+  "buildType": "performance (not debuggable, R8 off)",
+  "signerSha256": "c4e30ed357e8ed59b0bbc6cbd5725277cd196bfb091a9f3b07e270b91300fe46",
+  "updatesInPlace": "0.1.13-0.1.58 Full Audit (same package and signer)",
+  "changes": [
+    "Every walk is shown on DOC's own line, as up to 0.1.46: DOC's pieces joined end to end (gaps up to 3 km) from where the walk was tapped; no compiled routes, rerouting over the map's tracks, start/end options or extensions. Without a DOC line, the map's tracks of the walk's name. Descriptions, photos and huts along the line are unchanged. The compiled walk data and code stay in place behind TrackSheet.DOC_ROUTES."
+  ],
+  "tests": {
+    "kotlinJvm": "288 tests; PriorityPipelineTest timing case failed once under full-suite load and passed 3 of 3 alone",
+    "rust": "unchanged"
+  },
+  "lintErrors": 0,
+  "signatureVerified": true,
+  "zip16KiBAlignmentVerified": true,
+  "debuggable": false,
+  "physicalDeviceRun": false
+}
