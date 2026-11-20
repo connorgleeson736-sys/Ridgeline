@@ -234,7 +234,8 @@ async function main() {
     // Its centre in the middle of the map above an open panel, as the app frames it.
     view: (v) => {
       const [zoom, lat, lng, bearing = 0, pitch = 0] = v.split('/').map(Number);
-      const top = $('sheet').hidden ? innerHeight : $('sheet').getBoundingClientRect().top;
+      const panel = document.querySelector('[data-promo-panel]') || ($('sheet').hidden ? null : $('sheet'));
+      const top = panel ? panel.getBoundingClientRect().top : innerHeight;
       map.jumpTo({ zoom, center: [lng, lat], bearing, pitch, padding: { top: 0, left: 0, right: 0, bottom: Math.max(0, innerHeight - top) } });
     },
   };
