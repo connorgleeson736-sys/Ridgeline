@@ -196,7 +196,7 @@ test('shared route links whose polyline contains ~ open (old and new links)', as
 });
 
 // ---- Huts along a walk: the app's rules (TrackSheet.showHuts, DocTracks.named) ----
-import { hutName, named, pageText, compiledStops, walkHuts } from '../src/js/core/walks.js';
+import { hutName, named, namedOnly, pageText, compiledStops, walkHuts } from '../src/js/core/walks.js';
 import { gunzipSync } from 'node:zlib';
 
 test('hut names lose DOC asset codes, not historic notes', () => {
@@ -226,6 +226,13 @@ test('a compiled walk shows exactly its own huts, in order along it', () => {
   assert.deepEqual(out.map((s) => s.hut.name), ['Mid Caples Hut', 'Greenstone Hut']);
   assert.equal(out[1].hut.bunks, '20', "DOC's hut details where the map has them");
   assert.ok(Math.abs(out[0].along - meters(line[0], [168.02, -44.9])) < 1);
+});
+
+test('a compiled walk also shows the huts near it that its DOC page names, not others', () => {
+  const line = [[168.0, -44.9], [168.1, -44.9]];
+  const huts = [{ name: 'Mid Caples Hut', point: [168.02, -44.9] }, { name: 'Slip Flat Hut', point: [168.05, -44.9015] }, { name: 'Mokihinui Forks Hut', point: [168.07, -44.9] }];
+  const page = { s: [['Track', [['h', 'Goat Creek Hut to Mōkihinui Forks Hut']]]], h: [['Mid Caples Hut', 168.02, -44.9]] };
+  assert.deepEqual(walkHuts({ line, huts, page }).map((s) => s.hut.name), ['Mid Caples Hut', 'Mokihinui Forks Hut']);
 });
 
 test("the website lists the same huts as the app for every compiled walk with a DOC page", () => {

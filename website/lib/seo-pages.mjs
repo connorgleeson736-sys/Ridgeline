@@ -9,7 +9,7 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { gunzipSync } from 'node:zlib';
 import { join } from 'node:path';
-import { hutName, named, pageText, HUT_METERS } from '../src/js/core/walks.js';
+import { hutName, named, namedOnly, pageText, HUT_METERS } from '../src/js/core/walks.js';
 import { along } from '../src/js/core/geo.js';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -142,17 +142,20 @@ export function buildSeoPages({ here, appAssets, domain, mapHtml }) {
     w.huts = [];
     if (!w.lines.length) continue;
     const record = (compiled[w.guid]?.huts || []).filter((r) => Number.isFinite(r.lon) && Number.isFinite(r.lat));
+    const b = bbox(w.lines), m = 0.005;
+    const near = huts.filter((h) => { const [x, y] = h.point; return x >= b[0] - m && x <= b[2] + m && y >= b[1] - m && y <= b[3] + m && toLines(h.point, w.lines) <= HUT_METERS; }).map((hut) => ({ hut }));
+    const text = pageText(docPages[w.guid]);
     let list;
     if (record.length) {
       list = record.map((r) => {
         const at = [r.lon, r.lat], key = r.name.toLowerCase();
-        return huts.filter((h) => (hutName(h.name).toLowerCase() === key && metres(h.point, at) < 3000) || metres(h.point, at) < 150).sort((p, q) => metres(p.point, at) - metres(q.point, at))[0];
+        // The same name first ("Cedar Flat Hut", not "Historic Cedar Flat Hut" beside it), then the nearest within 150 m.
+        const byDistance = (list) => list.sort((p, q) => metres(p.point, at) - metres(q.point, at))[0];
+        return byDistance(huts.filter((h) => hutName(h.name).toLowerCase() === key && metres(h.point, at) < 3000)) || byDistance(huts.filter((h) => metres(h.point, at) < 150));
       }).filter(Boolean);
-    } else {
-      const b = bbox(w.lines), m = 0.005;
-      const near = huts.filter((h) => { const [x, y] = h.point; return x >= b[0] - m && x <= b[2] + m && y >= b[1] - m && y <= b[3] + m && toLines(h.point, w.lines) <= HUT_METERS; });
-      list = named(near.map((hut) => ({ hut })), pageText(docPages[w.guid])).map((s) => s.hut);
-    }
+      // Every hut DOC's page names near the line, as well as its links.
+      for (const s of namedOnly(near, text)) if (!list.some((h) => h === s.hut || metres(h.point, s.hut.point) < 150)) list.push(s.hut);
+    } else list = named(near, text).map((s) => s.hut);
     const main = w.lines.reduce((p, q) => (q.length > p.length ? q : p));
     for (const h of [...new Set(list)].sort((p, q) => along(main, p.point) - along(main, q.point))) { w.huts.push(h); h.walks.push(w); }
     w.length = length(w.lines);

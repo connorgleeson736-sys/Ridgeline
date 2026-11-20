@@ -156,14 +156,31 @@ export function named(list, text) {
 export function compiledStops(record, near, line) {
   const out = record.map(([name, lon, lat]) => {
     const point = [lon, lat];
-    return near.find((s) => meters(s.hut.point, point) < 150 || hutName(s.hut.name).toLowerCase() === String(name).toLowerCase())
+    // The same name first ("Cedar Flat Hut", not "Historic Cedar Flat Hut" 25 m away), then the nearest within 150 m.
+    const key = hutKey(hutName(name));
+    return near.find((s) => hutKey(hutName(s.hut.name)) === key)
+      || near.filter((s) => meters(s.hut.point, point) < 150).sort((p, q) => meters(p.hut.point, point) - meters(q.hut.point, point))[0]
       || { hut: { name, point }, along: line.length >= 2 ? alongLine(line, point) : 0 };
   });
   return out.sort((a, b) => a.along - b.along);
 }
-/** The huts along a walk, as the app shows them: a compiled walk's own (DOC's links),
- * otherwise the huts near its line that DOC's page names. */
+/** Only the `list` of stops DOC's page text names (none when it names none). */
+export function namedOnly(list, text) {
+  if (!text || !text.trim()) return [];
+  const words = hutWords(text);
+  return list.filter((s) => words.includes(hutWords(s.hut.name)));
+}
+/** The huts along a walk, as the app shows them. Every hut DOC names for the walk is
+ * shown: a compiled walk's own (DOC's links) and any other hut near its line that its DOC
+ * page names; any other walk, the huts near its line that its page names (all of them
+ * when it names none). Huts near the line DOC does not name are left out (Slip Flat Hut,
+ * beside the Greenstone Track but not on it). */
 export function walkHuts({ line, pieces = [], huts, page }) {
   const near = stops(line, huts, pieces);
-  return page?.h?.length ? compiledStops(page.h, near, line) : named(near, pageText(page));
+  const text = pageText(page);
+  if (!page?.h?.length) return named(near, text);
+  const own = compiledStops(page.h, near, line);
+  const same = (a, b) => meters(a.hut.point, b.hut.point) < 150 || hutKey(a.hut.name) === hutKey(b.hut.name);
+  const extra = namedOnly(near, text).filter((s) => !own.some((o) => same(o, s)));
+  return [...own, ...extra].sort((a, b) => a.along - b.along);
 }

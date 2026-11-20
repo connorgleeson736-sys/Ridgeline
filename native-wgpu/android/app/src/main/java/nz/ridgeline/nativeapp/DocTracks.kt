@@ -228,6 +228,12 @@ internal object DocTracks {
         val text=hutWords(page)
         return stops.filter{text.contains(hutWords(it.hut.name))}.ifEmpty{stops}
     }
+    /** Only the [stops] DOC's page names ([page]: its text); none when it names none. */
+    fun namedOnly(stops:List<Stop>,page:String):List<Stop>{
+        if(page.isBlank())return emptyList()
+        val text=hutWords(page)
+        return stops.filter{text.contains(hutWords(it.hut.name))}
+    }
     /** Longitude/latitude bounds of [line] grown by [meters]. */
     fun bounds(line:List<Coordinate>,meters:Double=HUT_METERS):DoubleArray?{
         if(line.isEmpty())return null

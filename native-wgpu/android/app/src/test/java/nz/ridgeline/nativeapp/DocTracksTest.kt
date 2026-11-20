@@ -82,4 +82,14 @@ class DocTracksTest {
         // A page naming none of them: all.
         assertEquals(4,DocTracks.named(near,"A walk up the valley.").size)
     }
+    /** Every hut a walk's DOC page names is kept beside its compiled huts (the Old Ghost
+     * Road's page names Mōkihinui Forks Hut; its links leave it out); a page naming none
+     * adds none. */
+    @Test fun hutsTheWalksPageNamesBesideItsLinks(){
+        fun stop(n:String,at:Double)=DocTracks.Stop(DocTracks.Hut(n,"","","",Coordinate(172.0,-41.6)),at)
+        val near=listOf(stop("Mōkihinui Forks Hut",60000.0),stop("Slip Flat Hut",52000.0))
+        assertEquals(listOf("Mōkihinui Forks Hut"),DocTracks.namedOnly(near,"Goat Creek Hut to Mokihinui Forks Hut Distance: 8 km").map{it.hut.name})
+        assertEquals(0,DocTracks.namedOnly(near,"A walk up the valley.").size)
+        assertEquals(0,DocTracks.namedOnly(near,"").size)
+    }
 }

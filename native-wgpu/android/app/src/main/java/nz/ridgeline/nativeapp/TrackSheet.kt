@@ -828,10 +828,18 @@ internal class TrackSheet(private val activity:Activity,private val root:FrameLa
     private var pageWords="";private var nearHuts=emptyList<DocTracks.Stop>()
     private fun showHuts(near:List<DocTracks.Stop>){
         nearHuts=near
-        // A compiled walk: exactly the huts DOC links as on it (details from DOC's hut
-        // data near the line where it has them).
-        val stops=recordHuts?.let{rh->rh.mapNotNull{h->near.firstOrNull{s->DocTracks.meters(s.hut.point,h.point)<150||DocTracks.hutName(s.hut.name).equals(h.name,true)}
-            ?:lineNow.takeIf{it.size>=2}?.let{l->DocTracks.Stop(DocTracks.Hut(h.name,"","","",h.point),DocTracks.along(l,h.point))}}.sortedBy{it.along}}
+        // Every hut DOC names for the walk is shown. A compiled walk: the huts DOC links
+        // as on it (details from DOC's hut data near the line: the same name first, as
+        // "Historic Cedar Flat Hut" stands beside "Cedar Flat Hut", then the nearest
+        // within 150 m), and any other hut near the line its page names. Any other walk:
+        // the huts near its line its page names (all of them when it names none).
+        val stops=recordHuts?.let{rh->
+            val own=rh.mapNotNull{h->val key=DocTracks.hutKey(DocTracks.hutName(h.name))
+                near.firstOrNull{s->DocTracks.hutKey(DocTracks.hutName(s.hut.name))==key}
+                    ?:near.filter{s->DocTracks.meters(s.hut.point,h.point)<150}.minByOrNull{s->DocTracks.meters(s.hut.point,h.point)}
+                    ?:lineNow.takeIf{it.size>=2}?.let{l->DocTracks.Stop(DocTracks.Hut(h.name,"","","",h.point),DocTracks.along(l,h.point))}}
+            val extra=DocTracks.namedOnly(near,pageWords).filter{s->own.none{o->DocTracks.meters(o.hut.point,s.hut.point)<150||DocTracks.hutKey(o.hut.name)==DocTracks.hutKey(s.hut.name)}}
+            (own+extra).distinctBy{DocTracks.hutKey(DocTracks.hutName(it.hut.name))}.sortedBy{it.along}}
             ?:DocTracks.named(near,pageWords)
         chart.markers=stops.map{it.along to DocTracks.hutName(it.hut.name)}
         huts.removeAllViews()
