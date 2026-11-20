@@ -34,7 +34,7 @@ def main():
                 ch = round(w * 630 / 1200); top = max(0, (h - ch) // 2)
                 im.crop((0, top, w, top + ch)).resize((1200, 630), Image.Resampling.LANCZOS).save(os.path.join(dst, 'og.jpg'), 'JPEG', quality=86, optimize=True)
         else:  # phone
-            short = {'walk-gillespie': 'walk', 'route-aspiring': 'route', 'route-aspiring-close': 'route'}.get(base, base)
+            short = {'walk-gillespie': 'walk', 'route-aspiring': 'route'}.get(base, base)
             save(im.resize((860, round(h * 860 / w)), Image.Resampling.LANCZOS), os.path.join(dst, short))
         print(base, im.size)
 

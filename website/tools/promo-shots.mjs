@@ -23,9 +23,8 @@ const DEFAULTS = { base: 'aerial', natural: true, threeD: true, relief: 1, names
 export const SCENES = {
   'hero-tongariro': { size: [1600, 900], view: '11.85/-39.136/175.634/232/60', settings: { relief: 1.6 } },
   'walk-gillespie': { size: [430, 932], view: '10.6/-44.2/169.1/0/55', open: ['walk', '515e0210-ba1a-4750-8297-a892aba9a23e'], after: '10.3/-44.205/169.1/-8/56' },
-  'route-aspiring': { size: [430, 932], view: '11.6/-44.4/168.7/10/60', route: 'mt-aspiring-via-bevan-col.gpx', after: '11.3/-44.397/168.70/14/58' },
-  'route-aspiring-close': { size: [430, 932], view: '12.4/-44.4/168.7/10/62', route: 'mt-aspiring-via-bevan-col.gpx', after: '12.32/-44.379/168.704/20/62', sheet: 'compact' },
-  'topo': { size: [430, 932], view: '12.8/-44.728/168.183/0/0', settings: { base: 'topo', threeD: false } },
+  'route-aspiring': { size: [430, 932], view: '11.6/-44.4/168.7/10/60', route: 'mt-aspiring-via-bevan-col.gpx', after: '11.65/-44.395/168.70/14/63' },
+  'topo': { size: [430, 932], view: '12.68/-44.729/168.186/0/0', settings: { base: 'topo', threeD: false } },
 };
 
 async function ready(page, quiet = 2500, limit = 240_000) {
