@@ -230,6 +230,8 @@ async function main() {
   if (promo) window.bushlinePromo = {
     walk: (guid) => openWalk(ctx, guid), teAraroa: (slug = null) => openTeAraroa(ctx, slug), sheet,
     route: (gpx) => planner.promoGpx(gpx),
+    // The hunting areas at a point (as a tap there opens them); false when none are loaded there yet.
+    hunting: (lng, lat) => { const areas = overlays.huntingAt({ lng, lat }); if (areas.length) openHunting(ctx, areas); return areas.length > 0; },
     // A view as in the address (zoom/lat/lng/bearing/pitch), set after a panel has framed its line.
     // Its centre in the middle of the map above an open panel, as the app frames it.
     view: (v) => {

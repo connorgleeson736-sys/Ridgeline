@@ -35,10 +35,35 @@ export const SCENES = {
       // High detail where it matters: the alpine crossing, John Tait Hut to West Sabine Hut.
       [3, 1.15, [-42.04, -41.972]],
     ] } },
+  // The app's offline maps (Region tab): the page frame over the flat map and the region panel.
+  'region': { size: [430, 932], view: '10.9/-43.66/170.12/0/0', settings: { threeD: false }, region: { name: 'Aoraki/Mount Cook', paper: [210, 297], zoom: 15 } },
+  // Hunting areas shaded over 3D terrain, one opened (its permit details).
+  'hunting': { size: [430, 932], view: '10.9/-39.21/176.0/30/58', settings: { hunting: true }, hunting: [176.0, -39.2], after: '10.9/-39.2/176.0/30/58' },
+  // A long Te Araroa section, its profile and notes open.
+  'te-araroa': { size: [430, 932], view: '10.2/-41.5/173.1/0/55', open: ['teAraroa', 'richmond-alpine-track'], after: '9.65/-41.6/173.18/-38/56' },
   'topo': { size: [430, 932], view: '12.68/-44.729/168.186/0/0', settings: { base: 'topo', threeD: false } },
 };
 
 // ---- The app's offline Paint tab, drawn over the map (as OfflineUi.kt and PaintedArea.kt) ----
+const PANEL_CSS = `
+      .op{position:fixed;left:0;right:0;bottom:0;z-index:50;background:#fbfaf5;border-radius:20px 20px 0 0;box-shadow:0 -4px 18px rgba(0,0,0,.25);padding:8px 12px 14px 16px;font:14px/1.3 Inter,system-ui,sans-serif;color:#1d2a24}
+      .op .top{display:flex;align-items:center;margin-bottom:8px}.op .tabs{display:flex;background:#ecebe4;border-radius:10px;padding:3px}
+      .op .tabs b,.op .tabs span{padding:7px 16px;border-radius:7px;font-size:13px}.op .tabs b{background:#1d2a24;color:#fbfaf5}.op .tabs span{color:#1d2a24}
+      .op .x{margin-left:auto;color:#6b746f;font-size:20px;padding:0 6px}
+      .op .chips{display:flex;gap:4px}.op .chip{flex:1;height:52px;border-radius:10px;background:#f0efe8;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11.5px;gap:5px}
+      .op .chip i{width:16px;height:16px;border-radius:50%}.op .chip.on{background:#fff;outline:2px solid #1d2a24}.op .chip.q{flex:0 0 36px;font-weight:700;font-size:15px}
+      .op .row{display:flex;gap:8px;margin-top:6px}.op .btn{flex:1;height:36px;border-radius:10px;border:1px solid #d6d4cb;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13.5px}
+      .op .info{font-size:12.5px;color:#4b5550;margin:8px 0}
+      .op .name{flex:1;border-bottom:1.5px solid #9aa39e;padding:10px 2px;font-size:14px}.op .dl{flex:0 0 116px;height:44px;border-radius:12px;background:#e8742c;color:#fff;font-weight:600;display:flex;align-items:center;justify-content:center}
+      `;
+const REGION_CSS = `
+      .op .row .sel{flex:1;height:40px;border-bottom:1.5px solid #9aa39e;display:flex;align-items:center;justify-content:space-between;padding:0 4px;font-size:14px}.op .row .sel:after{content:'▾';color:#6b746f;font-size:12px}
+      .op .name{border-bottom:1.5px solid #9aa39e;padding:10px 2px;font-size:14px;margin-top:2px}
+      .op .chk{display:flex;align-items:center;gap:10px;font-size:13px;margin:8px 0 2px}.op .chk i{width:18px;height:18px;border-radius:3px;background:#2f6b4f;color:#fff;font-style:normal;font-size:13px;display:flex;align-items:center;justify-content:center}.op .chk.off i{background:none;border:2px solid #6b746f;width:14px;height:14px}
+      .op .rg .row .btn,.op.rg .row .btn{height:44px}.op.rg .row .dl{flex:1;height:44px}
+      .op .fold{font-size:13px;color:#4b5550;margin-top:8px}
+      .rgf i{position:fixed;z-index:40;background:rgba(16,40,35,.27)}.rgf b{position:fixed;z-index:41;box-sizing:border-box;border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(18,32,35,.6),inset 0 0 0 1.5px rgba(18,32,35,.6)}
+      .rgf u{position:fixed;z-index:42;width:18px;height:18px;border-radius:50%;background:#fff;box-sizing:border-box;border:2px solid #1d2a24}`;
 const DETAILS = [13, 14, 15, 17], NAMES = ['Overview', 'Standard', 'Detailed', 'Maximum'];
 const COLORS = ['#e0503a', '#ef8a2b', '#e8c22e', '#3fae5a'];
 const merc = ([lng, lat]) => [(lng + 180) / 360, (1 - Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360)) / Math.PI) / 2];
@@ -99,31 +124,55 @@ async function paintOffline(page, spec) {
     return { type: 'Feature', properties: { color: COLORS[d] }, geometry: { type: 'Polygon', coordinates: [ring] } };
   });
   const { files, mb } = estimate(cells);
-  await page.evaluate(({ features, name, info, names, colors }) => {
+  await page.evaluate(({ features, css, name, info, names, colors }) => {
     const map = window.bushlineMap;
     map.addSource('promo-paint', { type: 'geojson', data: { type: 'FeatureCollection', features } });
     // As the app: painted cells at 150/255, no outline.
     map.addLayer({ id: 'promo-paint', type: 'fill', source: 'promo-paint', paint: { 'fill-color': ['get', 'color'], 'fill-opacity': 0.59, 'fill-antialias': false } });
     const panel = document.createElement('div');
-    panel.innerHTML = `<style>
-      .op{position:fixed;left:0;right:0;bottom:0;z-index:50;background:#fbfaf5;border-radius:20px 20px 0 0;box-shadow:0 -4px 18px rgba(0,0,0,.25);padding:8px 12px 14px 16px;font:14px/1.3 Inter,system-ui,sans-serif;color:#1d2a24}
-      .op .top{display:flex;align-items:center;margin-bottom:8px}.op .tabs{display:flex;background:#ecebe4;border-radius:10px;padding:3px}
-      .op .tabs b,.op .tabs span{padding:7px 16px;border-radius:8px;font-size:13px}.op .tabs b{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.15)}.op .tabs span{color:#6b746f}
-      .op .x{margin-left:auto;color:#6b746f;font-size:20px;padding:0 6px}
-      .op .chips{display:flex;gap:4px}.op .chip{flex:1;height:52px;border-radius:10px;background:#f0efe8;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11.5px;gap:5px}
-      .op .chip i{width:16px;height:16px;border-radius:50%}.op .chip.on{background:#fff;outline:2px solid #1d2a24}.op .chip.q{flex:0 0 36px;font-weight:700;font-size:15px}
-      .op .row{display:flex;gap:8px;margin-top:6px}.op .btn{flex:1;height:36px;border-radius:10px;border:1px solid #d6d4cb;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13.5px}
-      .op .info{font-size:12.5px;color:#4b5550;margin:8px 0}
-      .op .name{flex:1;border-bottom:1.5px solid #9aa39e;padding:10px 2px;font-size:14px}.op .dl{flex:0 0 116px;height:44px;border-radius:12px;background:#e8742c;color:#fff;font-weight:600;display:flex;align-items:center;justify-content:center}
-      </style><div class="op" data-promo-panel><div class="top"><div class="tabs"><b>Paint</b><span>Region</span></div><div class="x">✕</div></div>
+    panel.innerHTML = `<style>${css}</style><div class="op" data-promo-panel><div class="top"><div class="tabs"><b>Paint</b><span>Region</span></div><div class="x">✕</div></div>
       <div class="chips">${names.map((n, i) => `<div class="chip${i === 3 ? ' on' : ''}"><i style="background:${colors[i]}"></i>${n}</div>`).join('')}<div class="chip">Erase</div><div class="chip q">?</div></div>
       <div class="row"><div class="btn">Undo</div><div class="btn">Clear</div><div class="btn" style="flex:1.4">Along route</div></div>
       <div class="row"><div class="btn">Te Araroa…</div></div>
       <div class="info">${info}</div>
       <div class="row" style="align-items:center"><div class="name">${name}</div><div class="dl">Download</div></div></div>`;
     document.body.append(panel);
-  }, { features, name: spec.name, info: `About ${Math.round(mb)} MB · ${files.toLocaleString('en-NZ')} files`, names: NAMES, colors: COLORS });
+  }, { features, css: PANEL_CSS, name: spec.name, info: `About ${Math.round(mb)} MB · ${files.toLocaleString('en-NZ')} files`, names: NAMES, colors: COLORS });
   return { cells: cells.size, files, mb };
+}
+
+/** The app's Region tab over the map (OfflineUi.openTopo, RegionFrame): a page-shaped
+ * frame (84% of the map above the panel) with its corner handles, and the panel. */
+async function regionOffline(page, spec) {
+  const panelHtml = `<style>${PANEL_CSS}${REGION_CSS}</style><div class="op rg" data-promo-panel><div class="top"><div class="tabs"><span>Paint</span><b>Region</b></div><div class="x">✕</div></div>
+    <div class="row"><div class="sel">A4</div><div class="sel">Portrait</div></div>
+    <div class="name">${spec.name}</div>
+    <div class="row"><div class="sel">LINZ aerial</div><div class="sel">Zoom ${spec.zoom} · detailed</div></div>
+    <div class="chk"><i>✓</i>NZ Topo &amp; overlays</div>
+    <div class="info" id="rg-info"></div>
+    <div class="chk off"><i></i>Magnetic grid on PDF</div>
+    <div class="row"><div class="btn">Save as PDF</div><div class="dl">Download</div></div>
+    <div class="fold">Coordinates ›</div></div>`;
+  const box = await page.evaluate(({ html, paper }) => {
+    document.body.insertAdjacentHTML('beforeend', html);
+    const top = document.querySelector('[data-promo-panel]').getBoundingClientRect().top;
+    const W = innerWidth, aspect = paper[0] / paper[1];
+    const fw = Math.min(W * 0.84, top * 0.84 * aspect), fh = fw / aspect, l = (W - fw) / 2, t = (top - fh) / 2;
+    const f = document.createElement('div'); f.className = 'rgf';
+    f.innerHTML = `<i style="left:0;top:0;width:100%;height:${t}px"></i><i style="left:0;top:${t + fh}px;width:100%;height:${top - t - fh}px"></i><i style="left:0;top:${t}px;width:${l}px;height:${fh}px"></i><i style="left:${l + fw}px;top:${t}px;width:${W - l - fw}px;height:${fh}px"></i>
+      <b style="left:${l}px;top:${t}px;width:${fw}px;height:${fh}px"></b>${[[l, t], [l + fw, t], [l, t + fh], [l + fw, t + fh]].map(([x, y]) => `<u style="left:${x - 9}px;top:${y - 9}px"></u>`).join('')}`;
+    document.body.append(f);
+    const m = window.bushlineMap, a = m.unproject([l, t]), z = m.unproject([l + fw, t + fh]);
+    return [a.lng, z.lat, z.lng, a.lat];
+  }, { html: panelHtml, paper: spec.paper });
+  // Size and download as the app words them (regionEstimate: imagery and elevation to the detail zoom, overlays to 14).
+  const [w, s, e, n] = box, km = (dx, lat) => dx * 111.32 * Math.cos((lat * Math.PI) / 180);
+  const tx = (lng, z) => Math.floor(((lng + 180) / 360) * 2 ** z), ty = (lat, z) => Math.floor(((1 - Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360)) / Math.PI) / 2) * 2 ** z);
+  let tiles = 0;
+  for (let z = 0; z <= spec.zoom; z++) tiles += (tx(e, z) - tx(w, z) + 1) * (ty(s, z) - ty(n, z) + 1) * (z <= 14 ? 3 : 2);
+  const info = `${km(e - w, (s + n) / 2).toFixed(1)} × ${((n - s) * 110.57).toFixed(1)} km · about ${Math.round((tiles * 30) / 1024)} MB · ${tiles.toLocaleString('en-NZ')} files`;
+  await page.evaluate((t) => { document.getElementById('rg-info').textContent = t; }, info);
+  return info;
 }
 
 async function ready(page, quiet = 2500, limit = 240_000) {
@@ -150,6 +199,15 @@ for (const [name, scene] of Object.entries(SCENES)) {
   const t0 = Date.now();
   await page.goto(`${SITE}/?promo#${scene.view}`, { waitUntil: 'load' });
   await ready(page);
+  if (scene.hunting) {
+    // Hunting areas load with the view: tap (as a person would) once they are in.
+    let opened = false;
+    for (let i = 0; i < 30 && !opened; i++) { opened = await page.evaluate(([x, y]) => window.bushlinePromo.hunting(x, y), scene.hunting); if (!opened) await page.waitForTimeout(1000); }
+    if (!opened) console.log(name, 'no hunting area at', scene.hunting);
+    await page.waitForTimeout(3000);
+    if (scene.after) await page.evaluate((v) => window.bushlinePromo.view(v), scene.after);
+    await ready(page);
+  }
   if (scene.open || scene.route) {
     if (scene.open) await page.evaluate(([kind, arg]) => window.bushlinePromo[kind](arg), scene.open);
     else await page.evaluate((gpx) => window.bushlinePromo.route(gpx), readFileSync(new URL(`./promo-routes/${scene.route}`, import.meta.url), 'utf8'));
@@ -157,6 +215,11 @@ for (const [name, scene] of Object.entries(SCENES)) {
     await page.waitForTimeout(6000);
     if (scene.sheet) await page.evaluate((s) => window.bushlinePromo.sheet.size(s), scene.sheet);
     if (scene.after) { await page.waitForTimeout(1000); await page.evaluate((v) => window.bushlinePromo.view(v), scene.after); }
+    await ready(page);
+  }
+  if (scene.region) {
+    const info = await regionOffline(page, scene.region);
+    console.log(name, 'region:', info);
     await ready(page);
   }
   if (scene.offline) {
