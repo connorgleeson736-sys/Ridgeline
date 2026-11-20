@@ -194,3 +194,52 @@ test('shared route links whose polyline contains ~ open (old and new links)', as
   assert.equal(old.points.length, 4);
   assert.deepEqual(old.waypoints, [0, 3]);
 });
+
+// ---- Huts along a walk: the app's rules (TrackSheet.showHuts, DocTracks.named) ----
+import { hutName, named, pageText, compiledStops, walkHuts } from '../src/js/core/walks.js';
+import { gunzipSync } from 'node:zlib';
+
+test('hut names lose DOC asset codes, not historic notes', () => {
+  assert.equal(hutName('T3: South Ohau Hut'), 'South Ohau Hut');
+  assert.equal(hutName('Mintaro Hut (2021)'), 'Mintaro Hut');
+  assert.equal(hutName('Top Crooked Hut 3PM'), 'Top Crooked Hut');
+  assert.equal(hutName('Iron Gate Hut - 2019'), 'Iron Gate Hut');
+  assert.equal(hutName('Field Hut (H)'), 'Field Hut');
+  assert.equal(hutName('Hut (Historic 1949)'), 'Hut (Historic 1949)');
+});
+
+test('a walk shows only the huts near its line that its DOC page names', () => {
+  const line = [[168.0, -44.9], [168.1, -44.9]];
+  const hut = (name, x) => ({ name, point: [x, -44.9015] });
+  const huts = [hut('Mid Caples Hut', 168.02), hut('Slip Flat Hut', 168.05), hut('Greenstone Hut', 168.08)];
+  const page = { s: [['Huts', [['p', 'There are 3 DOC huts on this track:'], ['b', 'Mid Caples Hut'], ['b', 'Greenstone Hut'], ['i', 'Slip Flat Hut photo']]]] };
+  assert.deepEqual(walkHuts({ line, huts, page }).map((s) => s.hut.name), ['Mid Caples Hut', 'Greenstone Hut']);
+  // A page naming none of them: all the huts near the line.
+  assert.equal(walkHuts({ line, huts, page: { s: [['About', [['p', 'A valley walk.']]]] } }).length, 3);
+  assert.equal(named([], pageText(page)).length, 0);
+});
+
+test('a compiled walk shows exactly its own huts, in order along it', () => {
+  const line = [[168.0, -44.9], [168.1, -44.9]];
+  const near = [{ hut: { name: 'Slip Flat Hut', point: [168.05, -44.9015] }, along: 3900 }, { hut: { name: 'Greenstone Hut', point: [168.08, -44.9015], bunks: '20' }, along: 6300 }];
+  const out = compiledStops([['Greenstone Hut', 168.08, -44.9015], ['Mid Caples Hut', 168.02, -44.9]], near, line);
+  assert.deepEqual(out.map((s) => s.hut.name), ['Mid Caples Hut', 'Greenstone Hut']);
+  assert.equal(out[1].hut.bunks, '20', "DOC's hut details where the map has them");
+  assert.ok(Math.abs(out[0].along - meters(line[0], [168.02, -44.9])) < 1);
+});
+
+test("the website lists the same huts as the app for every compiled walk with a DOC page", () => {
+  const walksFile = fileURLToPath(new URL('../../native-wgpu/android/app/src/main/assets/walks/walks.json', import.meta.url));
+  const pagesFile = fileURLToPath(new URL('../data/walk-pages.json.gz', import.meta.url));
+  const compiled = JSON.parse(readFileSync(walksFile, 'utf8')).walks;
+  const pages = JSON.parse(gunzipSync(readFileSync(pagesFile)));
+  let checked = 0;
+  for (const [guid, w] of Object.entries(compiled)) {
+    const h = (w.huts || []).filter((x) => Number.isFinite(x.lon)).map((x) => [x.name, x.lon, x.lat]);
+    if (!h.length || !pages[guid]) continue;
+    const got = walkHuts({ line: [[h[0][1], h[0][2]], [h[0][1] + 0.01, h[0][2]]], huts: [], page: { ...pages[guid], h } }).map((s) => s.hut.name).sort();
+    assert.deepEqual(got, h.map((x) => x[0]).sort(), guid);
+    checked++;
+  }
+  assert.ok(checked > 100, `${checked} compiled walks checked`);
+});

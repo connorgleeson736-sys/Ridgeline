@@ -9,6 +9,8 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { gunzipSync } from 'node:zlib';
 import { join } from 'node:path';
+import { hutName, named, pageText, HUT_METERS } from '../src/js/core/walks.js';
+import { along } from '../src/js/core/geo.js';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const slugify = (s) => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'place';
@@ -132,17 +134,27 @@ export function buildSeoPages({ here, appAssets, domain, mapHtml }) {
   for (const w of walks.sort((a, b) => a.name.localeCompare(b.name))) { const n = walkSeen.get(w.slug) || 0; walkSeen.set(w.slug, n + 1); if (n) w.slug = `${w.slug}-${n + 1}`; }
   const walkUrl = (w) => `/walks/${w.slug}/`;
 
-  // Huts along each walk (within 250 m of its line), and walks at each hut.
+  // Huts along each walk, as the app and the map show them: a compiled walk's own
+  // (exactly the huts DOC's page links as on it); otherwise those within HUT_METERS of
+  // its line that its DOC page names. And the walks at each hut.
   for (const h of huts) h.walks = [];
   for (const w of walks) {
     w.huts = [];
     if (!w.lines.length) continue;
-    const b = bbox(w.lines), m = 0.005;
-    for (const h of huts) {
-      const [x, y] = h.point;
-      if (x < b[0] - m || x > b[2] + m || y < b[1] - m || y > b[3] + m) continue;
-      if (toLines(h.point, w.lines) <= 250) { w.huts.push(h); h.walks.push(w); }
+    const record = (compiled[w.guid]?.huts || []).filter((r) => Number.isFinite(r.lon) && Number.isFinite(r.lat));
+    let list;
+    if (record.length) {
+      list = record.map((r) => {
+        const at = [r.lon, r.lat], key = r.name.toLowerCase();
+        return huts.filter((h) => (hutName(h.name).toLowerCase() === key && metres(h.point, at) < 3000) || metres(h.point, at) < 150).sort((p, q) => metres(p.point, at) - metres(q.point, at))[0];
+      }).filter(Boolean);
+    } else {
+      const b = bbox(w.lines), m = 0.005;
+      const near = huts.filter((h) => { const [x, y] = h.point; return x >= b[0] - m && x <= b[2] + m && y >= b[1] - m && y <= b[3] + m && toLines(h.point, w.lines) <= HUT_METERS; });
+      list = named(near.map((hut) => ({ hut })), pageText(docPages[w.guid])).map((s) => s.hut);
     }
+    const main = w.lines.reduce((p, q) => (q.length > p.length ? q : p));
+    for (const h of [...new Set(list)].sort((p, q) => along(main, p.point) - along(main, q.point))) { w.huts.push(h); h.walks.push(w); }
     w.length = length(w.lines);
   }
   // Regions: DOC's region of the nearest hut (huts carry it; walks do not).

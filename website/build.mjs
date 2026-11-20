@@ -193,7 +193,15 @@ const pagesFile = join(here, 'data/walk-pages.json.gz');
 if (existsSync(pagesFile)) {
   const pages = JSON.parse(gunzipSync(readFileSync(pagesFile)));
   mkdirSync(join(data, 'walks'), { recursive: true });
-  for (const [guid, page] of Object.entries(pages)) if (/^[0-9a-f-]{36}$/.test(guid)) writeFileSync(join(data, 'walks', `${guid}.json`), JSON.stringify(page));
+  // A compiled walk's huts (exactly those DOC's page links as on it, as the app lists
+  // them) go with its page: h = [[name, lon, lat], …].
+  const compiledHuts = (guid) => (walks[guid]?.huts || []).filter((h) => Number.isFinite(h.lon) && Number.isFinite(h.lat)).map((h) => [h.name, h.lon, h.lat]);
+  for (const guid of new Set([...Object.keys(pages), ...Object.keys(walks)])) {
+    if (!/^[0-9a-f-]{36}$/.test(guid)) continue;
+    const h = compiledHuts(guid);
+    if (!pages[guid] && !h.length) continue;
+    writeFileSync(join(data, 'walks', `${guid}.json`), JSON.stringify(h.length ? { ...(pages[guid] || {}), h } : (pages[guid] || {})));
+  }
 }
 // Overview imagery (zooms 0-12, averaged from LINZ's zoom-13 aerial photography):
 // the same tiles as the app, served from the overview host, coarse ones with the site.

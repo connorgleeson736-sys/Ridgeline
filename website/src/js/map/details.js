@@ -4,7 +4,7 @@
 import { el, icon, distance, height, escape } from './ui.js';
 import { Chart, stats } from './chart.js';
 import { route as docRoute, stated } from '../core/docroute.js';
-import { stops, matchHut, guidOf } from '../core/walks.js';
+import { matchHut, guidOf, walkHuts } from '../core/walks.js';
 import { length, bounds, chain, nearestOn } from '../core/geo.js';
 import { legs } from '../core/docpages.js';
 import * as doc from './doc.js';
@@ -199,12 +199,13 @@ export function openWalk(ctx, guid, { push = false } = {}) {
         const link = docLink(info?.page || ctx.overlays.infos()[guid]?.page, 'DOC page ↗');
         if (link) actions.append(link);
         // Last: the Te Araroa sections it is part of, below DOC's sections and the buttons.
-        body.append(actions, ...[teAraroaLinks(ctx, line)].filter(Boolean), el('p', { class: 'fine' }, page ? 'From DOC’s page for this walk (CC BY 4.0). Check DOC for alerts and conditions before you go.' : DOC_NOTE));
+        body.append(actions, ...[teAraroaLinks(ctx, line)].filter(Boolean), el('p', { class: 'fine' }, page?.s ? 'From DOC’s page for this walk (CC BY 4.0). Check DOC for alerts and conditions before you go.' : DOC_NOTE));
         if (!profile) return;
-        // Huts along the way, on the profile and listed.
-        doc.hutsIn(bounds(line, 500), controller.signal).then((huts) => {
+        // Huts along the way, on the profile and listed: as the app, a compiled walk's
+        // own huts (DOC's links), otherwise the huts near DOC's line that its page names.
+        doc.hutsIn(bounds(line.concat(...paths), 500), controller.signal).then((huts) => {
           if (!alive()) return;
-          const along = stops(line, huts);
+          const along = walkHuts({ line, pieces: paths, huts, page });
           if (!along.length) return;
           profile.chart.setMarkers(along.map((h) => [h.along, h.hut.name]));
           hutsBox.append(el('h3', {}, 'Huts along the way'), el('ul', { class: 'hut-list' }, along.map((h) => el('li', {}, el('button', { type: 'button', onclick: () => openHut(ctx, h.hut.name, h.hut.point, { push: true }) }, el('span', { class: 'hut-dot' }), el('span', { class: 'hut-name' }, h.hut.name, el('small', {}, [h.hut.category, bunks(h.hut.bunks)].filter(Boolean).join(' · '))), el('span', { class: 'hut-km' }, distance(h.along)))))));

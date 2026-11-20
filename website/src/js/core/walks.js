@@ -1,7 +1,7 @@
 // DOC walks and huts: names, matching a map track to its DOC walk, and huts
 // beside a line (the Android app's DocWalks and DocTracks). Points are [lon, lat].
 import { normalize } from './search.js';
-import { meters, length, nearestOn, segment, lerp } from './geo.js';
+import { meters, length, nearestOn, segment, lerp, along as alongLine } from './geo.js';
 
 /** A section shows its own name instead of its walk's from this zoom. */
 export const CHILD_NAMES = 15;
@@ -98,12 +98,13 @@ export function matchHut(items, name, at, within = 250) {
   return by(items.filter((h) => hutKey(h.name) === key && meters(h.point, at) < 3000)) || by(items.filter((h) => meters(h.point, at) < within));
 }
 
-/** Huts within HUT_METERS of `line`, with how far along it they are, in order. */
-export function stops(line, huts) {
+/** Huts within HUT_METERS of `line` (or of any of `pieces`: all of DOC's line, side
+ * trips included), with how far along `line` they are, in order (the app's DocTracks.stops). */
+export function stops(line, huts, pieces = []) {
   const out = [];
   for (const h of huts) {
     const n = nearestOn(line, h.point);
-    if (n.d <= HUT_METERS) out.push({ hut: h, along: n.along });
+    if (n.d <= HUT_METERS || pieces.some((p) => p.length > 1 && nearestOn(p, h.point).d <= HUT_METERS)) out.push({ hut: h, along: n.along });
   }
   out.sort((a, b) => a.along - b.along);
   const seen = new Set();
@@ -118,4 +119,51 @@ export function characteristics(a) {
     if (name && value) out[name] = value;
   }
   return out;
+}
+
+// ---- Which huts a walk has: the app's rules (TrackSheet.showHuts, DocTracks.named) ----
+
+/** A hut's name without the codes in DOC's asset data ("T3: South Ohau Hut",
+ * "Mintaro Hut (2021)", "Top Crooked Hut 3PM", "Iron Gate Hut - 2019"); "(Historic)"
+ * and "(Old 1958)" are kept: they name an old hut beside the new (DocTracks.hutName). */
+export function hutName(name) {
+  const n = String(name || '').trim()
+    .replace(/^T\d+\s*:\s*/, '')
+    .replace(/\s*\((?![^)]*\b(?:historic|old|19\d\d)\b)[^)]*\)/gi, '')
+    .replace(/\s*\(\d{6}\)\s*\d{4}$/, '')
+    .replace(/\s+(?:-\s*)?(?:19|20)\d{2}$/, '')
+    .replace(/\s+\d+P[MO]$/, '')
+    .trim();
+  return n || String(name || '');
+}
+const hutWords = (text) => ` ${normalize(hutName(text)).replace(/\b(bivouac|bivvy|biv)\b/g, 'biv')} `;
+/** A walk's DOC page as the words the app searches for hut names (every block but images). */
+export function pageText(page) {
+  return (page?.s || []).map(([, blocks]) => (blocks || []).filter((b) => b[0] !== 'i').map((b) => b[1]).join(' ')).join(' ');
+}
+/** The `list` of stops DOC's page names in full ("There are 3 DOC huts on this track:
+ * Mid Caples Hut McKellar Hut Greenstone Hut" leaves out Slip Flat Hut, near the
+ * Greenstone Track but not on it); all of them when the page names none. */
+export function named(list, text) {
+  if (!text || !text.trim()) return list;
+  const words = hutWords(text);
+  const out = list.filter((s) => words.includes(hutWords(s.hut.name)));
+  return out.length ? out : list;
+}
+/** A compiled walk's huts (`record`: [name, lon, lat], exactly the huts DOC's page links
+ * as on it), each with DOC's hut details from `near` where it has them (same place or
+ * name), otherwise placed on `line` by its own point. */
+export function compiledStops(record, near, line) {
+  const out = record.map(([name, lon, lat]) => {
+    const point = [lon, lat];
+    return near.find((s) => meters(s.hut.point, point) < 150 || hutName(s.hut.name).toLowerCase() === String(name).toLowerCase())
+      || { hut: { name, point }, along: line.length >= 2 ? alongLine(line, point) : 0 };
+  });
+  return out.sort((a, b) => a.along - b.along);
+}
+/** The huts along a walk, as the app shows them: a compiled walk's own (DOC's links),
+ * otherwise the huts near its line that DOC's page names. */
+export function walkHuts({ line, pieces = [], huts, page }) {
+  const near = stops(line, huts, pieces);
+  return page?.h?.length ? compiledStops(page.h, near, line) : named(near, pageText(page));
 }
