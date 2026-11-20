@@ -1,7 +1,8 @@
 //! Asynchronous per-label terrain visibility for CPU collision placement.
-//! A tiny pass after the main pass tests every candidate label's anchor against
-//! this frame's depth (label_probe.wgsl); the 512 x 1 result is copied to a
-//! mappable buffer and read back without stalling, a few frames later.
+//! A tiny pass after the main pass reads every candidate label's smoothed
+//! terrain state (label_fade.wgsl, the same state the labels are drawn with;
+//! label_probe.wgsl); the 512 x 1 result is copied to a mappable buffer and
+//! read back without stalling, a few frames later.
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU8, Ordering};
 
@@ -15,12 +16,15 @@ const READY: u8 = 2;
 pub(crate) struct Point {
     pub anchor: [f32; 3],
     pub index: f32,
+    /// The label's state slot (labels::SLOTS; negative: none).
+    pub slot: f32,
 }
 
 pub(crate) struct LabelProbe {
     pipeline: wgpu::RenderPipeline,
     scene: wgpu::BindGroup,
-    depth_binds: Vec<wgpu::BindGroup>,
+    /// One bind per label state texture (labels read the one written this frame).
+    state_binds: Vec<wgpu::BindGroup>,
     target: wgpu::Texture,
     readback: wgpu::Buffer,
     points: wgpu::Buffer,
@@ -46,9 +50,9 @@ impl LabelProbe {
                 module: &shader,
                 entry_point: Some("vs"),
                 buffers: &[Some(wgpu::VertexBufferLayout {
-                    array_stride: 16,
+                    array_stride: 20,
                     step_mode: wgpu::VertexStepMode::Vertex,
-                    attributes: &wgpu::vertex_attr_array![0=>Float32x3,1=>Float32],
+                    attributes: &wgpu::vertex_attr_array![0=>Float32x3,1=>Float32,2=>Float32],
                 })],
                 compilation_options: Default::default(),
             },
@@ -101,14 +105,14 @@ impl LabelProbe {
         });
         let points = device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("label probe anchors"),
-            size: (MAX * 16) as u64,
+            size: (MAX * 20) as u64,
             usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
             mapped_at_creation: false,
         });
         Self {
             pipeline,
             scene,
-            depth_binds: Vec::new(),
+            state_binds: Vec::new(),
             target,
             readback,
             points,
@@ -119,30 +123,17 @@ impl LabelProbe {
         }
     }
 
-    pub fn set_depths(&mut self, device: &wgpu::Device, depths: &[wgpu::Texture]) {
-        let compare = device.create_sampler(&wgpu::SamplerDescriptor {
-            label: Some("label probe occlusion"),
-            compare: Some(wgpu::CompareFunction::LessEqual),
-            ..Default::default()
-        });
-        self.depth_binds = depths
+    pub fn set_states(&mut self, device: &wgpu::Device, states: &[wgpu::Texture]) {
+        self.state_binds = states
             .iter()
-            .map(|depth| {
+            .map(|state| {
                 device.create_bind_group(&wgpu::BindGroupDescriptor {
-                    label: Some("label probe depth"),
+                    label: Some("label probe state"),
                     layout: &self.pipeline.get_bind_group_layout(1),
-                    entries: &[
-                        wgpu::BindGroupEntry {
-                            binding: 0,
-                            resource: wgpu::BindingResource::TextureView(
-                                &depth.create_view(&Default::default()),
-                            ),
-                        },
-                        wgpu::BindGroupEntry {
-                            binding: 1,
-                            resource: wgpu::BindingResource::Sampler(&compare),
-                        },
-                    ],
+                    entries: &[wgpu::BindGroupEntry {
+                        binding: 0,
+                        resource: wgpu::BindingResource::TextureView(&state.create_view(&Default::default())),
+                    }],
                 })
             })
             .collect();
@@ -171,13 +162,13 @@ impl LabelProbe {
     /// Whether a new probe may start this frame (none in flight, ~15 per second).
     pub fn due(&self) -> bool {
         self.state.load(Ordering::Acquire) == IDLE
-            && !self.depth_binds.is_empty()
+            && !self.state_binds.is_empty()
             && self
                 .last
                 .is_none_or(|t| t.elapsed() >= std::time::Duration::from_millis(66))
     }
 
-    /// Encode a probe of [points] against depth slot [slot] (written this frame).
+    /// Encode a probe of [points] reading label state texture [slot] (written this frame).
     pub fn encode(
         &mut self,
         queue: &wgpu::Queue,
@@ -187,7 +178,7 @@ impl LabelProbe {
         generation: u64,
     ) -> bool {
         let count = points.len().min(MAX);
-        let Some(depth) = self.depth_binds.get(slot) else {
+        let Some(state) = self.state_binds.get(slot) else {
             return false;
         };
         if count == 0 {
@@ -214,7 +205,7 @@ impl LabelProbe {
             });
             pass.set_pipeline(&self.pipeline);
             pass.set_bind_group(0, &self.scene, &[]);
-            pass.set_bind_group(1, depth, &[]);
+            pass.set_bind_group(1, state, &[]);
             pass.set_vertex_buffer(0, self.points.slice(..));
             pass.draw(0..count as u32, 0..1);
         }

@@ -180,10 +180,21 @@ pub struct Renderer {
     label_anchor: [f64; 2],
     /// New-candidate batches keep the shown labels until their placement arrives.
     labels_stale: bool,
-    label_born: HashMap<(i64, i64), f32>,
-    label_seen: HashMap<(i64, i64), f32>,
     label_heights: HashMap<(i64, i64), f32>,
     label_fade_until: f32,
+    /// Each label identity's terrain state slot on the GPU (labels.rs).
+    label_slots: HashMap<labels::Ident, u16>,
+    /// Per candidate: its identity, its slot (-1: none), and back.
+    label_idents: Vec<labels::Ident>,
+    label_sprite_slots: Vec<i32>,
+    label_by_ident: HashMap<labels::Ident, usize>,
+    /// The labels in the drawn batch (placed or fading out).
+    label_drawn: Vec<labels::Drawn>,
+    label_drawn_revision: u64,
+    /// Slots given to new labels whose state the next fade pass starts afresh.
+    label_fresh: HashSet<u16>,
+    fade_points_key: Option<(u64, u64, [u64; 2], u64)>,
+    fade_points_at: f32,
     label_clock: std::time::Instant,
     labels_dirty: bool,
     inspection_gpu: routes::RouteGpu,
@@ -618,7 +629,8 @@ impl Renderer {
         let labels_gpu = labels::LabelGpu::new(&device, &queue, format);
         let sky_gpu = sky::SkyGpu::new(&device, format);
         let blit = resolution::Blit::new(&device, format);
-        let label_probe = label_probe::LabelProbe::new(&device, &labels_gpu.uniform);
+        let mut label_probe = label_probe::LabelProbe::new(&device, &labels_gpu.uniform);
+        label_probe.set_states(&device, labels_gpu.states());
         let mut renderer = Self {
             plane: None,
             interiors: Default::default(),
@@ -686,10 +698,17 @@ impl Renderer {
             label_selection: vec![],
             label_anchor: [0.5, 0.5],
             labels_stale: false,
-            label_born: HashMap::new(),
-            label_seen: HashMap::new(),
             label_heights: HashMap::new(),
             label_fade_until: 0.,
+            label_slots: HashMap::new(),
+            label_idents: Vec::new(),
+            label_sprite_slots: Vec::new(),
+            label_by_ident: HashMap::new(),
+            label_drawn: Vec::new(),
+            label_drawn_revision: 0,
+            label_fresh: HashSet::new(),
+            fade_points_key: None,
+            fade_points_at: 0.,
             label_clock: std::time::Instant::now(),
             labels_dirty: false,
             inspection_gpu,
@@ -885,7 +904,6 @@ impl Renderer {
     fn bind_label_depths(&mut self) {
         let depths = [self.depth.clone(), self.depth_previous.clone()];
         self.labels_gpu.set_depths(&self.device, &depths);
-        self.label_probe.set_depths(&self.device, &depths);
         self.label_probe_key = None;
     }
     /// Terrain visibility of every current label candidate (255 visible, 0
@@ -1215,6 +1233,8 @@ impl Renderer {
         if self.route_upload.is_some()
             || self.overlay.pending
             || self.label_clock.elapsed().as_secs_f32() < self.label_fade_until
+            // Labels' smoothed terrain visibility settling after the camera stopped.
+            || !self.label_sprites.is_empty() && self.label_clock.elapsed().as_secs_f32() < self.labels_gpu.settle_until
             || self.route_dirty
             || self.labels_dirty
             || self.inspection_dirty
@@ -1833,6 +1853,8 @@ impl Renderer {
         // previous frame's depth is valid (written late, labels were hidden one
         // extra frame after every gap, and could stay hidden once the map stopped).
         let labels_visible = self.labels_gpu.visible();
+        // The fade pass reads the previous frame's depth whenever there are candidates.
+        let keep_depth = labels_visible || !self.label_sprites.is_empty();
         self.labels_gpu.begin_frame(1 - self.depth_slot, self.depth_previous_stored);
         self.labels_missed = labels_visible && !self.depth_previous_stored;
         self.labels_gpu.camera(
@@ -2135,6 +2157,14 @@ impl Renderer {
         // Alternate depth textures: this frame writes one, labels read the other
         // (stored by the previous frame), so labels stay in the main pass.
         let depth = self.depth.create_view(&Default::default());
+        // Every label's terrain visibility, smoothed from the last frame's, before
+        // the main pass draws the labels with it.
+        if !self.label_sprites.is_empty() || labels_visible {
+            self.update_fade_points();
+            if self.labels_gpu.encode_fade(&mut encoder, 1 - self.depth_slot) {
+                self.faded();
+            }
+        }
         // Probe candidate visibility when the camera, labels or terrain changed.
         let wanted_key = (!self.label_sprites.is_empty())
             .then(|| {
@@ -2144,8 +2174,12 @@ impl Renderer {
                     self.drawn_triangles as u64 ^ ((rows.len() as u64) << 40) ^ self.cover_revision,
                 )
             })
-            .filter(|key| Some(*key) != self.label_probe_key);
-        let probe_key = wanted_key.filter(|_| self.label_probe.due());
+            // While the smoothed visibility settles, the same view probes again.
+            .filter(|key| Some(*key) != self.label_probe_key || self.label_clock.elapsed().as_secs_f32() < self.labels_gpu.settle_until);
+        // Only once the labels' smoothed state is known (the fade pass had the
+        // previous frame's depth): a probe before that read every label hidden.
+        let state_known = self.labels_gpu.state_known();
+        let probe_key = wanted_key.filter(|_| self.label_probe.due() && state_known);
         self.label_probe_wanted = wanted_key.is_some() && probe_key.is_none();
         let scene_target = self
             .offscreen
@@ -2179,7 +2213,7 @@ impl Renderer {
                     depth_ops: Some(wgpu::Operations {
                         load: wgpu::LoadOp::Clear(1.),
                         // Kept only when labels or the visibility probe read it.
-                        store: if labels_visible || probe_key.is_some() { wgpu::StoreOp::Store } else { wgpu::StoreOp::Discard },
+                        store: if keep_depth || probe_key.is_some() { wgpu::StoreOp::Store } else { wgpu::StoreOp::Discard },
                     }),
                     stencil_ops: None,
                 }),
@@ -2285,16 +2319,17 @@ impl Renderer {
                         height * scale,
                     ],
                     index: i as f32,
+                    slot: self.label_sprite_slots.get(i).copied().unwrap_or(-1) as f32,
                 });
             }
-            probing = self.label_probe.encode(&self.queue, &mut encoder, &points, self.depth_slot, self.label_generation);
+            probing = self.label_probe.encode(&self.queue, &mut encoder, &points, self.labels_gpu.state_slot, self.label_generation);
             if probing {
                 self.label_probe_key = Some(key);
             }
         }
         std::mem::swap(&mut self.depth, &mut self.depth_previous);
         self.depth_slot = 1 - self.depth_slot;
-        self.depth_previous_stored = labels_visible;
+        self.depth_previous_stored = keep_depth;
         self.pending_frames
             .fetch_add(1, std::sync::atomic::Ordering::Release);
         self.queue.submit(
